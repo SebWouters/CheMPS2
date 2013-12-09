@@ -1,0 +1,7 @@
+mycompilation
+build
+Build
+objects
+*~
+*.o
+*.swp
