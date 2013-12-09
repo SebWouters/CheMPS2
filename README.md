@@ -216,8 +216,8 @@ to
   ```include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/ "/h5incl/")```
 in ```./CheMPS2/CMakeLists.txt```, where ```/h5incl/``` is the absolute path
 of the folder containing hdf5.h. The required BLAS, LAPACK and GSL functions
-are defined in ```./CheMPS2/include/Lapack.h``` and
-```./CheMPS2/include/Gsl.h```.
+are defined in ```./CheMPS2/include/Lapack.h```
+and ```./CheMPS2/include/Gsl.h```. 
 
 ### 3. Libraries 
 
