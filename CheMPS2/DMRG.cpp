@@ -17,6 +17,10 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+/*! \mainpage
+ * \verbinclude ../README.md
+ */
+
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
