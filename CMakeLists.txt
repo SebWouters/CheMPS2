@@ -1,17 +1,37 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
 project (CheMPS2)
 
-option (INTELCOMPILER "Compile with the intel compiler" ON)
-option (BUILD_DOCUMENTATION "Use Doxygen to create a PDF manual" ON)
+option (MKL "Compile using the MKL" OFF)
+
+
+option (BUILD_DOCUMENTATION "Use Doxygen to create a HTML/PDF manual" OFF)
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
-if (INTELCOMPILER)
-   set (CMAKE_CXX_COMPILER icpc)
-   set (CMAKE_CXX_FLAGS "-g -Wall -openmp -xHost -ipo")
-else (INTELCOMPILER)
-   set (CMAKE_CXX_COMPILER g++)
-   set (CMAKE_CXX_FLAGS "-g -Wall -fopenmp -O3")
-endif (INTELCOMPILER)
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
+include(CheckCXXCompilerFlag)
+
+
+check_cxx_compiler_flag(-xHost HAS_XHOST)
+check_cxx_compiler_flag(-march=native HAS_MARCH_NATIVE)
+
+if (HAS_XHOST)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xHost")
+elseif (HAS_MARCH_NATIVE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif()
+
+
+check_cxx_compiler_flag(-ipo HAS_IPO)
+if (HAS_IPO)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2")
 
 add_subdirectory (CheMPS2)
 add_subdirectory (tests)
@@ -24,5 +44,4 @@ if (BUILD_DOCUMENTATION)
    configure_file (${CheMPS2_SOURCE_DIR}/CheMPS2/Doxyfile.in ${CheMPS2_BINARY_DIR}/Doxyfile  @ONLY IMMEDIATE)
    add_custom_target (doc COMMAND ${DOXYGEN_EXECUTABLE} ${CheMPS2_BINARY_DIR}/Doxyfile SOURCES ${CheMPS2_BINARY_DIR}/Doxyfile)
 endif (BUILD_DOCUMENTATION)
-
 

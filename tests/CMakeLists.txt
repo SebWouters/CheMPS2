@@ -15,5 +15,3 @@ target_link_libraries (test3 CheMPS2)
 target_link_libraries (test4 CheMPS2)
 target_link_libraries (test5 CheMPS2)
 target_link_libraries (test6 CheMPS2)
-
-
