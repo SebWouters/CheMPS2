@@ -18,7 +18,7 @@
 */
 
 /*! \mainpage
- * \verbinclude ../README.md
+ * \verbinclude README.md
  */
 
 #include <math.h>
