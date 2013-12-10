@@ -1,3 +1,5 @@
+![CheMPS2 Logo](../../blob/master/CheMPS2/CheMPS2logo.png?raw=true)
+
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
 ==============================================================================
 
