@@ -1,3 +1,5 @@
+![CheMPS2 Logo](../../blob/master/CheMPS2/CheMPS2logo.png?raw=true)
+
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
 ==============================================================================
 
@@ -27,7 +29,7 @@ To acknowledge CheMPS2, please cite
    CheMPS2: a free open-source spin-adapted implementation of the density
             matrix renormalization group for ab initio quantum chemistry,
    Submitted to Computer Physics Communications,
-   arXiv:1312.2415
+   [arXiv:1312.2415](http://arxiv.org/abs/1312.2415)
 
         @article{CheMPS2cite1,
             author = {Sebastian Wouters and Ward Poelmans and Paul W. Ayers and Dimitri {Van Neck}},
@@ -43,7 +45,7 @@ To acknowledge CheMPS2, please cite
    Longitudinal static optical properties of hydrogen chains: Finite field
                 extrapolations of matrix product state calculations,
    The Journal of Chemical Physics 136, 134110 (2012),
-   doi:10.1063/1.3700087
+   [doi:10.1063/1.3700087](http://dx.doi.org/10.1063/1.3700087)
 
         @article{CheMPS2cite2,
             author = {Sebastian Wouters and Peter A. Limacher and Dimitri {Van Neck} and Paul W. Ayers},
