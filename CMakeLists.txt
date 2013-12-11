@@ -1,37 +1,40 @@
-cmake_minimum_required (VERSION 2.8)
 project (CheMPS2)
 
 option (MKL "Compile using the MKL" OFF)
 
+if(MKL)
+    cmake_minimum_required (VERSION 2.8.11)
+else(MKL)
+    cmake_minimum_required (VERSION 2.8)
+endif(MKL)
 
 option (BUILD_DOCUMENTATION "Use Doxygen to create a HTML/PDF manual" OFF)
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
-find_package(OpenMP)
+find_package (OpenMP)
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+endif (OPENMP_FOUND)
 
-include(CheckCXXCompilerFlag)
+include (CheckCXXCompilerFlag)
 
-
-check_cxx_compiler_flag(-xHost HAS_XHOST)
-check_cxx_compiler_flag(-march=native HAS_MARCH_NATIVE)
+check_cxx_compiler_flag (-xHost HAS_XHOST)
+check_cxx_compiler_flag (-march=native HAS_MARCH_NATIVE)
 
 if (HAS_XHOST)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xHost")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -xHost")
 elseif (HAS_MARCH_NATIVE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-endif()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+endif ()
 
+check_cxx_compiler_flag (-ipo HAS_IPO)
 
-check_cxx_compiler_flag(-ipo HAS_IPO)
 if (HAS_IPO)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-endif()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
+endif (HAS_IPO)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2")
 
 add_subdirectory (CheMPS2)
 add_subdirectory (tests)

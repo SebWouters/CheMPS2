@@ -189,17 +189,24 @@ Now, replace the file ```mointegrals.cc``` with either:
    binary form with HDF5. See the Doxygen manual for more information on
    CheMPS2::Hamiltonian.
 
-Run
+For case 2, the ```Makefile``` should be adjusted. Replace
+    ```$(PSILIBS)```
+with
+    ```$(PSILIBS) -L${CheMPS2_BINARY_DIR}/CheMPS2/ -lCheMPS2```
+and replace
+    ```$(CXXINCLUDE)```
+with
+    ```$(CXXINCLUDE) -I${CheMPS2_SOURCE_DIR}/CheMPS2/include/```
+
+To compile the Psi4 plugin, run:
 
     > make
-    
-to build the Psi4 plugin.
 
 
 Build
 -----
 
-### 1. CMake
+### 1. Build CheMPS2 with CMake
 
 CheMPS2 can be build with CMake. The files
 
@@ -207,43 +214,29 @@ CheMPS2 can be build with CMake. The files
     ./CheMPS2/CMakeLists.txt
     ./tests/CMakeLists.txt
 
-provide a minimal compilation.
-
-### 2. Include
-
-To compile the library, the local HDF5 include path is needed. If CMake
-does not find it automatically, change
-  ```include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/)```
-to
-  ```include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/ "/h5incl/")```
-in ```./CheMPS2/CMakeLists.txt```, where ```/h5incl/``` is the absolute path
-of the folder containing hdf5.h. The required BLAS, LAPACK and GSL functions
-are defined in ```./CheMPS2/include/Lapack.h```
-and ```./CheMPS2/include/Gsl.h```. 
-
-### 3. Libraries 
-
-To link the CheMPS2 library to BLAS, LAPACK, GSL and HDF5, their local
-library paths are needed. If CMake does not find them automatically, change
-  ```link_directories ($ENV{LD_LIBRARY_PATH})```
-to
-  ```link_directories ($ENV{LD_LIBRARY_PATH} "/path1/" "/path2/")```
-in ```./CheMPS2/CMakeLists.txt```, where ```/path1/``` and ```/path2/``` (add
-as many as required) are the absolute paths of the folders containing the
-libraries.
-
-### 4. Build CheMPS2
-
-Building with CMake (start in ```./```):
+provide a minimal compilation. Start in ```./``` and run:
 
     > mkdir build
-    > cd build/
-    > cmake ..
+    > cd build
+    
+CMake generates makefiles based on the user's specifications:
+
+    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    
+Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
+Option2 can be ```ON``` or ```OFF``` and is used to switch on the
+intel math kernel library.
+Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
+documentation.
+
+To compile, run:
+
     > make
 
-### 5. Testing CheMPS2
 
-To test CheMPS2 (start in ```./build```):
+### 2. Testing CheMPS2
+
+To test CheMPS2, start in ```./build```, and run:
 
     > cd tests/
     > ./test1
@@ -256,15 +249,17 @@ To test CheMPS2 (start in ```./build```):
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).
 
-### 6. Doxygen
+### 3. Doxygen documentation
 
-To build and view the Doxygen manual (start in ```./build```):
+To build and view the Doxygen manual, the documentation flag should have
+been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
 
-    > cmake .. -DBUILD_DOCUMENTATION=ON
     > make doc
-    > cd LaTeX-documents/
+    > cd LaTeX-documents
     > make
     > evince refman.pdf &
+    > cd ../html
+    > firefox index.html &
 
 
 User manual
