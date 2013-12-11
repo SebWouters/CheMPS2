@@ -260,6 +260,7 @@ They only require a very limited amount of memory (order 10-100 MB).
 
 To build and view the Doxygen manual (start in ```./build```):
 
+    > cmake .. -DBUILD_DOCUMENTATION=ON
     > make doc
     > cd LaTeX-documents/
     > make
