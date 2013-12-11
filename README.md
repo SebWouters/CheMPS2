@@ -266,7 +266,7 @@ User manual
 -----------
 
 Doxygen output can be generated, see the section "Build" in README, or
-[Doxygen html output](http://sebwouters.github.io/CheMPS2/index.html)
+the [Doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
 
 For a more concise overview of the concepts and ideas used in CheMPS2,
 please read the code release paper "CheMPS2: a free open-source spin-adapted
