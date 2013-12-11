@@ -1,0 +1,294 @@
+\hypertarget{classCheMPS2_1_1TensorDiag}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-Diag Class Reference}
+\label{classCheMPS2_1_1TensorDiag}\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-Diag.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-Diag\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{classCheMPS2_1_1TensorDiag__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-Diag\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1TensorDiag__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorDiag_ab9473592e2028e2bd126e4c957f78de0}{Tensor\-Diag} (const int index\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorDiag_a1f5af4c0e7231a3b902d21f398f9d063}{\hyperlink{classCheMPS2_1_1TensorDiag_a1f5af4c0e7231a3b902d21f398f9d063}{$\sim$\-Tensor\-Diag} ()}\label{classCheMPS2_1_1TensorDiag_a1f5af4c0e7231a3b902d21f398f9d063}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorDiag_a8a92bb9cd8a81fbb0231a6dbfdd92a99}{g\-N\-Kappa} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of symmetry blocks. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorDiag_a7fb7bbec47e601be89ffba3ad3736ca7}{g\-Storage} ()
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorDiag_afe58c4ad11406778d2db5ae9605f9953}{g\-Kappa} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2) const 
+\begin{DoxyCompactList}\small\item\em Get the index corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorDiag_a294cca82527b6893a80e47336edf1952}{g\-Kappa2index} (const int kappa) const 
+\begin{DoxyCompactList}\small\item\em Get the storage jump corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorDiag_af06189fc46ecd5836b53dbd265ba75fd}{g\-Storage} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2)
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage of a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorDiag_a1902295ffebe5ce6d10291756a784d27}{g\-Index} () const 
+\begin{DoxyCompactList}\small\item\em Get the location index. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 15, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} class is a storage class for boundary tensors that are entirely block-\/diagonal\-:
+\begin{DoxyItemize}
+\item the L and R parts of the L\-Q and Q\-R decompositions of \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T}
+\item the storage part of \hyperlink{classCheMPS2_1_1TensorX}{Tensor\-X} 
+\end{DoxyItemize}
+
+Definition at line 34 of file Tensor\-Diag.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorDiag_ab9473592e2028e2bd126e4c957f78de0}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!Tensor\-Diag@{Tensor\-Diag}}
+\index{Tensor\-Diag@{Tensor\-Diag}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{Tensor\-Diag}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-Diag\-::\-Tensor\-Diag (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorDiag_ab9473592e2028e2bd126e4c957f78de0}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 22 of file Tensor\-Diag.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorDiag_ab9473592e2028e2bd126e4c957f78de0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorDiag_a1902295ffebe5ce6d10291756a784d27}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-Index@{g\-Index}}
+\index{g\-Index@{g\-Index}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-Index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_a1902295ffebe5ce6d10291756a784d27}
+
+
+Get the location index. 
+
+\begin{DoxyReturn}{Returns}
+the index 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a5af7779b53e54e506a1d569a723fdd11}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 99 of file Tensor\-Diag.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorDiag_afe58c4ad11406778d2db5ae9605f9953}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-Kappa@{g\-Kappa}}
+\index{g\-Kappa@{g\-Kappa}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-Kappa (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_afe58c4ad11406778d2db5ae9605f9953}
+
+
+Get the index corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The left or up particle number sector \\
+\hline
+{\em Two\-S1} & The left or up spin symmetry sector \\
+\hline
+{\em I1} & The left or up irrep sector \\
+\hline
+{\em N2} & The right or down particle number sector \\
+\hline
+{\em Two\-S2} & The right or down spin symmetry sector \\
+\hline
+{\em I2} & The right or down irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The kappa corresponding to the input parameters; -\/1 means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a3d8493380e00a9548267a79dae7e5567}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 77 of file Tensor\-Diag.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorDiag_a294cca82527b6893a80e47336edf1952}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-Kappa2index@{g\-Kappa2index}}
+\index{g\-Kappa2index@{g\-Kappa2index}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-Kappa2index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-Kappa2index (
+\begin{DoxyParamCaption}
+\item[{const int}]{kappa}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_a294cca82527b6893a80e47336edf1952}
+
+
+Get the storage jump corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em kappa} & The symmetry block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+kappa2index\mbox{[}kappa\mbox{]}, the memory jumper to a certain block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_adc93c318803791bef7286dfea3b135c0}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 89 of file Tensor\-Diag.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorDiag_a8a92bb9cd8a81fbb0231a6dbfdd92a99}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-N\-Kappa@{g\-N\-Kappa}}
+\index{g\-N\-Kappa@{g\-N\-Kappa}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-N\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-N\-Kappa (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_a8a92bb9cd8a81fbb0231a6dbfdd92a99}
+
+
+Get the number of symmetry blocks. 
+
+\begin{DoxyReturn}{Returns}
+The number of symmetry blocks 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_ad68f65759e764c6cb55e2b8db18f8874}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 73 of file Tensor\-Diag.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorDiag_a7fb7bbec47e601be89ffba3ad3736ca7}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-Storage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_a7fb7bbec47e601be89ffba3ad3736ca7}
+
+
+Get the pointer to the storage. 
+
+return pointer to the storage 
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a2f17a5413447e77ad3f128d49b3ca676}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 75 of file Tensor\-Diag.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorDiag_a7fb7bbec47e601be89ffba3ad3736ca7_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorDiag_af06189fc46ecd5836b53dbd265ba75fd}{\index{Che\-M\-P\-S2\-::\-Tensor\-Diag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorDiag@{Che\-M\-P\-S2\-::\-Tensor\-Diag}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-Diag\-::g\-Storage (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorDiag_af06189fc46ecd5836b53dbd265ba75fd}
+
+
+Get the pointer to the storage of a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The left or up particle number sector \\
+\hline
+{\em Two\-S1} & The left or up spin symmetry sector \\
+\hline
+{\em I1} & The left or up irrep sector \\
+\hline
+{\em N2} & The right or down particle number sector \\
+\hline
+{\em Two\-S2} & The right or down spin symmetry sector \\
+\hline
+{\em I2} & The right or down irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to the storage of the specified tensor block; N\-U\-L\-L means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a4335fc5fb5892a7386820c72b769f157}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 91 of file Tensor\-Diag.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-Diag.\-h\item 
+Tensor\-Diag.\-cpp\end{DoxyCompactItemize}

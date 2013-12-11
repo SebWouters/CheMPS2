@@ -1,0 +1,656 @@
+\hypertarget{classCheMPS2_1_1Sobject}{\subsection{Che\-M\-P\-S2\-:\-:Sobject Class Reference}
+\label{classCheMPS2_1_1Sobject}\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+}
+
+
+{\ttfamily \#include $<$Sobject.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1Sobject_a6fd85753dc9048918065a424c42846d2}{Sobject} (const int index\-In, const int Ilocal\-In1, const int Ilocal\-In2, \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Sobject_a96e39bf1063bb31010cc5c753599f827}{\hyperlink{classCheMPS2_1_1Sobject_a96e39bf1063bb31010cc5c753599f827}{$\sim$\-Sobject} ()}\label{classCheMPS2_1_1Sobject_a96e39bf1063bb31010cc5c753599f827}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a1dfbe469443fbf7daa49c1d0cb34425e}{g\-N\-Kappa} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of symmetry blocks. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1Sobject_a55a31306f564c1d220d36ac9a07623c9}{g\-Storage} ()
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a5626b98bd01a9fb04f4d8e9e739e3034}{g\-Kappa} (const int N\-L, const int Two\-S\-L, const int I\-L, const int N1, const int N2, const int Two\-J, const int N\-R, const int Two\-S\-R, const int I\-R) const 
+\begin{DoxyCompactList}\small\item\em Get the index corresponding to a certain symmetry block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_aff81bb404f07da2814b396306fb38588}{g\-Kappa2index} (const int kappa) const 
+\begin{DoxyCompactList}\small\item\em Get the storage jump corresponding to a certain symmetry block. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1Sobject_a5a20b20dd98d6ebb67936c525dad5dfc}{g\-Storage} (const int N\-L, const int Two\-S\-L, const int I\-L, const int N1, const int N2, const int Two\-J, const int N\-R, const int Two\-S\-R, const int I\-R)
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage of a certain symmetry block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a973aa40f2b0e659a55b4c63e768afdf2}{g\-Index} () const 
+\begin{DoxyCompactList}\small\item\em Get the location index. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Sobject_a687a29eab89ef3763af8c630b48e3bf6}{Join} (\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$Tleft, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$Tright)
+\begin{DoxyCompactList}\small\item\em Join two sites to form a composite S-\/object. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1Sobject_a34983e86ae9f19de0be6b923479c13df}{Split} (\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$Tleft, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$Tright, const int virtualdimension\-D, const bool movingright, const bool change)
+\begin{DoxyCompactList}\small\item\em S\-V\-D an S-\/object into 2 \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T}'s. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Sobject_abe676ef06644b5b675c65b123d118f2c}{add\-Noise} (const double Noise\-Level)
+\begin{DoxyCompactList}\small\item\em Add noise to the current S-\/object. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Sobject_a01b16408c5439e0eca69b2fde6d0185c}{void \hyperlink{classCheMPS2_1_1Sobject_a01b16408c5439e0eca69b2fde6d0185c}{prog2symm} ()}\label{classCheMPS2_1_1Sobject_a01b16408c5439e0eca69b2fde6d0185c}
+
+\begin{DoxyCompactList}\small\item\em Convert the storage from diagram convention to symmetric \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} convention. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Sobject_a2b482f6b45ddd735e42b906843c10e24}{void \hyperlink{classCheMPS2_1_1Sobject_a2b482f6b45ddd735e42b906843c10e24}{symm2prog} ()}\label{classCheMPS2_1_1Sobject_a2b482f6b45ddd735e42b906843c10e24}
+
+\begin{DoxyCompactList}\small\item\em Convert the storage from symmetric \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} convention to diagram convention. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a2b8ca2eaecfc448c0f0591462c8edede}{g\-N\-L} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the left particle number symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_ae33e692d6e5f89d446f62515a85f725f}{g\-Two\-S\-L} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the left spin symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a77be4052f1655e2f8fecee8f231bc209}{g\-I\-L} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the left irrep symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_ae27c30606eb0f3f1eb9a32c559b7b209}{g\-N1} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the left local particle number symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a62923e0b950298fe42017dcdeadcfb03}{g\-N2} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the right local particle number symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a2bf86bc7861704b1f2ddb655312da82b}{g\-Two\-J} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the central spin symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a6dc776c7b9c79a2fb5a5e6e81d190562}{g\-N\-R} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the right particle number symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_ac3d208dc1bc37fdbcf48aaa9e4cc6ed7}{g\-Two\-S\-R} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the right spin symmetry of block ikappa. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Sobject_a1a9a06b257e018439ded8c1bf9c88813}{g\-I\-R} (const int ikappa) const 
+\begin{DoxyCompactList}\small\item\em Get the right irrep symmetry of block ikappa. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1Sobject}{Sobject} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 18, 2013
+\end{DoxyDate}
+Handles the storage of a spin-\/coupled two-\/site object, as is needed for the effective \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} equations. Extra functionalities are\-:
+\begin{DoxyItemize}
+\item the formation of an S-\/object out of two neighbouring \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T}'s
+\item the decomposition into two \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T}'s 
+\end{DoxyItemize}
+
+Definition at line 34 of file Sobject.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1Sobject_a6fd85753dc9048918065a424c42846d2}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!Sobject@{Sobject}}
+\index{Sobject@{Sobject}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{Sobject}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Sobject\-::\-Sobject (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Ilocal\-In1, }
+\item[{const int}]{Ilocal\-In2, }
+\item[{{\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_a6fd85753dc9048918065a424c42846d2}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The first index (i ; S spans i \& i+1) \\
+\hline
+{\em Ilocal\-In1} & The local irrep index of site i \\
+\hline
+{\em Ilocal\-In2} & The local irrep index of site i+1 \\
+\hline
+{\em den\-B\-K\-In} & Contains the virtual dimensions. Not const as \hyperlink{classCheMPS2_1_1Sobject}{Sobject} is allowed to set the virtual dimensions of symmetry sectors based on the Schmidt spectrum. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 33 of file Sobject.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a6fd85753dc9048918065a424c42846d2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1Sobject_abe676ef06644b5b675c65b123d118f2c}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!add\-Noise@{add\-Noise}}
+\index{add\-Noise@{add\-Noise}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{add\-Noise}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Sobject\-::add\-Noise (
+\begin{DoxyParamCaption}
+\item[{const double}]{Noise\-Level}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_abe676ef06644b5b675c65b123d118f2c}
+
+
+Add noise to the current S-\/object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Noise\-Level} & The noise added to the S-\/object is of size (-\/0.\-5 $<$ random number $<$ 0.\-5) $\ast$ Noise\-Level / infinity-\/norm(\hyperlink{classCheMPS2_1_1Sobject_a55a31306f564c1d220d36ac9a07623c9}{g\-Storage()}) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 555 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a77be4052f1655e2f8fecee8f231bc209}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-I\-L@{g\-I\-L}}
+\index{g\-I\-L@{g\-I\-L}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-I\-L}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-I\-L (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a77be4052f1655e2f8fecee8f231bc209}
+
+
+Get the left irrep symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the left irrep symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 168 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a973aa40f2b0e659a55b4c63e768afdf2}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Index@{g\-Index}}
+\index{g\-Index@{g\-Index}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a973aa40f2b0e659a55b4c63e768afdf2}
+
+
+Get the location index. 
+
+\begin{DoxyReturn}{Returns}
+the index 
+\end{DoxyReturn}
+
+
+Definition at line 164 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a1a9a06b257e018439ded8c1bf9c88813}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-I\-R@{g\-I\-R}}
+\index{g\-I\-R@{g\-I\-R}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-I\-R}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-I\-R (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a1a9a06b257e018439ded8c1bf9c88813}
+
+
+Get the right irrep symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the right irrep symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 174 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a5626b98bd01a9fb04f4d8e9e739e3034}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Kappa@{g\-Kappa}}
+\index{g\-Kappa@{g\-Kappa}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Kappa (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\-L, }
+\item[{const int}]{Two\-S\-L, }
+\item[{const int}]{I\-L, }
+\item[{const int}]{N1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-J, }
+\item[{const int}]{N\-R, }
+\item[{const int}]{Two\-S\-R, }
+\item[{const int}]{I\-R}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a5626b98bd01a9fb04f4d8e9e739e3034}
+
+
+Get the index corresponding to a certain symmetry block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N\-L} & The left particle number sector \\
+\hline
+{\em Two\-S\-L} & The left spin symmetry sector \\
+\hline
+{\em I\-L} & The left irrep sector \\
+\hline
+{\em N1} & The first site particle number sector \\
+\hline
+{\em N2} & The second site particle number sector \\
+\hline
+{\em Two\-J} & The recoupled two-\/site spin symmetry sector \\
+\hline
+{\em N\-R} & The right particle number sector \\
+\hline
+{\em Two\-S\-R} & The right spin symmetry sector \\
+\hline
+{\em I\-R} & The right irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The kappa corresponding to the input parameters; -\/1 means no such block 
+\end{DoxyReturn}
+
+
+Definition at line 144 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_aff81bb404f07da2814b396306fb38588}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Kappa2index@{g\-Kappa2index}}
+\index{g\-Kappa2index@{g\-Kappa2index}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Kappa2index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Kappa2index (
+\begin{DoxyParamCaption}
+\item[{const int}]{kappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_aff81bb404f07da2814b396306fb38588}
+
+
+Get the storage jump corresponding to a certain symmetry block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em kappa} & The symmetry block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+kappa2index\mbox{[}kappa\mbox{]}, the memory jumper to a certain block 
+\end{DoxyReturn}
+
+
+Definition at line 154 of file Sobject.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_aff81bb404f07da2814b396306fb38588_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Sobject_ae27c30606eb0f3f1eb9a32c559b7b209}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-N1@{g\-N1}}
+\index{g\-N1@{g\-N1}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-N1}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-N1 (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_ae27c30606eb0f3f1eb9a32c559b7b209}
+
+
+Get the left local particle number symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the left local particle number symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 169 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a62923e0b950298fe42017dcdeadcfb03}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-N2@{g\-N2}}
+\index{g\-N2@{g\-N2}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-N2}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-N2 (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a62923e0b950298fe42017dcdeadcfb03}
+
+
+Get the right local particle number symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the right local particle number symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 170 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a1dfbe469443fbf7daa49c1d0cb34425e}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-N\-Kappa@{g\-N\-Kappa}}
+\index{g\-N\-Kappa@{g\-N\-Kappa}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-N\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-N\-Kappa (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a1dfbe469443fbf7daa49c1d0cb34425e}
+
+
+Get the number of symmetry blocks. 
+
+\begin{DoxyReturn}{Returns}
+The number of symmetry blocks 
+\end{DoxyReturn}
+
+
+Definition at line 140 of file Sobject.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a1dfbe469443fbf7daa49c1d0cb34425e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Sobject_a2b8ca2eaecfc448c0f0591462c8edede}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-N\-L@{g\-N\-L}}
+\index{g\-N\-L@{g\-N\-L}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-N\-L}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-N\-L (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a2b8ca2eaecfc448c0f0591462c8edede}
+
+
+Get the left particle number symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the left particle number symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 166 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a6dc776c7b9c79a2fb5a5e6e81d190562}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-N\-R@{g\-N\-R}}
+\index{g\-N\-R@{g\-N\-R}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-N\-R}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-N\-R (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a6dc776c7b9c79a2fb5a5e6e81d190562}
+
+
+Get the right particle number symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the right particle number symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 172 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a55a31306f564c1d220d36ac9a07623c9}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Sobject\-::g\-Storage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_a55a31306f564c1d220d36ac9a07623c9}
+
+
+Get the pointer to the storage. 
+
+return pointer to the storage 
+
+Definition at line 142 of file Sobject.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a55a31306f564c1d220d36ac9a07623c9_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Sobject_a5a20b20dd98d6ebb67936c525dad5dfc}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Sobject\-::g\-Storage (
+\begin{DoxyParamCaption}
+\item[{const int}]{N\-L, }
+\item[{const int}]{Two\-S\-L, }
+\item[{const int}]{I\-L, }
+\item[{const int}]{N1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-J, }
+\item[{const int}]{N\-R, }
+\item[{const int}]{Two\-S\-R, }
+\item[{const int}]{I\-R}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_a5a20b20dd98d6ebb67936c525dad5dfc}
+
+
+Get the pointer to the storage of a certain symmetry block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N\-L} & The left particle number sector \\
+\hline
+{\em Two\-S\-L} & The left spin symmetry sector \\
+\hline
+{\em I\-L} & The left irrep sector \\
+\hline
+{\em N1} & The first site particle number sector \\
+\hline
+{\em N2} & The second site particle number sector \\
+\hline
+{\em Two\-J} & The recoupled two-\/site spin symmetry sector \\
+\hline
+{\em N\-R} & The right particle number sector \\
+\hline
+{\em Two\-S\-R} & The right spin symmetry sector \\
+\hline
+{\em I\-R} & The right irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to the requested block; N\-U\-L\-L means no such block (kappa == -\/1) 
+\end{DoxyReturn}
+
+
+Definition at line 156 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a2bf86bc7861704b1f2ddb655312da82b}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Two\-J@{g\-Two\-J}}
+\index{g\-Two\-J@{g\-Two\-J}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Two\-J}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Two\-J (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_a2bf86bc7861704b1f2ddb655312da82b}
+
+
+Get the central spin symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the central spin symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 171 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_ae33e692d6e5f89d446f62515a85f725f}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Two\-S\-L@{g\-Two\-S\-L}}
+\index{g\-Two\-S\-L@{g\-Two\-S\-L}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Two\-S\-L}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Two\-S\-L (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_ae33e692d6e5f89d446f62515a85f725f}
+
+
+Get the left spin symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the left spin symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 167 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_ac3d208dc1bc37fdbcf48aaa9e4cc6ed7}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!g\-Two\-S\-R@{g\-Two\-S\-R}}
+\index{g\-Two\-S\-R@{g\-Two\-S\-R}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{g\-Two\-S\-R}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sobject\-::g\-Two\-S\-R (
+\begin{DoxyParamCaption}
+\item[{const int}]{ikappa}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Sobject_ac3d208dc1bc37fdbcf48aaa9e4cc6ed7}
+
+
+Get the right spin symmetry of block ikappa. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ikappa} & The tensor block number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the right spin symmetry of block ikappa 
+\end{DoxyReturn}
+
+
+Definition at line 173 of file Sobject.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Sobject_a687a29eab89ef3763af8c630b48e3bf6}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!Join@{Join}}
+\index{Join@{Join}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{Join}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Sobject\-::\-Join (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-T} $\ast$}]{Tleft, }
+\item[{{\bf Tensor\-T} $\ast$}]{Tright}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_a687a29eab89ef3763af8c630b48e3bf6}
+
+
+Join two sites to form a composite S-\/object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Tleft} & Left \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to form the composite S-\/object \\
+\hline
+{\em Tright} & Right \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to form the composite S-\/object \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 176 of file Sobject.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a687a29eab89ef3763af8c630b48e3bf6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a687a29eab89ef3763af8c630b48e3bf6_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Sobject_a34983e86ae9f19de0be6b923479c13df}{\index{Che\-M\-P\-S2\-::\-Sobject@{Che\-M\-P\-S2\-::\-Sobject}!Split@{Split}}
+\index{Split@{Split}!CheMPS2::Sobject@{Che\-M\-P\-S2\-::\-Sobject}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Sobject\-::\-Split (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-T} $\ast$}]{Tleft, }
+\item[{{\bf Tensor\-T} $\ast$}]{Tright, }
+\item[{const int}]{virtualdimension\-D, }
+\item[{const bool}]{movingright, }
+\item[{const bool}]{change}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Sobject_a34983e86ae9f19de0be6b923479c13df}
+
+
+S\-V\-D an S-\/object into 2 \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T}'s. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Tleft} & Left \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} storage space. At output left normalized. \\
+\hline
+{\em Tright} & Right \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} storage space. At output right normalized. \\
+\hline
+{\em virtualdimension\-D} & The virtual dimension which is partitioned over the different symmetry blocks based on the Schmidt spectrum \\
+\hline
+{\em movingright} & When true, the singular values are multiplied into V$^\wedge$\-T, when false, into U. \\
+\hline
+{\em change} & Whether or not the symmetry virtual dimensions are allowed to change (when false\-: D doesn't matter) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the discarded weight if change==true ; else 0.\-0 
+\end{DoxyReturn}
+
+
+Definition at line 233 of file Sobject.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a34983e86ae9f19de0be6b923479c13df_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Sobject_a34983e86ae9f19de0be6b923479c13df_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Sobject.\-h\item 
+Sobject.\-cpp\end{DoxyCompactItemize}

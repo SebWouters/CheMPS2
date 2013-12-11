@@ -1,0 +1,106 @@
+\hypertarget{classCheMPS2_1_1TensorL}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-L Class Reference}
+\label{classCheMPS2_1_1TensorL}\index{Che\-M\-P\-S2\-::\-Tensor\-L@{Che\-M\-P\-S2\-::\-Tensor\-L}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-L.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-L\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classCheMPS2_1_1TensorL__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-L\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1TensorL__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorL_afa66a63fa8cd26f49de8b93bed3d4bda}{Tensor\-L} (const int index\-In, const int Idiff\-In, const bool moving\-Right\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorL_a1e9e16eafa80c1268be6adff9fcbe63b}{\hyperlink{classCheMPS2_1_1TensorL_a1e9e16eafa80c1268be6adff9fcbe63b}{$\sim$\-Tensor\-L} ()}\label{classCheMPS2_1_1TensorL_a1e9e16eafa80c1268be6adff9fcbe63b}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorL_a5896b5010d9d8c96b02f0d06aa1ea727}{makenew} (\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T)
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 20, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} class is a storage and manipulation class for a single contracted creator/annihilitor. 
+
+Definition at line 34 of file Tensor\-L.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorL_afa66a63fa8cd26f49de8b93bed3d4bda}{\index{Che\-M\-P\-S2\-::\-Tensor\-L@{Che\-M\-P\-S2\-::\-Tensor\-L}!Tensor\-L@{Tensor\-L}}
+\index{Tensor\-L@{Tensor\-L}!CheMPS2::TensorL@{Che\-M\-P\-S2\-::\-Tensor\-L}}
+\paragraph[{Tensor\-L}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-L\-::\-Tensor\-L (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Idiff\-In, }
+\item[{const bool}]{moving\-Right\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorL_afa66a63fa8cd26f49de8b93bed3d4bda}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em Idiff\-In} & The irrep of the one creator ( sandwiched if \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} ; to sandwich if \hyperlink{classCheMPS2_1_1TensorQ}{Tensor\-Q} ) \\
+\hline
+{\em moving\-Right\-In} & If true\-: sweep from left to right. If false\-: sweep from right to left \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 27 of file Tensor\-L.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorL_a5896b5010d9d8c96b02f0d06aa1ea727}{\index{Che\-M\-P\-S2\-::\-Tensor\-L@{Che\-M\-P\-S2\-::\-Tensor\-L}!makenew@{makenew}}
+\index{makenew@{makenew}!CheMPS2::TensorL@{Che\-M\-P\-S2\-::\-Tensor\-L}}
+\paragraph[{makenew}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-L\-::makenew (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorL_a5896b5010d9d8c96b02f0d06aa1ea727}
+
+\begin{DoxyParams}{Parameters}
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} from which the new \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} should be made. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file Tensor\-L.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-L.\-h\item 
+Tensor\-L.\-cpp\end{DoxyCompactItemize}

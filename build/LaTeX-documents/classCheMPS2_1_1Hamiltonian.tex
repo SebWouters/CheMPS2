@@ -1,0 +1,453 @@
+\hypertarget{classCheMPS2_1_1Hamiltonian}{\subsection{Che\-M\-P\-S2\-:\-:Hamiltonian Class Reference}
+\label{classCheMPS2_1_1Hamiltonian}\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+}
+
+
+{\ttfamily \#include $<$Hamiltonian.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1Hamiltonian_a4ae3520da1ff8515a313c4357592a3d1}{Hamiltonian} (const int Norbitals, const int n\-Group, const int $\ast$Orb\-Irreps)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classCheMPS2_1_1Hamiltonian_a6d20a22b56d996fbd4c9628d4a671a6d}{Hamiltonian} (const string filename)
+\begin{DoxyCompactList}\small\item\em Load an output file created by mointegrals/mointegrals.\-cc; which can be used as a plugin in psi4 beta3. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Hamiltonian_a27623ac9db80f85c07761ac3ce554a51}{\hyperlink{classCheMPS2_1_1Hamiltonian_a27623ac9db80f85c07761ac3ce554a51}{$\sim$\-Hamiltonian} ()}\label{classCheMPS2_1_1Hamiltonian_a27623ac9db80f85c07761ac3ce554a51}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618}{get\-L} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of orbitals. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21}{get\-N\-Group} () const 
+\begin{DoxyCompactList}\small\item\em Get the group number. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1Hamiltonian_a02130b2901a5a3c05171d4f7dd5fa4cd}{get\-Orbital\-Irrep} (const int n\-Orb) const 
+\begin{DoxyCompactList}\small\item\em Get an orbital irrep number. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Hamiltonian_af6664242601063dd762c6a430054e4c5}{set\-Econst} (const double val)
+\begin{DoxyCompactList}\small\item\em Set the constant energy. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Hamiltonian_a7a56bcf4365125ec144c21d5a4684c32}{set\-Tmat} (const int index1, const int index2, const double val)
+\begin{DoxyCompactList}\small\item\em Set a Tmat element. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1}{set\-Vmat} (const int index1, const int index2, const int index3, const int index4, const double val)
+\begin{DoxyCompactList}\small\item\em Set a Vmat element. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82}{add\-To\-Vmat} (const int index1, const int index2, const int index3, const int index4, const double val)
+\begin{DoxyCompactList}\small\item\em Add to Vmat element. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab}{get\-Econst} () const 
+\begin{DoxyCompactList}\small\item\em Get the constant energy. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1Hamiltonian_ac0b8314dc6133642997e648d1169d10f}{get\-Tmat} (const int index1, const int index2) const 
+\begin{DoxyCompactList}\small\item\em Get a Tmat element. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1Hamiltonian_af2d3836be75d50640cbed9a9234af126}{get\-Vmat} (const int index1, const int index2, const int index3, const int index4) const 
+\begin{DoxyCompactList}\small\item\em Get a Vmat element. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Hamiltonian_a7d1e514143996895015413c50770990d}{void \hyperlink{classCheMPS2_1_1Hamiltonian_a7d1e514143996895015413c50770990d}{save} () const }\label{classCheMPS2_1_1Hamiltonian_a7d1e514143996895015413c50770990d}
+
+\begin{DoxyCompactList}\small\item\em Save the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian}. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Hamiltonian_a5c1030ac14e2d82ae6e89b8dc65c9ddf}{void \hyperlink{classCheMPS2_1_1Hamiltonian_a5c1030ac14e2d82ae6e89b8dc65c9ddf}{read} ()}\label{classCheMPS2_1_1Hamiltonian_a5c1030ac14e2d82ae6e89b8dc65c9ddf}
+
+\begin{DoxyCompactList}\small\item\em Load the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian}. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Hamiltonian_a4f7527a7bf071f46d0f71c47de85c343}{void \hyperlink{classCheMPS2_1_1Hamiltonian_a4f7527a7bf071f46d0f71c47de85c343}{debugcheck} () const }\label{classCheMPS2_1_1Hamiltonian_a4f7527a7bf071f46d0f71c47de85c343}
+
+\begin{DoxyCompactList}\small\item\em Debug check certain elements and sums. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 8, 2013
+\end{DoxyDate}
+Container class for the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} matrix elements.\hypertarget{classCheMPS2_1_1Hamiltonian_ham_info}{}\subsubsection{Specific Hamiltonian information}\label{classCheMPS2_1_1Hamiltonian_ham_info}
+Class containing all \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} information\-:\par
+
+\begin{DoxyItemize}
+\item L\-: the number of orbitals
+\item group\-Number (in Symm\-Info)\-: the number of the Abelian point group symmetry with real-\/valued character table (see \hyperlink{Irreps_8h_source}{Irreps.\-h})
+\item orb2irrep\-: array with the irrep number for each orbital
+\item Econst\-: nuclear repulsion energy; or any constant part of the energy not contained in the 1-\/ or 2-\/particle matrix elements
+\item Tmat\-: 1-\/particle matrix elements; Tmat $_{a,b}$ = 0 if $I_a$ is different from $I_b$
+\item Vmat\-: 2-\/particle matrix elements; Vmat $_{a,b,c,d}$ = 0 if $I_a \otimes I_b$ is not equal to $I_c \otimes I_d$; the matrix elements are not antisymmetrized and are stored with the convention that both (a \& c) and (b \& d) have the same spatial variable for the nuclear repulsion integral (physics notation).
+\end{DoxyItemize}
+
+The targeted spin, particle number and point group symmetry are not defined here. For convenience, the second quantized formulation of the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} is given here\-: \par
+ $ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $\par
+ where the latin letters denote site-\/indices and the greek letters spin projections. This \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} preserves spin, spin projection, particle number, and Abelian point group symmetry (if its character table is real at least). 
+
+Definition at line 53 of file Hamiltonian.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1Hamiltonian_a4ae3520da1ff8515a313c4357592a3d1}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!Hamiltonian@{Hamiltonian}}
+\index{Hamiltonian@{Hamiltonian}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{Hamiltonian}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Hamiltonian\-::\-Hamiltonian (
+\begin{DoxyParamCaption}
+\item[{const int}]{Norbitals, }
+\item[{const int}]{n\-Group, }
+\item[{const int $\ast$}]{Orb\-Irreps}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_a4ae3520da1ff8515a313c4357592a3d1}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Norbitals} & The number of orbitals (L) \\
+\hline
+{\em n\-Group} & The group number \\
+\hline
+{\em Orb\-Irreps} & Pointer to array containing the orbital irreps \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 36 of file Hamiltonian.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_a4ae3520da1ff8515a313c4357592a3d1_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a6d20a22b56d996fbd4c9628d4a671a6d}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!Hamiltonian@{Hamiltonian}}
+\index{Hamiltonian@{Hamiltonian}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{Hamiltonian}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Hamiltonian\-::\-Hamiltonian (
+\begin{DoxyParamCaption}
+\item[{const string}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_a6d20a22b56d996fbd4c9628d4a671a6d}
+
+
+Load an output file created by mointegrals/mointegrals.\-cc; which can be used as a plugin in psi4 beta3. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Filename of the psi4 mointegral output file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 240 of file Hamiltonian.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!add\-To\-Vmat@{add\-To\-Vmat}}
+\index{add\-To\-Vmat@{add\-To\-Vmat}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{add\-To\-Vmat}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Hamiltonian\-::add\-To\-Vmat (
+\begin{DoxyParamCaption}
+\item[{const int}]{index1, }
+\item[{const int}]{index2, }
+\item[{const int}]{index3, }
+\item[{const int}]{index4, }
+\item[{const double}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82}
+
+
+Add to Vmat element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index1} & The first index \\
+\hline
+{\em index2} & The second index \\
+\hline
+{\em index3} & The third index \\
+\hline
+{\em index4} & The fourth index \\
+\hline
+{\em val} & The value which should be added \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 117 of file Hamiltonian.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-Econst@{get\-Econst}}
+\index{get\-Econst@{get\-Econst}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-Econst}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-Econst (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab}
+
+
+Get the constant energy. 
+
+\begin{DoxyReturn}{Returns}
+The constant part of the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} (nuclear repulsion \& condensed orbitals) 
+\end{DoxyReturn}
+
+
+Definition at line 81 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-L@{get\-L}}
+\index{get\-L@{get\-L}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-L}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-L (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618}
+
+
+Get the number of orbitals. 
+
+\begin{DoxyReturn}{Returns}
+The number of orbitals 
+\end{DoxyReturn}
+
+
+Definition at line 73 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-N\-Group@{get\-N\-Group}}
+\index{get\-N\-Group@{get\-N\-Group}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-N\-Group}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-N\-Group (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21}
+
+
+Get the group number. 
+
+\begin{DoxyReturn}{Returns}
+The group number 
+\end{DoxyReturn}
+
+
+Definition at line 75 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a02130b2901a5a3c05171d4f7dd5fa4cd}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-Orbital\-Irrep@{get\-Orbital\-Irrep}}
+\index{get\-Orbital\-Irrep@{get\-Orbital\-Irrep}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-Orbital\-Irrep}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-Orbital\-Irrep (
+\begin{DoxyParamCaption}
+\item[{const int}]{n\-Orb}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_a02130b2901a5a3c05171d4f7dd5fa4cd}
+
+
+Get an orbital irrep number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n\-Orb} & The orbital number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The irrep of orbital n\-Orb 
+\end{DoxyReturn}
+
+
+Definition at line 77 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_a02130b2901a5a3c05171d4f7dd5fa4cd_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_ac0b8314dc6133642997e648d1169d10f}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-Tmat@{get\-Tmat}}
+\index{get\-Tmat@{get\-Tmat}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-Tmat}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-Tmat (
+\begin{DoxyParamCaption}
+\item[{const int}]{index1, }
+\item[{const int}]{index2}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_ac0b8314dc6133642997e648d1169d10f}
+
+
+Get a Tmat element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index1} & The first index \\
+\hline
+{\em index2} & The second index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$T_{index1,index2}$ 
+\end{DoxyReturn}
+
+
+Definition at line 95 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_ac0b8314dc6133642997e648d1169d10f_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_af2d3836be75d50640cbed9a9234af126}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!get\-Vmat@{get\-Vmat}}
+\index{get\-Vmat@{get\-Vmat}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{get\-Vmat}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Hamiltonian\-::get\-Vmat (
+\begin{DoxyParamCaption}
+\item[{const int}]{index1, }
+\item[{const int}]{index2, }
+\item[{const int}]{index3, }
+\item[{const int}]{index4}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Hamiltonian_af2d3836be75d50640cbed9a9234af126}
+
+
+Get a Vmat element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index1} & The first index \\
+\hline
+{\em index2} & The second index \\
+\hline
+{\em index3} & The third index \\
+\hline
+{\em index4} & The fourth index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+$V_{index1,index2,index3,index4}$ 
+\end{DoxyReturn}
+
+
+Definition at line 129 of file Hamiltonian.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Hamiltonian_af2d3836be75d50640cbed9a9234af126_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_af6664242601063dd762c6a430054e4c5}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!set\-Econst@{set\-Econst}}
+\index{set\-Econst@{set\-Econst}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{set\-Econst}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Hamiltonian\-::set\-Econst (
+\begin{DoxyParamCaption}
+\item[{const double}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_af6664242601063dd762c6a430054e4c5}
+
+
+Set the constant energy. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & The new constant energy \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 79 of file Hamiltonian.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a7a56bcf4365125ec144c21d5a4684c32}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!set\-Tmat@{set\-Tmat}}
+\index{set\-Tmat@{set\-Tmat}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{set\-Tmat}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Hamiltonian\-::set\-Tmat (
+\begin{DoxyParamCaption}
+\item[{const int}]{index1, }
+\item[{const int}]{index2, }
+\item[{const double}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_a7a56bcf4365125ec144c21d5a4684c32}
+
+
+Set a Tmat element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index1} & The first index \\
+\hline
+{\em index2} & The second index \\
+\hline
+{\em val} & The new Tmat element \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 83 of file Hamiltonian.\-cpp.
+
+\hypertarget{classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1}{\index{Che\-M\-P\-S2\-::\-Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}!set\-Vmat@{set\-Vmat}}
+\index{set\-Vmat@{set\-Vmat}!CheMPS2::Hamiltonian@{Che\-M\-P\-S2\-::\-Hamiltonian}}
+\paragraph[{set\-Vmat}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Hamiltonian\-::set\-Vmat (
+\begin{DoxyParamCaption}
+\item[{const int}]{index1, }
+\item[{const int}]{index2, }
+\item[{const int}]{index3, }
+\item[{const int}]{index4, }
+\item[{const double}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1}
+
+
+Set a Vmat element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index1} & The first index \\
+\hline
+{\em index2} & The second index \\
+\hline
+{\em index3} & The third index \\
+\hline
+{\em index4} & The fourth index \\
+\hline
+{\em val} & The new Vmat element \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 105 of file Hamiltonian.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Hamiltonian.\-h\item 
+Hamiltonian.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,8 @@
+/home/ward/Documents/phd/CheMPS2/build/CheMPS2/CMakeFiles/CheMPS2.dir
+/home/ward/Documents/phd/CheMPS2/build/CMakeFiles/doc.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test1.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test2.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test3.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test4.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test5.dir
+/home/ward/Documents/phd/CheMPS2/build/tests/CMakeFiles/test6.dir

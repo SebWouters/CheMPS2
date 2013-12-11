@@ -1,0 +1,214 @@
+\hypertarget{classCheMPS2_1_1CASSCF}{\subsection{Che\-M\-P\-S2\-:\-:C\-A\-S\-S\-C\-F Class Reference}
+\label{classCheMPS2_1_1CASSCF}\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+}
+
+
+{\ttfamily \#include $<$C\-A\-S\-S\-C\-F.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1CASSCF_aee2071ba5914ed3a6e7120e6d1656144}{C\-A\-S\-S\-C\-F} (const string filename)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{classCheMPS2_1_1CASSCF_a9c0aeea016f892a6b4a72cee8a37bd96}{C\-A\-S\-S\-C\-F} (\hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} $\ast$Ham\-In, int $\ast$D\-O\-C\-Cin, int $\ast$S\-O\-C\-Cin)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1CASSCF_a20937fd3dbc5c5f3fa2e7ffd4f751900}{\hyperlink{classCheMPS2_1_1CASSCF_a20937fd3dbc5c5f3fa2e7ffd4f751900}{$\sim$\-C\-A\-S\-S\-C\-F} ()}\label{classCheMPS2_1_1CASSCF_a20937fd3dbc5c5f3fa2e7ffd4f751900}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1CASSCF_afba8add72828a26c426f47a790511bf1}{get\-Number\-Of\-Irreps} ()
+\begin{DoxyCompactList}\small\item\em Get the number of irreps. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1CASSCF_a701bdaa40881168d6b386683eaa01cea}{setup\-Start} (int $\ast$Nocc\-In, int $\ast$N\-D\-M\-R\-G\-In, int $\ast$Nvirt\-In)
+\begin{DoxyCompactList}\small\item\em Set the start of the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} calculation. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1CASSCF_aee8753e7169f61e4804ddbc1b7e8409d}{do\-C\-A\-S\-S\-C\-Fnewtonraphson} (const int Nelectrons, const int Two\-S, const int Irrep, \hyperlink{classCheMPS2_1_1ConvergenceScheme}{Convergence\-Scheme} $\ast$Opt\-Scheme, const int root\-Num)
+\begin{DoxyCompactList}\small\item\em Does the state-\/specific \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} cycle with the (augmented hessian) newton raphson method. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1CASSCF_aafa1ad3896c1625be172f326113f9a30}{void \hyperlink{classCheMPS2_1_1CASSCF_aafa1ad3896c1625be172f326113f9a30}{delete\-Stored\-Unitary} ()}\label{classCheMPS2_1_1CASSCF_aafa1ad3896c1625be172f326113f9a30}
+
+\begin{DoxyCompactList}\small\item\em \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} unitary rotation remove call. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+June 18, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} class provides an implementation of D\-M\-R\-G\-S\-C\-F \mbox{[}Zgid et al., J. Chem. Phys. 128, 144116 (2008)\mbox{]} with as \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} solver the spin-\/adapted \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} code Che\-M\-P\-S2. For the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} update, the following implementations are included\-:\par
+
+\begin{DoxyItemize}
+\item the quadratically convergent Newton-\/\-Raphson approach \mbox{[}Siegbahn et al., J. Chem. Phys. 74, 2384 (1981)\mbox{]}
+\item the augmented Hessian Newton-\/\-Raphson approach \mbox{[}Lengsfield, J. Chem. Phys. 73, 382 (1980)\mbox{]}; which is O\-R\-C\-A's prefered choice 
+\end{DoxyItemize}
+
+Definition at line 42 of file C\-A\-S\-S\-C\-F.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1CASSCF_aee2071ba5914ed3a6e7120e6d1656144}{\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}!C\-A\-S\-S\-C\-F@{C\-A\-S\-S\-C\-F}}
+\index{C\-A\-S\-S\-C\-F@{C\-A\-S\-S\-C\-F}!CheMPS2::CASSCF@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+\paragraph[{C\-A\-S\-S\-C\-F}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F\-::\-C\-A\-S\-S\-C\-F (
+\begin{DoxyParamCaption}
+\item[{const string}]{filename}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1CASSCF_aee2071ba5914ed3a6e7120e6d1656144}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The file containing the Psi output to start the D\-M\-R\-G\-S\-C\-F calculations. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 35 of file C\-A\-S\-S\-C\-F.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1CASSCF_aee2071ba5914ed3a6e7120e6d1656144_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1CASSCF_a9c0aeea016f892a6b4a72cee8a37bd96}{\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}!C\-A\-S\-S\-C\-F@{C\-A\-S\-S\-C\-F}}
+\index{C\-A\-S\-S\-C\-F@{C\-A\-S\-S\-C\-F}!CheMPS2::CASSCF@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+\paragraph[{C\-A\-S\-S\-C\-F}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F\-::\-C\-A\-S\-S\-C\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf Hamiltonian} $\ast$}]{Ham\-In, }
+\item[{int $\ast$}]{D\-O\-C\-Cin, }
+\item[{int $\ast$}]{S\-O\-C\-Cin}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1CASSCF_a9c0aeea016f892a6b4a72cee8a37bd96}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Ham\-In} & \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} containing the matrix elements of the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} for which a \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} calculation is desired \\
+\hline
+{\em D\-O\-C\-Cin} & Array containing the number of doubly occupied H\-F orbitals per irrep \\
+\hline
+{\em S\-O\-C\-Cin} & Array containing the number of singly occupied H\-F orbitals per irrep \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 63 of file C\-A\-S\-S\-C\-F.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1CASSCF_a9c0aeea016f892a6b4a72cee8a37bd96_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1CASSCF_aee8753e7169f61e4804ddbc1b7e8409d}{\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}!do\-C\-A\-S\-S\-C\-Fnewtonraphson@{do\-C\-A\-S\-S\-C\-Fnewtonraphson}}
+\index{do\-C\-A\-S\-S\-C\-Fnewtonraphson@{do\-C\-A\-S\-S\-C\-Fnewtonraphson}!CheMPS2::CASSCF@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+\paragraph[{do\-C\-A\-S\-S\-C\-Fnewtonraphson}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F\-::do\-C\-A\-S\-S\-C\-Fnewtonraphson (
+\begin{DoxyParamCaption}
+\item[{const int}]{Nelectrons, }
+\item[{const int}]{Two\-S, }
+\item[{const int}]{Irrep, }
+\item[{{\bf Convergence\-Scheme} $\ast$}]{Opt\-Scheme, }
+\item[{const int}]{root\-Num}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1CASSCF_aee8753e7169f61e4804ddbc1b7e8409d}
+
+
+Does the state-\/specific \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} cycle with the (augmented hessian) newton raphson method. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Nelectrons} & Total number of electrons in the system\-: occupied H\-F orbitals + active space \\
+\hline
+{\em Two\-S} & Twice the targeted spin \\
+\hline
+{\em Irrep} & Desired wave-\/function irrep \\
+\hline
+{\em Opt\-Scheme} & The optimization scheme to run the inner \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} loop \\
+\hline
+{\em root\-Num} & Denotes the targeted state in state-\/specific \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F}; 1 means ground state, 2 first excited state etc. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 36 of file C\-A\-S\-S\-C\-Fnewtonraphson.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1CASSCF_aee8753e7169f61e4804ddbc1b7e8409d_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1CASSCF_afba8add72828a26c426f47a790511bf1}{\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}!get\-Number\-Of\-Irreps@{get\-Number\-Of\-Irreps}}
+\index{get\-Number\-Of\-Irreps@{get\-Number\-Of\-Irreps}!CheMPS2::CASSCF@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+\paragraph[{get\-Number\-Of\-Irreps}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F\-::get\-Number\-Of\-Irreps (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1CASSCF_afba8add72828a26c426f47a790511bf1}
+
+
+Get the number of irreps. 
+
+\begin{DoxyReturn}{Returns}
+The number of irreps 
+\end{DoxyReturn}
+
+
+Definition at line 152 of file C\-A\-S\-S\-C\-F.\-cpp.
+
+\hypertarget{classCheMPS2_1_1CASSCF_a701bdaa40881168d6b386683eaa01cea}{\index{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}!setup\-Start@{setup\-Start}}
+\index{setup\-Start@{setup\-Start}!CheMPS2::CASSCF@{Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F}}
+\paragraph[{setup\-Start}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-C\-A\-S\-S\-C\-F\-::setup\-Start (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{Nocc\-In, }
+\item[{int $\ast$}]{N\-D\-M\-R\-G\-In, }
+\item[{int $\ast$}]{Nvirt\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1CASSCF_a701bdaa40881168d6b386683eaa01cea}
+
+
+Set the start of the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} calculation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Nocc\-In} & Array of length number\-Of\-Irreps containing the number of double occupied H\-F orbitals per irrep for the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} loop. \\
+\hline
+{\em N\-D\-M\-R\-G\-In} & Array of length number\-Of\-Irreps containing the number of active orbitals per irrep for the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} loop. \\
+\hline
+{\em Nvirt\-In} & Array of length number\-Of\-Irreps containing the number of empty orbitals per irrep for the \hyperlink{classCheMPS2_1_1CASSCF}{C\-A\-S\-S\-C\-F} loop. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 650 of file C\-A\-S\-S\-C\-F.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+C\-A\-S\-S\-C\-F.\-h\item 
+C\-A\-S\-S\-C\-F.\-cpp\item 
+C\-A\-S\-S\-C\-Fdebug.\-cpp\item 
+C\-A\-S\-S\-C\-Fhamiltonianrotation.\-cpp\item 
+C\-A\-S\-S\-C\-Fnewtonraphson.\-cpp\end{DoxyCompactItemize}

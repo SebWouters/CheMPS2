@@ -1,0 +1,152 @@
+\hypertarget{classCheMPS2_1_1Heff}{\subsection{Che\-M\-P\-S2\-:\-:Heff Class Reference}
+\label{classCheMPS2_1_1Heff}\index{Che\-M\-P\-S2\-::\-Heff@{Che\-M\-P\-S2\-::\-Heff}}
+}
+
+
+{\ttfamily \#include $<$Heff.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1Heff_ade178b3ffb362e0b407f50e6393e6f1c}{Heff} (const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In, const \hyperlink{classCheMPS2_1_1Problem}{Problem} $\ast$Prob\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1Heff_aaa1c2a606d65807f669b2a6cbbd9b510}{\hyperlink{classCheMPS2_1_1Heff_aaa1c2a606d65807f669b2a6cbbd9b510}{$\sim$\-Heff} ()}\label{classCheMPS2_1_1Heff_aaa1c2a606d65807f669b2a6cbbd9b510}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3}{Solve\-D\-A\-V\-I\-D\-S\-O\-N} (\hyperlink{classCheMPS2_1_1Sobject}{Sobject} $\ast$den\-S, \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} $\ast$$\ast$$\ast$Ltensors, \hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A} $\ast$$\ast$$\ast$$\ast$Atensors, \hyperlink{classCheMPS2_1_1TensorB}{Tensor\-B} $\ast$$\ast$$\ast$$\ast$Btensors, \hyperlink{classCheMPS2_1_1TensorC}{Tensor\-C} $\ast$$\ast$$\ast$$\ast$Ctensors, \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D} $\ast$$\ast$$\ast$$\ast$Dtensors, \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} $\ast$$\ast$$\ast$$\ast$S0tensors, \hyperlink{classCheMPS2_1_1TensorS1}{Tensor\-S1} $\ast$$\ast$$\ast$$\ast$S1tensors, \hyperlink{classCheMPS2_1_1TensorF0}{Tensor\-F0} $\ast$$\ast$$\ast$$\ast$F0tensors, \hyperlink{classCheMPS2_1_1TensorF1}{Tensor\-F1} $\ast$$\ast$$\ast$$\ast$F1tensors, \hyperlink{classCheMPS2_1_1TensorQ}{Tensor\-Q} $\ast$$\ast$$\ast$Qtensors, \hyperlink{classCheMPS2_1_1TensorX}{Tensor\-X} $\ast$$\ast$Xtensors, int n\-Lower=0, double $\ast$$\ast$Veff\-Tilde=N\-U\-L\-L) const 
+\begin{DoxyCompactList}\small\item\em Davidson Solver. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1Heff}{Heff} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+May 2, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1Heff}{Heff} class contains the sparse eigensolver routines and effective \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} construction needed for the \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} algorithm. 
+
+Definition at line 45 of file Heff.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1Heff_ade178b3ffb362e0b407f50e6393e6f1c}{\index{Che\-M\-P\-S2\-::\-Heff@{Che\-M\-P\-S2\-::\-Heff}!Heff@{Heff}}
+\index{Heff@{Heff}!CheMPS2::Heff@{Che\-M\-P\-S2\-::\-Heff}}
+\paragraph[{Heff}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Heff\-::\-Heff (
+\begin{DoxyParamCaption}
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In, }
+\item[{const {\bf Problem} $\ast$}]{Prob\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1Heff_ade178b3ffb362e0b407f50e6393e6f1c}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em den\-B\-K\-In} & The \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} to get the dimensions \\
+\hline
+{\em Prob\-In} & The \hyperlink{classCheMPS2_1_1Problem}{Problem} that contains the \hyperlink{classCheMPS2_1_1Hamiltonian}{Hamiltonian} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 33 of file Heff.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3}{\index{Che\-M\-P\-S2\-::\-Heff@{Che\-M\-P\-S2\-::\-Heff}!Solve\-D\-A\-V\-I\-D\-S\-O\-N@{Solve\-D\-A\-V\-I\-D\-S\-O\-N}}
+\index{Solve\-D\-A\-V\-I\-D\-S\-O\-N@{Solve\-D\-A\-V\-I\-D\-S\-O\-N}!CheMPS2::Heff@{Che\-M\-P\-S2\-::\-Heff}}
+\paragraph[{Solve\-D\-A\-V\-I\-D\-S\-O\-N}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Heff\-::\-Solve\-D\-A\-V\-I\-D\-S\-O\-N (
+\begin{DoxyParamCaption}
+\item[{{\bf Sobject} $\ast$}]{den\-S, }
+\item[{{\bf Tensor\-L} $\ast$$\ast$$\ast$}]{Ltensors, }
+\item[{{\bf Tensor\-A} $\ast$$\ast$$\ast$$\ast$}]{Atensors, }
+\item[{{\bf Tensor\-B} $\ast$$\ast$$\ast$$\ast$}]{Btensors, }
+\item[{{\bf Tensor\-C} $\ast$$\ast$$\ast$$\ast$}]{Ctensors, }
+\item[{{\bf Tensor\-D} $\ast$$\ast$$\ast$$\ast$}]{Dtensors, }
+\item[{{\bf Tensor\-S0} $\ast$$\ast$$\ast$$\ast$}]{S0tensors, }
+\item[{{\bf Tensor\-S1} $\ast$$\ast$$\ast$$\ast$}]{S1tensors, }
+\item[{{\bf Tensor\-F0} $\ast$$\ast$$\ast$$\ast$}]{F0tensors, }
+\item[{{\bf Tensor\-F1} $\ast$$\ast$$\ast$$\ast$}]{F1tensors, }
+\item[{{\bf Tensor\-Q} $\ast$$\ast$$\ast$}]{Qtensors, }
+\item[{{\bf Tensor\-X} $\ast$$\ast$}]{Xtensors, }
+\item[{int}]{n\-Lower = {\ttfamily 0}, }
+\item[{double $\ast$$\ast$}]{Veff\-Tilde = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3}
+
+
+Davidson Solver. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em den\-S} & Initial guess S-\/object \\
+\hline
+{\em Ltensors} & Pointer to the single contracted 2nd quantized operators \\
+\hline
+{\em Atensors} & Spin-\/0 complementary operators of two creators \\
+\hline
+{\em Btensors} & Spin-\/1 complementary operators of two creators \\
+\hline
+{\em Ctensors} & Spin-\/0 complementary operators of a creator and an annihilator \\
+\hline
+{\em Dtensors} & Spin-\/1 complementary operators of a creator and an annihilator \\
+\hline
+{\em S0tensors} & Spin-\/0 reduction of two creators \\
+\hline
+{\em S1tensors} & Spin-\/1 reduction of two creators \\
+\hline
+{\em F0tensors} & Spin-\/0 reduction of a creator and an annihilator \\
+\hline
+{\em F1tensors} & Spin-\/1 reduction of a creator and an annihilator \\
+\hline
+{\em Qtensors} & Complementary operators of three sandwiched 2nd quantized operators \\
+\hline
+{\em Xtensors} & Pointer to the completely contracted terms \\
+\hline
+{\em n\-Lower} & Number of lower-\/lying states to project out \\
+\hline
+{\em Veff\-Tilde} & The projection operators to project the n\-Lower lower-\/lying states out \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 210 of file Heff.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Heff.\-h\item 
+Heff.\-cpp\item 
+Heff\-Diagonal.\-cpp\item 
+Heff\-Diagrams1.\-cpp\item 
+Heff\-Diagrams2.\-cpp\item 
+Heff\-Diagrams3.\-cpp\item 
+Heff\-Diagrams4.\-cpp\item 
+Heff\-Diagrams5.\-cpp\end{DoxyCompactItemize}

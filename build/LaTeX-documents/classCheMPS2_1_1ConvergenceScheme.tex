@@ -1,0 +1,242 @@
+\hypertarget{classCheMPS2_1_1ConvergenceScheme}{\subsection{Che\-M\-P\-S2\-:\-:Convergence\-Scheme Class Reference}
+\label{classCheMPS2_1_1ConvergenceScheme}\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+}
+
+
+{\ttfamily \#include $<$Convergence\-Scheme.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1ConvergenceScheme_a8aa20cc325aa2c2332bec394bb05823c}{Convergence\-Scheme} (const int n\-Instructions)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_af2ca92fc4ac3bbe78ae0ee252c58fab1}{\hyperlink{classCheMPS2_1_1ConvergenceScheme_af2ca92fc4ac3bbe78ae0ee252c58fab1}{$\sim$\-Convergence\-Scheme} ()}\label{classCheMPS2_1_1ConvergenceScheme_af2ca92fc4ac3bbe78ae0ee252c58fab1}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1ConvergenceScheme_ab8c98d5388c415c42115084c5817e1dc}{get\-N\-Instructions} ()
+\begin{DoxyCompactList}\small\item\em Get the number of instructions. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1ConvergenceScheme_a454421f377a2be63872d9199b84bad95}{set\-Instruction} (const int instruction, const int D, const double Econv, const int n\-Max, const double noise\-Prefactor)
+\begin{DoxyCompactList}\small\item\em Set an instruction. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1ConvergenceScheme_abb766295f71d3c1e3b9edc875504b317}{get\-D} (const int instruction)
+\begin{DoxyCompactList}\small\item\em Get the number of renormalized states for a particular instruction. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1ConvergenceScheme_a531e6d2a63b7fb8ad6d09bffd740687f}{get\-Econv} (const int instruction)
+\begin{DoxyCompactList}\small\item\em Get the energy convergence threshold for a particular instruction. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1ConvergenceScheme_abab59f923fab04a8def8ec6af9748df5}{get\-Max\-Sweeps} (const int instruction)
+\begin{DoxyCompactList}\small\item\em Get the maximum number of sweeps for a particular instruction. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1ConvergenceScheme_a06c60aeec22896b5018541ebcae2aeb8}{get\-Noise\-Prefactor} (const int instruction)
+\begin{DoxyCompactList}\small\item\em Get the noise prefactor for a particular instruction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1ConvergenceScheme}{Convergence\-Scheme} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+November 7, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1ConvergenceScheme}{Convergence\-Scheme} class contains the convergence settings. This is a list of instructions, which are performed in order. Each instruction line contains the information for one particular batch of \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} sweeps\-:\par
+ (1) the number of renormalized basis states to keep (D)\par
+ (2) the energy convergence threshold for energy changes per left-\/ and right-\/sweep\par
+ (3) the maximum number of iterations, in case the energy changes do not drop below the threshold\par
+ (4) the noise prefactor f\par
+ \par
+ The noise level which is added to the \hyperlink{classCheMPS2_1_1Sobject}{Sobject} is the product of\par
+ (1) f\par
+ (2) the maximum discarded weight during the last sweep\par
+ (3) a random number in the interval \mbox{[}-\/0.\-5,0.\-5\mbox{]} 
+
+Definition at line 38 of file Convergence\-Scheme.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_a8aa20cc325aa2c2332bec394bb05823c}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!Convergence\-Scheme@{Convergence\-Scheme}}
+\index{Convergence\-Scheme@{Convergence\-Scheme}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{Convergence\-Scheme}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::\-Convergence\-Scheme (
+\begin{DoxyParamCaption}
+\item[{const int}]{n\-Instructions}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_a8aa20cc325aa2c2332bec394bb05823c}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n\-Instructions} & the number of instructions \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 28 of file Convergence\-Scheme.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_abb766295f71d3c1e3b9edc875504b317}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!get\-D@{get\-D}}
+\index{get\-D@{get\-D}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{get\-D}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::get\-D (
+\begin{DoxyParamCaption}
+\item[{const int}]{instruction}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_abb766295f71d3c1e3b9edc875504b317}
+
+
+Get the number of renormalized states for a particular instruction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instruction} & the number of the instruction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the number of renormalized states for this instruction 
+\end{DoxyReturn}
+
+
+Definition at line 75 of file Convergence\-Scheme.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1ConvergenceScheme_abb766295f71d3c1e3b9edc875504b317_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_a531e6d2a63b7fb8ad6d09bffd740687f}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!get\-Econv@{get\-Econv}}
+\index{get\-Econv@{get\-Econv}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{get\-Econv}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::get\-Econv (
+\begin{DoxyParamCaption}
+\item[{const int}]{instruction}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_a531e6d2a63b7fb8ad6d09bffd740687f}
+
+
+Get the energy convergence threshold for a particular instruction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instruction} & the number of the instruction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the energy convergence threshold for this instruction 
+\end{DoxyReturn}
+
+
+Definition at line 77 of file Convergence\-Scheme.\-cpp.
+
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_abab59f923fab04a8def8ec6af9748df5}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!get\-Max\-Sweeps@{get\-Max\-Sweeps}}
+\index{get\-Max\-Sweeps@{get\-Max\-Sweeps}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{get\-Max\-Sweeps}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::get\-Max\-Sweeps (
+\begin{DoxyParamCaption}
+\item[{const int}]{instruction}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_abab59f923fab04a8def8ec6af9748df5}
+
+
+Get the maximum number of sweeps for a particular instruction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instruction} & the number of the instruction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the maximum number of sweeps for this instruction 
+\end{DoxyReturn}
+
+
+Definition at line 79 of file Convergence\-Scheme.\-cpp.
+
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_ab8c98d5388c415c42115084c5817e1dc}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!get\-N\-Instructions@{get\-N\-Instructions}}
+\index{get\-N\-Instructions@{get\-N\-Instructions}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{get\-N\-Instructions}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::get\-N\-Instructions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_ab8c98d5388c415c42115084c5817e1dc}
+
+
+Get the number of instructions. 
+
+return the number of instructions to converge the \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} calculation 
+
+Definition at line 52 of file Convergence\-Scheme.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1ConvergenceScheme_ab8c98d5388c415c42115084c5817e1dc_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_a06c60aeec22896b5018541ebcae2aeb8}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!get\-Noise\-Prefactor@{get\-Noise\-Prefactor}}
+\index{get\-Noise\-Prefactor@{get\-Noise\-Prefactor}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{get\-Noise\-Prefactor}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::get\-Noise\-Prefactor (
+\begin{DoxyParamCaption}
+\item[{const int}]{instruction}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_a06c60aeec22896b5018541ebcae2aeb8}
+
+
+Get the noise prefactor for a particular instruction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instruction} & the number of the instruction \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the noise prefactor for this instruction 
+\end{DoxyReturn}
+
+
+Definition at line 81 of file Convergence\-Scheme.\-cpp.
+
+\hypertarget{classCheMPS2_1_1ConvergenceScheme_a454421f377a2be63872d9199b84bad95}{\index{Che\-M\-P\-S2\-::\-Convergence\-Scheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}!set\-Instruction@{set\-Instruction}}
+\index{set\-Instruction@{set\-Instruction}!CheMPS2::ConvergenceScheme@{Che\-M\-P\-S2\-::\-Convergence\-Scheme}}
+\paragraph[{set\-Instruction}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Convergence\-Scheme\-::set\-Instruction (
+\begin{DoxyParamCaption}
+\item[{const int}]{instruction, }
+\item[{const int}]{D, }
+\item[{const double}]{Econv, }
+\item[{const int}]{n\-Max, }
+\item[{const double}]{noise\-Prefactor}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1ConvergenceScheme_a454421f377a2be63872d9199b84bad95}
+
+
+Set an instruction. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em instruction} & the number of the instruction \\
+\hline
+{\em D} & the number of renormalized states for that instruction \\
+\hline
+{\em Econv} & the energy convergence threshold for that instruction \\
+\hline
+{\em n\-Max} & the max. number of sweeps for that instruction \\
+\hline
+{\em noise\-Prefactor} & the noise prefactor for that instruction \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 54 of file Convergence\-Scheme.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Convergence\-Scheme.\-h\item 
+Convergence\-Scheme.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,358 @@
+\hypertarget{classCheMPS2_1_1TensorS0Abase}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-S0\-Abase Class Reference}
+\label{classCheMPS2_1_1TensorS0Abase}\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-S0\-Abase.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-S0\-Abase\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{classCheMPS2_1_1TensorS0Abase__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-S0\-Abase\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classCheMPS2_1_1TensorS0Abase__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorS0Abase_a173d2d9371a7a902a213c44fd7ae9d2a}{Tensor\-S0\-Abase} (const int index\-In, const int Idiff\-In, const bool moving\-Right\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a43d958e9fe840f20e760f9e7541da14b}{\hyperlink{classCheMPS2_1_1TensorS0Abase_a43d958e9fe840f20e760f9e7541da14b}{$\sim$\-Tensor\-S0\-Abase} ()}\label{classCheMPS2_1_1TensorS0Abase_a43d958e9fe840f20e760f9e7541da14b}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorS0Abase_a3f13601cd9e8556901b8f935299939c1}{g\-N\-Kappa} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of symmetry blocks. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorS0Abase_a7f771eac5ca75ca558c564bf088be583}{g\-Storage} ()
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorS0Abase_ac96592dcca60ea876eae16a952b4cca5}{g\-Kappa} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2) const 
+\begin{DoxyCompactList}\small\item\em Get the index corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorS0Abase_a6aa52e0b717724ae76fd86259db0cff3}{g\-Kappa2index} (const int kappa) const 
+\begin{DoxyCompactList}\small\item\em Get the storage jump corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorS0Abase_a392183e727ab33605f7bc681bef9da2f}{g\-Storage} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2)
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage of a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorS0Abase_ae7128c323dde642fcf373c1bd8f91994}{g\-Index} () const 
+\begin{DoxyCompactList}\small\item\em Get the boundary index. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorS0Abase_a5a752899bbe8f1d28bfecc0db45dc715}{g\-Idiff} () const 
+\begin{DoxyCompactList}\small\item\em Get Idiff. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorS0Abase_ac948b1b4b9a32f5dddf707de1a86001d}{update} (\hyperlink{classCheMPS2_1_1TensorS0Abase}{Tensor\-S0\-Abase} $\ast$S0\-Abase\-Previous, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T, double $\ast$workmem)
+\begin{DoxyCompactList}\small\item\em Clear and update. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a3d99ca8908161c3f2558ac0c860e8450}{void \hyperlink{classCheMPS2_1_1TensorS0Abase_a3d99ca8908161c3f2558ac0c860e8450}{Clear} ()}\label{classCheMPS2_1_1TensorS0Abase_a3d99ca8908161c3f2558ac0c860e8450}
+
+\begin{DoxyCompactList}\small\item\em Set all storage variables to 0.\-0. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classCheMPS2_1_1TensorS0Abase_aa0936f93318ecc4d6b9db45d34d8380b}{int \hyperlink{classCheMPS2_1_1TensorS0Abase_aa0936f93318ecc4d6b9db45d34d8380b}{Idiff}}\label{classCheMPS2_1_1TensorS0Abase_aa0936f93318ecc4d6b9db45d34d8380b}
+
+\begin{DoxyCompactList}\small\item\em The irrep difference (direct product of the two 2nd quantized operators; both sandwiched \& to sandwich) \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorS0Abase_ab6090ca778e8e1efdfcefedaf91156ec}{bool \hyperlink{classCheMPS2_1_1TensorS0Abase_ab6090ca778e8e1efdfcefedaf91156ec}{moving\-Right}}\label{classCheMPS2_1_1TensorS0Abase_ab6090ca778e8e1efdfcefedaf91156ec}
+
+\begin{DoxyCompactList}\small\item\em Whether or not moving right. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorS0Abase}{Tensor\-S0\-Abase} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+March 1, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorS0Abase}{Tensor\-S0\-Abase} class is a storage class for \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} and \hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A}. It also performs the update of a previous \hyperlink{classCheMPS2_1_1TensorS0Abase}{Tensor\-S0\-Abase} based on moving\-Right. 
+
+Definition at line 33 of file Tensor\-S0\-Abase.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a173d2d9371a7a902a213c44fd7ae9d2a}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!Tensor\-S0\-Abase@{Tensor\-S0\-Abase}}
+\index{Tensor\-S0\-Abase@{Tensor\-S0\-Abase}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{Tensor\-S0\-Abase}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::\-Tensor\-S0\-Abase (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Idiff\-In, }
+\item[{const bool}]{moving\-Right\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorS0Abase_a173d2d9371a7a902a213c44fd7ae9d2a}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em Idiff\-In} & Direct product of irreps of the two 2nd quantized operators; both sandwiched \& to sandwich \\
+\hline
+{\em moving\-Right\-In} & If true\-: sweep from left to right. If false\-: sweep from right to left \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 25 of file Tensor\-S0\-Abase.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorS0Abase_a173d2d9371a7a902a213c44fd7ae9d2a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a5a752899bbe8f1d28bfecc0db45dc715}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Idiff@{g\-Idiff}}
+\index{g\-Idiff@{g\-Idiff}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Idiff}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Idiff (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1TensorS0Abase_a5a752899bbe8f1d28bfecc0db45dc715}
+
+
+Get Idiff. 
+
+\begin{DoxyReturn}{Returns}
+Idiff 
+\end{DoxyReturn}
+
+
+Definition at line 118 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_ae7128c323dde642fcf373c1bd8f91994}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Index@{g\-Index}}
+\index{g\-Index@{g\-Index}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_ae7128c323dde642fcf373c1bd8f91994}
+
+
+Get the boundary index. 
+
+\begin{DoxyReturn}{Returns}
+the index 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a5af7779b53e54e506a1d569a723fdd11}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 116 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_ac96592dcca60ea876eae16a952b4cca5}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Kappa@{g\-Kappa}}
+\index{g\-Kappa@{g\-Kappa}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Kappa (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_ac96592dcca60ea876eae16a952b4cca5}
+
+
+Get the index corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The up particle number sector \\
+\hline
+{\em Two\-S1} & The up spin symmetry sector \\
+\hline
+{\em I1} & The up irrep sector \\
+\hline
+{\em N2} & The down particle number sector \\
+\hline
+{\em Two\-S2} & The down spin symmetry sector \\
+\hline
+{\em I2} & The down irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The kappa corresponding to the input parameters; -\/1 means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a3d8493380e00a9548267a79dae7e5567}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 92 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a6aa52e0b717724ae76fd86259db0cff3}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Kappa2index@{g\-Kappa2index}}
+\index{g\-Kappa2index@{g\-Kappa2index}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Kappa2index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Kappa2index (
+\begin{DoxyParamCaption}
+\item[{const int}]{kappa}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_a6aa52e0b717724ae76fd86259db0cff3}
+
+
+Get the storage jump corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em kappa} & The symmetry block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+kappa2index\mbox{[}kappa\mbox{]}, the memory jumper to a certain block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_adc93c318803791bef7286dfea3b135c0}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 106 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a3f13601cd9e8556901b8f935299939c1}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-N\-Kappa@{g\-N\-Kappa}}
+\index{g\-N\-Kappa@{g\-N\-Kappa}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-N\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-N\-Kappa (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_a3f13601cd9e8556901b8f935299939c1}
+
+
+Get the number of symmetry blocks. 
+
+\begin{DoxyReturn}{Returns}
+The number of symmetry blocks 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_ad68f65759e764c6cb55e2b8db18f8874}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 88 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a7f771eac5ca75ca558c564bf088be583}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Storage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_a7f771eac5ca75ca558c564bf088be583}
+
+
+Get the pointer to the storage. 
+
+return pointer to the storage 
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a2f17a5413447e77ad3f128d49b3ca676}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 90 of file Tensor\-S0\-Abase.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorS0Abase_a7f771eac5ca75ca558c564bf088be583_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_a392183e727ab33605f7bc681bef9da2f}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::g\-Storage (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorS0Abase_a392183e727ab33605f7bc681bef9da2f}
+
+
+Get the pointer to the storage of a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The up particle number sector \\
+\hline
+{\em Two\-S1} & The up spin symmetry sector \\
+\hline
+{\em I1} & The up irrep sector \\
+\hline
+{\em N2} & The down particle number sector \\
+\hline
+{\em Two\-S2} & The down spin symmetry sector \\
+\hline
+{\em I2} & The down irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to the storage of the specified tensor block; N\-U\-L\-L means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a4335fc5fb5892a7386820c72b769f157}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 108 of file Tensor\-S0\-Abase.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0Abase_ac948b1b4b9a32f5dddf707de1a86001d}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}!update@{update}}
+\index{update@{update}!CheMPS2::TensorS0Abase@{Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase}}
+\paragraph[{update}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-S0\-Abase\-::update (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-S0\-Abase} $\ast$}]{S0\-Abase\-Previous, }
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T, }
+\item[{double $\ast$}]{workmem}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorS0Abase_ac948b1b4b9a32f5dddf707de1a86001d}
+
+
+Clear and update. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em S0\-Abase\-Previous} & \hyperlink{classCheMPS2_1_1TensorS0Abase}{Tensor\-S0\-Abase} needed for the update \\
+\hline
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} needed for the update. \\
+\hline
+{\em workmem} & Work memory \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 126 of file Tensor\-S0\-Abase.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-S0\-Abase.\-h\item 
+Tensor\-S0\-Abase.\-cpp\end{DoxyCompactItemize}

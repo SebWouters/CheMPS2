@@ -1,0 +1,582 @@
+\hypertarget{classCheMPS2_1_1SyBookkeeper}{\subsection{Che\-M\-P\-S2\-:\-:Sy\-Bookkeeper Class Reference}
+\label{classCheMPS2_1_1SyBookkeeper}\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+}
+
+
+{\ttfamily \#include $<$Sy\-Bookkeeper.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Sy\-Bookkeeper\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1SyBookkeeper__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Sy\-Bookkeeper\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1SyBookkeeper__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1SyBookkeeper_a755ef2a2c237dcacba3ac4a5a8ea272a}{Sy\-Bookkeeper} (const \hyperlink{classCheMPS2_1_1Problem}{Problem} $\ast$Probin, const int Din)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a3904b642db40bc33db72612d3c534f8f}{\hyperlink{classCheMPS2_1_1SyBookkeeper_a3904b642db40bc33db72612d3c534f8f}{$\sim$\-Sy\-Bookkeeper} ()}\label{classCheMPS2_1_1SyBookkeeper_a3904b642db40bc33db72612d3c534f8f}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_aff6ffb8d891d6380a7b2770348a0dcd7}{g\-L} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of orbitals. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_ab06fa32f4e352d248ebfe67d850a574a}{g\-Irrep} (const int n\-Orb) const 
+\begin{DoxyCompactList}\small\item\em Get an orbital irrep. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a72189d68fe5a90d9b5e4f11aa752a393}{g\-Two\-S} () const 
+\begin{DoxyCompactList}\small\item\em Get twice the targeted spin. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_af39babd5df4cb5eeb84ffc017af841c3}{g\-N} () const 
+\begin{DoxyCompactList}\small\item\em Get the targeted particle number. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a280917b55df99e07e707f7e088b5f58d}{g\-Irrep} () const 
+\begin{DoxyCompactList}\small\item\em Get the targeted irrep. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a00b1b29641aade9ff5f4ce68e46c8320}{g\-Nmin} (const int bound) const 
+\begin{DoxyCompactList}\small\item\em Get the min. possible particle number for a certain boundary. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a39bc51595360d808a224ca6021ead99b}{g\-Nmax} (const int bound) const 
+\begin{DoxyCompactList}\small\item\em Get the max. possible particle number for a certain boundary. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_aa1a9f3397c15a44e10035f22161fc825}{g\-Two\-Smin} (const int bound, const int N) const 
+\begin{DoxyCompactList}\small\item\em Get the min. possible spin value for a certain boundary and particle number. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a5203e4ac44a9c369974d9f817f634ddb}{g\-Two\-Smax} (const int bound, const int N) const 
+\begin{DoxyCompactList}\small\item\em Get the max. possible spin value for a certain boundary and particle number. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a6f5e333529c89f6f5f2ce2f11e082c49}{g\-F\-C\-Idim} (const int bound, const int N, const int Two\-S, const int Icnt) const 
+\begin{DoxyCompactList}\small\item\em Get the F\-C\-I virtual dimensions (bound by cutoff) \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_a44ff8a4f047febaab0674a239c982715}{g\-D} () const 
+\begin{DoxyCompactList}\small\item\em Get the total (reduced) virtual dimension. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_ab9e13e1079e56b1ee12d4ed82b8c7d82}{g\-Current\-Dim} (const int bound, const int N, const int Two\-S, const int Icnt) const 
+\begin{DoxyCompactList}\small\item\em Get the current virtual dimensions. \end{DoxyCompactList}\item 
+bool \hyperlink{classCheMPS2_1_1SyBookkeeper_ae6bcbf2398cda17b45c02af73a02fc65}{Is\-Possible} () const 
+\begin{DoxyCompactList}\small\item\em Get whether the desired symmetry sector is possible. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1SyBookkeeper_ab496351a4cbc31f88be340d987d11406}{Set\-Dim} (const int bound, const int N, const int Two\-S, const int Icnt, const int val)
+\begin{DoxyCompactList}\small\item\em Get the current virtual dimensions. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1SyBookkeeper_ad52f6f852f6f2f88c286579054c1886f}{g\-Max\-Dim\-At\-Bound} (const int i\-Bound) const 
+\begin{DoxyCompactList}\small\item\em Get the max. virtual dimension at a certain boundary. Useful function to preallocate memory when constructing \hyperlink{classCheMPS2_1_1Heff}{Heff}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 14, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} class keeps track of all the symmetry at the boundaries. This includes\-:
+\begin{DoxyItemize}
+\item the F\-C\-I virtual dimensions per symmetry sector
+\item an extra consistency check (next to the one in \hyperlink{Problem_8cpp_source}{Problem.\-cpp}) to check whether the desired symmetry in the \hyperlink{classCheMPS2_1_1Problem}{Problem} class is possible (non-\/zero F\-C\-I dimensions)
+\item the current virtual dimensions per symmetry sector, so everyone can check the current dimensions here. 
+\end{DoxyItemize}
+
+Definition at line 36 of file Sy\-Bookkeeper.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a755ef2a2c237dcacba3ac4a5a8ea272a}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!Sy\-Bookkeeper@{Sy\-Bookkeeper}}
+\index{Sy\-Bookkeeper@{Sy\-Bookkeeper}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{Sy\-Bookkeeper}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::\-Sy\-Bookkeeper (
+\begin{DoxyParamCaption}
+\item[{const {\bf Problem} $\ast$}]{Probin, }
+\item[{const int}]{Din}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1SyBookkeeper_a755ef2a2c237dcacba3ac4a5a8ea272a}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Probin} & The problem to be solved \\
+\hline
+{\em Din} & The initial number of reduced renormalized \hyperlink{classCheMPS2_1_1DMRG}{D\-M\-R\-G} basis states \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 32 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_a755ef2a2c237dcacba3ac4a5a8ea272a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1SyBookkeeper_ab9e13e1079e56b1ee12d4ed82b8c7d82}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Current\-Dim@{g\-Current\-Dim}}
+\index{g\-Current\-Dim@{g\-Current\-Dim}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Current\-Dim}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Current\-Dim (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound, }
+\item[{const int}]{N, }
+\item[{const int}]{Two\-S, }
+\item[{const int}]{Icnt}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_ab9e13e1079e56b1ee12d4ed82b8c7d82}
+
+
+Get the current virtual dimensions. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+{\em N} & The particle number \\
+\hline
+{\em Two\-S} & Twice the spin sector \\
+\hline
+{\em Icnt} & The irrep \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Current\-Dim\mbox{[}bound\mbox{]}\mbox{[}N-\/g\-Nmin(bound)\mbox{]}\mbox{[}(Two\-S-\/g\-Two\-Smin(bound,N))/2\mbox{]}\mbox{[}Icnt\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 127 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_ab9e13e1079e56b1ee12d4ed82b8c7d82_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a44ff8a4f047febaab0674a239c982715}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-D@{g\-D}}
+\index{g\-D@{g\-D}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-D}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-D (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a44ff8a4f047febaab0674a239c982715}
+
+
+Get the total (reduced) virtual dimension. 
+
+\begin{DoxyReturn}{Returns}
+The virtual dimension (reduced) 
+\end{DoxyReturn}
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a6f5e333529c89f6f5f2ce2f11e082c49}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-F\-C\-Idim@{g\-F\-C\-Idim}}
+\index{g\-F\-C\-Idim@{g\-F\-C\-Idim}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-F\-C\-Idim}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-F\-C\-Idim (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound, }
+\item[{const int}]{N, }
+\item[{const int}]{Two\-S, }
+\item[{const int}]{Icnt}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a6f5e333529c89f6f5f2ce2f11e082c49}
+
+
+Get the F\-C\-I virtual dimensions (bound by cutoff) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+{\em N} & The particle number \\
+\hline
+{\em Two\-S} & Twice the spin sector \\
+\hline
+{\em Icnt} & The irrep \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+F\-C\-Idim\mbox{[}bound\mbox{]}\mbox{[}N-\/g\-Nmin(bound)\mbox{]}\mbox{[}(Two\-S-\/g\-Two\-Smin(bound,N))/2\mbox{]}\mbox{[}Icnt\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 125 of file Sy\-Bookkeeper.\-cpp.
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_ab06fa32f4e352d248ebfe67d850a574a}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Irrep@{g\-Irrep}}
+\index{g\-Irrep@{g\-Irrep}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Irrep}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Irrep (
+\begin{DoxyParamCaption}
+\item[{const int}]{n\-Orb}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_ab06fa32f4e352d248ebfe67d850a574a}
+
+
+Get an orbital irrep. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n\-Orb} & The orbital index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The irrep of the orbital with index n\-Orb 
+\end{DoxyReturn}
+
+
+Definition at line 109 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_ab06fa32f4e352d248ebfe67d850a574a_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a280917b55df99e07e707f7e088b5f58d}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Irrep@{g\-Irrep}}
+\index{g\-Irrep@{g\-Irrep}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Irrep}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Irrep (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a280917b55df99e07e707f7e088b5f58d}
+
+
+Get the targeted irrep. 
+
+\begin{DoxyReturn}{Returns}
+The targeted irrep 
+\end{DoxyReturn}
+
+
+Definition at line 115 of file Sy\-Bookkeeper.\-cpp.
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_aff6ffb8d891d6380a7b2770348a0dcd7}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-L@{g\-L}}
+\index{g\-L@{g\-L}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-L}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-L (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_aff6ffb8d891d6380a7b2770348a0dcd7}
+
+
+Get the number of orbitals. 
+
+\begin{DoxyReturn}{Returns}
+The number of orbitals 
+\end{DoxyReturn}
+
+
+Definition at line 107 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_aff6ffb8d891d6380a7b2770348a0dcd7_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_ad52f6f852f6f2f88c286579054c1886f}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Max\-Dim\-At\-Bound@{g\-Max\-Dim\-At\-Bound}}
+\index{g\-Max\-Dim\-At\-Bound@{g\-Max\-Dim\-At\-Bound}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Max\-Dim\-At\-Bound}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Max\-Dim\-At\-Bound (
+\begin{DoxyParamCaption}
+\item[{const int}]{i\-Bound}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_ad52f6f852f6f2f88c286579054c1886f}
+
+
+Get the max. virtual dimension at a certain boundary. Useful function to preallocate memory when constructing \hyperlink{classCheMPS2_1_1Heff}{Heff}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i\-Bound} & The boundary index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The max. virtual dimension at i\-Bound 
+\end{DoxyReturn}
+
+
+Definition at line 272 of file Sy\-Bookkeeper.\-cpp.
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_af39babd5df4cb5eeb84ffc017af841c3}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-N@{g\-N}}
+\index{g\-N@{g\-N}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-N}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-N (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_af39babd5df4cb5eeb84ffc017af841c3}
+
+
+Get the targeted particle number. 
+
+\begin{DoxyReturn}{Returns}
+The targeted particle number 
+\end{DoxyReturn}
+
+
+Definition at line 113 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_af39babd5df4cb5eeb84ffc017af841c3_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a39bc51595360d808a224ca6021ead99b}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Nmax@{g\-Nmax}}
+\index{g\-Nmax@{g\-Nmax}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Nmax}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Nmax (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a39bc51595360d808a224ca6021ead99b}
+
+
+Get the max. possible particle number for a certain boundary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nmax\mbox{[}bound\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 119 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_a39bc51595360d808a224ca6021ead99b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a00b1b29641aade9ff5f4ce68e46c8320}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Nmin@{g\-Nmin}}
+\index{g\-Nmin@{g\-Nmin}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Nmin}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Nmin (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a00b1b29641aade9ff5f4ce68e46c8320}
+
+
+Get the min. possible particle number for a certain boundary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index (from 0 to L (included)) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Nmin\mbox{[}bound\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 117 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_a00b1b29641aade9ff5f4ce68e46c8320_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a72189d68fe5a90d9b5e4f11aa752a393}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Two\-S@{g\-Two\-S}}
+\index{g\-Two\-S@{g\-Two\-S}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Two\-S}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Two\-S (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a72189d68fe5a90d9b5e4f11aa752a393}
+
+
+Get twice the targeted spin. 
+
+\begin{DoxyReturn}{Returns}
+Twice the targeted spin 
+\end{DoxyReturn}
+
+
+Definition at line 111 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_a72189d68fe5a90d9b5e4f11aa752a393_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_a5203e4ac44a9c369974d9f817f634ddb}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Two\-Smax@{g\-Two\-Smax}}
+\index{g\-Two\-Smax@{g\-Two\-Smax}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Two\-Smax}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Two\-Smax (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound, }
+\item[{const int}]{N}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_a5203e4ac44a9c369974d9f817f634ddb}
+
+
+Get the max. possible spin value for a certain boundary and particle number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+{\em N} & The particle number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Two\-Smax\mbox{[}bound\mbox{]}\mbox{[}N-\/\-Nmin\mbox{[}bound\mbox{]}\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 123 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_a5203e4ac44a9c369974d9f817f634ddb_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_aa1a9f3397c15a44e10035f22161fc825}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!g\-Two\-Smin@{g\-Two\-Smin}}
+\index{g\-Two\-Smin@{g\-Two\-Smin}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{g\-Two\-Smin}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::g\-Two\-Smin (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound, }
+\item[{const int}]{N}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_aa1a9f3397c15a44e10035f22161fc825}
+
+
+Get the min. possible spin value for a certain boundary and particle number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+{\em N} & The particle number \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Two\-Smin\mbox{[}bound\mbox{]}\mbox{[}N-\/\-Nmin\mbox{[}bound\mbox{]}\mbox{]} 
+\end{DoxyReturn}
+
+
+Definition at line 121 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_aa1a9f3397c15a44e10035f22161fc825_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_ae6bcbf2398cda17b45c02af73a02fc65}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!Is\-Possible@{Is\-Possible}}
+\index{Is\-Possible@{Is\-Possible}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{Is\-Possible}]{\setlength{\rightskip}{0pt plus 5cm}bool Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::\-Is\-Possible (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1SyBookkeeper_ae6bcbf2398cda17b45c02af73a02fc65}
+
+
+Get whether the desired symmetry sector is possible. 
+
+\begin{DoxyReturn}{Returns}
+The virtual dimension (reduced) 
+\end{DoxyReturn}
+
+
+Definition at line 313 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1SyBookkeeper_ae6bcbf2398cda17b45c02af73a02fc65_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1SyBookkeeper_ab496351a4cbc31f88be340d987d11406}{\index{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}!Set\-Dim@{Set\-Dim}}
+\index{Set\-Dim@{Set\-Dim}!CheMPS2::SyBookkeeper@{Che\-M\-P\-S2\-::\-Sy\-Bookkeeper}}
+\paragraph[{Set\-Dim}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Sy\-Bookkeeper\-::\-Set\-Dim (
+\begin{DoxyParamCaption}
+\item[{const int}]{bound, }
+\item[{const int}]{N, }
+\item[{const int}]{Two\-S, }
+\item[{const int}]{Icnt, }
+\item[{const int}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1SyBookkeeper_ab496351a4cbc31f88be340d987d11406}
+
+
+Get the current virtual dimensions. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bound} & The boundary index \\
+\hline
+{\em N} & The particle number \\
+\hline
+{\em Two\-S} & Twice the spin sector \\
+\hline
+{\em Icnt} & The irrep \\
+\hline
+{\em val} & The new dimension size \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 129 of file Sy\-Bookkeeper.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Sy\-Bookkeeper.\-h\item 
+Sy\-Bookkeeper.\-cpp\end{DoxyCompactItemize}

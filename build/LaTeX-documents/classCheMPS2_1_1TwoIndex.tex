@@ -1,0 +1,169 @@
+\hypertarget{classCheMPS2_1_1TwoIndex}{\subsection{Che\-M\-P\-S2\-:\-:Two\-Index Class Reference}
+\label{classCheMPS2_1_1TwoIndex}\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}}
+}
+
+
+{\ttfamily \#include $<$Two\-Index.\-h$>$}
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TwoIndex_a6f6c5a45f2522d4adfc4f51d161ef680}{Two\-Index} (const int n\-Group, const int $\ast$Irrep\-Sizes)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TwoIndex_afcc065077cfa14cfecc9a325f39e4649}{virtual \hyperlink{classCheMPS2_1_1TwoIndex_afcc065077cfa14cfecc9a325f39e4649}{$\sim$\-Two\-Index} ()}\label{classCheMPS2_1_1TwoIndex_afcc065077cfa14cfecc9a325f39e4649}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TwoIndex_a4385881853e910bb1ce7d5ea911b75c4}{set} (const int irrep, const int i, const int j, const double val)
+\begin{DoxyCompactList}\small\item\em Set an element. \end{DoxyCompactList}\item 
+double \hyperlink{classCheMPS2_1_1TwoIndex_a49c7065a18ca6b82e7a63a56cdf2687c}{get} (const int irrep, const int i, const int j) const 
+\begin{DoxyCompactList}\small\item\em Get an element. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TwoIndex_a8e9f890d5af1091e10d09f43da11de12}{save} (const std\-::string name) const 
+\begin{DoxyCompactList}\small\item\em Save the \hyperlink{classCheMPS2_1_1TwoIndex}{Two\-Index} object. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TwoIndex_a56586b601fa0b79fd6ab93c1a01d9705}{read} (const std\-::string name)
+\begin{DoxyCompactList}\small\item\em Load the \hyperlink{classCheMPS2_1_1TwoIndex}{Two\-Index} object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TwoIndex}{Two\-Index} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 8, 2013
+\end{DoxyDate}
+Container class for symmetric two-\/index tensors with Abelian point group symmetry (real character table; see \hyperlink{Irreps_8h_source}{Irreps.\-h})\-: 1\-D\-Ms and 1-\/particle matrix elements. 
+
+Definition at line 32 of file Two\-Index.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TwoIndex_a6f6c5a45f2522d4adfc4f51d161ef680}{\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}!Two\-Index@{Two\-Index}}
+\index{Two\-Index@{Two\-Index}!CheMPS2::TwoIndex@{Che\-M\-P\-S2\-::\-Two\-Index}}
+\paragraph[{Two\-Index}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Two\-Index\-::\-Two\-Index (
+\begin{DoxyParamCaption}
+\item[{const int}]{n\-Group, }
+\item[{const int $\ast$}]{Irrep\-Sizes}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TwoIndex_a6f6c5a45f2522d4adfc4f51d161ef680}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em n\-Group} & The symmetry group number (see \hyperlink{Irreps_8h_source}{Irreps.\-h}) \\
+\hline
+{\em Irrep\-Sizes} & Array with length the number of irreps of the specified group, containing the number of orbitals of that irrep \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 30 of file Two\-Index.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TwoIndex_a49c7065a18ca6b82e7a63a56cdf2687c}{\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}!get@{get}}
+\index{get@{get}!CheMPS2::TwoIndex@{Che\-M\-P\-S2\-::\-Two\-Index}}
+\paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}double Che\-M\-P\-S2\-::\-Two\-Index\-::get (
+\begin{DoxyParamCaption}
+\item[{const int}]{irrep, }
+\item[{const int}]{i, }
+\item[{const int}]{j}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1TwoIndex_a49c7065a18ca6b82e7a63a56cdf2687c}
+
+
+Get an element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em irrep} & The irrep number (see \hyperlink{Irreps_8h_source}{Irreps.\-h}) \\
+\hline
+{\em i} & The first index (within the symmetry block) \\
+\hline
+{\em j} & The second index (within the symmetry block) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value of the matrix element 
+\end{DoxyReturn}
+
+
+Definition at line 59 of file Two\-Index.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TwoIndex_a56586b601fa0b79fd6ab93c1a01d9705}{\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}!read@{read}}
+\index{read@{read}!CheMPS2::TwoIndex@{Che\-M\-P\-S2\-::\-Two\-Index}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Two\-Index\-::read (
+\begin{DoxyParamCaption}
+\item[{const std\-::string}]{name}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TwoIndex_a56586b601fa0b79fd6ab93c1a01d9705}
+
+
+Load the \hyperlink{classCheMPS2_1_1TwoIndex}{Two\-Index} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & filename \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 128 of file Two\-Index.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TwoIndex_a8e9f890d5af1091e10d09f43da11de12}{\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}!save@{save}}
+\index{save@{save}!CheMPS2::TwoIndex@{Che\-M\-P\-S2\-::\-Two\-Index}}
+\paragraph[{save}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Two\-Index\-::save (
+\begin{DoxyParamCaption}
+\item[{const std\-::string}]{name}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1TwoIndex_a8e9f890d5af1091e10d09f43da11de12}
+
+
+Save the \hyperlink{classCheMPS2_1_1TwoIndex}{Two\-Index} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em name} & filename \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 66 of file Two\-Index.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TwoIndex_a4385881853e910bb1ce7d5ea911b75c4}{\index{Che\-M\-P\-S2\-::\-Two\-Index@{Che\-M\-P\-S2\-::\-Two\-Index}!set@{set}}
+\index{set@{set}!CheMPS2::TwoIndex@{Che\-M\-P\-S2\-::\-Two\-Index}}
+\paragraph[{set}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Two\-Index\-::set (
+\begin{DoxyParamCaption}
+\item[{const int}]{irrep, }
+\item[{const int}]{i, }
+\item[{const int}]{j, }
+\item[{const double}]{val}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TwoIndex_a4385881853e910bb1ce7d5ea911b75c4}
+
+
+Set an element. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em irrep} & The irrep number (see \hyperlink{Irreps_8h_source}{Irreps.\-h}) \\
+\hline
+{\em i} & The first index (within the symmetry block) \\
+\hline
+{\em j} & The second index (within the symmetry block) \\
+\hline
+{\em val} & The value to which the element of the matrix should be set \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 52 of file Two\-Index.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Two\-Index.\-h\item 
+Two\-Index.\-cpp\end{DoxyCompactItemize}

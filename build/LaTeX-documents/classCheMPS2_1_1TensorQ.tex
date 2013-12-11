@@ -1,0 +1,235 @@
+\hypertarget{classCheMPS2_1_1TensorQ}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-Q Class Reference}
+\label{classCheMPS2_1_1TensorQ}\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-Q.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-Q\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classCheMPS2_1_1TensorQ__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-Q\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1TensorQ__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorQ_a29123b1ef23fbbdcf7d29d5c60b11b9f}{Tensor\-Q} (const int index\-In, const int Idiff\-In, const bool moving\-Right\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In, const \hyperlink{classCheMPS2_1_1Problem}{Problem} $\ast$Prob\-In, const int site\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorQ_ab61a16cadc17ff60870be54d27216f9f}{\hyperlink{classCheMPS2_1_1TensorQ_ab61a16cadc17ff60870be54d27216f9f}{$\sim$\-Tensor\-Q} ()}\label{classCheMPS2_1_1TensorQ_ab61a16cadc17ff60870be54d27216f9f}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorQ_aa8b8725cc9529f5954b7c16398fa7b00}{void \hyperlink{classCheMPS2_1_1TensorQ_aa8b8725cc9529f5954b7c16398fa7b00}{Clear\-Storage} ()}\label{classCheMPS2_1_1TensorQ_aa8b8725cc9529f5954b7c16398fa7b00}
+
+\begin{DoxyCompactList}\small\item\em Clear storage in case an update is not possible. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorQ_a2713d322bf2d702d276cac8619196b0f}{Add\-Term\-Simple} (\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T)
+\begin{DoxyCompactList}\small\item\em Add terms after update/clear without previous tensors. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorQ_a1aabed806e81453ed29f84626985bc65}{Add\-Terms\-L} (\hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} $\ast$$\ast$Ltensors, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T, double $\ast$workmem, double $\ast$workmem2)
+\begin{DoxyCompactList}\small\item\em Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorQ_acf51806ae9d447da34bcd0fb1d4ec814}{Add\-Terms\-A\-B} (\hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A} $\ast$den\-A, \hyperlink{classCheMPS2_1_1TensorB}{Tensor\-B} $\ast$den\-B, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T, double $\ast$workmem, double $\ast$workmem2)
+\begin{DoxyCompactList}\small\item\em Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A}'s and \hyperlink{classCheMPS2_1_1TensorB}{Tensor\-B}'s. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorQ_a330b217d44dc4d318c8d7e01bb6789cc}{Add\-Terms\-C\-F0\-D\-F1} (\hyperlink{classCheMPS2_1_1TensorC}{Tensor\-C} $\ast$den\-C, \hyperlink{classCheMPS2_1_1TensorF0}{Tensor\-F0} $\ast$$\ast$de\-F0s, \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D} $\ast$den\-D, \hyperlink{classCheMPS2_1_1TensorF1}{Tensor\-F1} $\ast$$\ast$de\-F1s, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T, double $\ast$workmem, double $\ast$workmem2)
+\begin{DoxyCompactList}\small\item\em Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorC}{Tensor\-C}'s, \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D}'s, \hyperlink{classCheMPS2_1_1TensorF0}{Tensor\-F0}'s, \hyperlink{classCheMPS2_1_1TensorF1}{Tensor\-F1}'s. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorQ}{Tensor\-Q} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+March 5, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorQ}{Tensor\-Q} class is a storage and manipulation class for the complementary operator of three contracted creators/annihilitors. 
+
+Definition at line 41 of file Tensor\-Q.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorQ_a29123b1ef23fbbdcf7d29d5c60b11b9f}{\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}!Tensor\-Q@{Tensor\-Q}}
+\index{Tensor\-Q@{Tensor\-Q}!CheMPS2::TensorQ@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+\paragraph[{Tensor\-Q}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-Q\-::\-Tensor\-Q (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Idiff\-In, }
+\item[{const bool}]{moving\-Right\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In, }
+\item[{const {\bf Problem} $\ast$}]{Prob\-In, }
+\item[{const int}]{site\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorQ_a29123b1ef23fbbdcf7d29d5c60b11b9f}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em Idiff\-In} & The irrep of the one creator ( sandwiched if \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} ; to sandwich if \hyperlink{classCheMPS2_1_1TensorQ}{Tensor\-Q} ) \\
+\hline
+{\em moving\-Right\-In} & If true\-: sweep from left to right. If false\-: sweep from right to left \\
+\hline
+{\em den\-B\-K\-In} & Symmetry bookkeeper of the problem at hand \\
+\hline
+{\em Prob\-In} & \hyperlink{classCheMPS2_1_1Problem}{Problem} containing the matrix elements \\
+\hline
+{\em site\-In} & The site on which the last crea/annih should work \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 27 of file Tensor\-Q.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorQ_acf51806ae9d447da34bcd0fb1d4ec814}{\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}!Add\-Terms\-A\-B@{Add\-Terms\-A\-B}}
+\index{Add\-Terms\-A\-B@{Add\-Terms\-A\-B}!CheMPS2::TensorQ@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+\paragraph[{Add\-Terms\-A\-B}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-Q\-::\-Add\-Terms\-A\-B (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-A} $\ast$}]{den\-A, }
+\item[{{\bf Tensor\-B} $\ast$}]{den\-B, }
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T, }
+\item[{double $\ast$}]{workmem, }
+\item[{double $\ast$}]{workmem2}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorQ_acf51806ae9d447da34bcd0fb1d4ec814}
+
+
+Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A}'s and \hyperlink{classCheMPS2_1_1TensorB}{Tensor\-B}'s. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em den\-A} & The \hyperlink{classCheMPS2_1_1TensorA}{Tensor\-A} to construct the Q-\/term \\
+\hline
+{\em den\-B} & The \hyperlink{classCheMPS2_1_1TensorB}{Tensor\-B} to construct the Q-\/term \\
+\hline
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to construct the Q-\/term with previous \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s \\
+\hline
+{\em workmem} & Work memory \\
+\hline
+{\em workmem2} & Work memory \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 379 of file Tensor\-Q.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorQ_a330b217d44dc4d318c8d7e01bb6789cc}{\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}!Add\-Terms\-C\-F0\-D\-F1@{Add\-Terms\-C\-F0\-D\-F1}}
+\index{Add\-Terms\-C\-F0\-D\-F1@{Add\-Terms\-C\-F0\-D\-F1}!CheMPS2::TensorQ@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+\paragraph[{Add\-Terms\-C\-F0\-D\-F1}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-Q\-::\-Add\-Terms\-C\-F0\-D\-F1 (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-C} $\ast$}]{den\-C, }
+\item[{{\bf Tensor\-F0} $\ast$$\ast$}]{de\-F0s, }
+\item[{{\bf Tensor\-D} $\ast$}]{den\-D, }
+\item[{{\bf Tensor\-F1} $\ast$$\ast$}]{de\-F1s, }
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T, }
+\item[{double $\ast$}]{workmem, }
+\item[{double $\ast$}]{workmem2}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorQ_a330b217d44dc4d318c8d7e01bb6789cc}
+
+
+Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorC}{Tensor\-C}'s, \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D}'s, \hyperlink{classCheMPS2_1_1TensorF0}{Tensor\-F0}'s, \hyperlink{classCheMPS2_1_1TensorF1}{Tensor\-F1}'s. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em den\-C} & The \hyperlink{classCheMPS2_1_1TensorC}{Tensor\-C} to construct the Q-\/term \\
+\hline
+{\em de\-F0s} & The \hyperlink{classCheMPS2_1_1TensorF0}{Tensor\-F0}'s to construct this Q-\/term \\
+\hline
+{\em den\-D} & The \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D} to construct the Q-\/term \\
+\hline
+{\em de\-F1s} & The \hyperlink{classCheMPS2_1_1TensorF1}{Tensor\-F1}'s to construct this Q-\/term \\
+\hline
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to construct the Q-\/term with previous \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s \\
+\hline
+{\em workmem} & Work memory \\
+\hline
+{\em workmem2} & Work memory \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 592 of file Tensor\-Q.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorQ_a2713d322bf2d702d276cac8619196b0f}{\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}!Add\-Term\-Simple@{Add\-Term\-Simple}}
+\index{Add\-Term\-Simple@{Add\-Term\-Simple}!CheMPS2::TensorQ@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+\paragraph[{Add\-Term\-Simple}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-Q\-::\-Add\-Term\-Simple (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorQ_a2713d322bf2d702d276cac8619196b0f}
+
+
+Add terms after update/clear without previous tensors. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to construct the Q-\/term without previous tensors \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 40 of file Tensor\-Q.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorQ_a2713d322bf2d702d276cac8619196b0f_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorQ_a1aabed806e81453ed29f84626985bc65}{\index{Che\-M\-P\-S2\-::\-Tensor\-Q@{Che\-M\-P\-S2\-::\-Tensor\-Q}!Add\-Terms\-L@{Add\-Terms\-L}}
+\index{Add\-Terms\-L@{Add\-Terms\-L}!CheMPS2::TensorQ@{Che\-M\-P\-S2\-::\-Tensor\-Q}}
+\paragraph[{Add\-Terms\-L}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-Q\-::\-Add\-Terms\-L (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-L} $\ast$$\ast$}]{Ltensors, }
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T, }
+\item[{double $\ast$}]{workmem, }
+\item[{double $\ast$}]{workmem2}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorQ_a1aabed806e81453ed29f84626985bc65}
+
+
+Add terms after update/clear with previous \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Ltensors} & The \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s to construct the Q-\/term \\
+\hline
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} to construct the Q-\/term with previous \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L}'s \\
+\hline
+{\em workmem} & Work memory \\
+\hline
+{\em workmem2} & Work memory \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 101 of file Tensor\-Q.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-Q.\-h\item 
+Tensor\-Q.\-cpp\end{DoxyCompactItemize}

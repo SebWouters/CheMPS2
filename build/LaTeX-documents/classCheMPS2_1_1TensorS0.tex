@@ -1,0 +1,130 @@
+\hypertarget{classCheMPS2_1_1TensorS0}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-S0 Class Reference}
+\label{classCheMPS2_1_1TensorS0}\index{Che\-M\-P\-S2\-::\-Tensor\-S0@{Che\-M\-P\-S2\-::\-Tensor\-S0}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-S0.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-S0\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classCheMPS2_1_1TensorS0__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-S0\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classCheMPS2_1_1TensorS0__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorS0_a862df3a3f5650891950e20ee80729cda}{Tensor\-S0} (const int index\-In, const int Idiff\-In, const bool moving\-Right\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorS0_ace3bc035b03bcbf1b0a8f94b96977465}{\hyperlink{classCheMPS2_1_1TensorS0_ace3bc035b03bcbf1b0a8f94b96977465}{$\sim$\-Tensor\-S0} ()}\label{classCheMPS2_1_1TensorS0_ace3bc035b03bcbf1b0a8f94b96977465}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorS0_a09b9ad3cb125b902abbb3a658e3a60b7}{makenew} (\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T)
+\item 
+void \hyperlink{classCheMPS2_1_1TensorS0_ad4e092203dac9cedc8e5d6ecc7e60dce}{makenew} (\hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} $\ast$den\-L, \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} $\ast$den\-T, double $\ast$workmem)
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+March 1, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} class is a storage and manipulation class for the spin-\/0 component of two contracted creators or two contracted annihilators. 
+
+Definition at line 35 of file Tensor\-S0.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorS0_a862df3a3f5650891950e20ee80729cda}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0@{Che\-M\-P\-S2\-::\-Tensor\-S0}!Tensor\-S0@{Tensor\-S0}}
+\index{Tensor\-S0@{Tensor\-S0}!CheMPS2::TensorS0@{Che\-M\-P\-S2\-::\-Tensor\-S0}}
+\paragraph[{Tensor\-S0}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-S0\-::\-Tensor\-S0 (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Idiff\-In, }
+\item[{const bool}]{moving\-Right\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorS0_a862df3a3f5650891950e20ee80729cda}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em Idiff\-In} & Direct product of irreps of the two 2nd quantized operators; both sandwiched \& to sandwich \\
+\hline
+{\em moving\-Right\-In} & If true\-: sweep from left to right. If false\-: sweep from right to left \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 26 of file Tensor\-S0.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorS0_a09b9ad3cb125b902abbb3a658e3a60b7}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0@{Che\-M\-P\-S2\-::\-Tensor\-S0}!makenew@{makenew}}
+\index{makenew@{makenew}!CheMPS2::TensorS0@{Che\-M\-P\-S2\-::\-Tensor\-S0}}
+\paragraph[{makenew}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-S0\-::makenew (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorS0_a09b9ad3cb125b902abbb3a658e3a60b7}
+
+\begin{DoxyParams}{Parameters}
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} from which the new \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} should be made. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 34 of file Tensor\-S0.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorS0_ad4e092203dac9cedc8e5d6ecc7e60dce}{\index{Che\-M\-P\-S2\-::\-Tensor\-S0@{Che\-M\-P\-S2\-::\-Tensor\-S0}!makenew@{makenew}}
+\index{makenew@{makenew}!CheMPS2::TensorS0@{Che\-M\-P\-S2\-::\-Tensor\-S0}}
+\paragraph[{makenew}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-S0\-::makenew (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-L} $\ast$}]{den\-L, }
+\item[{{\bf Tensor\-T} $\ast$}]{den\-T, }
+\item[{double $\ast$}]{workmem}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorS0_ad4e092203dac9cedc8e5d6ecc7e60dce}
+
+\begin{DoxyParams}{Parameters}
+{\em den\-L} & \hyperlink{classCheMPS2_1_1TensorL}{Tensor\-L} from which the new \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} should be made. \\
+\hline
+{\em den\-T} & \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} from which the new \hyperlink{classCheMPS2_1_1TensorS0}{Tensor\-S0} should be made. \\
+\hline
+{\em workmem} & Work memory \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 41 of file Tensor\-S0.\-cpp.
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-S0.\-h\item 
+Tensor\-S0.\-cpp\end{DoxyCompactItemize}

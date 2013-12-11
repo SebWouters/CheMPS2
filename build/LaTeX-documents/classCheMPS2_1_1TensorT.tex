@@ -1,0 +1,508 @@
+\hypertarget{classCheMPS2_1_1TensorT}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-T Class Reference}
+\label{classCheMPS2_1_1TensorT}\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-T.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-T\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{classCheMPS2_1_1TensorT__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-T\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{classCheMPS2_1_1TensorT__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorT_a08705c000454ebea5b96a4a8a7fbdc0f}{Tensor\-T} (const int index\-In, const int Ilocal\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorT_af4de45c3fe49b6f0cfc605c4effb5a01}{\hyperlink{classCheMPS2_1_1TensorT_af4de45c3fe49b6f0cfc605c4effb5a01}{$\sim$\-Tensor\-T} ()}\label{classCheMPS2_1_1TensorT_af4de45c3fe49b6f0cfc605c4effb5a01}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorT_aa842eea97db91466ce8ef14bda6d18ea}{g\-N\-Kappa} () const 
+\begin{DoxyCompactList}\small\item\em Get the number of symmetry blocks. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorT_aafb4d43ad6178437b47a32a24c375fa3}{g\-Storage} ()
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorT_a4a3fef6e66cc3210eb674c2d0409ad04}{g\-Kappa} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2) const 
+\begin{DoxyCompactList}\small\item\em Get the index corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorT_a55f79851b7dc42a4c288ab82d54d8f1a}{g\-Kappa2index} (const int kappa) const 
+\begin{DoxyCompactList}\small\item\em Get the storage jump corresponding to a certain tensor block. \end{DoxyCompactList}\item 
+double $\ast$ \hyperlink{classCheMPS2_1_1TensorT_aedead7609c9c66d336d14cdb0fbb5fec}{g\-Storage} (const int N1, const int Two\-S1, const int I1, const int N2, const int Two\-S2, const int I2)
+\begin{DoxyCompactList}\small\item\em Get the pointer to the storage of a certain tensor block. \end{DoxyCompactList}\item 
+int \hyperlink{classCheMPS2_1_1TensorT_a279b51f0616ab58f2a2893681b4cab71}{g\-Index} () const 
+\begin{DoxyCompactList}\small\item\em Get the location index. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorT_a5143f02e292c2c7e25d472e75b239298}{void \hyperlink{classCheMPS2_1_1TensorT_a5143f02e292c2c7e25d472e75b239298}{random} ()}\label{classCheMPS2_1_1TensorT_a5143f02e292c2c7e25d472e75b239298}
+
+\begin{DoxyCompactList}\small\item\em Fill storage with random numbers 0 $<$ val $<$ 1. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorT_af21d5300f20c3baf88edf9ec3d3bd943}{Q\-R} (\hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} $\ast$Rstorage)
+\begin{DoxyCompactList}\small\item\em Left-\/normalization. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorT_afea87f0a1be6ed05fb668528f2f8bf30}{L\-Q} (\hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} $\ast$Lstorage)
+\begin{DoxyCompactList}\small\item\em Right-\/normalization. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorT_a6048e242ad6c3b1798ead44f7256fe31}{Left\-Multiply} (\hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} $\ast$Mx)
+\begin{DoxyCompactList}\small\item\em Multiply at the left with a \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag}. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorT_ad53db81f1f1bf33512f93a23abc0ed50}{Right\-Multiply} (\hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} $\ast$Mx)
+\begin{DoxyCompactList}\small\item\em Multiply at the right with a \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag}. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorT_a1f0830b0e729573fe19a3327462f7e7e}{void \hyperlink{classCheMPS2_1_1TensorT_a1f0830b0e729573fe19a3327462f7e7e}{Reset} ()}\label{classCheMPS2_1_1TensorT_a1f0830b0e729573fe19a3327462f7e7e}
+
+\begin{DoxyCompactList}\small\item\em Reset the \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} (if virtual dimensions are changed) \end{DoxyCompactList}\item 
+bool \hyperlink{classCheMPS2_1_1TensorT_a2d9f4127678d9c52388ccf26f7ebe775}{Check\-Left\-Normal} () const 
+\begin{DoxyCompactList}\small\item\em Check whether the \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is left-\/normal. \end{DoxyCompactList}\item 
+bool \hyperlink{classCheMPS2_1_1TensorT_a734f76ffa266908bd522fd1d11d4c699}{Check\-Right\-Normal} () const 
+\begin{DoxyCompactList}\small\item\em Check whether the \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is right-\/normal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+February 18, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} class is a storage class for M\-P\-S tensors. Extra functionalities are
+\begin{DoxyItemize}
+\item left-\/ and right-\/orthonormalization
+\item left-\/ and right-\/multiplication with the R-\//\-L-\/ matrices from the orthonormalization 
+\end{DoxyItemize}
+
+Definition at line 35 of file Tensor\-T.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorT_a08705c000454ebea5b96a4a8a7fbdc0f}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Tensor\-T@{Tensor\-T}}
+\index{Tensor\-T@{Tensor\-T}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Tensor\-T}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Tensor\-T (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Ilocal\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorT_a08705c000454ebea5b96a4a8a7fbdc0f}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The site index \\
+\hline
+{\em Ilocal\-In} & The local irrep index \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 29 of file Tensor\-T.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorT_a2d9f4127678d9c52388ccf26f7ebe775}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Check\-Left\-Normal@{Check\-Left\-Normal}}
+\index{Check\-Left\-Normal@{Check\-Left\-Normal}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Check\-Left\-Normal}]{\setlength{\rightskip}{0pt plus 5cm}bool Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Check\-Left\-Normal (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1TensorT_a2d9f4127678d9c52388ccf26f7ebe775}
+
+
+Check whether the \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is left-\/normal. 
+
+\begin{DoxyReturn}{Returns}
+Whether \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is left-\/normal 
+\end{DoxyReturn}
+
+
+Definition at line 404 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_a734f76ffa266908bd522fd1d11d4c699}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Check\-Right\-Normal@{Check\-Right\-Normal}}
+\index{Check\-Right\-Normal@{Check\-Right\-Normal}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Check\-Right\-Normal}]{\setlength{\rightskip}{0pt plus 5cm}bool Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Check\-Right\-Normal (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}}\label{classCheMPS2_1_1TensorT_a734f76ffa266908bd522fd1d11d4c699}
+
+
+Check whether the \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is right-\/normal. 
+
+\begin{DoxyReturn}{Returns}
+Whether \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} is right-\/normal 
+\end{DoxyReturn}
+
+
+Definition at line 445 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_a279b51f0616ab58f2a2893681b4cab71}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-Index@{g\-Index}}
+\index{g\-Index@{g\-Index}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-Index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_a279b51f0616ab58f2a2893681b4cab71}
+
+
+Get the location index. 
+
+\begin{DoxyReturn}{Returns}
+the index 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a5af7779b53e54e506a1d569a723fdd11}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 153 of file Tensor\-T.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_a279b51f0616ab58f2a2893681b4cab71_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorT_a4a3fef6e66cc3210eb674c2d0409ad04}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-Kappa@{g\-Kappa}}
+\index{g\-Kappa@{g\-Kappa}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-Kappa (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_a4a3fef6e66cc3210eb674c2d0409ad04}
+
+
+Get the index corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The left particle number sector \\
+\hline
+{\em Two\-S1} & The left spin symmetry sector \\
+\hline
+{\em I1} & The left irrep sector \\
+\hline
+{\em N2} & The right particle number sector \\
+\hline
+{\em Two\-S2} & The right spin symmetry sector \\
+\hline
+{\em I2} & The right irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The kappa corresponding to the input parameters; -\/1 means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a3d8493380e00a9548267a79dae7e5567}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 133 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_a55f79851b7dc42a4c288ab82d54d8f1a}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-Kappa2index@{g\-Kappa2index}}
+\index{g\-Kappa2index@{g\-Kappa2index}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-Kappa2index}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-Kappa2index (
+\begin{DoxyParamCaption}
+\item[{const int}]{kappa}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_a55f79851b7dc42a4c288ab82d54d8f1a}
+
+
+Get the storage jump corresponding to a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em kappa} & The symmetry block \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+kappa2index\mbox{[}kappa\mbox{]}, the memory jumper to a certain block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_adc93c318803791bef7286dfea3b135c0}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 143 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_aa842eea97db91466ce8ef14bda6d18ea}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-N\-Kappa@{g\-N\-Kappa}}
+\index{g\-N\-Kappa@{g\-N\-Kappa}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-N\-Kappa}]{\setlength{\rightskip}{0pt plus 5cm}int Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-N\-Kappa (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_aa842eea97db91466ce8ef14bda6d18ea}
+
+
+Get the number of symmetry blocks. 
+
+\begin{DoxyReturn}{Returns}
+The number of symmetry blocks 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_ad68f65759e764c6cb55e2b8db18f8874}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 129 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_aafb4d43ad6178437b47a32a24c375fa3}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-Storage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_aafb4d43ad6178437b47a32a24c375fa3}
+
+
+Get the pointer to the storage. 
+
+return pointer to the storage 
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a2f17a5413447e77ad3f128d49b3ca676}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 131 of file Tensor\-T.\-cpp.
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_aafb4d43ad6178437b47a32a24c375fa3_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorT_aedead7609c9c66d336d14cdb0fbb5fec}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!g\-Storage@{g\-Storage}}
+\index{g\-Storage@{g\-Storage}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{g\-Storage}]{\setlength{\rightskip}{0pt plus 5cm}double $\ast$ Che\-M\-P\-S2\-::\-Tensor\-T\-::g\-Storage (
+\begin{DoxyParamCaption}
+\item[{const int}]{N1, }
+\item[{const int}]{Two\-S1, }
+\item[{const int}]{I1, }
+\item[{const int}]{N2, }
+\item[{const int}]{Two\-S2, }
+\item[{const int}]{I2}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classCheMPS2_1_1TensorT_aedead7609c9c66d336d14cdb0fbb5fec}
+
+
+Get the pointer to the storage of a certain tensor block. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em N1} & The left particle number sector \\
+\hline
+{\em Two\-S1} & The left spin symmetry sector \\
+\hline
+{\em I1} & The left irrep sector \\
+\hline
+{\em N2} & The right particle number sector \\
+\hline
+{\em Two\-S2} & The right spin symmetry sector \\
+\hline
+{\em I2} & The right irrep sector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to the storage of the specified tensor block; N\-U\-L\-L means no such block 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classCheMPS2_1_1Tensor_a4335fc5fb5892a7386820c72b769f157}{Che\-M\-P\-S2\-::\-Tensor}.
+
+
+
+Definition at line 145 of file Tensor\-T.\-cpp.
+
+\hypertarget{classCheMPS2_1_1TensorT_a6048e242ad6c3b1798ead44f7256fe31}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Left\-Multiply@{Left\-Multiply}}
+\index{Left\-Multiply@{Left\-Multiply}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Left\-Multiply}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Left\-Multiply (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-Diag} $\ast$}]{Mx}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorT_a6048e242ad6c3b1798ead44f7256fe31}
+
+
+Multiply at the left with a \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Mx} & The \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} with which the current \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} should be multiplied at the left \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 362 of file Tensor\-T.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_a6048e242ad6c3b1798ead44f7256fe31_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorT_afea87f0a1be6ed05fb668528f2f8bf30}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!L\-Q@{L\-Q}}
+\index{L\-Q@{L\-Q}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{L\-Q}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-T\-::\-L\-Q (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-Diag} $\ast$}]{Lstorage}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorT_afea87f0a1be6ed05fb668528f2f8bf30}
+
+
+Right-\/normalization. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Lstorage} & Where the L-\/part of the L\-Q-\/decomposition can be stored. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 260 of file Tensor\-T.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_afea87f0a1be6ed05fb668528f2f8bf30_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_afea87f0a1be6ed05fb668528f2f8bf30_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorT_af21d5300f20c3baf88edf9ec3d3bd943}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Q\-R@{Q\-R}}
+\index{Q\-R@{Q\-R}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Q\-R}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Q\-R (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-Diag} $\ast$}]{Rstorage}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorT_af21d5300f20c3baf88edf9ec3d3bd943}
+
+
+Left-\/normalization. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Rstorage} & Where the R-\/part of the Q\-R-\/decomposition can be stored. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 157 of file Tensor\-T.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_af21d5300f20c3baf88edf9ec3d3bd943_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_af21d5300f20c3baf88edf9ec3d3bd943_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorT_ad53db81f1f1bf33512f93a23abc0ed50}{\index{Che\-M\-P\-S2\-::\-Tensor\-T@{Che\-M\-P\-S2\-::\-Tensor\-T}!Right\-Multiply@{Right\-Multiply}}
+\index{Right\-Multiply@{Right\-Multiply}!CheMPS2::TensorT@{Che\-M\-P\-S2\-::\-Tensor\-T}}
+\paragraph[{Right\-Multiply}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-T\-::\-Right\-Multiply (
+\begin{DoxyParamCaption}
+\item[{{\bf Tensor\-Diag} $\ast$}]{Mx}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorT_ad53db81f1f1bf33512f93a23abc0ed50}
+
+
+Multiply at the right with a \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em Mx} & The \hyperlink{classCheMPS2_1_1TensorDiag}{Tensor\-Diag} with which the current \hyperlink{classCheMPS2_1_1TensorT}{Tensor\-T} should be multiplied at the right \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 383 of file Tensor\-T.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_ad53db81f1f1bf33512f93a23abc0ed50_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorT_ad53db81f1f1bf33512f93a23abc0ed50_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-T.\-h\item 
+Tensor\-T.\-cpp\end{DoxyCompactItemize}

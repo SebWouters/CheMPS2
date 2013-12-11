@@ -1,0 +1,163 @@
+\hypertarget{classCheMPS2_1_1TensorD}{\subsection{Che\-M\-P\-S2\-:\-:Tensor\-D Class Reference}
+\label{classCheMPS2_1_1TensorD}\index{Che\-M\-P\-S2\-::\-Tensor\-D@{Che\-M\-P\-S2\-::\-Tensor\-D}}
+}
+
+
+{\ttfamily \#include $<$Tensor\-D.\-h$>$}
+
+
+
+Inheritance diagram for Che\-M\-P\-S2\-:\-:Tensor\-D\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classCheMPS2_1_1TensorD__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Che\-M\-P\-S2\-:\-:Tensor\-D\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classCheMPS2_1_1TensorD__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCheMPS2_1_1TensorD_ad9bfedc79e5bcd731b7bab893b88fa88}{Tensor\-D} (const int index\-In, const int Idiff\-In, const bool moving\-Right\-In, const \hyperlink{classCheMPS2_1_1SyBookkeeper}{Sy\-Bookkeeper} $\ast$den\-B\-K\-In)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorD_aa9cc270346429692e580a3b7cc5890f2}{\hyperlink{classCheMPS2_1_1TensorD_aa9cc270346429692e580a3b7cc5890f2}{$\sim$\-Tensor\-D} ()}\label{classCheMPS2_1_1TensorD_aa9cc270346429692e580a3b7cc5890f2}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\hypertarget{classCheMPS2_1_1TensorD_aa50056f6f5e242f8933c3ed0177faade}{void \hyperlink{classCheMPS2_1_1TensorD_aa50056f6f5e242f8933c3ed0177faade}{Clear\-Storage} ()}\label{classCheMPS2_1_1TensorD_aa50056f6f5e242f8933c3ed0177faade}
+
+\begin{DoxyCompactList}\small\item\em Clear the storage. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorD_a62fdb77e0a88f0ae6a21078b433b01db}{Add\-A\-Term} (double alpha, \hyperlink{classCheMPS2_1_1TensorF1Dbase}{Tensor\-F1\-Dbase} $\ast$Term\-To\-Add)
+\begin{DoxyCompactList}\small\item\em Add a term. \end{DoxyCompactList}\item 
+void \hyperlink{classCheMPS2_1_1TensorD_a18e3f1730c2f05d7334ca0331c279088}{Add\-A\-Term\-Transpose} (const double alpha, \hyperlink{classCheMPS2_1_1TensorF1Dbase}{Tensor\-F1\-Dbase} $\ast$Term\-To\-Add)
+\begin{DoxyCompactList}\small\item\em Add a term. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D} class. \begin{DoxyAuthor}{Author}
+Sebastian Wouters \href{mailto:sebastianwouters@gmail.com}{\tt sebastianwouters@gmail.\-com} 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+March 4, 2013
+\end{DoxyDate}
+The \hyperlink{classCheMPS2_1_1TensorD}{Tensor\-D} class is a storageclass for the complementary operator of the spin-\/1 component of a contracted creator \& annihilator. 
+
+Definition at line 32 of file Tensor\-D.\-h.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classCheMPS2_1_1TensorD_ad9bfedc79e5bcd731b7bab893b88fa88}{\index{Che\-M\-P\-S2\-::\-Tensor\-D@{Che\-M\-P\-S2\-::\-Tensor\-D}!Tensor\-D@{Tensor\-D}}
+\index{Tensor\-D@{Tensor\-D}!CheMPS2::TensorD@{Che\-M\-P\-S2\-::\-Tensor\-D}}
+\paragraph[{Tensor\-D}]{\setlength{\rightskip}{0pt plus 5cm}Che\-M\-P\-S2\-::\-Tensor\-D\-::\-Tensor\-D (
+\begin{DoxyParamCaption}
+\item[{const int}]{index\-In, }
+\item[{const int}]{Idiff\-In, }
+\item[{const bool}]{moving\-Right\-In, }
+\item[{const {\bf Sy\-Bookkeeper} $\ast$}]{den\-B\-K\-In}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorD_ad9bfedc79e5bcd731b7bab893b88fa88}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index\-In} & The boundary index \\
+\hline
+{\em Idiff\-In} & Direct product of irreps of the two 2nd quantized operators; both sandwiched \& to sandwich \\
+\hline
+{\em moving\-Right\-In} & If true\-: sweep from left to right. If false\-: sweep from right to left \\
+\hline
+{\em den\-B\-K\-In} & The problem to be solved \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 26 of file Tensor\-D.\-cpp.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classCheMPS2_1_1TensorD_a62fdb77e0a88f0ae6a21078b433b01db}{\index{Che\-M\-P\-S2\-::\-Tensor\-D@{Che\-M\-P\-S2\-::\-Tensor\-D}!Add\-A\-Term@{Add\-A\-Term}}
+\index{Add\-A\-Term@{Add\-A\-Term}!CheMPS2::TensorD@{Che\-M\-P\-S2\-::\-Tensor\-D}}
+\paragraph[{Add\-A\-Term}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-D\-::\-Add\-A\-Term (
+\begin{DoxyParamCaption}
+\item[{double}]{alpha, }
+\item[{{\bf Tensor\-F1\-Dbase} $\ast$}]{Term\-To\-Add}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorD_a62fdb77e0a88f0ae6a21078b433b01db}
+
+
+Add a term. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em alpha} & prefactor \\
+\hline
+{\em Term\-To\-Add} & \hyperlink{classCheMPS2_1_1TensorF1Dbase}{Tensor\-F1\-Dbase} to add \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 36 of file Tensor\-D.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorD_a62fdb77e0a88f0ae6a21078b433b01db_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classCheMPS2_1_1TensorD_a18e3f1730c2f05d7334ca0331c279088}{\index{Che\-M\-P\-S2\-::\-Tensor\-D@{Che\-M\-P\-S2\-::\-Tensor\-D}!Add\-A\-Term\-Transpose@{Add\-A\-Term\-Transpose}}
+\index{Add\-A\-Term\-Transpose@{Add\-A\-Term\-Transpose}!CheMPS2::TensorD@{Che\-M\-P\-S2\-::\-Tensor\-D}}
+\paragraph[{Add\-A\-Term\-Transpose}]{\setlength{\rightskip}{0pt plus 5cm}void Che\-M\-P\-S2\-::\-Tensor\-D\-::\-Add\-A\-Term\-Transpose (
+\begin{DoxyParamCaption}
+\item[{const double}]{alpha, }
+\item[{{\bf Tensor\-F1\-Dbase} $\ast$}]{Term\-To\-Add}
+\end{DoxyParamCaption}
+)}}\label{classCheMPS2_1_1TensorD_a18e3f1730c2f05d7334ca0331c279088}
+
+
+Add a term. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em alpha} & prefactor \\
+\hline
+{\em Term\-To\-Add} & \hyperlink{classCheMPS2_1_1TensorF1Dbase}{Tensor\-F1\-Dbase} to add \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 43 of file Tensor\-D.\-cpp.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classCheMPS2_1_1TensorD_a18e3f1730c2f05d7334ca0331c279088_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+Tensor\-D.\-h\item 
+Tensor\-D.\-cpp\end{DoxyCompactItemize}
