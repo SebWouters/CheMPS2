@@ -1,5 +1,0 @@
-<map id="CheMPS2::Sobject::gKappa2index" name="CheMPS2::Sobject::gKappa2index">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a35db8f58be5130548d5998ccbda4d37e" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!..." alt="" coords="553,5,743,32"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3" title="Davidson Solver." alt="" coords="277,31,504,57"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#aee8753e7169f61e4804ddbc1b7e8409d" title="Does the state&#45;specific CASSCF cycle with the (augmented hessian) newton raphson method." alt="" coords="793,5,1103,32"/>
-</map>

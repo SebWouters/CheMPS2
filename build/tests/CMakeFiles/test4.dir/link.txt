@@ -1,1 +1,0 @@
-/usr/lib64/ccache/c++    -fopenmp -march=native -g -O2    CMakeFiles/test4.dir/test4.cpp.o  -o test4  -L/home/ward/Documents/phd/CheMPS2/build/CheMPS2 -rdynamic ../CheMPS2/libCheMPS2.so -llapack -lblas -lhdf5 -lz -lm -lgsl -lgslcblas -lm -Wl,-rpath,/home/ward/Documents/phd/CheMPS2/build/CheMPS2 

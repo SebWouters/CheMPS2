@@ -1,8 +1,0 @@
-<map id="CheMPS2::Irreps::directProd" name="CheMPS2::Irreps::directProd">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#a6fd85753dc9048918065a424c42846d2" title="Constructor." alt="" coords="245,5,432,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorF0Cbase.html#a4768747102a6722f85df6f4a4e67b43e" title="Constructor." alt="" coords="247,57,430,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorF1Dbase.html#a47f965d099706fd38c82ed571cdf03c6" title="Constructor." alt="" coords="247,122,430,163"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorS0Abase.html#a173d2d9371a7a902a213c44fd7ae9d2a" title="Constructor." alt="" coords="247,187,430,229"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorS1Bbase.html#ab942dd11c199fac9de678b4f513f920d" title="Constructor." alt="" coords="247,253,430,294"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1TensorSwap.html#a766c00b77a2a68696079e943b1bfae39" title="Constructor." alt="" coords="257,318,420,359"/>
-</map>
