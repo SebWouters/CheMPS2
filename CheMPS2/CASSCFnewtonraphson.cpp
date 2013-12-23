@@ -55,8 +55,14 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
    //One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!!!
-   double * mem1 = new double[max( maxBSpower4 , maxlinsize*maxlinsize*3 )]; //Second argument for updateUnitary
-   double * mem2 = new double[max( maxBSpower4 , maxlinsize*maxlinsize*2 )];
+   int sizeWorkmem1 = max( maxBSpower4 , maxlinsize*maxlinsize*3 ); //Second argument for updateUnitary
+   int sizeWorkmem2 = max( maxBSpower4 , maxlinsize*maxlinsize*2 );
+   if (CheMPS2::CASSCF_rotate2DMtoNO){
+      sizeWorkmem1 = max( sizeWorkmem1 , nOrbDMRG*nOrbDMRG ); //Second argument for eigenvectors 1DM
+      sizeWorkmem2 = max( sizeWorkmem2 , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //Second argument to rotate 2DM
+   }
+   double * mem1 = new double[sizeWorkmem1];
+   double * mem2 = new double[sizeWorkmem2];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    
@@ -93,11 +99,23 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          }
       }
       theDMRG->calc2DM();
-      theDMRG2DM = theDMRG->get2DM();
-      //theDMRG2DM->print2DMAandB_HAM();
+      copy2DMover(theDMRG->get2DM());
       setDMRG1DM(N);
-      calcNOON();
-      
+
+      if (!CheMPS2::CASSCF_rotate2DMtoNO){
+
+         calcNOON();
+
+      } else {
+
+         calcNOON(mem1);
+         rotateUnitaryAnd2DMand1DM(N,mem1, mem2);
+         //Unitary update implies matrix element update. --> Can actually be done for DMRG orbitals alone = faster --> TODO
+         if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
+         else{             fillRotatedHamAllInMemory(mem1, mem2); }
+
+      }
+
       if (CheMPS2::CASSCF_debugPrint){ check1DMand2DMrotated(Nelectrons); }
       
       buildFmat(); //Needs to be updated before the Fmat and Wmat functions

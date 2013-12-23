@@ -149,18 +149,27 @@ namespace CheMPS2{
          
          //List of condensed orbitals in terms of the original Ham orbitals
          int * listCondensed;
-         
-         //The DMRG 2DM -->externally allocated and deleted
-         TwoDM * theDMRG2DM;
+
+         //Copy theDMRG2DM over to CASSCF::DMRG2DM
+         void copy2DMover(TwoDM * theDMRG2DM);
+
+         //Update the unitary, 2DM and 1DM with the given NO basis
+         void rotateUnitaryAnd2DMand1DM(const int N, double * eigenvecs, double * work); 
          
          //Space for the DMRG 1DM
          double * DMRG1DM;
+
+         //Space for the DMRG 2DM
+         double * DMRG2DM;
          
          //Set the DMRG 1DM
          void setDMRG1DM(const int N);
          
          //Once the DMRG1DM is set, the NOON can be calculated
          void calcNOON();
+
+         //The NO in terms of the active space orbitals are stored in the nOrbDMRG*nOrbDMRG array eigenvecs
+         void calcNOON(double * eigenvecs);
          
          //Helper function to fetch DOCC and SOCC from filename
          void allocateAndFillOCC(const string filename);

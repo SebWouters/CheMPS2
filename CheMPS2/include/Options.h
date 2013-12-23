@@ -29,6 +29,7 @@ namespace CheMPS2{
 
    const bool   CASSCF_debugPrint             = false;
    const bool   CASSCF_storeUnitary           = true;
+   const bool   CASSCF_rotate2DMtoNO          = true;
    const double CASSCF_gradientNormThreshold  = 1e-6;
    const string CASSCF_unitaryStorageName     = "CheMPS2_CASSCF.h5";
    const int    CASSCF_maxlinsizeCutoff       = 100;

@@ -139,6 +139,7 @@ CheMPS2::CASSCF::~CASSCF(){
       
       delete [] jumpsHamOrig;
       delete [] DMRG1DM;
+      delete [] DMRG2DM;
       delete [] x_firstindex;
       delete [] x_secondindex;
       
@@ -249,7 +250,7 @@ double CheMPS2::CASSCF::get2DMrotated(const int index1, const int index2, const 
       DMRGindex3 += cnt3 - Nocc[irrep3];
       DMRGindex4 += cnt4 - Nocc[irrep4];
       
-      return theDMRG2DM->getTwoDMA_HAM(DMRGindex1, DMRGindex2, DMRGindex3, DMRGindex4);
+      return DMRG2DM[DMRGindex1 + nOrbDMRG * ( DMRGindex2 + nOrbDMRG * (DMRGindex3 + nOrbDMRG * DMRGindex4 ) ) ];
       
    }
    
@@ -330,6 +331,20 @@ double CheMPS2::CASSCF::get2DMrotated(const int index1, const int index2, const 
 
 }
 
+void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM){
+
+   for (int i1=0; i1<nOrbDMRG; i1++){
+      for (int i2=0; i2<nOrbDMRG; i2++){
+         for (int i3=0; i3<nOrbDMRG; i3++){
+            for (int i4=0; i4<nOrbDMRG; i4++){
+               DMRG2DM[i1 + nOrbDMRG * ( i2 + nOrbDMRG * (i3 + nOrbDMRG * i4 ) ) ] = theDMRG2DM->getTwoDMA_HAM(i1, i2, i3, i4);
+            }
+         }
+      }
+   }
+
+}
+
 double CheMPS2::CASSCF::get1DMrotated(const int index1, const int index2) const{
 
    if ((index1<0) || (index1>=L)){ return 0.0; }
@@ -369,7 +384,7 @@ void CheMPS2::CASSCF::setDMRG1DM(const int N){
    for (int cnt1=0; cnt1<nOrbDMRG; cnt1++){
       for (int cnt2=cnt1; cnt2<nOrbDMRG; cnt2++){
          DMRG1DM[cnt1 + nOrbDMRG*cnt2] = 0.0;
-         for (int cnt3=0; cnt3<nOrbDMRG; cnt3++){ DMRG1DM[cnt1 + nOrbDMRG*cnt2] += theDMRG2DM->getTwoDMA_HAM(cnt1,cnt3,cnt2,cnt3); }
+         for (int cnt3=0; cnt3<nOrbDMRG; cnt3++){ DMRG1DM[cnt1 + nOrbDMRG*cnt2] += DMRG2DM[cnt1 + nOrbDMRG * (cnt3 + nOrbDMRG * (cnt2 + nOrbDMRG * cnt3 ) ) ]; }
          DMRG1DM[cnt1 + nOrbDMRG*cnt2] *= prefactor;
          DMRG1DM[cnt2 + nOrbDMRG*cnt1] = DMRG1DM[cnt1 + nOrbDMRG*cnt2];
       }
@@ -398,6 +413,129 @@ void CheMPS2::CASSCF::calcNOON(){
    delete [] work;
    delete [] eigenval;
    delete [] copy;
+
+}
+
+void CheMPS2::CASSCF::calcNOON(double * eigenvecs){
+
+   int size = nOrbDMRG * nOrbDMRG;
+   double * eigenval = new double[nOrbDMRG];
+   double * work = new double[size];
+
+   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = DMRG1DM[cnt]; }
+
+   char jobz = 'V';
+   char uplo = 'U';
+   int info;
+   int passed = 0;
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+
+      if (NDMRG[irrep] > 0){
+
+         //Calculate the eigenvectors and values per block
+         dsyev_(&jobz, &uplo, NDMRG+irrep, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, work, &size, &info);
+
+         //Print the NOON
+         cout << "CASSCF :: DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
+         for (int cnt=0; cnt<NDMRG[irrep]-1; cnt++){ cout << eigenval[passed + NDMRG[irrep]-1-cnt] << " , "; }
+         cout << eigenval[passed + 0] << " ]." << endl;
+
+         //Sort the eigenvecs
+         for (int col=0; col<NDMRG[irrep]/2; col++){
+            for (int row=0; row<NDMRG[irrep]; row++){
+               double temp = eigenvecs[passed + row + nOrbDMRG * (passed + NDMRG[irrep] - 1 - col)];
+               eigenvecs[passed + row + nOrbDMRG * (passed + NDMRG[irrep] - 1 - col)] = eigenvecs[passed + row + nOrbDMRG * (passed + col)];
+               eigenvecs[passed + row + nOrbDMRG * (passed + col)] = temp;
+            }
+         }
+
+      }
+
+      //Update the number of passed DMRG orbitals
+      passed += NDMRG[irrep];
+
+   }
+
+   delete [] work;
+   delete [] eigenval;
+
+}
+
+void CheMPS2::CASSCF::rotateUnitaryAnd2DMand1DM(const int N, double * eigenvecs, double * work){
+
+   char notr = 'N';
+   char tran = 'T';
+   double alpha = 1.0;
+   double beta = 0.0;
+
+   int power1 = nOrbDMRG;
+   int power2 = nOrbDMRG*nOrbDMRG;
+   int power3 = nOrbDMRG*nOrbDMRG*nOrbDMRG;
+
+   //2DM: Gamma_{ijkl} --> Gamma_{ajkl}
+   dgemm_(&tran,&notr,&power1,&power3,&power1,&alpha,eigenvecs,&power1,DMRG2DM,&power1,&beta,work,&power1);
+   //2DM: Gamma_{ajkl} --> Gamma_{ajkd}
+   dgemm_(&notr,&notr,&power3,&power1,&power1,&alpha,work,&power3,eigenvecs,&power1,&beta,DMRG2DM,&power3);
+   //2DM: Gamma_{ajkd} --> Gamma_{ajcd}
+   for (int cnt=0; cnt<nOrbDMRG; cnt++){
+      dgemm_(&notr,&notr,&power2,&power1,&power1,&alpha,DMRG2DM + cnt*power3,&power2,eigenvecs,&power1,&beta,work + cnt*power3,&power2);
+   }
+   //2DM: Gamma_{ajcd} --> Gamma_{abcd}
+   for (int cnt=0; cnt<power2; cnt++){
+      dgemm_(&notr,&notr,&power1,&power1,&power1,&alpha,work + cnt*power2,&power1,eigenvecs,&power1,&beta,DMRG2DM + cnt*power2,&power1);
+   }
+
+   //Update 1DM
+   setDMRG1DM(N);
+
+   //Rotate unitary...
+   int passed = 0;
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+
+      if (NDMRG[irrep] > 1){
+
+         int rotationlinsize = NDMRG[irrep];
+         int blocklinsize = OrbPerIrrep[irrep];
+
+         double * temp1 = work;
+         double * temp2 = work + rotationlinsize*blocklinsize;
+         double * BlockEigen = eigenvecs + passed * (nOrbDMRG + 1);
+      
+         for (int row = 0; row<rotationlinsize; row++){
+            for (int col = 0; col<blocklinsize; col++){
+               temp1[row + rotationlinsize*col] = unitary[irrep][ Nocc[irrep] + row + blocklinsize * col ];
+            }
+         }
+
+         dgemm_(&tran,&notr,&rotationlinsize,&blocklinsize,&rotationlinsize,&alpha,BlockEigen,&nOrbDMRG,temp1,&rotationlinsize,&beta,temp2,&rotationlinsize);
+
+         for (int row = 0; row<rotationlinsize; row++){
+            for (int col = 0; col<blocklinsize; col++){
+               unitary[irrep][ Nocc[irrep] + row + blocklinsize * col ] = temp2[row + rotationlinsize*col];
+            }
+         }
+
+      }
+
+      if (CheMPS2::CASSCF_debugPrint){
+
+         int linsize = OrbPerIrrep[irrep];
+         dgemm_(&tran,&notr,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
+         double value = 0.0;
+         for (int cnt=0; cnt<linsize; cnt++){
+            value += (work[cnt*(1+linsize)]-1.0) * (work[cnt*(1+linsize)]-1.0);
+            for (int cnt2=cnt+1; cnt2<linsize; cnt2++){
+               value += work[cnt + cnt2*linsize] * work[cnt + cnt2*linsize] + work[cnt2 + cnt*linsize] * work[cnt2 + cnt*linsize];
+            }
+         }
+         value = sqrt(value);
+         cout << "Two-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
+
+      }
+
+      passed += NDMRG[irrep];
+
+   }
 
 }
 
@@ -730,8 +868,9 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    jumpsHamOrig[0] = 0;
    for (int cnt=0; cnt<numberOfIrreps; cnt++){ jumpsHamOrig[cnt+1] = jumpsHamOrig[cnt] + OrbPerIrrep[cnt]; }
    
-   //Allocate space for the DMRG 1DM
+   //Allocate space for the DMRG 1DM and 2DM
    DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
+   DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
    
    //Find the corresponding indices
    x_firstindex = new int[x_linearlength];
