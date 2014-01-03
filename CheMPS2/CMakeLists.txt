@@ -9,7 +9,6 @@ endif (MKL)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CheMPS2_SOURCE_DIR}/CMake/")
 
 find_package(LAPACK REQUIRED)
-find_package(HDF5 REQUIRED)
 find_package(GSL REQUIRED)
 
 include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/ ${HDF5_INCLUDE_DIRS})

@@ -1,4 +1,4 @@
-include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/)
+include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/ ${HDF5_INCLUDE_DIRS})
 
 link_directories (${CheMPS2_BINARY_DIR}/CheMPS2)
 
