@@ -411,9 +411,13 @@ command
     
 instead, where option4 and option5 are respectively the missing
 colon-separated include and library paths, e.g.
-```CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/```
+
+    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
+
 and
-```CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/```.
+
+    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
+
 
 To compile, run:
 
