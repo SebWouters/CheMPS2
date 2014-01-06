@@ -135,100 +135,100 @@ $(document).ready(function(){initNavTree('index.html','');});
 </pre></li>
 </ol>
 <h2>List of files in the CheMPS2 library</h2>
-<pre class="fragment">CheMPS2/CASSCF.cpp
-CheMPS2/CASSCFdebug.cpp
-CheMPS2/CASSCFhamiltonianrotation.cpp
-CheMPS2/CASSCFnewtonraphson.cpp
-CheMPS2/ConvergenceScheme.cpp
-CheMPS2/DMRG.cpp
-CheMPS2/DMRGmpsio.cpp
-CheMPS2/DMRGoperators.cpp
-CheMPS2/DMRGtechnics.cpp
-CheMPS2/FourIndex.cpp
-CheMPS2/Hamiltonian.cpp
-CheMPS2/Heff.cpp
-CheMPS2/HeffDiagonal.cpp
-CheMPS2/HeffDiagrams1.cpp
-CheMPS2/HeffDiagrams2.cpp
-CheMPS2/HeffDiagrams3.cpp
-CheMPS2/HeffDiagrams4.cpp
-CheMPS2/HeffDiagrams5.cpp
-CheMPS2/Irreps.cpp
-CheMPS2/PrintLicense.cpp
-CheMPS2/Problem.cpp
-CheMPS2/Sobject.cpp
-CheMPS2/SyBookkeeper.cpp
-CheMPS2/TensorA.cpp
-CheMPS2/TensorB.cpp
-CheMPS2/TensorC.cpp
-CheMPS2/TensorD.cpp
-CheMPS2/TensorDiag.cpp
-CheMPS2/TensorF0Cbase.cpp
-CheMPS2/TensorF0.cpp
-CheMPS2/TensorF1.cpp
-CheMPS2/TensorF1Dbase.cpp
-CheMPS2/TensorL.cpp
-CheMPS2/TensorO.cpp
-CheMPS2/TensorQ.cpp
-CheMPS2/TensorS0Abase.cpp
-CheMPS2/TensorS0.cpp
-CheMPS2/TensorS1Bbase.cpp
-CheMPS2/TensorS1.cpp
-CheMPS2/TensorSwap.cpp
-CheMPS2/TensorT.cpp
-CheMPS2/TensorX.cpp
-CheMPS2/TwoDM.cpp
-CheMPS2/TwoIndex.cpp
-CheMPS2/include/CASSCF.h
-CheMPS2/include/ConvergenceScheme.h
-CheMPS2/include/DMRG.h
-CheMPS2/include/FourIndex.h
-CheMPS2/include/Gsl.h
-CheMPS2/include/Hamiltonian.h
-CheMPS2/include/Heff.h
-CheMPS2/include/Irreps.h
-CheMPS2/include/Lapack.h
-CheMPS2/include/Options.h
-CheMPS2/include/Problem.h
-CheMPS2/include/Sobject.h
-CheMPS2/include/SyBookkeeper.h
-CheMPS2/include/TensorA.h
-CheMPS2/include/TensorB.h
-CheMPS2/include/TensorC.h
-CheMPS2/include/TensorD.h
-CheMPS2/include/TensorDiag.h
-CheMPS2/include/TensorF0Cbase.h
-CheMPS2/include/TensorF0.h
-CheMPS2/include/TensorF1Dbase.h
-CheMPS2/include/TensorF1.h
-CheMPS2/include/Tensor.h
-CheMPS2/include/TensorL.h
-CheMPS2/include/TensorO.h
-CheMPS2/include/TensorQ.h
-CheMPS2/include/TensorS0Abase.h
-CheMPS2/include/TensorS0.h
-CheMPS2/include/TensorS1Bbase.h
-CheMPS2/include/TensorS1.h
-CheMPS2/include/TensorSwap.h
-CheMPS2/include/TensorT.h
-CheMPS2/include/TensorX.h
-CheMPS2/include/TwoDM.h
-CheMPS2/include/TwoIndex.h
-</pre><p>Please note that these files are documented with Doxygen-readable comments. Search for the section "Build" in README to see how a manual can be generated from these comments.</p>
+<p><code><a class="el" href="CASSCF_8cpp_source.html">CheMPS2/CASSCF.cpp</a></code> contains the constructor and destructor of the CASSCF class, as well as the functions which allow to update, get or set its variables.</p>
+<p><code><a class="el" href="CASSCFdebug_8cpp_source.html">CheMPS2/CASSCFdebug.cpp</a></code> contains the functions to store and load CASSCF checkpoint file, as well as several test functions for debugging purposes.</p>
+<p><code><a class="el" href="CASSCFhamiltonianrotation_8cpp_source.html">CheMPS2/CASSCFhamiltonianrotation.cpp</a></code> contains the Hamiltonian rotation function, based on the CASSCF unitary matrix.</p>
+<p><code><a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CheMPS2/CASSCFnewtonraphson.cpp</a></code> contains all DMRG-SCF functions which are specific to the augmented Hessian Newton-Raphson update scheme, including the functions to calculate the gradient and Hessian.</p>
+<p><code><a class="el" href="ConvergenceScheme_8cpp_source.html">CheMPS2/ConvergenceScheme.cpp</a></code> contains all functions of the ConvergenceScheme class, which contains the instructions for the subsequent DMRG sweeps.</p>
+<p><code><a class="el" href="DMRG_8cpp_source.html">CheMPS2/DMRG.cpp</a></code> contains the constructor and destructor of the DMRG class, as well as the top-level sweep functions.</p>
+<p><code><a class="el" href="DMRGmpsio_8cpp_source.html">CheMPS2/DMRGmpsio.cpp</a></code> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
+<p><code><a class="el" href="DMRGoperators_8cpp_source.html">CheMPS2/DMRGoperators.cpp</a></code> contains all functions related to the DMRG renormalized operators: saving to disk, loading from disk, and updating.</p>
+<p><code><a class="el" href="DMRGtechnics_8cpp_source.html">CheMPS2/DMRGtechnics.cpp</a></code> contains the functions related to the 2-RDM and the excited-state calculations.</p>
+<p><code><a class="el" href="FourIndex_8cpp_source.html">CheMPS2/FourIndex.cpp</a></code> contains all functions of the FourIndex container class for the two-body matrix elements.</p>
+<p><code><a class="el" href="Hamiltonian_8cpp_source.html">CheMPS2/Hamiltonian.cpp</a></code> contains all functions of the Hamiltonian class, including functions to get or set specific variables, as well as the save and load functions to store the Hamiltonian on disk.</p>
+<p><code><a class="el" href="Heff_8cpp_source.html">CheMPS2/Heff.cpp</a></code> contains the constructor and destructor of the Heff class, as well as the top-level functions to perform the effective Hamiltonian times guess-vector multiplication and Davidson's algorithm.</p>
+<p><code><a class="el" href="HeffDiagonal_8cpp_source.html">CheMPS2/HeffDiagonal.cpp</a></code> contains the functions to calculate the diagonal elements of the effective Hamiltonian. These are required as preconditioner in Davidson's algorithm.</p>
+<p><code><a class="el" href="HeffDiagrams1_8cpp_source.html">CheMPS2/HeffDiagrams1.cpp</a></code> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
+<p><code><a class="el" href="HeffDiagrams2_8cpp_source.html">CheMPS2/HeffDiagrams2.cpp</a></code> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
+<p><code><a class="el" href="HeffDiagrams3_8cpp_source.html">CheMPS2/HeffDiagrams3.cpp</a></code> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
+<p><code><a class="el" href="HeffDiagrams4_8cpp_source.html">CheMPS2/HeffDiagrams4.cpp</a></code> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
+<p><code><a class="el" href="HeffDiagrams5_8cpp_source.html">CheMPS2/HeffDiagrams5.cpp</a></code> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
+<p><code><a class="el" href="Irreps_8cpp_source.html">CheMPS2/Irreps.cpp</a></code> contains the Psi4 symmetry conventions.</p>
+<p><code><a class="el" href="PrintLicense_8cpp_source.html">CheMPS2/PrintLicense.cpp</a></code> contains a function which prints the license disclaimer.</p>
+<p><code><a class="el" href="Problem_8cpp_source.html">CheMPS2/Problem.cpp</a></code> contains all Problem class functions. This wrapper class allows to set the desired symmetry sector for the DMRG algorithm.</p>
+<p><code><a class="el" href="Sobject_8cpp_source.html">CheMPS2/Sobject.cpp</a></code> contains all Sobject class functions. This class constructs, stores, and decomposes the reduced two-site object.</p>
+<p><code><a class="el" href="SyBookkeeper_8cpp_source.html">CheMPS2/SyBookkeeper.cpp</a></code> contains all SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual dimensions of all symmetry sectors at all boundaries.</p>
+<p><code><a class="el" href="TensorA_8cpp_source.html">CheMPS2/TensorA.cpp</a></code> contains the TensorA functions. This class stores and handles the complementary reduced spin-0 S0-tensors.</p>
+<p><code><a class="el" href="TensorB_8cpp_source.html">CheMPS2/TensorB.cpp</a></code> contains the TensorB functions. This class stores and handles the complementary reduced spin-1 S1-tensors.</p>
+<p><code><a class="el" href="TensorC_8cpp_source.html">CheMPS2/TensorC.cpp</a></code> contains the TensorC functions. This class stores and handles the complementary reduced spin-0 F0-tensors.</p>
+<p><code><a class="el" href="TensorD_8cpp_source.html">CheMPS2/TensorD.cpp</a></code> contains the TensorB functions. This class stores and handles the complementary reduced spin-1 F1-tensors.</p>
+<p><code><a class="el" href="TensorDiag_8cpp_source.html">CheMPS2/TensorDiag.cpp</a></code> contains the TensorDiag functions. This storage class handles reduced tensors which are diagonal in the symmetry sectors.</p>
+<p><code><a class="el" href="TensorF0Cbase_8cpp_source.html">CheMPS2/TensorF0Cbase.cpp</a></code> contains the common storage and handling functions of the TensorF0 and TensorC classes.</p>
+<p><code><a class="el" href="TensorF0_8cpp_source.html">CheMPS2/TensorF0.cpp</a></code> contains all TensorF0 functions. This class stores and handles the reduced spin-0 part of two sandwiched second quantized operators, of which the particle symmetry sectors are equal.</p>
+<p><code><a class="el" href="TensorF1_8cpp_source.html">CheMPS2/TensorF1.cpp</a></code> contains all TensorF1 functions. This class stores and handles the reduced spin-1 part of two sandwiched second quantized operators, of which the particle symmetry sectors are equal.</p>
+<p><code><a class="el" href="TensorF1Dbase_8cpp_source.html">CheMPS2/TensorF1Dbase.cpp</a></code> contains the common storage and handling functions of the TensorF1 and TensorD classes.</p>
+<p><code><a class="el" href="TensorL_8cpp_source.html">CheMPS2/TensorL.cpp</a></code> contains all TensorL functions. This class stores and handles the reduced spin-1/2 part of a single sandwiched second quantized operator.</p>
+<p><code><a class="el" href="TensorO_8cpp_source.html">CheMPS2/TensorO.cpp</a></code> implements the storage and handling of the partial terms which are required to calculate the overlap between two MPSs.</p>
+<p><code><a class="el" href="TensorQ_8cpp_source.html">CheMPS2/TensorQ.cpp</a></code> contains all TensorQ functions. This class stores and handles the complementary reduced spin-1/2 part of three sandwiched second quantized operators.</p>
+<p><code><a class="el" href="TensorS0Abase_8cpp_source.html">CheMPS2/TensorS0Abase.cpp</a></code> contains the common storage and handling functions of the TensorS0 and TensorA classes.</p>
+<p><code><a class="el" href="TensorS0_8cpp_source.html">CheMPS2/TensorS0.cpp</a></code> contains all TensorS0 functions. This class stores and handles the reduced spin-0 part of two sandwiched second quantized operators, of which the particle symmetry sectors differ by 2.</p>
+<p><code><a class="el" href="TensorS1Bbase_8cpp_source.html">CheMPS2/TensorS1Bbase.cpp</a></code> contains the common storage and handling functions of the TensorS1 and TensorB classes.</p>
+<p><code><a class="el" href="TensorS1_8cpp_source.html">CheMPS2/TensorS1.cpp</a></code> contains all TensorS1 functions. This class stores and handles the reduced spin-1 part of two sandwiched second quantized operators, of which the particle symmetry sectors differ by 2.</p>
+<p><code><a class="el" href="TensorSwap_8cpp_source.html">CheMPS2/TensorSwap.cpp</a></code> contains the common storage and handling functions of the TensorL and TensorQ classes.</p>
+<p><code><a class="el" href="TensorT_8cpp_source.html">CheMPS2/TensorT.cpp</a></code> contains all TensorT functions. This class stores and handles the reduced part of an MPS site-tensor.</p>
+<p><code><a class="el" href="TensorX_8cpp_source.html">CheMPS2/TensorX.cpp</a></code> contains all TensorX functions. This class stores and handles the complementary reduced spin-0 part of four sandwiched second quantized operators, which is of course diagonal in the symmetry sectors.</p>
+<p><code><a class="el" href="TwoDM_8cpp_source.html">CheMPS2/TwoDM.cpp</a></code> contains all functions to store and calculate the 2-RDM from the DMRG-optimized MPS.</p>
+<p><code><a class="el" href="TwoIndex_8cpp_source.html">CheMPS2/TwoIndex.cpp</a></code> contains all functions of the TwoIndex container class for the one-body matrix elements.</p>
+<p><code><a class="el" href="CASSCF_8h_source.html">CheMPS2/include/CASSCF.h</a></code> contains the definitions of the CASSCF class.</p>
+<p><code><a class="el" href="ConvergenceScheme_8h_source.html">CheMPS2/include/ConvergenceScheme.h</a></code> contains the definitions of the ConvergenceScheme class.</p>
+<p><code><a class="el" href="DMRG_8h_source.html">CheMPS2/include/DMRG.h</a></code> contains the definitions of the DMRG class.</p>
+<p><code><a class="el" href="FourIndex_8h_source.html">CheMPS2/include/FourIndex.h</a></code> contains the definitions of the FourIndex class.</p>
+<p><code><a class="el" href="Gsl_8h_source.html">CheMPS2/include/Gsl.h</a></code> contains the definitions of the external GSL routines.</p>
+<p><code><a class="el" href="Hamiltonian_8h_source.html">CheMPS2/include/Hamiltonian.h</a></code> contains the definitions of the Hamiltonian class.</p>
+<p><code><a class="el" href="Heff_8h_source.html">CheMPS2/include/Heff.h</a></code> contains the definitions of the Heff class.</p>
+<p><code><a class="el" href="Irreps_8h_source.html">CheMPS2/include/Irreps.h</a></code> contains the definitions of the Irrep class.</p>
+<p><code><a class="el" href="Lapack_8h_source.html">CheMPS2/include/Lapack.h</a></code> contains the definitions of the external BLAS and LAPACK routines.</p>
+<p><code><a class="el" href="Options_8h_source.html">CheMPS2/include/Options.h</a></code> contains all the options of the CheMPS2 namespace. Here the checkpoint storage names and folders can be set, as well as parameters related to memory usage and convergence.</p>
+<p><code><a class="el" href="Problem_8h_source.html">CheMPS2/include/Problem.h</a></code> contains the definitions of the Problem class.</p>
+<p><code><a class="el" href="Sobject_8h_source.html">CheMPS2/include/Sobject.h</a></code> contains the definitions of the Sobject class.</p>
+<p><code><a class="el" href="SyBookkeeper_8h_source.html">CheMPS2/include/SyBookkeeper.h</a></code> contains the definitions of the SyBookkeeper class.</p>
+<p><code><a class="el" href="TensorA_8h_source.html">CheMPS2/include/TensorA.h</a></code> contains the definitions of the TensorA class.</p>
+<p><code><a class="el" href="TensorB_8h_source.html">CheMPS2/include/TensorB.h</a></code> contains the definitions of the TensorB class.</p>
+<p><code><a class="el" href="TensorC_8h_source.html">CheMPS2/include/TensorC.h</a></code> contains the definitions of the TensorC class.</p>
+<p><code><a class="el" href="TensorD_8h_source.html">CheMPS2/include/TensorD.h</a></code> contains the definitions of the TensorD class.</p>
+<p><code><a class="el" href="TensorDiag_8h_source.html">CheMPS2/include/TensorDiag.h</a></code> contains the definitions of the TensorDiag class.</p>
+<p><code><a class="el" href="TensorF0Cbase_8h_source.html">CheMPS2/include/TensorF0Cbase.h</a></code> contains the definitions of the TensorF0Cbase class.</p>
+<p><code><a class="el" href="TensorF0_8h_source.html">CheMPS2/include/TensorF0.h</a></code> contains the definitions of the TensorF0 class.</p>
+<p><code><a class="el" href="TensorF1Dbase_8h_source.html">CheMPS2/include/TensorF1Dbase.h</a></code> contains the definitions of the TensorF1Dbase class.</p>
+<p><code><a class="el" href="TensorF1_8h_source.html">CheMPS2/include/TensorF1.h</a></code> contains the definitions of the TensorF1 class.</p>
+<p><code><a class="el" href="Tensor_8h_source.html">CheMPS2/include/Tensor.h</a></code> contains the definitions of the virtual Tensor class.</p>
+<p><code><a class="el" href="TensorL_8h_source.html">CheMPS2/include/TensorL.h</a></code> contains the definitions of the TensorL class.</p>
+<p><code><a class="el" href="TensorO_8h_source.html">CheMPS2/include/TensorO.h</a></code> contains the definitions of the TensorO class.</p>
+<p><code><a class="el" href="TensorQ_8h_source.html">CheMPS2/include/TensorQ.h</a></code> contains the definitions of the TensorQ class.</p>
+<p><code><a class="el" href="TensorS0Abase_8h_source.html">CheMPS2/include/TensorS0Abase.h</a></code> contains the definitions of the TensorS0Abase class.</p>
+<p><code><a class="el" href="TensorS0_8h_source.html">CheMPS2/include/TensorS0.h</a></code> contains the definitions of the TensorS0 class.</p>
+<p><code><a class="el" href="TensorS1Bbase_8h_source.html">CheMPS2/include/TensorS1Bbase.h</a></code> contains the definitions of the TensorS1Bbase class.</p>
+<p><code><a class="el" href="TensorS1_8h_source.html">CheMPS2/include/TensorS1.h</a></code> contains the definitions of the TensorS1 class.</p>
+<p><code><a class="el" href="TensorSwap_8h_source.html">CheMPS2/include/TensorSwap.h</a></code> contains the definitions of the TensorSwap class.</p>
+<p><code><a class="el" href="TensorT_8h_source.html">CheMPS2/include/TensorT.h</a></code> contains the definitions of the TensorT class.</p>
+<p><code><a class="el" href="TensorX_8h_source.html">CheMPS2/include/TensorX.h</a></code> contains the definitions of the TensorX class.</p>
+<p><code><a class="el" href="TwoDM_8h_source.html">CheMPS2/include/TwoDM.h</a></code> contains the definitions of the TwoDM class.</p>
+<p><code><a class="el" href="TwoIndex_8h_source.html">CheMPS2/include/TwoIndex.h</a></code> contains the definitions of the TwoIndex class.</p>
+<p>Please note that these files are documented with Doxygen-readable comments. Search for the section "Build" in <code><a class="el" href="README_8md_source.html">README.md</a></code> to see how a manual can be generated from these comments.</p>
 <h2>List of files to perform test runs</h2>
-<pre class="fragment">tests/test1.cpp
-tests/test2.cpp
-tests/test3.cpp
-tests/test4.cpp
-tests/test5.cpp
-tests/test6.cpp
-tests/matrixelements/CH4_N10_S0_c2v_I0.dat
-tests/matrixelements/H6_N6_S0_d2h_I0.dat
-tests/matrixelements/N2_N14_S0_d2h_I0.dat
-tests/matrixelements/O2_CCPVDZ.dat
-</pre><p>These test files illustrate how to use the CheMPS2 library. They only require a very limited amount of memory (order 10-100 MB).</p>
+<p><code>tests/test1.cpp</code> contains a ground state DMRG calculation of the ^1Ag state of N2 (d2h symmetry) in the minimal STO-3G basis set.</p>
+<p><code>tests/test2.cpp</code> contains a ground state DMRG calculation of the ^1Ag state of a linear H6 chain (d2h symmetry) in the 6-31G basis set.</p>
+<p><code>tests/test3.cpp</code> contains a ground state DMRG calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</p>
+<p><code>tests/test4.cpp</code> contains a ground state DMRG calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open boundary conditions, containing 9 fermions (just below half-filling).</p>
+<p><code>tests/test5.cpp</code> contains an excited state DMRG calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The ground and two lowest excited states are determined.</p>
+<p><code>tests/test6.cpp</code> contains a DMRG-SCF ground state calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and the lowest two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space.</p>
+<p><code>tests/matrixelements/CH4_N10_S0_c2v_I0.dat</code> contains the matrix elements for test3.</p>
+<p><code>tests/matrixelements/H6_N6_S0_d2h_I0.dat</code> contains the matrix elements for test2.</p>
+<p><code>tests/matrixelements/N2_N14_S0_d2h_I0.dat</code> contains the matrix elements for test1 and test5.</p>
+<p><code>tests/matrixelements/O2_CCPVDZ.dat</code> contains the matrix elements for test6.</p>
+<p>These test files illustrate how to use the CheMPS2 library. The tests only require a very limited amount of memory (order 10-100 MB).</p>
 <h2>Matrix elements from Psi4</h2>
-<p>CheMPS2 has a Hamiltonian object which is able to read in matrix elements from a plugin to Psi4 <a href="http://www.psicode.org">Psi4, Ab initio quantum chemistry</a>, which works on version psi4.0b5 and higher.</p>
+<p>CheMPS2 has a Hamiltonian object which is able to read in matrix elements from a plugin to Psi4 <a href="http://www.psicode.org">[Psi4, Ab initio quantum chemistry]</a>, which works on version psi4.0b5 and higher.</p>
 <p>To make use of this feature, build Psi4 with the plugin option, and then run: </p>
 <pre class="fragment">&gt; psi4 --new-plugin mointegrals
 &gt; cd mointegrals
@@ -244,7 +244,7 @@ tests/matrixelements/O2_CCPVDZ.dat
 <pre class="fragment">&gt; make
 </pre><h2>Build</h2>
 <h3>1. Build CheMPS2 with CMake</h3>
-<p>CheMPS2 can be build with CMake. The files </p>
+<p>CheMPS2 can be built with CMake. The files </p>
 <pre class="fragment">./CMakeLists.txt
 ./CheMPS2/CMakeLists.txt
 ./tests/CMakeLists.txt
@@ -253,8 +253,14 @@ tests/matrixelements/O2_CCPVDZ.dat
 &gt; cd build
 </pre><p>CMake generates makefiles based on the user's specifications: </p>
 <pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on doxygen documentation.</p>
-<p>To compile, run: </p>
+</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on doxygen documentation. If one or more of the required libraries are not found, please use the command </p>
+<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option4 CMAKE_LIBRARY_PATH=option5 CXX=option1
+cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+</pre><p>instead, where option4 and option5 are respectively the missing colon-separated include and library paths, e.g. </p>
+<pre class="fragment">CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
+</pre><p>and </p>
+<pre class="fragment">CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
+</pre><p>To compile, run: </p>
 <pre class="fragment">&gt; make
 </pre><h3>2. Testing CheMPS2</h3>
 <p>To test CheMPS2, start in <code>./build</code>, and run: </p>
@@ -275,14 +281,14 @@ tests/matrixelements/O2_CCPVDZ.dat
 &gt; cd ../html
 &gt; firefox index.html &amp;
 </pre><h2>User manual</h2>
-<p>Doxygen output can be generated, see the section "Build" in README.</p>
+<p>Doxygen output can be generated, see the section "Build" in <a class="el" href="README_8md_source.html">README.md</a>, or the <a href="http://sebwouters.github.io/CheMPS2/index.html">[Doxygen html output]</a>.</p>
 <p>For a more concise overview of the concepts and ideas used in CheMPS2, please read the code release paper "CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry", one of the references in CITATIONS. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Dec 11 2013 16:32:53 for CheMPS2 by
+    <li class="footer">Generated on Mon Jan 6 2014 11:36:07 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>
