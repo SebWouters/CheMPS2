@@ -21,7 +21,6 @@
 #define DMRG_H
 
 #include <string>
-#include <hdf5.h>
 
 #include "Options.h"
 #include "Problem.h"
@@ -43,6 +42,7 @@
 #include "Heff.h"
 #include "Sobject.h"
 #include "ConvergenceScheme.h"
+#include "myhdf5.h"
 
 namespace CheMPS2{
 /** DMRG class.
