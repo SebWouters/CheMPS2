@@ -17,13 +17,13 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <hdf5.h>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <string>
 
 #include "DMRG.h"
+#include "myhdf5.h"
 
 void CheMPS2::DMRG::saveMPS(const std::string name, TensorT ** MPSlocation, SyBookkeeper * BKlocation, bool isConverged) const{
  
