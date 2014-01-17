@@ -42,7 +42,7 @@
 #include "Heff.h"
 #include "Sobject.h"
 #include "ConvergenceScheme.h"
-#include "myhdf5.h"
+#include "MyHDF5.h"
 
 namespace CheMPS2{
 /** DMRG class.

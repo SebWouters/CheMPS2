@@ -231,6 +231,9 @@ class.
 ```CheMPS2/include/Lapack.h``` contains the definitions of the external BLAS
 and LAPACK routines.
 
+```CheMPS2/include/MyHDF5.h``` forces the use of the HDF5 1.8 API, e.g. 
+H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.
+
 ```CheMPS2/include/Options.h``` contains all the options of the CheMPS2
 namespace. Here the checkpoint storage names and folders can be set, as well
 as parameters related to memory usage and convergence.
@@ -324,6 +327,10 @@ state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals
 are kept frozen, and the lowest two Ag, B2g, B3g, B1u, B2u, and B3u orbitals
 are chosen as active space.
 
+```tests/test7.cpp``` reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
+stores these matrix elements to disk, reads them back in from disk, and
+compares the two versions.
+
 ```tests/matrixelements/CH4_N10_S0_c2v_I0.dat``` contains the matrix elements
 for test3.
 
@@ -334,7 +341,7 @@ for test2.
 for test1 and test5.
 
 ```tests/matrixelements/O2_CCPVDZ.dat``` contains the matrix elements
-for test6.
+for test6 and test7.
 
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).

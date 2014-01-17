@@ -24,7 +24,7 @@
 
 #include "FourIndex.h"
 #include "Lapack.h"
-#include "myhdf5.h"
+#include "MyHDF5.h"
 
 using namespace std;
 

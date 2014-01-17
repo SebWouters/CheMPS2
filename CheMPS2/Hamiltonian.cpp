@@ -26,7 +26,7 @@
 #include "TwoIndex.h"
 #include "FourIndex.h"
 #include "Hamiltonian.h"
-#include "myhdf5.h"
+#include "MyHDF5.h"
 
 using std::cout;
 using std::endl;

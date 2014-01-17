@@ -23,7 +23,7 @@
 #include <string>
 
 #include "TwoIndex.h"
-#include "myhdf5.h"
+#include "MyHDF5.h"
 
 using namespace std;
 
