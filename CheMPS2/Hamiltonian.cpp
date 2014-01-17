@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <iostream>
-#include <hdf5.h>
 #include <string>
 #include <fstream>
 
@@ -27,6 +26,7 @@
 #include "TwoIndex.h"
 #include "FourIndex.h"
 #include "Hamiltonian.h"
+#include "myhdf5.h"
 
 using std::cout;
 using std::endl;

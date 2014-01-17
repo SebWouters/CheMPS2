@@ -17,7 +17,6 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <hdf5.h>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
@@ -27,6 +26,7 @@
 
 #include "DMRG.h"
 #include "Lapack.h"
+#include "myhdf5.h"
 
 using std::cout;
 using std::endl;

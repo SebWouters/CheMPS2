@@ -23,10 +23,10 @@
 #include <string>
 #include <math.h>
 #include <sstream>
-#include <hdf5.h>
 
 #include "CASSCF.h"
 #include "Lapack.h"
+#include "myhdf5.h"
 
 using std::string;
 using std::ifstream;

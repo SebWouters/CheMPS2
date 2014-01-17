@@ -17,13 +17,13 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <hdf5.h>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 #include "TwoIndex.h"
+#include "myhdf5.h"
 
 using namespace std;
 
@@ -137,12 +137,12 @@ void CheMPS2::TwoIndex::read(const std::string name){
          hid_t dataset_id = H5Dopen(group_id, "IrrepSizes", H5P_DEFAULT);
     
             //Attributes
-            hid_t attribute_id1 = H5Aopen_name(dataset_id, "nGroup");
+            hid_t attribute_id1 = H5Aopen_by_name(group_id,"IrrepSizes", "nGroup", H5P_DEFAULT, H5P_DEFAULT);
             int nGroup;
             H5Aread(attribute_id1, H5T_NATIVE_INT, &nGroup);
             if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at TwoIndex::read : nGroup doesn't match." << std::endl;
             
-            hid_t attribute_id2 = H5Aopen_name(dataset_id, "nIrreps");
+            hid_t attribute_id2 = H5Aopen_by_name(group_id,"IrrepSizes", "nIrreps", H5P_DEFAULT, H5P_DEFAULT);
             int nIrreps;
             H5Aread(attribute_id2, H5T_NATIVE_INT, &nIrreps);
             if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at TwoIndex::read : nIrreps doesn't match." << std::endl;
