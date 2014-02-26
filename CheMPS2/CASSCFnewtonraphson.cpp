@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -329,16 +329,11 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
             // Case2a: (index1==index3) and (alpha==beta)
             for (int irrep_ab=0; irrep_ab<numberOfIrreps; irrep_ab++){
                for (int alpha_index=jumpsHamOrig[irrep_ab]; alpha_index<jumpsHamOrig[irrep_ab]+Nocc[irrep_ab]; alpha_index++){
-                  if (index1 == alpha_index){
-                     value += 4 * HamRotated->getVmat(index2,alpha_index,index4,alpha_index) + 4 * HamRotated->getVmat(index2,index4,alpha_index,alpha_index);
-                  } else {
-                     value += 8 * HamRotated->getVmat(index2,alpha_index,index4,alpha_index) - 4 * HamRotated->getVmat(index2,index4,alpha_index,alpha_index);
-                  }
+                  value += 8 * HamRotated->getVmat(index2,alpha_index,index4,alpha_index) - 4 * HamRotated->getVmat(index2,index4,alpha_index,alpha_index);
                }
             }
             
-            // Case2b: (index1==index3); some element :-)
-            value += 4 * HamRotated->getVmat(index2,index4,index1,index3);
+            value += 12 * HamRotated->getVmat(index2,index4,index1,index1) - 4 * HamRotated->getVmat(index2,index1,index4,index1);
             
          } else { //index1 != index3
          
@@ -449,11 +444,7 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
       for (int irrep_sum=0; irrep_sum<numberOfIrreps; irrep_sum++){ //irrep_sum is the irrep of r_index and s_index
       
          for (int r_index=jumpsHamOrig[irrep_sum]; r_index<jumpsHamOrig[irrep_sum]+Nocc[irrep_sum]; r_index++){ //r_index occupied --> delta(r_index,s_index)
-            if (r_index != index1){
-               value += 4 * HamRotated->getVmat(index2, r_index, index1, r_index) - 2 * HamRotated->getVmat(index2, r_index, r_index, index1);
-            } else { //r_index equal to index1
-               value += 2 * HamRotated->getVmat(index2, index1, index1, index1);
-            }
+            value += 4 * HamRotated->getVmat(index2, r_index, index1, r_index) - 2 * HamRotated->getVmat(index2, index1, r_index, r_index);
          }
       
          for (int r_index=jumpsHamOrig[irrep_sum]+Nocc[irrep_sum]; r_index<jumpsHamOrig[irrep_sum+1]-Nvirt[irrep_sum]; r_index++){ //r_index act --> s_index act

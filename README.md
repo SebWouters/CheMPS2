@@ -3,7 +3,7 @@
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
 ==============================================================================
 
-Copyright (C) 2013 Sebastian Wouters <sebastianwouters@gmail.com>
+Copyright (C) 2013, 2014 Sebastian Wouters <sebastianwouters@gmail.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,17 +28,15 @@ To acknowledge CheMPS2, please cite
 1. S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck,
    CheMPS2: a free open-source spin-adapted implementation of the density
             matrix renormalization group for ab initio quantum chemistry,
-   Submitted to Computer Physics Communications,
-   [arXiv:1312.2415](http://arxiv.org/abs/1312.2415)
+   Computer Physics Communications (2014),
+   [doi:10.1016/j.cpc.2014.01.019](http://dx.doi.org/j.cpc.2014.01.019)
 
         @article{CheMPS2cite1,
             author = {Sebastian Wouters and Ward Poelmans and Paul W. Ayers and Dimitri {Van Neck}},
             title = {CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry},
-            journal = {ArXiv e-prints},
-            archivePrefix = "arXiv",
-            eprint = {1312.2415},
-            primaryClass = "cond-mat.str-el",
-            year = {2013}
+            journal = {Computer Physics Communications},
+            year = {2014},
+            doi = {10.1016/j.cpc.2014.01.019}
         }
 
 2. S. Wouters, P.A. Limacher, D. Van Neck and P.W. Ayers,
