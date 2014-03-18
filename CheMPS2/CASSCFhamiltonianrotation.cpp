@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,21 +18,12 @@
 */
 
 #include <stdlib.h>
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <math.h>
-#include <sstream>
 #include <algorithm>
 
 #include "CASSCF.h"
 #include "Lapack.h"
-#include "MyHDF5.h"
 
-using std::string;
-using std::ifstream;
-using std::cout;
-using std::endl;
 using std::min;
 using std::max;
 
@@ -45,9 +36,7 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
    int passed = 0;
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
    
-      int linsize = OrbPerIrrep[irrep];
-      //int size = linsize * linsize;
-   
+      int linsize = iHandler->getNORB(irrep);
       if (linsize>1){
          
          for (int cnt1=0; cnt1<linsize; cnt1++){
@@ -60,8 +49,8 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
          char notra = 'N';
          double alpha = 1.0;
          double beta = 0.0;
-         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,temp1,&linsize,&beta,temp2,&linsize);
-         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,temp2,&linsize,unitary[irrep],&linsize,&beta,temp1,&linsize);
+         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha, unitary->getBlock(irrep),&linsize,temp1,&linsize,&beta,temp2,&linsize);
+         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,temp2,&linsize, unitary->getBlock(irrep),&linsize,&beta,temp1,&linsize);
          
          for (int cnt1=0; cnt1<linsize; cnt1++){
             for (int cnt2=cnt1; cnt2<linsize; cnt2++){
@@ -84,10 +73,10 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
             const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
-               int linsize1 = OrbPerIrrep[irrep1];
-               int linsize2 = OrbPerIrrep[irrep2];
-               int linsize3 = OrbPerIrrep[irrep3];
-               int linsize4 = OrbPerIrrep[irrep4];
+               int linsize1 = iHandler->getNORB(irrep1);
+               int linsize2 = iHandler->getNORB(irrep2);
+               int linsize3 = iHandler->getNORB(irrep3);
+               int linsize4 = iHandler->getNORB(irrep4);
                
                if ((linsize1>0) && (linsize2>0) && (linsize3>0) && (linsize4>0)){
                   
@@ -96,7 +85,8 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
                               temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ]
-                                = HamOrig->getVmat(jumpsHamOrig[irrep1]+cnt1, jumpsHamOrig[irrep2]+cnt2, jumpsHamOrig[irrep3]+cnt3, jumpsHamOrig[irrep4]+cnt4);
+                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
+                                                    iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4 );
                            }
                         }
                      }
@@ -108,29 +98,30 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
                   double beta = 0.0; //SET !!!
                   
                   int rightdim = linsize2 * linsize3 * linsize4; //(ijkl) -> (ajkl)
-                  dgemm_(&notra,&notra,&linsize1,&rightdim,&linsize1, &alpha,unitary[irrep1],&linsize1,temp1,&linsize1, &beta,temp2,&linsize1);
+                  dgemm_(&notra,&notra,&linsize1,&rightdim,&linsize1, &alpha, unitary->getBlock(irrep1),&linsize1,temp1,&linsize1, &beta,temp2,&linsize1);
                   
                   int leftdim = linsize1 * linsize2 * linsize3; //(ajkl) -> (ajkd)
-                  dgemm_(&notra,&trans,&leftdim,&linsize4,&linsize4, &alpha,temp2,&leftdim,unitary[irrep4],&linsize4, &beta,temp1,&leftdim);
+                  dgemm_(&notra,&trans,&leftdim,&linsize4,&linsize4, &alpha,temp2,&leftdim, unitary->getBlock(irrep4),&linsize4, &beta,temp1,&leftdim);
                   
                   int jump = leftdim; //(ajkd) -> (ajcd)
                   leftdim = linsize1 * linsize2;
                   for (int bla=0; bla<linsize4; bla++){
-                     dgemm_(&notra,&trans,&leftdim,&linsize3,&linsize3, &alpha,temp1+jump*bla,&leftdim,unitary[irrep3],&linsize3, &beta,temp2+jump*bla,&leftdim);
+                     dgemm_(&notra,&trans,&leftdim,&linsize3,&linsize3, &alpha,temp1+jump*bla,&leftdim, unitary->getBlock(irrep3),&linsize3, &beta,temp2+jump*bla,&leftdim);
                   }
                   
                   jump = leftdim;
                   rightdim = linsize3*linsize4;
                   for (int bla=0; bla<rightdim; bla++){
-                     dgemm_(&notra,&trans,&linsize1,&linsize2,&linsize2,&alpha,temp2+jump*bla,&linsize1,unitary[irrep2],&linsize2,&beta,temp1+jump*bla,&linsize1);
+                     dgemm_(&notra,&trans,&linsize1,&linsize2,&linsize2,&alpha,temp2+jump*bla,&linsize1, unitary->getBlock(irrep2),&linsize2,&beta,temp1+jump*bla,&linsize1);
                   }
                   
                   for (int cnt1=0; cnt1<linsize1; cnt1++){
                      for (int cnt2=0; cnt2<linsize2; cnt2++){
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
-                              HamRotated->setVmat(jumpsHamOrig[irrep1]+cnt1, jumpsHamOrig[irrep2]+cnt2, jumpsHamOrig[irrep3]+cnt3, jumpsHamOrig[irrep4]+cnt4,
-                                                  temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ] );
+                              HamRotated->setVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
+                                                   iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4,
+                                                   temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ] );
                            }
                         }
                      }
@@ -158,7 +149,7 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
    int passed = 0;
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
    
-      int linsize = OrbPerIrrep[irrep];
+      int linsize = iHandler->getNORB(irrep);
       if (linsize>1){
          
          for (int cnt1=0; cnt1<linsize; cnt1++){
@@ -171,8 +162,8 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
          char notra = 'N';
          double alpha = 1.0;
          double beta = 0.0;
-         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,mem1,&linsize,&beta,mem2,&linsize);
-         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,mem2,&linsize,unitary[irrep],&linsize,&beta,mem1,&linsize);
+         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha, unitary->getBlock(irrep),&linsize,mem1,&linsize,&beta,mem2,&linsize);
+         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,mem2,&linsize, unitary->getBlock(irrep),&linsize,&beta,mem1,&linsize);
          
          for (int cnt1=0; cnt1<linsize; cnt1++){
             for (int cnt2=cnt1; cnt2<linsize; cnt2++){
@@ -198,10 +189,10 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
             const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
-               const int linsize1 = OrbPerIrrep[irrep1];
-               const int linsize2 = OrbPerIrrep[irrep2];
-               const int linsize3 = OrbPerIrrep[irrep3];
-               const int linsize4 = OrbPerIrrep[irrep4];
+               const int linsize1 = iHandler->getNORB(irrep1);
+               const int linsize2 = iHandler->getNORB(irrep2);
+               const int linsize3 = iHandler->getNORB(irrep3);
+               const int linsize4 = iHandler->getNORB(irrep4);
                
                if ((linsize1>0) && (linsize2>0) && (linsize3>0) && (linsize4>0)){
                
@@ -252,7 +243,8 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                      for (int cnt2=0; cnt2<linsize2; cnt2++){
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
-                              HamRotated->setVmat(jumpsHamOrig[irrep1]+cnt1, jumpsHamOrig[irrep2]+cnt2, jumpsHamOrig[irrep3]+cnt3, jumpsHamOrig[irrep4]+cnt4, 0.0);
+                              HamRotated->setVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
+                                                   iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4, 0.0);
                            }
                         }
                      }
@@ -296,10 +288,10 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                        for (int origIndex3=0; origIndex3<origSize3; origIndex3++){
                                           for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
                                              mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
-                                                = HamOrig->getVmat( jumpsHamOrig[irrep1] + origStart1 + origIndex1,
-                                                                    jumpsHamOrig[irrep2] + origStart2 + origIndex2,
-                                                                    jumpsHamOrig[irrep3] + origStart3 + origIndex3,
-                                                                    jumpsHamOrig[irrep4] + origStart4 + origIndex4 );
+                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + origStart1 + origIndex1,
+                                                                    iHandler->getOrigNOCCstart(irrep2) + origStart2 + origIndex2,
+                                                                    iHandler->getOrigNOCCstart(irrep3) + origStart3 + origIndex3,
+                                                                    iHandler->getOrigNOCCstart(irrep4) + origStart4 + origIndex4 );
                                           }
                                        }
                                     }
@@ -313,7 +305,7 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                     int rightdim = origSize2 * origSize3 * origSize4;
                                     int leftdim = targetSize1;
                                     int middledim = origSize1;
-                                    double * rotationBlock = unitary[irrep1] + targetStart1 + linsize1 * origStart1; // --> lda = linsize1;
+                                    double * rotationBlock = unitary->getBlock(irrep1) + targetStart1 + linsize1 * origStart1; // --> lda = linsize1;
                                     int lda = linsize1;
                                     dgemm_(&notra,&notra,&leftdim,&rightdim,&middledim, &alpha,rotationBlock,&lda,mem2,&middledim, &beta,mem1,&leftdim);
                                  }
@@ -337,7 +329,7 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                        int rightdim = targetSize2;
                                        int leftdim = targetSize1;
                                        int middledim = origSize2;
-                                       double * rotationBlock = unitary[irrep2] + targetStart2 + linsize2 * origStart2;  // --> lda = linsize2;
+                                       double * rotationBlock = unitary->getBlock(irrep2) + targetStart2 + linsize2 * origStart2;  // --> lda = linsize2;
                                        int ldb = linsize2;
                                        for (int cntloop=0; cntloop<loop; cntloop++){
                                           dgemm_(&notra,&trans,&leftdim,&rightdim,&middledim, &alpha,mem1+cntloop*jump_mem1,&leftdim,rotationBlock,&ldb,
@@ -364,7 +356,7 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                           int rightdim = targetSize3;
                                           int leftdim = targetSize1*targetSize2;
                                           int middledim = origSize3;
-                                          double * rotationBlock = unitary[irrep3] + targetStart3 + linsize3 * origStart3;  // --> lda = linsize3;
+                                          double * rotationBlock = unitary->getBlock(irrep3) + targetStart3 + linsize3 * origStart3;  // --> lda = linsize3;
                                           int ldb = linsize3;
                                           for (int cntloop=0; cntloop<loop; cntloop++){
                                              dgemm_(&notra,&trans,&leftdim,&rightdim,&middledim, &alpha,mem2+cntloop*jump_mem2,&leftdim,rotationBlock,&ldb,
@@ -384,9 +376,9 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                           int targetIndex3 = (temp - targetIndex2) / targetSize2;
                                           
                                           const int rowindex  = targetIndex1 + targetSize1 * (targetIndex2 + targetSize2 * targetIndex3);
-                                          const int hamIndex1 = jumpsHamOrig[irrep1] + targetStart1 + targetIndex1;
-                                          const int hamIndex2 = jumpsHamOrig[irrep2] + targetStart2 + targetIndex2;
-                                          const int hamIndex3 = jumpsHamOrig[irrep3] + targetStart3 + targetIndex3;
+                                          const int hamIndex1 = iHandler->getOrigNOCCstart(irrep1) + targetStart1 + targetIndex1;
+                                          const int hamIndex2 = iHandler->getOrigNOCCstart(irrep2) + targetStart2 + targetIndex2;
+                                          const int hamIndex3 = iHandler->getOrigNOCCstart(irrep3) + targetStart3 + targetIndex3;
                                           
                                           //Only once per unique matrix element, does the relevant term need to be added
                                           if ((hamIndex1 <= hamIndex2) && (hamIndex1 <= hamIndex3)){
@@ -395,13 +387,13 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                           
                                              for (int targetIndex4=targetStart4; targetIndex4<linsize4; targetIndex4++){
                                              
-                                                const int hamIndex4 = jumpsHamOrig[irrep4] + targetIndex4;
+                                                const int hamIndex4 = iHandler->getOrigNOCCstart(irrep4) + targetIndex4;
                                              
                                                 //Only once per unique matrix element, add contribution; hamIndex2 <= hamIndex4 ensured by targetStart4
                                                 if ( (hamIndex1 != hamIndex2) || ( (hamIndex1 == hamIndex2) && (hamIndex3 <= hamIndex4) ) ){
                                                 
                                                    double value = 0.0;
-                                                   double * rotatedBlock = unitary[irrep4] + linsize4 * origStart4;
+                                                   double * rotatedBlock = unitary->getBlock(irrep4) + linsize4 * origStart4;
                                                    for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
                                                       value += mem3[rowindex + leftdim * origIndex4] * rotatedBlock[targetIndex4 + linsize4 * origIndex4];
                                                    }

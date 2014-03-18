@@ -64,8 +64,9 @@ List of files in the CheMPS2 library
 class, as well as the functions which allow to update, get or set its
 variables.
     
-```CheMPS2/CASSCFdebug.cpp``` contains the functions to store and load CASSCF
-checkpoint file, as well as several test functions for debugging purposes.
+```CheMPS2/CASSCFdebug.cpp``` contains two functions: one for calculating the
+ROHF energy; and one for fetching FCI coefficients to determine the point group
+symmetry of certain electronic states of the carbon dimer.
     
 ```CheMPS2/CASSCFhamiltonianrotation.cpp``` contains the Hamiltonian rotation
 function, based on the CASSCF unitary matrix.
@@ -86,6 +87,13 @@ checkpoint file (the MPS).
 
 ```CheMPS2/DMRGoperators.cpp``` contains all functions related to the DMRG
 renormalized operators: saving to disk, loading from disk, and updating.
+
+```CheMPS2/DMRGSCFindices.cpp``` contains the index conversions for the
+DMRG-SCF algorithm.
+
+```CheMPS2/DMRGSCFunitary.cpp``` contains the storage and handling of the
+unitary matrix and its nonredundant skew-symmetric parametrization
+required for the DMRG-SCF algorithm.
 
 ```CheMPS2/DMRGtechnics.cpp``` contains the functions related to the 2-RDM
 and the excited-state calculations.
@@ -212,6 +220,12 @@ class for the one-body matrix elements.
 ConvergenceScheme class.
 
 ```CheMPS2/include/DMRG.h``` contains the definitions of the DMRG class.
+
+```CheMPS2/include/DMRGSCFindices.h``` contains the definitions of the
+DMRGSCFindices class.
+
+```CheMPS2/include/DMRGSCFunitary.h``` contains the definitions of the
+DMRGSCFunitary class.
 
 ```CheMPS2/include/FourIndex.h``` contains the definitions of the FourIndex
 class.

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@
 #include "Problem.h"
 #include "Options.h"
 #include "ConvergenceScheme.h"
+#include "DMRGSCFindices.h"
+#include "DMRGSCFunitary.h"
 
 namespace CheMPS2{
 /** CASSCF class.
@@ -75,26 +77,15 @@ namespace CheMPS2{
          double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum);
          
          //! CASSCF unitary rotation remove call
-         void deleteStoredUnitary();
+         void deleteStoredUnitary(){ unitary->deleteStoredUnitary(); }
          
       private:
+      
+         //Index convention handler
+         DMRGSCFindices * iHandler;
          
-         /* The x-matrix (anti-symmetric) from the paper:
-              xmatrix[irrep][case][row + l_row * col]
-              case 0: occ(col) -> DMRG(row)
-              case 1: DMRG(col) -> virt(row)
-              case 2: occ(col) -> virt(row) */
-         double *** xmatrix;
-         
-         //Number of variables in the x-matrix
-         int x_linearlength;
-         
-         //Helper arrays to jump from linear x-matrix index to orbital indices and back
-         int * x_firstindex;
-         int * x_secondindex;
-         
-         //The unitary matrix (e^x * previous unitary): unitary[irrep][row + size_irrep * col]
-         double ** unitary;
+         //Unitary matrix storage and manipulator
+         DMRGSCFunitary * unitary;
       
          //The original Hamiltonian
          Hamiltonian * HamOrig;
@@ -117,44 +108,17 @@ namespace CheMPS2{
          //Single occupations
          int * SOCC;
          
-         //Filled HF orbitals for CASSCF loop
-         int * Nocc;
-         
-         //Active orbitals for CASSCF loop
-         int * NDMRG;
-         
-         //Empty orbitals for CASSCF loop
-         int * Nvirt;
-         
-         //Number of orbitals per irrep
-         int * OrbPerIrrep;
-         
          //Boolean whether or not setupStart has been called
          bool setupStartCalled;
          
          //Number of DMRG orbitals
          int nOrbDMRG;
-         
-         //Irrep of each DMRG orbital (length nOrbDMRG)
-         int * irrepOfEachDMRGOrbital;
-         
-         //jumpsHamOrig[irrep+1]-jumpsHamOrig[irrep] = OrbPerIrrep[irrep]
-         int * jumpsHamOrig;
-         
-         //List of DMRG orbitals in terms of the original Ham orbitals
-         int * listDMRG;
-         
-         //Number of condensed orbitals
-         int nCondensed;
-         
-         //List of condensed orbitals in terms of the original Ham orbitals
-         int * listCondensed;
 
          //Copy theDMRG2DM over to CASSCF::DMRG2DM
          void copy2DMover(TwoDM * theDMRG2DM);
 
          //Update the unitary, 2DM and 1DM with the given NO basis
-         void rotateUnitaryAnd2DMand1DM(const int N, double * eigenvecs, double * work); 
+         void rotate2DMand1DM(const int N, double * eigenvecs, double * work); 
          
          //Space for the DMRG 1DM
          double * DMRG1DM;
@@ -164,9 +128,6 @@ namespace CheMPS2{
          
          //Set the DMRG 1DM
          void setDMRG1DM(const int N);
-         
-         //Once the DMRG1DM is set, the NOON can be calculated
-         void calcNOON();
 
          //The NO in terms of the active space orbitals are stored in the nOrbDMRG*nOrbDMRG array eigenvecs
          void calcNOON(double * eigenvecs);
@@ -183,20 +144,11 @@ namespace CheMPS2{
          //Helper function to fill the Hamiltonian for the DMRG part
          void fillHamDMRG(Hamiltonian * HamDMRG);
          
-         //Update the unitary transformation based on the calculated xmatrix and the previous unitary
-         void updateUnitary(double * workmem1, double * workmem2);
-         
          //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory
          void fillRotatedHamAllInMemory(double * workmem1, double * workmem2);
          
          //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory, but blockwise
          void fillRotatedHamInMemoryBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize);
-         
-         //Get the 1DM in the rotated basis
-         double get1DMrotated(const int index1, const int index2) const;
-         
-         //Get the 2DM in the rotated basis
-         double get2DMrotated(const int index1, const int index2, const int index3, const int index4) const;
          
          //Calculate the gradient, return function is the gradient 2-norm
          double calcGradient(double * gradient);
@@ -210,12 +162,6 @@ namespace CheMPS2{
          //Do Augmented Hessian form of NR
          double updateXmatrixAugmentedHessianNR();
          
-         //Copy the x solution back (NR, Steepest descent, ...)
-         void copyXsolutionBack(double * vector);
-         
-         //Find the linear index corresponding to p and q. -1 is returned if no index corresponds to it.
-         int x_tolin(const int p_index, const int q_index);
-         
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          double FmatHelper(const int index1, const int index2) const;
          double Fmat(const int index1, const int index2) const;
@@ -224,13 +170,6 @@ namespace CheMPS2{
          
          //Wmat function as defined by Eq.(21b) in the Siegbahn paper.
          double Wmat(const int index1, const int index2, const int index3, const int index4) const;
-         
-         //Check the 1DM and 2DM rotated
-         void check1DMand2DMrotated(const int N);
-         
-         //Save and load functions
-         void loadU();
-         void saveU();
          
          //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
          void PrintCoeff_C2(DMRG * theDMRG);
