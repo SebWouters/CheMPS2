@@ -111,8 +111,14 @@ CheMPS2::CASSCF::~CASSCF(){
       delete [] DMRG1DM;
       delete [] DMRG2DM;
       
-      for (int cnt=0; cnt<numberOfIrreps; cnt++){ delete [] Fmatrix[cnt]; }
+      for (int irrep=0; irrep<numberOfIrreps; irrep++){
+         delete [] Fmatrix[irrep];
+         delete [] QmatrixOCC[irrep];
+         delete [] QmatrixACT[irrep];
+      }
       delete [] Fmatrix;
+      delete [] QmatrixOCC;
+      delete [] QmatrixACT;
       
    }
 
@@ -224,18 +230,87 @@ void CheMPS2::CASSCF::rotate2DMand1DM(const int N, double * eigenvecs, double * 
 
 }
 
+void CheMPS2::CASSCF::buildQmatrixOCC(){
+
+   for (int irrep_ij=0; irrep_ij<numberOfIrreps; irrep_ij++){
+      for (int indexi=0; indexi<iHandler->getNORB(irrep_ij); indexi++){
+         const int origIndexI = indexi + iHandler->getOrigNOCCstart(irrep_ij);
+         for (int indexj=indexi; indexj<iHandler->getNORB(irrep_ij); indexj++){
+            const int origIndexJ = indexj + iHandler->getOrigNOCCstart(irrep_ij);
+            double value = 0.0;
+            for (int irrep_occ=0; irrep_occ<numberOfIrreps; irrep_occ++){
+               for (int origIndexOcc=iHandler->getOrigNOCCstart(irrep_occ); origIndexOcc<iHandler->getOrigNDMRGstart(irrep_occ); origIndexOcc++){
+                  value += 2 * HamRotated->getVmat(origIndexI, origIndexOcc, origIndexJ, origIndexOcc)
+                             - HamRotated->getVmat(origIndexI, origIndexJ, origIndexOcc, origIndexOcc);
+               }
+            }
+            QmatrixOCC[irrep_ij][indexi + iHandler->getNORB(irrep_ij) * indexj] = value;
+            QmatrixOCC[irrep_ij][indexj + iHandler->getNORB(irrep_ij) * indexi] = value;
+         }
+      }
+   }
+
+}
+
+double CheMPS2::CASSCF::QmatOCC(const int index1, const int index2) const{
+
+   int irrep1 = 0;
+   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
+   int irrep2 = 0;
+   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
+   
+   if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
+   
+   return QmatrixOCC[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
+
+}
+
+void CheMPS2::CASSCF::buildQmatrixACT(){
+
+   for (int irrep_ij=0; irrep_ij<numberOfIrreps; irrep_ij++){
+      for (int indexi=0; indexi<iHandler->getNORB(irrep_ij); indexi++){
+         const int origIndexI = indexi + iHandler->getOrigNOCCstart(irrep_ij);
+         for (int indexj=indexi; indexj<iHandler->getNORB(irrep_ij); indexj++){
+            const int origIndexJ = indexj + iHandler->getOrigNOCCstart(irrep_ij);
+            double value = 0.0;
+            for (int irrep_act=0; irrep_act<numberOfIrreps; irrep_act++){
+               for (int origIndexAct1=iHandler->getOrigNDMRGstart(irrep_act); origIndexAct1<iHandler->getOrigNVIRTstart(irrep_act); origIndexAct1++){
+                  const int DMRGindex1 = iHandler->getDMRGcumulative(irrep_act) + origIndexAct1 - iHandler->getOrigNDMRGstart(irrep_act);
+                  for (int origIndexAct2=iHandler->getOrigNDMRGstart(irrep_act); origIndexAct2<iHandler->getOrigNVIRTstart(irrep_act); origIndexAct2++){
+                     const int DMRGindex2 = iHandler->getDMRGcumulative(irrep_act) + origIndexAct2 - iHandler->getOrigNDMRGstart(irrep_act);
+                     value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex2 ] * ( HamRotated->getVmat(origIndexI, origIndexAct1, origIndexJ, origIndexAct2)
+                                                                        - 0.5 * HamRotated->getVmat(origIndexI, origIndexJ, origIndexAct1, origIndexAct2) );
+                  }
+               }
+            }
+            QmatrixACT[irrep_ij][indexi + iHandler->getNORB(irrep_ij) * indexj] = value;
+            QmatrixACT[irrep_ij][indexj + iHandler->getNORB(irrep_ij) * indexi] = value;
+         }
+      }
+   }
+
+}
+
+double CheMPS2::CASSCF::QmatACT(const int index1, const int index2) const{
+
+   int irrep1 = 0;
+   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
+   int irrep2 = 0;
+   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
+   
+   if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
+   
+   return QmatrixACT[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
+
+}
+
 void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG){
 
    //Calculate the constant part of the energy.
    double Econst = HamRotated->getEconst();
    for (int irrep1=0; irrep1<numberOfIrreps; irrep1++){
       for (int orb1=iHandler->getOrigNOCCstart(irrep1); orb1<iHandler->getOrigNDMRGstart(irrep1); orb1++){
-         Econst += 2*HamRotated->getTmat(orb1,orb1);
-         for (int irrep2=0; irrep2<numberOfIrreps; irrep2++){
-            for (int orb2=iHandler->getOrigNOCCstart(irrep2); orb2<iHandler->getOrigNDMRGstart(irrep2); orb2++){
-               Econst += 2*HamRotated->getVmat(orb1,orb2,orb1,orb2) - HamRotated->getVmat(orb1,orb2,orb2,orb1);
-            }
-         }
+         Econst += 2 * HamRotated->getTmat(orb1,orb1) + QmatOCC(orb1,orb1);
       }
    }
    HamDMRG->setEconst(Econst);
@@ -245,12 +320,7 @@ void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG){
       for (int orb1=iHandler->getOrigNDMRGstart(irrep1); orb1<iHandler->getOrigNVIRTstart(irrep1); orb1++){
          const int DMRGorb1 = iHandler->getDMRGcumulative(irrep1) + orb1 - iHandler->getOrigNDMRGstart(irrep1);
          for (int orb2=orb1; orb2<iHandler->getOrigNVIRTstart(irrep1); orb2++){
-            double value = HamRotated->getTmat(orb1, orb2);
-            for (int irrep_occ=0; irrep_occ<numberOfIrreps; irrep_occ++){
-               for (int orbocc=iHandler->getOrigNOCCstart(irrep_occ); orbocc<iHandler->getOrigNDMRGstart(irrep_occ); orbocc++){
-                  value += 2 * HamRotated->getVmat(orb1,orbocc,orb2,orbocc) - HamRotated->getVmat(orb1,orbocc,orbocc,orb2);
-               }
-            }
+            double value = HamRotated->getTmat(orb1, orb2) + QmatOCC(orb1, orb2);
             const int DMRGorb2 = iHandler->getDMRGcumulative(irrep1) + orb2 - iHandler->getOrigNDMRGstart(irrep1);
             HamDMRG->setTmat(DMRGorb1, DMRGorb2, value);
          }
@@ -380,11 +450,20 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
    DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
    
-   //To calculate the F-matrix elements only once, and to store them for future access
-   Fmatrix = new double*[numberOfIrreps];
-   for (int cnt=0; cnt<numberOfIrreps; cnt++){
-      Fmatrix[cnt] = new double[iHandler->getNORB(cnt) * iHandler->getNORB(cnt)];
-      for (int cnt2=0; cnt2 < iHandler->getNORB(cnt) * iHandler->getNORB(cnt); cnt2++){ Fmatrix[cnt][cnt2] = 0.0; }
+   //To calculate the F-matrix and Q-matrix(occ,act) elements only once, and to store them for future access
+   Fmatrix    = new double*[numberOfIrreps];
+   QmatrixOCC = new double*[numberOfIrreps];
+   QmatrixACT = new double*[numberOfIrreps];
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int size = iHandler->getNORB(irrep) * iHandler->getNORB(irrep);
+      Fmatrix[irrep]    = new double[size];
+      QmatrixOCC[irrep] = new double[size];
+      QmatrixACT[irrep] = new double[size];
+      for (int cnt2=0; cnt2<size; cnt2++){
+         Fmatrix[irrep][cnt2]    = 0.0;
+         QmatrixOCC[irrep][cnt2] = 0.0;
+         QmatrixACT[irrep][cnt2] = 0.0;
+      }
    }
    
    //Print the MO info. This requires the indexHandler to be created...

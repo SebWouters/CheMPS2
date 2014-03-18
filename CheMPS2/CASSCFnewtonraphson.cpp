@@ -86,7 +86,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
       else{             fillRotatedHamAllInMemory(mem1, mem2); }
    
-      //Fill HamDMRG based on the HamRotated
+      //Fill HamDMRG based on the HamRotated --> requires QmatrixOcc to be filled
+      buildQmatrixOCC();
       fillHamDMRG(HamDMRG);
       
       //Do the DMRG sweeps, and calculate the 2DM
@@ -112,9 +113,12 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          else{             fillRotatedHamAllInMemory(mem1, mem2); }
       }
       
-      buildFmat(); //Needs to be updated before the Fmat and Wmat functions
-      //gradNorm = updateXmatrixNewtonRaphson();
-      gradNorm = updateXmatrixAugmentedHessianNR();
+      //In order to construct the gradient and Hessian faster, the following three matrices need to be updated (in this order!)
+      if (CheMPS2::CASSCF_rotate2DMtoNO){ buildQmatrixOCC(); }
+      buildQmatrixACT();
+      buildFmat();
+
+      gradNorm = updateXmatrixAugmentedHessianNR(); //updateXmatrixNewtonRaphson();
       
       //PrintCoeff_C2(theDMRG); //Print coeff for C2 to discern (for 1Ag) ^1Sigma_g^+ <--> ^1Delta_g   &   (for 3B1u) ^3Sigma_u^+ <--> ^3Delta_u
       
@@ -317,37 +321,18 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          // (index1,index3) (occupied,occupied) --> (alpha,beta) can be (occupied,occupied) or (active,active)
          if (index1==index3){
          
-            value += 4 * HamRotated->getTmat(index2,index4); //Part of one-body matrix elements if 1-RDM occ indices
-         
-            // Case1: (alpha,beta) is (active,active) --> index1 == index3 needed to return a non-zero element
-            for (int irrep_ab=0; irrep_ab<numberOfIrreps; irrep_ab++){
-               for (int alpha_index=iHandler->getOrigNDMRGstart(irrep_ab); alpha_index<iHandler->getOrigNVIRTstart(irrep_ab); alpha_index++){ //alpha act
-                  const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep_ab) + alpha_index - iHandler->getOrigNDMRGstart(irrep_ab);
-                  for (int beta_index=iHandler->getOrigNDMRGstart(irrep_ab); beta_index<iHandler->getOrigNVIRTstart(irrep_ab); beta_index++){ //beta act
-                     const int DMRGindexBETA = iHandler->getDMRGcumulative(irrep_ab) + beta_index - iHandler->getOrigNDMRGstart(irrep_ab);
-                     value += 2 * DMRG1DM[ DMRGindexALPHA + nOrbDMRG * DMRGindexBETA ] * ( 2 * HamRotated->getVmat(index2,alpha_index,index4,beta_index)
-                                                                                             - HamRotated->getVmat(index2,index4,alpha_index,beta_index) );
-                  }
-               }
-            }
-            
-            // Case2: (alpha,beta) is (occupied,occupied)
-            // Case2a: (index1==index3) and (alpha==beta)
-            for (int irrep_ab=0; irrep_ab<numberOfIrreps; irrep_ab++){
-               for (int alpha_index=iHandler->getOrigNOCCstart(irrep_ab); alpha_index<iHandler->getOrigNDMRGstart(irrep_ab); alpha_index++){
-                  value += 8 * HamRotated->getVmat(index2,alpha_index,index4,alpha_index) - 4 * HamRotated->getVmat(index2,index4,alpha_index,alpha_index);
-               }
-            }
-            
+            // Part of one-body matrix elements if 1-RDM occ indices
+            value += 4 * ( HamRotated->getTmat(index2,index4) + QmatOCC(index2,index4) + QmatACT(index2, index4) );
             value += 12 * HamRotated->getVmat(index2,index4,index1,index1) - 4 * HamRotated->getVmat(index2,index1,index4,index1);
+            return value;
             
          } else { //index1 != index3
          
-            // Case2b: (index1!=index3); remaining elements :-)
             value += 16 * HamRotated->getVmat(index2,index4,index1,index3)
                    - 4  * HamRotated->getVmat(index2,index1,index4,index3)
                    - 4  * HamRotated->getVmat(index2,index4,index3,index1);
-         
+            return value;
+            
          }
       
       } else {
@@ -361,6 +346,7 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
                                                                                  - HamRotated->getVmat(index2,index4,alpha_index,index1)
                                                                                  - HamRotated->getVmat(index2,index1,index4,alpha_index) );
          }
+         return value;
          
       }
    } else {
@@ -376,6 +362,7 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
                                                                                  - HamRotated->getVmat(index2,alpha_index,index4,index3)
                                                                                  - HamRotated->getVmat(index2,index4,index3,alpha_index) );
          }
+         return value;
          
       } else {
       
@@ -383,13 +370,8 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
       
          // (index1,index3) (active,active) --> (alpha,beta) can be (occupied,occupied) or (active,active)
          // Case1: (alpha,beta)==(occ,occ) --> alpha == beta
-         double sum = HamRotated->getTmat(index2,index4); //Part of one-body matrix elements if 1-RDM active indices
-         for (int irrep_alpha=0; irrep_alpha<numberOfIrreps; irrep_alpha++){
-            for (int alpha_index=iHandler->getOrigNOCCstart(irrep_alpha); alpha_index<iHandler->getOrigNDMRGstart(irrep_alpha); alpha_index++){
-               sum += 2 * HamRotated->getVmat(index2,alpha_index,index4,alpha_index) - HamRotated->getVmat(index2,index4,alpha_index,alpha_index);
-            }
-         }
-         value += sum * 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ];
+         // Part of one-body matrix elements if 1-RDM active indices
+         value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ] * ( HamRotated->getTmat(index2,index4) + QmatOCC(index2,index4) );
          
          // Case2: (alpha,beta)==(act,act)
          const int productIrrep = SymmInfo.directProd(irrep1,irrep3);
@@ -407,6 +389,7 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
                }
             }
          }
+         return value;
          
       }
    }
@@ -456,28 +439,7 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
    
    if (index1 < iHandler->getOrigNDMRGstart(irrep1)){ //index1 occupied
    
-      //1DM will only return non-zero if r_index==index1, and then returns 2.0
-      value += 2 * HamRotated->getTmat(index2,index1);
-      
-      //irrep1 is the irrep of index1 and index2
-      for (int irrep_sum=0; irrep_sum<numberOfIrreps; irrep_sum++){ //irrep_sum is the irrep of r_index and s_index
-      
-         for (int r_index=iHandler->getOrigNOCCstart(irrep_sum); r_index<iHandler->getOrigNDMRGstart(irrep_sum); r_index++){ //r_index occ --> delta(r_ind,s_ind)
-            value += 4 * HamRotated->getVmat(index2, r_index, index1, r_index) - 2 * HamRotated->getVmat(index2, index1, r_index, r_index);
-         }
-      
-         for (int r_index=iHandler->getOrigNDMRGstart(irrep_sum); r_index<iHandler->getOrigNVIRTstart(irrep_sum); r_index++){ //r_index act --> s_index act
-            const int DMRGindexR = iHandler->getDMRGcumulative(irrep_sum) + r_index - iHandler->getOrigNDMRGstart(irrep_sum);
-            for (int s_index=iHandler->getOrigNDMRGstart(irrep_sum); s_index<iHandler->getOrigNVIRTstart(irrep_sum); s_index++){ //s_index act, index1 occ
-               const int DMRGindexS = iHandler->getDMRGcumulative(irrep_sum) + s_index - iHandler->getOrigNDMRGstart(irrep_sum);
-               value += DMRG1DM[ DMRGindexR + nOrbDMRG * DMRGindexS ]
-                        * (2*HamRotated->getVmat(index2, r_index, index1, s_index) - HamRotated->getVmat(index2, r_index, s_index, index1));
-            }
-         }
-         
-         //r_index virtual --> 2DM return 0.0
-         
-      }
+      value += 2 * ( HamRotated->getTmat(index2,index1) + QmatOCC(index2,index1) + QmatACT(index2,index1) );
    
    } else { //index1 active
    
@@ -486,18 +448,7 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
       //1DM will only return non-zero if r_index also active, and corresponds to the same irrep
       for (int r_index=iHandler->getOrigNDMRGstart(irrep1); r_index<iHandler->getOrigNVIRTstart(irrep1); r_index++){
          const int DMRGindexR = iHandler->getDMRGcumulative(irrep1) + r_index - iHandler->getOrigNDMRGstart(irrep1);
-         value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexR ] * HamRotated->getTmat(index2,r_index);
-      }
-      
-      //Two of the summation indices are occupied (and equal) --> the two active indices have the same irrep
-      for (int s_index=iHandler->getOrigNDMRGstart(irrep1); s_index<iHandler->getOrigNVIRTstart(irrep1); s_index++){
-         const int DMRGindexS = iHandler->getDMRGcumulative(irrep1) + s_index - iHandler->getOrigNDMRGstart(irrep1);
-         const double OneDMelement = DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexS ];
-         for (int irrep_r=0; irrep_r<numberOfIrreps; irrep_r++){
-            for (int r_index=iHandler->getOrigNOCCstart(irrep_r); r_index<iHandler->getOrigNDMRGstart(irrep_r); r_index++){
-               value += OneDMelement * ( 2 * HamRotated->getVmat(index2, r_index, s_index, r_index) - HamRotated->getVmat(index2, r_index, r_index, s_index) );
-            }
-         }
+         value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexR ] * ( HamRotated->getTmat(index2,r_index) + QmatOCC(index2,r_index) );
       }
       
       //All the summation indices are active

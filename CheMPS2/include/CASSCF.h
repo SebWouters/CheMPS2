@@ -168,6 +168,14 @@ namespace CheMPS2{
          double ** Fmatrix;
          void buildFmat();
          
+         //The Coulomb and exchange interaction with the occupied and active electrons respectively
+         double ** QmatrixOCC;
+         double ** QmatrixACT;
+         void buildQmatrixOCC();
+         void buildQmatrixACT();
+         double QmatOCC(const int index1, const int index2) const;
+         double QmatACT(const int index1, const int index2) const;
+         
          //Wmat function as defined by Eq.(21b) in the Siegbahn paper.
          double Wmat(const int index1, const int index2, const int index3, const int index4) const;
          
