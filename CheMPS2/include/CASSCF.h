@@ -141,14 +141,13 @@ namespace CheMPS2{
          //Helper function to check HF
          void checkHF();
          
-         //Helper function to fill the Hamiltonian for the DMRG part
-         void fillHamDMRG(Hamiltonian * HamDMRG);
-         
          //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory
          void fillRotatedHamAllInMemory(double * workmem1, double * workmem2);
+         void fillHamDMRGAllInMemory(Hamiltonian * HamDMRG, double * temp1, double * temp2);
          
          //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory, but blockwise
          void fillRotatedHamInMemoryBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize);
+         void fillHamDMRGInMemoryBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize);
          
          //Calculate the gradient, return function is the gradient 2-norm
          double calcGradient(double * gradient);
@@ -171,10 +170,16 @@ namespace CheMPS2{
          //The Coulomb and exchange interaction with the occupied and active electrons respectively
          double ** QmatrixOCC;
          double ** QmatrixACT;
+         double ** QmatrixWORK;
+         double ** OneBodyMatrixElements;
          void buildQmatrixOCC();
          void buildQmatrixACT();
+         void buildOneBodyMatrixElements();
+         void rotateOldToNew(double ** matrix);
+         void constructCoulombAndExchangeMatrixInOrigIndices(double ** densityMatrix, double ** result);
          double QmatOCC(const int index1, const int index2) const;
          double QmatACT(const int index1, const int index2) const;
+         double TmatRotated(const int index1, const int index2) const;
          
          //Wmat function as defined by Eq.(21b) in the Siegbahn paper.
          double Wmat(const int index1, const int index2, const int index3, const int index4) const;

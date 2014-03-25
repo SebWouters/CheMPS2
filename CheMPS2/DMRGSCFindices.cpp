@@ -107,7 +107,7 @@ int * CheMPS2::DMRGSCFindices::getIrrepOfEachDMRGorbital(){ return irrepOfEachDM
 
 void CheMPS2::DMRGSCFindices::Print() const{
 
-   cout << "NORB = [ ";
+   cout << "NORB  = [ ";
    for (int irrep=0; irrep<Nirreps-1; irrep++){ cout << NORB[irrep] << " , "; }
    cout << NORB[Nirreps-1] << " ]" << endl;
 

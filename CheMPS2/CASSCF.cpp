@@ -115,10 +115,14 @@ CheMPS2::CASSCF::~CASSCF(){
          delete [] Fmatrix[irrep];
          delete [] QmatrixOCC[irrep];
          delete [] QmatrixACT[irrep];
+         delete [] QmatrixWORK[irrep];
+         delete [] OneBodyMatrixElements[irrep];
       }
       delete [] Fmatrix;
       delete [] QmatrixOCC;
       delete [] QmatrixACT;
+      delete [] QmatrixWORK;
+      delete [] OneBodyMatrixElements;
       
    }
 
@@ -230,35 +234,96 @@ void CheMPS2::CASSCF::rotate2DMand1DM(const int N, double * eigenvecs, double * 
 
 }
 
-void CheMPS2::CASSCF::buildQmatrixOCC(){
+void CheMPS2::CASSCF::rotateOldToNew(double ** matrix){
 
-   for (int irrep_ij=0; irrep_ij<numberOfIrreps; irrep_ij++){
-      for (int indexi=0; indexi<iHandler->getNORB(irrep_ij); indexi++){
-         const int origIndexI = indexi + iHandler->getOrigNOCCstart(irrep_ij);
-         for (int indexj=indexi; indexj<iHandler->getNORB(irrep_ij); indexj++){
-            const int origIndexJ = indexj + iHandler->getOrigNOCCstart(irrep_ij);
-            double value = 0.0;
-            for (int irrep_occ=0; irrep_occ<numberOfIrreps; irrep_occ++){
-               for (int origIndexOcc=iHandler->getOrigNOCCstart(irrep_occ); origIndexOcc<iHandler->getOrigNDMRGstart(irrep_occ); origIndexOcc++){
-                  value += 2 * HamRotated->getVmat(origIndexI, origIndexOcc, origIndexJ, origIndexOcc)
-                             - HamRotated->getVmat(origIndexI, origIndexJ, origIndexOcc, origIndexOcc);
+   #pragma omp parallel for schedule(dynamic)
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   
+      int linsize  = iHandler->getNORB(irrep);
+      double * Umx = unitary->getBlock(irrep);
+      double alpha = 1.0;
+      double beta  = 0.0;
+      char trans   = 'T';
+      char notrans = 'N';
+      dgemm_(&notrans,&notrans,&linsize,&linsize,&linsize,&alpha,Umx,               &linsize,matrix[irrep],&linsize,&beta,QmatrixWORK[irrep],&linsize);
+      dgemm_(&notrans,&trans,  &linsize,&linsize,&linsize,&alpha,QmatrixWORK[irrep],&linsize,Umx,          &linsize,&beta,matrix[irrep],     &linsize);
+      
+   }
+
+}
+
+void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(double ** densityMatrix, double ** result){
+
+  for (int irrepQ=0; irrepQ<numberOfIrreps; irrepQ++){
+   
+      const int linearsizeQ = iHandler->getNORB(irrepQ);
+      const int numberOfUniqueIndices = (linearsizeQ * (linearsizeQ + 1))/2;
+      
+      #pragma omp parallel for schedule(static)
+      for (int combinedindex=0; combinedindex<numberOfUniqueIndices; combinedindex++){
+         
+         int colQ = 1;
+         while ( (colQ*(colQ+1))/2 <= combinedindex ){ colQ++; }
+         colQ -= 1;
+         int rowQ = combinedindex - (colQ*(colQ+1))/2;
+         
+         const int HamIndexI = iHandler->getOrigNOCCstart(irrepQ) + rowQ;
+         const int HamIndexK = iHandler->getOrigNOCCstart(irrepQ) + colQ;
+         
+         double * myPtr = result[irrepQ] + rowQ + linearsizeQ * colQ;
+         myPtr[0] = 0.0;
+         
+         for (int irrepN=0; irrepN<numberOfIrreps; irrepN++){
+            const int linearsizeN = iHandler->getNORB(irrepN);
+            for (int rowN=0; rowN<linearsizeN; rowN++){
+               const int HamIndexJ = iHandler->getOrigNOCCstart(irrepN) + rowN;
+               
+               myPtr[0] += densityMatrix[irrepN][rowN*(1+linearsizeN)] * ( HamOrig->getVmat(HamIndexI,HamIndexJ,HamIndexK,HamIndexJ)
+                                                                   - 0.5 * HamOrig->getVmat(HamIndexI,HamIndexK,HamIndexJ,HamIndexJ) );
+                                                                 
+               for (int colN = rowN+1; colN<linearsizeN; colN++){
+                  const int HamIndexL = iHandler->getOrigNOCCstart(irrepN) + colN;
+               
+                  myPtr[0] += densityMatrix[irrepN][rowN + linearsizeN * colN] * 
+                              ( HamOrig->getVmat(HamIndexI,HamIndexJ,HamIndexK,HamIndexL) - 0.5 * HamOrig->getVmat(HamIndexI,HamIndexK,HamIndexJ,HamIndexL) 
+                              + HamOrig->getVmat(HamIndexI,HamIndexL,HamIndexK,HamIndexJ) - 0.5 * HamOrig->getVmat(HamIndexI,HamIndexK,HamIndexL,HamIndexJ) );
+               
                }
             }
-            QmatrixOCC[irrep_ij][indexi + iHandler->getNORB(irrep_ij) * indexj] = value;
-            QmatrixOCC[irrep_ij][indexj + iHandler->getNORB(irrep_ij) * indexi] = value;
          }
+         
+         result[irrepQ][colQ + linearsizeQ * rowQ] = myPtr[0];
+      
       }
    }
 
 }
 
+void CheMPS2::CASSCF::buildQmatrixOCC(){
+
+   #pragma omp parallel for schedule(dynamic)
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   
+      int linsize = iHandler->getNORB(irrep);
+      int NOCC    = iHandler->getNOCC(irrep);
+      double alpha = 2.0;
+      double beta  = 0.0;
+      char trans   = 'T';
+      char notrans = 'N';
+      double * Umx = unitary->getBlock(irrep);
+      dgemm_(&trans,&notrans,&linsize,&linsize,&NOCC,&alpha,Umx,&linsize,Umx,&linsize,&beta,QmatrixWORK[irrep],&linsize);
+      
+   }
+   
+   constructCoulombAndExchangeMatrixInOrigIndices(QmatrixWORK, QmatrixOCC);
+   rotateOldToNew(QmatrixOCC);
+
+}
+
 double CheMPS2::CASSCF::QmatOCC(const int index1, const int index2) const{
 
-   int irrep1 = 0;
-   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
-   int irrep2 = 0;
-   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
-   
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
    if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
    
    return QmatrixOCC[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
@@ -267,88 +332,71 @@ double CheMPS2::CASSCF::QmatOCC(const int index1, const int index2) const{
 
 void CheMPS2::CASSCF::buildQmatrixACT(){
 
-   for (int irrep_ij=0; irrep_ij<numberOfIrreps; irrep_ij++){
-      for (int indexi=0; indexi<iHandler->getNORB(irrep_ij); indexi++){
-         const int origIndexI = indexi + iHandler->getOrigNOCCstart(irrep_ij);
-         for (int indexj=indexi; indexj<iHandler->getNORB(irrep_ij); indexj++){
-            const int origIndexJ = indexj + iHandler->getOrigNOCCstart(irrep_ij);
-            double value = 0.0;
-            for (int irrep_act=0; irrep_act<numberOfIrreps; irrep_act++){
-               for (int origIndexAct1=iHandler->getOrigNDMRGstart(irrep_act); origIndexAct1<iHandler->getOrigNVIRTstart(irrep_act); origIndexAct1++){
-                  const int DMRGindex1 = iHandler->getDMRGcumulative(irrep_act) + origIndexAct1 - iHandler->getOrigNDMRGstart(irrep_act);
-                  for (int origIndexAct2=iHandler->getOrigNDMRGstart(irrep_act); origIndexAct2<iHandler->getOrigNVIRTstart(irrep_act); origIndexAct2++){
-                     const int DMRGindex2 = iHandler->getDMRGcumulative(irrep_act) + origIndexAct2 - iHandler->getOrigNDMRGstart(irrep_act);
-                     value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex2 ] * ( HamRotated->getVmat(origIndexI, origIndexAct1, origIndexJ, origIndexAct2)
-                                                                        - 0.5 * HamRotated->getVmat(origIndexI, origIndexJ, origIndexAct1, origIndexAct2) );
-                  }
-               }
-            }
-            QmatrixACT[irrep_ij][indexi + iHandler->getNORB(irrep_ij) * indexj] = value;
-            QmatrixACT[irrep_ij][indexj + iHandler->getNORB(irrep_ij) * indexi] = value;
-         }
-      }
+   #pragma omp parallel for schedule(dynamic)
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   
+      int linsize = iHandler->getNORB(irrep);
+      int NDMRG   = iHandler->getNDMRG(irrep);
+      double alpha = 1.0;
+      double beta  = 0.0;
+      char trans   = 'T';
+      char notrans = 'N';
+      double * Umx = unitary->getBlock(irrep) + iHandler->getNOCC(irrep);
+      int linsizeRDM = iHandler->getDMRGcumulative(numberOfIrreps);
+      double * RDM = DMRG1DM + iHandler->getDMRGcumulative(irrep) * (1+nOrbDMRG);
+      dgemm_(&trans,  &notrans,&linsize,&NDMRG,  &NDMRG,&alpha,Umx,               &linsize,RDM,&nOrbDMRG,&beta,QmatrixWORK[irrep],&linsize);
+      dgemm_(&notrans,&notrans,&linsize,&linsize,&NDMRG,&alpha,QmatrixWORK[irrep],&linsize,Umx,&linsize, &beta,QmatrixACT[irrep], &linsize);
+      
+      int inc = 1;
+      int totalsize = linsize * linsize;
+      dcopy_(&totalsize,QmatrixACT[irrep],&inc,QmatrixWORK[irrep],&inc);
+      
    }
+   
+   constructCoulombAndExchangeMatrixInOrigIndices(QmatrixWORK, QmatrixACT);
+   rotateOldToNew(QmatrixACT);
 
 }
 
 double CheMPS2::CASSCF::QmatACT(const int index1, const int index2) const{
 
-   int irrep1 = 0;
-   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
-   int irrep2 = 0;
-   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
-   
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
    if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
    
    return QmatrixACT[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
 
 }
 
-void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG){
+void CheMPS2::CASSCF::buildOneBodyMatrixElements(){
 
-   //Calculate the constant part of the energy.
-   double Econst = HamRotated->getEconst();
-   for (int irrep1=0; irrep1<numberOfIrreps; irrep1++){
-      for (int orb1=iHandler->getOrigNOCCstart(irrep1); orb1<iHandler->getOrigNDMRGstart(irrep1); orb1++){
-         Econst += 2 * HamRotated->getTmat(orb1,orb1) + QmatOCC(orb1,orb1);
-      }
-   }
-   HamDMRG->setEconst(Econst);
-   
-   for (int irrep1=0; irrep1<numberOfIrreps; irrep1++){
-      //Calculate the one-body matrix elements.
-      for (int orb1=iHandler->getOrigNDMRGstart(irrep1); orb1<iHandler->getOrigNVIRTstart(irrep1); orb1++){
-         const int DMRGorb1 = iHandler->getDMRGcumulative(irrep1) + orb1 - iHandler->getOrigNDMRGstart(irrep1);
-         for (int orb2=orb1; orb2<iHandler->getOrigNVIRTstart(irrep1); orb2++){
-            double value = HamRotated->getTmat(orb1, orb2) + QmatOCC(orb1, orb2);
-            const int DMRGorb2 = iHandler->getDMRGcumulative(irrep1) + orb2 - iHandler->getOrigNDMRGstart(irrep1);
-            HamDMRG->setTmat(DMRGorb1, DMRGorb2, value);
+   #pragma omp parallel for schedule(dynamic)
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int linsize = iHandler->getNORB(irrep);
+      
+      for (int row=0; row<linsize; row++){
+         const int HamIndex1 = iHandler->getOrigNOCCstart(irrep) + row;
+         OneBodyMatrixElements[irrep][row*(1+linsize)] = HamOrig->getTmat(HamIndex1,HamIndex1);
+         for (int col=row+1; col<linsize; col++){
+            const int HamIndex2 = iHandler->getOrigNOCCstart(irrep) + col;
+            OneBodyMatrixElements[irrep][row + linsize * col] = HamOrig->getTmat(HamIndex1,HamIndex2);
+            OneBodyMatrixElements[irrep][col + linsize * row] = OneBodyMatrixElements[irrep][row + linsize * col];
          }
       }
       
-      //Calculate the two-body matrix elements.
-      for (int irrep2=irrep1; irrep2<numberOfIrreps; irrep2++){
-         const int irrep_product = SymmInfo.directProd(irrep1, irrep2);
-         for (int irrep3=irrep1; irrep3<numberOfIrreps; irrep3++){
-            const int irrep4 = SymmInfo.directProd(irrep_product, irrep3);
-            if (irrep4 >= irrep2){
-               for (int orb1=iHandler->getOrigNDMRGstart(irrep1); orb1<iHandler->getOrigNVIRTstart(irrep1); orb1++){
-                  const int DMRGorb1 = iHandler->getDMRGcumulative(irrep1) + orb1 - iHandler->getOrigNDMRGstart(irrep1);
-                  for (int orb2=iHandler->getOrigNDMRGstart(irrep2); orb2<iHandler->getOrigNVIRTstart(irrep2); orb2++){
-                     const int DMRGorb2 = iHandler->getDMRGcumulative(irrep2) + orb2 - iHandler->getOrigNDMRGstart(irrep2);
-                     for (int orb3=iHandler->getOrigNDMRGstart(irrep3); orb3<iHandler->getOrigNVIRTstart(irrep3); orb3++){
-                        const int DMRGorb3 = iHandler->getDMRGcumulative(irrep3) + orb3 - iHandler->getOrigNDMRGstart(irrep3);
-                        for (int orb4=iHandler->getOrigNDMRGstart(irrep4); orb4<iHandler->getOrigNVIRTstart(irrep4); orb4++){
-                           const int DMRGorb4 = iHandler->getDMRGcumulative(irrep4) + orb4 - iHandler->getOrigNDMRGstart(irrep4);
-                           HamDMRG->setVmat(DMRGorb1, DMRGorb2, DMRGorb3, DMRGorb4, HamRotated->getVmat(orb1, orb2, orb3, orb4));
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
    }
+
+   rotateOldToNew(OneBodyMatrixElements);
+
+}
+
+double CheMPS2::CASSCF::TmatRotated(const int index1, const int index2) const{
+
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
+   if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
+   
+   return OneBodyMatrixElements[irrep1][index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * (index2 - iHandler->getOrigNOCCstart(irrep1))];
 
 }
 
@@ -451,18 +499,24 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
    
    //To calculate the F-matrix and Q-matrix(occ,act) elements only once, and to store them for future access
-   Fmatrix    = new double*[numberOfIrreps];
-   QmatrixOCC = new double*[numberOfIrreps];
-   QmatrixACT = new double*[numberOfIrreps];
+   Fmatrix               = new double*[numberOfIrreps];
+   QmatrixOCC            = new double*[numberOfIrreps];
+   QmatrixACT            = new double*[numberOfIrreps];
+   QmatrixWORK           = new double*[numberOfIrreps];
+   OneBodyMatrixElements = new double*[numberOfIrreps];
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
       const int size = iHandler->getNORB(irrep) * iHandler->getNORB(irrep);
-      Fmatrix[irrep]    = new double[size];
-      QmatrixOCC[irrep] = new double[size];
-      QmatrixACT[irrep] = new double[size];
+      Fmatrix[              irrep] = new double[size];
+      QmatrixOCC[           irrep] = new double[size];
+      QmatrixACT[           irrep] = new double[size];
+      QmatrixWORK[          irrep] = new double[size];
+      OneBodyMatrixElements[irrep] = new double[size];
       for (int cnt2=0; cnt2<size; cnt2++){
-         Fmatrix[irrep][cnt2]    = 0.0;
-         QmatrixOCC[irrep][cnt2] = 0.0;
-         QmatrixACT[irrep][cnt2] = 0.0;
+         Fmatrix[              irrep][cnt2] = 0.0;
+         QmatrixOCC[           irrep][cnt2] = 0.0;
+         QmatrixACT[           irrep][cnt2] = 0.0;
+         QmatrixWORK[          irrep][cnt2] = 0.0;
+         OneBodyMatrixElements[irrep][cnt2] = 0.0;
       }
    }
    

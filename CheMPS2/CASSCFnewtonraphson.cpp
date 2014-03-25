@@ -62,7 +62,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    if (CheMPS2::CASSCF_rotate2DMtoNO){
       sizeWorkmem2 = max( sizeWorkmem2 , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //Second argument to rotate 2DM
    }
-   double * mem1 = new double[sizeWorkmem1];
+   double * mem1 = new double[sizeWorkmem1]; //TODO: recheck the required sizes (they have not grown in any case)
    double * mem2 = new double[sizeWorkmem2];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
@@ -79,16 +79,13 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
       //Update the unitary transformations based on the previous unitary transformation and the xmatrix
       unitary->updateUnitary(mem1, mem2);
-      
       if ((CheMPS2::CASSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
    
-      //Setup rotated Hamiltonian matrix elements based on unitary transformations
-      if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
-      else{             fillRotatedHamAllInMemory(mem1, mem2); }
-   
-      //Fill HamDMRG based on the HamRotated --> requires QmatrixOcc to be filled
+      //Fill HamDMRG
       buildQmatrixOCC();
-      fillHamDMRG(HamDMRG);
+      buildOneBodyMatrixElements();
+      if (doBlockWise){ fillHamDMRGInMemoryBlockWise(HamDMRG, mem1, mem2, mem3, maxBlockSize); }
+      else {            fillHamDMRGAllInMemory(HamDMRG, mem1, mem2); }
       
       //Do the DMRG sweeps, and calculate the 2DM
       DMRG * theDMRG = new DMRG(Prob,OptScheme);
@@ -104,23 +101,26 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       copy2DMover(theDMRG->get2DM());
       setDMRG1DM(N);
       
+      //Calculate the NOON and possibly rotate the active space to the natural orbitals
       calcNOON(mem1);
       if (CheMPS2::CASSCF_rotate2DMtoNO){
-         rotate2DMand1DM(N,mem1, mem2);
+         rotate2DMand1DM(N, mem1, mem2);
          unitary->rotateUnitaryNOeigenvecs(mem1, mem2);
-         //Unitary update implies matrix element update. --> Can actually be done for DMRG orbitals alone = faster --> TODO
-         if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
-         else{             fillRotatedHamAllInMemory(mem1, mem2); }
+         buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
+         buildOneBodyMatrixElements();
       }
       
-      //In order to construct the gradient and Hessian faster, the following three matrices need to be updated (in this order!)
-      if (CheMPS2::CASSCF_rotate2DMtoNO){ buildQmatrixOCC(); }
+      //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatrixACT();
+      if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
+      else{             fillRotatedHamAllInMemory(mem1, mem2); }
       buildFmat();
 
-      gradNorm = updateXmatrixAugmentedHessianNR(); //updateXmatrixNewtonRaphson();
+      //Calculate the gradient, hessian and corresponding update
+      gradNorm = updateXmatrixAugmentedHessianNR();
       
-      //PrintCoeff_C2(theDMRG); //Print coeff for C2 to discern (for 1Ag) ^1Sigma_g^+ <--> ^1Delta_g   &   (for 3B1u) ^3Sigma_u^+ <--> ^3Delta_u
+      //Print the coefficients to discern the 1Ag and 3B1u states in the carbon dimer
+      /*PrintCoeff_C2(theDMRG);*/
       
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
       if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
@@ -292,18 +292,12 @@ void CheMPS2::CASSCF::calcHessian(double * hessian, const int rowjump){
 
 double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index3, const int index4) const{
 
-   int irrep1 = 0;
-   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
-   int irrep2 = 0;
-   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
-   
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
    if (irrep1 != irrep2){ return 0.0; } //From now on: irrep1 == irrep2
    
-   int irrep3 = 0;
-   while (index3 >= iHandler->getOrigNOCCstart(irrep3+1)){ irrep3++; }
-   int irrep4 = 0;
-   while (index4 >= iHandler->getOrigNOCCstart(irrep4+1)){ irrep4++; }
-   
+   const int irrep3 = HamOrig->getOrbitalIrrep(index3);
+   const int irrep4 = HamOrig->getOrbitalIrrep(index4);
    if (irrep3 != irrep4){ return 0.0; } //From now on: irrep3 == irrep4
    
    double value = 0.0;
@@ -322,7 +316,7 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          if (index1==index3){
          
             // Part of one-body matrix elements if 1-RDM occ indices
-            value += 4 * ( HamRotated->getTmat(index2,index4) + QmatOCC(index2,index4) + QmatACT(index2, index4) );
+            value += 4 * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) + QmatACT(index2, index4) );
             value += 12 * HamRotated->getVmat(index2,index4,index1,index1) - 4 * HamRotated->getVmat(index2,index1,index4,index1);
             return value;
             
@@ -371,7 +365,7 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          // (index1,index3) (active,active) --> (alpha,beta) can be (occupied,occupied) or (active,active)
          // Case1: (alpha,beta)==(occ,occ) --> alpha == beta
          // Part of one-body matrix elements if 1-RDM active indices
-         value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ] * ( HamRotated->getTmat(index2,index4) + QmatOCC(index2,index4) );
+         value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ] * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) );
          
          // Case2: (alpha,beta)==(act,act)
          const int productIrrep = SymmInfo.directProd(irrep1,irrep3);
@@ -413,11 +407,8 @@ void CheMPS2::CASSCF::buildFmat(){
 
 double CheMPS2::CASSCF::Fmat(const int index1, const int index2) const{
 
-   int irrep1 = 0;
-   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
-   int irrep2 = 0;
-   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
-   
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
    if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
    
    return Fmatrix[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
@@ -426,11 +417,8 @@ double CheMPS2::CASSCF::Fmat(const int index1, const int index2) const{
 
 double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
    
-   int irrep1 = 0;
-   while (index1 >= iHandler->getOrigNOCCstart(irrep1+1)){ irrep1++; }
-   int irrep2 = 0;
-   while (index2 >= iHandler->getOrigNOCCstart(irrep2+1)){ irrep2++; }
-   
+   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
+   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
    if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
    
    if (index1 >= iHandler->getOrigNVIRTstart(irrep1)){ return 0.0; } //index1 virtual: 1/2DM returns 0.0
@@ -439,7 +427,7 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
    
    if (index1 < iHandler->getOrigNDMRGstart(irrep1)){ //index1 occupied
    
-      value += 2 * ( HamRotated->getTmat(index2,index1) + QmatOCC(index2,index1) + QmatACT(index2,index1) );
+      value += 2 * ( TmatRotated(index2,index1) + QmatOCC(index2,index1) + QmatACT(index2,index1) );
    
    } else { //index1 active
    
@@ -448,7 +436,7 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
       //1DM will only return non-zero if r_index also active, and corresponds to the same irrep
       for (int r_index=iHandler->getOrigNDMRGstart(irrep1); r_index<iHandler->getOrigNVIRTstart(irrep1); r_index++){
          const int DMRGindexR = iHandler->getDMRGcumulative(irrep1) + r_index - iHandler->getOrigNDMRGstart(irrep1);
-         value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexR ] * ( HamRotated->getTmat(index2,r_index) + QmatOCC(index2,r_index) );
+         value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexR ] * ( TmatRotated(index2,r_index) + QmatOCC(index2,r_index) );
       }
       
       //All the summation indices are active

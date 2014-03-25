@@ -32,37 +32,15 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
    //Constant part of the energy
    HamRotated->setEconst(HamOrig->getEconst());
    
-   //One-body terms: diagonal in the irreps.
-   int passed = 0;
+   //One-body terms: diagonal in the irreps
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
-   
-      int linsize = iHandler->getNORB(irrep);
-      if (linsize>1){
-         
-         for (int cnt1=0; cnt1<linsize; cnt1++){
-            for (int cnt2=0; cnt2<linsize; cnt2++){
-               temp1[cnt1 + linsize * cnt2] = HamOrig->getTmat(passed+cnt1,passed+cnt2);
-            }
+      const int passed  = iHandler->getOrigNOCCstart(irrep);
+      const int linsize = iHandler->getNORB(irrep);
+      for (int cnt1=0; cnt1<linsize; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsize; cnt2++){
+            HamRotated->setTmat( passed+cnt1, passed+cnt2, OneBodyMatrixElements[irrep][cnt1 + linsize * cnt2] );
          }
-         
-         char trans = 'T';
-         char notra = 'N';
-         double alpha = 1.0;
-         double beta = 0.0;
-         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha, unitary->getBlock(irrep),&linsize,temp1,&linsize,&beta,temp2,&linsize);
-         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,temp2,&linsize, unitary->getBlock(irrep),&linsize,&beta,temp1,&linsize);
-         
-         for (int cnt1=0; cnt1<linsize; cnt1++){
-            for (int cnt2=cnt1; cnt2<linsize; cnt2++){
-               HamRotated->setTmat(passed+cnt1,passed+cnt2, temp1[cnt1 + linsize * cnt2] ) ;
-            }
-         }
-         
       }
-      if (linsize==1){ HamRotated->setTmat(passed,passed, HamOrig->getTmat(passed,passed) ); }
-      
-      passed += linsize;
-   
    }
    
    //Two-body terms --> use eightfold permutation symmetry
@@ -135,6 +113,110 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
 
 }
 
+void CheMPS2::CASSCF::fillHamDMRGAllInMemory(Hamiltonian * HamDMRG, double * temp1, double * temp2){
+
+   //Constant part of the energy
+   double value = HamOrig->getEconst();
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
+         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
+      }
+   }
+   HamDMRG->setEconst(value);
+   
+   //One-body terms: diagonal in the irreps
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
+      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
+      const int linsizeDMRG = iHandler->getNDMRG(irrep);
+      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
+            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
+         }
+      }
+   }
+   
+   //Two-body terms --> use eightfold permutation symmetry in the irreps :-)
+   for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
+      for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
+         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
+            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            if (irrep4>=irrep2){
+            
+               int linsizeDMRG1 = iHandler->getNDMRG(irrep1);
+               int linsizeDMRG2 = iHandler->getNDMRG(irrep2);
+               int linsizeDMRG3 = iHandler->getNDMRG(irrep3);
+               int linsizeDMRG4 = iHandler->getNDMRG(irrep4);
+               
+               if ((linsizeDMRG1>0) && (linsizeDMRG2>0) && (linsizeDMRG3>0) && (linsizeDMRG4>0)){
+               
+                  int linsizeORIG1 = iHandler->getNORB(irrep1);
+                  int linsizeORIG2 = iHandler->getNORB(irrep2);
+                  int linsizeORIG3 = iHandler->getNORB(irrep3);
+                  int linsizeORIG4 = iHandler->getNORB(irrep4);
+                  
+                  for (int cnt1=0; cnt1<linsizeORIG1; cnt1++){
+                     for (int cnt2=0; cnt2<linsizeORIG2; cnt2++){
+                        for (int cnt3=0; cnt3<linsizeORIG3; cnt3++){
+                           for (int cnt4=0; cnt4<linsizeORIG4; cnt4++){
+                              temp1[cnt1 + linsizeORIG1 * ( cnt2 + linsizeORIG2 * (cnt3 + linsizeORIG3 * cnt4) ) ]
+                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
+                                                    iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4 );
+                           }
+                        }
+                     }
+                  }
+                  
+                  char trans = 'T';
+                  char notra = 'N';
+                  double alpha = 1.0;
+                  double beta  = 0.0; //SET !!!
+                  
+                  int rightdim = linsizeORIG2 * linsizeORIG3 * linsizeORIG4; //(ijkl) -> (ajkl)
+                  double * Umx = unitary->getBlock(irrep1) + iHandler->getNOCC(irrep1);
+                  dgemm_(&notra, &notra, &linsizeDMRG1, &rightdim, &linsizeORIG1, &alpha, Umx, &linsizeORIG1, temp1, &linsizeORIG1, &beta, temp2, &linsizeDMRG1);
+                  
+                  int leftdim = linsizeDMRG1 * linsizeORIG2 * linsizeORIG3; //(ajkl) -> (ajkd)
+                  Umx = unitary->getBlock(irrep4) + iHandler->getNOCC(irrep4);
+                  dgemm_(&notra, &trans, &leftdim, &linsizeDMRG4, &linsizeORIG4, &alpha, temp2, &leftdim, Umx, &linsizeORIG4, &beta, temp1, &leftdim);
+                  
+                  int jump1 = linsizeDMRG1 * linsizeORIG2 * linsizeORIG3; //(ajkd) -> (ajcd)
+                  int jump2 = linsizeDMRG1 * linsizeORIG2 * linsizeDMRG3;
+                  leftdim   = linsizeDMRG1 * linsizeORIG2;
+                  Umx = unitary->getBlock(irrep3) + iHandler->getNOCC(irrep3);
+                  for (int bla=0; bla<linsizeDMRG4; bla++){
+                     dgemm_(&notra, &trans, &leftdim, &linsizeDMRG3, &linsizeORIG3, &alpha, temp1+jump1*bla, &leftdim, Umx, &linsizeORIG3, &beta, temp2+jump2*bla, &leftdim);
+                  }
+                  
+                  jump2    = linsizeDMRG1 * linsizeORIG2;
+                  jump1    = linsizeDMRG1 * linsizeDMRG2;
+                  rightdim = linsizeDMRG3 * linsizeDMRG4;
+                  Umx = unitary->getBlock(irrep2) + iHandler->getNOCC(irrep2);
+                  for (int bla=0; bla<rightdim; bla++){
+                     dgemm_(&notra, &trans, &linsizeDMRG1, &linsizeDMRG2, &linsizeORIG2, &alpha, temp2+jump2*bla, &linsizeDMRG1, Umx, &linsizeORIG2, &beta, temp1+jump1*bla, &linsizeDMRG1);
+                  }
+                  
+                  for (int cnt1=0; cnt1<linsizeDMRG1; cnt1++){
+                     for (int cnt2=0; cnt2<linsizeDMRG2; cnt2++){
+                        for (int cnt3=0; cnt3<linsizeDMRG3; cnt3++){
+                           for (int cnt4=0; cnt4<linsizeDMRG4; cnt4++){
+                              HamDMRG->setVmat( iHandler->getDMRGcumulative(irrep1) + cnt1, iHandler->getDMRGcumulative(irrep2) + cnt2,
+                                                iHandler->getDMRGcumulative(irrep3) + cnt3, iHandler->getDMRGcumulative(irrep4) + cnt4,
+                                                temp1[cnt1 + linsizeDMRG1 * ( cnt2 + linsizeDMRG2 * (cnt3 + linsizeDMRG3 * cnt4) ) ] );
+                           }
+                        }
+                     }
+                  }
+                  
+               }
+            }
+         }
+      }
+   }
+
+}
+
 void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize){
 
    /************************************
@@ -142,39 +224,18 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
    ************************************/
    HamRotated->setEconst(HamOrig->getEconst());
    
-   /**********************************************************
-   **   One-body terms; diagonal in the irreps.             **
-   **   Requires mem1 and mem2 to be of size maxlinsize^2   **
-   **********************************************************/
-   int passed = 0;
+   /************************************************************
+   **   One-body terms; diagonal in the irreps.               **
+   **   Used to require mem1 and mem2 of size maxlinsize^2    **
+   ************************************************************/
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
-   
-      int linsize = iHandler->getNORB(irrep);
-      if (linsize>1){
-         
-         for (int cnt1=0; cnt1<linsize; cnt1++){
-            for (int cnt2=0; cnt2<linsize; cnt2++){
-               mem1[cnt1 + linsize * cnt2] = HamOrig->getTmat(passed+cnt1,passed+cnt2);
-            }
+      const int passed  = iHandler->getOrigNOCCstart(irrep);
+      const int linsize = iHandler->getNORB(irrep);
+      for (int cnt1=0; cnt1<linsize; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsize; cnt2++){
+            HamRotated->setTmat( passed+cnt1, passed+cnt2, OneBodyMatrixElements[irrep][cnt1 + linsize * cnt2] );
          }
-         
-         char trans = 'T';
-         char notra = 'N';
-         double alpha = 1.0;
-         double beta = 0.0;
-         dgemm_(&notra,&notra,&linsize,&linsize,&linsize,&alpha, unitary->getBlock(irrep),&linsize,mem1,&linsize,&beta,mem2,&linsize);
-         dgemm_(&notra,&trans,&linsize,&linsize,&linsize,&alpha,mem2,&linsize, unitary->getBlock(irrep),&linsize,&beta,mem1,&linsize);
-         
-         for (int cnt1=0; cnt1<linsize; cnt1++){
-            for (int cnt2=cnt1; cnt2<linsize; cnt2++){
-               HamRotated->setTmat(passed+cnt1,passed+cnt2, mem1[cnt1 + linsize * cnt2] ) ;
-            }
-         }
-         
       }
-      if (linsize==1){ HamRotated->setTmat(passed,passed, HamOrig->getTmat(passed,passed) ); }
-      passed += linsize;
-   
    }
    
    /***********************************************************
@@ -375,7 +436,6 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                           int targetIndex2 = temp % targetSize2;
                                           int targetIndex3 = (temp - targetIndex2) / targetSize2;
                                           
-                                          const int rowindex  = targetIndex1 + targetSize1 * (targetIndex2 + targetSize2 * targetIndex3);
                                           const int hamIndex1 = iHandler->getOrigNOCCstart(irrep1) + targetStart1 + targetIndex1;
                                           const int hamIndex2 = iHandler->getOrigNOCCstart(irrep2) + targetStart2 + targetIndex2;
                                           const int hamIndex3 = iHandler->getOrigNOCCstart(irrep3) + targetStart3 + targetIndex3;
@@ -395,9 +455,263 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                                    double value = 0.0;
                                                    double * rotatedBlock = unitary->getBlock(irrep4) + linsize4 * origStart4;
                                                    for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
-                                                      value += mem3[rowindex + leftdim * origIndex4] * rotatedBlock[targetIndex4 + linsize4 * origIndex4];
+                                                      value += mem3[counter + leftdim * origIndex4] * rotatedBlock[targetIndex4 + linsize4 * origIndex4];
                                                    }
                                                    HamRotated->addToVmat( hamIndex1, hamIndex2, hamIndex3, hamIndex4, value );
+                                                   
+                                                }
+                                                
+                                             }
+                                          }
+                                       }//End of of last rotation V_partial_abcd = U_dl mem3_abcl
+                                    }
+                                 }
+                              }
+                           } // End of loop original blocks
+                        }
+                     }
+                  }
+               } // End of non-zero irrep block (all linsizes > 0)
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::CASSCF::fillHamDMRGInMemoryBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize){
+
+   //Constant part of the energy
+   double value = HamOrig->getEconst();
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
+         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
+      }
+   }
+   HamDMRG->setEconst(value);
+   
+   //One-body terms: diagonal in the irreps
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
+      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
+      const int linsizeDMRG = iHandler->getNDMRG(irrep);
+      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
+            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
+         }
+      }
+   }
+   
+   /***********************************************************
+   **   Two-body terms; use eightfold permutation symmetry   **
+   **   Requires 3 buffers of size maxBlockSize^4            **
+   **   maxBlockSize = ceil(maxlinsize/factor) at alloc      **
+   ***********************************************************/
+   for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
+      for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
+         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
+            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            if (irrep4>=irrep2){
+            
+               const int linsizeDMRG1 = iHandler->getNDMRG(irrep1);
+               const int linsizeDMRG2 = iHandler->getNDMRG(irrep2);
+               const int linsizeDMRG3 = iHandler->getNDMRG(irrep3);
+               const int linsizeDMRG4 = iHandler->getNDMRG(irrep4);
+               
+               int factorDMRG1 = max( (int) ( ceil((1.0 * linsizeDMRG1) / maxBlockSize) + 0.01 ) , 1 ); //factor >= linsize/maxBlockSize
+               int factorDMRG2 = max( (int) ( ceil((1.0 * linsizeDMRG2) / maxBlockSize) + 0.01 ) , 1 );
+               int factorDMRG3 = max( (int) ( ceil((1.0 * linsizeDMRG3) / maxBlockSize) + 0.01 ) , 1 );
+               
+               const int blocksizeDMRG1 = min( (int) ( ceil( (1.0 * linsizeDMRG1) / factorDMRG1 ) + 0.01 ) , maxBlockSize ); //Hence at most maxBlockSize
+               const int blocksizeDMRG2 = min( (int) ( ceil( (1.0 * linsizeDMRG2) / factorDMRG2 ) + 0.01 ) , maxBlockSize );
+               const int blocksizeDMRG3 = min( (int) ( ceil( (1.0 * linsizeDMRG3) / factorDMRG3 ) + 0.01 ) , maxBlockSize );
+               
+               while (factorDMRG1 * blocksizeDMRG1 < linsizeDMRG1){ factorDMRG1++; }
+               while (factorDMRG2 * blocksizeDMRG2 < linsizeDMRG2){ factorDMRG2++; }
+               while (factorDMRG3 * blocksizeDMRG3 < linsizeDMRG3){ factorDMRG3++; }
+               
+               if ((linsizeDMRG1>0) && (linsizeDMRG2>0) && (linsizeDMRG3>0) && (linsizeDMRG4>0)){
+               
+                  const int linsizeORIG1 = iHandler->getNORB(irrep1);
+                  const int linsizeORIG2 = iHandler->getNORB(irrep2);
+                  const int linsizeORIG3 = iHandler->getNORB(irrep3);
+                  const int linsizeORIG4 = iHandler->getNORB(irrep4);
+               
+                  int factorORIG1 = max( (int) ( ceil((1.0 * linsizeORIG1) / maxBlockSize) + 0.01 ) , 1 ); //factor >= linsize/maxBlockSize
+                  int factorORIG2 = max( (int) ( ceil((1.0 * linsizeORIG2) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorORIG3 = max( (int) ( ceil((1.0 * linsizeORIG3) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorORIG4 = max( (int) ( ceil((1.0 * linsizeORIG4) / maxBlockSize) + 0.01 ) , 1 );
+                  
+                  const int blocksizeORIG1 = min( (int) ( ceil( (1.0 * linsizeORIG1) / factorORIG1 ) + 0.01 ) , maxBlockSize ); //Hence at most maxBlockSize
+                  const int blocksizeORIG2 = min( (int) ( ceil( (1.0 * linsizeORIG2) / factorORIG2 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeORIG3 = min( (int) ( ceil( (1.0 * linsizeORIG3) / factorORIG3 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeORIG4 = min( (int) ( ceil( (1.0 * linsizeORIG4) / factorORIG4 ) + 0.01 ) , maxBlockSize );
+                  
+                  while (factorORIG1 * blocksizeORIG1 < linsizeORIG1){ factorORIG1++; }
+                  while (factorORIG2 * blocksizeORIG2 < linsizeORIG2){ factorORIG2++; }
+                  while (factorORIG3 * blocksizeORIG3 < linsizeORIG3){ factorORIG3++; }
+                  while (factorORIG4 * blocksizeORIG4 < linsizeORIG4){ factorORIG4++; }
+                  
+                  //Reset the FourIndex object
+                  for (int cnt1=0; cnt1<linsizeDMRG1; cnt1++){
+                     for (int cnt2=0; cnt2<linsizeDMRG2; cnt2++){
+                        for (int cnt3=0; cnt3<linsizeDMRG3; cnt3++){
+                           for (int cnt4=0; cnt4<linsizeDMRG4; cnt4++){
+                              HamDMRG->setVmat( iHandler->getDMRGcumulative(irrep1) + cnt1, iHandler->getDMRGcumulative(irrep2) + cnt2,
+                                                iHandler->getDMRGcumulative(irrep3) + cnt3, iHandler->getDMRGcumulative(irrep4) + cnt4, 0.0 );
+                           }
+                        }
+                     }
+                  }
+                  
+                  //Loop original blocks
+                  for (int origBlock1=0; origBlock1<factorORIG1; origBlock1++){
+                  
+                     const int origStart1 = origBlock1 * blocksizeORIG1;
+                     const int origStop1  = min( (origBlock1 + 1) * blocksizeORIG1 , linsizeORIG1 );
+                     const int origSize1  = max( origStop1 - origStart1 , 0 );
+                     
+                     for (int origBlock2=0; origBlock2<factorORIG2; origBlock2++){
+                     
+                        const int origStart2 = origBlock2 * blocksizeORIG2;
+                        const int origStop2  = min( (origBlock2 + 1) * blocksizeORIG2 , linsizeORIG2 );
+                        const int origSize2  = max( origStop2 - origStart2 , 0 );
+                     
+                        for (int origBlock3=0; origBlock3<factorORIG3; origBlock3++){
+                        
+                           const int origStart3 = origBlock3 * blocksizeORIG3;
+                           const int origStop3  = min( (origBlock3 + 1) * blocksizeORIG3 , linsizeORIG3 );
+                           const int origSize3  = max( origStop3 - origStart3 , 0 );
+                        
+                           for (int origBlock4=0; origBlock4<factorORIG4; origBlock4++){
+                           
+                              const int origStart4 = origBlock4 * blocksizeORIG4;
+                              const int origStop4  = min( (origBlock4 + 1) * blocksizeORIG4 , linsizeORIG4 );
+                              const int origSize4  = max( origStop4 - origStart4 , 0 );
+                              
+                              //Loop the target block 1
+                              for (int dmrgBlock1=0; dmrgBlock1<factorDMRG1; dmrgBlock1++){
+                  
+                                 const int dmrgStart1 = dmrgBlock1 * blocksizeDMRG1;
+                                 const int dmrgStop1  = min( (dmrgBlock1 + 1) * blocksizeDMRG1 , linsizeDMRG1 );
+                                 const int dmrgSize1  = max( dmrgStop1 - dmrgStart1 , 0 );
+                                 
+                                 //Copy HamOrig->getVmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
+                                 for (int origIndex1=0; origIndex1<origSize1; origIndex1++){
+                                    for (int origIndex2=0; origIndex2<origSize2; origIndex2++){
+                                       for (int origIndex3=0; origIndex3<origSize3; origIndex3++){
+                                          for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
+                                             mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
+                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + origStart1 + origIndex1,
+                                                                    iHandler->getOrigNOCCstart(irrep2) + origStart2 + origIndex2,
+                                                                    iHandler->getOrigNOCCstart(irrep3) + origStart3 + origIndex3,
+                                                                    iHandler->getOrigNOCCstart(irrep4) + origStart4 + origIndex4 );
+                                          }
+                                       }
+                                    }
+                                 }
+                                 
+                                 //Rotate mem1_ajkl = U_ai mem2_ijkl (but only orig and target block1 indices)
+                                 {
+                                    char notra = 'N';
+                                    double alpha = 1.0;
+                                    double beta  = 0.0; //SET !!!
+                                    int rightdim  = origSize2 * origSize3 * origSize4;
+                                    int leftdim   = dmrgSize1;
+                                    int middledim = origSize1;
+                                    double * rotationBlock = unitary->getBlock(irrep1) + iHandler->getNOCC(irrep1) + dmrgStart1 + linsizeORIG1 * origStart1;
+                                    int lda = linsizeORIG1;
+                                    dgemm_(&notra,&notra,&leftdim,&rightdim,&middledim, &alpha,rotationBlock,&lda,mem2,&middledim, &beta,mem1,&leftdim);
+                                 }
+                                 
+                                 //Loop the target block 2
+                                 for (int dmrgBlock2=((irrep1==irrep2)?dmrgBlock1:0); dmrgBlock2<factorDMRG2; dmrgBlock2++){
+                     
+                                    const int dmrgStart2 = dmrgBlock2 * blocksizeDMRG2;
+                                    const int dmrgStop2  = min( (dmrgBlock2 + 1) * blocksizeDMRG2 , linsizeDMRG2 );
+                                    const int dmrgSize2  = max( dmrgStop2 - dmrgStart2 , 0 );
+                                    
+                                    //Rotate mem2_abkl = U_bj mem1_ajkl (only block2 indices)
+                                    {
+                                       char trans = 'T';
+                                       char notra = 'N';
+                                       double alpha = 1.0;
+                                       double beta  = 0.0; //SET !!!
+                                       int loop = origSize3 * origSize4;
+                                       int jump_mem1 = dmrgSize1 * origSize2;
+                                       int jump_mem2 = dmrgSize1 * dmrgSize2;
+                                       int rightdim  = dmrgSize2;
+                                       int leftdim   = dmrgSize1;
+                                       int middledim = origSize2;
+                                       double * rotationBlock = unitary->getBlock(irrep2) + iHandler->getNOCC(irrep2) + dmrgStart2 + linsizeORIG2 * origStart2;
+                                       int ldb = linsizeORIG2;
+                                       for (int cntloop=0; cntloop<loop; cntloop++){
+                                          dgemm_(&notra,&trans,&leftdim,&rightdim,&middledim, &alpha,mem1+cntloop*jump_mem1,&leftdim,rotationBlock,&ldb,
+                                                                                              &beta, mem2+cntloop*jump_mem2,&leftdim);
+                                       }
+                                    }
+                                    
+                                    //Loop the target block 3
+                                    for (int dmrgBlock3=((irrep1==irrep3)?dmrgBlock1:0); dmrgBlock3<factorDMRG3; dmrgBlock3++){
+                        
+                                       const int dmrgStart3 = dmrgBlock3 * blocksizeDMRG3;
+                                       const int dmrgStop3 = min( (dmrgBlock3 + 1) * blocksizeDMRG3 , linsizeDMRG3 );
+                                       const int dmrgSize3 = max( dmrgStop3 - dmrgStart3 , 0 );
+                                       
+                                       //Rotate mem3_abcl = U_ck mem2_abkl (only block3 indices)
+                                       {
+                                          char trans = 'T';
+                                          char notra = 'N';
+                                          double alpha = 1.0;
+                                          double beta = 0.0; //SET !!!
+                                          //int loop = origSize4;
+                                          int jump_mem2 = dmrgSize1*dmrgSize2*origSize3;
+                                          int jump_mem3 = dmrgSize1*dmrgSize2*dmrgSize3;
+                                          int rightdim  = dmrgSize3;
+                                          int leftdim   = dmrgSize1*dmrgSize2;
+                                          int middledim = origSize3;
+                                          double * rotationBlock = unitary->getBlock(irrep3) + iHandler->getNOCC(irrep3) + dmrgStart3 + linsizeORIG3 * origStart3;
+                                          int ldb = linsizeORIG3;
+                                          for (int cntloop=0; cntloop<origSize4; cntloop++){
+                                             dgemm_(&notra,&trans,&leftdim,&rightdim,&middledim, &alpha,mem2+cntloop*jump_mem2,&leftdim,rotationBlock,&ldb,
+                                                                                                 &beta, mem3+cntloop*jump_mem3,&leftdim);
+                                          }
+                                       }
+                                       
+                                       //Calculate V_partial_abcd = U_dl mem3_abcl and add to the FourIndexObject for all relevant d-indices
+                                       const int leftdim = dmrgSize1 * dmrgSize2 * dmrgSize3;
+                                       
+                                       #pragma omp parallel for schedule(static)
+                                       for (int counter=0; counter<leftdim; counter++){
+                                          
+                                          int dmrgIndex1 = counter % dmrgSize1;
+                                          int temp       = (counter - dmrgIndex1) / dmrgSize1;
+                                          int dmrgIndex2 = temp    % dmrgSize2;
+                                          int dmrgIndex3 = (temp    - dmrgIndex2) / dmrgSize2;
+                                          
+                                          const int hamIndex1 = iHandler->getDMRGcumulative(irrep1) + dmrgStart1 + dmrgIndex1;
+                                          const int hamIndex2 = iHandler->getDMRGcumulative(irrep2) + dmrgStart2 + dmrgIndex2;
+                                          const int hamIndex3 = iHandler->getDMRGcumulative(irrep3) + dmrgStart3 + dmrgIndex3;
+                                          
+                                          //Only once per unique matrix element, does the relevant term need to be added
+                                          if ((hamIndex1 <= hamIndex2) && (hamIndex1 <= hamIndex3)){
+                                          
+                                             int dmrgStart4 = (irrep2==irrep4) ? dmrgStart2 + dmrgIndex2 : 0; //hamIndex2 <= hamIndex4
+                                          
+                                             for (int dmrgIndex4=dmrgStart4; dmrgIndex4<linsizeDMRG4; dmrgIndex4++){
+                                             
+                                                const int hamIndex4 = iHandler->getDMRGcumulative(irrep4) + dmrgIndex4;
+                                             
+                                                //Only once per unique matrix element, add contribution; hamIndex2 <= hamIndex4 ensured by targetStart4
+                                                if ( (hamIndex1 != hamIndex2) || ( (hamIndex1 == hamIndex2) && (hamIndex3 <= hamIndex4) ) ){
+                                                
+                                                   double value = 0.0;
+                                                   double * rotatedBlock = unitary->getBlock(irrep4) + iHandler->getNOCC(irrep4) + linsizeORIG4 * origStart4;
+                                                   for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
+                                                      value += mem3[counter + leftdim * origIndex4] * rotatedBlock[dmrgIndex4 + linsizeORIG4 * origIndex4];
+                                                   }
+                                                   HamDMRG->addToVmat( hamIndex1, hamIndex2, hamIndex3, hamIndex4, value );
                                                    
                                                 }
                                                 
