@@ -3,6 +3,8 @@ var hierarchy =
     [ "CheMPS2::CASSCF", "classCheMPS2_1_1CASSCF.html", null ],
     [ "CheMPS2::ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", null ],
     [ "CheMPS2::DMRG", "classCheMPS2_1_1DMRG.html", null ],
+    [ "CheMPS2::DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", null ],
+    [ "CheMPS2::DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", null ],
     [ "CheMPS2::FourIndex", "classCheMPS2_1_1FourIndex.html", null ],
     [ "CheMPS2::Hamiltonian", "classCheMPS2_1_1Hamiltonian.html", null ],
     [ "CheMPS2::Heff", "classCheMPS2_1_1Heff.html", null ],

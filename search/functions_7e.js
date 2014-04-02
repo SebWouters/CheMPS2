@@ -3,6 +3,8 @@ var searchData=
   ['_7ecasscf',['~CASSCF',['../classCheMPS2_1_1CASSCF.html#a20937fd3dbc5c5f3fa2e7ffd4f751900',1,'CheMPS2::CASSCF']]],
   ['_7econvergencescheme',['~ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#af2ca92fc4ac3bbe78ae0ee252c58fab1',1,'CheMPS2::ConvergenceScheme']]],
   ['_7edmrg',['~DMRG',['../classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5',1,'CheMPS2::DMRG']]],
+  ['_7edmrgscfindices',['~DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#a1dc37bccdc88d7d8f28ab151937f891d',1,'CheMPS2::DMRGSCFindices']]],
+  ['_7edmrgscfunitary',['~DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#aceba497a828617733e83f00fc2766163',1,'CheMPS2::DMRGSCFunitary']]],
   ['_7efourindex',['~FourIndex',['../classCheMPS2_1_1FourIndex.html#a4988b7745b0ec4d5f86c4af89ba20430',1,'CheMPS2::FourIndex']]],
   ['_7ehamiltonian',['~Hamiltonian',['../classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51',1,'CheMPS2::Hamiltonian']]],
   ['_7eheff',['~Heff',['../classCheMPS2_1_1Heff.html#aaa1c2a606d65807f669b2a6cbbd9b510',1,'CheMPS2::Heff']]],

@@ -123,13 +123,13 @@ $(document).ready(function(){initNavTree('TwoIndex_8cpp_source.html','');});
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;hdf5.h&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;cstdlib&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;TwoIndex.h&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;cstdlib&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;TwoIndex.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;MyHDF5.h&quot;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">using namespace </span>std;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
@@ -243,12 +243,12 @@ $(document).ready(function(){initNavTree('TwoIndex_8cpp_source.html','');});
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;         hid_t dataset_id = H5Dopen(group_id, <span class="stringliteral">&quot;IrrepSizes&quot;</span>, H5P_DEFAULT);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    </div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            <span class="comment">//Attributes</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            hid_t attribute_id1 = H5Aopen_name(dataset_id, <span class="stringliteral">&quot;nGroup&quot;</span>);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;            hid_t attribute_id1 = H5Aopen_by_name(group_id,<span class="stringliteral">&quot;IrrepSizes&quot;</span>, <span class="stringliteral">&quot;nGroup&quot;</span>, H5P_DEFAULT, H5P_DEFAULT);</div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            <span class="keywordtype">int</span> nGroup;</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;            H5Aread(attribute_id1, H5T_NATIVE_INT, &amp;nGroup);</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">if</span> (nGroup != SymmInfo.getGroupNumber()) std::cout &lt;&lt; <span class="stringliteral">&quot;Error at TwoIndex::read : nGroup doesn&#39;t match.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            hid_t attribute_id2 = H5Aopen_name(dataset_id, <span class="stringliteral">&quot;nIrreps&quot;</span>);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            hid_t attribute_id2 = H5Aopen_by_name(group_id,<span class="stringliteral">&quot;IrrepSizes&quot;</span>, <span class="stringliteral">&quot;nIrreps&quot;</span>, H5P_DEFAULT, H5P_DEFAULT);</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            <span class="keywordtype">int</span> nIrreps;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            H5Aread(attribute_id2, H5T_NATIVE_INT, &amp;nIrreps);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            <span class="keywordflow">if</span> (nGroup != SymmInfo.getGroupNumber()) std::cout &lt;&lt; <span class="stringliteral">&quot;Error at TwoIndex::read : nIrreps doesn&#39;t match.&quot;</span> &lt;&lt; std::endl;</div>
@@ -297,7 +297,7 @@ $(document).ready(function(){initNavTree('TwoIndex_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TwoIndex.cpp</b></li>
-    <li class="footer">Generated on Mon Jan 6 2014 11:36:07 for CheMPS2 by
+    <li class="footer">Generated on Wed Apr 2 2014 14:52:31 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

@@ -4,6 +4,8 @@ var annotated =
       [ "CASSCF", "classCheMPS2_1_1CASSCF.html", "classCheMPS2_1_1CASSCF" ],
       [ "ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", "classCheMPS2_1_1ConvergenceScheme" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],
+      [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", "classCheMPS2_1_1DMRGSCFindices" ],
+      [ "DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", "classCheMPS2_1_1DMRGSCFunitary" ],
       [ "FourIndex", "classCheMPS2_1_1FourIndex.html", "classCheMPS2_1_1FourIndex" ],
       [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html", "classCheMPS2_1_1Hamiltonian" ],
       [ "Heff", "classCheMPS2_1_1Heff.html", "classCheMPS2_1_1Heff" ],

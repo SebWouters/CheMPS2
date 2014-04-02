@@ -123,14 +123,14 @@ $(document).ready(function(){initNavTree('FourIndex_8cpp_source.html','');});
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;hdf5.h&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;cstdlib&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;FourIndex.h&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;cstdlib&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;FourIndex.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;MyHDF5.h&quot;</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">using namespace </span>std;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
@@ -621,17 +621,17 @@ $(document).ready(function(){initNavTree('FourIndex_8cpp_source.html','');});
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;         hid_t dataset_id = H5Dopen(group_id, <span class="stringliteral">&quot;IrrepSizes&quot;</span>, H5P_DEFAULT);</div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    </div>
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;            <span class="comment">//Attributes</span></div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;            hid_t attribute_id1 = H5Aopen_name(dataset_id, <span class="stringliteral">&quot;nGroup&quot;</span>);</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;            hid_t attribute_id1 = H5Aopen_by_name(group_id,<span class="stringliteral">&quot;IrrepSizes&quot;</span>, <span class="stringliteral">&quot;nGroup&quot;</span>, H5P_DEFAULT, H5P_DEFAULT);</div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;            <span class="keywordtype">int</span> nGroup;</div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;            H5Aread(attribute_id1, H5T_NATIVE_INT, &amp;nGroup);</div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;            <span class="keywordflow">if</span> (nGroup != SymmInfo.getGroupNumber()) std::cout &lt;&lt; <span class="stringliteral">&quot;Error at FourIndex::read : nGroup doesn&#39;t match.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;            </div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;            hid_t attribute_id2 = H5Aopen_name(dataset_id, <span class="stringliteral">&quot;nIrreps&quot;</span>);</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;            hid_t attribute_id2 = H5Aopen_by_name(group_id,<span class="stringliteral">&quot;IrrepSizes&quot;</span>, <span class="stringliteral">&quot;nIrreps&quot;</span>, H5P_DEFAULT, H5P_DEFAULT);</div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;            <span class="keywordtype">int</span> nIrreps;</div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;            H5Aread(attribute_id2, H5T_NATIVE_INT, &amp;nIrreps);</div>
 <div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;            <span class="keywordflow">if</span> (nGroup != SymmInfo.getGroupNumber()) std::cout &lt;&lt; <span class="stringliteral">&quot;Error at FourIndex::read : nIrreps doesn&#39;t match.&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;            </div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;            hid_t attribute_id3 = H5Aopen_name(dataset_id, <span class="stringliteral">&quot;theTotalSize&quot;</span>);</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;            hid_t attribute_id3 = H5Aopen_by_name(group_id,<span class="stringliteral">&quot;IrrepSizes&quot;</span>, <span class="stringliteral">&quot;theTotalSize&quot;</span>, H5P_DEFAULT, H5P_DEFAULT);</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;            <span class="keywordtype">long</span> <span class="keywordtype">long</span> theTotalSize;</div>
 <div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;            H5Aread(attribute_id3, H5T_NATIVE_LLONG, &amp;theTotalSize);</div>
 <div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;</div>
@@ -753,7 +753,7 @@ $(document).ready(function(){initNavTree('FourIndex_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>FourIndex.cpp</b></li>
-    <li class="footer">Generated on Mon Jan 6 2014 11:36:05 for CheMPS2 by
+    <li class="footer">Generated on Wed Apr 2 2014 14:52:30 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>
