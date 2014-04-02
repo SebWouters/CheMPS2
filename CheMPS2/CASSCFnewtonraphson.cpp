@@ -35,57 +35,68 @@ using std::max;
 
 double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum){
 
+   //Convergence variables
    double gradNorm = 1.0;
    double Energy;
    
+   //The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
    int N = Nelectrons;
    for (int irrep=0; irrep<numberOfIrreps; irrep++){ N -= 2*iHandler->getNOCC(irrep); }
    Problem * Prob = new Problem(HamDMRG, TwoS, N, Irrep);
-   Prob->SetupReorderD2h(); //Doesn't matter if the group isn't d2h, Prob checks it.
+   Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
    
-   int maxlinsize = 0;
-   for (int cnt=0; cnt<numberOfIrreps; cnt++){ if (iHandler->getNORB(cnt) > maxlinsize){ maxlinsize = iHandler->getNORB(cnt); } }
+   //Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
+   int maxlinsize   = 0;
+   int maxlinsizeOK = 0;
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int linsize_irrep = iHandler->getNORB(irrep);
+      if  (linsize_irrep > maxlinsize  )                                                        {  maxlinsize  = linsize_irrep; }
+      if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::CASSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
+   }
    const bool doBlockWise = (maxlinsize <= CheMPS2::CASSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
+   
+   //Determine the blocksize for the 2-body transformation
    int maxBlockSize = maxlinsize;
    if (doBlockWise){
       int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::CASSCF_maxlinsizeCutoff ) + 0.01);
-      maxBlockSize = (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01);
-      cout << "CASSCF info: the max. # orb per irrep = " << maxlinsize << " and was truncated to " << maxBlockSize << " for the 2-body rotation." << endl;
+      maxBlockSize = max( (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01) , maxlinsizeOK ); //If a particular index can be rotated at once....
+      cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize << endl;
+      cout << "              The size cutoff for 2-body transfo = " << CheMPS2::CASSCF_maxlinsizeCutoff << endl;
+      cout << "              The max. # orb per irrep <= cutoff = " << maxlinsizeOK << endl;
+      cout << "              The blocksize for piecewise tfo    = " << maxBlockSize << endl;
    }
    
-   //One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
-   int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!!!
-   int sizeWorkmem1 = max( maxBSpower4 , maxlinsize*maxlinsize*3 ); //Second argument for updateUnitary
-       sizeWorkmem1 = max( sizeWorkmem1 , nOrbDMRG*nOrbDMRG ); //Second argument for eigenvectors 1DM (calcNOON)
-   int sizeWorkmem2 = max( maxBSpower4 , maxlinsize*maxlinsize*2 );
-   if (CheMPS2::CASSCF_rotate2DMtoNO){
-      sizeWorkmem2 = max( sizeWorkmem2 , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //Second argument to rotate 2DM
-   }
-   double * mem1 = new double[sizeWorkmem1]; //TODO: recheck the required sizes (they have not grown in any case)
+   //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
+   const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
+   const int sizeWorkmem1 = max( max( maxBSpower4 , maxlinsize*maxlinsize*3 ) , nOrbDMRG * nOrbDMRG ); //For (2-body tfo , updateUnitary, calcNOON)
+   const int sizeWorkmem2 = max( max( maxBSpower4 , maxlinsize*maxlinsize*2 ) , (CheMPS2::CASSCF_rotate2DMtoNO) ? nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG : nOrbDMRG*(nOrbDMRG + 1) ); //For (2-body tfo, updateUnitary and rotateUnitaryNOeigenvecs, rotate2DMand1DM or calcNOON)
+   double * mem1 = new double[sizeWorkmem1];
    double * mem2 = new double[sizeWorkmem2];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    
+   //Load unitary from disk
    if (CheMPS2::CASSCF_storeUnitary){
-   
       struct stat stFileInfo;
       int intStat = stat(CheMPS2::CASSCF_unitaryStorageName.c_str(),&stFileInfo);
       if (intStat==0){ unitary->loadU(); }
-   
    }
 
+   /*******************************
+   ***   Actual DMRGSCF loops   ***
+   *******************************/
    while (gradNorm > CheMPS2::CASSCF_gradientNormThreshold){
    
-      //Update the unitary transformations based on the previous unitary transformation and the xmatrix
+      //Update the unitary transformation based on the previous unitary transformation and the xmatrix
       unitary->updateUnitary(mem1, mem2);
       if ((CheMPS2::CASSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
    
       //Fill HamDMRG
       buildQmatrixOCC();
       buildOneBodyMatrixElements();
-      if (doBlockWise){ fillHamDMRGInMemoryBlockWise(HamDMRG, mem1, mem2, mem3, maxBlockSize); }
-      else {            fillHamDMRGAllInMemory(HamDMRG, mem1, mem2); }
+      if (doBlockWise){ fillHamDMRGBlockWise(HamDMRG, mem1, mem2, mem3, maxBlockSize); }
+      else {            fillHamDMRG(HamDMRG, mem1, mem2); }
       
       //Do the DMRG sweeps, and calculate the 2DM
       DMRG * theDMRG = new DMRG(Prob,OptScheme);
@@ -102,7 +113,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       setDMRG1DM(N);
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
-      calcNOON(mem1);
+      calcNOON(mem1, mem2);
       if (CheMPS2::CASSCF_rotate2DMtoNO){
          rotate2DMand1DM(N, mem1, mem2);
          unitary->rotateUnitaryNOeigenvecs(mem1, mem2);
@@ -112,8 +123,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatrixACT();
-      if (doBlockWise){ fillRotatedHamInMemoryBlockWise(mem1, mem2, mem3, maxBlockSize); }
-      else{             fillRotatedHamAllInMemory(mem1, mem2); }
+      if (doBlockWise){ fillVmatRotatedBlockWise(mem1, mem2, mem3, maxBlockSize, true); }
+      else{             fillVmatRotated(mem1, mem2); }
       buildFmat();
 
       //Calculate the gradient, hessian and corresponding update
@@ -215,7 +226,7 @@ double CheMPS2::CASSCF::updateXmatrixNewtonRaphson(){
    dsyev_(&jobz,&uplo,&x_linearlength,hessian,&x_linearlength,vector,inverse,&size,&info);
    
    if (vector[0]<=0.0){
-      cout << "CASSCF :: Eigenvalues of the Hessian = [ ";
+      cout << "DMRGSCF :: Eigenvalues of the Hessian = [ ";
       for (int cnt=0; cnt<x_linearlength-1; cnt++){ cout << vector[cnt] << " , "; }
       cout << vector[x_linearlength-1] << " ]" << endl;
    }
@@ -259,7 +270,7 @@ double CheMPS2::CASSCF::calcGradient(double * gradient){
    double gradNorm = 0.0;
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
    gradNorm = sqrt(gradNorm);
-   cout << "CASSCF :: Norm of the gradient = " << gradNorm << endl;
+   cout << "DMRGSCF :: Norm of the gradient = " << gradNorm << endl;
    return gradNorm;
 
 }
@@ -309,6 +320,11 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
    if (index1 >= iHandler->getOrigNVIRTstart(irrep1)){ return value; }
    if (index3 >= iHandler->getOrigNVIRTstart(irrep3)){ return value; } //index1 and index3 are now certainly not virtual!
    
+   const int relIndex1 = index1 - iHandler->getOrigNOCCstart(irrep1);
+   const int relIndex2 = index2 - iHandler->getOrigNOCCstart(irrep2);
+   const int relIndex3 = index3 - iHandler->getOrigNOCCstart(irrep3);
+   const int relIndex4 = index4 - iHandler->getOrigNOCCstart(irrep4);
+   
    if (index1 < iHandler->getOrigNDMRGstart(irrep1)){
       if (index3 < iHandler->getOrigNDMRGstart(irrep3)){
       
@@ -317,14 +333,15 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          
             // Part of one-body matrix elements if 1-RDM occ indices
             value += 4 * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) + QmatACT(index2, index4) );
-            value += 12 * HamRotated->getVmat(index2,index4,index1,index1) - 4 * HamRotated->getVmat(index2,index1,index4,index1);
+            value += 12 * VmatRotated->get(irrep2, irrep4, irrep1, irrep1, relIndex2, relIndex4, relIndex1, relIndex1)
+                   - 4  * VmatRotated->get(irrep2, irrep1, irrep4, irrep1, relIndex2, relIndex1, relIndex4, relIndex1);
             return value;
             
          } else { //index1 != index3
          
-            value += 16 * HamRotated->getVmat(index2,index4,index1,index3)
-                   - 4  * HamRotated->getVmat(index2,index1,index4,index3)
-                   - 4  * HamRotated->getVmat(index2,index4,index3,index1);
+            value += 16 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relIndex1, relIndex3)
+                   - 4  * VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relIndex1, relIndex4, relIndex3)
+                   - 4  * VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relIndex3, relIndex1);
             return value;
             
          }
@@ -336,9 +353,11 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          // (index1,index3) (occupied,active) --> (alpha,beta) can be (active,occupied) or (occupied,active)
          for (int alpha_index=iHandler->getOrigNDMRGstart(irrep3); alpha_index<iHandler->getOrigNVIRTstart(irrep3); alpha_index++){
             const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep3) + alpha_index - iHandler->getOrigNDMRGstart(irrep3);
-            value += 2 * DMRG1DM[ DMRGindex3 + nOrbDMRG * DMRGindexALPHA ] * ( 4 * HamRotated->getVmat(index2,index4,index1,alpha_index)
-                                                                                 - HamRotated->getVmat(index2,index4,alpha_index,index1)
-                                                                                 - HamRotated->getVmat(index2,index1,index4,alpha_index) );
+            const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep3);
+            value += 2 * DMRG1DM[ DMRGindex3 + nOrbDMRG * DMRGindexALPHA ]
+                          * ( 4 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relIndex1, relALPHA)
+                                - VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relALPHA,  relIndex1)
+                                - VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relIndex1, relIndex4, relALPHA) );
          }
          return value;
          
@@ -352,9 +371,11 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          // (index1,index3) (active,occupied) --> (alpha,beta) can be (active,occupied) or (occupied,active)
          for (int alpha_index=iHandler->getOrigNDMRGstart(irrep1); alpha_index<iHandler->getOrigNVIRTstart(irrep1); alpha_index++){
             const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep1) + alpha_index - iHandler->getOrigNDMRGstart(irrep1);
-            value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexALPHA ] * ( 4 * HamRotated->getVmat(index2,index4,alpha_index,index3)
-                                                                                 - HamRotated->getVmat(index2,alpha_index,index4,index3)
-                                                                                 - HamRotated->getVmat(index2,index4,index3,alpha_index) );
+            const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep1);
+            value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexALPHA ]
+                          * ( 4 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relALPHA,  relIndex3)
+                                - VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relALPHA,  relIndex4, relIndex3)
+                                - VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relIndex3, relALPHA) );
          }
          return value;
          
@@ -373,13 +394,15 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
             int irrep_beta = SymmInfo.directProd(productIrrep,irrep_alpha);
             for (int alpha_index=iHandler->getOrigNDMRGstart(irrep_alpha); alpha_index<iHandler->getOrigNVIRTstart(irrep_alpha); alpha_index++){
                const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep_alpha) + alpha_index - iHandler->getOrigNDMRGstart(irrep_alpha);
+               const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep_alpha);
                for (int beta_index=iHandler->getOrigNDMRGstart(irrep_beta); beta_index<iHandler->getOrigNVIRTstart(irrep_beta); beta_index++){
                   const int DMRGindexBETA = iHandler->getDMRGcumulative(irrep_beta) + beta_index - iHandler->getOrigNDMRGstart(irrep_beta);
+                  const int relBETA = beta_index - iHandler->getOrigNOCCstart(irrep_beta);
                   const double TwoDMval1 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindexALPHA + nOrbDMRG * ( DMRGindex1 + nOrbDMRG * DMRGindexBETA ) ) ];
                   const double TwoDMval2 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindexALPHA + nOrbDMRG * ( DMRGindexBETA + nOrbDMRG * DMRGindex1 ) ) ];
                   const double TwoDMval3 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindex1 + nOrbDMRG * ( DMRGindexBETA + nOrbDMRG * DMRGindexALPHA ) ) ];
-                  value += 2 * (   TwoDMval1 * HamRotated->getVmat(index2,alpha_index,index4,beta_index)
-                               + ( TwoDMval2 + TwoDMval3 ) * HamRotated->getVmat(index2,index4,alpha_index,beta_index) );
+                  value += 2 * (   TwoDMval1 * VmatRotated->get(irrep2, irrep_alpha, irrep4, irrep_beta, relIndex2, relALPHA, relIndex4, relBETA)
+                     + (TwoDMval2+TwoDMval3) * VmatRotated->get(irrep2, irrep4, irrep_alpha, irrep_beta, relIndex2, relIndex4, relALPHA, relBETA) );
                }
             }
          }
@@ -440,18 +463,22 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
       }
       
       //All the summation indices are active
+      const int relIndex2 = index2 - iHandler->getOrigNOCCstart(irrep2);
       for (int irrep_r=0; irrep_r<numberOfIrreps; irrep_r++){
          const int productIrrep = SymmInfo.directProd(irrep1,irrep_r);
          for (int irrep_s=0; irrep_s<numberOfIrreps; irrep_s++){
             int irrep_t = SymmInfo.directProd(productIrrep,irrep_s);
             for (int r_index=iHandler->getOrigNDMRGstart(irrep_r); r_index<iHandler->getOrigNVIRTstart(irrep_r); r_index++){
                const int DMRGindexR = iHandler->getDMRGcumulative(irrep_r) + r_index - iHandler->getOrigNDMRGstart(irrep_r);
+               const int relR = r_index - iHandler->getOrigNOCCstart(irrep_r);
                for (int s_index=iHandler->getOrigNDMRGstart(irrep_s); s_index<iHandler->getOrigNVIRTstart(irrep_s); s_index++){
                   const int DMRGindexS = iHandler->getDMRGcumulative(irrep_s) + s_index - iHandler->getOrigNDMRGstart(irrep_s);
+                  const int relS = s_index - iHandler->getOrigNOCCstart(irrep_s);
                   for (int t_index=iHandler->getOrigNDMRGstart(irrep_t); t_index<iHandler->getOrigNVIRTstart(irrep_t); t_index++){
                      const int DMRGindexT = iHandler->getDMRGcumulative(irrep_t) + t_index - iHandler->getOrigNDMRGstart(irrep_t);
+                     const int relT = t_index - iHandler->getOrigNOCCstart(irrep_t);
                      const double TwoDMvalue = DMRG2DM[ DMRGindex1 + nOrbDMRG * ( DMRGindexR + nOrbDMRG * ( DMRGindexS + nOrbDMRG * DMRGindexT ) ) ];
-                     value += TwoDMvalue * HamRotated->getVmat(index2, r_index, s_index, t_index);
+                     value += TwoDMvalue * VmatRotated->get(irrep2, irrep_r, irrep_s, irrep_t, relIndex2, relR, relS, relT);
                   }
                }
             }

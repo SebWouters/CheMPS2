@@ -90,8 +90,8 @@ namespace CheMPS2{
          //The original Hamiltonian
          Hamiltonian * HamOrig;
          
-         //The rotated Hamiltonian
-         Hamiltonian * HamRotated;
+         //The rotated 2-body matrix elements
+         FourIndex * VmatRotated;
          
          //Irreps controller
          Irreps SymmInfo;
@@ -130,7 +130,7 @@ namespace CheMPS2{
          void setDMRG1DM(const int N);
 
          //The NO in terms of the active space orbitals are stored in the nOrbDMRG*nOrbDMRG array eigenvecs
-         void calcNOON(double * eigenvecs);
+         void calcNOON(double * eigenvecs, double * workmem);
          
          //Helper function to fetch DOCC and SOCC from filename
          void allocateAndFillOCC(const string filename);
@@ -141,13 +141,13 @@ namespace CheMPS2{
          //Helper function to check HF
          void checkHF();
          
-         //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory
-         void fillRotatedHamAllInMemory(double * workmem1, double * workmem2);
-         void fillHamDMRGAllInMemory(Hamiltonian * HamDMRG, double * temp1, double * temp2);
+         //With the updated unitary, the rotated matrix elements can be determined
+         void fillVmatRotated(double * workmem1, double * workmem2);
+         void fillHamDMRG(Hamiltonian * HamDMRG, double * temp1, double * temp2);
          
-         //With the updated unitary, the rotated matrix elements can be determined --> do everything in memory, but blockwise
-         void fillRotatedHamInMemoryBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize);
-         void fillHamDMRGInMemoryBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize);
+         //With the updated unitary, the rotated matrix elements can be determined --> do blockwise
+         void fillVmatRotatedBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners);
+         void fillHamDMRGBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize);
          
          //Calculate the gradient, return function is the gradient 2-norm
          double calcGradient(double * gradient);

@@ -27,21 +27,7 @@
 using std::min;
 using std::max;
 
-void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
-
-   //Constant part of the energy
-   HamRotated->setEconst(HamOrig->getEconst());
-   
-   //One-body terms: diagonal in the irreps
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      const int passed  = iHandler->getOrigNOCCstart(irrep);
-      const int linsize = iHandler->getNORB(irrep);
-      for (int cnt1=0; cnt1<linsize; cnt1++){
-         for (int cnt2=cnt1; cnt2<linsize; cnt2++){
-            HamRotated->setTmat( passed+cnt1, passed+cnt2, OneBodyMatrixElements[irrep][cnt1 + linsize * cnt2] );
-         }
-      }
-   }
+void CheMPS2::CASSCF::fillVmatRotated(double * temp1, double * temp2){
    
    //Two-body terms --> use eightfold permutation symmetry
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
@@ -97,9 +83,8 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
                      for (int cnt2=0; cnt2<linsize2; cnt2++){
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
-                              HamRotated->setVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
-                                                   iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4,
-                                                   temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ] );
+                              VmatRotated->set(irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4,
+                                               temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ] );
                            }
                         }
                      }
@@ -113,7 +98,7 @@ void CheMPS2::CASSCF::fillRotatedHamAllInMemory(double * temp1, double * temp2){
 
 }
 
-void CheMPS2::CASSCF::fillHamDMRGAllInMemory(Hamiltonian * HamDMRG, double * temp1, double * temp2){
+void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG, double * temp1, double * temp2){
 
    //Constant part of the energy
    double value = HamOrig->getEconst();
@@ -217,26 +202,7 @@ void CheMPS2::CASSCF::fillHamDMRGAllInMemory(Hamiltonian * HamDMRG, double * tem
 
 }
 
-void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize){
-
-   /************************************
-   **   Constant part of the energy   **
-   ************************************/
-   HamRotated->setEconst(HamOrig->getEconst());
-   
-   /************************************************************
-   **   One-body terms; diagonal in the irreps.               **
-   **   Used to require mem1 and mem2 of size maxlinsize^2    **
-   ************************************************************/
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      const int passed  = iHandler->getOrigNOCCstart(irrep);
-      const int linsize = iHandler->getNORB(irrep);
-      for (int cnt1=0; cnt1<linsize; cnt1++){
-         for (int cnt2=cnt1; cnt2<linsize; cnt2++){
-            HamRotated->setTmat( passed+cnt1, passed+cnt2, OneBodyMatrixElements[irrep][cnt1 + linsize * cnt2] );
-         }
-      }
-   }
+void CheMPS2::CASSCF::fillVmatRotatedBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners){
    
    /***********************************************************
    **   Two-body terms; use eightfold permutation symmetry   **
@@ -255,13 +221,52 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                const int linsize3 = iHandler->getNORB(irrep3);
                const int linsize4 = iHandler->getNORB(irrep4);
                
+               const bool caseA = ((irrep1 == irrep2) && (irrep1 == irrep3) && (irrep1 == irrep4)); //I1 = I2 = I3 = I4
+               const bool caseB = ((!caseA) && (irrep1 == irrep2) && (irrep3 == irrep4));           //I1 = I2 < I3 = I4
+               const bool caseC = ((!caseA) && (irrep1 == irrep3) && (irrep2 == irrep4));           //I1 = I3 < I2 = I4
+               //caseD : All irreps different
+               /* if (cutCorners):
+                     For the Gradient and Hessian, not all matrix elements are required: Maximum two indices are virtual.
+                     Thereto split up all target indices in an OA (occupied + active) part and a V (virtual) part and see that max. two indices are virtual.
+
+                     CASE A: if I1 = I2 = I3 = I4 the following combinations are allowed
+                        0: OA  OA  OA  OA
+                        1: OA  OA  OA  V
+                        1: OA  OA  V   OA
+                        2: OA  OA  V   V
+                        2: OA  V   OA  V
+                     due to either ( i1 < i2 <= i4 and i1 <= i3 ) or ( i1 = i2 <= i3 <= i4 ) .
+
+                     CASE B: if I1 = I2 < I3 = I4 the following combinations are allowed
+                        0: OA  OA  OA  OA
+                        1: OA  OA  OA  V
+                        1: OA  OA  V   OA
+                        1: OA  V   OA  OA
+                        2: OA  OA  V   V
+                        2: OA  V   V   OA
+                        2: OA  V   OA  V
+                        2: V   V   OA  OA
+                     due to either ( i1 < i2 and i3,i4 all ) or ( i1 = i2 <= i3 <= i4 ) .
+
+                     CASE C: if I1 = I3 < I2 = I4 the following combinations are allowed
+                        0: OA  OA  OA  OA
+                        1: OA  OA  OA  V
+                        1: OA  OA  V   OA
+                        2: OA  OA  V   V
+                        2: V   OA  V   OA
+                        2: OA  V   OA  V
+                     due to either ( i1 <= i3 and i2 <= i4 ) .
+
+                     CASE D: all irreps different: max two blocks virtual .
+               */
+               
                if ((linsize1>0) && (linsize2>0) && (linsize3>0) && (linsize4>0)){
                
                   /** The scheme: 
                       Split up each of the linsizes into factor parts of size (linsize/factor). Make sure the boundaries are clear.
                       
                       Algorithm:
-                         Reset the FourIndex object for the particular symmetry case under consideration --> HamRotated->setVmat(i,j,k,l,0.0)
+                         Reset the FourIndex object for the particular symmetry case under consideration --> Vmat(i,j,k,l) = 0.0
                          Loop block1, block2, block3, block4 --> factor^4:
                             Loop block1 --> factor:
                                Copy HamOrig->getVmat(i,j,k,l) for the particular block into mem2_ijkl --> cost (linsize/factor)^4
@@ -275,8 +280,8 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                         Add (not set!!!) V_partial_abcd to FourIndex (for the different ijkl-blocks) --> cost (linsize/factor)^4
                       Total cost: f^4 * ( (l/f)^4 + f * ( (l/f)^5 + f * ( (l/f)^5 + f * ( (l/f)^5 + f * ( (l/f)^5 + (l/f)^4 ) ) ) ) ) = f^3 * l^5
                   */
-                  
-                  //Split up the linsizes
+               
+                  //Split up the linsizes for the original Hamiltonian
                   int factor1 = max( (int) ( ceil((1.0 * linsize1) / maxBlockSize) + 0.01 ) , 1 ); //factor >= linsize/maxBlockSize
                   int factor2 = max( (int) ( ceil((1.0 * linsize2) / maxBlockSize) + 0.01 ) , 1 );
                   int factor3 = max( (int) ( ceil((1.0 * linsize3) / maxBlockSize) + 0.01 ) , 1 );
@@ -291,21 +296,53 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                   while (factor2 * blocksize2 < linsize2){ factor2++; }
                   while (factor3 * blocksize3 < linsize3){ factor3++; }
                   while (factor4 * blocksize4 < linsize4){ factor4++; }
+               
+                  //Split up the linsizes for the rotated Hamiltonian
+                  const int linsizeV1  = iHandler->getNVIRT(irrep1);
+                  const int linsizeOA1 = linsize1 - linsizeV1;
+                  const int linsizeV2  = iHandler->getNVIRT(irrep2);
+                  const int linsizeOA2 = linsize2 - linsizeV2;
+                  const int linsizeV3  = iHandler->getNVIRT(irrep3);
+                  const int linsizeOA3 = linsize3 - linsizeV3;
+                  const int linsizeV4  = iHandler->getNVIRT(irrep4);
+                  const int linsizeOA4 = linsize4 - linsizeV4;
                   
-                  /* for (int blocki=0; blocki<factori; blocki++)
-                        int starti = blocki * blocksizei
-                        int stopi = min( (blocki+1) * blocksizei , linsizei )
-                        int sizei = upperboundi - starti
-                        for (int indexi = starti; indexi<stopi; indexi++) 
-                  */
+                  int factorV1 = (linsizeV1 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV1) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorV2 = (linsizeV2 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV2) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorV3 = (linsizeV3 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV3) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorV4 = (linsizeV4 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV4) / maxBlockSize) + 0.01 ) , 1 );
+                  
+                  const int blocksizeV1 = (linsizeV1 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV1) / factorV1 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeV2 = (linsizeV2 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV2) / factorV2 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeV3 = (linsizeV3 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV3) / factorV3 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeV4 = (linsizeV4 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV4) / factorV4 ) + 0.01 ) , maxBlockSize );
+                  
+                  if (linsizeV1 > 0){ while (factorV1 * blocksizeV1 < linsizeV1){ factorV1++; } }
+                  if (linsizeV2 > 0){ while (factorV2 * blocksizeV2 < linsizeV2){ factorV2++; } }
+                  if (linsizeV3 > 0){ while (factorV3 * blocksizeV3 < linsizeV3){ factorV3++; } }
+                  if (linsizeV4 > 0){ while (factorV4 * blocksizeV4 < linsizeV4){ factorV4++; } }
+                  
+                  int factorOA1 = (linsizeOA1 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA1) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorOA2 = (linsizeOA2 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA2) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorOA3 = (linsizeOA3 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA3) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorOA4 = (linsizeOA4 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA4) / maxBlockSize) + 0.01 ) , 1 );
+                  
+                  const int blocksizeOA1 = (linsizeOA1 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA1) / factorOA1 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeOA2 = (linsizeOA2 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA2) / factorOA2 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeOA3 = (linsizeOA3 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA3) / factorOA3 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeOA4 = (linsizeOA4 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA4) / factorOA4 ) + 0.01 ) , maxBlockSize );
+                  
+                  if (linsizeOA1 > 0){ while (factorOA1 * blocksizeOA1 < linsizeOA1){ factorOA1++; } }
+                  if (linsizeOA2 > 0){ while (factorOA2 * blocksizeOA2 < linsizeOA2){ factorOA2++; } }
+                  if (linsizeOA3 > 0){ while (factorOA3 * blocksizeOA3 < linsizeOA3){ factorOA3++; } }
+                  if (linsizeOA4 > 0){ while (factorOA4 * blocksizeOA4 < linsizeOA4){ factorOA4++; } }
                   
                   //Reset the FourIndex object
                   for (int cnt1=0; cnt1<linsize1; cnt1++){
                      for (int cnt2=0; cnt2<linsize2; cnt2++){
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
-                              HamRotated->setVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
-                                                   iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4, 0.0);
+                              VmatRotated->set(irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4, 0.0);
                            }
                         }
                      }
@@ -315,33 +352,39 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                   for (int origBlock1=0; origBlock1<factor1; origBlock1++){
                   
                      const int origStart1 = origBlock1 * blocksize1;
-                     const int origStop1 = min( (origBlock1 + 1) * blocksize1 , linsize1 );
-                     const int origSize1 = max( origStop1 - origStart1 , 0 );
+                     const int origStop1  = min( (origBlock1 + 1) * blocksize1 , linsize1 );
+                     const int origSize1  = max( origStop1 - origStart1 , 0 );
                      
                      for (int origBlock2=0; origBlock2<factor2; origBlock2++){
                      
                         const int origStart2 = origBlock2 * blocksize2;
-                        const int origStop2 = min( (origBlock2 + 1) * blocksize2 , linsize2 );
-                        const int origSize2 = max( origStop2 - origStart2 , 0 );
+                        const int origStop2  = min( (origBlock2 + 1) * blocksize2 , linsize2 );
+                        const int origSize2  = max( origStop2 - origStart2 , 0 );
                      
                         for (int origBlock3=0; origBlock3<factor3; origBlock3++){
                         
                            const int origStart3 = origBlock3 * blocksize3;
-                           const int origStop3 = min( (origBlock3 + 1) * blocksize3 , linsize3 );
-                           const int origSize3 = max( origStop3 - origStart3 , 0 );
+                           const int origStop3  = min( (origBlock3 + 1) * blocksize3 , linsize3 );
+                           const int origSize3  = max( origStop3 - origStart3 , 0 );
                         
                            for (int origBlock4=0; origBlock4<factor4; origBlock4++){
                            
                               const int origStart4 = origBlock4 * blocksize4;
-                              const int origStop4 = min( (origBlock4 + 1) * blocksize4 , linsize4 );
-                              const int origSize4 = max( origStop4 - origStart4 , 0 );
+                              const int origStop4  = min( (origBlock4 + 1) * blocksize4 , linsize4 );
+                              const int origSize4  = max( origStop4 - origStart4 , 0 );
                               
                               //Loop the target block 1
-                              for (int targetBlock1=0; targetBlock1<factor1; targetBlock1++){
+                              int startTB1 = 0;
+                              int stopTB1  = factorOA1 + factorV1;
+                              if ((cutCorners) && (caseA)){ stopTB1 = factorOA1; } //Only for case A the first index CANNOT be V.
+                              for (int targetBlock1 = startTB1; targetBlock1 < stopTB1; targetBlock1++){
                   
-                                 const int targetStart1 = targetBlock1 * blocksize1;
-                                 const int targetStop1 = min( (targetBlock1 + 1) * blocksize1 , linsize1 );
-                                 const int targetSize1 = max( targetStop1 - targetStart1 , 0 );
+                                 const bool block1_OA   = (targetBlock1 < factorOA1) ? true : false;
+                                 const int targetStart1 = (block1_OA) ? (targetBlock1 * blocksizeOA1)
+                                                                      : (linsizeOA1 + (targetBlock1 - factorOA1) * blocksizeV1);
+                                 const int targetStop1  = (block1_OA) ? min( targetStart1 + blocksizeOA1 , linsizeOA1 )
+                                                                      : min( targetStart1 + blocksizeV1  , linsize1   );
+                                 const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
                                  
                                  //Copy HamOrig->getVmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
                                  for (int origIndex1=0; origIndex1<origSize1; origIndex1++){
@@ -372,11 +415,24 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                  }
                                  
                                  //Loop the target block 2
-                                 for (int targetBlock2=((irrep1==irrep2)?targetBlock1:0); targetBlock2<factor2; targetBlock2++){
+                                 int startTB2 = (irrep1==irrep2) ? targetBlock1 : 0;
+                                 int stopTB2  = factorOA2 + factorV2;
+                                 if (cutCorners){
+                                    //case A: First index was forced to OA. Second one can be both OA and V
+                                    //case B: First index can be OA and V. If the first one is V, the second one must be V as well.
+                                    if ((caseB) && (!block1_OA)){ startTB2 = max( startTB2 , factorOA2 ); }
+                                    //case C: First index can be OA and V. If the first index is V, the second one must be OA.
+                                    if ((caseC) && (!block1_OA)){ stopTB2 = factorOA2; }
+                                    //case D: At most two indices can be virtual: no restrictions yet.
+                                 }
+                                 for (int targetBlock2 = startTB2; targetBlock2 < stopTB2; targetBlock2++){
                      
-                                    const int targetStart2 = targetBlock2 * blocksize2;
-                                    const int targetStop2 = min( (targetBlock2 + 1) * blocksize2 , linsize2 );
-                                    const int targetSize2 = max( targetStop2 - targetStart2 , 0 );
+                                    const bool block2_OA   = (targetBlock2 < factorOA2) ? true : false;
+                                    const int targetStart2 = (block2_OA) ? (targetBlock2 * blocksizeOA2)
+                                                                         : (linsizeOA2 + (targetBlock2 - factorOA2) * blocksizeV2);
+                                    const int targetStop2  = (block2_OA) ? min( targetStart2 + blocksizeOA2 , linsizeOA2 )
+                                                                         : min( targetStart2 + blocksizeV2  , linsize2   );
+                                    const int targetSize2  = max( targetStop2 - targetStart2 , 0 );
                                     
                                     //Rotate mem2_abkl = U_bj mem1_ajkl (only block2 indices)
                                     {
@@ -399,11 +455,28 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                     }
                                     
                                     //Loop the target block 3
-                                    for (int targetBlock3=((irrep1==irrep3)?targetBlock1:0); targetBlock3<factor3; targetBlock3++){
+                                    int startTB3 = (irrep1==irrep3) ? targetBlock1 : 0;
+                                    int stopTB3  = factorOA3 + factorV3;
+                                    if (cutCorners){
+                                       //All cases: at most two indices can be V. If the first two are V, the third must be OA.
+                                       if ((!block1_OA) && (!block2_OA)){ stopTB3 = factorOA3; }
+                                       //case A: First index is OA. Second index can be OA and V. If second index is V, the third one must be OA.
+                                       if ((caseA) && (!block2_OA)){ stopTB3 = factorOA3; }
+                                       //case B: First index V  --> second one V as well. Third must be OA, but imposed by first if statement above.
+                                       //        First index OA --> (2,3) can be (OA,OA); (OA,V); (V,OA) and (V,V) --> no restrictions.
+                                       if (caseC){
+                                          if (!block1_OA){ startTB3 = max( startTB3 , factorOA3 ); } // First index V  --> (2,3) must be (OA,V)
+                                          if ((block1_OA) && (!block2_OA)){ stopTB3 = factorOA3; } // First index OA --> if index2 is V, the index3 must be OA.
+                                       }
+                                    }
+                                    for (int targetBlock3 = startTB3; targetBlock3 < stopTB3; targetBlock3++){
                         
-                                       const int targetStart3 = targetBlock3 * blocksize3;
-                                       const int targetStop3 = min( (targetBlock3 + 1) * blocksize3 , linsize3 );
-                                       const int targetSize3 = max( targetStop3 - targetStart3 , 0 );
+                                       const bool block3_OA   = (targetBlock3 < factorOA3) ? true : false;
+                                       const int targetStart3 = (block3_OA) ? (targetBlock3 * blocksizeOA3)
+                                                                            : (linsizeOA3 + (targetBlock3 - factorOA3) * blocksizeV3);
+                                       const int targetStop3  = (block3_OA) ? min( targetStart3 + blocksizeOA3 , linsizeOA3 )
+                                                                            : min( targetStart3 + blocksizeV3  , linsize3   );
+                                       const int targetSize3  = max( targetStop3 - targetStart3 , 0 );
                                        
                                        //Rotate mem3_abcl = U_ck mem2_abkl (only block3 indices)
                                        {
@@ -443,11 +516,28 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                           //Only once per unique matrix element, does the relevant term need to be added
                                           if ((hamIndex1 <= hamIndex2) && (hamIndex1 <= hamIndex3)){
                                           
-                                             int targetStart4 = (irrep2==irrep4) ? targetStart2 + targetIndex2 : 0; //hamIndex2 <= hamIndex4
-                                          
-                                             for (int targetIndex4=targetStart4; targetIndex4<linsize4; targetIndex4++){
+                                             //Loop the target INDEX 4
+                                             int startTI4 = (irrep2==irrep4) ? targetStart2 + targetIndex2 : 0; //hamIndex2 <= hamIndex4
+                                             int stopTI4  = linsizeOA4 + linsizeV4;
+                                             if (cutCorners){
+                                                //Get the number of virtuals
+                                                int numV = 0;
+                                                if (!block1_OA){ numV++; }
+                                                if (!block2_OA){ numV++; }
+                                                if (!block3_OA){ numV++; }
+                                                //All cases: max two virtuals
+                                                if (numV>=2){ stopTI4 = linsizeOA4; }
+                                                //case A: With (1,2,3)=(OA,OA,OA) index4 can be both OA and V
+                                                //        With (1,2,3)=(OA,OA,V) index4 van be both OA and V
+                                                //        With (1,2,3)=(OA,V,OA) index4 must be V!
+                                                if ((caseA) && (!block2_OA)){ startTI4 = max( startTI4, linsizeOA4 ); }
+                                                //case B: For all cases not constrained by numV<=2, index4 can be both OA and V.
+                                                //case C: For all cases not constrained by numV<=2, index4 can be both OA and V, except if the second index is V
+                                                if ((caseC) && (!block2_OA)){ startTI4 = max( startTI4, linsizeOA4 ); }
+                                             }
+                                             for (int targetIndex4 = startTI4; targetIndex4 < stopTI4; targetIndex4++){
                                              
-                                                const int hamIndex4 = iHandler->getOrigNOCCstart(irrep4) + targetIndex4;
+                                                const int hamIndex4  = iHandler->getOrigNOCCstart(irrep4) + targetIndex4;
                                              
                                                 //Only once per unique matrix element, add contribution; hamIndex2 <= hamIndex4 ensured by targetStart4
                                                 if ( (hamIndex1 != hamIndex2) || ( (hamIndex1 == hamIndex2) && (hamIndex3 <= hamIndex4) ) ){
@@ -457,7 +547,8 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
                                                    for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
                                                       value += mem3[counter + leftdim * origIndex4] * rotatedBlock[targetIndex4 + linsize4 * origIndex4];
                                                    }
-                                                   HamRotated->addToVmat( hamIndex1, hamIndex2, hamIndex3, hamIndex4, value );
+                                                   VmatRotated->add(irrep1, irrep2, irrep3, irrep4, targetStart1 + targetIndex1,
+                                                                    targetStart2 + targetIndex2, targetStart3 + targetIndex3, targetIndex4, value);
                                                    
                                                 }
                                                 
@@ -479,7 +570,7 @@ void CheMPS2::CASSCF::fillRotatedHamInMemoryBlockWise(double * mem1, double * me
 
 }
 
-void CheMPS2::CASSCF::fillHamDMRGInMemoryBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize){
+void CheMPS2::CASSCF::fillHamDMRGBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize){
 
    //Constant part of the energy
    double value = HamOrig->getEconst();

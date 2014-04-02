@@ -36,11 +36,6 @@ CheMPS2::CASSCF::CASSCF(const string filename){
 
    HamOrig = new Hamiltonian(filename);
    
-   int * orb2irrepHamOrig = new int[HamOrig->getL()];
-   for (int cnt=0; cnt<HamOrig->getL(); cnt++){ orb2irrepHamOrig[cnt] = HamOrig->getOrbitalIrrep(cnt); }
-   HamRotated = new Hamiltonian(HamOrig->getL(), HamOrig->getNGroup(), orb2irrepHamOrig);
-   delete [] orb2irrepHamOrig;
-   
    L = HamOrig->getL();
    
    SymmInfo.setGroup(HamOrig->getNGroup());
@@ -61,7 +56,6 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
    for (int cnt=0; cnt<L; cnt++){ OrbIrreps[cnt] = HamIn->getOrbitalIrrep(cnt); }
 
    HamOrig    = new Hamiltonian(L, SyGroup, OrbIrreps);
-   HamRotated = new Hamiltonian(L, SyGroup, OrbIrreps);
    
    delete [] OrbIrreps;
    
@@ -98,12 +92,13 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
 CheMPS2::CASSCF::~CASSCF(){
 
    delete HamOrig;
-   delete HamRotated;
    
    delete [] DOCC;
    delete [] SOCC;
    
    if (setupStartCalled){
+   
+      delete VmatRotated;
    
       delete unitary; //First delete the unitary as it requires the iHandler in its destructor.
       delete iHandler;
@@ -159,11 +154,10 @@ void CheMPS2::CASSCF::setDMRG1DM(const int N){
 
 }
 
-void CheMPS2::CASSCF::calcNOON(double * eigenvecs){
+void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
 
    int size = nOrbDMRG * nOrbDMRG;
-   double * eigenval = new double[nOrbDMRG];
-   double * work = new double[size];
+   double * eigenval = workmem + size;
 
    for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = DMRG1DM[cnt]; }
 
@@ -177,7 +171,7 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs){
       if (NDMRG > 0){
 
          //Calculate the eigenvectors and values per block
-         dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, work, &size, &info);
+         dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
          cout << "CASSCF :: DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
@@ -199,9 +193,6 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs){
       passed += NDMRG;
 
    }
-
-   delete [] work;
-   delete [] eigenval;
 
 }
 
@@ -491,7 +482,11 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    setupStartCalled = true;
    
    iHandler = new DMRGSCFindices(L, SymmInfo.getGroupNumber(), NoccIn, NDMRGIn, NvirtIn);
-   unitary = new DMRGSCFunitary(iHandler);
+   unitary  = new DMRGSCFunitary(iHandler);
+   int * orbPerIrrep = new int[numberOfIrreps];
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){ orbPerIrrep[irrep] = iHandler->getNORB(irrep); }
+   VmatRotated = new FourIndex(SymmInfo.getGroupNumber(), orbPerIrrep);
+   delete [] orbPerIrrep;
    
    //Allocate space for the DMRG 1DM and 2DM
    nOrbDMRG = iHandler->getDMRGcumulative(numberOfIrreps);
