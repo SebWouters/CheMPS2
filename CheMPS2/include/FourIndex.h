@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -115,12 +115,21 @@ namespace CheMPS2{
                         - Vmat[Icent][I_i][I_i][i + k*(k+1)/2][j][l-j]
                         - If I_i <  I_k and hence I_j <  I_l : fixed by block order
                         - Vmat[Icent][I_i][I_k][i + nOrbWithIrrepI_i * k][j][l] */
-         double ****** storage;
+         long long ***** storage;
+         
+         //Calculate the number of unique FourIndex elements --> true means allocate the storage and false means deallocate the storage!
+         long long calcNumberOfUniqueElements(const bool allocateStorage);
+         
+         //The number of unique FourIndex elements
+         long long arrayLength;
+         
+         //The actual two-body matrix elements
+         double * theElements;
          
          //Functions to get the correct pointer to memory
-         double * getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const;
-         double * getPtrIrrepOrderOK(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const;
-         double * getPtrAllOK(const int number, const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const;
+         long long getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const;
+         long long getPtrIrrepOrderOK(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const;
+         long long getPtrAllOK(const int number, const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const;
 
    };
 }

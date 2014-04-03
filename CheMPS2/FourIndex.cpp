@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,132 +33,118 @@ CheMPS2::FourIndex::FourIndex(const int nGroup, const int * IrrepSizes){
    SymmInfo.setGroup(nGroup);
    
    Isizes = new int[SymmInfo.getNumberOfIrreps()];
-   storage = new double*****[SymmInfo.getNumberOfIrreps()];
+   storage = new long long****[SymmInfo.getNumberOfIrreps()];
    
    for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
       Isizes[Icenter] = IrrepSizes[Icenter];
    }
    
-   //For the following: see text above storage in Fourindex.h
+   arrayLength = calcNumberOfUniqueElements(true); //true means allocate the storage!
+   theElements = new double[arrayLength];
+   
+}
+
+long long CheMPS2::FourIndex::calcNumberOfUniqueElements(const bool allocate){
+
+   //The object size: see text above storage in Fourindex.h
+   long long theTotalSize = 0;
+   
    for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
-      storage[Icenter] = new double****[SymmInfo.getNumberOfIrreps()];
+      if (allocate){ storage[Icenter] = new long long***[SymmInfo.getNumberOfIrreps()]; }
       for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
          int I_j = SymmInfo.directProd(Icenter,I_i);
          if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
-            storage[Icenter][I_i] = new double***[SymmInfo.getNumberOfIrreps()];
+            if (allocate){ storage[Icenter][I_i] = new long long**[SymmInfo.getNumberOfIrreps()]; }
             for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
                int I_l = SymmInfo.directProd(Icenter,I_k);
                if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
                   if ((I_i <= I_j) && (I_j <= I_l)){
                      if (Icenter == 0){ // I_i = I_j and I_k = I_l
                         if (I_i == I_k){
-                           storage[Icenter][I_i][I_k] = new double**[Isizes[I_i]*(Isizes[I_i]+1)/2];
+                           if (allocate){ storage[Icenter][I_i][I_k] = new long long*[Isizes[I_i]*(Isizes[I_i]+1)/2]; }
                            for (int i=0; i<Isizes[I_i]; i++){
                               for (int k=i; k<Isizes[I_k]; k++){
-                                 storage[Icenter][I_i][I_k][i + k*(k+1)/2] = new double*[Isizes[I_j]-i];
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    if (i==j) storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i] = new double[Isizes[I_l]-k]; 
-                                    else      storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i] = new double[Isizes[I_l]-j]; 
+                                 if (allocate){
+                                    storage[Icenter][I_i][I_k][i + k*(k+1)/2] = new long long[Isizes[I_j]-i]; 
+                                    for (int j=i; j<Isizes[I_j]; j++){
+                                       storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i] = theTotalSize;
+                                       theTotalSize += Isizes[I_l] - ((i==j) ? k : j);
+                                    }
+                                 } else {
+                                    delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2];
                                  }
                               }
                            }
+                           if (!allocate){ delete [] storage[Icenter][I_i][I_k]; }
                         } else { // I_i < I_k
-                           storage[Icenter][I_i][I_k] = new double**[Isizes[I_i]*Isizes[I_k]];
+                           if (allocate){ storage[Icenter][I_i][I_k] = new long long*[Isizes[I_i]*Isizes[I_k]]; }
                            for (int i=0; i<Isizes[I_i]; i++){
                               for (int k=0; k<Isizes[I_k]; k++){
-                                 storage[Icenter][I_i][I_k][i + k*Isizes[I_i]] = new double*[Isizes[I_j]-i];
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    if (i==j) storage[Icenter][I_i][I_k][i+k*Isizes[I_i]][j-i] = new double[Isizes[I_l]-k];
-                                    else      storage[Icenter][I_i][I_k][i+k*Isizes[I_i]][j-i] = new double[Isizes[I_l]];
+                                 if (allocate){
+                                    storage[Icenter][I_i][I_k][i + k*Isizes[I_i]] = new long long[Isizes[I_j]-i];
+                                    for (int j=i; j<Isizes[I_j]; j++){
+                                       storage[Icenter][I_i][I_k][i+k*Isizes[I_i]][j-i] = theTotalSize;
+                                       theTotalSize += Isizes[I_l] - ((i==j) ? k : 0 );
+                                    }
+                                 } else {
+                                    delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]];
                                  }
                               }
                            }
+                           if (!allocate){ delete [] storage[Icenter][I_i][I_k]; }
                         }
                      } else { //Icenter !=0 ; I_i < I_j and I_k != I_l
                         if (I_i == I_k){
-                           storage[Icenter][I_i][I_k] = new double**[Isizes[I_i]*(Isizes[I_i]+1)/2];
+                           if (allocate){ storage[Icenter][I_i][I_k] = new long long*[Isizes[I_i]*(Isizes[I_i]+1)/2]; }
                            for (int i=0; i<Isizes[I_i]; i++){
                               for (int k=i; k<Isizes[I_k]; k++){
-                                 storage[Icenter][I_i][I_k][i + k*(k+1)/2] = new double*[Isizes[I_j]];
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    storage[Icenter][I_i][I_k][i + k*(k+1)/2][j] = new double[Isizes[I_l]-j];
+                                 if (allocate){
+                                    storage[Icenter][I_i][I_k][i + k*(k+1)/2] = new long long[Isizes[I_j]];
+                                    for (int j=0; j<Isizes[I_j]; j++){
+                                       storage[Icenter][I_i][I_k][i + k*(k+1)/2][j] = theTotalSize;
+                                       theTotalSize += Isizes[I_l] - j;
+                                    }
+                                 } else {
+                                    delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2];
                                  }
                               }
                            }
+                           if (!allocate){ delete [] storage[Icenter][I_i][I_k]; }
                         } else { // I_i < I_k
-                           storage[Icenter][I_i][I_k] = new double**[Isizes[I_i]*Isizes[I_k]];
+                           if (allocate){ storage[Icenter][I_i][I_k] = new long long*[Isizes[I_i]*Isizes[I_k]]; }
                            for (int i=0; i<Isizes[I_i]; i++){
                               for (int k=0; k<Isizes[I_k]; k++){
-                                 storage[Icenter][I_i][I_k][i + k*Isizes[I_i]] = new double*[Isizes[I_j]];
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j] = new double[Isizes[I_l]];
+                                 if (allocate){
+                                    storage[Icenter][I_i][I_k][i + k*Isizes[I_i]] = new long long[Isizes[I_j]];
+                                    for (int j=0; j<Isizes[I_j]; j++){
+                                       storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j] = theTotalSize;
+                                       theTotalSize += Isizes[I_l];
+                                    }
+                                 } else {
+                                    delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]];
                                  }
                               }
                            }
+                           if (!allocate){ delete [] storage[Icenter][I_i][I_k]; }
                         }
                      }
                   }
                }
             }
+            if (!allocate){ delete [] storage[Icenter][I_i]; }
          }
       }
+      if (!allocate){ delete [] storage[Icenter]; }
    }
+   
+   return theTotalSize;
    
 }
 
 CheMPS2::FourIndex::~FourIndex(){
    
-   for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
-      for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
-         int I_j = SymmInfo.directProd(Icenter,I_i);
-         if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
-            for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
-               int I_l = SymmInfo.directProd(Icenter,I_k);
-               if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
-                  if ((I_i <= I_j) && (I_j <= I_l)){
-                     if (Icenter == 0){
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++) delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i];
-                                 delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2];
-                              }
-                           }
-                        } else {
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++) delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j-i];
-                                 delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]];
-                              }
-                           }
-                        }
-                     } else {
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++) delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2][j];
-                                 delete [] storage[Icenter][I_i][I_k][i + k*(k+1)/2];
-                              }
-                           }
-                        } else {
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++) delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j];
-                                 delete [] storage[Icenter][I_i][I_k][i + k*Isizes[I_i]];
-                              }
-                           }
-                        }
-                     }
-                     delete [] storage[Icenter][I_i][I_k];
-                  }
-               }
-            }
-            delete [] storage[Icenter][I_i];
-         }
-      }
-      delete [] storage[Icenter];
-   }
-   
+   arrayLength = calcNumberOfUniqueElements(false); //false means delete the storage!
+   delete [] theElements;
    delete [] Isizes;
    delete [] storage;
    
@@ -166,23 +152,23 @@ CheMPS2::FourIndex::~FourIndex(){
 
 void CheMPS2::FourIndex::set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val){
 
-   getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)[0] = val;
+   theElements[getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)] = val;
 
 }
 
 void CheMPS2::FourIndex::add(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val){
 
-   getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)[0] += val;
+   theElements[getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)] += val;
 
 }
 
 double CheMPS2::FourIndex::get(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const{
 
-   return getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)[0];
+   return theElements[getPointer(irrep_i, irrep_j, irrep_k, irrep_l, i, j, k, l)];
 
 }
 
-double * CheMPS2::FourIndex::getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
+long long CheMPS2::FourIndex::getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
 
    if (SymmInfo.directProd(irrep_i,irrep_j)==SymmInfo.directProd(irrep_k,irrep_l)){
 
@@ -220,11 +206,11 @@ double * CheMPS2::FourIndex::getPointer(const int irrep_i, const int irrep_j, co
         
    }
    
-   return NULL;
+   return -1;
 
 }
 
-double * CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
+long long CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
 
    //I_i <= I_j <= I_l and I_i <= I_k
    int Icenter = SymmInfo.directProd(irrep_i,irrep_j);
@@ -293,11 +279,11 @@ double * CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int irr
       
    }
    
-   return NULL;
+   return -1;
    
 }
 
-double * CheMPS2::FourIndex::getPtrAllOK(const int number, const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const {
+long long CheMPS2::FourIndex::getPtrAllOK(const int number, const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const {
 
    switch (number){
       case 1:
@@ -314,136 +300,11 @@ double * CheMPS2::FourIndex::getPtrAllOK(const int number, const int Icent, cons
          return storage[Icent][irrep_i][irrep_k][i + Isizes[irrep_i]*k][j] + l;
    }
    
-   return NULL;
+   return -1;
 
 }
 
 void CheMPS2::FourIndex::save(const std::string name) const{
-
-   //The object size.
-   long long theTotalSize = 0;
-   for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
-      for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
-         int I_j = SymmInfo.directProd(Icenter,I_i);
-         if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
-            for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
-               int I_l = SymmInfo.directProd(Icenter,I_k);
-               if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
-                  if ((I_i <= I_j) && (I_j <= I_l)){
-                     if (Icenter == 0){ // I_i = I_j and I_k = I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    theTotalSize += Isizes[I_l] - ((i==j)?k:j);
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    theTotalSize += Isizes[I_l] - ((i==j)?k:0);
-                                 }
-                              }
-                           }
-                        }
-                     } else { //Icenter !=0 ; I_i < I_j and I_k != I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    theTotalSize += Isizes[I_l] - j;
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    theTotalSize += Isizes[I_l];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   //Space to copy it: needed for fast HDF5 write.
-   double * writeDump = new double[theTotalSize];
-   
-   //Copy the object.
-   long long theTotalSize2 = 0;
-   for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
-      for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
-         int I_j = SymmInfo.directProd(Icenter,I_i);
-         if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
-            for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
-               int I_l = SymmInfo.directProd(Icenter,I_k);
-               if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
-                  if ((I_i <= I_j) && (I_j <= I_l)){
-                     if (Icenter == 0){ // I_i = I_j and I_k = I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    int mySize = Isizes[I_l] - ((i==j)?k:j);
-                                    int inc = 1;
-                                    dcopy_(&mySize, storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i], &inc, writeDump + theTotalSize2, &inc);
-                                    theTotalSize2 += mySize;
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                    int mySize = Isizes[I_l] - ((i==j)?k:0);
-                                    int inc = 1;
-                                    dcopy_(&mySize, storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j-i], &inc, writeDump + theTotalSize2, &inc);
-                                    theTotalSize2 += mySize;
-                                 }
-                              }
-                           }
-                        }
-                     } else { //Icenter !=0 ; I_i < I_j and I_k != I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    int mySize = Isizes[I_l] - j;
-                                    int inc = 1;
-                                    dcopy_(&mySize, storage[Icenter][I_i][I_k][i + k*(k+1)/2][j], &inc, writeDump + theTotalSize2, &inc);
-                                    theTotalSize2 += mySize;
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                    int mySize = Isizes[I_l];
-                                    int inc = 1;
-                                    dcopy_(&mySize, storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j], &inc, writeDump + theTotalSize2, &inc);
-                                    theTotalSize2 += mySize;
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   if (theTotalSize != theTotalSize2){ std::cerr << "FourIndex::save : mismatch of theTotalSize and theTotalSize2" << std::endl;}
  
    //The hdf5 file
    hid_t file_id = H5Fcreate(name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -470,7 +331,7 @@ void CheMPS2::FourIndex::save(const std::string name) const{
             
             hid_t attribute_space_id3  = H5Screate(H5S_SCALAR);
             hid_t attribute_id3        = H5Acreate(dataset_id, "theTotalSize", H5T_STD_I64LE, attribute_space_id3, H5P_DEFAULT, H5P_DEFAULT);
-            H5Awrite(attribute_id3, H5T_NATIVE_LLONG, &theTotalSize); 
+            H5Awrite(attribute_id3, H5T_NATIVE_LLONG, &arrayLength); 
 
             H5Aclose(attribute_id1);
             H5Aclose(attribute_id2);
@@ -487,10 +348,10 @@ void CheMPS2::FourIndex::save(const std::string name) const{
       //The object itself
       hid_t group_id7 = H5Gcreate(file_id, "/FourIndexObject", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
             
-         hsize_t dimarray7       = theTotalSize; //hsize_t is defined by default as unsigned long long, so no problem
+         hsize_t dimarray7       = arrayLength; //hsize_t is defined by default as unsigned long long, so no problem
          hid_t dataspace_id7     = H5Screate_simple(1, &dimarray7, NULL);
          hid_t dataset_id7       = H5Dcreate(group_id7, "Matrix elements", H5T_IEEE_F64LE, dataspace_id7, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-         H5Dwrite(dataset_id7, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, writeDump);
+         H5Dwrite(dataset_id7, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, theElements);
              
          H5Dclose(dataset_id7);
          H5Sclose(dataspace_id7);
@@ -498,8 +359,6 @@ void CheMPS2::FourIndex::save(const std::string name) const{
       H5Gclose(group_id7);
       
    H5Fclose(file_id);
-   
-   delete [] writeDump;
 
 }
 
@@ -518,16 +377,17 @@ void CheMPS2::FourIndex::read(const std::string name){
             hid_t attribute_id1 = H5Aopen_by_name(group_id,"IrrepSizes", "nGroup", H5P_DEFAULT, H5P_DEFAULT);
             int nGroup;
             H5Aread(attribute_id1, H5T_NATIVE_INT, &nGroup);
-            if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at FourIndex::read : nGroup doesn't match." << std::endl;
+            if (nGroup != SymmInfo.getGroupNumber()) std::cerr << "Error at FourIndex::read : nGroup doesn't match." << std::endl;
             
             hid_t attribute_id2 = H5Aopen_by_name(group_id,"IrrepSizes", "nIrreps", H5P_DEFAULT, H5P_DEFAULT);
             int nIrreps;
             H5Aread(attribute_id2, H5T_NATIVE_INT, &nIrreps);
-            if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at FourIndex::read : nIrreps doesn't match." << std::endl;
+            if (nGroup != SymmInfo.getGroupNumber()) std::cerr << "Error at FourIndex::read : nIrreps doesn't match." << std::endl;
             
             hid_t attribute_id3 = H5Aopen_by_name(group_id,"IrrepSizes", "theTotalSize", H5P_DEFAULT, H5P_DEFAULT);
             long long theTotalSize;
             H5Aread(attribute_id3, H5T_NATIVE_LLONG, &theTotalSize);
+            if (theTotalSize != arrayLength) std::cerr << "Error at FourIndex::read : the number of unique FourIndex elements doesn't match." << std::endl;
 
             H5Aclose(attribute_id1);
             H5Aclose(attribute_id2);
@@ -536,108 +396,27 @@ void CheMPS2::FourIndex::read(const std::string name){
          int * IsizesAgain = new int[SymmInfo.getNumberOfIrreps()];
          H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, IsizesAgain);
          for (int cnt=0; cnt<SymmInfo.getNumberOfIrreps(); cnt++){
-            if (IsizesAgain[cnt]!=Isizes[cnt]) std::cout << "Error at FourIndex::read : One of the Isizes doesn't match." << std::endl;
+            if (IsizesAgain[cnt]!=Isizes[cnt]) std::cerr << "Error at FourIndex::read : One of the Isizes doesn't match." << std::endl;
          }
          delete [] IsizesAgain;
          H5Dclose(dataset_id);
 
       H5Gclose(group_id);
       
-      std::cout << "FourIndex::read : loading " << theTotalSize << " doubles." << std::endl;
-      double * readDump = new double[theTotalSize];
+      std::cout << "FourIndex::read : loading " << arrayLength << " doubles." << std::endl;
       
       //The object itself.
       hid_t group_id7 = H5Gopen(file_id, "/FourIndexObject", H5P_DEFAULT);
 
       hid_t dataset_id7 = H5Dopen(group_id7, "Matrix elements", H5P_DEFAULT);
-      H5Dread(dataset_id7, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, readDump);
+      H5Dread(dataset_id7, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, theElements);
       H5Dclose(dataset_id7);
 
       H5Gclose(group_id7);
       
    H5Fclose(file_id);
    
-   //Copy the matrix elements back
-   long long theTotalSize2 = 0;
-   for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
-      for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
-         int I_j = SymmInfo.directProd(Icenter,I_i);
-         if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
-            for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
-               int I_l = SymmInfo.directProd(Icenter,I_k);
-               if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
-                  if ((I_i <= I_j) && (I_j <= I_l)){
-                     if (Icenter == 0){ // I_i = I_j and I_k = I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                 
-                                    double * location = storage[Icenter][I_i][I_k][i + k*(k+1)/2][j-i];
-                                    int mySize = Isizes[I_l] - ((i==j)?k:j);
-                                    int inc = 1;
-                                    dcopy_(&mySize, readDump + theTotalSize2, &inc, location, &inc);
-                                    theTotalSize2 += mySize;
-
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=i; j<Isizes[I_j]; j++){
-                                 
-                                    double * location = storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j-i];
-                                    int mySize = Isizes[I_l] - ((i==j)?k:0);
-                                    int inc = 1;
-                                    dcopy_(&mySize, readDump + theTotalSize2, &inc, location, &inc);
-                                    theTotalSize2 += mySize;
-
-                                 }
-                              }
-                           }
-                        }
-                     } else { //Icenter !=0 ; I_i < I_j and I_k != I_l
-                        if (I_i == I_k){
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=i; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                 
-                                    double * location = storage[Icenter][I_i][I_k][i + k*(k+1)/2][j];
-                                    int mySize = Isizes[I_l] - j;
-                                    int inc = 1;
-                                    dcopy_(&mySize, readDump + theTotalSize2, &inc, location, &inc);
-                                    theTotalSize2 += mySize;
-                           
-                                 }
-                              }
-                           }
-                        } else { // I_i < I_k
-                           for (int i=0; i<Isizes[I_i]; i++){
-                              for (int k=0; k<Isizes[I_k]; k++){
-                                 for (int j=0; j<Isizes[I_j]; j++){
-                                 
-                                    double * location = storage[Icenter][I_i][I_k][i + k*Isizes[I_i]][j];
-                                    int mySize = Isizes[I_l];
-                                    int inc = 1;
-                                    dcopy_(&mySize, readDump + theTotalSize2, &inc, location, &inc);
-                                    theTotalSize2 += mySize;
-                           
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   if (theTotalSize != theTotalSize2){ std::cerr << "FourIndex::read : mismatch of theTotalSize and theTotalSize2" << std::endl; }
-   
-   delete [] readDump;
+   std::cout << "FourIndex::read : everything loaded!" << std::endl;
 
 }
 
