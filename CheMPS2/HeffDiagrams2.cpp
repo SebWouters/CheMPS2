@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -416,7 +416,7 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * workspace, double * mem) const{
+void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * workspace) const{
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -452,20 +452,6 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
             
                //no transpose
                double * ptr = Ctensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSR,IRdown);
-               if (denBK->gIrrep(l_alpha)==denBK->gIrrep(l_gamma)){
-               
-                  int size = dimR * dimRdown;
-                  int inc = 1;
-                  dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-                     double factor = 2 * Prob->gMxElement(l_gamma,l_beta,l_alpha,l_beta) - Prob->gMxElement(l_gamma,l_alpha,l_beta,l_beta);
-                     daxpy_(&size,&factor,F0tensors[theindex+1][0][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IRdown),&inc,mem,&inc);
-                  }
-                  
-                  ptr = mem;
-               }
-            
                double * BlockF0 = F0tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,ILdown);
          
                char trans = 'T';
@@ -497,20 +483,6 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
             
                //transpose
                double * ptr = Ctensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSR,IRdown,NR,TwoSR,IR);
-               if (denBK->gIrrep(l_alpha)==denBK->gIrrep(l_gamma)){
-               
-                  int size = dimR * dimRdown;
-                  int inc = 1;
-                  dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-                     double alpha = 2 * Prob->gMxElement(l_alpha,l_beta,l_gamma,l_beta) - Prob->gMxElement(l_alpha,l_gamma,l_beta,l_beta);
-                     daxpy_(&size,&alpha,F0tensors[theindex+1][0][l_beta-theindex-2]->gStorage(NR,TwoSR,IRdown,NR,TwoSR,IR),&inc,mem,&inc);
-                  }
-                  
-                  ptr = mem;
-               }
-            
                double * BlockF0 = F0tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSL,ILdown,NL,TwoSL,IL);
          
                char trans = 'T';
@@ -544,20 +516,6 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
             
                //no transpose
                double * ptr = Ctensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,ILdown);
-               if (denBK->gIrrep(l_beta)==denBK->gIrrep(l_delta)){
-               
-                  int size = dimL * dimLdown;
-                  int inc = 1;
-                  dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                  for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-                     double factor = 2 * Prob->gMxElement(l_alpha,l_delta,l_alpha,l_beta) - Prob->gMxElement(l_alpha,l_alpha,l_delta,l_beta);
-                     daxpy_(&size,&factor,F0tensors[theindex-1][0][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,ILdown),&inc,mem,&inc);
-                  }
-                  
-                  ptr = mem;
-               }
-            
                double * BlockF0 = F0tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IRdown);
          
                char trans = 'T';
@@ -589,20 +547,6 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
             
                //transpose
                double * ptr = Ctensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSL,ILdown,NL,TwoSL,IL);
-               if (denBK->gIrrep(l_beta)==denBK->gIrrep(l_delta)){
-               
-                  int size = dimL * dimLdown;
-                  int inc = 1;
-                  dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                  for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-                     double factor = 2 * Prob->gMxElement(l_alpha,l_beta,l_alpha,l_delta) - Prob->gMxElement(l_alpha,l_alpha,l_beta,l_delta);
-                     daxpy_(&size,&factor,F0tensors[theindex-1][0][theindex-1-l_alpha]->gStorage(NL,TwoSL,ILdown,NL,TwoSL,IL),&inc,mem,&inc);
-                  }
-                  
-                  ptr = mem;
-               }
-            
                double * BlockF0 = F0tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSR,IRdown,NR,TwoSR,IR);
          
                char trans = 'T';
@@ -623,7 +567,7 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * workspace, double * mem) const{
+void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * workspace) const{
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -667,20 +611,6 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             
                         //no transpose
                         double * ptr = Dtensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSRdown,IRdown);
-                        if (denBK->gIrrep(l_alpha)==denBK->gIrrep(l_gamma)){
-                        
-                           int size = dimR * dimRdown;
-                           int inc = 1;
-                           dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                           for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-                              double factor = - Prob->gMxElement(l_gamma,l_alpha,l_beta,l_beta);
-                              daxpy_(&size,&factor,F1tensors[theindex+1][0][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSRdown,IRdown),&inc,mem,&inc);
-                           }
-                           
-                           ptr = mem;
-                        }
-            
                         double * BlockF1 = F1tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSLdown,ILdown);
          
                         char trans = 'T';
@@ -714,20 +644,6 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             
                         //transpose
                         double * ptr = Dtensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSRdown,IRdown,NR,TwoSR,IR);
-                        if (denBK->gIrrep(l_alpha)==denBK->gIrrep(l_gamma)){
-                        
-                           int size = dimR * dimRdown;
-                           int inc = 1;
-                           dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                           for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-                              double alpha = - Prob->gMxElement(l_alpha,l_gamma,l_beta,l_beta);
-                              daxpy_(&size,&alpha,F1tensors[theindex+1][0][l_beta-theindex-2]->gStorage(NR,TwoSRdown,IRdown,NR,TwoSR,IR),&inc,mem,&inc);
-                           }
-                           
-                           ptr = mem;
-                        }
-            
                         double * BlockF1 = F1tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSLdown,ILdown,NL,TwoSL,IL);
          
                         char trans = 'T';
@@ -771,20 +687,6 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             
                         //no transpose
                         double * ptr = Dtensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSLdown,ILdown);
-                        if (denBK->gIrrep(l_beta)==denBK->gIrrep(l_delta)){
-                        
-                           int size = dimL * dimLdown;
-                           int inc = 1;
-                           dcopy_(&size,ptr,&inc,mem,&inc);
-                        
-                           for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-                              double factor = - Prob->gMxElement(l_alpha,l_alpha,l_delta,l_beta);
-                              daxpy_(&size,&factor,F1tensors[theindex-1][0][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSLdown,ILdown),&inc,mem,&inc);
-                           }
-                           
-                           ptr = mem;
-                        }
-            
                         double * BlockF1 = F1tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSRdown,IRdown);
          
                         char trans = 'T';
@@ -818,19 +720,6 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             
                         //transpose
                         double * ptr = Dtensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSLdown,ILdown,NL,TwoSL,IL);
-                        if (denBK->gIrrep(l_beta)==denBK->gIrrep(l_delta)){
-                           int size = dimL * dimLdown;
-                           int inc = 1;
-                           dcopy_(&size,ptr,&inc,mem,&inc);
-               
-                           for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-                              double factor = - Prob->gMxElement(l_alpha,l_alpha,l_beta,l_delta);
-                              daxpy_(&size,&factor,F1tensors[theindex-1][0][theindex-1-l_alpha]->gStorage(NL,TwoSLdown,ILdown,NL,TwoSL,IL),&inc,mem,&inc);
-                           }
-                           
-                           ptr = mem;
-                        }
-            
                         double * BlockF1 = F1tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSRdown,IRdown,NR,TwoSR,IR);
          
                         char trans = 'T';
@@ -1185,7 +1074,7 @@ void CheMPS2::Heff::addDiagram2f1and2f2(const int ikappa, double * memS, double 
    
 }
 
-void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1200,31 +1089,20 @@ void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double *
       int dimL     = denBK->gCurrentDim(theindex,  NL,               TwoSL,               IL);
       int dimR     = denBK->gCurrentDim(theindex+2,denS->gNR(ikappa),denS->gTwoSR(ikappa),denS->gIR(ikappa));
       
-      int size = dimL*dimL;
-      int inc = 1;
       double * Cblock = Ctensor->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-      dcopy_(&size,Cblock,&inc,workmem,&inc);
-      
-      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-      
-         double * F0block = F0tensors[theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-         double factor = 2 * Prob->gMxElement(l_alpha,theindex,l_alpha,theindex) - Prob->gMxElement(l_alpha,l_alpha,theindex,theindex);
-         daxpy_(&size,&factor,F0block,&inc,workmem,&inc);
-      
-      }
-      
+
       char trans = 'T';
       char notrans = 'N';
       double alpha = ((N1==2)?1.0:0.5)*sqrt(2.0);
       double beta = 1.0;
             
-      dgemm_(&trans,&notrans,&dimL,&dimR,&dimL,&alpha,workmem,&dimL,memS+denS->gKappa2index(ikappa),&dimL,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+      dgemm_(&trans,&notrans,&dimL,&dimR,&dimL,&alpha,Cblock,&dimL,memS+denS->gKappa2index(ikappa),&dimL,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
 
    }
    
 }
 
-void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1239,31 +1117,20 @@ void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double *
       int dimL     = denBK->gCurrentDim(theindex,  NL,               TwoSL,               IL);
       int dimR     = denBK->gCurrentDim(theindex+2,denS->gNR(ikappa),denS->gTwoSR(ikappa),denS->gIR(ikappa));
       
-      int size = dimL*dimL;
-      int inc = 1;
       double * Cblock = Ctensor->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-      dcopy_(&size,Cblock,&inc,workmem,&inc);
-      
-      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-      
-         double * F0block = F0tensors[theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-         double factor = 2 * Prob->gMxElement(l_alpha,theindex+1,l_alpha,theindex+1) - Prob->gMxElement(l_alpha,l_alpha,theindex+1,theindex+1);
-         daxpy_(&size,&factor,F0block,&inc,workmem,&inc);
-      
-      }
-      
+
       char trans = 'T';
       char notrans = 'N';
       double alpha = ((N2==2)?1.0:0.5)*sqrt(2.0);
       double beta = 1.0;
             
-      dgemm_(&trans,&notrans,&dimL,&dimR,&dimL,&alpha,workmem,&dimL,memS+denS->gKappa2index(ikappa),&dimL,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+      dgemm_(&trans,&notrans,&dimL,&dimR,&dimL,&alpha,Cblock,&dimL,memS+denS->gKappa2index(ikappa),&dimL,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
 
    }
    
 }
 
-void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1277,31 +1144,20 @@ void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double *
       
       int dimR     = denBK->gCurrentDim(theindex+2,NR,               TwoSR,               IR);
       int dimL     = denBK->gCurrentDim(theindex  ,denS->gNL(ikappa),denS->gTwoSL(ikappa),denS->gIL(ikappa));
-      
-      int size = dimR*dimR;
-      int inc = 1;
+
       double * Cblock = Ctensor->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-      dcopy_(&size,Cblock,&inc,workmem,&inc);
-      
-      for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-      
-         double * F0block = F0tensors[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-         double factor = 2 * Prob->gMxElement(theindex,l_beta,theindex,l_beta) - Prob->gMxElement(theindex,theindex,l_beta,l_beta);
-         daxpy_(&size,&factor,F0block,&inc,workmem,&inc);
-      
-      }
-      
+
       char notrans = 'N';
       double alpha = ((N1==2)?1.0:0.5)*sqrt(2.0);
       double beta = 1.0;
             
-      dgemm_(&notrans,&notrans,&dimL,&dimR,&dimR,&alpha,memS+denS->gKappa2index(ikappa),&dimL,workmem,&dimR,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+      dgemm_(&notrans,&notrans,&dimL,&dimR,&dimR,&alpha,memS+denS->gKappa2index(ikappa),&dimL,Cblock,&dimR,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
 
    }
    
 }
 
-void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1316,30 +1172,19 @@ void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double *
       int dimR     = denBK->gCurrentDim(theindex+2,NR,               TwoSR,               IR);
       int dimL     = denBK->gCurrentDim(theindex  ,denS->gNL(ikappa),denS->gTwoSL(ikappa),denS->gIL(ikappa));
       
-      int size = dimR*dimR;
-      int inc = 1;
       double * Cblock = Ctensor->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-      dcopy_(&size,Cblock,&inc,workmem,&inc);
-      
-      for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-      
-         double * F0block = F0tensors[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-         double factor = 2 * Prob->gMxElement(theindex+1,l_beta,theindex+1,l_beta) - Prob->gMxElement(theindex+1,theindex+1,l_beta,l_beta);
-         daxpy_(&size,&factor,F0block,&inc,workmem,&inc);
-      
-      }
       
       char notrans = 'N';
       double alpha = ((N2==2)?1.0:0.5)*sqrt(2.0);
       double beta = 1.0;
             
-      dgemm_(&notrans,&notrans,&dimL,&dimR,&dimR,&alpha,memS+denS->gKappa2index(ikappa),&dimL,workmem,&dimR,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+      dgemm_(&notrans,&notrans,&dimL,&dimR,&dimR,&alpha,memS+denS->gKappa2index(ikappa),&dimL,Cblock,&dimR,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
 
    }
    
 }
 
-void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1365,19 +1210,8 @@ void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double *
          
          if (dimLdown>0){
          
-            int size = dimLup * dimLdown;
-            int inc = 1;
             double * Dblock = Dtensor->gStorage(NL,TwoSLdown,IL,NL,TwoSL,IL);
-            dcopy_(&size,Dblock,&inc,workmem,&inc);
-         
-            for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-      
-               double * F1block = F1tensors[theindex-1-l_alpha]->gStorage(NL,TwoSLdown,IL,NL,TwoSL,IL);
-               double factor = - Prob->gMxElement(l_alpha,l_alpha,theindex,theindex);
-               daxpy_(&size,&factor,F1block,&inc,workmem,&inc);
-      
-            }
-            
+
             int TwoS2 = (N2==1)?1:0;
             int TwoJstart = ((TwoSR!=TwoSLdown) || (TwoS2==0)) ? 1 + TwoS2 : 0;
             for (int TwoJdown=TwoJstart; TwoJdown<=1+TwoS2; TwoJdown+=2){
@@ -1393,7 +1227,7 @@ void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double *
                      char notra = 'N';
                      double beta = 1.0;
                
-                     dgemm_(&trans,&notra,&dimLup,&dimR,&dimLdown,&alpha,workmem,&dimLdown,memS+denS->gKappa2index(memSkappa),&dimLdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimLup);
+                     dgemm_(&trans,&notra,&dimLup,&dimR,&dimLdown,&alpha,Dblock,&dimLdown,memS+denS->gKappa2index(memSkappa),&dimLdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimLup);
             
                   }
                }
@@ -1404,7 +1238,7 @@ void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1430,18 +1264,7 @@ void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double *
          
          if (dimLdown>0){
          
-            int size = dimLup * dimLdown;
-            int inc = 1;
             double * Dblock = Dtensor->gStorage(NL,TwoSLdown,IL,NL,TwoSL,IL);
-            dcopy_(&size,Dblock,&inc,workmem,&inc);
-         
-            for (int l_alpha=0; l_alpha<theindex; l_alpha++){
-      
-               double * F1block = F1tensors[theindex-1-l_alpha]->gStorage(NL,TwoSLdown,IL,NL,TwoSL,IL);
-               double factor = - Prob->gMxElement(l_alpha,l_alpha,theindex+1,theindex+1);
-               daxpy_(&size,&factor,F1block,&inc,workmem,&inc);
-      
-            }
             
             int TwoS1 = (N1==1)?1:0;
             int TwoJstart = ((TwoSR!=TwoSLdown) || (TwoS1==0)) ? 1 + TwoS1 : 0;
@@ -1458,7 +1281,7 @@ void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double *
                      char notra = 'N';
                      double beta = 1.0;
                
-                     dgemm_(&trans,&notra,&dimLup,&dimR,&dimLdown,&alpha,workmem,&dimLdown,memS+denS->gKappa2index(memSkappa),&dimLdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimLup);
+                     dgemm_(&trans,&notra,&dimLup,&dimR,&dimLdown,&alpha,Dblock,&dimLdown,memS+denS->gKappa2index(memSkappa),&dimLdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimLup);
                      
                   }
                }
@@ -1469,7 +1292,7 @@ void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1494,19 +1317,8 @@ void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double *
          int dimRdown = denBK->gCurrentDim(theindex+2, NR, TwoSRdown, IR);
          
          if (dimRdown>0){
-         
-            int size = dimRup * dimRdown;
-            int inc = 1;
+
             double * Dblock = Dtensor->gStorage(NR,TwoSRdown,IR,NR,TwoSR,IR);
-            dcopy_(&size,Dblock,&inc,workmem,&inc);
-         
-            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-      
-               double * F1block = F1tensors[l_beta-theindex-2]->gStorage(NR,TwoSRdown,IR,NR,TwoSR,IR);
-               double factor = - Prob->gMxElement(theindex,theindex,l_beta,l_beta);
-               daxpy_(&size,&factor,F1block,&inc,workmem,&inc);
-      
-            }
             
             int TwoS2 = (N2==1)?1:0;
             int TwoJstart = ((TwoSRdown!=TwoSL) || (TwoS2==0)) ? 1 + TwoS2 : 0;
@@ -1522,7 +1334,7 @@ void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double *
                      char notr = 'N';
                      double beta = 1.0;
                
-                     dgemm_(&notr,&notr,&dimL,&dimRup,&dimRdown,&alpha,memS+denS->gKappa2index(memSkappa),&dimL,workmem,&dimRdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+                     dgemm_(&notr,&notr,&dimL,&dimRup,&dimRdown,&alpha,memS+denS->gKappa2index(memSkappa),&dimL,Dblock,&dimRdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
                      
                   }
                }
@@ -1533,7 +1345,7 @@ void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const{
+void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1559,18 +1371,7 @@ void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double *
          
          if (dimRdown>0){
          
-            int size = dimRup * dimRdown;
-            int inc = 1;
             double * Dblock = Dtensor->gStorage(NR,TwoSRdown,IR,NR,TwoSR,IR);
-            dcopy_(&size,Dblock,&inc,workmem,&inc);
-         
-            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
-      
-               double * F1block = F1tensors[l_beta-theindex-2]->gStorage(NR,TwoSRdown,IR,NR,TwoSR,IR);
-               double factor = - Prob->gMxElement(theindex+1,theindex+1,l_beta,l_beta);
-               daxpy_(&size,&factor,F1block,&inc,workmem,&inc);
-      
-            }
             
             int TwoS1 = (N1==1)?1:0;
             int TwoJstart = ((TwoSRdown!=TwoSL) || (TwoS1==0)) ? 1 + TwoS1 : 0;
@@ -1586,7 +1387,7 @@ void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double *
                      char notr = 'N';
                      double beta = 1.0;
                
-                     dgemm_(&notr,&notr,&dimL,&dimRup,&dimRdown,&alpha,memS+denS->gKappa2index(memSkappa),&dimL,workmem,&dimRdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
+                     dgemm_(&notr,&notr,&dimL,&dimRup,&dimRdown,&alpha,memS+denS->gKappa2index(memSkappa),&dimL,Dblock,&dimRdown,&beta,memHeff+denS->gKappa2index(ikappa),&dimL);
                      
                   }
                }

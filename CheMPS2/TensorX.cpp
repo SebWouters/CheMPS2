@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ void CheMPS2::TensorX::update(TensorT * denT){
 
 }
 
-void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorF0 ** F0tensors, TensorD * Dtensor, TensorF1 ** F1tensors){
+void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorD * Dtensor){
 
    if (movingRight){
       //PARALLEL
@@ -65,8 +65,8 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
             addTermXRight(ikappa, denT, Xtensor, workmemLR);
             addTermQLRight(ikappa, denT, Ltensors, Qtensor, workmemRR, workmemLR, workmemLL);
             addTermARight(ikappa, denT, Atensor, workmemRR, workmemLR);
-            addTermCF0Right(ikappa, denT, Ctensor, F0tensors, workmemLL, workmemLR);
-            addTermDF1Right(ikappa, denT, Dtensor, F1tensors, workmemLL, workmemLR);
+            addTermCRight(ikappa, denT, Ctensor, workmemLR);
+            addTermDRight(ikappa, denT, Dtensor, workmemLR);
             delete [] workmemLL;
             delete [] workmemLR;
             delete [] workmemRR;
@@ -86,8 +86,8 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
             addTermXLeft(ikappa, denT, Xtensor, workmemLR);
             addTermQLLeft(ikappa, denT, Ltensors, Qtensor, workmemLL, workmemLR, workmemRR);
             addTermALeft(ikappa, denT, Atensor, workmemLR, workmemLL);
-            addTermCF0Left(ikappa, denT, Ctensor, F0tensors, workmemRR, workmemLR);
-            addTermDF1Left(ikappa, denT, Dtensor, F1tensors, workmemRR, workmemLR);
+            addTermCLeft(ikappa, denT, Ctensor, workmemLR);
+            addTermDLeft(ikappa, denT, Dtensor, workmemLR);
             delete [] workmemLL;
             delete [] workmemLR;
             delete [] workmemRR;
@@ -520,7 +520,7 @@ void CheMPS2::TensorX::addTermALeft(const int ikappa, TensorT * denT, TensorA * 
 
 }
 
-void CheMPS2::TensorX::addTermCF0Right(const int ikappa, TensorT * denT, TensorC * denC, TensorF0 ** deF0s, double * workmemLL, double * workmemLR){
+void CheMPS2::TensorX::addTermCRight(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR){
 
    int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    for (int geval=0; geval<3; geval++){
@@ -545,25 +545,13 @@ void CheMPS2::TensorX::addTermCF0Right(const int ikappa, TensorT * denT, TensorC
       int dimL = denBK->gCurrentDim(index-1,NL,TwoSL,IL);
       if (dimL>0){
       
-         int dimLsq = dimL * dimL;
          double * BlockC = denC->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-         int inc = 1;
-         dcopy_(&dimLsq,BlockC,&inc,workmemLL,&inc);
-         
-         for (int loca=0; loca<index-1; loca++){
-         
-            double alpha = 2*Prob->gMxElement(loca,index-1,loca,index-1) - Prob->gMxElement(loca,loca,index-1,index-1);
-            double * BlockF0 = deF0s[index-2-loca]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-            daxpy_(&dimLsq,&alpha,BlockF0,&inc,workmemLL,&inc);
-         
-         }
-         
          double * BlockT = denT->gStorage(NL,TwoSL,IL,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
 
          double factor = (geval<2)?sqrt(0.5):sqrt(2.0);
          double beta = 0.0; //set
          char totrans = 'T';
-         dgemm_(&totrans, &totrans, &dimR, &dimL, &dimL, &factor, BlockT, &dimL, workmemLL, &dimL, &beta, workmemLR, &dimR);
+         dgemm_(&totrans, &totrans, &dimR, &dimL, &dimL, &factor, BlockT, &dimL, BlockC, &dimL, &beta, workmemLR, &dimR);
          
          totrans = 'N';
          factor = 1.0;
@@ -575,7 +563,7 @@ void CheMPS2::TensorX::addTermCF0Right(const int ikappa, TensorT * denT, TensorC
 
 }
 
-void CheMPS2::TensorX::addTermCF0Left(const int ikappa, TensorT * denT, TensorC * denC, TensorF0 ** deF0s, double * workmemRR, double * workmemLR){
+void CheMPS2::TensorX::addTermCLeft(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR){
 
    int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    for (int geval=0; geval<3; geval++){
@@ -600,26 +588,14 @@ void CheMPS2::TensorX::addTermCF0Left(const int ikappa, TensorT * denT, TensorC 
       int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
       if (dimR>0){
       
-         int dimRsq = dimR * dimR;
          double * BlockC = denC->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-         int inc = 1;
-         dcopy_(&dimRsq,BlockC,&inc,workmemRR,&inc);
-         
-         for (int loca=index+1; loca<Prob->gL(); loca++){
-         
-            double alpha = 2*Prob->gMxElement(index,loca,index,loca) - Prob->gMxElement(index,index,loca,loca);
-            double * BlockF0 = deF0s[loca-index-1]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-            daxpy_(&dimRsq,&alpha,BlockF0,&inc,workmemRR,&inc);
-         
-         }
-         
          double * BlockT = denT->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa],NR,TwoSR,IR);
 
          double factor = (geval<2)?(sqrt(0.5)*(TwoSR+1.0)/(sectorTwoS1[ikappa]+1.0)):sqrt(2.0);
          double beta = 0.0; //set
          char trans = 'T';
          char notr = 'N';
-         dgemm_(&notr, &trans, &dimL, &dimR, &dimR, &factor, BlockT, &dimL, workmemRR, &dimR, &beta, workmemLR, &dimL);
+         dgemm_(&notr, &trans, &dimL, &dimR, &dimR, &factor, BlockT, &dimL, BlockC, &dimR, &beta, workmemLR, &dimL);
          
          factor = 1.0;
          beta = 1.0; //add
@@ -630,7 +606,7 @@ void CheMPS2::TensorX::addTermCF0Left(const int ikappa, TensorT * denT, TensorC 
 
 }
 
-void CheMPS2::TensorX::addTermDF1Right(const int ikappa, TensorT * denT, TensorD * denD, TensorF1 ** deF1s, double * workmemLL, double * workmemLR){
+void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR){
 
    int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    
@@ -663,19 +639,7 @@ void CheMPS2::TensorX::addTermDF1Right(const int ikappa, TensorT * denT, TensorD
       
       if ((dimLup>0) && (dimLdown>0)){
       
-         int dimLsq = dimLup * dimLdown;
          double * BlockD = denD->gStorage(NL,TwoSLdown,IL,NL,TwoSLup,IL);
-         int inc = 1;
-         dcopy_(&dimLsq,BlockD,&inc,workmemLL,&inc);
-         
-         for (int loca=0; loca<index-1; loca++){
-         
-            double alpha = - Prob->gMxElement(loca,loca,index-1,index-1);
-            double * BlockF1 = deF1s[index-2-loca]->gStorage(NL,TwoSLdown,IL,NL,TwoSLup,IL);
-            daxpy_(&dimLsq,&alpha,BlockF1,&inc,workmemLL,&inc);
-         
-         }
-         
          double * BlockTup   = denT->gStorage(NL,TwoSLup,  IL,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
          double * BlockTdown = (TwoSLup==TwoSLdown)? BlockTup : denT->gStorage(NL,TwoSLdown,IL,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
          
@@ -683,7 +647,7 @@ void CheMPS2::TensorX::addTermDF1Right(const int ikappa, TensorT * denT, TensorD
          double factor = fase * sqrt(3.0 * (TwoSLup+1)) * gsl_sf_coupling_6j(1,1,2,TwoSLup,TwoSLdown,sectorTwoS1[ikappa]);
          double beta = 0.0; //set
          char totrans = 'T';
-         dgemm_(&totrans, &totrans, &dimR, &dimLdown, &dimLup, &factor, BlockTup, &dimLup, workmemLL, &dimLdown, &beta, workmemLR, &dimR);
+         dgemm_(&totrans, &totrans, &dimR, &dimLdown, &dimLup, &factor, BlockTup, &dimLup, BlockD, &dimLdown, &beta, workmemLR, &dimR);
          
          totrans = 'N';
          factor = 1.0;
@@ -695,7 +659,7 @@ void CheMPS2::TensorX::addTermDF1Right(const int ikappa, TensorT * denT, TensorD
 
 }
 
-void CheMPS2::TensorX::addTermDF1Left(const int ikappa, TensorT * denT, TensorD * denD, TensorF1 ** deF1s, double * workmemRR, double * workmemLR){
+void CheMPS2::TensorX::addTermDLeft(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR){
 
    int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    
@@ -728,19 +692,7 @@ void CheMPS2::TensorX::addTermDF1Left(const int ikappa, TensorT * denT, TensorD 
       
       if ((dimRup>0) && (dimRdown>0)){
       
-         int dimRsq = dimRup * dimRdown;
          double * BlockD = denD->gStorage(NR,TwoSRdown,IR,NR,TwoSRup,IR);
-         int inc = 1;
-         dcopy_(&dimRsq,BlockD,&inc,workmemRR,&inc);
-         
-         for (int loca=index+1; loca<Prob->gL(); loca++){
-         
-            double alpha = - Prob->gMxElement(index,index,loca,loca);
-            double * BlockF1 = deF1s[loca-index-1]->gStorage(NR,TwoSRdown,IR,NR,TwoSRup,IR);
-            daxpy_(&dimRsq,&alpha,BlockF1,&inc,workmemRR,&inc);
-         
-         }
-         
          double * BlockTup   = denT->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa],NR,TwoSRup,IR);
          double * BlockTdown = (TwoSRup == TwoSRdown)? BlockTup : denT->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa],NR,TwoSRdown,IR);
          
@@ -749,7 +701,7 @@ void CheMPS2::TensorX::addTermDF1Left(const int ikappa, TensorT * denT, TensorD 
          double beta = 0.0; //set
          char trans = 'T';
          char notr = 'N';
-         dgemm_(&notr, &trans, &dimL, &dimRdown, &dimRup, &factor, BlockTup, &dimL, workmemRR, &dimRdown, &beta, workmemLR, &dimL);
+         dgemm_(&notr, &trans, &dimL, &dimRdown, &dimRup, &factor, BlockTup, &dimL, BlockD, &dimRdown, &beta, workmemLR, &dimL);
          
          factor = 1.0;
          beta = 1.0; //add

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -589,14 +589,14 @@ void CheMPS2::TensorQ::AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * 
 
 }
 
-void CheMPS2::TensorQ::AddTermsCF0DF1(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCD(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
 
-   if (movingRight){ AddTermsCF0DF1Right(denC, deF0s, denD, deF1s, denT, workmem, workmem2); }
-   else{ AddTermsCF0DF1Left(denC, deF0s, denD, deF1s, denT, workmem, workmem2); }
+   if (movingRight){ AddTermsCDRight(denC, denD, denT, workmem, workmem2); }
+   else{ AddTermsCDLeft(denC, denD, denT, workmem, workmem2); }
    
 }
 
-void CheMPS2::TensorQ::AddTermsCF0DF1Right(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int IRD  = denBK->directProd(sectorI1[ikappa],Idiff);
@@ -619,43 +619,12 @@ void CheMPS2::TensorQ::AddTermsCF0DF1Right(TensorC * denC, TensorF0 ** deF0s, Te
             double * block = denD->gStorage( sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], TwoSLD, ILD );
             for (int cnt=0; cnt<dimLUxLD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
-            //add possible F1's
-            if (Idiff==denBK->gIrrep(index-1)){
-               fase = ((((TwoSLD - sectorTwoS1[ikappa])/2)%2)!=0)?-1:1;
-               factor *= fase * sqrt((sectorTwoS1[ikappa]+1.0) / (TwoSLD+1.0));
-               for (int loca=0; loca<index-1; loca++){
-                  block = deF1s[index-2-loca]->gStorage( sectorN1[ikappa], TwoSLD, ILD, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa] );
-                  const double alpha = - factor * Prob->gMxElement(loca,loca,index-1,site);
-                  for (int irow=0; irow<dimLU; irow++){
-                     for (int icol=0; icol<dimLD; icol++){
-                        workmem[irow + dimLU * icol] += alpha * block[icol + dimLD * irow];
-                     }
-                  }
-               }
-            }
-            
-            //add C and F0's
+            //add C
             if (TwoSLD==sectorTwoS1[ikappa]){
-            
-               //C
                factor = sqrt(0.5);
                block = denC->gStorage( sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], TwoSLD, ILD );
                int inc = 1;
                daxpy_(&dimLUxLD, &factor, block, &inc, workmem, &inc);
-               
-               //F0
-               if (Idiff==denBK->gIrrep(index-1)){
-                  for (int loca=0; loca<index-1; loca++){
-                     block = deF0s[index-2-loca]->gStorage( sectorN1[ikappa], TwoSLD, ILD, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa] );
-                     const double alpha = factor * ( 2*Prob->gMxElement(loca,index-1,loca,site) - Prob->gMxElement(loca,loca,index-1,site) );
-                     for (int irow=0; irow<dimLU; irow++){
-                        for (int icol=0; icol<dimLD; icol++){
-                           workmem[irow + dimLU * icol] += alpha * block[icol + dimLD * irow];
-                        }
-                     }
-                  }
-               }
-            
             }
             
             double * BlockTup = denT->gStorage( sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa] );
@@ -688,44 +657,13 @@ void CheMPS2::TensorQ::AddTermsCF0DF1Right(TensorC * denC, TensorF0 ** deF0s, Te
             double * block = denD->gStorage( sectorN1[ikappa]-1, TwoSLU, ILU, sectorN1[ikappa]-1, sectorTwoSD[ikappa], IRD );
             for (int cnt=0; cnt<dimLUxLD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
-            //add possible F1's
-            if (Idiff==denBK->gIrrep(index-1)){
-               fase = ((((TwoSLU - sectorTwoSD[ikappa])/2)%2)!=0)?-1:1;
-               factor *= fase * sqrt((TwoSLU+1.0) / (sectorTwoSD[ikappa]+1.0));
-               for (int loca=0; loca<index-1; loca++){
-                  block = deF1s[index-2-loca]->gStorage( sectorN1[ikappa]-1, sectorTwoSD[ikappa], IRD, sectorN1[ikappa]-1, TwoSLU, ILU );
-                  const double alpha = - factor * Prob->gMxElement(loca,loca,index-1,site);
-                  for (int irow=0; irow<dimLU; irow++){
-                     for (int icol=0; icol<dimLD; icol++){
-                        workmem[irow + dimLU * icol] += alpha * block[icol + dimLD * irow];
-                     }
-                  }
-               }
-            }
-            
-            //add C and F0's
+            //add C
             if (TwoSLU==sectorTwoSD[ikappa]){
-            
-               //C
                fase = ((((sectorTwoSD[ikappa]+1-sectorTwoS1[ikappa])/2)%2)!=0)?-1:1;
                factor = fase * sqrt(0.5 * ( sectorTwoS1[ikappa]+1.0 ) / ( sectorTwoSD[ikappa] + 1.0 ) );
                block = denC->gStorage( sectorN1[ikappa]-1, TwoSLU, ILU, sectorN1[ikappa]-1, sectorTwoSD[ikappa], IRD );
                int inc = 1;
                daxpy_(&dimLUxLD, &factor, block, &inc, workmem, &inc);
-               
-               //F0
-               if (Idiff==denBK->gIrrep(index-1)){
-                  for (int loca=0; loca<index-1; loca++){
-                     block = deF0s[index-2-loca]->gStorage( sectorN1[ikappa]-1, sectorTwoSD[ikappa], IRD, sectorN1[ikappa]-1, TwoSLU, ILU );
-                     const double alpha = factor * ( 2*Prob->gMxElement(loca,index-1,loca,site) - Prob->gMxElement(loca,loca,index-1,site) );
-                     for (int irow=0; irow<dimLU; irow++){
-                        for (int icol=0; icol<dimLD; icol++){
-                           workmem[irow + dimLU * icol] += alpha * block[icol + dimLD * irow];
-                        }
-                     }
-                  }
-               }
-            
             }
             
             double * BlockTup = denT->gStorage( sectorN1[ikappa]-1, TwoSLU, ILU, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa] );
@@ -745,7 +683,7 @@ void CheMPS2::TensorQ::AddTermsCF0DF1Right(TensorC * denC, TensorF0 ** deF0s, Te
 
 }
 
-void CheMPS2::TensorQ::AddTermsCF0DF1Left(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int ILD  = denBK->directProd(sectorI1[ikappa],Idiff);
@@ -768,43 +706,12 @@ void CheMPS2::TensorQ::AddTermsCF0DF1Left(TensorC * denC, TensorF0 ** deF0s, Ten
             double * block = denD->gStorage( sectorN1[ikappa]+1, TwoSRU, IRU, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD );
             for (int cnt=0; cnt<dimRUxRD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
-            //add possible F1's
-            if (Idiff==denBK->gIrrep(index)){
-               fase = ((((TwoSRU-sectorTwoSD[ikappa])/2)%2)!=0)?-1:1;
-               factor *= fase * sqrt((sectorTwoSD[ikappa]+1.0) / (TwoSRU+1.0));
-               for (int loca=index+1; loca<Prob->gL(); loca++){
-                  block = deF1s[loca-index-1]->gStorage( sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD, sectorN1[ikappa]+1, TwoSRU, IRU );
-                  const double alpha = - factor * Prob->gMxElement(site,index,loca,loca);
-                  for (int irow=0; irow<dimRU; irow++){
-                     for (int icol=0; icol<dimRD; icol++){
-                        workmem[irow + dimRU * icol] += alpha * block[icol + dimRD * irow];
-                     }
-                  }
-               }
-            }
-            
-            //add C and F0's
+            //add C
             if (TwoSRU==sectorTwoSD[ikappa]){
-            
-               //C
                factor = sqrt(0.5);
                block = denC->gStorage( sectorN1[ikappa]+1, TwoSRU, IRU, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD );
                int inc = 1;
                daxpy_(&dimRUxRD, &factor, block, &inc, workmem, &inc);
-               
-               //F0
-               if (Idiff==denBK->gIrrep(index)){
-                  for (int loca=index+1; loca<Prob->gL(); loca++){
-                     block = deF0s[loca-index-1]->gStorage( sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD, sectorN1[ikappa]+1, TwoSRU, IRU );
-                     const double alpha = factor * ( 2*Prob->gMxElement(site,loca,index,loca) - Prob->gMxElement(site,index,loca,loca) );
-                     for (int irow=0; irow<dimRU; irow++){
-                        for (int icol=0; icol<dimRD; icol++){
-                           workmem[irow + dimRU * icol] += alpha * block[icol + dimRD * irow];
-                        }
-                     }
-                  }
-               }
-            
             }
             
             double * BlockTup = denT->gStorage( sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+1, TwoSRU, IRU );
@@ -837,44 +744,13 @@ void CheMPS2::TensorQ::AddTermsCF0DF1Left(TensorC * denC, TensorF0 ** deF0s, Ten
             double * block = denD->gStorage( sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+2, TwoSRD, IRD );
             for (int cnt=0; cnt<dimRUxRD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
-            //add possible F1's
-            if (Idiff==denBK->gIrrep(index)){
-               fase = ((((TwoSRD - sectorTwoS1[ikappa])/2)%2)!=0)?-1:1;
-               factor *= fase * sqrt((TwoSRD+1.0) / (sectorTwoS1[ikappa]+1.0));
-               for (int loca=index+1; loca<Prob->gL(); loca++){
-                  block = deF1s[loca-index-1]->gStorage( sectorN1[ikappa]+2, TwoSRD, IRD, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa] );
-                  const double alpha = - factor * Prob->gMxElement(site,index,loca,loca);
-                  for (int irow=0; irow<dimRU; irow++){
-                     for (int icol=0; icol<dimRD; icol++){
-                        workmem[irow + dimRU * icol] += alpha * block[icol + dimRD * irow];
-                     }
-                  }
-               }
-            }
-            
-            //add C and F0's
+            //add C
             if (TwoSRD==sectorTwoS1[ikappa]){
-            
-               //C
                fase = ((((sectorTwoS1[ikappa]+1-sectorTwoSD[ikappa])/2)%2)!=0)?-1:1;
                factor = fase * sqrt(0.5 * ( sectorTwoS1[ikappa]+1.0 ) / ( sectorTwoSD[ikappa] + 1.0 ) );
                block = denC->gStorage( sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+2, TwoSRD, IRD );
                int inc = 1;
                daxpy_(&dimRUxRD, &factor, block, &inc, workmem, &inc);
-               
-               //F0
-               if (Idiff==denBK->gIrrep(index)){
-                  for (int loca=index+1; loca<Prob->gL(); loca++){
-                     block = deF0s[loca-index-1]->gStorage( sectorN1[ikappa]+2, TwoSRD, IRD, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa] );
-                     const double alpha = factor * ( 2*Prob->gMxElement(site,loca,index,loca) - Prob->gMxElement(site,index,loca,loca) );
-                     for (int irow=0; irow<dimRU; irow++){
-                        for (int icol=0; icol<dimRD; icol++){
-                           workmem[irow + dimRU * icol] += alpha * block[icol + dimRD * irow];
-                        }
-                     }
-                  }
-               }
-            
             }
             
             double * BlockTup = denT->gStorage( sectorN1[ikappa],  sectorTwoS1[ikappa],sectorI1[ikappa],sectorN1[ikappa]+2,sectorTwoS1[ikappa],sectorI1[ikappa] );

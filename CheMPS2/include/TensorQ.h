@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -78,13 +78,11 @@ namespace CheMPS2{
          
          //! Add terms after update/clear with previous TensorC's, TensorD's, TensorF0's, TensorF1's
          /** \param denC The TensorC to construct the Q-term
-             \param deF0s The TensorF0's to construct this Q-term
              \param denD The TensorD to construct the Q-term
-             \param deF1s The TensorF1's to construct this Q-term
              \param denT TensorT to construct the Q-term with previous TensorL's
              \param workmem Work memory
              \param workmem2 Work memory */
-         void AddTermsCF0DF1(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCD(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
          
       private:
       
@@ -101,8 +99,8 @@ namespace CheMPS2{
          void AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double * workmem, double * workmem2);
          void AddTermsABRight(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2);
          void AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsCF0DF1Right(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsCF0DF1Left(TensorC * denC, TensorF0 ** deF0s, TensorD * denD, TensorF1 ** deF1s, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
          
    };
 }

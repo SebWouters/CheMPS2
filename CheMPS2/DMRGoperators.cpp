@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -260,24 +260,25 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
             if ((cnt2==0) && (num==0)) alpha *= 0.5;
             if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
             Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
-               
+
+            alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+            Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+            
+            alpha = - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+            Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+            
             if (num>0){
                if (cnt2>0){
                   alpha = Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt3+cnt2) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
                   Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
                }
-
-               alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-               Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+               
                alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
                Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
                
-               alpha = - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-               Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
                alpha = - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
                Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
             }
-                  
          }
       }
    }
@@ -295,7 +296,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
          Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
          Qtensors[index][cnt2]->AddTermsL(Ltensors[index-1],MPS[index], workmem, workmem2);
          Qtensors[index][cnt2]->AddTermsAB(Atensors[index-1][cnt2+1][0], Btensors[index-1][cnt2+1][0], MPS[index], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsCF0DF1(Ctensors[index-1][cnt2+1][0],F0tensors[index-1][0],Dtensors[index-1][cnt2+1][0],F1tensors[index-1][0],MPS[index], workmem, workmem2);
+         Qtensors[index][cnt2]->AddTermsCD(Ctensors[index-1][cnt2+1][0], Dtensors[index-1][cnt2+1][0], MPS[index], workmem, workmem2);
          delete [] workmem;
          delete [] workmem2;
       }
@@ -305,7 +306,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
    if (index==0){
       Xtensors[index]->update(MPS[index]);
    } else {
-      Xtensors[index]->update(MPS[index], Ltensors[index-1], Xtensors[index-1], Qtensors[index-1][0], Atensors[index-1][0][0], Ctensors[index-1][0][0], F0tensors[index-1][0], Dtensors[index-1][0][0], F1tensors[index-1][0]);
+      Xtensors[index]->update(MPS[index], Ltensors[index-1], Xtensors[index-1], Qtensors[index-1][0], Atensors[index-1][0][0], Ctensors[index-1][0][0], Dtensors[index-1][0][0]);
    }
    
    //Otensors
@@ -396,23 +397,25 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
             if ((cnt2==0) && (num==0)) alpha *= 0.5;
             if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
             Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
-               
+            
+            alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+            Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+            
+            alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+            Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+            
             if (num>0){
                if (cnt2>0){
                   alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
                   Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
                }
-               alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-               Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+               
                alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
                Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
-                  
-               alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-               Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+               
                alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
                Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
             }
-               
          }
       }
    }
@@ -430,7 +433,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
          Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
          Qtensors[index][cnt2]->AddTermsL(Ltensors[index+1],MPS[index+1], workmem, workmem2);
          Qtensors[index][cnt2]->AddTermsAB(Atensors[index+1][cnt2+1][0], Btensors[index+1][cnt2+1][0], MPS[index+1], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsCF0DF1(Ctensors[index+1][cnt2+1][0],F0tensors[index+1][0],Dtensors[index+1][cnt2+1][0],F1tensors[index+1][0],MPS[index+1], workmem, workmem2);
+         Qtensors[index][cnt2]->AddTermsCD(Ctensors[index+1][cnt2+1][0], Dtensors[index+1][cnt2+1][0], MPS[index+1], workmem, workmem2);
          delete [] workmem;
          delete [] workmem2;
       }
@@ -440,7 +443,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
    if (index==Prob->gL()-2){
       Xtensors[index]->update(MPS[index+1]);
    } else {
-      Xtensors[index]->update(MPS[index+1], Ltensors[index+1], Xtensors[index+1], Qtensors[index+1][0], Atensors[index+1][0][0], Ctensors[index+1][0][0], F0tensors[index+1][0], Dtensors[index+1][0][0], F1tensors[index+1][0]);
+      Xtensors[index]->update(MPS[index+1], Ltensors[index+1], Xtensors[index+1], Qtensors[index+1][0], Atensors[index+1][0][0], Ctensors[index+1][0][0], Dtensors[index+1][0][0]);
    }
    
    //Otensors

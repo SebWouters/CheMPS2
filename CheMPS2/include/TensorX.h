@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -58,10 +58,9 @@ namespace CheMPS2{
              \param Qtensor The previous TensorQ
              \param Atensor The previous TensorA
              \param Ctensor The previous TensorC
-             \param F0tensors Array with the TensorF0's
              \param Dtensor The previous TensorD
              \param F1tensors Array with the TensorF1's */
-         void update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorF0 ** F0tensors, TensorD * Dtensor, TensorF1 ** F1tensors);
+         void update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorD * Dtensor);
          
          //! Clear and add the relevant terms to the TensorX
          /** \param denT TensorT from which the new TensorX should be made */
@@ -84,10 +83,10 @@ namespace CheMPS2{
          void addTermQLLeft(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemLL, double * workmemLR, double * workmemRR);
          void addTermALeft(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemLR, double * workmemLL);
          void addTermARight(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemRR, double * workmemLR);
-         void addTermCF0Right(const int ikappa, TensorT * denT, TensorC * denC, TensorF0 ** deF0s, double * workmemLL, double * workmemLR);
-         void addTermCF0Left(const int ikappa, TensorT * denT, TensorC * denC, TensorF0 ** deF0s, double * workmemRR, double * workmemLR);
-         void addTermDF1Right(const int ikappa, TensorT * denT, TensorD * denD, TensorF1 ** deF1s, double * workmemLL, double * workmemLR);
-         void addTermDF1Left(const int ikappa, TensorT * denT, TensorD * denD, TensorF1 ** deF1s, double * workmemRR, double * workmemLR);
+         void addTermCRight(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR);
+         void addTermCLeft(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR);
+         void addTermDRight(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR);
+         void addTermDLeft(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR);
          
    };
 }

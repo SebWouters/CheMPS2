@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -100,21 +100,21 @@ namespace CheMPS2{
          void addDiagram2a2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA **** Atensors, TensorS0 **** S0tensors, double * workspace) const;
          void addDiagram2a1spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB **** Btensors, TensorS1 **** S1tensors, double * workspace) const;
          void addDiagram2a2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB **** Btensors, TensorS1 **** S1tensors, double * workspace) const;
-         void addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * workspace, double * mem) const;
-         void addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * workspace, double * mem) const;
+         void addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * workspace) const;
+         void addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * workspace) const;
          void addDiagram2b1and2b2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const;
          void addDiagram2c1and2c2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const;
          void addDiagram2dall(const int ikappa, double * memS, double * memHeff, const Sobject * denS) const;
          void addDiagram2e1and2e2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const;
          void addDiagram2f1and2f2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const;
-         void addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const;
-         void addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const;
-         void addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const;
-         void addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors, double * workmem) const;
-         void addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const;
-         void addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const;
-         void addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const;
-         void addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors, double * workmem) const;
+         void addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const;
          
          //The diagrams: Type 3/5
          void addDiagram3Aand3D(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorQ * Qleft, TensorL ** Lleft, double * temp) const;
@@ -128,16 +128,16 @@ namespace CheMPS2{
          //The diagrams: Type 4/5
          void addDiagram4A1and4A2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atens) const;
          void addDiagram4A1and4A2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB * Btens) const;
-         void addDiagram4A3and4A4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctens, TensorF0 ** F0tens, double * temp) const;
-         void addDiagram4A3and4A4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtens, TensorF1 ** F1tens, double * temp) const;
+         void addDiagram4A3and4A4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctens) const;
+         void addDiagram4A3and4A4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtens) const;
          void addDiagram4B1and4B2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA *** Aleft, TensorL ** Lright, double * temp) const;
          void addDiagram4B1and4B2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB *** Bleft, TensorL ** Lright, double * temp) const;
-         void addDiagram4B3and4B4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC *** Cleft, TensorF0 ** F0left, TensorL ** Lright, double * temp, double * temp2) const;
-         void addDiagram4B3and4B4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD *** Dleft, TensorF1 ** F1left, TensorL ** Lright, double * temp, double * temp2) const;
+         void addDiagram4B3and4B4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC *** Cleft, TensorL ** Lright, double * temp) const;
+         void addDiagram4B3and4B4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD *** Dleft, TensorL ** Lright, double * temp) const;
          void addDiagram4C1and4C2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA *** Aleft, TensorL ** Lright, double * temp) const;
          void addDiagram4C1and4C2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB *** Bleft, TensorL ** Lright, double * temp) const;
-         void addDiagram4C3and4C4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC *** Cleft, TensorF0 ** F0left, TensorL ** Lright, double * temp, double * temp2) const;
-         void addDiagram4C3and4C4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD *** Dleft, TensorF1 ** F1left, TensorL ** Lright, double * temp, double * temp2) const;
+         void addDiagram4C3and4C4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC *** Cleft, TensorL ** Lright, double * temp) const;
+         void addDiagram4C3and4C4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD *** Dleft, TensorL ** Lright, double * temp) const;
          void addDiagram4D(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, double * temp) const;
          void addDiagram4E(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const;
          void addDiagram4F(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lright, double * temp) const;
@@ -146,16 +146,16 @@ namespace CheMPS2{
          void addDiagram4I(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, double * temp) const;
          void addDiagram4J1and4J2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Aright) const;
          void addDiagram4J1and4J2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB * Bright) const;
-         void addDiagram4J3and4J4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Cright, TensorF0 ** F0tens, double * temp) const;
-         void addDiagram4J3and4J4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dright, TensorF1 ** F1tens, double * temp) const;
+         void addDiagram4J3and4J4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Cright) const;
+         void addDiagram4J3and4J4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dright) const;
          void addDiagram4K1and4K2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorA *** Aright, double * temp) const;
          void addDiagram4L1and4L2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorA *** Aright, double * temp) const;
          void addDiagram4K1and4K2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorB *** Bright, double * temp) const;
          void addDiagram4L1and4L2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorB *** Bright, double * temp) const;
-         void addDiagram4K3and4K4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorC *** Cright, TensorF0 ** F0right, double * temp, double * temp2) const;
-         void addDiagram4L3and4L4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorC *** Cright, TensorF0 ** F0right, double * temp, double * temp2) const;
-         void addDiagram4K3and4K4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorD *** Dright, TensorF1 ** F1right, double * temp, double * temp2) const;
-         void addDiagram4L3and4L4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorD *** Dright, TensorF1 ** F1right, double * temp, double * temp2) const;
+         void addDiagram4K3and4K4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorC *** Cright, double * temp) const;
+         void addDiagram4L3and4L4spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorC *** Cright, double * temp) const;
+         void addDiagram4K3and4K4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorD *** Dright, double * temp) const;
+         void addDiagram4L3and4L4spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorD *** Dright, double * temp) const;
          
          //The diagrams: type 5/5
          void addDiagram5A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const;
@@ -165,23 +165,22 @@ namespace CheMPS2{
          void addDiagram5E(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const;
          void addDiagram5F(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const;
          
-         
          //All diagonal contributions
          void addDiagonal1A(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorX * Xleft) const;
          void addDiagonal1B(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorX * Xright) const;
          void addDiagonal1C(const int ikappa, double * memHeffDiag, const Sobject * denS, const double Helem_links) const;
          void addDiagonal1D(const int ikappa, double * memHeffDiag, const Sobject * denS, const double Helem_rechts) const;
          void addDiagonal2d3all(const int ikappa, double * memHeffDiag, const Sobject * denS) const;
-         void addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors) const;
-         void addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors) const;
-         void addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors) const;
-         void addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor, TensorF0 ** F0tensors) const;
-         void addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors) const;
-         void addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors) const;
-         void addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors) const;
-         void addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor, TensorF1 ** F1tensors) const;
-         void addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * work) const;
-         void addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * work) const;
+         void addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const;
+         void addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const;
+         void addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors) const;
+         void addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors) const;
          void addDiagonalExcitations(const int ikappa, double * memHeffDiag, const Sobject * denS, int nLower, double ** VeffTilde) const;
          
    };
