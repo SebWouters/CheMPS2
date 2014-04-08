@@ -363,7 +363,6 @@ void CheMPS2::Heff::addDiagram4A3and4A4spin0(const int ikappa, double * memS, do
    char trans = 'T';
    char notrans = 'N';
    double beta = 1.0; //add
-   int inc = 1;
    
    //4A3A.spin0
    if ((N1==1) && (N2==0)){
@@ -510,7 +509,6 @@ void CheMPS2::Heff::addDiagram4A3and4A4spin1(const int ikappa, double * memS, do
    char trans = 'T';
    char notrans = 'N';
    double beta = 1.0; //add
-   int inc = 1;
    
    //4A3A.spin1
    if ((N1==1) && (N2==0)){
@@ -4248,7 +4246,6 @@ void CheMPS2::Heff::addDiagram4J3and4J4spin0(const int ikappa, double * memS, do
    
       char trans = 'T';
       char notrans = 'N';
-      int inc = 1;
 
       //4J3A.spin0
       if ((N1==1) && (N2==0)){
@@ -4370,7 +4367,6 @@ void CheMPS2::Heff::addDiagram4J3and4J4spin1(const int ikappa, double * memS, do
    
    char trans = 'T';
    char notrans = 'N';
-   int inc = 1;
 
    int IRdown = denBK->directProd(IR,Dright->gIdiff());
    

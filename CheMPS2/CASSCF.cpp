@@ -333,7 +333,6 @@ void CheMPS2::CASSCF::buildQmatrixACT(){
       char trans   = 'T';
       char notrans = 'N';
       double * Umx = unitary->getBlock(irrep) + iHandler->getNOCC(irrep);
-      int linsizeRDM = iHandler->getDMRGcumulative(numberOfIrreps);
       double * RDM = DMRG1DM + iHandler->getDMRGcumulative(irrep) * (1+nOrbDMRG);
       dgemm_(&trans,  &notrans,&linsize,&NDMRG,  &NDMRG,&alpha,Umx,               &linsize,RDM,&nOrbDMRG,&beta,QmatrixWORK[irrep],&linsize);
       dgemm_(&notrans,&notrans,&linsize,&linsize,&NDMRG,&alpha,QmatrixWORK[irrep],&linsize,Umx,&linsize, &beta,QmatrixACT[irrep], &linsize);
