@@ -28,7 +28,7 @@ To acknowledge CheMPS2, please cite
 1. S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck,
    CheMPS2: a free open-source spin-adapted implementation of the density
             matrix renormalization group for ab initio quantum chemistry,
-   Computer Physics Communications (2014),
+   Computer Physics Communications 185, 1501 (2014),
    [doi:10.1016/j.cpc.2014.01.019](http://dx.doi.org/10.1016/j.cpc.2014.01.019)
 
         @article{CheMPS2cite1,
@@ -36,6 +36,9 @@ To acknowledge CheMPS2, please cite
             title = {CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry},
             journal = {Computer Physics Communications},
             year = {2014},
+            volume = {185},
+            number = {6},
+            pages = {1501},
             doi = {10.1016/j.cpc.2014.01.019}
         }
 
