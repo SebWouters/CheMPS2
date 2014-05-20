@@ -89,7 +89,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    while (gradNorm > CheMPS2::CASSCF_gradientNormThreshold){
    
       //Update the unitary transformation based on the previous unitary transformation and the xmatrix
-      unitary->updateUnitary(mem1, mem2);
+      if (unitary->getNumVariablesX() > 0){ unitary->updateUnitary(mem1, mem2); }
       if ((CheMPS2::CASSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
    
       //Fill HamDMRG
