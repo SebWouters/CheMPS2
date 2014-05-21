@@ -218,10 +218,11 @@ void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2){
          
          char uplo = 'U';
          char jobz = 'V';
-         double * eigenval = temp1 + 2*size;
-         double * work = temp1 + size;
+         double * eigenval = temp1 + size;
+         double * work = eigenval + linsize;
+         int lwork = 2*size - linsize; //For linsize=2, lwork is 6 and should be 3*linsize-1=5, i.e. larger than linsize^2.
          int info;
-         dsyev_(&jobz, &uplo, &linsize, Bmat, &linsize, eigenval, work, &size, &info); // xblock * xblock = Bmat * eigenval * Bmat^T
+         dsyev_(&jobz, &uplo, &linsize, Bmat, &linsize, eigenval, work, &lwork, &info); // xblock * xblock = Bmat * eigenval * Bmat^T
          
          dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,xblock,&linsize,Bmat,&linsize,&beta,work,&linsize);
          char trans = 'T';
