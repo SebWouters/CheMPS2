@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ CheMPS2::Irreps::Irreps(const int nGroup){
    if ((nGroup >= 0) && (nGroup <= 7)){
       isActivated = true;
       groupNumber = nGroup;
+      setTable();
    } else {
       isActivated = false;
    }
@@ -45,14 +46,19 @@ CheMPS2::Irreps::Irreps(const int nGroup){
 }
 
 CheMPS2::Irreps::~Irreps(){
+
+   if (isActivated){ delete [] multiplicationTable; }
    
 }
 
 bool CheMPS2::Irreps::setGroup(const int nGroup){
 
+   if (isActivated){ delete [] multiplicationTable; }
+
    if ((nGroup >= 0) && (nGroup <= 7)){
       isActivated = true;
       groupNumber = nGroup;
+      setTable();
    } else {
       isActivated = false;
    }
@@ -61,17 +67,23 @@ bool CheMPS2::Irreps::setGroup(const int nGroup){
 
 }
 
-bool CheMPS2::Irreps::getIsActivated() const{
+void CheMPS2::Irreps::setTable(){
 
-   return isActivated;
+   nIrreps = getNumberOfIrrepsPrivate(groupNumber);
+   
+   multiplicationTable = new int[nIrreps * nIrreps];
+   for (int n1=0; n1<nIrreps; n1++){
+      for (int n2=n1; n2<nIrreps; n2++){
+         multiplicationTable[n1 + nIrreps * n2] = directProdPrivate(groupNumber, n1, n2);
+         multiplicationTable[n2 + nIrreps * n1] = multiplicationTable[n1 + nIrreps * n2];
+      }
+   }
 
 }
 
-int CheMPS2::Irreps::getGroupNumber() const{
+bool CheMPS2::Irreps::getIsActivated() const{ return isActivated; }
 
-   return isActivated ? groupNumber : -1 ;
-
-}
+int CheMPS2::Irreps::getGroupNumber() const{ return isActivated ? groupNumber : -1 ; }
 
 string CheMPS2::Irreps::getGroupName() const{
 
@@ -101,7 +113,7 @@ string CheMPS2::Irreps::getGroupNamePrivate(const int nGroup){
 
 int CheMPS2::Irreps::getNumberOfIrreps() const{
 
-   return isActivated ? getNumberOfIrrepsPrivate(groupNumber) : -1 ;
+   return isActivated ? nIrreps : -1 ;
 
 }
 
@@ -118,7 +130,7 @@ string CheMPS2::Irreps::getIrrepName(const int irrepNumber) const{
 
    if (!isActivated) return "error1";
    
-   if ((irrepNumber<0) || (irrepNumber >= getNumberOfIrreps())) return "error2";
+   if ( (irrepNumber<0) || (irrepNumber >= nIrreps) ) return "error2";
    
    return getIrrepNamePrivate(groupNumber,irrepNumber);
    
@@ -181,18 +193,12 @@ string CheMPS2::Irreps::getIrrepNamePrivate(const int nGroup, const int nIrrep){
 
 }
 
-int CheMPS2::Irreps::getTrivialIrrep(){
-
-   return 0 ;
-
-}
-
 int CheMPS2::Irreps::directProd(const int n1, const int n2) const{
 
    if (!isActivated) return -1;
-   if ((n1<0) || (n1>=getNumberOfIrreps()) || (n2<0) || (n2>=getNumberOfIrreps())) return -2;
+   if ((n1<0) || (n1>=getNumberOfIrreps()) || (n2<0) || (n2>=getNumberOfIrreps())) return -1;
    
-   return directProdPrivate(groupNumber,n1,n2);
+   return multiplicationTable[n1 + nIrreps * n2];
 
 }
 

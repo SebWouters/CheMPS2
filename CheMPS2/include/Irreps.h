@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -95,14 +95,10 @@ namespace CheMPS2{
              \return The irrep name (not activated returns "error1"; wrong number returns "error2") */
          string getIrrepName(const int irrepNumber) const;
          
-         //! Get the irrep number of the trivial irrep (always 0)
-         /** \return The trivial irrep number */
-         static int getTrivialIrrep();
-         
          //! Get the direct product of the irreps with numbers n1 and n2 for the currently activated group
          /** \param n1 The number of the first irrep
              \param n2 The number of the second irrep
-             \return The number of the direct product (-1 means not activated; -2 means n1 or n2 out of bound) */
+             \return The number of the direct product (-1 means not activated; or n1 or n2 out of bound) */
          int directProd(const int n1, const int n2) const;
          
          //! Print all info contained in this class
@@ -116,11 +112,18 @@ namespace CheMPS2{
          //the currently set group number (check isActivated)
          int groupNumber;
          
+         //multiplication table
+         int * multiplicationTable;
+         
+         //number of irreps
+         int nIrreps;
+         
          //static member functions containing the group names, the number of irreps, the names of the irreps, and the multiplication tables
          static string getGroupNamePrivate(const int nGroup);
          static int getNumberOfIrrepsPrivate(const int nGroup);
          static string getIrrepNamePrivate(const int nGroup, const int nIrrep);
          static int directProdPrivate(const int nGroup, const int n1, const int n2);
+         void setTable();
 
    };
 }
