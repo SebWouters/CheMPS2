@@ -85,8 +85,28 @@ mointegrals(Options &options)
     moOei.set(temp);
     
     int * orbitalIrreps = new int[nmo];
-    int SyGroup = 0; //For oxoMnSalen->no point group symmetry
-    for (int cnt=0; cnt<nmo; cnt++){ orbitalIrreps[cnt] = SyGroup; }
+
+    int SyGroup = 0;
+    bool stopFindGN = false;
+    std::string SymmLabel = Process::environment.molecule()->sym_label();
+    do {
+        if (SymmLabel.compare(CheMPS2::Irreps::getGroupName(SyGroup))==0) stopFindGN = true;
+        else SyGroup += 1;
+    } while ((!stopFindGN) && (SyGroup<42));
+    fprintf(outfile, "If anything went wrong: Is ");
+    fprintf(outfile, SymmLabel.c_str());
+    fprintf(outfile, " equal to ");
+    fprintf(outfile, (CheMPS2::Irreps::getGroupName(SyGroup)).c_str());
+    fprintf(outfile, " ?\n");
+
+    int counterFillOrbitalIrreps = 0;
+    for (int h=0; h<nirrep; ++h){
+       for (int cnt=0; cnt<moOei.rowspi(h); ++cnt){
+          orbitalIrreps[counterFillOrbitalIrreps] = h;
+          counterFillOrbitalIrreps++;
+       }
+    }
+
     CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(nmo,SyGroup,orbitalIrreps);
     delete [] orbitalIrreps;
     
