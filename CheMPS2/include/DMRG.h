@@ -60,7 +60,7 @@ namespace CheMPS2{
          DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn);
          
          //! Destructor
-         ~DMRG();
+         virtual ~DMRG();
          
          //! Solver
          /** \return The min. energy encountered so far during the sweeps. */

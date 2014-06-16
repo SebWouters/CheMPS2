@@ -43,7 +43,7 @@ namespace CheMPS2{
          Sobject(const int indexIn, const int IlocalIn1, const int IlocalIn2, SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~Sobject();
+         virtual ~Sobject();
          
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */

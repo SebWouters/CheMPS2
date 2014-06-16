@@ -50,7 +50,7 @@ namespace CheMPS2{
          TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn);
          
          //! Destructor
-         ~TwoDM();
+         virtual ~TwoDM();
          
          //! Set an 2DM_A term, using the DMRG indices
          /** \param cnt1 the first index

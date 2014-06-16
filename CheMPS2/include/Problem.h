@@ -44,7 +44,7 @@ namespace CheMPS2{
          Problem(const Hamiltonian * Hamin, const int TwoSin, const int Nin, const int Irrepin);
          
          //! Destructor
-         ~Problem();
+         virtual ~Problem();
          
          //! Get the number of orbitals
          /** \return The number of orbitals */

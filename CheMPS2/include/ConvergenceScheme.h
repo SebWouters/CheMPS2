@@ -44,7 +44,7 @@ namespace CheMPS2{
          ConvergenceScheme(const int nInstructions);
          
          //! Destructor
-         ~ConvergenceScheme();
+         virtual ~ConvergenceScheme();
          
          //!Get the number of instructions
          /** return the number of instructions to converge the DMRG calculation */

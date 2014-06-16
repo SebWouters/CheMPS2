@@ -42,7 +42,7 @@ namespace CheMPS2{
          DMRGSCFindices(const int L, const int Group, int * NOCCin, int * NDMRGin, int * NVIRTin);
          
          //! Destructor
-         ~DMRGSCFindices();
+         virtual ~DMRGSCFindices();
          
          //! Get the number of orbitals
          /** \return The number of orbitals */

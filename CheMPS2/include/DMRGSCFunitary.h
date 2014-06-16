@@ -39,7 +39,7 @@ namespace CheMPS2{
          DMRGSCFunitary(DMRGSCFindices * iHandlerIn);
          
          //! Destructor
-         ~DMRGSCFunitary();
+         virtual ~DMRGSCFunitary();
          
          //! Get the number of variables in the x-parametrization of the unitary update
          /** \return The number of unique variables in the x-matrix */

@@ -43,7 +43,7 @@ namespace CheMPS2{
          SyBookkeeper(const Problem * Probin, const int Din);
          
          //! Destructor
-         ~SyBookkeeper();
+         virtual ~SyBookkeeper();
          
          //! Get the number of orbitals
          /** \return The number of orbitals */

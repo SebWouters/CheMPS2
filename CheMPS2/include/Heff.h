@@ -52,7 +52,7 @@ namespace CheMPS2{
          Heff(const SyBookkeeper * denBKIn, const Problem * ProbIn);
          
          //! Destructor
-         ~Heff();
+         virtual ~Heff();
          
          //! Davidson Solver
          /** \param denS Initial guess S-object

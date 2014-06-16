@@ -43,7 +43,7 @@ namespace CheMPS2{
          TensorT(const int indexIn, const int IlocalIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorT();
+         virtual ~TensorT();
          
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */

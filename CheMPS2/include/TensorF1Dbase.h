@@ -42,7 +42,7 @@ namespace CheMPS2{
          TensorF1Dbase(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorF1Dbase();
+         virtual ~TensorF1Dbase();
          
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */

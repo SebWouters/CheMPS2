@@ -49,7 +49,7 @@ namespace CheMPS2{
          TensorX(const int indexIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn);
          
          //! Destructor
-         ~TensorX();
+         virtual ~TensorX();
          
          //! Clear and add the relevant terms to the TensorX
          /** \param denT TensorT from which the new TensorX should be made

@@ -65,7 +65,7 @@ namespace CheMPS2{
          Hamiltonian(const string filename);
          
          //! Destructor
-         ~Hamiltonian();
+         virtual ~Hamiltonian();
          
          //! Get the number of orbitals
          /** \return The number of orbitals */

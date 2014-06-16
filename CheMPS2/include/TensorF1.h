@@ -44,7 +44,7 @@ namespace CheMPS2{
          TensorF1(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorF1();
+         virtual ~TensorF1();
          
          //Make new TensorF1 (vs update)
          /** \param denT TensorT from which the new TensorF1 should be made. */

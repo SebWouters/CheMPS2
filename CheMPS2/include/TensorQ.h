@@ -52,7 +52,7 @@ namespace CheMPS2{
          TensorQ(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn, const int siteIn);
          
          //! Destructor
-         ~TensorQ();
+         virtual ~TensorQ();
          
          //! Clear storage in case an update is not possible
          void ClearStorage();

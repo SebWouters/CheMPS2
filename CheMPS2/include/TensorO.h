@@ -44,7 +44,7 @@ namespace CheMPS2{
          TensorO(const int indexIn, const bool movingRightIn, const SyBookkeeper * denBKupIn, const SyBookkeeper * denBKdownIn, const Problem * ProbIn);
          
          //! Destructor
-         ~TensorO();
+         virtual ~TensorO();
          
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */

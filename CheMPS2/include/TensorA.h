@@ -41,7 +41,7 @@ namespace CheMPS2{
          TensorA(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorA();
+         virtual ~TensorA();
          
          //! Clear the tensor when update is not yet possible
          void ClearStorage();

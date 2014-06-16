@@ -56,7 +56,7 @@ namespace CheMPS2{
          CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin);
          
          //! Destructor
-         ~CASSCF();
+         virtual ~CASSCF();
          
          //! Get the number of irreps
          /** \return The number of irreps */

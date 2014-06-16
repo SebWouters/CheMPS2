@@ -43,7 +43,7 @@ namespace CheMPS2{
          TensorL(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorL();
+         virtual ~TensorL();
          
          //Make new TensorL (vs update)
          /** \param denT TensorT from which the new TensorL should be made. */

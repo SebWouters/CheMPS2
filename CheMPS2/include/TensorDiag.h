@@ -41,7 +41,7 @@ namespace CheMPS2{
          TensorDiag(const int indexIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         ~TensorDiag();
+         virtual ~TensorDiag();
          
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */
