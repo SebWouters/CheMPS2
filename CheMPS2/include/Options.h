@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,6 +43,9 @@ namespace CheMPS2{
    const string HAMILTONIAN_TmatStorageName   = "CheMPS2_Ham_Tmat.h5";
    const string HAMILTONIAN_VmatStorageName   = "CheMPS2_Ham_Vmat.h5"; 
    const string HAMILTONIAN_ParentStorageName = "CheMPS2_Ham_parent.h5";
+   
+   const string TWODM_2DM_A_storagename       = "CheMPS2_2DM-A.h5";
+   const string TWODM_2DM_B_storagename       = "CheMPS2_2DM-B.h5";
    
    const bool   HEFF_debugPrint               = true;
    const int    HEFF_DAVIDSON_NUM_VEC         = 32;

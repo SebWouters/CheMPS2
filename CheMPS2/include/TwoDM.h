@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "TensorS0.h"
 #include "TensorS1.h"
 #include "SyBookkeeper.h"
+#include "TwoDMstorage.h"
 
 namespace CheMPS2{
 /** TwoDM class.
@@ -51,22 +52,6 @@ namespace CheMPS2{
          
          //! Destructor
          virtual ~TwoDM();
-         
-         //! Set an 2DM_A term, using the DMRG indices
-         /** \param cnt1 the first index
-             \param cnt2 the second index
-             \param cnt3 the third index
-             \param cnt4 the fourth index
-             \param value the value to which the term should be set */
-         void setTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
-         
-         //! Set an 2DM_B term, using the DMRG indices
-         /** \param cnt1 the first index
-             \param cnt2 the second index
-             \param cnt3 the third index
-             \param cnt4 the fourth index
-             \param value the value to which the term should be set */
-         void setTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
          
          //! Get a 2DM_A term, using the DMRG indices
          /** \param cnt1 the first index
@@ -117,8 +102,11 @@ namespace CheMPS2{
          /** \return The energy calculated as 0.5*trace(2DM-A * Ham) */
          double calcEnergy();
          
-         //! Print the 2DM-A and 2DM-B in Hamiltonian indices [i.e. the irrep order from Psi4] to the file 2DMoutput.txt
-         void print2DMAandB_HAM();
+         //! Save the TwoDMs to disk
+         void save();
+         
+         //! Load the TwoDMs from disk
+         void read();
          
       private:
       
@@ -132,8 +120,18 @@ namespace CheMPS2{
          int L;
          
          //Two 2DM^{A,B} objects
-         double * TwoDMA;
-         double * TwoDMB;
+         TwoDMstorage * TwoDMA;
+         TwoDMstorage * TwoDMB;
+         
+         //number of orbitals per irrep
+         int * irrep2num_orb;
+         
+         //index of an orbital within irrep block
+         int * orb2IndexSy;
+         
+         // Set 2DM terms, using the DMRG indices
+         void setTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
+         void setTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
          
          //Helper functions
          double doD1(TensorT * denT);

@@ -382,7 +382,7 @@ void CheMPS2::FourIndex::read(const std::string name){
             hid_t attribute_id2 = H5Aopen_by_name(group_id,"IrrepSizes", "nIrreps", H5P_DEFAULT, H5P_DEFAULT);
             int nIrreps;
             H5Aread(attribute_id2, H5T_NATIVE_INT, &nIrreps);
-            if (nGroup != SymmInfo.getGroupNumber()) std::cerr << "Error at FourIndex::read : nIrreps doesn't match." << std::endl;
+            if (nIrreps != SymmInfo.getNumberOfIrreps()) std::cerr << "Error at FourIndex::read : nIrreps doesn't match." << std::endl;
             
             hid_t attribute_id3 = H5Aopen_by_name(group_id,"IrrepSizes", "theTotalSize", H5P_DEFAULT, H5P_DEFAULT);
             long long theTotalSize;

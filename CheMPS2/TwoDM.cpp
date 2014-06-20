@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "TwoDM.h"
 #include "Lapack.h"
 #include "Gsl.h"
+#include "Options.h"
 
 using std::endl;
 using std::ofstream;
@@ -38,68 +39,106 @@ CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
    Prob = ProbIn;
    L = denBK->gL();
    
-   TwoDMA = new double[L*L*L*L];
-   TwoDMB = new double[L*L*L*L];
-   
-   for (int cnt=0; cnt<L*L*L*L; cnt++){
-      TwoDMA[cnt] = 0.0;
-      TwoDMB[cnt] = 0.0;
+   orb2IndexSy = new int[L];
+   irrep2num_orb = new int[denBK->getNumberOfIrreps()];
+   for (int cnt=0; cnt<denBK->getNumberOfIrreps(); cnt++){ irrep2num_orb[cnt] = 0; }
+   for (int orb=0; orb<L; orb++){
+      const int irrep = Prob->gIrrep( orb ); //Prob assumes you use DMRG orbs...
+      orb2IndexSy[ orb ] = irrep2num_orb[ irrep ];
+      irrep2num_orb[ irrep ] += 1;
    }
+   TwoDMA = new TwoDMstorage( Prob->gSy() , irrep2num_orb );
+   TwoDMB = new TwoDMstorage( Prob->gSy() , irrep2num_orb );
 
 }
 
 CheMPS2::TwoDM::~TwoDM(){
 
-   delete [] TwoDMA;
-   delete [] TwoDMB;
+   delete TwoDMA;
+   delete TwoDMB;
+   delete [] orb2IndexSy;
+   delete [] irrep2num_orb;
 
 }
 
 void CheMPS2::TwoDM::setTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
 
-   TwoDMA[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))] = value;
-   TwoDMA[cnt2 + L*(cnt1 + L*(cnt4 + L*cnt3))] = value;
-   TwoDMA[cnt3 + L*(cnt4 + L*(cnt1 + L*cnt2))] = value;
-   TwoDMA[cnt4 + L*(cnt3 + L*(cnt2 + L*cnt1))] = value;
+   //Prob assumes you use DMRG orbs...
+   //Irrep sanity checks are performed in TwoDM::FillSite
+   TwoDMA->set( Prob->gIrrep(cnt1), Prob->gIrrep(cnt2), Prob->gIrrep(cnt3), Prob->gIrrep(cnt4),
+                orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  value );
+   TwoDMA->set( Prob->gIrrep(cnt2), Prob->gIrrep(cnt1), Prob->gIrrep(cnt4), Prob->gIrrep(cnt3),
+                orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  value );
+   TwoDMA->set( Prob->gIrrep(cnt3), Prob->gIrrep(cnt4), Prob->gIrrep(cnt1), Prob->gIrrep(cnt2),
+                orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  value );
+   TwoDMA->set( Prob->gIrrep(cnt4), Prob->gIrrep(cnt3), Prob->gIrrep(cnt2), Prob->gIrrep(cnt1),
+                orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  value );
+
 
 }
 
 void CheMPS2::TwoDM::setTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
 
-   TwoDMB[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))] = value;
-   TwoDMB[cnt2 + L*(cnt1 + L*(cnt4 + L*cnt3))] = value;
-   TwoDMB[cnt3 + L*(cnt4 + L*(cnt1 + L*cnt2))] = value;
-   TwoDMB[cnt4 + L*(cnt3 + L*(cnt2 + L*cnt1))] = value;
+   //Prob assumes you use DMRG orbs...
+   //Irrep sanity checks are performed in TwoDM::FillSite
+   TwoDMB->set( Prob->gIrrep(cnt1), Prob->gIrrep(cnt2), Prob->gIrrep(cnt3), Prob->gIrrep(cnt4),
+                orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  value );
+   TwoDMB->set( Prob->gIrrep(cnt2), Prob->gIrrep(cnt1), Prob->gIrrep(cnt4), Prob->gIrrep(cnt3),
+                orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  value );
+   TwoDMB->set( Prob->gIrrep(cnt3), Prob->gIrrep(cnt4), Prob->gIrrep(cnt1), Prob->gIrrep(cnt2),
+                orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  value );
+   TwoDMB->set( Prob->gIrrep(cnt4), Prob->gIrrep(cnt3), Prob->gIrrep(cnt2), Prob->gIrrep(cnt1),
+                orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  value );
 
 }
 
 double CheMPS2::TwoDM::getTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
-   return TwoDMA[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))];
+   //Prob assumes you use DMRG orbs...
+   const int irrep1 = Prob->gIrrep(cnt1);
+   const int irrep2 = Prob->gIrrep(cnt2);
+   const int irrep3 = Prob->gIrrep(cnt3);
+   const int irrep4 = Prob->gIrrep(cnt4);
+   if ( denBK->directProd(irrep1, irrep2) == denBK->directProd(irrep3, irrep4) ){
+      return TwoDMA->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
+   }
+   
+   return 0.0;
 
 }
 
 double CheMPS2::TwoDM::getTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
-   return TwoDMB[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))];
+   //Prob assumes you use DMRG orbs...
+   const int irrep1 = Prob->gIrrep(cnt1);
+   const int irrep2 = Prob->gIrrep(cnt2);
+   const int irrep3 = Prob->gIrrep(cnt3);
+   const int irrep4 = Prob->gIrrep(cnt4);
+   if ( denBK->directProd(irrep1, irrep2) == denBK->directProd(irrep3, irrep4) ){
+      return TwoDMB->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
+   }
+   
+   return 0.0;
 
 }
 
 double CheMPS2::TwoDM::getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
-   if (Prob->gReorderD2h()){
-      return TwoDMA[Prob->gf1(cnt1) + L*(Prob->gf1(cnt2) + L*(Prob->gf1(cnt3) + L*Prob->gf1(cnt4)))];
+   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
+   if ( Prob->gReorderD2h() ){
+      return getTwoDMA_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2), Prob->gf1(cnt3), Prob->gf1(cnt4) );
    }
-   return TwoDMA[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))];
+   return getTwoDMA_DMRG( cnt1, cnt2, cnt3, cnt4 );
 
 }
 
 double CheMPS2::TwoDM::getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
-   if (Prob->gReorderD2h()){
-      return TwoDMB[Prob->gf1(cnt1) + L*(Prob->gf1(cnt2) + L*(Prob->gf1(cnt3) + L*Prob->gf1(cnt4)))];
+   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
+   if ( Prob->gReorderD2h() ){
+      return getTwoDMB_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2), Prob->gf1(cnt3), Prob->gf1(cnt4) );
    }
-   return TwoDMB[cnt1 + L*(cnt2 + L*(cnt3 + L*cnt4))];
+   return getTwoDMB_DMRG( cnt1, cnt2, cnt3, cnt4 );
 
 }
 
@@ -132,57 +171,17 @@ double CheMPS2::TwoDM::calcEnergy(){
 
 }
 
-void CheMPS2::TwoDM::print2DMAandB_HAM(){
+void CheMPS2::TwoDM::save(){
 
-   ofstream file("2DMoutput.txt", ios::trunc);
-   file.precision(15);
+   TwoDMA->save(CheMPS2::TWODM_2DM_A_storagename);
+   TwoDMB->save(CheMPS2::TWODM_2DM_B_storagename);
 
-   file << "*******************************************************" << endl;
-   file << "*** 2DM-A in Hamiltonian indices (Psi4 irrep order) ***" << endl;
-   file << "*******************************************************" << endl;
-   file << "index1 index2 index3 index4 value" << endl;
+}
 
-   for (int cnt1=0; cnt1<L; cnt1++){ //These are Ham indices. If (Prob->gReorderD2h()) then Prob->gIrrep(orb) thinks orb is an DMRG orbital. Therefore use Prob->gIrrep(Prob->gf1(cnt1)).
-      const int irrep1 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt1)) : Prob->gIrrep(cnt1);
-      for (int cnt2=0; cnt2<L; cnt2++){
-         const int irrep2 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt2)) : Prob->gIrrep(cnt2);
-         const int prod12 = denBK->directProd(irrep1,irrep2);
-         for (int cnt3=0; cnt3<L; cnt3++){
-            const int irrep3 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt3)) : Prob->gIrrep(cnt3);
-            for (int cnt4=0; cnt4<L; cnt4++){
-               const int irrep4 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt4)) : Prob->gIrrep(cnt4);
-               if ( prod12 == denBK->directProd(irrep3, irrep4) ){
-                  file << cnt1 << " " << cnt2 << " " << cnt3 << " " << cnt4 << " " << getTwoDMA_HAM(cnt1,cnt2,cnt3,cnt4) << endl;
-               }
-            }
-         }
-      }
-   }
-   
-   file << "*******************************************************" << endl;
-   file << "*** 2DM-B in Hamiltonian indices (Psi4 irrep order) ***" << endl;
-   file << "*******************************************************" << endl;
-   file << "index1 index2 index3 index4 value" << endl;
+void CheMPS2::TwoDM::read(){
 
-   for (int cnt1=0; cnt1<L; cnt1++){ //These are Ham indices. If (Prob->gReorderD2h()) then Prob->gIrrep(orb) thinks orb is an DMRG orbital. Therefore use Prob->gIrrep(Prob->gf1(cnt1)).
-      const int irrep1 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt1)) : Prob->gIrrep(cnt1);
-      for (int cnt2=0; cnt2<L; cnt2++){
-         const int irrep2 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt2)) : Prob->gIrrep(cnt2);
-         const int prod12 = denBK->directProd(irrep1,irrep2);
-         for (int cnt3=0; cnt3<L; cnt3++){
-            const int irrep3 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt3)) : Prob->gIrrep(cnt3);
-            for (int cnt4=0; cnt4<L; cnt4++){
-               const int irrep4 = (Prob->gReorderD2h()) ? Prob->gIrrep(Prob->gf1(cnt4)) : Prob->gIrrep(cnt4);
-               if ( prod12 == denBK->directProd(irrep3, irrep4) ){
-                  file << cnt1 << " " << cnt2 << " " << cnt3 << " " << cnt4 << " " << getTwoDMB_HAM(cnt1,cnt2,cnt3,cnt4) << endl;
-               }
-            }
-         }
-      }
-   }
-   
-   file << "*******************************************************" << endl;
-   file.close();
+   TwoDMA->read(CheMPS2::TWODM_2DM_A_storagename);
+   TwoDMB->read(CheMPS2::TWODM_2DM_B_storagename);
 
 }
 

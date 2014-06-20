@@ -211,7 +211,10 @@ stores and handles the complementary reduced spin-0 part of four sandwiched
 second quantized operators, which is of course diagonal in the symmetry
 sectors.
 
-```CheMPS2/TwoDM.cpp``` contains all functions to store and calculate the
+```CheMPS2/TwoDM.cpp``` contains all functions to calculate the
+2-RDM from the DMRG-optimized MPS.
+
+```CheMPS2/TwoDMstorage.cpp``` contains all functions to store the
 2-RDM from the DMRG-optimized MPS.
 
 ```CheMPS2/TwoIndex.cpp``` contains all functions of the TwoIndex container
@@ -308,6 +311,9 @@ class.
 ```CheMPS2/include/TensorX.h``` contains the definitions of the TensorX class.
 
 ```CheMPS2/include/TwoDM.h``` contains the definitions of the TwoDM class.
+
+```CheMPS2/include/TwoDMstorage.h``` contains the definitions of the
+TwoDMstorage class.
 
 ```CheMPS2/include/TwoIndex.h``` contains the definitions of the TwoIndex
 class.

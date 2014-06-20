@@ -27,7 +27,7 @@ namespace CheMPS2{
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date February 8, 2013
     
-    Container class for four-index tensors with Abelian point group symmetry (real character table; see Irreps.h): 2DMs and 2-particle matrix elements. The four-index tensor element V_ijkl has 8-fold permutation symmetry and is only nonzero when I_i x I_j = I_k x I_l. To clarify the convention, the potential energy is given: \n
+    Container class for four-index tensors with Abelian point group symmetry (real character table; see Irreps.h): 2-particle matrix elements. The four-index tensor element V_ijkl has 8-fold permutation symmetry and is only nonzero when I_i x I_j = I_k x I_l. To clarify the convention, the potential energy is given: \n
     \f$\frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} \f$.\n
     Hence \f$ V_{ijkl} = ( ij \mid V \mid kl ) \f$ in physics notation, i.e. with i and k the same integration coordinate for the electron repulsion integrals.
 */
