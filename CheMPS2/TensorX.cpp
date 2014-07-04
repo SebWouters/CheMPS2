@@ -53,45 +53,65 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
 
    if (movingRight){
       //PARALLEL
-      #pragma omp parallel for schedule(dynamic)
-      for (int ikappa=0; ikappa<nKappa; ikappa++){
-         makenewRight(ikappa, denT);
-         if (index>1){
-            const int dimL = denBK->gMaxDimAtBound(index-1);
-            const int dimR = denBK->gMaxDimAtBound(index);
-            double * workmemLL = new double[dimL*dimL];
-            double * workmemLR = new double[dimL*dimR];
-            double * workmemRR = new double[dimR*dimR];
-            addTermXRight(ikappa, denT, Xtensor, workmemLR);
-            addTermQLRight(ikappa, denT, Ltensors, Qtensor, workmemRR, workmemLR, workmemLL);
-            addTermARight(ikappa, denT, Atensor, workmemRR, workmemLR);
-            addTermCRight(ikappa, denT, Ctensor, workmemLR);
-            addTermDRight(ikappa, denT, Dtensor, workmemLR);
+      #pragma omp parallel
+      {
+      
+         const bool doOtherThings = (index>1) ? true : false ;
+         const int dimL     = (doOtherThings) ? denBK->gMaxDimAtBound(index-1) : 0 ;
+         const int dimR     = (doOtherThings) ? denBK->gMaxDimAtBound(index)   : 0 ;
+         double * workmemLL = (doOtherThings) ? new double[dimL*dimL] : NULL ;
+         double * workmemLR = (doOtherThings) ? new double[dimL*dimR] : NULL ;
+         double * workmemRR = (doOtherThings) ? new double[dimR*dimR] : NULL ;
+      
+         #pragma omp for schedule(dynamic)
+         for (int ikappa=0; ikappa<nKappa; ikappa++){
+            makenewRight(ikappa, denT);
+            if (doOtherThings){
+               addTermXRight(ikappa, denT, Xtensor, workmemLR);
+               addTermQLRight(ikappa, denT, Ltensors, Qtensor, workmemRR, workmemLR, workmemLL);
+               addTermARight(ikappa, denT, Atensor, workmemRR, workmemLR);
+               addTermCRight(ikappa, denT, Ctensor, workmemLR);
+               addTermDRight(ikappa, denT, Dtensor, workmemLR);
+            }
+         }
+         
+         if (doOtherThings){
             delete [] workmemLL;
             delete [] workmemLR;
             delete [] workmemRR;
          }
+      
       }
    } else {
       //PARALLEL
-      #pragma omp parallel for schedule(dynamic)
-      for (int ikappa=0; ikappa<nKappa; ikappa++){
-         makenewLeft(ikappa, denT);
-         if (index<Prob->gL()-1){
-            const int dimL = denBK->gMaxDimAtBound(index);
-            const int dimR = denBK->gMaxDimAtBound(index+1);
-            double * workmemLL = new double[dimL*dimL];
-            double * workmemLR = new double[dimL*dimR];
-            double * workmemRR = new double[dimR*dimR];
-            addTermXLeft(ikappa, denT, Xtensor, workmemLR);
-            addTermQLLeft(ikappa, denT, Ltensors, Qtensor, workmemLL, workmemLR, workmemRR);
-            addTermALeft(ikappa, denT, Atensor, workmemLR, workmemLL);
-            addTermCLeft(ikappa, denT, Ctensor, workmemLR);
-            addTermDLeft(ikappa, denT, Dtensor, workmemLR);
+      #pragma omp parallel
+      {
+      
+         const bool doOtherThings = (index<Prob->gL()-1) ? true : false ;
+         const int dimL     = (doOtherThings) ? denBK->gMaxDimAtBound(index)   : 0 ;
+         const int dimR     = (doOtherThings) ? denBK->gMaxDimAtBound(index+1) : 0 ;
+         double * workmemLL = (doOtherThings) ? new double[dimL*dimL] : NULL ;
+         double * workmemLR = (doOtherThings) ? new double[dimL*dimR] : NULL ;
+         double * workmemRR = (doOtherThings) ? new double[dimR*dimR] : NULL ;
+      
+         #pragma omp for schedule(dynamic)
+         for (int ikappa=0; ikappa<nKappa; ikappa++){
+            makenewLeft(ikappa, denT);
+            if (doOtherThings){
+               addTermXLeft(ikappa, denT, Xtensor, workmemLR);
+               addTermQLLeft(ikappa, denT, Ltensors, Qtensor, workmemLL, workmemLR, workmemRR);
+               addTermALeft(ikappa, denT, Atensor, workmemLR, workmemLL);
+               addTermCLeft(ikappa, denT, Ctensor, workmemLR);
+               addTermDLeft(ikappa, denT, Dtensor, workmemLR);
+            }
+         }
+         
+         if (doOtherThings){
             delete [] workmemLL;
             delete [] workmemLR;
             delete [] workmemRR;
          }
+      
       }
    }
 

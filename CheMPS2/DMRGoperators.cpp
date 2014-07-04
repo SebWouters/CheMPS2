@@ -189,117 +189,117 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
 
    const int dimL = denBK->gMaxDimAtBound(index);
    const int dimR = denBK->gMaxDimAtBound(index+1);
-
-   //Ltensors
-   #pragma omp parallel for schedule(static)
-   for (int cnt2=0; cnt2<(index+1) ; cnt2++){
-      if (cnt2==0){
-         Ltensors[index][cnt2]->makenew(MPS[index]);
-      } else {
-         double * workmem = new double[dimL*dimR];
-         Ltensors[index][cnt2]->update( Ltensors[index-1][cnt2-1] , MPS[index] , workmem );
-         delete [] workmem;
-      }
-   }
    
-   //Two-operator tensors
-   const int k1 = index+1;
-   const int upperbound1 = k1*(k1+1)/2;
-   #pragma omp parallel for schedule(static)
-   for (int glob=0; glob<upperbound1; glob++){
-      const int cnt2 = trianglefunction(k1,glob);
-      const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
-      if (cnt3==0){
+   #pragma omp parallel
+   {
+   
+      double * workmem = new double[dimL*dimR];
+
+      //Ltensors
+      #pragma omp for schedule(static) nowait
+      for (int cnt2=0; cnt2<(index+1) ; cnt2++){
          if (cnt2==0){
-            F0tensors[index][cnt2][cnt3]->makenew(MPS[index]);
-            F1tensors[index][cnt2][cnt3]->makenew(MPS[index]);
-            S0tensors[index][cnt2][cnt3]->makenew(MPS[index]);
-            //S1[index][0][cnt3] doesn't exist
+            Ltensors[index][cnt2]->makenew(MPS[index]);
          } else {
-            double * workmem = new double[dimL*dimR];
-            F0tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
-            F1tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
-            S0tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
-            S1tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
-            delete [] workmem;
+            Ltensors[index][cnt2]->update( Ltensors[index-1][cnt2-1] , MPS[index] , workmem );
          }
-      } else {
-         double * workmem = new double[dimL*dimR];
-         F0tensors[index][cnt2][cnt3]->update(F0tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
-         F1tensors[index][cnt2][cnt3]->update(F1tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
-         S0tensors[index][cnt2][cnt3]->update(S0tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
-         if (cnt2>0){ S1tensors[index][cnt2][cnt3]->update(S1tensors[index-1][cnt2][cnt3-1],MPS[index],workmem); }
-         delete [] workmem;
       }
-   }
-   
-   //Complementary two-operator tensors
-   const int k2 = Prob->gL()-1-index;
-   const int upperbound2 = k2*(k2+1)/2;
-   #pragma omp parallel for schedule(static)
-   for (int glob=0; glob<upperbound2; glob++){
-      const int cnt2 = trianglefunction(k2,glob);
-      const int cnt3 = glob - (k2-1-cnt2)*(k2-cnt2)/2;
-      if (index==0){
-         Atensors[index][cnt2][cnt3]->ClearStorage();
-         if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
-         Ctensors[index][cnt2][cnt3]->ClearStorage();
-         Dtensors[index][cnt2][cnt3]->ClearStorage();
-      } else {
-         double * workmem = new double[dimL*dimR];
-         Atensors[index][cnt2][cnt3]->update(Atensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
-         if (cnt2>0){ Btensors[index][cnt2][cnt3]->update(Btensors[index-1][cnt2][cnt3+1],MPS[index],workmem); }
-         Ctensors[index][cnt2][cnt3]->update(Ctensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
-         Dtensors[index][cnt2][cnt3]->update(Dtensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
-         delete [] workmem;
+      
+      //Two-operator tensors
+      const int k1 = index+1;
+      const int upperbound1 = k1*(k1+1)/2;
+      //After this parallel region, WAIT because F0,F1,S0,S1[index][cnt2][cnt3==0] is required for the complementary operators
+      #pragma omp for schedule(static)
+      for (int glob=0; glob<upperbound1; glob++){
+         const int cnt2 = trianglefunction(k1,glob);
+         const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
+         if (cnt3==0){
+            if (cnt2==0){
+               F0tensors[index][cnt2][cnt3]->makenew(MPS[index]);
+               F1tensors[index][cnt2][cnt3]->makenew(MPS[index]);
+               S0tensors[index][cnt2][cnt3]->makenew(MPS[index]);
+               //S1[index][0][cnt3] doesn't exist
+            } else {
+               F0tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
+               F1tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
+               S0tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
+               S1tensors[index][cnt2][cnt3]->makenew(Ltensors[index-1][cnt2-1],MPS[index],workmem);
+            }
+         } else {
+            F0tensors[index][cnt2][cnt3]->update(F0tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
+            F1tensors[index][cnt2][cnt3]->update(F1tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
+            S0tensors[index][cnt2][cnt3]->update(S0tensors[index-1][cnt2][cnt3-1],MPS[index],workmem);
+            if (cnt2>0){ S1tensors[index][cnt2][cnt3]->update(S1tensors[index-1][cnt2][cnt3-1],MPS[index],workmem); }
+         }
       }
-      for (int num=0; num<(index+1); num++){
-         if ( Atensors[index][cnt2][cnt3]->gIdiff() == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
-            
-            double alpha = Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt3+cnt2);
-            if ((cnt2==0) && (num==0)) alpha *= 0.5;
-            if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-            Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
+      
+      //Complementary two-operator tensors
+      const int k2 = Prob->gL()-1-index;
+      const int upperbound2 = k2*(k2+1)/2;
+      #pragma omp for schedule(static) nowait
+      for (int glob=0; glob<upperbound2; glob++){
+         const int cnt2 = trianglefunction(k2,glob);
+         const int cnt3 = glob - (k2-1-cnt2)*(k2-cnt2)/2;
+         if (index==0){
+            Atensors[index][cnt2][cnt3]->ClearStorage();
+            if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
+            Ctensors[index][cnt2][cnt3]->ClearStorage();
+            Dtensors[index][cnt2][cnt3]->ClearStorage();
+         } else {
+            Atensors[index][cnt2][cnt3]->update(Atensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
+            if (cnt2>0){ Btensors[index][cnt2][cnt3]->update(Btensors[index-1][cnt2][cnt3+1],MPS[index],workmem); }
+            Ctensors[index][cnt2][cnt3]->update(Ctensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
+            Dtensors[index][cnt2][cnt3]->update(Dtensors[index-1][cnt2][cnt3+1],MPS[index],workmem);
+         }
+         for (int num=0; num<(index+1); num++){
+            if ( Atensors[index][cnt2][cnt3]->gIdiff() == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
+               
+               double alpha = Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt3+cnt2);
+               if ((cnt2==0) && (num==0)) alpha *= 0.5;
+               if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+               Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
 
-            alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-            Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
-            
-            alpha = - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-            Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
-            
-            if (num>0){
-               if (cnt2>0){
-                  alpha = Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt3+cnt2) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
-                  Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+               alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+               Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+               
+               alpha = - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+               Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+               
+               if (num>0){
+                  if (cnt2>0){
+                     alpha = Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt3+cnt2) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+                     Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+                  }
+                  
+                  alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
+                  Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
+                  
+                  alpha = - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
+                  Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
                }
-               
-               alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
-               Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
-               
-               alpha = - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
-               Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
             }
          }
       }
-   }
-   
-   //Qtensors
-   #pragma omp parallel for schedule(static)
-   for (int cnt2=0; cnt2<Prob->gL()-1-index ; cnt2++){
-      if (index==0){
-         Qtensors[index][cnt2]->ClearStorage();
-         Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
-      } else {
-         double * workmem = new double[dimL*dimL];
-         double * workmem2 = new double[dimL*dimR];
-         Qtensors[index][cnt2]->update(Qtensors[index-1][cnt2+1],MPS[index],workmem2);
-         Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
-         Qtensors[index][cnt2]->AddTermsL(Ltensors[index-1],MPS[index], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsAB(Atensors[index-1][cnt2+1][0], Btensors[index-1][cnt2+1][0], MPS[index], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsCD(Ctensors[index-1][cnt2+1][0], Dtensors[index-1][cnt2+1][0], MPS[index], workmem, workmem2);
-         delete [] workmem;
-         delete [] workmem2;
+      
+      //Qtensors
+      #pragma omp for schedule(static) nowait
+      for (int cnt2=0; cnt2<Prob->gL()-1-index ; cnt2++){
+         if (index==0){
+            Qtensors[index][cnt2]->ClearStorage();
+            Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
+         } else {
+            double * workmemBIS = new double[dimL*dimL];
+            Qtensors[index][cnt2]->update(Qtensors[index-1][cnt2+1],MPS[index],workmem);
+            Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
+            Qtensors[index][cnt2]->AddTermsL(Ltensors[index-1],MPS[index], workmemBIS, workmem);
+            Qtensors[index][cnt2]->AddTermsAB(Atensors[index-1][cnt2+1][0], Btensors[index-1][cnt2+1][0], MPS[index], workmemBIS, workmem);
+            Qtensors[index][cnt2]->AddTermsCD(Ctensors[index-1][cnt2+1][0], Dtensors[index-1][cnt2+1][0], MPS[index], workmemBIS, workmem);
+            delete [] workmemBIS;
+         }
       }
+      
+      delete [] workmem;
+   
    }
    
    //Xtensors
@@ -326,117 +326,117 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
 
    const int dimL = denBK->gMaxDimAtBound(index+1);
    const int dimR = denBK->gMaxDimAtBound(index+2);
-
-   //Ltensors
-   #pragma omp parallel for schedule(static)
-   for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){
-      if (cnt2==0){
-         Ltensors[index][cnt2]->makenew(MPS[index+1]);
-      } else {
-         double * workmem = new double[dimL*dimR];
-         Ltensors[index][cnt2]->update( Ltensors[index+1][cnt2-1] , MPS[index+1] , workmem );
-         delete [] workmem;
-      }
-   }
    
-   //Two-operator tensors
-   const int k1 = Prob->gL()-1-index;
-   const int upperbound1 = k1*(k1+1)/2;
-   #pragma omp parallel for schedule(static)
-   for (int glob=0; glob<upperbound1; glob++){
-      const int cnt2 = trianglefunction(k1,glob);
-      const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
-      if (cnt3==0){
+   #pragma omp parallel
+   {
+   
+      double * workmem = new double[dimL*dimR];
+
+      //Ltensors
+      #pragma omp for schedule(static) nowait
+      for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){
          if (cnt2==0){
-            F0tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
-            F1tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
-            S0tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
-            //S1[index][0] doesn't exist
+            Ltensors[index][cnt2]->makenew(MPS[index+1]);
          } else {
-            double * workmem = new double[dimL*dimR];
-            F0tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
-            F1tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
-            S0tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
-            S1tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
-            delete [] workmem;
+            Ltensors[index][cnt2]->update( Ltensors[index+1][cnt2-1] , MPS[index+1] , workmem );
          }
-      } else {
-         double * workmem = new double[dimL*dimR];
-         F0tensors[index][cnt2][cnt3]->update(F0tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
-         F1tensors[index][cnt2][cnt3]->update(F1tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
-         S0tensors[index][cnt2][cnt3]->update(S0tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
-         if (cnt2>0){ S1tensors[index][cnt2][cnt3]->update(S1tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem); }
-         delete [] workmem;
       }
-   }
       
-   //Complementary two-operator tensors
-   const int k2 = index+1;
-   const int upperbound2 = k2*(k2+1)/2;
-   #pragma omp parallel for schedule(static)
-   for (int glob=0; glob<upperbound2; glob++){
-      const int cnt2 = trianglefunction(k2,glob);
-      const int cnt3 = glob - (k2-1-cnt2)*(k2-cnt2)/2;
-      if (index==Prob->gL()-2){
-         Atensors[index][cnt2][cnt3]->ClearStorage();
-         if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
-         Ctensors[index][cnt2][cnt3]->ClearStorage();
-         Dtensors[index][cnt2][cnt3]->ClearStorage();
-      } else {
-         double * workmem = new double[dimL*dimR];
-         Atensors[index][cnt2][cnt3]->update(Atensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
-         if (cnt2>0){ Btensors[index][cnt2][cnt3]->update(Btensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem); }
-         Ctensors[index][cnt2][cnt3]->update(Ctensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
-         Dtensors[index][cnt2][cnt3]->update(Dtensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
-         delete [] workmem;
+      //Two-operator tensors
+      const int k1 = Prob->gL()-1-index;
+      const int upperbound1 = k1*(k1+1)/2;
+      //After this parallel region, WAIT because F0,F1,S0,S1[index][cnt2][cnt3==0] is required for the complementary operators
+      #pragma omp for schedule(static)
+      for (int glob=0; glob<upperbound1; glob++){
+         const int cnt2 = trianglefunction(k1,glob);
+         const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
+         if (cnt3==0){
+            if (cnt2==0){
+               F0tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
+               F1tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
+               S0tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
+               //S1[index][0] doesn't exist
+            } else {
+               F0tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
+               F1tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
+               S0tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
+               S1tensors[index][cnt2][cnt3]->makenew(Ltensors[index+1][cnt2-1],MPS[index+1],workmem);
+            }
+         } else {
+            F0tensors[index][cnt2][cnt3]->update(F0tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
+            F1tensors[index][cnt2][cnt3]->update(F1tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
+            S0tensors[index][cnt2][cnt3]->update(S0tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem);
+            if (cnt2>0){ S1tensors[index][cnt2][cnt3]->update(S1tensors[index+1][cnt2][cnt3-1],MPS[index+1],workmem); }
+         }
       }
-      for (int num=0; num<Prob->gL()-index-1; num++){
-         if ( Atensors[index][cnt2][cnt3]->gIdiff() == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
-              
-            double alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
-            if ((cnt2==0) && (num==0)) alpha *= 0.5;
-            if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-            Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
-            
-            alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-            Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
-            
-            alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-            Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
-            
-            if (num>0){
-               if (cnt2>0){
-                  alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
-                  Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+         
+      //Complementary two-operator tensors
+      const int k2 = index+1;
+      const int upperbound2 = k2*(k2+1)/2;
+      #pragma omp for schedule(static) nowait
+      for (int glob=0; glob<upperbound2; glob++){
+         const int cnt2 = trianglefunction(k2,glob);
+         const int cnt3 = glob - (k2-1-cnt2)*(k2-cnt2)/2;
+         if (index==Prob->gL()-2){
+            Atensors[index][cnt2][cnt3]->ClearStorage();
+            if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
+            Ctensors[index][cnt2][cnt3]->ClearStorage();
+            Dtensors[index][cnt2][cnt3]->ClearStorage();
+         } else {
+            Atensors[index][cnt2][cnt3]->update(Atensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
+            if (cnt2>0){ Btensors[index][cnt2][cnt3]->update(Btensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem); }
+            Ctensors[index][cnt2][cnt3]->update(Ctensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
+            Dtensors[index][cnt2][cnt3]->update(Dtensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
+         }
+         for (int num=0; num<Prob->gL()-index-1; num++){
+            if ( Atensors[index][cnt2][cnt3]->gIdiff() == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
+                 
+               double alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
+               if ((cnt2==0) && (num==0)) alpha *= 0.5;
+               if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+               Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
+               
+               alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+               Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+               
+               alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+               Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+               
+               if (num>0){
+                  if (cnt2>0){
+                     alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+                     Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+                  }
+                  
+                  alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
+                  Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
+                  
+                  alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
+                  Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
                }
-               
-               alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
-               Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
-               
-               alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
-               Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
             }
          }
       }
-   }
-   
-   //Qtensors
-   #pragma omp parallel for schedule(static)
-   for (int cnt2=0; cnt2<index+1 ; cnt2++){
-      if (index==Prob->gL()-2){
-         Qtensors[index][cnt2]->ClearStorage();
-         Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
-      } else {
-         double * workmem = new double[dimR*dimR];
-         double * workmem2 = new double[dimR*dimL];
-         Qtensors[index][cnt2]->update(Qtensors[index+1][cnt2+1],MPS[index+1],workmem2);
-         Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
-         Qtensors[index][cnt2]->AddTermsL(Ltensors[index+1],MPS[index+1], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsAB(Atensors[index+1][cnt2+1][0], Btensors[index+1][cnt2+1][0], MPS[index+1], workmem, workmem2);
-         Qtensors[index][cnt2]->AddTermsCD(Ctensors[index+1][cnt2+1][0], Dtensors[index+1][cnt2+1][0], MPS[index+1], workmem, workmem2);
-         delete [] workmem;
-         delete [] workmem2;
+      
+      //Qtensors
+      #pragma omp for schedule(static) nowait
+      for (int cnt2=0; cnt2<index+1 ; cnt2++){
+         if (index==Prob->gL()-2){
+            Qtensors[index][cnt2]->ClearStorage();
+            Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
+         } else {
+            double * workmemBIS = new double[dimR*dimR];
+            Qtensors[index][cnt2]->update(Qtensors[index+1][cnt2+1],MPS[index+1],workmem);
+            Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
+            Qtensors[index][cnt2]->AddTermsL(Ltensors[index+1],MPS[index+1], workmemBIS, workmem);
+            Qtensors[index][cnt2]->AddTermsAB(Atensors[index+1][cnt2+1][0], Btensors[index+1][cnt2+1][0], MPS[index+1], workmemBIS, workmem);
+            Qtensors[index][cnt2]->AddTermsCD(Ctensors[index+1][cnt2+1][0], Dtensors[index+1][cnt2+1][0], MPS[index+1], workmemBIS, workmem);
+            delete [] workmemBIS;
+         }
       }
+      
+      delete [] workmem;
+   
    }
    
    //Xtensors

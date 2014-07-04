@@ -132,30 +132,42 @@ void CheMPS2::TensorO::update(TensorT * denTup, TensorT * denTdown, TensorO * de
 
    if (movingRight){
    
-      const int dimL = std::max(denBK->gMaxDimAtBound(index-1),denBKup->gMaxDimAtBound(index-1));
-      const int dimR = std::max(denBK->gMaxDimAtBound(index),  denBKup->gMaxDimAtBound(index)  );
+      if (index>1){
    
-      //PARALLEL
-      #pragma omp parallel for schedule(dynamic)
-      for (int ikappa=0; ikappa<nKappa; ikappa++){
-         if (index>1){
+         const int dimL = std::max(denBK->gMaxDimAtBound(index-1),denBKup->gMaxDimAtBound(index-1));
+         const int dimR = std::max(denBK->gMaxDimAtBound(index),  denBKup->gMaxDimAtBound(index)  );
+      
+         //PARALLEL
+         #pragma omp parallel
+         {
+         
             double * workmem = new double[dimL*dimR];
-            updateRight(ikappa, denTup, denTdown, denO, workmem);
+         
+            #pragma omp for schedule(dynamic)
+            for (int ikappa=0; ikappa<nKappa; ikappa++){ updateRight(ikappa, denTup, denTdown, denO, workmem); }
+            
             delete [] workmem;
+         
          }
       }
    } else {
    
-      const int dimL = std::max(denBK->gMaxDimAtBound(index),  denBKup->gMaxDimAtBound(index)  );
-      const int dimR = std::max(denBK->gMaxDimAtBound(index+1),denBKup->gMaxDimAtBound(index+1));
-      
-      //PARALLEL
-      #pragma omp parallel for schedule(dynamic)
-      for (int ikappa=0; ikappa<nKappa; ikappa++){
-         if (index<Prob->gL()-1){
+      if (index<Prob->gL()-1){
+   
+         const int dimL = std::max(denBK->gMaxDimAtBound(index),  denBKup->gMaxDimAtBound(index)  );
+         const int dimR = std::max(denBK->gMaxDimAtBound(index+1),denBKup->gMaxDimAtBound(index+1));
+         
+         //PARALLEL
+         #pragma omp parallel
+         {
+         
             double * workmem = new double[dimL*dimR];
-            updateLeft(ikappa, denTup, denTdown, denO, workmem);
+         
+            #pragma omp for schedule(dynamic)
+            for (int ikappa=0; ikappa<nKappa; ikappa++){ updateLeft(ikappa, denTup, denTdown, denO, workmem); }
+            
             delete [] workmem;
+      
          }
       }
    }

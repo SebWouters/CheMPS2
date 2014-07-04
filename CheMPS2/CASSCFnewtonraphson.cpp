@@ -262,7 +262,6 @@ double CheMPS2::CASSCF::updateXmatrixNewtonRaphson(){
 
 double CheMPS2::CASSCF::calcGradient(double * gradient){
 
-   #pragma omp parallel for schedule(static)
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){
       gradient[cnt] = 2*( Fmat( unitary->getFirstIndex(cnt), unitary->getSecondIndex(cnt) ) - Fmat( unitary->getSecondIndex(cnt), unitary->getFirstIndex(cnt) ));
    }
@@ -419,7 +418,9 @@ void CheMPS2::CASSCF::buildFmat(){
 
    for (int cnt=0; cnt<numberOfIrreps; cnt++){
       const int nOrbitals = iHandler->getNORB(cnt);
-      for (int cnt2=0; cnt2<nOrbitals*nOrbitals; cnt2++){
+      const int nOrbSquar = nOrbitals*nOrbitals;
+      #pragma omp parallel for schedule(static)
+      for (int cnt2=0; cnt2<nOrbSquar; cnt2++){
          int row = cnt2 % nOrbitals;
          int col = cnt2 / nOrbitals;
          Fmatrix[cnt][cnt2] = FmatHelper(iHandler->getOrigNOCCstart(cnt) + row, iHandler->getOrigNOCCstart(cnt) + col);

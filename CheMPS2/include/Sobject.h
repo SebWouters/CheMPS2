@@ -157,6 +157,11 @@ namespace CheMPS2{
              \return the right irrep symmetry of block ikappa*/
          int gIR(const int ikappa) const;
          
+         //! Get the blocks from large to small: blocksize(reorder[i])>=blocksize(reorder[i+1])
+         /** \param ikappa The index which counts from large to small
+             \return The original block index*/
+         int gReorder(const int ikappa) const;
+         
          
       private:
       
@@ -191,6 +196,9 @@ namespace CheMPS2{
          
          //The actual variables. Symmetry block kappa begins at storage+kappa2index[kappa] and ends at storage+kappa2index[kappa+1].
          double * storage;
+         
+         //The array reorder: blocksize(reorder[i]) >= blocksize(reorder[i+1]), with blocksize(k) = kappa2index[k+1]-kappa2index[k]
+         int * reorder;
          
    };
 }

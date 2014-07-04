@@ -49,109 +49,116 @@ void CheMPS2::Heff::makeHeff(double * memS, double * memHeff, const Sobject * de
    const int DIM = max(denBK->gMaxDimAtBound(indexS), denBK->gMaxDimAtBound(indexS+2));
    
    //PARALLEL
-   #pragma omp parallel for schedule(dynamic)
-   for (int ikappa=0; ikappa<denS->gNKappa(); ikappa++){
-
-      for (int cnt=denS->gKappa2index(ikappa); cnt<denS->gKappa2index(ikappa+1); cnt++){ memHeff[cnt] = 0.0; }
-      
-      double * temp = new double[DIM*DIM];
+   #pragma omp parallel
+   {
+   
+      double * temp  = new double[DIM*DIM];
       double * temp2 = new double[DIM*DIM];
+   
+      #pragma omp for schedule(dynamic)
+      for (int ikappaBIS=0; ikappaBIS<denS->gNKappa(); ikappaBIS++){
       
-      addDiagram1C(ikappa, memS,memHeff,denS,Prob->gMxElement(indexS,indexS,indexS,indexS));
-      addDiagram1D(ikappa, memS,memHeff,denS,Prob->gMxElement(indexS+1,indexS+1,indexS+1,indexS+1));
-      addDiagram2dall(ikappa, memS, memHeff, denS);
-      addDiagram3Eand3H(ikappa, memS, memHeff, denS);
-      addDiagramExcitations(ikappa, memS, memHeff, denS, nLower, VeffTilde);
-      
-      if (!atLeft){
+         const int ikappa = denS->gReorder(ikappaBIS);
 
-         addDiagram1A(ikappa, memS, memHeff, denS, Xtensors[indexS-1]);
+         for (int cnt=denS->gKappa2index(ikappa); cnt<denS->gKappa2index(ikappa+1); cnt++){ memHeff[cnt] = 0.0; }
          
-         addDiagram2b1and2b2(ikappa, memS, memHeff, denS, Atensors[indexS-1][0][0]);
-         addDiagram2c1and2c2(ikappa, memS, memHeff, denS, Atensors[indexS-1][0][1]);
-         addDiagram2b3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][0][0]);
-         addDiagram2c3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][0][1]);
-         addDiagram2b3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][0][0]);
-         addDiagram2c3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][0][1]);
+         addDiagram1C(ikappa, memS,memHeff,denS,Prob->gMxElement(indexS,indexS,indexS,indexS));
+         addDiagram1D(ikappa, memS,memHeff,denS,Prob->gMxElement(indexS+1,indexS+1,indexS+1,indexS+1));
+         addDiagram2dall(ikappa, memS, memHeff, denS);
+         addDiagram3Eand3H(ikappa, memS, memHeff, denS);
+         addDiagramExcitations(ikappa, memS, memHeff, denS, nLower, VeffTilde);
          
-         addDiagram3Aand3D(ikappa, memS, memHeff, denS, Qtensors[indexS-1][0], Ltensors[indexS-1], temp);
-         addDiagram3Band3I(ikappa, memS, memHeff, denS, Qtensors[indexS-1][1], Ltensors[indexS-1], temp);
+         if (!atLeft){
+
+            addDiagram1A(ikappa, memS, memHeff, denS, Xtensors[indexS-1]);
+            
+            addDiagram2b1and2b2(ikappa, memS, memHeff, denS, Atensors[indexS-1][0][0]);
+            addDiagram2c1and2c2(ikappa, memS, memHeff, denS, Atensors[indexS-1][0][1]);
+            addDiagram2b3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][0][0]);
+            addDiagram2c3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][0][1]);
+            addDiagram2b3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][0][0]);
+            addDiagram2c3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][0][1]);
+            
+            addDiagram3Aand3D(ikappa, memS, memHeff, denS, Qtensors[indexS-1][0], Ltensors[indexS-1], temp);
+            addDiagram3Band3I(ikappa, memS, memHeff, denS, Qtensors[indexS-1][1], Ltensors[indexS-1], temp);
+            
+            addDiagram4A1and4A2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1][1][0]);
+            addDiagram4A1and4A2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1][1][0]);
+            addDiagram4A3and4A4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][1][0]);
+            addDiagram4A3and4A4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][1][0]);
+            addDiagram4D(ikappa, memS, memHeff, denS, Ltensors[indexS-1], temp);
+            addDiagram4I(ikappa, memS, memHeff, denS, Ltensors[indexS-1], temp);
          
-         addDiagram4A1and4A2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1][1][0]);
-         addDiagram4A1and4A2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1][1][0]);
-         addDiagram4A3and4A4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1][1][0]);
-         addDiagram4A3and4A4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1][1][0]);
-         addDiagram4D(ikappa, memS, memHeff, denS, Ltensors[indexS-1], temp);
-         addDiagram4I(ikappa, memS, memHeff, denS, Ltensors[indexS-1], temp);
-      
-      }
-      
-      if (!atRight){
-      
-         addDiagram1B(ikappa, memS, memHeff, denS, Xtensors[indexS+1]);
+         }
          
-         addDiagram2e1and2e2(ikappa, memS, memHeff, denS, Atensors[indexS+1][0][1]);
-         addDiagram2f1and2f2(ikappa, memS, memHeff, denS, Atensors[indexS+1][0][0]);
-         addDiagram2e3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][0][1]);
-         addDiagram2f3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][0][0]);
-         addDiagram2e3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][0][1]);
-         addDiagram2f3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][0][0]);
+         if (!atRight){
          
-         addDiagram3Kand3F(ikappa, memS, memHeff, denS, Qtensors[indexS+1][1], Ltensors[indexS+1], temp);
-         addDiagram3Land3G(ikappa, memS, memHeff, denS, Qtensors[indexS+1][0], Ltensors[indexS+1], temp);
+            addDiagram1B(ikappa, memS, memHeff, denS, Xtensors[indexS+1]);
+            
+            addDiagram2e1and2e2(ikappa, memS, memHeff, denS, Atensors[indexS+1][0][1]);
+            addDiagram2f1and2f2(ikappa, memS, memHeff, denS, Atensors[indexS+1][0][0]);
+            addDiagram2e3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][0][1]);
+            addDiagram2f3spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][0][0]);
+            addDiagram2e3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][0][1]);
+            addDiagram2f3spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][0][0]);
+            
+            addDiagram3Kand3F(ikappa, memS, memHeff, denS, Qtensors[indexS+1][1], Ltensors[indexS+1], temp);
+            addDiagram3Land3G(ikappa, memS, memHeff, denS, Qtensors[indexS+1][0], Ltensors[indexS+1], temp);
+            
+            addDiagram4F(ikappa, memS, memHeff, denS, Ltensors[indexS+1], temp);
+            addDiagram4G(ikappa, memS, memHeff, denS, Ltensors[indexS+1], temp);
+            addDiagram4J1and4J2spin0(ikappa, memS, memHeff, denS, Atensors[indexS+1][1][0]);
+            addDiagram4J1and4J2spin1(ikappa, memS, memHeff, denS, Btensors[indexS+1][1][0]);
+            addDiagram4J3and4J4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][1][0]);
+            addDiagram4J3and4J4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][1][0]);
+            
+         }
          
-         addDiagram4F(ikappa, memS, memHeff, denS, Ltensors[indexS+1], temp);
-         addDiagram4G(ikappa, memS, memHeff, denS, Ltensors[indexS+1], temp);
-         addDiagram4J1and4J2spin0(ikappa, memS, memHeff, denS, Atensors[indexS+1][1][0]);
-         addDiagram4J1and4J2spin1(ikappa, memS, memHeff, denS, Btensors[indexS+1][1][0]);
-         addDiagram4J3and4J4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS+1][1][0]);
-         addDiagram4J3and4J4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS+1][1][0]);
+         if ((!atLeft) && (!atRight)){
          
-      }
-      
-      if ((!atLeft) && (!atRight)){
-      
-         addDiagram2a1spin0(ikappa, memS, memHeff, denS, Atensors, S0tensors, temp);
-         addDiagram2a2spin0(ikappa, memS, memHeff, denS, Atensors, S0tensors, temp);
-         addDiagram2a1spin1(ikappa, memS, memHeff, denS, Btensors, S1tensors, temp);
-         addDiagram2a2spin1(ikappa, memS, memHeff, denS, Btensors, S1tensors, temp);
-         addDiagram2a3spin0(ikappa, memS, memHeff, denS, Ctensors, F0tensors, temp);
-         addDiagram2a3spin1(ikappa, memS, memHeff, denS, Dtensors, F1tensors, temp);
+            addDiagram2a1spin0(ikappa, memS, memHeff, denS, Atensors, S0tensors, temp);
+            addDiagram2a2spin0(ikappa, memS, memHeff, denS, Atensors, S0tensors, temp);
+            addDiagram2a1spin1(ikappa, memS, memHeff, denS, Btensors, S1tensors, temp);
+            addDiagram2a2spin1(ikappa, memS, memHeff, denS, Btensors, S1tensors, temp);
+            addDiagram2a3spin0(ikappa, memS, memHeff, denS, Ctensors, F0tensors, temp);
+            addDiagram2a3spin1(ikappa, memS, memHeff, denS, Dtensors, F1tensors, temp);
+            
+            addDiagram3C(ikappa, memS, memHeff, denS, Qtensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram3J(ikappa, memS, memHeff, denS, Qtensors[indexS+1], Ltensors[indexS-1], temp);
+            
+            addDiagram4B1and4B2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4B1and4B2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4B3and4B4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4B3and4B4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4C1and4C2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4C1and4C2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4C3and4C4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4C3and4C4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1], Ltensors[indexS+1], temp);
+            addDiagram4E(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram4H(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram4K1and4K2spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Atensors[indexS+1], temp);
+            addDiagram4L1and4L2spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Atensors[indexS+1], temp);
+            addDiagram4K1and4K2spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Btensors[indexS+1], temp);
+            addDiagram4L1and4L2spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Btensors[indexS+1], temp);
+            addDiagram4K3and4K4spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ctensors[indexS+1], temp);
+            addDiagram4L3and4L4spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ctensors[indexS+1], temp);
+            addDiagram4K3and4K4spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Dtensors[indexS+1], temp);
+            addDiagram4L3and4L4spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Dtensors[indexS+1], temp);
+            
+            addDiagram5A(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram5B(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram5C(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram5D(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram5E(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+            addDiagram5F(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
+                  
+         }
          
-         addDiagram3C(ikappa, memS, memHeff, denS, Qtensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram3J(ikappa, memS, memHeff, denS, Qtensors[indexS+1], Ltensors[indexS-1], temp);
-         
-         addDiagram4B1and4B2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4B1and4B2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4B3and4B4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4B3and4B4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4C1and4C2spin0(ikappa, memS, memHeff, denS, Atensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4C1and4C2spin1(ikappa, memS, memHeff, denS, Btensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4C3and4C4spin0(ikappa, memS, memHeff, denS, Ctensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4C3and4C4spin1(ikappa, memS, memHeff, denS, Dtensors[indexS-1], Ltensors[indexS+1], temp);
-         addDiagram4E(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram4H(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram4K1and4K2spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Atensors[indexS+1], temp);
-         addDiagram4L1and4L2spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Atensors[indexS+1], temp);
-         addDiagram4K1and4K2spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Btensors[indexS+1], temp);
-         addDiagram4L1and4L2spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Btensors[indexS+1], temp);
-         addDiagram4K3and4K4spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ctensors[indexS+1], temp);
-         addDiagram4L3and4L4spin0(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ctensors[indexS+1], temp);
-         addDiagram4K3and4K4spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Dtensors[indexS+1], temp);
-         addDiagram4L3and4L4spin1(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Dtensors[indexS+1], temp);
-         
-         addDiagram5A(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram5B(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram5C(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram5D(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram5E(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-         addDiagram5F(ikappa, memS, memHeff, denS, Ltensors[indexS-1], Ltensors[indexS+1], temp, temp2);
-               
       }
       
       delete [] temp;
       delete [] temp2;
-      
+   
    }
 
 }
@@ -162,9 +169,16 @@ void CheMPS2::Heff::fillHeffDiag(double * memHeffDiag, const Sobject * denS, Ten
    const bool atLeft  = (indexS==0)?true:false;
    const bool atRight = (indexS==Prob->gL()-2)?true:false;
    
+   /*for (int ikappaBIS=0; ikappaBIS<denS->gNKappa(); ikappaBIS++){
+      const int ikappa = denS->gReorder(ikappaBIS);
+      cout << "Size of block " << ikappa << " is " << denS->gKappa2index(ikappa+1) - denS->gKappa2index(ikappa) << endl;
+   }*/
+   
    //PARALLEL
    #pragma omp parallel for schedule(dynamic)
-   for (int ikappa=0; ikappa<denS->gNKappa(); ikappa++){
+   for (int ikappaBIS=0; ikappaBIS<denS->gNKappa(); ikappaBIS++){
+   
+      const int ikappa = denS->gReorder(ikappaBIS);
 
       for (int cnt=denS->gKappa2index(ikappa); cnt<denS->gKappa2index(ikappa+1); cnt++){ memHeffDiag[cnt] = 0.0; }
       

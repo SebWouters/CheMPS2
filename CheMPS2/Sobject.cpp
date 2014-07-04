@@ -83,17 +83,17 @@ CheMPS2::Sobject::Sobject(const int indexIn, const int IlocalIn1, const int Iloc
    for (int NL = denBK->gNmin(index); NL<= denBK->gNmax(index); NL++){
       for (int TwoSL = denBK->gTwoSmin(index,NL); TwoSL<= denBK->gTwoSmax(index,NL); TwoSL+=2){
          for (int IL = 0; IL< denBK->getNumberOfIrreps(); IL++){
-            int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
+            const int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
             if (dimL>0){
                for (int N1=0; N1<=2; N1++){
                   for (int N2=0; N2<=2; N2++){
-                     int NR = NL+N1+N2;
+                     const int NR = NL+N1+N2;
                      int IR = ((N1==1)?(denBK->directProd(IL,Ilocal1)):IL); //IR as intermediary
-                         IR = ((N2==1)?(denBK->directProd(IR,Ilocal2)):IR);
+                         IR = ((N2==1)?(denBK->directProd(IR,Ilocal2)):IR); //IR final result
                      for (int TwoJ = ((N1+N2)%2); TwoJ<=(((N1==1)&&(N2==1))?2:((N1+N2)%2)) ; TwoJ+=2){
                         for (int TwoSR = TwoSL-TwoJ; TwoSR <= TwoSL+TwoJ; TwoSR+=2){
                            if (TwoSR>=0){
-                              int dimR = denBK->gCurrentDim(index+2,NR,TwoSR,IR); //two boundaries further!
+                              const int dimR = denBK->gCurrentDim(index+2,NR,TwoSR,IR); //two boundaries further!
                               if (dimR>0){
                                  sectorNL[nKappa] = NL;
                                  sectorTwoSL[nKappa] = TwoSL;
@@ -118,6 +118,22 @@ CheMPS2::Sobject::Sobject(const int indexIn, const int IlocalIn1, const int Iloc
    }
    
    storage = new double[kappa2index[nKappa]];
+   
+   reorder = new int[nKappa];
+   for (int cnt=0; cnt<nKappa; cnt++){ reorder[cnt] = cnt; }
+   bool sorted = false;
+   while (!sorted){ //Bubble sort so that blocksize(reorder[i]) >= blocksize(reorder[i+1]), with blocksize(k) = kappa2index[k+1]-kappa2index[k]
+      sorted = true;
+      for (int cnt=0; cnt<nKappa-1; cnt++){
+         const int index1 = reorder[cnt];
+         const int index2 = reorder[cnt+1];
+         if ((kappa2index[index1+1] - kappa2index[index1]) < (kappa2index[index2+1] - kappa2index[index2])){
+            sorted = false;
+            reorder[cnt]   = index2;
+            reorder[cnt+1] = index1;
+         }
+      }
+   }
 
 }
 
@@ -134,12 +150,15 @@ CheMPS2::Sobject::~Sobject(){
    delete [] sectorIR;
    delete [] kappa2index;
    delete [] storage;
+   delete [] reorder;
 
 }
 
 int CheMPS2::Sobject::gNKappa() const { return nKappa; }
 
 double * CheMPS2::Sobject::gStorage() { return storage; }
+
+int CheMPS2::Sobject::gReorder(const int ikappa) const{ return reorder[ikappa]; }
       
 int CheMPS2::Sobject::gKappa(const int NL, const int TwoSL, const int IL, const int N1, const int N2, const int TwoJ, const int NR, const int TwoSR, const int IR) const{
 
