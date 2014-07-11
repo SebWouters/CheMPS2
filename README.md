@@ -479,6 +479,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test5
     > ./test6
     > ./test7
+    > ./test8
 
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).
