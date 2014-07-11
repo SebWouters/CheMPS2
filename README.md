@@ -376,6 +376,9 @@ for test1 and test5.
 ```tests/matrixelements/O2_CCPVDZ.dat``` contains the matrix elements
 for test6 and test7.
 
+```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
+for test8.
+
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).
 
