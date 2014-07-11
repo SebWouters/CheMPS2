@@ -102,6 +102,7 @@ CheMPS2::CASSCF::~CASSCF(){
    
       delete unitary; //First delete the unitary as it requires the iHandler in its destructor.
       delete iHandler;
+      if (theDIIS!=NULL){ delete theDIIS; }
 
       delete [] DMRG1DM;
       delete [] DMRG2DM;
@@ -174,7 +175,7 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         cout << "CASSCF :: DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
+         cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 
@@ -482,6 +483,7 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    
    iHandler = new DMRGSCFindices(L, SymmInfo.getGroupNumber(), NoccIn, NDMRGIn, NvirtIn);
    unitary  = new DMRGSCFunitary(iHandler);
+   theDIIS = NULL;
    int * orbPerIrrep = new int[numberOfIrreps];
    for (int irrep=0; irrep<numberOfIrreps; irrep++){ orbPerIrrep[irrep] = iHandler->getNORB(irrep); }
    VmatRotated = new FourIndex(SymmInfo.getGroupNumber(), orbPerIrrep);
@@ -520,7 +522,7 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    //Print what we have just set up.
    iHandler->Print();
    
-   cout << "Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
+   cout << "   DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
 
 }
 

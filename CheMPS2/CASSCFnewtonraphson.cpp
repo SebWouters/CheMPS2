@@ -33,10 +33,15 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum){
+double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, const bool doDIIS){
 
    //Convergence variables
    double gradNorm = 1.0;
+   double updateNorm = 1.0;
+   double * gradient = new double[unitary->getNumVariablesX()];
+   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
+   double * theDIISparameterVector = NULL;
+   int theDIISvectorParamSize = 0;
    double Energy;
    
    //The CheMPS2::Problem for the inner DMRG calculation
@@ -51,46 +56,77 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    int maxlinsizeOK = 0;
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
       const int linsize_irrep = iHandler->getNORB(irrep);
+      theDIISvectorParamSize += linsize_irrep*(linsize_irrep-1)/2;
       if  (linsize_irrep > maxlinsize  )                                                        {  maxlinsize  = linsize_irrep; }
-      if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::CASSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
+      if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::DMRGSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
    }
-   const bool doBlockWise = (maxlinsize <= CheMPS2::CASSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
+   const bool doBlockWise = (maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
    
    //Determine the blocksize for the 2-body transformation
    int maxBlockSize = maxlinsize;
    if (doBlockWise){
-      int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::CASSCF_maxlinsizeCutoff ) + 0.01);
+      int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::DMRGSCF_maxlinsizeCutoff ) + 0.01);
       maxBlockSize = max( (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01) , maxlinsizeOK ); //If a particular index can be rotated at once....
       cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize << endl;
-      cout << "              The size cutoff for 2-body transfo = " << CheMPS2::CASSCF_maxlinsizeCutoff << endl;
+      cout << "              The size cutoff for 2-body transfo = " << CheMPS2::DMRGSCF_maxlinsizeCutoff << endl;
       cout << "              The max. # orb per irrep <= cutoff = " << maxlinsizeOK << endl;
       cout << "              The blocksize for piecewise tfo    = " << maxBlockSize << endl;
    }
    
    //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int sizeWorkmem1 = max( max( maxBSpower4 , maxlinsize*maxlinsize*3 ) , nOrbDMRG * nOrbDMRG ); //For (2-body tfo , updateUnitary, calcNOON)
-   const int sizeWorkmem2 = max( max( maxBSpower4 , maxlinsize*maxlinsize*2 ) , (CheMPS2::CASSCF_rotate2DMtoNO) ? nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG : nOrbDMRG*(nOrbDMRG + 1) ); //For (2-body tfo, updateUnitary and rotateUnitaryNOeigenvecs, rotate2DMand1DM or calcNOON)
+   const int sizeWorkmem1 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG * nOrbDMRG ); //For (2-body tfo , updateUnitary, calcNOON)
+   const int sizeWorkmem2 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , (CheMPS2::DMRGSCF_rotate2DMtoNO) ? nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG : nOrbDMRG*(nOrbDMRG + 1) ); //For (2-body tfo, updateUnitary and rotateUnitaryNOeigenvecs, rotate2DMand1DM or calcNOON)
    double * mem1 = new double[sizeWorkmem1];
    double * mem2 = new double[sizeWorkmem2];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    
    //Load unitary from disk
-   if (CheMPS2::CASSCF_storeUnitary){
+   if (CheMPS2::DMRGSCF_storeUnitary){
       struct stat stFileInfo;
-      int intStat = stat(CheMPS2::CASSCF_unitaryStorageName.c_str(),&stFileInfo);
+      int intStat = stat(CheMPS2::DMRGSCF_unitaryStorageName.c_str(),&stFileInfo);
       if (intStat==0){ unitary->loadU(); }
+   }
+   
+   //Load DIIS from disk
+   if ((doDIIS) && (CheMPS2::DMRGSCF_storeDIIS)){
+      struct stat stFileInfo;
+      int intStat = stat(CheMPS2::DMRGSCF_DIISstorageName.c_str(),&stFileInfo);
+      if (intStat==0){
+         if (theDIIS == NULL){
+            theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), CheMPS2::DMRGSCF_numDIISvecs);
+            theDIISparameterVector = new double[ theDIISvectorParamSize ];
+         }
+         theDIIS->loadDIIS();
+      }
    }
 
    /*******************************
    ***   Actual DMRGSCF loops   ***
    *******************************/
-   while (gradNorm > CheMPS2::CASSCF_gradientNormThreshold){
+   while (gradNorm > CheMPS2::DMRGSCF_gradientNormThreshold){
    
-      //Update the unitary transformation based on the previous unitary transformation and the xmatrix
-      if (unitary->getNumVariablesX() > 0){ unitary->updateUnitary(mem1, mem2); }
-      if ((CheMPS2::CASSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
+      //Update the unitary transformation
+      if (unitary->getNumVariablesX() > 0){
+      
+         unitary->updateUnitary(mem1, mem2, gradient, true, true); //multiply = compact = true
+         
+         if ((doDIIS) && (updateNorm <= CheMPS2::DMRGSCF_DIISgradientBranch)){
+            if (CheMPS2::DMRGSCF_rotate2DMtoNO){ cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl; }
+            if (theDIIS == NULL){
+               theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), CheMPS2::DMRGSCF_numDIISvecs);
+               theDIISparameterVector = new double[ theDIISvectorParamSize ];
+            }
+            unitary->getLog(theDIISparameterVector, mem1, mem2);
+            theDIIS->appendNew(gradient, theDIISparameterVector);
+            theDIIS->calculateParam(theDIISparameterVector);
+            unitary->updateUnitary(mem1, mem2, theDIISparameterVector, false, false); //multiply = compact = false
+         }
+         
+      }
+      if ((CheMPS2::DMRGSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
+      if ((CheMPS2::DMRGSCF_storeDIIS) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS(); }
    
       //Fill HamDMRG
       buildQmatrixOCC();
@@ -114,7 +150,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
       calcNOON(mem1, mem2);
-      if (CheMPS2::CASSCF_rotate2DMtoNO){
+      if ((CheMPS2::DMRGSCF_rotate2DMtoNO) && (theDIIS==NULL)){ //When the DIIS has started, stop rotating the active space to NOs
          rotate2DMand1DM(N, mem1, mem2);
          unitary->rotateUnitaryNOeigenvecs(mem1, mem2);
          buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
@@ -127,8 +163,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       else{             fillVmatRotated(mem1, mem2); }
       buildFmat();
 
-      //Calculate the gradient, hessian and corresponding update
-      gradNorm = updateXmatrixAugmentedHessianNR();
+      //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
+      gradNorm = augmentedHessianNR(gradient, &updateNorm);
       
       //Print the coefficients to discern the 1Ag and 3B1u states in the carbon dimer
       /*PrintCoeff_C2(theDMRG);*/
@@ -145,12 +181,14 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
    delete Prob;
    delete HamDMRG;
+   delete [] gradient;
+   if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
    
    return Energy;
 
 }
 
-double CheMPS2::CASSCF::updateXmatrixAugmentedHessianNR(){
+double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNorm){
 
    /* A good read to understand
             (1) how the augmented Hessian arises from a rational function optimization
@@ -161,14 +199,13 @@ double CheMPS2::CASSCF::updateXmatrixAugmentedHessianNR(){
    
    //Calculate the gradient
    int x_linearlength = unitary->getNumVariablesX();
-   double * gradient = new double[x_linearlength];
    double gradNorm = calcGradient(gradient);
    
    //Calculate the Hessian
    int aug_linlength = x_linearlength+1;
    int size = aug_linlength * aug_linlength;
    double * hessian = new double[size];
-   calcHessian(hessian, x_linearlength+1);
+   calcHessian(hessian, aug_linlength);
    
    //Augment the gradient into the Hessian matrix
    for (int cnt=0; cnt<x_linearlength; cnt++){
@@ -185,76 +222,24 @@ double CheMPS2::CASSCF::updateXmatrixAugmentedHessianNR(){
    int info;
    dsyev_(&jobz,&uplo,&aug_linlength,hessian,&aug_linlength,eigen,work,&size,&info);
    
-   if (CheMPS2::CASSCF_debugPrint){
-      cout << "Lowest eigenvalue = " << eigen[0] << endl;
-      cout << "The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
+   if (CheMPS2::DMRGSCF_debugPrint){
+      cout << "   DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << eigen[0] << endl;
+      cout << "   DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
    }
    double scalar = 1.0/hessian[x_linearlength];
    int inc = 1;
    dscal_(&x_linearlength,&scalar,hessian,&inc);
    
-   //Copy the new x back to xmatrix.
-   unitary->copyXsolutionBack(hessian);
+   //Copy the update to the gradient vector --> needed for updates of the unitary and DIIS
+   dcopy_(&x_linearlength,hessian,&inc,gradient,&inc);
+   updateNorm[0] = 0.0;
+   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ updateNorm[0] += gradient[cnt] * gradient[cnt]; }
+   updateNorm[0] = sqrt(updateNorm[0]);
+   cout << "   DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
    
    delete [] hessian;
-   delete [] gradient;
    delete [] eigen;
    delete [] work;
-   
-   return gradNorm;
-
-}
-
-double CheMPS2::CASSCF::updateXmatrixNewtonRaphson(){
-   
-   //Calculate the gradient
-   int x_linearlength = unitary->getNumVariablesX();
-   double * gradient = new double[x_linearlength];
-   double gradNorm = calcGradient(gradient);
-   
-   //Calculate the Hessian
-   int size = x_linearlength * x_linearlength;
-   double * hessian = new double[size];
-   calcHessian(hessian, x_linearlength);
-   
-   //Invert the Hessian
-   double * inverse = new double[size];
-   double * vector = new double[x_linearlength];
-   char jobz = 'V';
-   char uplo = 'U';
-   int info;
-   dsyev_(&jobz,&uplo,&x_linearlength,hessian,&x_linearlength,vector,inverse,&size,&info);
-   
-   if (vector[0]<=0.0){
-      cout << "DMRGSCF :: Eigenvalues of the Hessian = [ ";
-      for (int cnt=0; cnt<x_linearlength-1; cnt++){ cout << vector[cnt] << " , "; }
-      cout << vector[x_linearlength-1] << " ]" << endl;
-   }
-   
-   for (int cnt=0; cnt<x_linearlength; cnt++){
-      double value = 1.0/sqrt(vector[cnt]);
-      for (int cnt2=0; cnt2<x_linearlength; cnt2++){
-         hessian[cnt2 + x_linearlength*cnt] *= value;
-      }
-   }
-   char notr = 'N';
-   char tran = 'T';
-   double afac = 1.0;
-   double bfac = 0.0; //set
-   dgemm_(&notr,&tran,&x_linearlength,&x_linearlength,&x_linearlength,&afac,hessian,&x_linearlength,hessian,&x_linearlength,&bfac,inverse,&x_linearlength);
-   
-   //Calculate the new x --> Eq. (6c) of the Siegbahn paper
-   afac = -1.0;
-   int one = 1;
-   dgemm_(&notr,&notr,&x_linearlength,&one,&x_linearlength,&afac,inverse,&x_linearlength,gradient,&x_linearlength,&bfac,vector,&x_linearlength);
-   
-   //Copy the new x back to xmatrix.
-   unitary->copyXsolutionBack(vector);
-   
-   delete [] hessian;
-   delete [] gradient;
-   delete [] vector;
-   delete [] inverse;
    
    return gradNorm;
 
@@ -269,7 +254,7 @@ double CheMPS2::CASSCF::calcGradient(double * gradient){
    double gradNorm = 0.0;
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
    gradNorm = sqrt(gradNorm);
-   cout << "DMRGSCF :: Norm of the gradient = " << gradNorm << endl;
+   cout << "   DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
    return gradNorm;
 
 }

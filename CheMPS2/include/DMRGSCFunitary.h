@@ -22,11 +22,12 @@
 
 #include "Options.h"
 #include "DMRGSCFindices.h"
+#include "DIIS.h"
 
 namespace CheMPS2{
 /** DMRGSCFunitary class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
-    \date March 17, 2014
+    \date July 11, 2014
     
     The DMRGSCFunitary class is a storage and manipulation class for the DMRGSCF unitary matrix. This matrix is blockdiagonal in the irreducible representations, and is formed by stepwise multiplying in new unitary rotations due to the Newton-Raphson algorithm.
 */
@@ -60,14 +61,13 @@ namespace CheMPS2{
              \return Pointer to the desired unitary block */
          double * getBlock(const int irrep);
          
-         //! Copy the x solution back (NR, augmented NR, ...)
-         /** \param vector The x-solution */
-         void copyXsolutionBack(double * vector);
-         
-         //! Update the unitary transformation based on the calculated xmatrix and the previous unitary
+         //! Update the unitary transformation
          /** \param workmem1 Work memory
-             \param workmem2 Work memory */
-         void updateUnitary(double * workmem1, double * workmem2);
+             \param workmem2 Work memory
+             \param vector The elements in X
+             \param multiply Boolean whether exp(X)*U or exp(X) should become the new U. If multiply==true, U <-- exp(X)*U. If multiply==false, U <-- exp(X).
+             \param compact Boolean which indicates how the elements X are stored */
+         void updateUnitary(double * workmem1, double * workmem2, double * vector, const bool multiply, const bool compact);
          
          //! Rotate the unitary matrix to the NO eigenbasis
          /** \param eigenvecs The NO eigenbasis
@@ -77,6 +77,20 @@ namespace CheMPS2{
          //! Calculate the two-norm of U^T*U - I
          /** \param work Work memory */
          void CheckDeviationFromUnitary(double * work) const;
+         
+         //! Obtain the logarithm of the unitary matrix
+         /** \param vector Where the logarithm should be stored
+             \param temp1 Work memory
+             \param temp2 Work memory */
+         void getLog(double * vector, double * temp1, double * temp2) const;
+         
+         //! Obtain the logarithm of the current unitary matrix based on the BCH formula
+         /** \param Xprev The logarithm of the previous unitary matrix
+             \param step The update based on the gradient and the Hessian
+             \param Xnew The approximated logarithm of the current unitary matrix (write)
+             \param temp1 Work memory
+             \param temp2 Work memory */
+         void BCH(double * Xprev, double * step, double * Xnew, double * temp1, double * temp2) const;
          
          //! Save the unitary to disk
          void saveU() const;
@@ -92,13 +106,6 @@ namespace CheMPS2{
       
          //Externally created and destroyed index handler
          DMRGSCFindices * iHandler;
-      
-         /* The x-matrix (anti-symmetric):
-              xmatrix[irrep][case][row + l_row * col]
-              case 0: occ(col) -> DMRG(row)
-              case 1: DMRG(col) -> virt(row)
-              case 2: occ(col) -> virt(row) */
-         double *** xmatrix;
          
          //Number of variables in the x-matrix
          int x_linearlength;
@@ -115,6 +122,9 @@ namespace CheMPS2{
              \param q_index The second Hamiltonian index
              \return The linear index corresponding to (p,q). If no index is found -1 is returned. */
          int getLinearIndex(const int p_index, const int q_index) const;
+         
+         // Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.
+         void buildSkewSymmX(const int irrep, double * result, double * Xelem, const bool compact) const;
          
    };
 }

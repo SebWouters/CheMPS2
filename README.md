@@ -82,6 +82,8 @@ including the functions to calculate the gradient and Hessian.
 ConvergenceScheme class, which contains the instructions for the subsequent
 DMRG sweeps.
 
+```CheMPS2/DIIS.cpp``` contains a DIIS convergence speed-up for DMRG-SCF.
+
 ```CheMPS2/DMRG.cpp``` contains the constructor and destructor of the DMRG
 class, as well as the top-level sweep functions.
 
@@ -225,6 +227,8 @@ class for the one-body matrix elements.
 ```CheMPS2/include/ConvergenceScheme.h``` contains the definitions of the
 ConvergenceScheme class.
 
+```CheMPS2/include/DIIS.h``` contains the definitions of the DIIS class.
+
 ```CheMPS2/include/DMRG.h``` contains the definitions of the DMRG class.
 
 ```CheMPS2/include/DMRGSCFindices.h``` contains the definitions of the
@@ -345,12 +349,20 @@ ground and two lowest excited states are determined.
 
 ```tests/test6.cpp``` contains a DMRG-SCF ground state calculation of the ^1Ag
 state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals
-are kept frozen, and the lowest two Ag, B2g, B3g, B1u, B2u, and B3u orbitals
-are chosen as active space.
+are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen
+as active space. A significant speedup is obtained with DIIS.
 
 ```tests/test7.cpp``` reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
 stores these matrix elements to disk, reads them back in from disk, and
 compares the two versions.
+
+```tests/test8.cpp``` contains a DMRG-SCF ground state calculation of the ^1Ag
+state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals
+are kept frozen. The next two Ag and B1u orbitals (sigma bonding and
+antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding
+and antibonding) are chosen as active space. A significant speedup is obtained
+with DIIS. This test is smaller than test6, and is included for debugging with
+valgrind.
 
 ```tests/matrixelements/CH4_N10_S0_c2v_I0.dat``` contains the matrix elements
 for test3.

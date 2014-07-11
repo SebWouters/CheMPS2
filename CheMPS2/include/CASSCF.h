@@ -31,6 +31,7 @@
 #include "ConvergenceScheme.h"
 #include "DMRGSCFindices.h"
 #include "DMRGSCFunitary.h"
+#include "DIIS.h"
 
 namespace CheMPS2{
 /** CASSCF class.
@@ -68,16 +69,20 @@ namespace CheMPS2{
              \param NvirtIn Array of length numberOfIrreps containing the number of empty orbitals per irrep for the CASSCF loop. */
          void setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn);
          
-         //! Does the state-specific CASSCF cycle with the (augmented hessian) newton raphson method
+         //! Does the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
              \param TwoS Twice the targeted spin
              \param Irrep Desired wave-function irrep
              \param OptScheme The optimization scheme to run the inner DMRG loop
-             \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc. */
-         double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum);
+             \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
+             \param doDIIS Use DIIS when the gradient becomes sufficiently small to speed up the augmented Hessian NR method */
+         double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, const bool doDIIS=false);
          
          //! CASSCF unitary rotation remove call
          void deleteStoredUnitary(){ unitary->deleteStoredUnitary(); }
+         
+         //! CASSCF DIIS vectors remove call
+         void deleteStoredDIIS(){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(); }}
          
       private:
       
@@ -86,6 +91,9 @@ namespace CheMPS2{
          
          //Unitary matrix storage and manipulator
          DMRGSCFunitary * unitary;
+         
+         //DIIS object
+         DIIS * theDIIS;
       
          //The original Hamiltonian
          Hamiltonian * HamOrig;
@@ -155,11 +163,8 @@ namespace CheMPS2{
          //Calculate the hessian
          void calcHessian(double * hessian, const int rowjump);
          
-         //Based on the new 2DM and 1DM from the DMRG calculation, calculate the gradient, Hessian, and new x
-         double updateXmatrixNewtonRaphson();
-         
-         //Do Augmented Hessian form of NR
-         double updateXmatrixAugmentedHessianNR();
+         //Do Augmented Hessian form of NR. On return, gradient contains the RESCALED gradient.
+         double augmentedHessianNR(double * gradient, double * updateNorm);
          
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          double FmatHelper(const int index1, const int index2) const;

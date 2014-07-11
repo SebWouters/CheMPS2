@@ -38,23 +38,7 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
 
    this->iHandler = iHandlerIn;
    
-   //Allocate the xmatrix
-   x_linearlength = 0;
-   xmatrix = new double**[ iHandler->getNirreps() ];
-   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
-      xmatrix[irrep] = new double*[3];
-      for (int geval=0; geval<3; geval++){
-         int size = 0;
-         if (geval==0){ size = iHandler->getNOCC( irrep) * iHandler->getNDMRG(irrep); }
-         if (geval==1){ size = iHandler->getNDMRG(irrep) * iHandler->getNVIRT(irrep); }
-         if (geval==2){ size = iHandler->getNOCC( irrep) * iHandler->getNVIRT(irrep); }
-         xmatrix[irrep][geval] = new double[size];
-         for (int cnt=0; cnt<size; cnt++){ xmatrix[irrep][geval][cnt] = 0.0; }
-         x_linearlength += size;
-      }
-   }
-   
-   //Allocate the unitary
+   //Allocate the unitary and set to I
    unitary = new double*[ iHandler->getNirreps() ];
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
       const int linsize = iHandler->getNORB(irrep);
@@ -64,7 +48,11 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
       for (int cnt=0; cnt<linsize; cnt++){ unitary[irrep][cnt*(1+linsize)] = 1.0; }
    }
    
-   //Find the corresponding indices
+   //Find the unique indices for OCC-ACT, OCC-VIRT, and ACT-VIRT rotations
+   x_linearlength = 0;
+   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+      x_linearlength += iHandler->getNOCC(irrep)*iHandler->getNDMRG(irrep) + iHandler->getNDMRG(irrep)*iHandler->getNVIRT(irrep) + iHandler->getNOCC(irrep)*iHandler->getNVIRT(irrep);
+   }
    x_firstindex  = new int[x_linearlength];
    x_secondindex = new int[x_linearlength];
    int x_linearlength2 = 0;
@@ -104,12 +92,6 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
 }
 
 CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
-
-   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
-      for (int geval=0; geval<3; geval++){ delete [] xmatrix[irrep][geval]; }
-      delete [] xmatrix[irrep];
-   }
-   delete [] xmatrix;
       
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){ delete [] unitary[irrep]; }
    delete [] unitary;
@@ -137,17 +119,23 @@ int CheMPS2::DMRGSCFunitary::getSecondIndex(const int linearindex) const{ return
 
 double * CheMPS2::DMRGSCFunitary::getBlock(const int irrep){ return unitary[irrep]; }
 
-void CheMPS2::DMRGSCFunitary::copyXsolutionBack(double * vector){
+void CheMPS2::DMRGSCFunitary::buildSkewSymmX(const int irrep, double * result, double * Xelem, const bool compact) const{
 
-   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
-         
+   const int linsize = iHandler->getNORB(irrep);
+   for (int cnt=0; cnt<linsize*linsize; cnt++){ result[cnt] = 0.0; }
+
+   if (compact){
+
       for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
          for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
             int index1 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
             int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
             int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::copyXsolutionBack : xsolindex==-1" << endl; }
-            xmatrix[irrep][0][ cntDMRG + iHandler->getNDMRG(irrep) * cntOcc ] = vector[xsolindex];
+            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
+            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
          }
       }
       for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
@@ -155,8 +143,11 @@ void CheMPS2::DMRGSCFunitary::copyXsolutionBack(double * vector){
             int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
             int index2 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
             int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::copyXsolutionBack : xsolindex==-1" << endl; }
-            xmatrix[irrep][1][ cntVirt + iHandler->getNVIRT(irrep) * cntDMRG ] = vector[xsolindex];
+            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
+            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
          }
       }
       for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
@@ -164,16 +155,34 @@ void CheMPS2::DMRGSCFunitary::copyXsolutionBack(double * vector){
             int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
             int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
             int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::copyXsolutionBack : xsolindex==-1" << endl; }
-            xmatrix[irrep][2][ cntVirt + iHandler->getNVIRT(irrep) * cntOcc ] = vector[xsolindex];
+            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
+            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
+            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
          }
       }
+         
+   } else { //NOT compact
+   
+      int jump = 0;
+      for (int cnt=0; cnt<irrep; cnt++){
+         int linsizeCNT = iHandler->getNORB(cnt);
+         jump += linsizeCNT * (linsizeCNT-1) / 2;
+      }
       
+      for (int row=0; row<linsize; row++){
+         for (int col=row+1; col<linsize; col++){
+            result[ row + linsize * col ] =   Xelem[ jump + row + col*(col-1)/2 ];
+            result[ col + linsize * row ] = - Xelem[ jump + row + col*(col-1)/2 ];
+         }
+      }
+   
    }
 
 }
 
-void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2){
+void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2, double * vector, const bool multiply, const bool compact){
 
    //Per irrep
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -181,100 +190,86 @@ void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2){
       int linsize = iHandler->getNORB(irrep);
       int size = linsize * linsize;
       
-      const int NOCC  = iHandler->getNOCC( irrep);
-      const int NDMRG = iHandler->getNDMRG(irrep);
-      const int NVIRT = iHandler->getNVIRT(irrep);
-      
       if (linsize>1){ //linsize is op z'n minst 2 dus temp1, temp1+size, temp1+2*size,temp1+3*size zijn zeker ok
+      
+         double * xblock    = temp1;            //linsize*linsize
+         double * Bmat      = temp1 +   size;   //linsize*linsize
+         double * work1     = temp1 + 2*size;   //linsize*linsize
+         double * work2     = temp1 + 3*size;   //linsize*linsize
          
-         //Construct the anti-symmetric x-matrix
-         double * xblock = temp1;
-         for (int cnt=0; cnt<size; cnt++){ xblock[cnt] = 0.0; }
-         for (int cntOcc=0; cntOcc<NOCC; cntOcc++){
-            for (int cntDMRG=0; cntDMRG<NDMRG; cntDMRG++){
-               xblock[ NOCC + cntDMRG + linsize*cntOcc ]   =   xmatrix[irrep][0][ cntDMRG + NDMRG * cntOcc];
-               xblock[ cntOcc + linsize*(NOCC + cntDMRG) ] = - xblock[ NOCC + cntDMRG + linsize*cntOcc ];
-            }
-         }
-         for (int cntDMRG=0; cntDMRG<NDMRG; cntDMRG++){
-            for (int cntVirt=0; cntVirt<NVIRT; cntVirt++){
-               xblock[ NOCC + NDMRG + cntVirt + linsize*(NOCC + cntDMRG )] =   xmatrix[irrep][1][ cntVirt + NVIRT * cntDMRG ];
-               xblock[ NOCC + cntDMRG + linsize*(NOCC + NDMRG + cntVirt )] = - xblock[ NOCC + NDMRG + cntVirt + linsize*( NOCC + cntDMRG ) ];
-            }
-         }
-         for (int cntOcc=0; cntOcc<NOCC; cntOcc++){
-            for (int cntVirt=0; cntVirt<NVIRT; cntVirt++){
-               xblock[ NOCC + NDMRG + cntVirt + linsize*cntOcc ]     =   xmatrix[irrep][2][ cntVirt + NVIRT * cntOcc ];
-               xblock[ cntOcc + linsize*( NOCC + NDMRG + cntVirt ) ] = - xblock[ NOCC + NDMRG + cntVirt + linsize*cntOcc ];
-            }
-         }
+         double * workLARGE = temp2;  //4*size
+         int     lworkLARGE = 4*size; //4*size = 4*linsize*linsize > 3*linsize-1
          
-         //Calculate its eigenvalues and eigenvectors
-         double * Bmat = temp2;
+         //Construct the antisymmetric x-matrix
+         buildSkewSymmX(irrep, xblock, vector, compact);
+         
+         //Bmat <= xblock * xblock
          char notr = 'N';
          double alpha = 1.0;
          double beta = 0.0; //SET !!!
-         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,xblock,&linsize,xblock,&linsize,&beta,Bmat,&linsize); //Bmat = xblock * xblock
+         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,xblock,&linsize,xblock,&linsize,&beta,Bmat,&linsize);
          
+         //Bmat * work1 * Bmat^T <= xblock * xblock
          char uplo = 'U';
          char jobz = 'V';
-         double * eigenval = temp1 + size;
-         double * work = eigenval + linsize;
-         int lwork = 2*size - linsize; //For linsize=2, lwork is 6 and should be 3*linsize-1=5, i.e. larger than linsize^2.
          int info;
-         dsyev_(&jobz, &uplo, &linsize, Bmat, &linsize, eigenval, work, &lwork, &info); // xblock * xblock = Bmat * eigenval * Bmat^T
+         dsyev_(&jobz, &uplo, &linsize, Bmat, &linsize, work1, workLARGE, &lworkLARGE, &info);
          
-         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,xblock,&linsize,Bmat,&linsize,&beta,work,&linsize);
+         //work2 <= Bmat^T * xblock * Bmat
+         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,xblock,&linsize,Bmat,&linsize,&beta,work1,&linsize);
          char trans = 'T';
-         double * work2 = temp2 + size;
-         dgemm_(&trans,&notr,&linsize,&linsize,&linsize,&alpha,Bmat,&linsize,work,&linsize,&beta,work2,&linsize); //work2 = Bmat^T * xblock * Bmat
+         dgemm_(&trans,&notr,&linsize,&linsize,&linsize,&alpha,Bmat,&linsize,work1,&linsize,&beta,work2,&linsize);
          
-         if (CheMPS2::CASSCF_debugPrint){
-            cout << "lambdas of irrep block " << irrep << " : " << endl;
+         if (CheMPS2::DMRGSCF_debugPrint){
+            cout << "   DMRGSCFunitary::updateUnitary : Lambdas of irrep block " << irrep << " : " << endl;
             for (int cnt=0; cnt<linsize/2; cnt++){
-               cout << "   block = [ " << work2[2*cnt   + linsize*2*cnt] << " , " << work2[2*cnt   + linsize*(2*cnt+1)] << " ] " << endl;
-               cout << "           [ " << work2[2*cnt+1 + linsize*2*cnt] << " , " << work2[2*cnt+1 + linsize*(2*cnt+1)] << " ] " << endl;
+               cout << "      block = [ " << work2[2*cnt   + linsize*2*cnt] << " , " << work2[2*cnt   + linsize*(2*cnt+1)] << " ] " << endl;
+               cout << "              [ " << work2[2*cnt+1 + linsize*2*cnt] << " , " << work2[2*cnt+1 + linsize*(2*cnt+1)] << " ] " << endl;
             }
          }
          
-         for (int cnt=0; cnt<linsize/2; cnt++){
-            eigenval[cnt] = 0.5*( work2[2*cnt + linsize*(2*cnt+1)] - work2[2*cnt+1 + linsize*(2*cnt)] );
-            work2[2*cnt + linsize*(2*cnt+1)] -= eigenval[cnt];
-            work2[2*cnt+1 + linsize*(2*cnt)] += eigenval[cnt];
+         //work1 <= values of the antisymmetric 2x2 blocks
+         for (int cnt=0; cnt<linsize/2; cnt++){ work1[cnt] = 0.5*( work2[2*cnt + linsize*(2*cnt+1)] - work2[2*cnt+1 + linsize*(2*cnt)] ); }
+         
+         if (CheMPS2::DMRGSCF_debugPrint){
+            for (int cnt=0; cnt<linsize/2; cnt++){
+               work2[2*cnt + linsize*(2*cnt+1)] -= work1[cnt];
+               work2[2*cnt+1 + linsize*(2*cnt)] += work1[cnt];
+            }
+            double RMSdeviation = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSdeviation += work2[cnt] * work2[cnt]; }
+            RMSdeviation = sqrt(RMSdeviation);
+            cout << "   DMRGSCFunitary::updateUnitary : RMSdeviation of irrep block " << irrep << " (should be 0.0) = " << RMSdeviation << endl;
          }
          
-         if (CheMPS2::CASSCF_debugPrint){
-            double TwoNormResidual = 0.0;
-            for (int cnt=0; cnt<size; cnt++){ TwoNormResidual += work2[cnt] * work2[cnt]; }
-            TwoNormResidual = sqrt(TwoNormResidual);
-            cout << "TwoNormResidual of irrep block " << irrep << " = " << TwoNormResidual << endl;
-         }
-         
-         //Calculate exp(x)
+         //work2 <= exp(Bmat^T * xblock * Bmat)
          for (int cnt=0; cnt<size; cnt++){ work2[cnt] = 0.0; }
          for (int cnt=0; cnt<linsize/2; cnt++){
-            double cosine = cos(eigenval[cnt]);
-            double sine = sin(eigenval[cnt]);
+            double cosine = cos(work1[cnt]);
+            double sine   = sin(work1[cnt]);
             work2[2*cnt   + linsize*(2*cnt  )] = cosine;
             work2[2*cnt+1 + linsize*(2*cnt+1)] = cosine;
             work2[2*cnt   + linsize*(2*cnt+1)] = sine;
-            work2[2*cnt+1 + linsize*(2*cnt  )] = - sine;
+            work2[2*cnt+1 + linsize*(2*cnt  )] = -sine;
          }
-         for (int cnt=2*(linsize/2); cnt<linsize; cnt++){
-            work2[cnt*(linsize + 1)] = 1.0;
-         }
-         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,Bmat,&linsize,work2,&linsize,&beta,work,&linsize);
-         dgemm_(&notr,&trans,&linsize,&linsize,&linsize,&alpha,work,&linsize,Bmat,&linsize,&beta,work2,&linsize); //work2 = exp(xblock)
+         for (int cnt=2*(linsize/2); cnt<linsize; cnt++){ work2[cnt*(linsize + 1)] = 1.0; }
          
-         //U <-- exp(x) * U
-         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,work2,&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
+         //work2 <= Bmat * exp(Bmat^T * xblock * Bmat) * Bmat^T = exp(xblock)
+         dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,Bmat,&linsize,work2,&linsize,&beta,work1,&linsize);
+         dgemm_(&notr,&trans,&linsize,&linsize,&linsize,&alpha,work1,&linsize,Bmat,&linsize,&beta,work2,&linsize);
+         
          int inc = 1;
-         dcopy_(&size, work, &inc, unitary[irrep], &inc);
+         if (multiply){ //U <-- exp(x) * U
+            dgemm_(&notr,&notr,&linsize,&linsize,&linsize,&alpha,work2,&linsize,unitary[irrep],&linsize,&beta,work1,&linsize);
+            dcopy_(&size, work1, &inc, unitary[irrep], &inc);
+         } else { //U <-- exp(x)
+            dcopy_(&size, work2, &inc, unitary[irrep], &inc);
+         }
 
       }
    }
    
-   if (CheMPS2::CASSCF_debugPrint){ CheckDeviationFromUnitary(temp2); }
+   if (CheMPS2::DMRGSCF_debugPrint){ CheckDeviationFromUnitary(temp2); }
 
 }
 
@@ -318,7 +313,7 @@ void CheMPS2::DMRGSCFunitary::rotateUnitaryNOeigenvecs(double * eigenvecs, doubl
 
    }
    
-   if (CheMPS2::CASSCF_debugPrint){ CheckDeviationFromUnitary(work); }
+   if (CheMPS2::DMRGSCF_debugPrint){ CheckDeviationFromUnitary(work); }
 
 }
 
@@ -327,7 +322,7 @@ void CheMPS2::DMRGSCFunitary::CheckDeviationFromUnitary(double * work) const{
    char tran = 'T';
    char notr = 'N';
    double alpha = 1.0;
-   double beta = 0.0;
+   double beta  = 0.0;
    
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
    
@@ -341,15 +336,246 @@ void CheMPS2::DMRGSCFunitary::CheckDeviationFromUnitary(double * work) const{
          }
       }
       value = sqrt(value);
-      cout << "Two-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
+      cout << "   DMRGSCFunitary::CheckDeviationFromUnitary : 2-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
       
+   }
+
+}
+
+void CheMPS2::DMRGSCFunitary::getLog(double * vector, double * temp1, double * temp2) const{
+
+   int jump = 0;
+
+   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+   
+      int linsize = iHandler->getNORB(irrep);
+      int size = linsize * linsize;
+      
+      if (linsize>1){
+         /* linsize >= 2; hence temp1 is at least of size 4*linsize*linsize
+            if linsize <= 1; there corresponds no block in xmatrix to it */
+         
+         double * work1     = temp1;          //linsize * linsize
+         double * work2     = temp1 +   size; //linsize * linsize
+         double * work3     = temp1 + 2*size; //linsize * linsize
+         double * work4     = temp1 + 3*size; //linsize * linsize
+         
+         double * workLARGE = temp2;
+         int lworkLARGE     = 4*size;
+         
+         //S = U + U^T --> work1
+         for (int row=0; row<linsize; row++){
+            for (int col=0; col<linsize; col++){
+               work1[row + linsize * col] = unitary[irrep][row + linsize * col] + unitary[irrep][col + linsize * row];
+            }
+         }
+         
+         //Get the eigenvectors of S = U + U^T: eigvals in work4, eigvecs in work1
+         char jobz = 'V'; //compute eigenvectors
+         char uplo = 'U';
+         int info;
+         dsyev_(&jobz, &uplo, &linsize, work1, &linsize, work4, workLARGE, &lworkLARGE, &info);
+         
+         //Transform the original orthogonal matrix with the real orthonormal eigenbasis of S --> the result V^T U V is stored in work3
+         char trans = 'T';
+         char notra = 'N';
+         double alpha = 1.0;
+         double beta = 0.0; //set
+         dgemm_(&trans, &notra, &linsize, &linsize, &linsize, &alpha, work1, &linsize, unitary[irrep], &linsize, &beta, workLARGE, &linsize);
+         dgemm_(&notra, &notra, &linsize, &linsize, &linsize, &alpha, workLARGE, &linsize, work1, &linsize, &beta, work3, &linsize);
+         
+         //Work3 should contain 1x1 blocks containing [+/-1] and 2x2 blocks containing [[cos(u) sin(u)][-sin(u) cos(u)]].
+         //Fill work2 with ln(V^T U V) = ln(work3).
+         for (int cnt=0; cnt<size; cnt++){ work2[cnt] = 0.0; }
+         for (int cnt=0; cnt<linsize/2; cnt++){ //2x2 blocks
+            double cosinus = 0.5 * ( work3[2*cnt + linsize*2*cnt    ] + work3[2*cnt+1 + linsize*(2*cnt+1)] );
+            double sinus   = 0.5 * ( work3[2*cnt + linsize*(2*cnt+1)] - work3[2*cnt+1 + linsize*2*cnt    ] );
+            work3[2*cnt   + linsize*2*cnt    ] -= cosinus;
+            work3[2*cnt+1 + linsize*(2*cnt+1)] -= cosinus;
+            work3[2*cnt   + linsize*(2*cnt+1)] -= sinus;
+            work3[2*cnt+1 + linsize*2*cnt    ] += sinus;
+            double theta   = atan2( sinus, cosinus );
+            if (CheMPS2::DMRGSCF_debugPrint){ cout << "   DMRGSCFunitary::getLog : 2x2 block which corresponds to theta = " << theta << endl; }
+            work2[2*cnt   + linsize*(2*cnt+1)] = theta;
+            work2[2*cnt+1 + linsize*2*cnt    ] = -theta;
+         } //The rest are 1x1 blocks, corresponding to eigenvalue 1 --> ln(1) = 0 --> work2 does not need to be updated.
+         for (int cnt=2*(linsize/2); cnt<linsize; cnt++){ work3[cnt*(linsize+1)] -= 1; }
+         
+         //Calculate the 2-norm of updated work3 (should be 0.0)
+         if (CheMPS2::DMRGSCF_debugPrint){
+            double RMSdeviation = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSdeviation += work3[cnt]*work3[cnt]; }
+            RMSdeviation = sqrt(RMSdeviation);
+            cout << "   DMRGSCFunitary::getLog : 2-norm of [ V^T*U*V - assumed blocks ] for irrep " << irrep << " (should be 0.0) = " << RMSdeviation << endl;
+         }
+         
+         //Calculate V * ln(blocks) * V^T --> work4
+         dgemm_(&notra, &notra, &linsize, &linsize, &linsize, &alpha, work1, &linsize, work2, &linsize, &beta, workLARGE, &linsize); //V*ln(blocks)
+         dgemm_(&notra, &trans, &linsize, &linsize, &linsize, &alpha, workLARGE, &linsize, work1, &linsize, &beta, work4, &linsize); //V*ln(blocks)*V^T
+         
+         //Fill the vector with the just calculated ln(U) = work4
+         for (int row=0; row<linsize; row++){
+            for (int col=row+1; col<linsize; col++){
+               vector[ jump + row + col*(col-1)/2 ] = 0.5 * ( work4[ row + linsize * col ] - work4[ col + linsize * row ] );
+            }
+         }
+         
+         jump += linsize*(linsize-1)/2;
+         
+      }
+   
+   }
+   
+   //if (CheMPS2::DMRGSCF_debugPrint){
+   if (true){
+      DMRGSCFunitary temporaryU = DMRGSCFunitary(iHandler);
+      temporaryU.updateUnitary(temp1, temp2, vector, false, false); //multiply = compact = false
+      double TwoNormDifference = 0.0;
+      for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+         const int linsize = iHandler->getNORB(irrep);
+         for (int cnt=0; cnt<linsize*linsize; cnt++){
+            TwoNormDifference += ( temporaryU.getBlock(irrep)[cnt] - unitary[irrep][cnt] ) * ( temporaryU.getBlock(irrep)[cnt] - unitary[irrep][cnt] );
+         }
+      }
+      TwoNormDifference = sqrt(TwoNormDifference);
+      cout << "   DMRGSCFunitary::getLog : 2-norm of [ U - exp(ln(U)) ] (should be 0.0) = " << TwoNormDifference << endl;
+   }
+
+}
+
+void CheMPS2::DMRGSCFunitary::BCH(double * Xprev, double * step, double * Xnew, double * temp1, double * temp2) const{
+
+   int jump = 0;
+
+   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+   
+      int linsize = iHandler->getNORB(irrep);
+      int size = linsize * linsize;
+      
+      if (linsize>1){
+         /* linsize >= 2; hence temp1 and temp2 are at least of size 4*linsize*linsize
+            if linsize <= 1; the corresponding blocks in x are zero */
+         
+         double * theY      = temp1;          //linsize * linsize --> will contain Xprev in unfolded form
+         double * xblock    = temp1 +   size; //linsize * linsize --> will contain step in unfolded form
+         double * work1     = temp1 + 2*size; //linsize * linsize
+         double * work2     = temp1 + 3*size; //linsize * linsize
+         double * work3     = temp2;          //linsize * linsize
+         double * work4     = temp2 +   size; //linsize * linsize
+         //double * work5     = temp2 + 2*size; //linsize * linsize
+         double * result    = temp2 + 3*size; //linsize * linsize
+         
+         //Copy Xprev to theY (right hand side of BCH)
+         buildSkewSymmX(irrep, theY, Xprev, false); //NOT compact
+         buildSkewSymmX(irrep, xblock, step, true); //compact
+         
+         //Z1 = X+Y
+         int inc = 1;
+         dcopy_(&size, xblock, &inc, result, &inc);
+         double alpha = 1.0;
+         daxpy_(&size, &alpha, theY, &inc, result, &inc);
+         
+         //Z2 = 0.5[X,Y]
+         char notrans = 'N';
+         double beta = 0.0; //SET
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, xblock, &linsize, theY, &linsize, &beta, work1, &linsize); //X*Y --> work1
+         alpha = -1.0;
+         beta = 1.0; //ADD
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, theY, &linsize, xblock, &linsize, &beta, work1, &linsize); //work1 = XY - YX = [X,Y]
+         alpha = 0.5;
+         daxpy_(&size, &alpha, work1, &inc, result, &inc);
+         if (CheMPS2::DMRGSCF_debugPrint){
+            double RMSmat = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSmat += work1[cnt] * work1[cnt]; }         
+            RMSmat = sqrt(0.25 * RMSmat);
+            cout << "   DMRGSCFunitary::BCH : for irrep " << irrep << endl;
+            cout << "                         the 2-norm of the 2nd order term is " << RMSmat << endl;
+         }
+         
+         //Z3 = 1/12 * ( [X,[X,Y]] - [Y,[X,Y]] )
+         beta = 0.0; //SET
+         alpha = 1.0;
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, xblock, &linsize, work1, &linsize, &beta, work2, &linsize); //X * [X,Y] --> work2
+         alpha = -1.0;
+         beta = 1.0; //ADD
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, work1, &linsize, xblock, &linsize, &beta, work2, &linsize); //work2 = [X,[X,Y]]
+         beta = 0.0; //SET
+         alpha = 1.0;
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, theY, &linsize, work1, &linsize, &beta, work3, &linsize); //Y * [X,Y] --> work3
+         alpha = -1.0;
+         beta = 1.0; //ADD
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, work1, &linsize, theY, &linsize, &beta, work3, &linsize); //work3 = [Y,[X,Y]]
+         alpha = 1 / 12.0;
+         daxpy_(&size, &alpha, work2, &inc, result, &inc);
+         alpha = - 1 / 12.0;
+         daxpy_(&size, &alpha, work3, &inc, result, &inc);
+         if (CheMPS2::DMRGSCF_debugPrint){
+            double RMSmat = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSmat += ( work2[cnt] - work3[cnt] ) * ( work2[cnt] - work3[cnt] ); }
+            RMSmat = sqrt(RMSmat / 144.0);
+            cout << "                         the 2-norm of the 3rd order term is " << RMSmat << endl;
+         }
+         
+         //Z4 = -1/24 [Y,[X,[X,Y]]]
+         beta = 0.0; //SET
+         alpha = 1.0;
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, theY, &linsize, work2, &linsize, &beta, work4, &linsize); //Y * [X,[X,Y]] --> work4
+         alpha = -1.0;
+         beta = 1.0; //ADD
+         dgemm_(&notrans, &notrans, &linsize, &linsize, &linsize, &alpha, work2, &linsize, theY, &linsize, &beta, work4, &linsize); //work4 = [Y,[X,[X,Y]]]
+         alpha = - 1 / 24.0;
+         daxpy_(&size, &alpha, work4, &inc, result, &inc);
+         if (CheMPS2::DMRGSCF_debugPrint){
+            double RMSmat = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSmat += work4[cnt] * work4[cnt]; }
+            RMSmat = sqrt(RMSmat / 576.0);
+            cout << "                         the 2-norm of the 4th order term is " << RMSmat << endl;
+         }
+         
+         //Copy back the result
+         for (int row=0; row<linsize; row++){
+            for (int col=row+1; col<linsize; col++){
+               Xnew[ jump + row + col*(col-1)/2 ] = 0.5 * ( result[ row + linsize * col ] - result[ col + linsize * row ] );
+            }
+         }
+         
+         if (CheMPS2::DMRGSCF_debugPrint){
+            for (int row=0; row<linsize; row++){
+               for (int col=row+1; col<linsize; col++){
+                  result[ row + linsize * col ] -= Xnew[ jump + row + col*(col-1)/2 ];
+                  result[ col + linsize * row ] += Xnew[ jump + row + col*(col-1)/2 ];
+               }
+            }
+            double RMSmat = 0.0;
+            for (int cnt=0; cnt<size; cnt++){ RMSmat += result[cnt] * result[cnt]; }
+            RMSmat = sqrt(RMSmat);
+            cout << "                         the 2-norm of the adapted result (should be 0.0) = " << RMSmat << endl;
+         }
+         
+         jump += linsize*(linsize-1)/2;
+         
+      }
+   }
+   
+   if (CheMPS2::DMRGSCF_debugPrint){
+      DMRGSCFunitary temporaryU = DMRGSCFunitary(iHandler);
+      temporaryU.updateUnitary(temp1, temp2, Xnew, false, false); //multiply = compact = false
+      double TwoNormDifference = 0.0;
+      for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+         const int linsize = iHandler->getNORB(irrep);
+         for (int cnt=0; cnt<linsize*linsize; cnt++){
+            TwoNormDifference += ( temporaryU.getBlock(irrep)[cnt] - unitary[irrep][cnt] ) * ( temporaryU.getBlock(irrep)[cnt] - unitary[irrep][cnt] );
+         }
+      }
+      TwoNormDifference = sqrt(TwoNormDifference);
+      cout << "   DMRGSCFunitary::getLog : 2-norm of [ U - exp( Xnew ) ] = " << TwoNormDifference << endl;
    }
 
 }
 
 void CheMPS2::DMRGSCFunitary::saveU() const{
 
-   hid_t file_id = H5Fcreate(CheMPS2::CASSCF_unitaryStorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+   hid_t file_id = H5Fcreate(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
    hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
    
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -374,7 +600,7 @@ void CheMPS2::DMRGSCFunitary::saveU() const{
 
 void CheMPS2::DMRGSCFunitary::loadU(){
 
-   hid_t file_id = H5Fopen(CheMPS2::CASSCF_unitaryStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
    hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
        
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -397,9 +623,9 @@ void CheMPS2::DMRGSCFunitary::loadU(){
 void CheMPS2::DMRGSCFunitary::deleteStoredUnitary() const{
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::CASSCF_unitaryStorageName;
+   temp << "rm " << CheMPS2::DMRGSCF_unitaryStorageName;
    int info = system(temp.str().c_str());
-   cout << "Info on CASSCF::Unitary rm call to system: " << info << endl;
+   cout << "Info on DMRGSCF::Unitary rm call to system: " << info << endl;
 
 }
 

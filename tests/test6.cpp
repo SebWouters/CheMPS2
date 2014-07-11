@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -80,10 +80,12 @@ int main(void){
 
    //Run CASSCF
    int rootNum = 1; //Ground state only
-   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum);
+   bool doDIIS = true;
+   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, doDIIS);
    
    //Clean up
-   if (CheMPS2::CASSCF_storeUnitary){ koekoek.deleteStoredUnitary(); }
+   if (CheMPS2::DMRGSCF_storeUnitary){ koekoek.deleteStoredUnitary(); }
+   if (CheMPS2::DMRGSCF_storeDIIS){ koekoek.deleteStoredDIIS(); }
    delete OptScheme;
    
    //Check succes
