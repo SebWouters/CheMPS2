@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <string.h>
 #include <sstream>
 #include <sys/stat.h>
+#include <sys/time.h>
 
 #include "DMRG.h"
 
@@ -166,11 +167,20 @@ double CheMPS2::DMRG::Solve(){
       
       while ( (fabs(Energy-EnergyPrevious) > OptScheme->getEconv(instruction) ) && ( nIterations < OptScheme->getMaxSweeps(instruction) )){
       
+         struct timeval start, end;
          EnergyPrevious = Energy;
+         gettimeofday(&start, NULL);
          Energy = sweepleft(change, instruction);
+         gettimeofday(&end, NULL);
+         double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+         cout << "***  Elapsed wall time during last sweep is " << elapsed << endl;
          cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
          if (!change) change = true; //rest of sweeps: variable virtual dimensions
+         gettimeofday(&start, NULL);
          Energy = sweepright(change, instruction);
+         gettimeofday(&end, NULL);
+         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+         cout << "***  Elapsed wall time during last sweep is " << elapsed << endl;
          cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
          if (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, false); }
          
