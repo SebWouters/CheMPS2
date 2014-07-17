@@ -30,13 +30,13 @@ namespace CheMPS2{
    const bool   DMRGSCF_debugPrint            = false;
    const bool   DMRGSCF_storeUnitary          = true;
    const bool   DMRGSCF_rotate2DMtoNO         = true;
-   const double DMRGSCF_gradientNormThreshold = 1e-8;
+   const double DMRGSCF_gradientNormThreshold = 1e-6;
    const string DMRGSCF_unitaryStorageName    = "CheMPS2_CASSCF.h5";
    const int    DMRGSCF_maxlinsizeCutoff      = 100;
    
    const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
    const bool   DMRGSCF_storeDIIS             = true;
-   const double DMRGSCF_DIISgradientBranch    = 5e-3;
+   const double DMRGSCF_DIISgradientBranch    = 1e-2;
    const int    DMRGSCF_numDIISvecs           = 10;
 
    const string TMPpath                       = "/tmp/";

@@ -58,8 +58,7 @@ namespace CheMPS2{
              \param Qtensor The previous TensorQ
              \param Atensor The previous TensorA
              \param Ctensor The previous TensorC
-             \param Dtensor The previous TensorD
-             \param F1tensors Array with the TensorF1's */
+             \param Dtensor The previous TensorD */
          void update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorD * Dtensor);
          
          //! Clear and add the relevant terms to the TensorX
