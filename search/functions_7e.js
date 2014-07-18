@@ -2,6 +2,7 @@ var searchData=
 [
   ['_7ecasscf',['~CASSCF',['../classCheMPS2_1_1CASSCF.html#a20937fd3dbc5c5f3fa2e7ffd4f751900',1,'CheMPS2::CASSCF']]],
   ['_7econvergencescheme',['~ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#af2ca92fc4ac3bbe78ae0ee252c58fab1',1,'CheMPS2::ConvergenceScheme']]],
+  ['_7ediis',['~DIIS',['../classCheMPS2_1_1DIIS.html#a4fdba33bfbbf693f0565a9a4f8e1e0e1',1,'CheMPS2::DIIS']]],
   ['_7edmrg',['~DMRG',['../classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5',1,'CheMPS2::DMRG']]],
   ['_7edmrgscfindices',['~DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#a1dc37bccdc88d7d8f28ab151937f891d',1,'CheMPS2::DMRGSCFindices']]],
   ['_7edmrgscfunitary',['~DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#aceba497a828617733e83f00fc2766163',1,'CheMPS2::DMRGSCFunitary']]],
@@ -32,5 +33,6 @@ var searchData=
   ['_7etensort',['~TensorT',['../classCheMPS2_1_1TensorT.html#af4de45c3fe49b6f0cfc605c4effb5a01',1,'CheMPS2::TensorT']]],
   ['_7etensorx',['~TensorX',['../classCheMPS2_1_1TensorX.html#af9f8e434f869bf10d7110686411dc95c',1,'CheMPS2::TensorX']]],
   ['_7etwodm',['~TwoDM',['../classCheMPS2_1_1TwoDM.html#ae76f74e153484c87b54d4c4152283752',1,'CheMPS2::TwoDM']]],
+  ['_7etwodmstorage',['~TwoDMstorage',['../classCheMPS2_1_1TwoDMstorage.html#a928943351fa0c262c422e6f03712dbe1',1,'CheMPS2::TwoDMstorage']]],
   ['_7etwoindex',['~TwoIndex',['../classCheMPS2_1_1TwoIndex.html#afcc065077cfa14cfecc9a325f39e4649',1,'CheMPS2::TwoIndex']]]
 ];

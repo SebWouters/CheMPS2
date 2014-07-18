@@ -7,6 +7,8 @@ var files =
     [ "CASSCFnewtonraphson.cpp", "CASSCFnewtonraphson_8cpp_source.html", null ],
     [ "ConvergenceScheme.cpp", "ConvergenceScheme_8cpp_source.html", null ],
     [ "ConvergenceScheme.h", "ConvergenceScheme_8h_source.html", null ],
+    [ "DIIS.cpp", "DIIS_8cpp_source.html", null ],
+    [ "DIIS.h", "DIIS_8h_source.html", null ],
     [ "DMRG.cpp", "DMRG_8cpp_source.html", null ],
     [ "DMRG.h", "DMRG_8h_source.html", null ],
     [ "DMRGmpsio.cpp", "DMRGmpsio_8cpp_source.html", null ],
@@ -82,6 +84,8 @@ var files =
     [ "TensorX.h", "TensorX_8h_source.html", null ],
     [ "TwoDM.cpp", "TwoDM_8cpp_source.html", null ],
     [ "TwoDM.h", "TwoDM_8h_source.html", null ],
+    [ "TwoDMstorage.cpp", "TwoDMstorage_8cpp_source.html", null ],
+    [ "TwoDMstorage.h", "TwoDMstorage_8h_source.html", null ],
     [ "TwoIndex.cpp", "TwoIndex_8cpp_source.html", null ],
     [ "TwoIndex.h", "TwoIndex_8h_source.html", null ]
 ];

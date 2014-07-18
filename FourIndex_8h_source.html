@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('FourIndex_8h_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013, 2014 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -182,25 +182,34 @@ $(document).ready(function(){initNavTree('FourIndex_8h_source.html','');});
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">                        - Vmat[Icent][I_i][I_i][i + k*(k+1)/2][j][l-j]</span></div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">                        - If I_i &lt;  I_k and hence I_j &lt;  I_l : fixed by block order</span></div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">                        - Vmat[Icent][I_i][I_k][i + nOrbWithIrrepI_i * k][j][l] */</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;         <span class="keywordtype">double</span> ****** storage;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> ***** storage;</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;         </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;         <span class="comment">//Functions to get the correct pointer to memory</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;         <span class="keywordtype">double</span> * getPointer(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;         <span class="keywordtype">double</span> * getPtrIrrepOrderOK(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;         <span class="keywordtype">double</span> * getPtrAllOK(<span class="keyword">const</span> <span class="keywordtype">int</span> number, <span class="keyword">const</span> <span class="keywordtype">int</span> Icent, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;   };</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;}</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;         <span class="comment">//Calculate the number of unique FourIndex elements --&gt; true means allocate the storage and false means deallocate the storage!</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> calcNumberOfUniqueElements(<span class="keyword">const</span> <span class="keywordtype">bool</span> allocateStorage);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;         </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;         <span class="comment">//The number of unique FourIndex elements</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> arrayLength;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;         </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;         <span class="comment">//The actual two-body matrix elements</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;         <span class="keywordtype">double</span> * theElements;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;         </div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;         <span class="comment">//Functions to get the correct pointer to memory</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> getPointer(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> getPtrIrrepOrderOK(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> getPtrAllOK(<span class="keyword">const</span> <span class="keywordtype">int</span> number, <span class="keyword">const</span> <span class="keywordtype">int</span> Icent, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;   };</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;}</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><b>FourIndex.h</b></li>
-    <li class="footer">Generated on Wed Apr 2 2014 14:52:30 for CheMPS2 by
+    <li class="footer">Generated on Fri Jul 18 2014 12:46:15 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

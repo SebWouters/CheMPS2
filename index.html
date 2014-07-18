@@ -110,11 +110,14 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>How to acknowledge CheMPS2</h2>
 <p>To acknowledge CheMPS2, please cite</p>
 <ol type="1">
-<li>S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry, Computer Physics Communications (2014), <a href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">doi:10.1016/j.cpc.2014.01.019</a> <pre class="fragment"> @article{CheMPS2cite1,
+<li>S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry, Computer Physics Communications 185, 1501 (2014), <a href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">doi:10.1016/j.cpc.2014.01.019</a> <pre class="fragment"> @article{CheMPS2cite1,
      author = {Sebastian Wouters and Ward Poelmans and Paul W. Ayers and Dimitri {Van Neck}},
      title = {CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry},
      journal = {Computer Physics Communications},
      year = {2014},
+     volume = {185},
+     number = {6},
+     pages = {1501},
      doi = {10.1016/j.cpc.2014.01.019}
  }
 </pre></li>
@@ -138,6 +141,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code><a class="el" href="CASSCFhamiltonianrotation_8cpp_source.html">CheMPS2/CASSCFhamiltonianrotation.cpp</a></code> contains the Hamiltonian rotation function, based on the CASSCF unitary matrix.</p>
 <p><code><a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CheMPS2/CASSCFnewtonraphson.cpp</a></code> contains all DMRG-SCF functions which are specific to the augmented Hessian Newton-Raphson update scheme, including the functions to calculate the gradient and Hessian.</p>
 <p><code><a class="el" href="ConvergenceScheme_8cpp_source.html">CheMPS2/ConvergenceScheme.cpp</a></code> contains all functions of the ConvergenceScheme class, which contains the instructions for the subsequent DMRG sweeps.</p>
+<p><code><a class="el" href="DIIS_8cpp_source.html">CheMPS2/DIIS.cpp</a></code> contains a DIIS convergence speed-up for DMRG-SCF.</p>
 <p><code><a class="el" href="DMRG_8cpp_source.html">CheMPS2/DMRG.cpp</a></code> contains the constructor and destructor of the DMRG class, as well as the top-level sweep functions.</p>
 <p><code><a class="el" href="DMRGmpsio_8cpp_source.html">CheMPS2/DMRGmpsio.cpp</a></code> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
 <p><code><a class="el" href="DMRGoperators_8cpp_source.html">CheMPS2/DMRGoperators.cpp</a></code> contains all functions related to the DMRG renormalized operators: saving to disk, loading from disk, and updating.</p>
@@ -177,10 +181,12 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code><a class="el" href="TensorSwap_8cpp_source.html">CheMPS2/TensorSwap.cpp</a></code> contains the common storage and handling functions of the TensorL and TensorQ classes.</p>
 <p><code><a class="el" href="TensorT_8cpp_source.html">CheMPS2/TensorT.cpp</a></code> contains all TensorT functions. This class stores and handles the reduced part of an MPS site-tensor.</p>
 <p><code><a class="el" href="TensorX_8cpp_source.html">CheMPS2/TensorX.cpp</a></code> contains all TensorX functions. This class stores and handles the complementary reduced spin-0 part of four sandwiched second quantized operators, which is of course diagonal in the symmetry sectors.</p>
-<p><code><a class="el" href="TwoDM_8cpp_source.html">CheMPS2/TwoDM.cpp</a></code> contains all functions to store and calculate the 2-RDM from the DMRG-optimized MPS.</p>
+<p><code><a class="el" href="TwoDM_8cpp_source.html">CheMPS2/TwoDM.cpp</a></code> contains all functions to calculate the 2-RDM from the DMRG-optimized MPS.</p>
+<p><code><a class="el" href="TwoDMstorage_8cpp_source.html">CheMPS2/TwoDMstorage.cpp</a></code> contains all functions to store the 2-RDM from the DMRG-optimized MPS.</p>
 <p><code><a class="el" href="TwoIndex_8cpp_source.html">CheMPS2/TwoIndex.cpp</a></code> contains all functions of the TwoIndex container class for the one-body matrix elements.</p>
 <p><code><a class="el" href="CASSCF_8h_source.html">CheMPS2/include/CASSCF.h</a></code> contains the definitions of the CASSCF class.</p>
 <p><code><a class="el" href="ConvergenceScheme_8h_source.html">CheMPS2/include/ConvergenceScheme.h</a></code> contains the definitions of the ConvergenceScheme class.</p>
+<p><code><a class="el" href="DIIS_8h_source.html">CheMPS2/include/DIIS.h</a></code> contains the definitions of the DIIS class.</p>
 <p><code><a class="el" href="DMRG_8h_source.html">CheMPS2/include/DMRG.h</a></code> contains the definitions of the DMRG class.</p>
 <p><code><a class="el" href="DMRGSCFindices_8h_source.html">CheMPS2/include/DMRGSCFindices.h</a></code> contains the definitions of the DMRGSCFindices class.</p>
 <p><code><a class="el" href="DMRGSCFunitary_8h_source.html">CheMPS2/include/DMRGSCFunitary.h</a></code> contains the definitions of the DMRGSCFunitary class.</p>
@@ -216,6 +222,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code><a class="el" href="TensorT_8h_source.html">CheMPS2/include/TensorT.h</a></code> contains the definitions of the TensorT class.</p>
 <p><code><a class="el" href="TensorX_8h_source.html">CheMPS2/include/TensorX.h</a></code> contains the definitions of the TensorX class.</p>
 <p><code><a class="el" href="TwoDM_8h_source.html">CheMPS2/include/TwoDM.h</a></code> contains the definitions of the TwoDM class.</p>
+<p><code><a class="el" href="TwoDMstorage_8h_source.html">CheMPS2/include/TwoDMstorage.h</a></code> contains the definitions of the TwoDMstorage class.</p>
 <p><code><a class="el" href="TwoIndex_8h_source.html">CheMPS2/include/TwoIndex.h</a></code> contains the definitions of the TwoIndex class.</p>
 <p>Please note that these files are documented with Doxygen-readable comments. Search for the section "Build" in <code><a class="el" href="README_8md_source.html">README.md</a></code> to see how a manual can be generated from these comments.</p>
 <h2>List of files to perform test runs</h2>
@@ -224,12 +231,14 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code>tests/test3.cpp</code> contains a ground state DMRG calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</p>
 <p><code>tests/test4.cpp</code> contains a ground state DMRG calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open boundary conditions, containing 9 fermions (just below half-filling).</p>
 <p><code>tests/test5.cpp</code> contains an excited state DMRG calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The ground and two lowest excited states are determined.</p>
-<p><code>tests/test6.cpp</code> contains a DMRG-SCF ground state calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and the lowest two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space.</p>
+<p><code>tests/test6.cpp</code> contains a DMRG-SCF ground state calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A significant speedup is obtained with DIIS.</p>
 <p><code>tests/test7.cpp</code> reads in <code>tests/matrixelements/O2_CCPVDZ.dat</code>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
+<p><code>tests/test8.cpp</code> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
 <p><code>tests/matrixelements/CH4_N10_S0_c2v_I0.dat</code> contains the matrix elements for test3.</p>
 <p><code>tests/matrixelements/H6_N6_S0_d2h_I0.dat</code> contains the matrix elements for test2.</p>
 <p><code>tests/matrixelements/N2_N14_S0_d2h_I0.dat</code> contains the matrix elements for test1 and test5.</p>
 <p><code>tests/matrixelements/O2_CCPVDZ.dat</code> contains the matrix elements for test6 and test7.</p>
+<p><code>tests/matrixelements/N2_CCPVDZ.dat</code> contains the matrix elements for test8.</p>
 <p>These test files illustrate how to use the CheMPS2 library. The tests only require a very limited amount of memory (order 10-100 MB).</p>
 <h2>Matrix elements from Psi4</h2>
 <p>CheMPS2 has a Hamiltonian object which is able to read in matrix elements from a plugin to Psi4 <a href="http://www.psicode.org">[Psi4, Ab initio quantum chemistry]</a>, which works on version psi4.0b5 and higher.</p>
@@ -276,6 +285,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 &gt; ./test5
 &gt; ./test6
 &gt; ./test7
+&gt; ./test8
 </pre><p>The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-100 MB).</p>
 <h3>3. Doxygen documentation</h3>
 <p>To build and view the Doxygen manual, the documentation flag should have been on: <code>-DBUILD_DOCUMENTATION=ON</code>. Start in <code>./build</code> and run: </p>
@@ -293,7 +303,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Apr 2 2014 14:52:32 for CheMPS2 by
+    <li class="footer">Generated on Fri Jul 18 2014 12:46:21 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.3.1 </li>
   </ul>

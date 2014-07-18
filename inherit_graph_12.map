@@ -1,3 +1,22 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classCheMPS2_1_1TwoDM.html" title="CheMPS2::TwoDM" alt="" coords="5,5,141,32"/>
+<area shape="rect" id="node1" href="$classCheMPS2_1_1Tensor.html" title="CheMPS2::Tensor" alt="" coords="5,284,136,311"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorDiag.html" title="CheMPS2::TensorDiag" alt="" coords="197,31,355,57"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorF0Cbase.html" title="CheMPS2::TensorF0Cbase" alt="" coords="185,107,367,133"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TensorF1Dbase.html" title="CheMPS2::TensorF1Dbase" alt="" coords="185,208,367,235"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1TensorO.html" title="CheMPS2::TensorO" alt="" coords="206,259,346,285"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1TensorS0Abase.html" title="CheMPS2::TensorS0Abase" alt="" coords="185,309,367,336"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1TensorS1Bbase.html" title="CheMPS2::TensorS1Bbase" alt="" coords="185,360,367,387"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1TensorSwap.html" title="CheMPS2::TensorSwap" alt="" coords="195,436,357,463"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1TensorT.html" title="CheMPS2::TensorT" alt="" coords="207,487,345,513"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorX.html" title="CheMPS2::TensorX" alt="" coords="420,5,559,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorC.html" title="CheMPS2::TensorC" alt="" coords="419,56,559,83"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorF0.html" title="CheMPS2::TensorF0" alt="" coords="417,107,562,133"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1TensorD.html" title="CheMPS2::TensorD" alt="" coords="419,157,559,184"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1TensorF1.html" title="CheMPS2::TensorF1" alt="" coords="417,208,562,235"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1TensorA.html" title="CheMPS2::TensorA" alt="" coords="420,259,559,285"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1TensorS0.html" title="CheMPS2::TensorS0" alt="" coords="416,309,563,336"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1TensorB.html" title="CheMPS2::TensorB" alt="" coords="420,360,559,387"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1TensorS1.html" title="CheMPS2::TensorS1" alt="" coords="416,411,563,437"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1TensorL.html" title="CheMPS2::TensorL" alt="" coords="421,461,558,488"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1TensorQ.html" title="CheMPS2::TensorQ" alt="" coords="419,512,559,539"/>
 </map>

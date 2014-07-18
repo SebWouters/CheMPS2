@@ -2,6 +2,7 @@ var hierarchy =
 [
     [ "CheMPS2::CASSCF", "classCheMPS2_1_1CASSCF.html", null ],
     [ "CheMPS2::ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", null ],
+    [ "CheMPS2::DIIS", "classCheMPS2_1_1DIIS.html", null ],
     [ "CheMPS2::DMRG", "classCheMPS2_1_1DMRG.html", null ],
     [ "CheMPS2::DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", null ],
     [ "CheMPS2::DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", null ],
@@ -41,5 +42,6 @@ var hierarchy =
       [ "CheMPS2::TensorT", "classCheMPS2_1_1TensorT.html", null ]
     ] ],
     [ "CheMPS2::TwoDM", "classCheMPS2_1_1TwoDM.html", null ],
+    [ "CheMPS2::TwoDMstorage", "classCheMPS2_1_1TwoDMstorage.html", null ],
     [ "CheMPS2::TwoIndex", "classCheMPS2_1_1TwoIndex.html", null ]
 ];

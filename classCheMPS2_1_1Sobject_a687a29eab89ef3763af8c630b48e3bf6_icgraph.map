@@ -1,4 +1,4 @@
 <map id="CheMPS2::Sobject::Join" name="CheMPS2::Sobject::Join">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a35db8f58be5130548d5998ccbda4d37e" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!..." alt="" coords="222,5,413,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#aee8753e7169f61e4804ddbc1b7e8409d" title="Does the state&#45;specific CASSCF cycle with the (augmented hessian) newton raphson method." alt="" coords="462,5,773,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method." alt="" coords="462,5,773,32"/>
 </map>

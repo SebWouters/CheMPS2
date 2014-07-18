@@ -1,4 +1,4 @@
 <map id="CheMPS2::DMRGSCFindices::getNORB" name="CheMPS2::DMRGSCFindices::getNORB">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#aee8753e7169f61e4804ddbc1b7e8409d" title="Does the state&#45;specific CASSCF cycle with the (augmented hessian) newton raphson method." alt="" coords="254,5,565,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method." alt="" coords="254,5,565,32"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor." alt="" coords="311,57,508,98"/>
 </map>

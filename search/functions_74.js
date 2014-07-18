@@ -20,5 +20,6 @@ var searchData=
   ['tensort',['TensorT',['../classCheMPS2_1_1TensorT.html#a08705c000454ebea5b96a4a8a7fbdc0f',1,'CheMPS2::TensorT']]],
   ['tensorx',['TensorX',['../classCheMPS2_1_1TensorX.html#a494fde7a79bf746d09d92b9fe26a3201',1,'CheMPS2::TensorX']]],
   ['twodm',['TwoDM',['../classCheMPS2_1_1TwoDM.html#adafda7081d8bb8670482ef8d79485961',1,'CheMPS2::TwoDM']]],
+  ['twodmstorage',['TwoDMstorage',['../classCheMPS2_1_1TwoDMstorage.html#a3558e85e4d8467e40393cdb1964a2e19',1,'CheMPS2::TwoDMstorage']]],
   ['twoindex',['TwoIndex',['../classCheMPS2_1_1TwoIndex.html#a6f6c5a45f2522d4adfc4f51d161ef680',1,'CheMPS2::TwoIndex']]]
 ];

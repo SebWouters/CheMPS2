@@ -21,5 +21,6 @@ var searchData=
   ['tensort',['TensorT',['../classCheMPS2_1_1TensorT.html',1,'CheMPS2']]],
   ['tensorx',['TensorX',['../classCheMPS2_1_1TensorX.html',1,'CheMPS2']]],
   ['twodm',['TwoDM',['../classCheMPS2_1_1TwoDM.html',1,'CheMPS2']]],
+  ['twodmstorage',['TwoDMstorage',['../classCheMPS2_1_1TwoDMstorage.html',1,'CheMPS2']]],
   ['twoindex',['TwoIndex',['../classCheMPS2_1_1TwoIndex.html',1,'CheMPS2']]]
 ];

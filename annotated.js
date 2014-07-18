@@ -3,6 +3,7 @@ var annotated =
     [ "CheMPS2", null, [
       [ "CASSCF", "classCheMPS2_1_1CASSCF.html", "classCheMPS2_1_1CASSCF" ],
       [ "ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", "classCheMPS2_1_1ConvergenceScheme" ],
+      [ "DIIS", "classCheMPS2_1_1DIIS.html", "classCheMPS2_1_1DIIS" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],
       [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", "classCheMPS2_1_1DMRGSCFindices" ],
       [ "DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", "classCheMPS2_1_1DMRGSCFunitary" ],
@@ -34,6 +35,7 @@ var annotated =
       [ "TensorT", "classCheMPS2_1_1TensorT.html", "classCheMPS2_1_1TensorT" ],
       [ "TensorX", "classCheMPS2_1_1TensorX.html", "classCheMPS2_1_1TensorX" ],
       [ "TwoDM", "classCheMPS2_1_1TwoDM.html", "classCheMPS2_1_1TwoDM" ],
+      [ "TwoDMstorage", "classCheMPS2_1_1TwoDMstorage.html", "classCheMPS2_1_1TwoDMstorage" ],
       [ "TwoIndex", "classCheMPS2_1_1TwoIndex.html", "classCheMPS2_1_1TwoIndex" ]
     ] ]
 ];

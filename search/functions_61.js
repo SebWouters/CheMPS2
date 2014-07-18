@@ -6,8 +6,9 @@ var searchData=
   ['addatermtranspose',['AddATermTranspose',['../classCheMPS2_1_1TensorC.html#a59ecea30bb4eb5c3ff634999931bcb5c',1,'CheMPS2::TensorC::AddATermTranspose()'],['../classCheMPS2_1_1TensorD.html#a18e3f1730c2f05d7334ca0331c279088',1,'CheMPS2::TensorD::AddATermTranspose()']]],
   ['addnoise',['addNoise',['../classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c',1,'CheMPS2::Sobject']]],
   ['addtermsab',['AddTermsAB',['../classCheMPS2_1_1TensorQ.html#acf51806ae9d447da34bcd0fb1d4ec814',1,'CheMPS2::TensorQ']]],
-  ['addtermscf0df1',['AddTermsCF0DF1',['../classCheMPS2_1_1TensorQ.html#a330b217d44dc4d318c8d7e01bb6789cc',1,'CheMPS2::TensorQ']]],
+  ['addtermscd',['AddTermsCD',['../classCheMPS2_1_1TensorQ.html#a4590f2433b7d5d44a8a2c6a847e15e0c',1,'CheMPS2::TensorQ']]],
   ['addtermsimple',['AddTermSimple',['../classCheMPS2_1_1TensorQ.html#a2713d322bf2d702d276cac8619196b0f',1,'CheMPS2::TensorQ']]],
   ['addtermsl',['AddTermsL',['../classCheMPS2_1_1TensorQ.html#a1aabed806e81453ed29f84626985bc65',1,'CheMPS2::TensorQ']]],
-  ['addtovmat',['addToVmat',['../classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82',1,'CheMPS2::Hamiltonian']]]
+  ['addtovmat',['addToVmat',['../classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82',1,'CheMPS2::Hamiltonian']]],
+  ['appendnew',['appendNew',['../classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432',1,'CheMPS2::DIIS']]]
 ];

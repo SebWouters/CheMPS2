@@ -1,4 +1,4 @@
 <map id="CheMPS2::TensorT::RightMultiply" name="CheMPS2::TensorT::RightMultiply">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a35db8f58be5130548d5998ccbda4d37e" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!..." alt="" coords="278,5,469,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#aee8753e7169f61e4804ddbc1b7e8409d" title="Does the state&#45;specific CASSCF cycle with the (augmented hessian) newton raphson method." alt="" coords="518,5,829,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method." alt="" coords="518,5,829,32"/>
 </map>
