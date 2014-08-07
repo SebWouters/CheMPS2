@@ -117,6 +117,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
             if (theDIIS == NULL){
                theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), CheMPS2::DMRGSCF_numDIISvecs);
                theDIISparameterVector = new double[ theDIISvectorParamSize ];
+               unitary->makeSureAllBlocksDetOne(mem1, mem2);
             }
             unitary->getLog(theDIISparameterVector, mem1, mem2);
             theDIIS->appendNew(gradient, theDIISparameterVector);
@@ -152,7 +153,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       calcNOON(mem1, mem2);
       if ((CheMPS2::DMRGSCF_rotate2DMtoNO) && (theDIIS==NULL)){ //When the DIIS has started, stop rotating the active space to NOs
          rotate2DMand1DM(N, mem1, mem2);
-         unitary->rotateUnitaryNOeigenvecs(mem1, mem2);
+         unitary->rotateUnitaryNOeigenvecs(mem1, mem2); //Very very very important remark: This rotation can change the determinant from +1 to -1 !!!!
          buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildOneBodyMatrixElements();
       }

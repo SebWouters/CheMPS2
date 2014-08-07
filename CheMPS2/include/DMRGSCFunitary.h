@@ -92,6 +92,11 @@ namespace CheMPS2{
              \param temp2 Work memory */
          void BCH(double * Xprev, double * step, double * Xnew, double * temp1, double * temp2) const;
          
+         //! Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1.
+         /** \param temp1 Work memory
+             \param temp2 Work memory */
+         void makeSureAllBlocksDetOne(double * temp1, double * temp2);
+         
          //! Save the unitary to disk
          void saveU() const;
          
