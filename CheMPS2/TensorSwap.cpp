@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -135,14 +135,14 @@ void CheMPS2::TensorSwap::Clear(){
 
 }
 
-void CheMPS2::TensorSwap::update(TensorSwap * SwapPrevious, TensorT * denT, double * workmem){
+void CheMPS2::TensorSwap::update(TensorSwap * SwapPrevious, TensorT * denT, double * workmem, const bool JordanWigner){
 
-   if (movingRight){ updateMovingRight(SwapPrevious, denT, workmem); }
-   else{ updateMovingLeft( SwapPrevious, denT, workmem); }
+   if (movingRight){ updateMovingRight(SwapPrevious, denT, workmem, JordanWigner); }
+   else{ updateMovingLeft( SwapPrevious, denT, workmem, JordanWigner); }
 
 }
 
-void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT * denT, double * workmem){
+void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT * denT, double * workmem, const bool JordanWigner){
 
    Clear();
    
@@ -203,6 +203,7 @@ void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT *
             double alpha = 1.0;
             if (geval>=2){
                int fase = ((((TwoSDL+sectorTwoS1[ikappa])/2)%2)!=0)?-1:1;
+               if (!JordanWigner){ fase *= -1; }
                alpha = fase * sqrt((TwoSDL+1.0)*(sectorTwoS1[ikappa]+1.0)) * gsl_sf_coupling_6j(sectorTwoS1[ikappa],sectorTwoSD[ikappa],1,TwoSDL,TwoSUL,1);
             }
             char trans = 'T';
@@ -222,7 +223,7 @@ void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT *
 
 }
 
-void CheMPS2::TensorSwap::updateMovingLeft(TensorSwap * SwapPrevious, TensorT * denT, double * workmem){
+void CheMPS2::TensorSwap::updateMovingLeft(TensorSwap * SwapPrevious, TensorT * denT, double * workmem, const bool JordanWigner){
 
    Clear();
    
@@ -283,6 +284,7 @@ void CheMPS2::TensorSwap::updateMovingLeft(TensorSwap * SwapPrevious, TensorT * 
             double alpha = 1.0;
             if (geval>=2){
                int fase = ((((sectorTwoSD[ikappa]+TwoSUR)/2)%2)!=0)?-1:1;
+               if (!JordanWigner){ fase *= -1; }
                alpha = fase*(TwoSDR+1)*sqrt((TwoSUR+1.0)/(sectorTwoSD[ikappa]+1.0))*gsl_sf_coupling_6j(TwoSUR,TwoSDR,1,sectorTwoSD[ikappa],sectorTwoS1[ikappa],1);
             }
             char notr = 'N';

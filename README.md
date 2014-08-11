@@ -177,9 +177,19 @@ quantized operators, of which the particle symmetry sectors are equal.
 ```CheMPS2/TensorF1Dbase.cpp``` contains the common storage and handling
 functions of the TensorF1 and TensorD classes.
 
+```CheMPS2/TensorGYZ.cpp``` contains the contruct and update functions
+for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
+information.
+
+```CheMPS2/TensorK.cpp``` contains the contruct and update functions
+for the K-tensor. It is required for the two-orbital mutual information.
+
 ```CheMPS2/TensorL.cpp``` contains all TensorL functions. This class stores
 and handles the reduced spin-1/2 part of a single sandwiched second quantized
 operator.
+
+```CheMPS2/TensorM.cpp``` contains the contruct and update functions
+for the M-tensor. It is required for the two-orbital mutual information.
 
 ```CheMPS2/TensorO.cpp``` implements the storage and handling of the partial
 terms which are required to calculate the overlap between two MPSs.
@@ -288,10 +298,17 @@ TensorF1Dbase class.
 
 ```CheMPS2/include/TensorF1.h``` contains the definitions of the TensorF1 class.
 
+```CheMPS2/include/TensorGYZ.h``` contains the definitions of the TensorGYZ
+class.
+
 ```CheMPS2/include/Tensor.h``` contains the definitions of the virtual Tensor
 class.
 
+```CheMPS2/include/TensorK.h``` contains the definitions of the TensorK class.
+
 ```CheMPS2/include/TensorL.h``` contains the definitions of the TensorL class.
+
+```CheMPS2/include/TensorM.h``` contains the definitions of the TensorM class.
 
 ```CheMPS2/include/TensorO.h``` contains the definitions of the TensorO class.
 

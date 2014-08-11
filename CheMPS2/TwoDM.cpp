@@ -17,20 +17,14 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h>
 #include <math.h>
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 
 #include "TwoDM.h"
 #include "Lapack.h"
 #include "Gsl.h"
 #include "Options.h"
 
-using std::endl;
-using std::ofstream;
-using std::ios;
 using std::max;
 
 CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){

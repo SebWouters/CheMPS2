@@ -44,7 +44,7 @@ namespace CheMPS2{
          //! Constructor
          /** \param indexIn The boundary index
              \param movingRightIn If true: sweep from left to right. If false: sweep from right to left
-             \param denBKIn The symmetry bookkeeper with symemtry sector virtual dimensions
+             \param denBKIn The symmetry bookkeeper with symmetry sector virtual dimensions
              \param ProbIn The Problem containing the Hamiltonian matrix elements */
          TensorX(const int indexIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn);
          
@@ -76,8 +76,6 @@ namespace CheMPS2{
          //helper functions
          void makenewRight(const int ikappa, TensorT * denT);
          void makenewLeft(const int ikappa, TensorT * denT);
-         void addTermXLeft(const int ikappa, TensorT * denT, TensorX * Xprev, double * workmemLR);
-         void addTermXRight(const int ikappa, TensorT * denT, TensorX * Xprev, double * workmemLR);
          void addTermQLRight(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemRR, double * workmemLR, double * workmemLL);
          void addTermQLLeft(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemLL, double * workmemLR, double * workmemRR);
          void addTermALeft(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemLR, double * workmemLL);

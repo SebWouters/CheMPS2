@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ namespace CheMPS2{
     
     The TensorDiag class is a storage class for boundary tensors that are entirely block-diagonal:
      - the L and R parts of the LQ and QR decompositions of TensorT
-     - the storage part of TensorX */
+     - the storage part of TensorX and TensorGYZ */
    class TensorDiag : public Tensor{
 
       public:
@@ -81,6 +81,20 @@ namespace CheMPS2{
          int gIndex() const;
          
       protected:
+      
+         //! Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving right.
+         /** \param ikappa Symmetry block of this TensorDiag which is updated
+             \param denT TensorT to update the TensorDiag
+             \param diagPrevious The previous TensorDiag
+             \param workmemLR Work memory */
+         void updateRight(const int ikappa, Tensor * denT, TensorDiag * diagPrevious, double * workmemLR);
+         
+         //! Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving left.
+         /** \param ikappa Symmetry block of this TensorDiag which is updated
+             \param denT TensorT to update the TensorDiag
+             \param diagPrevious The previous TensorDiag
+             \param workmemLR Work memory */
+         void updateLeft(const int ikappa, Tensor * denT, TensorDiag * diagPrevious, double * workmemLR);
          
    };
 }

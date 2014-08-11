@@ -67,7 +67,7 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
          for (int ikappa=0; ikappa<nKappa; ikappa++){
             makenewRight(ikappa, denT);
             if (doOtherThings){
-               addTermXRight(ikappa, denT, Xtensor, workmemLR);
+               updateRight(ikappa, denT, Xtensor, workmemLR);
                addTermQLRight(ikappa, denT, Ltensors, Qtensor, workmemRR, workmemLR, workmemLL);
                addTermARight(ikappa, denT, Atensor, workmemRR, workmemLR);
                addTermCRight(ikappa, denT, Ctensor, workmemLR);
@@ -98,7 +98,7 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
          for (int ikappa=0; ikappa<nKappa; ikappa++){
             makenewLeft(ikappa, denT);
             if (doOtherThings){
-               addTermXLeft(ikappa, denT, Xtensor, workmemLR);
+               updateLeft(ikappa, denT, Xtensor, workmemLR);
                addTermQLLeft(ikappa, denT, Ltensors, Qtensor, workmemLL, workmemLR, workmemRR);
                addTermALeft(ikappa, denT, Atensor, workmemLR, workmemLL);
                addTermCLeft(ikappa, denT, Ctensor, workmemLR);
@@ -157,104 +157,6 @@ void CheMPS2::TensorX::makenewLeft(const int ikappa, TensorT * denT){
 
 }
 
-void CheMPS2::TensorX::addTermXRight(const int ikappa, TensorT * denT, TensorX * Xprev, double * workmemLR){
-
-   int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-   for (int geval=0; geval<4; geval++){
-      int NL,TwoSL,IL;
-      switch(geval){
-         case 0:
-            NL = sectorN1[ikappa];
-            TwoSL = sectorTwoS1[ikappa];
-            IL = sectorI1[ikappa];
-            break;
-         case 1:
-            NL = sectorN1[ikappa]-2;
-            TwoSL = sectorTwoS1[ikappa];
-            IL = sectorI1[ikappa];
-            break;
-         case 2:
-            NL = sectorN1[ikappa]-1;
-            TwoSL = sectorTwoS1[ikappa]-1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
-            break;
-         case 3:
-            NL = sectorN1[ikappa]-1;
-            TwoSL = sectorTwoS1[ikappa]+1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
-            break;
-      }
-      int dimL = denBK->gCurrentDim(index-1,NL,TwoSL,IL);
-      if (dimL>0){
-
-         double * BlockT = denT->gStorage(NL,TwoSL,IL,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-         double * BlockX = Xprev->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-
-         //T^T * Xprev --> mem
-         char trans = 'T';
-         char notr = 'N';
-         double alpha = 1.0;
-         double beta = 0.0; //set
-         dgemm_(&trans,&notr,&dimR,&dimL,&dimL,&alpha,BlockT,&dimL,BlockX,&dimL,&beta,workmemLR,&dimR);
-         
-         //mem * T --> storage
-         beta = 1.0; //add
-         dgemm_(&notr,&notr,&dimR,&dimR,&dimL,&alpha,workmemLR,&dimR,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimR);
-     
-      }
-   }
-
-}
-
-void CheMPS2::TensorX::addTermXLeft(const int ikappa, TensorT * denT, TensorX * Xprev, double * workmemLR){
-
-   int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-   for (int geval=0; geval<4; geval++){
-      int NR,TwoSR,IR;
-      switch(geval){
-         case 0:
-            NR = sectorN1[ikappa];
-            TwoSR = sectorTwoS1[ikappa];
-            IR = sectorI1[ikappa];
-            break;
-         case 1:
-            NR = sectorN1[ikappa]+2;
-            TwoSR = sectorTwoS1[ikappa];
-            IR = sectorI1[ikappa];
-            break;
-         case 2:
-            NR = sectorN1[ikappa]+1;
-            TwoSR = sectorTwoS1[ikappa]-1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
-            break;
-         case 3:
-            NR = sectorN1[ikappa]+1;
-            TwoSR = sectorTwoS1[ikappa]+1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
-            break;
-      }
-      int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
-      if (dimR>0){
-
-         double * BlockT = denT->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa],NR,TwoSR,IR);
-         double * BlockX = Xprev->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-
-         //factor * T * Xprev --> mem
-         char notr = 'N';
-         double alpha = (geval>1) ? (TwoSR+1.0)/(sectorTwoS1[ikappa]+1.0) : 1.0;
-         double beta = 0.0; //set
-         dgemm_(&notr,&notr,&dimL,&dimR,&dimR,&alpha,BlockT,&dimL,BlockX,&dimR,&beta,workmemLR,&dimL);
-
-         //mem * T^T --> storage
-         char trans = 'T';
-         alpha = 1.0;
-         beta = 1.0; //add
-         dgemm_(&notr,&trans,&dimL,&dimL,&dimR,&alpha,workmemLR,&dimL,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimL);
-        
-      }
-   }
-
-}
 
 void CheMPS2::TensorX::addTermQLRight(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemRR, double * workmemLR, double * workmemLL){
 
