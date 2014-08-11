@@ -82,6 +82,10 @@ including the functions to calculate the gradient and Hessian.
 ConvergenceScheme class, which contains the instructions for the subsequent
 DMRG sweeps.
 
+```CheMPS2/Correlations.cpp``` contains all the functionality to calculate
+the spin, density, and spin-flip correlation functions as well as the
+two-orbital mutual information.
+
 ```CheMPS2/DIIS.cpp``` contains a DIIS convergence speed-up for DMRG-SCF.
 
 ```CheMPS2/DMRG.cpp``` contains the constructor and destructor of the DMRG
@@ -236,6 +240,9 @@ class for the one-body matrix elements.
 
 ```CheMPS2/include/ConvergenceScheme.h``` contains the definitions of the
 ConvergenceScheme class.
+
+```CheMPS2/include/Correlations.h``` contains the definitions of the
+Correlations class.
 
 ```CheMPS2/include/DIIS.h``` contains the definitions of the DIIS class.
 

@@ -175,7 +175,8 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
+         if (irrep==0){ cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
+         else {         cout << "                       DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 

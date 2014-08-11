@@ -62,6 +62,9 @@ namespace CheMPS2{
    const int    SYBK_dimensionCutoff          = 262144;
    
    const double TENSORT_orthoComparison       = 1e-13;
+   
+   const bool   CORRELATIONS_debugPrint       = false;
+   const double CORRELATIONS_discardEig       = 1e-100;
 
 }
 

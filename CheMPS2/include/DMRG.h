@@ -39,6 +39,7 @@
 #include "TensorQ.h"
 #include "TensorO.h"
 #include "TwoDM.h"
+#include "Correlations.h"
 #include "Heff.h"
 #include "Sobject.h"
 #include "ConvergenceScheme.h"
@@ -67,10 +68,15 @@ namespace CheMPS2{
          double Solve();
          
          //! Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!
-         void calc2DM();
+         void calc2DMandCorrelations();
          
          //! Get the pointer to the 2DM
+         /** \return The 2DM. Returns a NULL pointer if not yet calculated. */
          TwoDM * get2DM();
+         
+         //! Get the pointer to the Correlations
+         /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
+         Correlations * getCorrelations();
          
          //! Get a specific FCI coefficient. coeff contains the occupation numbers of the L orbitals. It is assumed that the number of unpaired electrons equals twice the total targeted spin.
          /** \param coeff Array containing the occupation numbers of the L Hamiltonian orbitals.
@@ -131,6 +137,12 @@ namespace CheMPS2{
          
          //Whether the2DM is allocated
          bool the2DMallocated;
+         
+         //The Correlations
+         Correlations * theCorr;
+         
+         //Whether the Correlations is allocated
+         bool theCorrAllocated;
          
          //Whether or not allocated
          int * isAllocated;

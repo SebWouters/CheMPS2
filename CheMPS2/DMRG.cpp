@@ -61,6 +61,9 @@ CheMPS2::DMRG::DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn){
    for (int cnt=0; cnt<Prob->gL()-1; cnt++){ isAllocated[cnt] = 0; }
    
    the2DMallocated = false;
+   the2DM = NULL;
+   theCorrAllocated = false;
+   theCorr = NULL;
    Exc_activated = false;
    
    setupBookkeeperAndMPS();
@@ -142,6 +145,7 @@ CheMPS2::DMRG::~DMRG(){
    }
    
    if (the2DMallocated){ delete the2DM; }
+   if (theCorrAllocated){ delete theCorr; }
 
 }
 
