@@ -1,4 +1,4 @@
 <map id="CheMPS2::Sobject::Split" name="CheMPS2::Sobject::Split">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed)" alt="" coords="231,5,412,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage." alt="" coords="222,56,421,83"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="231,5,412,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="222,56,421,83"/>
 </map>

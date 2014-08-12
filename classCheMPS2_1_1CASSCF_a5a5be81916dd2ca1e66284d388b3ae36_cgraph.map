@@ -1,49 +1,51 @@
 <map id="CheMPS2::CASSCF::doCASSCFnewtonraphson" name="CheMPS2::CASSCF::doCASSCFnewtonraphson">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update." alt="" coords="392,5,589,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number." alt="" coords="399,70,583,111"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d" title="Get an array with the irreps of each DMRG orbital." alt="" coords="391,135,590,177"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep." alt="" coords="391,201,590,242"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="392,5,589,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="399,70,583,111"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d" title="Get an array with the irreps of each DMRG orbital. " alt="" coords="391,135,590,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="391,201,590,242"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="365,267,616,293"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep." alt="" coords="391,318,590,359"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFunitary.html#a37649fd421f715c464f39e334106038f" title="Load the unitary from disk." alt="" coords="392,383,589,425"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1DIIS.html#acd3ee9c7a2e8977705154871651581e7" title="Load the DIIS object from disk." alt="" coords="403,449,579,476"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation." alt="" coords="689,490,887,531"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix." alt="" coords="392,551,589,593"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432" title="Append a new error and parameter vector." alt="" coords="393,617,588,644"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors..." alt="" coords="402,669,579,710"/>
-<area shape="rect" id="node15" href="$classCheMPS2_1_1DMRGSCFunitary.html#a5be525a4b42e9f6dbf5dc1209ff89dff" title="Save the unitary to disk." alt="" coords="392,734,589,775"/>
-<area shape="rect" id="node16" href="$classCheMPS2_1_1DIIS.html#a67d248c428186ba3cbdc83387e3e9c06" title="Save the DIIS object to disk." alt="" coords="401,800,581,827"/>
-<area shape="rect" id="node17" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver." alt="" coords="405,851,577,877"/>
-<area shape="rect" id="node18" href="$classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations." alt="" coords="365,901,616,928"/>
-<area shape="rect" id="node19" href="$classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation." alt="" coords="380,952,601,979"/>
-<area shape="rect" id="node20" href="$classCheMPS2_1_1DMRG.html#a35db8f58be5130548d5998ccbda4d37e" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!..." alt="" coords="395,1003,586,1029"/>
-<area shape="rect" id="node45" href="$classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd" title="Get the pointer to the 2DM." alt="" coords="398,1053,583,1080"/>
-<area shape="rect" id="node46" href="$classCheMPS2_1_1DMRGSCFunitary.html#a38c8b78d1528a01f6210044819f51846" title="Rotate the unitary matrix to the NO eigenbasis." alt="" coords="392,1105,589,1146"/>
-<area shape="rect" id="node47" href="$classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm CheMPS2_MPS*.h5&quot;." alt="" coords="370,1171,611,1197"/>
-<area shape="rect" id="node48" href="$classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm + localTmpPath + CheMPS2_ + RNstorage + *.h5&quot;." alt="" coords="385,1222,597,1263"/>
-<area shape="rect" id="node12" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep." alt="" coords="689,555,887,597"/>
-<area shape="rect" id="node21" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals." alt="" coords="708,621,868,648"/>
-<area shape="rect" id="node22" href="$classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a" title="Get an orbital irrep." alt="" coords="701,673,875,714"/>
-<area shape="rect" id="node23" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object." alt="" coords="705,739,871,765"/>
-<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block." alt="" coords="960,840,1184,867"/>
-<area shape="rect" id="node26" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks." alt="" coords="974,1043,1170,1069"/>
-<area shape="rect" id="node27" href="$classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3" title="Davidson Solver." alt="" coords="675,891,901,917"/>
-<area shape="rect" id="node31" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian." alt="" coords="691,992,885,1019"/>
-<area shape="rect" id="node32" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s." alt="" coords="704,789,872,816"/>
-<area shape="rect" id="node34" href="$classCheMPS2_1_1ConvergenceScheme.html#abb766295f71d3c1e3b9edc875504b317" title="Get the number of renormalized states for a particular instruction." alt="" coords="681,1043,895,1085"/>
-<area shape="rect" id="node35" href="$classCheMPS2_1_1ConvergenceScheme.html#ab8c98d5388c415c42115084c5817e1dc" title="Get the number of instructions." alt="" coords="681,1109,895,1150"/>
-<area shape="rect" id="node36" href="$classCheMPS2_1_1TensorT.html#af21d5300f20c3baf88edf9ec3d3bd943" title="Left&#45;normalization." alt="" coords="705,1175,871,1201"/>
-<area shape="rect" id="node38" href="$classCheMPS2_1_1TwoDM.html#a5c5bf12b31aa9cb4b0b31bd53dad1ed3" title="Fill the 2DM terms with as second site index denT&#45;&gt;gIndex()" alt="" coords="696,1327,880,1353"/>
-<area shape="rect" id="node40" href="$classCheMPS2_1_1TensorT.html#afea87f0a1be6ed05fb668528f2f8bf30" title="Right&#45;normalization." alt="" coords="707,1225,869,1252"/>
-<area shape="rect" id="node41" href="$classCheMPS2_1_1TensorT.html#ad53db81f1f1bf33512f93a23abc0ed50" title="Multiply at the right with a TensorDiag." alt="" coords="677,1276,899,1303"/>
-<area shape="rect" id="node42" href="$classCheMPS2_1_1TwoDM.html#a3970c2fccf52e6e653e2866fabcd3d04" title="Return the double trace of 2DM&#45;A (should be N(N&#45;1))" alt="" coords="664,1377,912,1404"/>
-<area shape="rect" id="node43" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number." alt="" coords="688,1428,888,1455"/>
-<area shape="rect" id="node44" href="$classCheMPS2_1_1TwoDM.html#a1e1714c5e2d9cd7bf756ea9263f4711d" title="Calculate the energy based on the 2DM&#45;A." alt="" coords="683,1479,893,1505"/>
-<area shape="rect" id="node24" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage." alt="" coords="973,739,1171,765"/>
-<area shape="rect" id="node28" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention." alt="" coords="967,891,1177,917"/>
-<area shape="rect" id="node29" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage." alt="" coords="975,941,1169,968"/>
-<area shape="rect" id="node30" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention." alt="" coords="967,992,1177,1019"/>
-<area shape="rect" id="node33" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed)" alt="" coords="981,789,1163,816"/>
-<area shape="rect" id="node37" href="$classCheMPS2_1_1TensorDiag.html#a7fb7bbec47e601be89ffba3ad3736ca7" title="Get the pointer to the storage." alt="" coords="993,1218,1151,1259"/>
-<area shape="rect" id="node39" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index." alt="" coords="979,1327,1165,1353"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="391,318,590,359"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFunitary.html#a37649fd421f715c464f39e334106038f" title="Load the unitary from disk. " alt="" coords="392,383,589,425"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1DIIS.html#acd3ee9c7a2e8977705154871651581e7" title="Load the DIIS object from disk. " alt="" coords="403,449,579,476"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="689,366,887,407"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799" title="Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary ..." alt="" coords="392,551,589,593"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="392,617,589,658"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432" title="Append a new error and parameter vector. " alt="" coords="393,683,588,709"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors..." alt="" coords="402,734,579,775"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1DMRGSCFunitary.html#a5be525a4b42e9f6dbf5dc1209ff89dff" title="Save the unitary to disk. " alt="" coords="392,799,589,841"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1DIIS.html#a67d248c428186ba3cbdc83387e3e9c06" title="Save the DIIS object to disk. " alt="" coords="401,865,581,892"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="405,916,577,943"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations. " alt="" coords="365,967,616,993"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation. " alt="" coords="380,1017,601,1044"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!! ..." alt="" coords="385,1069,597,1110"/>
+<area shape="rect" id="node47" href="$classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd" title="Get the pointer to the 2DM. " alt="" coords="398,1135,583,1161"/>
+<area shape="rect" id="node48" href="$classCheMPS2_1_1DMRGSCFunitary.html#a38c8b78d1528a01f6210044819f51846" title="Rotate the unitary matrix to the NO eigenbasis. " alt="" coords="392,1186,589,1227"/>
+<area shape="rect" id="node49" href="$classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm CheMPS2_MPS*.h5&quot;. " alt="" coords="370,1252,611,1279"/>
+<area shape="rect" id="node50" href="$classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm + localTmpPath + CheMPS2_ + RNstorage + *.h5&quot;. " alt="" coords="385,1303,597,1345"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="689,431,887,473"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="708,497,868,524"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a" title="Get an orbital irrep. " alt="" coords="701,549,875,590"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object. " alt="" coords="705,615,871,641"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="960,691,1184,717"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="974,753,1170,780"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3" title="Davidson Solver. " alt="" coords="675,716,901,743"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="691,817,885,844"/>
+<area shape="rect" id="node29" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s. " alt="" coords="704,868,872,895"/>
+<area shape="rect" id="node30" href="$classCheMPS2_1_1ConvergenceScheme.html#abb766295f71d3c1e3b9edc875504b317" title="Get the number of renormalized states for a particular instruction. " alt="" coords="681,919,895,961"/>
+<area shape="rect" id="node31" href="$classCheMPS2_1_1ConvergenceScheme.html#ab8c98d5388c415c42115084c5817e1dc" title="Get the number of instructions. " alt="" coords="681,985,895,1026"/>
+<area shape="rect" id="node32" href="$classCheMPS2_1_1TensorT.html#af21d5300f20c3baf88edf9ec3d3bd943" title="Left&#45;normalization. " alt="" coords="705,1051,871,1077"/>
+<area shape="rect" id="node33" href="$classCheMPS2_1_1TwoDM.html#a5c5bf12b31aa9cb4b0b31bd53dad1ed3" title="Fill the 2DM terms with as second site index denT&#45;&gt;gIndex() " alt="" coords="696,1101,880,1128"/>
+<area shape="rect" id="node34" href="$classCheMPS2_1_1TensorT.html#afea87f0a1be6ed05fb668528f2f8bf30" title="Right&#45;normalization. " alt="" coords="707,1152,869,1179"/>
+<area shape="rect" id="node35" href="$classCheMPS2_1_1TensorT.html#ad53db81f1f1bf33512f93a23abc0ed50" title="Multiply at the right with a TensorDiag. " alt="" coords="677,1203,899,1229"/>
+<area shape="rect" id="node36" href="$classCheMPS2_1_1TwoDM.html#a3970c2fccf52e6e653e2866fabcd3d04" title="Return the double trace of 2DM&#45;A (should be N(N&#45;1)) " alt="" coords="664,1253,912,1280"/>
+<area shape="rect" id="node37" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number. " alt="" coords="688,1304,888,1331"/>
+<area shape="rect" id="node38" href="$classCheMPS2_1_1TwoDM.html#a1e1714c5e2d9cd7bf756ea9263f4711d" title="Calculate the energy based on the 2DM&#45;A. " alt="" coords="683,1355,893,1381"/>
+<area shape="rect" id="node39" href="$classCheMPS2_1_1TensorT.html#a6048e242ad6c3b1798ead44f7256fe31" title="Multiply at the left with a TensorDiag. " alt="" coords="681,1405,895,1432"/>
+<area shape="rect" id="node40" href="$classCheMPS2_1_1SyBookkeeper.html#ad52f6f852f6f2f88c286579054c1886f" title="Get the max. virtual dimension at a certain boundary. Useful function to preallocate memory when cons..." alt="" coords="701,1457,875,1498"/>
+<area shape="rect" id="node41" href="$classCheMPS2_1_1TensorGYZ.html#a3f06f0df3e52b3b67bf5e63faaaa2a55" title="Update the TensorGYZ. " alt="" coords="709,1522,867,1563"/>
+<area shape="rect" id="node42" href="$classCheMPS2_1_1TensorSwap.html#aecb02bc029d2cdd0d7a754bdf3ac491c" title="Clear and update. " alt="" coords="707,1587,869,1629"/>
+<area shape="rect" id="node43" href="$classCheMPS2_1_1TensorGYZ.html#a8470ec48e82ff7d002a1b248afc98787" title="Construct a new TensorGYZ. " alt="" coords="709,1653,867,1694"/>
+<area shape="rect" id="node44" href="$classCheMPS2_1_1TensorK.html#af50dfd56702742ce0d0642e28413a893" title="CheMPS2::TensorK::construct" alt="" coords="687,1719,889,1745"/>
+<area shape="rect" id="node45" href="$classCheMPS2_1_1Correlations.html#a5fa2dd8712c0b9359e5e8a14de50c105" title="Fill at the current step of the iterations the two&#45;orbital mutual information. " alt="" coords="708,1770,868,1811"/>
+<area shape="rect" id="node46" href="$classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e" title="Get the single&#45;orbital entropy for a certain site, using hte HAM indices. " alt="" coords="695,1835,881,1877"/>
 </map>

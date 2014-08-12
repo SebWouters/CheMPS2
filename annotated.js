@@ -3,6 +3,7 @@ var annotated =
     [ "CheMPS2", null, [
       [ "CASSCF", "classCheMPS2_1_1CASSCF.html", "classCheMPS2_1_1CASSCF" ],
       [ "ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", "classCheMPS2_1_1ConvergenceScheme" ],
+      [ "Correlations", "classCheMPS2_1_1Correlations.html", "classCheMPS2_1_1Correlations" ],
       [ "DIIS", "classCheMPS2_1_1DIIS.html", "classCheMPS2_1_1DIIS" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],
       [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", "classCheMPS2_1_1DMRGSCFindices" ],
@@ -24,7 +25,10 @@ var annotated =
       [ "TensorF0Cbase", "classCheMPS2_1_1TensorF0Cbase.html", "classCheMPS2_1_1TensorF0Cbase" ],
       [ "TensorF1", "classCheMPS2_1_1TensorF1.html", "classCheMPS2_1_1TensorF1" ],
       [ "TensorF1Dbase", "classCheMPS2_1_1TensorF1Dbase.html", "classCheMPS2_1_1TensorF1Dbase" ],
+      [ "TensorGYZ", "classCheMPS2_1_1TensorGYZ.html", "classCheMPS2_1_1TensorGYZ" ],
+      [ "TensorK", "classCheMPS2_1_1TensorK.html", "classCheMPS2_1_1TensorK" ],
       [ "TensorL", "classCheMPS2_1_1TensorL.html", "classCheMPS2_1_1TensorL" ],
+      [ "TensorM", "classCheMPS2_1_1TensorM.html", "classCheMPS2_1_1TensorM" ],
       [ "TensorO", "classCheMPS2_1_1TensorO.html", "classCheMPS2_1_1TensorO" ],
       [ "TensorQ", "classCheMPS2_1_1TensorQ.html", "classCheMPS2_1_1TensorQ" ],
       [ "TensorS0", "classCheMPS2_1_1TensorS0.html", "classCheMPS2_1_1TensorS0" ],

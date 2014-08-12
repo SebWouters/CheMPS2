@@ -1,5 +1,5 @@
 <map id="CheMPS2::DMRGSCFunitary::updateUnitary" name="CheMPS2::DMRGSCFunitary::updateUnitary">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method." alt="" coords="534,5,845,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix." alt="" coords="269,27,467,69"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula." alt="" coords="251,93,485,120"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="534,5,845,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="269,27,467,69"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula. " alt="" coords="251,93,485,120"/>
 </map>

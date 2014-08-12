@@ -11,6 +11,7 @@ var classCheMPS2_1_1DMRGSCFunitary =
     [ "getNumVariablesX", "classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4", null ],
     [ "getSecondIndex", "classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c", null ],
     [ "loadU", "classCheMPS2_1_1DMRGSCFunitary.html#a37649fd421f715c464f39e334106038f", null ],
+    [ "makeSureAllBlocksDetOne", "classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799", null ],
     [ "rotateUnitaryNOeigenvecs", "classCheMPS2_1_1DMRGSCFunitary.html#a38c8b78d1528a01f6210044819f51846", null ],
     [ "saveU", "classCheMPS2_1_1DMRGSCFunitary.html#a5be525a4b42e9f6dbf5dc1209ff89dff", null ],
     [ "updateUnitary", "classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630", null ]

@@ -7,10 +7,10 @@
 
 var indexSectionsWithContent =
 {
-  0: "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111101111111110111111000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  1: "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001101011000000100110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  2: "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000111101111101110111111000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  3: "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100001010110000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+  0: "abcdfghijklmnpqrstu~",
+  1: "cdfhipst",
+  2: "abcdfghijlmnpqrstu~",
+  3: "dikmns"
 };
 
 var indexSectionNames =
@@ -28,7 +28,7 @@ function convertToId(search)
   {
     var c = search.charAt(i);
     var cn = c.charCodeAt(0);
-    if (c.match(/[a-z0-9]/))
+    if (c.match(/[a-z0-9\u0080-\uFFFF]/))
     {
       result+=c;
     }
@@ -333,22 +333,20 @@ function SearchBox(name, resultsPath, inFrame, label)
     var searchValue = this.DOMSearchField().value.replace(/^ +/, "");
 
     var code = searchValue.toLowerCase().charCodeAt(0);
-    var hexCode;
-    if (code<16) 
+    var idxChar = searchValue.substr(0, 1).toLowerCase();
+    if ( 0xD800 <= code && code <= 0xDBFF && searchValue > 1) // surrogate pair
     {
-      hexCode="0"+code.toString(16);
-    }
-    else 
-    {
-      hexCode=code.toString(16);
+      idxChar = searchValue.substr(0, 2);
     }
 
     var resultsPage;
     var resultsPageWithSearch;
     var hasResultsPage;
 
-    if (indexSectionsWithContent[this.searchIndex].charAt(code) == '1')
+    var idx = indexSectionsWithContent[this.searchIndex].indexOf(idxChar);
+    if (idx!=-1)
     {
+       var hexCode=idx.toString(16);
        resultsPage = this.resultsPath + '/' + indexSectionNames[this.searchIndex] + '_' + hexCode + '.html';
        resultsPageWithSearch = resultsPage+'?'+escape(searchValue);
        hasResultsPage = true;

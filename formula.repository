@@ -1,18 +1,23 @@
-\form#0:$\frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
-\form#1:$ V_{ijkl} = ( ij \mid V \mid kl ) $
-\form#2:$_{a,b}$
-\form#3:$I_a$
-\form#4:$I_b$
-\form#5:$_{a,b,c,d}$
-\form#6:$I_a \otimes I_b$
-\form#7:$I_c \otimes I_d$
-\form#8:$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
-\form#9:$T_{index1,index2}$
-\form#10:$V_{index1,index2,index3,index4}$
-\form#11:$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$
-\form#12:$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) $
-\form#13:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
-\form#14:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
-\form#15:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
-\form#16:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
-\form#17:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
+\form#0:$ C_{spin}(i,j) = 4 \left( \braket{ \hat{S}_i^z \hat{S}_j^z } - \braket{ \hat{S}_i^z } \braket{ \hat{S}_j^z } \right) $
+\form#1:$ C_{dens}(i,j) = \braket{ \hat{n}_i \hat{n}_j } - \braket{ \hat{n}_i } \braket{ \hat{n}_j } $
+\form#2:$ C_{spinflip}(i,j) = \braket{ \hat{S}_i^+ \hat{S}_j^- } + \braket{ \hat{S}_i^- \hat{S}_j^+ } $
+\form#3:$ I(i,j) = \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left( 1 - \delta_{ij} \right) $
+\form#4:$ Idistance(power) = sum_{ij} I(i,j) * \mid i-j \mid^{power} $
+\form#5:$\frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
+\form#6:$ V_{ijkl} = ( ij \mid V \mid kl ) $
+\form#7:$_{a,b}$
+\form#8:$I_a$
+\form#9:$I_b$
+\form#10:$_{a,b,c,d}$
+\form#11:$I_a \otimes I_b$
+\form#12:$I_c \otimes I_d$
+\form#13:$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
+\form#14:$T_{index1,index2}$
+\form#15:$V_{index1,index2,index3,index4}$
+\form#16:$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$
+\form#17:$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) $
+\form#18:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
+\form#19:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
+\form#20:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
+\form#21:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
+\form#22:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
