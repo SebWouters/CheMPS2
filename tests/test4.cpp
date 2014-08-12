@@ -76,6 +76,7 @@ int main(void){
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
    double Energy = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
+   theDMRG->getCorrelations()->Print();
    
    //Clean up
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }

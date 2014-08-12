@@ -20,6 +20,9 @@
 #ifndef CORRELATIONS_H
 #define CORRELATIONS_H
 
+#include <iostream>
+#include <sstream>
+
 #include "SyBookkeeper.h"
 #include "Problem.h"
 #include "TwoDM.h"
@@ -128,6 +131,11 @@ namespace CheMPS2{
              \return \f$ Idistance(power) = sum_{ij} I(i,j) * \mid i-j \mid^{power} \f$ */
          double MutualInformationDistance(const double power) const;
          
+         //! Print the correlation functions and two-orbital mutual information
+         /** \param precision The number of digits to be printed
+             \param columnsPerLine Rarara: The number of columns per line */
+         void Print(const int precision=6, const int columnsPerLine=8) const;
+         
       private:
       
          //The BK containing all the irrep information
@@ -166,6 +174,9 @@ namespace CheMPS2{
          double diagram3(TensorT * denT, TensorGYZ * denG, double * workmem) const;
          double diagram4(TensorT * denT, TensorSwap * denK, double * workmem) const;
          double diagram5(TensorT * denT, TensorSwap * denM, double * workmem) const;
+         
+         //Helper function to print tables in a nice format
+         void PrintTableNice(const double * table, const int sPrecision, const int columnsPerLine) const;
          
    };
 }

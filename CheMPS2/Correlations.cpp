@@ -19,6 +19,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <math.h>
 
@@ -29,6 +30,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::max;
+using std::min;
 
 CheMPS2::Correlations::Correlations(const SyBookkeeper * denBKIn, const Problem * ProbIn, TwoDM * the2DMin){
 
@@ -540,6 +542,62 @@ double CheMPS2::Correlations::diagram5(TensorT * denT, TensorSwap * denM, double
    }
 
    return total;
+
+}
+
+void CheMPS2::Correlations::PrintTableNice(const double * table, const int sPrecision, const int columnsPerLine) const{
+
+   std::stringstream thestream;
+   thestream.precision(sPrecision);
+   thestream << std::fixed;
+   
+   int numGroups = L / columnsPerLine;
+   if (numGroups * columnsPerLine < L){ numGroups++; }
+   
+   std::string prefix = "   ";
+   
+   for (int groups=0; groups<numGroups; groups++){
+      const int startCol = groups * columnsPerLine + 1;
+      const int stopCol  = min( (groups + 1) * columnsPerLine , L );
+      thestream << prefix << "Columns " << startCol << " to " << stopCol << "\n \n";
+      for (int row=0; row<L; row++){
+         for (int col=startCol-1; col<stopCol; col++){
+            if ((row==col) && (table==MutInfo)){
+               thestream << prefix << " 0 ";
+               for (int cnt=0; cnt<sPrecision; cnt++){ thestream << " "; }
+            } else {
+               if (table[row + L*col] < 0.0){
+                  thestream << prefix        << table[row + L*col];
+               } else {
+                  thestream << prefix << " " << table[row + L*col];
+               }
+            }
+         }
+         thestream << "\n";
+      }
+      thestream << "\n";
+   
+   }
+   
+   cout << thestream.str();
+
+}
+
+void CheMPS2::Correlations::Print(const int precision, const int columnsPerLine) const{
+   
+   cout << "--------------------------------------------------------" << endl;
+   cout << "Spin correlation function = 4 * ( < S_i^z S_j^z > - < S_i^z > * < S_j^z > ) \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( Cspin , precision, columnsPerLine );
+   cout << "--------------------------------------------------------" << endl;
+   cout << "Density correlation function = < n_i n_j > - < n_i > * < n_j > \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( Cdens , precision, columnsPerLine );
+   cout << "--------------------------------------------------------" << endl;
+   cout << "Spin-flip correlation function = < S_i^+ S_j^- > + < S_i^- S_j^+ > \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( Cspinflip , precision, columnsPerLine);
+   cout << "--------------------------------------------------------" << endl;
+   cout << "Two-orbital mutual information = 0.5 * ( s1(i) + s1(j) - s2(i,j) ) * ( 1 - delta(i,j) ) \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( MutInfo , precision, columnsPerLine );
+   cout << "--------------------------------------------------------" << endl;
 
 }
 

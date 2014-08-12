@@ -185,9 +185,9 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    delete [] Ktensors;
    delete [] Mtensors;
    
-   cout << "   Single-orbital entropies (DMRG indices!) = [ ";
-   for (int index=0; index < Prob->gL()-1; index++){ cout << theCorr->SingleOrbitalEntropy_DMRG(index) << " , "; }
-   cout << theCorr->SingleOrbitalEntropy_DMRG(Prob->gL()-1) << " ]." << endl;
+   cout << "   Single-orbital entropies (Hamiltonian index order is used!) = [ ";
+   for (int index=0; index < Prob->gL()-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
+   cout << theCorr->SingleOrbitalEntropy_HAM(Prob->gL()-1) << " ]." << endl;
    
    for (int power=-2; power<=2; power++){
       cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
