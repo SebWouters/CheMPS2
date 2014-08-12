@@ -20,9 +20,6 @@
 #ifndef CORRELATIONS_H
 #define CORRELATIONS_H
 
-#include <iostream>
-#include <sstream>
-
 #include "SyBookkeeper.h"
 #include "Problem.h"
 #include "TwoDM.h"

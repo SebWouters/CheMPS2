@@ -566,10 +566,12 @@ void CheMPS2::Correlations::PrintTableNice(const double * table, const int sPrec
                thestream << prefix << " 0 ";
                for (int cnt=0; cnt<sPrecision; cnt++){ thestream << " "; }
             } else {
-               if (table[row + L*col] < 0.0){
-                  thestream << prefix        << table[row + L*col];
+               int row2 = (Prob->gReorderD2h()) ? Prob->gf1(row) : row;
+               int col2 = (Prob->gReorderD2h()) ? Prob->gf1(col) : col;
+               if (table[row2 + L*col2] < 0.0){
+                  thestream << prefix        << table[row2 + L*col2];
                } else {
-                  thestream << prefix << " " << table[row + L*col];
+                  thestream << prefix << " " << table[row2 + L*col2];
                }
             }
          }
