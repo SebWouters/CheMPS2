@@ -672,48 +672,50 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;               thestream &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; 0 &quot;</span>;</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;sPrecision; cnt++){ thestream &lt;&lt; <span class="stringliteral">&quot; &quot;</span>; }</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;               <span class="keywordflow">if</span> (table[row + L*col] &lt; 0.0){</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;                  thestream &lt;&lt; prefix        &lt;&lt; table[row + L*col];</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;               } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;                  thestream &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; table[row + L*col];</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;               }</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;            }</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;         }</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;         thestream &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;      }</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;      thestream &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;   </div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;   }</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;               <span class="keywordtype">int</span> row2 = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf1(row) : row;</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;               <span class="keywordtype">int</span> col2 = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf1(col) : col;</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;               <span class="keywordflow">if</span> (table[row2 + L*col2] &lt; 0.0){</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;                  thestream &lt;&lt; prefix        &lt;&lt; table[row2 + L*col2];</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;               } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;                  thestream &lt;&lt; prefix &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; table[row2 + L*col2];</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;               }</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;            }</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;         }</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;         thestream &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;      }</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;      thestream &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
 <div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;   </div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;   cout &lt;&lt; thestream.str();</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;}</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;   }</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;   </div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;   cout &lt;&lt; thestream.str();</div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;</div>
-<div class="line"><a name="l00586"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">  586</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">CheMPS2::Correlations::Print</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> precision, <span class="keyword">const</span> <span class="keywordtype">int</span> columnsPerLine)<span class="keyword"> const</span>{</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;   </div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Spin correlation function = 4 * ( &lt; S_i^z S_j^z &gt; - &lt; S_i^z &gt; * &lt; S_j^z &gt; ) \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;   PrintTableNice( Cspin , precision, columnsPerLine );</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Density correlation function = &lt; n_i n_j &gt; - &lt; n_i &gt; * &lt; n_j &gt; \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;   PrintTableNice( Cdens , precision, columnsPerLine );</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Spin-flip correlation function = &lt; S_i^+ S_j^- &gt; + &lt; S_i^- S_j^+ &gt; \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;   PrintTableNice( Cspinflip , precision, columnsPerLine);</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Two-orbital mutual information = 0.5 * ( s1(i) + s1(j) - s2(i,j) ) * ( 1 - delta(i,j) ) \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;   PrintTableNice( MutInfo , precision, columnsPerLine );</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;}</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;}</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;</div>
+<div class="line"><a name="l00588"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">  588</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">CheMPS2::Correlations::Print</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> precision, <span class="keyword">const</span> <span class="keywordtype">int</span> columnsPerLine)<span class="keyword"> const</span>{</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;   </div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Spin correlation function = 4 * ( &lt; S_i^z S_j^z &gt; - &lt; S_i^z &gt; * &lt; S_j^z &gt; ) \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;   PrintTableNice( Cspin , precision, columnsPerLine );</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Density correlation function = &lt; n_i n_j &gt; - &lt; n_i &gt; * &lt; n_j &gt; \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;   PrintTableNice( Cdens , precision, columnsPerLine );</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Spin-flip correlation function = &lt; S_i^+ S_j^- &gt; + &lt; S_i^- S_j^+ &gt; \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;   PrintTableNice( Cspinflip , precision, columnsPerLine);</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Two-orbital mutual information = 0.5 * ( s1(i) + s1(j) - s2(i,j) ) * ( 1 - delta(i,j) ) \nHamiltonian index order is used!\n&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;   PrintTableNice( MutInfo , precision, columnsPerLine );</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;--------------------------------------------------------&quot;</span> &lt;&lt; endl;</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;}</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_aeb2b17926e78c7735821a13c1faf6867"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#aeb2b17926e78c7735821a13c1faf6867">CheMPS2::Correlations::Correlations</a></div><div class="ttdeci">Correlations(const SyBookkeeper *denBKIn, const Problem *ProbIn, TwoDM *the2DMin)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00035">Correlations.cpp:35</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorGYZ_html"><div class="ttname"><a href="classCheMPS2_1_1TensorGYZ.html">CheMPS2::TensorGYZ</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorGYZ_8h_source.html#l00033">TensorGYZ.h:33</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_a279b51f0616ab58f2a2893681b4cab71"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71">CheMPS2::TensorT::gIndex</a></div><div class="ttdeci">int gIndex() const </div><div class="ttdoc">Get the location index. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00153">TensorT.cpp:153</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a7bca21ac7e7e53f6266f52901dddcd19"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a7bca21ac7e7e53f6266f52901dddcd19">CheMPS2::Correlations::getMutualInformation_HAM</a></div><div class="ttdeci">double getMutualInformation_HAM(const int row, const int col) const </div><div class="ttdoc">Get a mutual information term, using the HAM indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00146">Correlations.cpp:146</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a6fd4628a95b8ca83f05f5b4ff27056a8"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a6fd4628a95b8ca83f05f5b4ff27056a8">CheMPS2::Correlations::getMutualInformation_DMRG</a></div><div class="ttdeci">double getMutualInformation_DMRG(const int row, const int col) const </div><div class="ttdoc">Get a mutual information term, using the DMRG indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00144">Correlations.cpp:144</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Correlations_html_a9e99dc1d7c2d571e2743ff6b472c50f6"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">CheMPS2::Correlations::Print</a></div><div class="ttdeci">void Print(const int precision=6, const int columnsPerLine=8) const </div><div class="ttdoc">Print the correlation functions and two-orbital mutual information. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00586">Correlations.cpp:586</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Correlations_html_a9e99dc1d7c2d571e2743ff6b472c50f6"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6">CheMPS2::Correlations::Print</a></div><div class="ttdeci">void Print(const int precision=6, const int columnsPerLine=8) const </div><div class="ttdoc">Print the correlation functions and two-orbital mutual information. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00588">Correlations.cpp:588</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a494210f45774ea1f3b1bbb0e8efef8a5"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a494210f45774ea1f3b1bbb0e8efef8a5">CheMPS2::Correlations::getCdens_HAM</a></div><div class="ttdeci">double getCdens_HAM(const int row, const int col) const </div><div class="ttdoc">Get a Cdens term, using the HAM indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00122">Correlations.cpp:122</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a1cf618a098e75511dda2fb0d010dab2e"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e">CheMPS2::Correlations::SingleOrbitalEntropy_HAM</a></div><div class="ttdeci">double SingleOrbitalEntropy_HAM(const int index) const </div><div class="ttdoc">Get the single-orbital entropy for a certain site, using hte HAM indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00174">Correlations.cpp:174</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorM_html"><div class="ttname"><a href="classCheMPS2_1_1TensorM.html">CheMPS2::TensorM</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorM_8h_source.html#l00034">TensorM.h:34</a></div></div>
@@ -740,7 +742,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>Correlations.cpp</b></li>
-    <li class="footer">Generated on Tue Aug 12 2014 15:50:31 for CheMPS2 by
+    <li class="footer">Generated on Tue Aug 12 2014 16:13:35 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
