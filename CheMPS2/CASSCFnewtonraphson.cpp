@@ -26,6 +26,7 @@
 
 #include "CASSCF.h"
 #include "Lapack.h"
+#include "DMRGSCFVmatRotations.h"
 
 using std::string;
 using std::ifstream;
@@ -82,6 +83,9 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    
+   //The two-body rotator
+   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
+   
    //Load unitary from disk
    if (CheMPS2::DMRGSCF_storeUnitary){
       struct stat stFileInfo;
@@ -132,8 +136,9 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       //Fill HamDMRG
       buildQmatrixOCC();
       buildOneBodyMatrixElements();
-      if (doBlockWise){ fillHamDMRGBlockWise(HamDMRG, mem1, mem2, mem3, maxBlockSize); }
-      else {            fillHamDMRG(HamDMRG, mem1, mem2); }
+      fillConstAndTmatDMRG(HamDMRG);
+      if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
+      else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
       
       //Do the DMRG sweeps, and calculate the 2DM
       DMRG * theDMRG = new DMRG(Prob,OptScheme);
@@ -153,15 +158,15 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       calcNOON(mem1, mem2);
       if ((CheMPS2::DMRGSCF_rotate2DMtoNO) && (theDIIS==NULL)){ //When the DIIS has started, stop rotating the active space to NOs
          rotate2DMand1DM(N, mem1, mem2);
-         unitary->rotateUnitaryNOeigenvecs(mem1, mem2); //Very very very important remark: This rotation can change the determinant from +1 to -1 !!!!
+         unitary->rotateUnitaryNOeigenvecs(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildOneBodyMatrixElements();
       }
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatrixACT();
-      if (doBlockWise){ fillVmatRotatedBlockWise(mem1, mem2, mem3, maxBlockSize, true); }
-      else{             fillVmatRotated(mem1, mem2); }
+      if (doBlockWise){ theRotator.fillVmatRotatedBlockWise(VmatRotated, unitary, mem1, mem2, mem3, maxBlockSize, true); }
+      else{             theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
       buildFmat();
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.

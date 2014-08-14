@@ -21,13 +21,24 @@
 #include <math.h>
 #include <algorithm>
 
-#include "CASSCF.h"
+#include "DMRGSCFVmatRotations.h"
 #include "Lapack.h"
 
 using std::min;
 using std::max;
 
-void CheMPS2::CASSCF::fillVmatRotated(double * temp1, double * temp2){
+CheMPS2::DMRGSCFVmatRotations::DMRGSCFVmatRotations(Hamiltonian * HamOrigIn, DMRGSCFindices * iHandlerIn){
+
+   HamOrig = HamOrigIn;
+   iHandler = iHandlerIn;
+   SymmInfo.setGroup(HamOrig->getNGroup());
+   numberOfIrreps = SymmInfo.getNumberOfIrreps();
+
+}
+
+CheMPS2::DMRGSCFVmatRotations::~DMRGSCFVmatRotations(){ }
+
+void CheMPS2::DMRGSCFVmatRotations::fillVmatRotated(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * temp1, double * temp2) const{
    
    //Two-body terms --> use eightfold permutation symmetry
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
@@ -98,28 +109,7 @@ void CheMPS2::CASSCF::fillVmatRotated(double * temp1, double * temp2){
 
 }
 
-void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG, double * temp1, double * temp2){
-
-   //Constant part of the energy
-   double value = HamOrig->getEconst();
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
-         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
-      }
-   }
-   HamDMRG->setEconst(value);
-   
-   //One-body terms: diagonal in the irreps
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
-      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
-      const int linsizeDMRG = iHandler->getNDMRG(irrep);
-      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
-         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
-            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
-         }
-      }
-   }
+void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * temp1, double * temp2) const{
    
    //Two-body terms --> use eightfold permutation symmetry in the irreps :-)
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
@@ -202,7 +192,7 @@ void CheMPS2::CASSCF::fillHamDMRG(Hamiltonian * HamDMRG, double * temp1, double 
 
 }
 
-void CheMPS2::CASSCF::fillVmatRotatedBlockWise(double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners){
+void CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners) const{
    
    /***********************************************************
    **   Two-body terms; use eightfold permutation symmetry   **
@@ -570,28 +560,7 @@ void CheMPS2::CASSCF::fillVmatRotatedBlockWise(double * mem1, double * mem2, dou
 
 }
 
-void CheMPS2::CASSCF::fillHamDMRGBlockWise(Hamiltonian * HamDMRG, double * mem1, double * mem2, double * mem3, const int maxBlockSize){
-
-   //Constant part of the energy
-   double value = HamOrig->getEconst();
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
-         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
-      }
-   }
-   HamDMRG->setEconst(value);
-   
-   //One-body terms: diagonal in the irreps
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
-      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
-      const int linsizeDMRG = iHandler->getNDMRG(irrep);
-      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
-         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
-            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
-         }
-      }
-   }
+void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRGBlockWise(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize) const{
    
    /***********************************************************
    **   Two-body terms; use eightfold permutation symmetry   **

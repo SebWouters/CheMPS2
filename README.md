@@ -71,9 +71,6 @@ variables.
 ROHF energy; and one for fetching FCI coefficients to determine the point group
 symmetry of certain electronic states of the carbon dimer.
     
-```CheMPS2/CASSCFhamiltonianrotation.cpp``` contains the Hamiltonian rotation
-function, based on the CASSCF unitary matrix.
-    
 ```CheMPS2/CASSCFnewtonraphson.cpp``` contains all DMRG-SCF functions which
 are specific to the augmented Hessian Newton-Raphson update scheme,
 including the functions to calculate the gradient and Hessian.
@@ -103,6 +100,9 @@ DMRG-SCF algorithm.
 ```CheMPS2/DMRGSCFunitary.cpp``` contains the storage and handling of the
 unitary matrix and its nonredundant skew-symmetric parametrization
 required for the DMRG-SCF algorithm.
+
+```CheMPS2/DMRGSCFVmatRotations.cpp``` performs the two-body matrix element
+rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
 
 ```CheMPS2/DMRGtechnics.cpp``` contains the functions related to the 2-RDM
 and the excited-state calculations.
@@ -253,6 +253,9 @@ DMRGSCFindices class.
 
 ```CheMPS2/include/DMRGSCFunitary.h``` contains the definitions of the
 DMRGSCFunitary class.
+
+```CheMPS2/include/DMRGSCFVmatRotations.h``` contains the definitions of the
+DMRGSCFVmatRotations class.
 
 ```CheMPS2/include/FourIndex.h``` contains the definitions of the FourIndex
 class.

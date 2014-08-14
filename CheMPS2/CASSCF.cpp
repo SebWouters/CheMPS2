@@ -392,6 +392,31 @@ double CheMPS2::CASSCF::TmatRotated(const int index1, const int index2) const{
 
 }
 
+void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
+
+   //Constant part of the energy
+   double value = HamOrig->getEconst();
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
+         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
+      }
+   }
+   HamDMRG->setEconst(value);
+   
+   //One-body terms: diagonal in the irreps
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
+      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
+      const int linsizeDMRG = iHandler->getNDMRG(irrep);
+      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
+            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
+         }
+      }
+   }
+
+}
+
 void CheMPS2::CASSCF::allocateAndFillOCC(int * DOCCin, int * SOCCin){
    
    DOCC = new int[numberOfIrreps];
