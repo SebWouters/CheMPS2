@@ -1,7 +1,23 @@
 var searchData=
 [
-  ['update',['update',['../classCheMPS2_1_1TensorF0Cbase.html#a901bfd9cee6af125f30ee89902b9ccd3',1,'CheMPS2::TensorF0Cbase::update()'],['../classCheMPS2_1_1TensorF1Dbase.html#a2076a13eaccfa554f666331811216bc6',1,'CheMPS2::TensorF1Dbase::update()'],['../classCheMPS2_1_1TensorGYZ.html#a3f06f0df3e52b3b67bf5e63faaaa2a55',1,'CheMPS2::TensorGYZ::update()'],['../classCheMPS2_1_1TensorO.html#ae18de2e237ca7555dd9c4deffd2c139b',1,'CheMPS2::TensorO::update(TensorT *denTup, TensorT *denTdown, TensorO *denO)'],['../classCheMPS2_1_1TensorO.html#a93103fc63c21bd77d068ea20aed3d4a0',1,'CheMPS2::TensorO::update(TensorT *denTup, TensorT *denTdown)'],['../classCheMPS2_1_1TensorS0Abase.html#ac948b1b4b9a32f5dddf707de1a86001d',1,'CheMPS2::TensorS0Abase::update()'],['../classCheMPS2_1_1TensorS1Bbase.html#a8abea6ade905a2f097324486ce2e7c77',1,'CheMPS2::TensorS1Bbase::update()'],['../classCheMPS2_1_1TensorSwap.html#aecb02bc029d2cdd0d7a754bdf3ac491c',1,'CheMPS2::TensorSwap::update()'],['../classCheMPS2_1_1TensorX.html#a450b67e316ae606dd27a289cb04b6f9a',1,'CheMPS2::TensorX::update(TensorT *denT, TensorL **Ltensors, TensorX *Xtensor, TensorQ *Qtensor, TensorA *Atensor, TensorC *Ctensor, TensorD *Dtensor)'],['../classCheMPS2_1_1TensorX.html#a0030fdecfeac6021f378febe95614c79',1,'CheMPS2::TensorX::update(TensorT *denT)']]],
-  ['updateleft',['updateLeft',['../classCheMPS2_1_1TensorDiag.html#aee82a1881caecda56a2c41ea40450070',1,'CheMPS2::TensorDiag']]],
-  ['updateright',['updateRight',['../classCheMPS2_1_1TensorDiag.html#a47170a08cf4c82a89b688e12a8b89275',1,'CheMPS2::TensorDiag']]],
-  ['updateunitary',['updateUnitary',['../classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630',1,'CheMPS2::DMRGSCFunitary']]]
+  ['save',['save',['../classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d',1,'CheMPS2::FourIndex::save()'],['../classCheMPS2_1_1Hamiltonian.html#a7d1e514143996895015413c50770990d',1,'CheMPS2::Hamiltonian::save()'],['../classCheMPS2_1_1TwoDM.html#a46d24ed5f6ce42c1453475d77c60e143',1,'CheMPS2::TwoDM::save()'],['../classCheMPS2_1_1TwoDMstorage.html#ada1dcc9a9e78132a0d33a47e5a290ba5',1,'CheMPS2::TwoDMstorage::save()'],['../classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12',1,'CheMPS2::TwoIndex::save()']]],
+  ['savediis',['saveDIIS',['../classCheMPS2_1_1DIIS.html#a67d248c428186ba3cbdc83387e3e9c06',1,'CheMPS2::DIIS']]],
+  ['saveu',['saveU',['../classCheMPS2_1_1DMRGSCFunitary.html#a5be525a4b42e9f6dbf5dc1209ff89dff',1,'CheMPS2::DMRGSCFunitary']]],
+  ['set',['set',['../classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f',1,'CheMPS2::FourIndex::set()'],['../classCheMPS2_1_1TwoDMstorage.html#a2eb0495511d151e372b77edb3f9d5d36',1,'CheMPS2::TwoDMstorage::set()'],['../classCheMPS2_1_1TwoIndex.html#a4385881853e910bb1ce7d5ea911b75c4',1,'CheMPS2::TwoIndex::set()']]],
+  ['setdim',['SetDim',['../classCheMPS2_1_1SyBookkeeper.html#ab496351a4cbc31f88be340d987d11406',1,'CheMPS2::SyBookkeeper']]],
+  ['seteconst',['setEconst',['../classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5',1,'CheMPS2::Hamiltonian']]],
+  ['setgroup',['setGroup',['../classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c',1,'CheMPS2::Irreps']]],
+  ['setinstruction',['setInstruction',['../classCheMPS2_1_1ConvergenceScheme.html#a454421f377a2be63872d9199b84bad95',1,'CheMPS2::ConvergenceScheme']]],
+  ['settmat',['setTmat',['../classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32',1,'CheMPS2::Hamiltonian']]],
+  ['setupreorderd2h',['SetupReorderD2h',['../classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9',1,'CheMPS2::Problem']]],
+  ['setupstart',['setupStart',['../classCheMPS2_1_1CASSCF.html#a701bdaa40881168d6b386683eaa01cea',1,'CheMPS2::CASSCF']]],
+  ['setvmat',['setVmat',['../classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1',1,'CheMPS2::Hamiltonian']]],
+  ['singleorbitalentropy_5fdmrg',['SingleOrbitalEntropy_DMRG',['../classCheMPS2_1_1Correlations.html#a7414689fc9e58291884af75779f18f85',1,'CheMPS2::Correlations']]],
+  ['singleorbitalentropy_5fham',['SingleOrbitalEntropy_HAM',['../classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e',1,'CheMPS2::Correlations']]],
+  ['sobject',['Sobject',['../classCheMPS2_1_1Sobject.html#a6fd85753dc9048918065a424c42846d2',1,'CheMPS2::Sobject']]],
+  ['solve',['Solve',['../classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2',1,'CheMPS2::DMRG']]],
+  ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3',1,'CheMPS2::Heff']]],
+  ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
+  ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],
+  ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]]
 ];

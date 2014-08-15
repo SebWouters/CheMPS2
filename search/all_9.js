@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kappa2index',['kappa2index',['../classCheMPS2_1_1Tensor.html#ab0c53b7a9fd798d2160d611f83c48133',1,'CheMPS2::Tensor']]]
+  ['join',['Join',['../classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6',1,'CheMPS2::Sobject']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fourindex',['FourIndex',['../classCheMPS2_1_1FourIndex.html',1,'CheMPS2']]]
+  ['edmistonruedenberg',['EdmistonRuedenberg',['../classCheMPS2_1_1EdmistonRuedenberg.html',1,'CheMPS2']]]
 ];

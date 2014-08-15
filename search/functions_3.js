@@ -10,6 +10,7 @@ var searchData=
   ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71',1,'CheMPS2::DMRG']]],
   ['dmrgscfindices',['DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3',1,'CheMPS2::DMRGSCFindices']]],
   ['dmrgscfunitary',['DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36',1,'CheMPS2::DMRGSCFunitary']]],
+  ['dmrgscfvmatrotations',['DMRGSCFVmatRotations',['../classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036',1,'CheMPS2::DMRGSCFVmatRotations']]],
   ['docasscfnewtonraphson',['doCASSCFnewtonraphson',['../classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36',1,'CheMPS2::CASSCF']]],
   ['doubletrace2dma',['doubletrace2DMA',['../classCheMPS2_1_1TwoDM.html#a3970c2fccf52e6e653e2866fabcd3d04',1,'CheMPS2::TwoDM']]]
 ];

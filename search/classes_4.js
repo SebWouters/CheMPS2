@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['irreps',['Irreps',['../classCheMPS2_1_1Irreps.html',1,'CheMPS2']]]
+  ['hamiltonian',['Hamiltonian',['../classCheMPS2_1_1Hamiltonian.html',1,'CheMPS2']]],
+  ['heff',['Heff',['../classCheMPS2_1_1Heff.html',1,'CheMPS2']]]
 ];

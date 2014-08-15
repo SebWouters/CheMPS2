@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['random',['random',['../classCheMPS2_1_1TensorT.html#a5143f02e292c2c7e25d472e75b239298',1,'CheMPS2::TensorT']]],
-  ['read',['read',['../classCheMPS2_1_1FourIndex.html#a557d6a17fa93c708a94fa5924626c405',1,'CheMPS2::FourIndex::read()'],['../classCheMPS2_1_1Hamiltonian.html#a5c1030ac14e2d82ae6e89b8dc65c9ddf',1,'CheMPS2::Hamiltonian::read()'],['../classCheMPS2_1_1TwoDM.html#a371ffeddaa5c310b32449fed92071ac3',1,'CheMPS2::TwoDM::read()'],['../classCheMPS2_1_1TwoDMstorage.html#a7d1ba6f22b269a0a97853fb08665439e',1,'CheMPS2::TwoDMstorage::read()'],['../classCheMPS2_1_1TwoIndex.html#a56586b601fa0b79fd6ab93c1a01d9705',1,'CheMPS2::TwoIndex::read()']]],
-  ['reset',['Reset',['../classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e',1,'CheMPS2::TensorT']]],
-  ['rightmultiply',['RightMultiply',['../classCheMPS2_1_1TensorT.html#ad53db81f1f1bf33512f93a23abc0ed50',1,'CheMPS2::TensorT']]],
-  ['rotateunitarynoeigenvecs',['rotateUnitaryNOeigenvecs',['../classCheMPS2_1_1DMRGSCFunitary.html#a38c8b78d1528a01f6210044819f51846',1,'CheMPS2::DMRGSCFunitary']]]
+  ['print',['Print',['../classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6',1,'CheMPS2::Correlations::Print()'],['../classCheMPS2_1_1DMRGSCFindices.html#a9e59260eecdb760a58464e330b313928',1,'CheMPS2::DMRGSCFindices::Print()']]],
+  ['printall',['printAll',['../classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848',1,'CheMPS2::Irreps']]],
+  ['printlicense',['PrintLicense',['../classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904',1,'CheMPS2::DMRG']]],
+  ['problem',['Problem',['../classCheMPS2_1_1Problem.html',1,'CheMPS2']]],
+  ['problem',['Problem',['../classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c',1,'CheMPS2::Problem']]],
+  ['prog2symm',['prog2symm',['../classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c',1,'CheMPS2::Sobject']]]
 ];

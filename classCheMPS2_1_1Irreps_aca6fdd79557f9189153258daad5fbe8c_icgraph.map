@@ -1,5 +1,7 @@
 <map id="CheMPS2::Irreps::setGroup" name="CheMPS2::Irreps::setGroup">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="237,5,445,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3" title="Constructor. " alt="" coords="242,57,441,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1" title="Constructor. " alt="" coords="262,122,421,163"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="256,5,464,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3" title="Constructor. " alt="" coords="261,57,459,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036" title="Constructor. " alt="" coords="237,122,483,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="253,187,467,229"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1" title="Constructor. " alt="" coords="281,253,439,294"/>
 </map>
