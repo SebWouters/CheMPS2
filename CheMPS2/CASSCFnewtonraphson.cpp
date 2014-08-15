@@ -76,10 +76,9 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
    //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int sizeWorkmem1 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG * nOrbDMRG ); //For (2-body tfo , updateUnitary, calcNOON)
-   const int sizeWorkmem2 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , (CheMPS2::DMRGSCF_rotate2DMtoNO) ? nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG : nOrbDMRG*(nOrbDMRG + 1) ); //For (2-body tfo, updateUnitary and rotateUnitaryNOeigenvecs, rotate2DMand1DM or calcNOON)
-   double * mem1 = new double[sizeWorkmem1];
-   double * mem2 = new double[sizeWorkmem2];
+   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
+   double * mem1 = new double[sizeWorkmem];
+   double * mem2 = new double[sizeWorkmem];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    

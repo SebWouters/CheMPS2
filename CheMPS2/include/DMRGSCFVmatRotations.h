@@ -48,7 +48,7 @@ namespace CheMPS2{
              \param unitary The unitary matrix to rotate Vmat(HamOrig) to VmatRotated.
              \param mem1 Work memory with at least the size max(linsize of irreps)^4.
              \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         void fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * temp1, double * temp2) const;
+         void fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
          
          //! Fill the rotated two-body matrix elements, based on HamOrig and unitary. Do entire blocks at once.
          /** \param VmatRotated The rotated two-body matrix elements are stored here.

@@ -10,6 +10,7 @@ add_executable (test5 test5.cpp)
 add_executable (test6 test6.cpp)
 add_executable (test7 test7.cpp)
 add_executable (test8 test8.cpp)
+add_executable (test9 test9.cpp)
 
 target_link_libraries (test1 CheMPS2)
 target_link_libraries (test2 CheMPS2)
@@ -19,4 +20,5 @@ target_link_libraries (test5 CheMPS2)
 target_link_libraries (test6 CheMPS2)
 target_link_libraries (test7 CheMPS2)
 target_link_libraries (test8 CheMPS2)
+target_link_libraries (test9 CheMPS2)
 

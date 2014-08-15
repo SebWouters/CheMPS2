@@ -189,7 +189,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    for (int index=0; index < Prob->gL()-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
    cout << theCorr->SingleOrbitalEntropy_HAM(Prob->gL()-1) << " ]." << endl;
    
-   for (int power=-2; power<=2; power++){
+   for (int power=0; power<=2; power++){
       cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
    }
 

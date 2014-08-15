@@ -65,6 +65,10 @@ namespace CheMPS2{
    
    const bool   CORRELATIONS_debugPrint       = false;
    const double CORRELATIONS_discardEig       = 1e-100;
+   
+   const double EDMISTONRUED_gradThreshold    = 1e-8;
+   const int    EDMISTONRUED_maxIter          = 1000;
+   const int    EDMISTONRUED_maxIterBackTfo   = 15;
 
 }
 

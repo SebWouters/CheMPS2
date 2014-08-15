@@ -107,6 +107,10 @@ rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
 ```CheMPS2/DMRGtechnics.cpp``` contains the functions related to the 2-RDM
 and the excited-state calculations.
 
+```CheMPS2/EdmistonRuedenberg.cpp``` contains an orbital localization function
+based on the Edmiston-Ruedenberg cost function and an augmented Hessian
+Newton-Raphson optimizer.
+
 ```CheMPS2/FourIndex.cpp``` contains all functions of the FourIndex container
 class for the two-body matrix elements.
 
@@ -256,6 +260,9 @@ DMRGSCFunitary class.
 
 ```CheMPS2/include/DMRGSCFVmatRotations.h``` contains the definitions of the
 DMRGSCFVmatRotations class.
+
+```CheMPS2/include/EdmistonRuedenberg.h``` contains the definitions of the
+EdmistonRuedenberg class.
 
 ```CheMPS2/include/FourIndex.h``` contains the definitions of the FourIndex
 class.

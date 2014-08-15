@@ -53,6 +53,7 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
       x_linearlength += iHandler->getNOCC(irrep)*iHandler->getNDMRG(irrep) + iHandler->getNDMRG(irrep)*iHandler->getNVIRT(irrep) + iHandler->getNOCC(irrep)*iHandler->getNVIRT(irrep);
    }
+   if (x_linearlength==0){ return; }
    x_firstindex  = new int[x_linearlength];
    x_secondindex = new int[x_linearlength];
    int x_linearlength2 = 0;
@@ -95,9 +96,11 @@ CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
       
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){ delete [] unitary[irrep]; }
    delete [] unitary;
-      
-   delete [] x_firstindex;
-   delete [] x_secondindex;
+   
+   if (x_linearlength!=0){
+      delete [] x_firstindex;
+      delete [] x_secondindex;
+   }
       
 }
 
@@ -327,16 +330,18 @@ void CheMPS2::DMRGSCFunitary::CheckDeviationFromUnitary(double * work) const{
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
    
       int linsize = iHandler->getNORB(irrep);
-      dgemm_(&tran,&notr,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
-      double value = 0.0;
-      for (int cnt=0; cnt<linsize; cnt++){
-         value += (work[cnt*(1+linsize)]-1.0) * (work[cnt*(1+linsize)]-1.0);
-         for (int cnt2=cnt+1; cnt2<linsize; cnt2++){
-            value += work[cnt + cnt2*linsize] * work[cnt + cnt2*linsize] + work[cnt2 + cnt*linsize] * work[cnt2 + cnt*linsize];
+      if (linsize>0){
+         dgemm_(&tran,&notr,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
+         double value = 0.0;
+         for (int cnt=0; cnt<linsize; cnt++){
+            value += (work[cnt*(1+linsize)]-1.0) * (work[cnt*(1+linsize)]-1.0);
+            for (int cnt2=cnt+1; cnt2<linsize; cnt2++){
+               value += work[cnt + cnt2*linsize] * work[cnt + cnt2*linsize] + work[cnt2 + cnt*linsize] * work[cnt2 + cnt*linsize];
+            }
          }
+         value = sqrt(value);
+         cout << "   DMRGSCFunitary::CheckDeviationFromUnitary : 2-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
       }
-      value = sqrt(value);
-      cout << "   DMRGSCFunitary::CheckDeviationFromUnitary : 2-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
       
    }
 
