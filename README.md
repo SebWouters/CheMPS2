@@ -398,6 +398,11 @@ and antibonding) are chosen as active space. A significant speedup is obtained
 with DIIS. This test is smaller than test6, and is included for debugging with
 valgrind.
 
+```tests/test9.cpp``` tests the Edmiston-Ruedenberg localizer. For all irreps
+of ```tests/matrixelements/N2_CCPVDZ.dat```, the Edmiston-Ruedenberg cost
+function is maximized, by means of an augmented Hessian Newton-Raphson
+optimizer.
+
 ```tests/matrixelements/CH4_N10_S0_c2v_I0.dat``` contains the matrix elements
 for test3.
 
@@ -411,7 +416,7 @@ for test1 and test5.
 for test6 and test7.
 
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
-for test8.
+for test8 and test9.
 
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).
@@ -514,6 +519,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test6
     > ./test7
     > ./test8
+    > ./test9
 
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).
