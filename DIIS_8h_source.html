@@ -159,60 +159,63 @@ $(document).ready(function(){initNavTree('DIIS_8h_source.html','');});
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3">calculateParam</a>(<span class="keywordtype">double</span> * newParam);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;         </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#a67d248c428186ba3cbdc83387e3e9c06">saveDIIS</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;         </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#acd3ee9c7a2e8977705154871651581e7">loadDIIS</a>();</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;         </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#a6104d1874c0eb44bf0b244a74ffb70a7">deleteStoredDIIS</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;         </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;         <span class="comment">//The number of variables in the parameter vectors</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;         <span class="keywordtype">int</span> numVarsParam;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;         </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;         <span class="comment">//The number of variables in the error vectors</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;         <span class="keywordtype">int</span> numVarsError;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37">saveDIIS</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_DIISstorageName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#a9a18331523e2455812e808f83072f3d8">loadDIIS</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_DIISstorageName);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba">deleteStoredDIIS</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_DIISstorageName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;         </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;         <span class="comment">//The number of variables in the parameter vectors</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;         <span class="keywordtype">int</span> numVarsParam;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;         </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;         <span class="comment">//The max. number of vectors which should be kept</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;         <span class="keywordtype">int</span> numVecs;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;         <span class="comment">//The number of variables in the error vectors</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;         <span class="keywordtype">int</span> numVarsError;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;         </div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;         <span class="comment">//The current number of vectors in this object</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         <span class="keywordtype">int</span> currentNumVecs;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      </div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;         <span class="comment">//The error vectors</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;         <span class="keywordtype">double</span> ** errorVectors;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;         </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         <span class="comment">//The parameter vectors</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         <span class="keywordtype">double</span> ** paramVectors;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;         <span class="comment">//The max. number of vectors which should be kept</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         <span class="keywordtype">int</span> numVecs;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;         <span class="comment">//The current number of vectors in this object</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;         <span class="keywordtype">int</span> currentNumVecs;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         <span class="comment">//The error vectors</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         <span class="keywordtype">double</span> ** errorVectors;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;         </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         <span class="comment">//The last linco of parameter vectors</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;         <span class="keywordtype">double</span> * lastLinco;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         <span class="comment">//The parameter vectors</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;         <span class="keywordtype">double</span> ** paramVectors;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;         </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;   };</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;}</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;         <span class="comment">//The last linco of parameter vectors</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;         <span class="keywordtype">double</span> * lastLinco;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;         </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;   };</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;}</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a81381386f2ebf71857d382747ed597ae"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a81381386f2ebf71857d382747ed597ae">CheMPS2::DIIS::getNumVarsError</a></div><div class="ttdeci">int getNumVarsError() const </div><div class="ttdoc">Get the number of variables in the error vectors. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00066">DIIS.cpp:66</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a9cbcd9c6176fdfe09844aa7c89d8e583"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a9cbcd9c6176fdfe09844aa7c89d8e583">CheMPS2::DIIS::DIIS</a></div><div class="ttdeci">DIIS(const int numVarsParamIn, const int numVarsErrorIn, const int numVecsIn)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00037">DIIS.cpp:37</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_ae08b4931a1ed04490fecb06618d26432"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432">CheMPS2::DIIS::appendNew</a></div><div class="ttdeci">void appendNew(double *newError, double *newParam)</div><div class="ttdoc">Append a new error and parameter vector. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00074">DIIS.cpp:74</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a53ed9c34c62a372b5ab48dbb01b50150"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a53ed9c34c62a372b5ab48dbb01b50150">CheMPS2::DIIS::getNumVarsParam</a></div><div class="ttdeci">int getNumVarsParam() const </div><div class="ttdoc">Get the number of variables in the parameter vectors. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00064">DIIS.cpp:64</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DIIS_html_aa7e7da7574b2936c681e6f652f14ae37"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37">CheMPS2::DIIS::saveDIIS</a></div><div class="ttdeci">void saveDIIS(const string filename=DMRGSCF_DIISstorageName) const </div><div class="ttdoc">Save the DIIS object to disk. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00165">DIIS.cpp:165</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DIIS_html_a057c39a90dea9bb70d93d82154bccbba"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba">CheMPS2::DIIS::deleteStoredDIIS</a></div><div class="ttdeci">void deleteStoredDIIS(const string filename=DMRGSCF_DIISstorageName) const </div><div class="ttdoc">Delete the stored DIIS object (on disk) </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00289">DIIS.cpp:289</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a4fdba33bfbbf693f0565a9a4f8e1e0e1"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a4fdba33bfbbf693f0565a9a4f8e1e0e1">CheMPS2::DIIS::~DIIS</a></div><div class="ttdeci">virtual ~DIIS()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00051">DIIS.cpp:51</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a8ae6de96166c26ea34c2b34c96848aab"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a8ae6de96166c26ea34c2b34c96848aab">CheMPS2::DIIS::getLastLinco</a></div><div class="ttdeci">double * getLastLinco()</div><div class="ttdoc">Get pointer to the last linco of parameter vectors. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00072">DIIS.cpp:72</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DIIS_html_a67d248c428186ba3cbdc83387e3e9c06"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a67d248c428186ba3cbdc83387e3e9c06">CheMPS2::DIIS::saveDIIS</a></div><div class="ttdeci">void saveDIIS() const </div><div class="ttdoc">Save the DIIS object to disk. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00165">DIIS.cpp:165</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_ad8f60dd3e52d1d8a59c155c25a7ce3f3"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3">CheMPS2::DIIS::calculateParam</a></div><div class="ttdeci">void calculateParam(double *newParam)</div><div class="ttdoc">Calculate the new parameter vector, based on the just appended error and parameter vectors...</div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00103">DIIS.cpp:103</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_a5d7d6401d9d627363fb730ee0df3b034"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a5d7d6401d9d627363fb730ee0df3b034">CheMPS2::DIIS::getCurrentNumVecs</a></div><div class="ttdeci">int getCurrentNumVecs() const </div><div class="ttdoc">Get the current number of vectors which are used for DIIS. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00070">DIIS.cpp:70</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html">CheMPS2::DIIS</a></div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8h_source.html#l00034">DIIS.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DIIS_html_ab8ace1d47532d7382d6c4e63a899b51c"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#ab8ace1d47532d7382d6c4e63a899b51c">CheMPS2::DIIS::getNumVecs</a></div><div class="ttdeci">int getNumVecs() const </div><div class="ttdoc">Get the max. number of parameter and error vectors which are kept. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00068">DIIS.cpp:68</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DIIS_html_a6104d1874c0eb44bf0b244a74ffb70a7"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a6104d1874c0eb44bf0b244a74ffb70a7">CheMPS2::DIIS::deleteStoredDIIS</a></div><div class="ttdeci">void deleteStoredDIIS() const </div><div class="ttdoc">Delete the stored DIIS object (on disk) </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00289">DIIS.cpp:289</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DIIS_html_acd3ee9c7a2e8977705154871651581e7"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#acd3ee9c7a2e8977705154871651581e7">CheMPS2::DIIS::loadDIIS</a></div><div class="ttdeci">void loadDIIS()</div><div class="ttdoc">Load the DIIS object from disk. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00223">DIIS.cpp:223</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DIIS_html_a9a18331523e2455812e808f83072f3d8"><div class="ttname"><a href="classCheMPS2_1_1DIIS.html#a9a18331523e2455812e808f83072f3d8">CheMPS2::DIIS::loadDIIS</a></div><div class="ttdeci">void loadDIIS(const string filename=DMRGSCF_DIISstorageName)</div><div class="ttdoc">Load the DIIS object from disk. </div><div class="ttdef"><b>Definition:</b> <a href="DIIS_8cpp_source.html#l00223">DIIS.cpp:223</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><b>DIIS.h</b></li>
-    <li class="footer">Generated on Tue Aug 19 2014 10:06:30 for CheMPS2 by
+    <li class="footer">Generated on Wed Aug 20 2014 14:06:54 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

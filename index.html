@@ -144,6 +144,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code><a class="el" href="DMRGmpsio_8cpp_source.html">CheMPS2/DMRGmpsio.cpp</a></code> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
 <p><code><a class="el" href="DMRGoperators_8cpp_source.html">CheMPS2/DMRGoperators.cpp</a></code> contains all functions related to the DMRG renormalized operators: saving to disk, loading from disk, and updating.</p>
 <p><code><a class="el" href="DMRGSCFindices_8cpp_source.html">CheMPS2/DMRGSCFindices.cpp</a></code> contains the index conversions for the DMRG-SCF algorithm.</p>
+<p><code><a class="el" href="DMRGSCFoptions_8cpp_source.html">CheMPS2/DMRGSCFoptions.cpp</a></code> is a container class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson routine.</p>
 <p><code><a class="el" href="DMRGSCFunitary_8cpp_source.html">CheMPS2/DMRGSCFunitary.cpp</a></code> contains the storage and handling of the unitary matrix and its nonredundant skew-symmetric parametrization required for the DMRG-SCF algorithm.</p>
 <p><code><a class="el" href="DMRGSCFVmatRotations_8cpp_source.html">CheMPS2/DMRGSCFVmatRotations.cpp</a></code> performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.</p>
 <p><code><a class="el" href="DMRGtechnics_8cpp_source.html">CheMPS2/DMRGtechnics.cpp</a></code> contains the functions related to the 2-RDM and the excited-state calculations.</p>
@@ -193,6 +194,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code><a class="el" href="DIIS_8h_source.html">CheMPS2/include/DIIS.h</a></code> contains the definitions of the DIIS class.</p>
 <p><code><a class="el" href="DMRG_8h_source.html">CheMPS2/include/DMRG.h</a></code> contains the definitions of the DMRG class.</p>
 <p><code><a class="el" href="DMRGSCFindices_8h_source.html">CheMPS2/include/DMRGSCFindices.h</a></code> contains the definitions of the DMRGSCFindices class.</p>
+<p><code><a class="el" href="DMRGSCFoptions_8h_source.html">CheMPS2/include/DMRGSCFoptions.h</a></code> contains the definitions of the DMRGSCFoptions container class.</p>
 <p><code><a class="el" href="DMRGSCFunitary_8h_source.html">CheMPS2/include/DMRGSCFunitary.h</a></code> contains the definitions of the DMRGSCFunitary class.</p>
 <p><code><a class="el" href="DMRGSCFVmatRotations_8h_source.html">CheMPS2/include/DMRGSCFVmatRotations.h</a></code> contains the definitions of the DMRGSCFVmatRotations class.</p>
 <p><code><a class="el" href="EdmistonRuedenberg_8h_source.html">CheMPS2/include/EdmistonRuedenberg.h</a></code> contains the definitions of the EdmistonRuedenberg class.</p>
@@ -244,11 +246,12 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p><code>tests/test7.cpp</code> reads in <code>tests/matrixelements/O2_CCPVDZ.dat</code>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
 <p><code>tests/test8.cpp</code> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
 <p><code>tests/test9.cpp</code> tests the Edmiston-Ruedenberg localizer. For all irreps of <code>tests/matrixelements/N2_CCPVDZ.dat</code>, the Edmiston-Ruedenberg cost function is maximized, by means of an augmented Hessian Newton-Raphson optimizer.</p>
+<p><code>tests/test10.cpp</code> is a copy of test8.cpp, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
 <p><code>tests/matrixelements/CH4_N10_S0_c2v_I0.dat</code> contains the matrix elements for test3.</p>
 <p><code>tests/matrixelements/H6_N6_S0_d2h_I0.dat</code> contains the matrix elements for test2.</p>
 <p><code>tests/matrixelements/N2_N14_S0_d2h_I0.dat</code> contains the matrix elements for test1 and test5.</p>
 <p><code>tests/matrixelements/O2_CCPVDZ.dat</code> contains the matrix elements for test6 and test7.</p>
-<p><code>tests/matrixelements/N2_CCPVDZ.dat</code> contains the matrix elements for test8 and test9.</p>
+<p><code>tests/matrixelements/N2_CCPVDZ.dat</code> contains the matrix elements for test8, test9, and test10.</p>
 <p>These test files illustrate how to use the CheMPS2 library. The tests only require a very limited amount of memory (order 10-100 MB).</p>
 <h2>Matrix elements from Psi4 </h2>
 <p>CheMPS2 has a Hamiltonian object which is able to read in matrix elements from a plugin to Psi4 <a href="http://www.psicode.org">[Psi4, Ab initio quantum chemistry]</a>, which works on version psi4.0b5 and higher.</p>
@@ -295,6 +298,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 &gt; ./test7
 &gt; ./test8
 &gt; ./test9
+&gt; ./test10
 </pre><p>The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-100 MB).</p>
 <h3>3. Doxygen documentation</h3>
 <p>To build and view the Doxygen manual, the documentation flag should have been on: <code>-DBUILD_DOCUMENTATION=ON</code>. Start in <code>./build</code> and run: </p>
@@ -312,7 +316,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Aug 19 2014 10:06:37 for CheMPS2 by
+    <li class="footer">Generated on Wed Aug 20 2014 14:07:01 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

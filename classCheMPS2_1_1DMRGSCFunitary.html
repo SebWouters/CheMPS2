@@ -137,9 +137,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a0b7e14e83dd48b97dcd791509bddc630"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630">updateUnitary</a> (double *workmem1, double *workmem2, double *vector, const bool multiply, const bool compact)</td></tr>
 <tr class="memdesc:a0b7e14e83dd48b97dcd791509bddc630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the unitary transformation.  <a href="#a0b7e14e83dd48b97dcd791509bddc630">More...</a><br/></td></tr>
 <tr class="separator:a0b7e14e83dd48b97dcd791509bddc630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38c8b78d1528a01f6210044819f51846"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a38c8b78d1528a01f6210044819f51846">rotateUnitaryNOeigenvecs</a> (double *eigenvecs, double *work)</td></tr>
-<tr class="memdesc:a38c8b78d1528a01f6210044819f51846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate the unitary matrix to the NO eigenbasis.  <a href="#a38c8b78d1528a01f6210044819f51846">More...</a><br/></td></tr>
-<tr class="separator:a38c8b78d1528a01f6210044819f51846"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fb26346f9c7a15af27b459f7d5b0d3b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b">rotateActiveSpaceVectors</a> (double *eigenvecs, double *work)</td></tr>
+<tr class="memdesc:a2fb26346f9c7a15af27b459f7d5b0d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotate the unitary matrix.  <a href="#a2fb26346f9c7a15af27b459f7d5b0d3b">More...</a><br/></td></tr>
+<tr class="separator:a2fb26346f9c7a15af27b459f7d5b0d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fb18978b7e7de003479e3d06a3dca0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a">CheckDeviationFromUnitary</a> (double *work) const </td></tr>
 <tr class="memdesc:a8fb18978b7e7de003479e3d06a3dca0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the two-norm of U^T*U - I.  <a href="#a8fb18978b7e7de003479e3d06a3dca0a">More...</a><br/></td></tr>
 <tr class="separator:a8fb18978b7e7de003479e3d06a3dca0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,18 +152,15 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a661342a71c1ee032e9c2bf0efaa8e799"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799">makeSureAllBlocksDetOne</a> (double *temp1, double *temp2)</td></tr>
 <tr class="memdesc:a661342a71c1ee032e9c2bf0efaa8e799"><td class="mdescLeft">&#160;</td><td class="mdescRight">Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1.  <a href="#a661342a71c1ee032e9c2bf0efaa8e799">More...</a><br/></td></tr>
 <tr class="separator:a661342a71c1ee032e9c2bf0efaa8e799"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5be525a4b42e9f6dbf5dc1209ff89dff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5be525a4b42e9f6dbf5dc1209ff89dff"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a5be525a4b42e9f6dbf5dc1209ff89dff">saveU</a> () const </td></tr>
-<tr class="memdesc:a5be525a4b42e9f6dbf5dc1209ff89dff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the unitary to disk. <br/></td></tr>
-<tr class="separator:a5be525a4b42e9f6dbf5dc1209ff89dff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37649fd421f715c464f39e334106038f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37649fd421f715c464f39e334106038f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a37649fd421f715c464f39e334106038f">loadU</a> ()</td></tr>
-<tr class="memdesc:a37649fd421f715c464f39e334106038f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the unitary from disk. <br/></td></tr>
-<tr class="separator:a37649fd421f715c464f39e334106038f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30ca68b015de56d2b80e1cc84e10d42f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a30ca68b015de56d2b80e1cc84e10d42f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a30ca68b015de56d2b80e1cc84e10d42f">deleteStoredUnitary</a> () const </td></tr>
-<tr class="memdesc:a30ca68b015de56d2b80e1cc84e10d42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the stored unitary (on disk) <br/></td></tr>
-<tr class="separator:a30ca68b015de56d2b80e1cc84e10d42f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11ad63632a4a368db38a383366847c06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06">saveU</a> (const string filename=DMRGSCF_unitaryStorageName) const </td></tr>
+<tr class="memdesc:a11ad63632a4a368db38a383366847c06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the unitary to disk.  <a href="#a11ad63632a4a368db38a383366847c06">More...</a><br/></td></tr>
+<tr class="separator:a11ad63632a4a368db38a383366847c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a867a52da2ca19a581d9c8476fab61246"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a867a52da2ca19a581d9c8476fab61246">loadU</a> (const string filename=DMRGSCF_unitaryStorageName)</td></tr>
+<tr class="memdesc:a867a52da2ca19a581d9c8476fab61246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the unitary from disk.  <a href="#a867a52da2ca19a581d9c8476fab61246">More...</a><br/></td></tr>
+<tr class="separator:a867a52da2ca19a581d9c8476fab61246"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f102451d366a3a856db499799c0c5eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb">deleteStoredUnitary</a> (const string filename=DMRGSCF_unitaryStorageName) const </td></tr>
+<tr class="memdesc:a5f102451d366a3a856db499799c0c5eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the stored unitary (on disk)  <a href="#a5f102451d366a3a856db499799c0c5eb">More...</a><br/></td></tr>
+<tr class="separator:a5f102451d366a3a856db499799c0c5eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> class. </p>
@@ -306,6 +303,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a5f102451d366a3a856db499799c0c5eb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::DMRGSCFunitary::deleteStoredUnitary </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em> = <code>DMRGSCF_unitaryStorageName</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Delete the stored unitary (on disk) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>Delete this file </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00712">712</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a5f102451d366a3a856db499799c0c5eb_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a5f102451d366a3a856db499799c0c5eb_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRGSCFunitary_a5f102451d366a3a856db499799c0c5eb_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a5f102451d366a3a856db499799c0c5eb_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ac5d09078027fad94ceb82009cb78d328" title="CASSCF unitary rotation remove call. " alt="" coords="251,5,477,46"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="a7ca4dead16809cd2a896c1a05b92fc0b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -331,14 +365,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00123">123</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a7ca4dead16809cd2a896c1a05b92fc0b_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a7ca4dead16809cd2a896c1a05b92fc0b_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a7ca4dead16809cd2a896c1a05b92fc0b_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a7ca4dead16809cd2a896c1a05b92fc0b_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="275,5,472,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula. " alt="" coords="256,71,491,97"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="251,318,496,359"/><area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="251,122,496,163"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a3eb27cf23f7415294b6880a07b4c91ea" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Cut the blocks into chunks w..." alt="" coords="251,187,496,229"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="251,253,496,294"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="545,195,855,221"/><area shape="rect" id="node6" href="classCheMPS2_1_1EdmistonRuedenberg.html#aa6976b26713962a74c975c81b98226ca" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="593,318,807,359"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="568,5,765,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula. " alt="" coords="256,128,491,155"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="251,179,496,221"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="544,253,789,294"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a3eb27cf23f7415294b6880a07b4c91ea" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Cut the blocks into chunks w..." alt="" coords="251,297,496,338"/><area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="251,362,496,403"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="838,195,1149,221"/><area shape="rect" id="node6" href="classCheMPS2_1_1EdmistonRuedenberg.html#aa6976b26713962a74c975c81b98226ca" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="559,122,774,163"/><area shape="rect" id="node7" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="559,187,774,229"/></map>
 </div>
 </p>
 
@@ -405,33 +439,33 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vector</td><td>Where the logarithm should be stored </td></tr>
-    <tr><td class="paramname">temp1</td><td>Work memory </td></tr>
-    <tr><td class="paramname">temp2</td><td>Work memory </td></tr>
+    <tr><td class="paramname">temp1</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
+    <tr><td class="paramname">temp2</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00350">350</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_cgraph" id="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="251,5,448,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="251,70,448,111"/></map>
 </div>
 </p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a4fc1da7a1ee20da577495f0f0c6d5100_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
 </div>
 </p>
 
@@ -455,14 +489,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00107">107</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a725cdfa70964b24914436fc40bba90b4_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a725cdfa70964b24914436fc40bba90b4_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a725cdfa70964b24914436fc40bba90b4_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a725cdfa70964b24914436fc40bba90b4_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
 </div>
 </p>
 
@@ -495,6 +529,43 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a867a52da2ca19a581d9c8476fab61246"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::DMRGSCFunitary::loadU </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em> = <code>DMRGSCF_unitaryStorageName</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Load the unitary from disk. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>Filename to load the unitary from </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00690">690</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a867a52da2ca19a581d9c8476fab61246_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a867a52da2ca19a581d9c8476fab61246_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRGSCFunitary_a867a52da2ca19a581d9c8476fab61246_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a867a52da2ca19a581d9c8476fab61246_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="a661342a71c1ee032e9c2bf0efaa8e799"></a>
 <div class="memitem">
 <div class="memproto">
@@ -522,33 +593,33 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">temp1</td><td>Work memory </td></tr>
-    <tr><td class="paramname">temp2</td><td>Work memory </td></tr>
+    <tr><td class="paramname">temp1</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
+    <tr><td class="paramname">temp2</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00602">602</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a661342a71c1ee032e9c2bf0efaa8e799_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a661342a71c1ee032e9c2bf0efaa8e799_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a661342a71c1ee032e9c2bf0efaa8e799_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a661342a71c1ee032e9c2bf0efaa8e799_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a38c8b78d1528a01f6210044819f51846"></a>
+<a class="anchor" id="a2fb26346f9c7a15af27b459f7d5b0d3b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CheMPS2::DMRGSCFunitary::rotateUnitaryNOeigenvecs </td>
+          <td class="memname">void CheMPS2::DMRGSCFunitary::rotateActiveSpaceVectors </td>
           <td>(</td>
           <td class="paramtype">double *&#160;</td>
           <td class="paramname"><em>eigenvecs</em>, </td>
@@ -567,25 +638,62 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 
-<p>Rotate the unitary matrix to the NO eigenbasis. </p>
+<p>Rotate the unitary matrix. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">eigenvecs</td><td>The NO eigenbasis </td></tr>
-    <tr><td class="paramname">work</td><td>Work memory </td></tr>
+    <tr><td class="paramname">eigenvecs</td><td>The rotation vectors, in a memory block of size nOrbDMRG^2 </td></tr>
+    <tr><td class="paramname">work</td><td>Work memory, with size 2*max(dim(irrep(Ham)))^2 </td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00279">279</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-7-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a38c8b78d1528a01f6210044819f51846_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a38c8b78d1528a01f6210044819f51846_icgraph" alt=""/></div>
-<map name="classCheMPS2_1_1DMRGSCFunitary_a38c8b78d1528a01f6210044819f51846_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a38c8b78d1528a01f6210044819f51846_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+<div id="dynsection-9-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a2fb26346f9c7a15af27b459f7d5b0d3b_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a2fb26346f9c7a15af27b459f7d5b0d3b_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRGSCFunitary_a2fb26346f9c7a15af27b459f7d5b0d3b_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a2fb26346f9c7a15af27b459f7d5b0d3b_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a11ad63632a4a368db38a383366847c06"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::DMRGSCFunitary::saveU </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em> = <code>DMRGSCF_unitaryStorageName</code></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Save the unitary to disk. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>Filename to store the unitary to </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00665">665</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+
+<p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-10-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-10-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a11ad63632a4a368db38a383366847c06_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a11ad63632a4a368db38a383366847c06_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRGSCFunitary_a11ad63632a4a368db38a383366847c06_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a11ad63632a4a368db38a383366847c06_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,12,562,39"/></map>
 </div>
 </p>
 
@@ -636,8 +744,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Update the unitary transformation. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">workmem1</td><td>Work memory </td></tr>
-    <tr><td class="paramname">workmem2</td><td>Work memory </td></tr>
+    <tr><td class="paramname">workmem1</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
+    <tr><td class="paramname">workmem2</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
     <tr><td class="paramname">vector</td><td>The elements in X </td></tr>
     <tr><td class="paramname">multiply</td><td>Boolean whether exp(X)*U or exp(X) should become the new U. If multiply==true, U &lt;&ndash; exp(X)*U. If multiply==false, U &lt;&ndash; exp(X). </td></tr>
     <tr><td class="paramname">compact</td><td>Boolean which indicates how the elements X are stored </td></tr>
@@ -647,14 +755,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 <p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00188">188</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
-<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-11-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-11-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-8-content" class="dyncontent" style="display:none;">
+<div id="dynsection-11-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFunitary_a0b7e14e83dd48b97dcd791509bddc630_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFunitary_a0b7e14e83dd48b97dcd791509bddc630_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFunitary_a0b7e14e83dd48b97dcd791509bddc630_icgraph" id="classCheMPS2_1_1DMRGSCFunitary_a0b7e14e83dd48b97dcd791509bddc630_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a5a5be81916dd2ca1e66284d388b3ae36" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="534,5,845,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="269,27,467,69"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula. " alt="" coords="251,93,485,120"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="534,5,845,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="269,27,467,69"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22" title="Obtain the logarithm of the current unitary matrix based on the BCH formula. " alt="" coords="251,93,485,120"/></map>
 </div>
 </p>
 
@@ -670,7 +778,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a></li>
-    <li class="footer">Generated on Tue Aug 19 2014 10:06:31 for CheMPS2 by
+    <li class="footer">Generated on Wed Aug 20 2014 14:06:55 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

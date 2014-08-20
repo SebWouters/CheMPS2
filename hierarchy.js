@@ -6,6 +6,7 @@ var hierarchy =
     [ "CheMPS2::DIIS", "classCheMPS2_1_1DIIS.html", null ],
     [ "CheMPS2::DMRG", "classCheMPS2_1_1DMRG.html", null ],
     [ "CheMPS2::DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", null ],
+    [ "CheMPS2::DMRGSCFoptions", "classCheMPS2_1_1DMRGSCFoptions.html", null ],
     [ "CheMPS2::DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", null ],
     [ "CheMPS2::DMRGSCFVmatRotations", "classCheMPS2_1_1DMRGSCFVmatRotations.html", null ],
     [ "CheMPS2::EdmistonRuedenberg", "classCheMPS2_1_1EdmistonRuedenberg.html", null ],

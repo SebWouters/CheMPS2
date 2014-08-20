@@ -7,6 +7,7 @@ var annotated =
       [ "DIIS", "classCheMPS2_1_1DIIS.html", "classCheMPS2_1_1DIIS" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],
       [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", "classCheMPS2_1_1DMRGSCFindices" ],
+      [ "DMRGSCFoptions", "classCheMPS2_1_1DMRGSCFoptions.html", "classCheMPS2_1_1DMRGSCFoptions" ],
       [ "DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", "classCheMPS2_1_1DMRGSCFunitary" ],
       [ "DMRGSCFVmatRotations", "classCheMPS2_1_1DMRGSCFVmatRotations.html", "classCheMPS2_1_1DMRGSCFVmatRotations" ],
       [ "EdmistonRuedenberg", "classCheMPS2_1_1EdmistonRuedenberg.html", "classCheMPS2_1_1EdmistonRuedenberg" ],

@@ -125,6 +125,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:aa6976b26713962a74c975c81b98226ca"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#aa6976b26713962a74c975c81b98226ca">Optimize</a> (double *temp1, double *temp2, const double gradThreshold=EDMISTONRUED_gradThreshold, const int maxIter=EDMISTONRUED_maxIter)</td></tr>
 <tr class="memdesc:aa6976b26713962a74c975c81b98226ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximize the Edmiston-Ruedenberg cost function.  <a href="#aa6976b26713962a74c975c81b98226ca">More...</a><br/></td></tr>
 <tr class="separator:aa6976b26713962a74c975c81b98226ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad73febba415f3bcbef367b587d5bcc0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">FiedlerExchange</a> (const int maxlinsize, double *temp1, double *temp2)</td></tr>
+<tr class="memdesc:ad73febba415f3bcbef367b587d5bcc0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per irrep)  <a href="#ad73febba415f3bcbef367b587d5bcc0d">More...</a><br/></td></tr>
+<tr class="separator:ad73febba415f3bcbef367b587d5bcc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af02cbffdb428682c4d53cf6c862fdb02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02">getUnitary</a> ()</td></tr>
 <tr class="memdesc:af02cbffdb428682c4d53cf6c862fdb02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pointer to the unitary to use in DMRGSCF.  <a href="#af02cbffdb428682c4d53cf6c862fdb02">More...</a><br/></td></tr>
 <tr class="separator:af02cbffdb428682c4d53cf6c862fdb02"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,7 +173,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00033">33</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00034">34</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -186,6 +189,72 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ad73febba415f3bcbef367b587d5bcc0d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::EdmistonRuedenberg::FiedlerExchange </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>maxlinsize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>temp1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>temp2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per irrep) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">maxlinsize</td><td>max(dim(irrep(Ham))) </td></tr>
+    <tr><td class="paramname">temp1</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
+    <tr><td class="paramname">temp2</td><td>Work memory of at least 4*max(dim(irrep(Ham)))^2 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00373">373</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+
+<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="269,34,515,75"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="563,5,760,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="574,71,749,97"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="270,12,581,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="af02cbffdb428682c4d53cf6c862fdb02"></a>
 <div class="memitem">
 <div class="memproto">
@@ -202,7 +271,18 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the pointer to the unitary to use in DMRGSCF. </p>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the unitary which defines the localized orbitals </dd></dl>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00133">133</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00142">142</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="270,12,581,39"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -254,16 +334,27 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The value of the optimized cost function </dd></dl>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00061">61</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00062">62</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
 
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="269,34,515,75"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="563,5,760,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="574,71,749,97"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_aa6976b26713962a74c975c81b98226ca_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="270,12,581,39"/></map>
 </div>
 </p>
 
@@ -279,7 +370,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html">EdmistonRuedenberg</a></li>
-    <li class="footer">Generated on Tue Aug 19 2014 10:06:31 for CheMPS2 by
+    <li class="footer">Generated on Wed Aug 20 2014 14:06:55 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
