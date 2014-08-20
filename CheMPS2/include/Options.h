@@ -27,17 +27,20 @@ using std::string;
 
 namespace CheMPS2{
 
-   const bool   DMRGSCF_debugPrint            = false;
-   const bool   DMRGSCF_storeUnitary          = true;
-   const bool   DMRGSCF_rotate2DMtoNO         = true;
+   const int    DMRGSCF_maxIterations         = 100;
    const double DMRGSCF_gradientNormThreshold = 1e-6;
+   const bool   DMRGSCF_storeUnitary          = true;
    const string DMRGSCF_unitaryStorageName    = "CheMPS2_CASSCF.h5";
    const int    DMRGSCF_maxlinsizeCutoff      = 100;
+   const bool   DMRGSCF_debugPrint            = false;
    
-   const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
-   const bool   DMRGSCF_storeDIIS             = true;
+   const int    DMRGSCF_whichActiveSpace      = 0;
+   
+   const bool   DMRGSCF_doDIIS                = false;
    const double DMRGSCF_DIISgradientBranch    = 1e-2;
-   const int    DMRGSCF_numDIISvecs           = 10;
+   const int    DMRGSCF_numDIISvecs           = 7;
+   const bool   DMRGSCF_storeDIIS             = true;
+   const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
 
    const string TMPpath                       = "/tmp/";
    const bool   DMRG_printDiscardedWeight     = false;

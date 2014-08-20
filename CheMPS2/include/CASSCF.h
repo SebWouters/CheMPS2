@@ -20,8 +20,6 @@
 #ifndef CASSCF_H
 #define CASSCF_H
 
-#include <string>
-
 #include "Hamiltonian.h"
 #include "Irreps.h"
 #include "TwoDM.h"
@@ -32,6 +30,7 @@
 #include "DMRGSCFindices.h"
 #include "DMRGSCFunitary.h"
 #include "DIIS.h"
+#include "DMRGSCFoptions.h"
 
 namespace CheMPS2{
 /** CASSCF class.
@@ -75,14 +74,15 @@ namespace CheMPS2{
              \param Irrep Desired wave-function irrep
              \param OptScheme The optimization scheme to run the inner DMRG loop
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
-             \param doDIIS Use DIIS when the gradient becomes sufficiently small to speed up the augmented Hessian NR method */
-         double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, const bool doDIIS=false);
+             \param theDMRGSCFoptions Contains the DMRGSCF options
+             \return The converged DMRGSCF energy */
+         double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
          
          //! CASSCF unitary rotation remove call
-         void deleteStoredUnitary(){ unitary->deleteStoredUnitary(); }
+         void deleteStoredUnitary(const string filename){ unitary->deleteStoredUnitary(filename); }
          
          //! CASSCF DIIS vectors remove call
-         void deleteStoredDIIS(){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(); }}
+         void deleteStoredDIIS(const string filename){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(filename); }}
          
       private:
       
@@ -139,6 +139,9 @@ namespace CheMPS2{
 
          //The NO in terms of the active space orbitals are stored in the nOrbDMRG*nOrbDMRG array eigenvecs
          void calcNOON(double * eigenvecs, double * workmem);
+         
+         //Copy the localized orbitals over from unitary to the nOrbDMRG*nOrbDMRG array eigenvecs
+         void fillLocalizedOrbitalRotations(DMRGSCFunitary * unitary, double * eigenvecs);
          
          //Helper function to fetch DOCC and SOCC from filename
          void allocateAndFillOCC(const string filename);

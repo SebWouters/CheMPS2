@@ -276,7 +276,7 @@ void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2, doub
 
 }
 
-void CheMPS2::DMRGSCFunitary::rotateUnitaryNOeigenvecs(double * eigenvecs, double * work){
+void CheMPS2::DMRGSCFunitary::rotateActiveSpaceVectors(double * eigenvecs, double * work){
 
    int passed = 0;
    int nOrbDMRG = iHandler->getDMRGcumulative(iHandler->getNirreps());
@@ -662,9 +662,9 @@ void CheMPS2::DMRGSCFunitary::makeSureAllBlocksDetOne(double * temp1, double * t
 
 }
 
-void CheMPS2::DMRGSCFunitary::saveU() const{
+void CheMPS2::DMRGSCFunitary::saveU(const string filename) const{
 
-   hid_t file_id = H5Fcreate(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+   hid_t file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
    hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
    
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -687,9 +687,9 @@ void CheMPS2::DMRGSCFunitary::saveU() const{
 
 }
 
-void CheMPS2::DMRGSCFunitary::loadU(){
+void CheMPS2::DMRGSCFunitary::loadU(const string filename){
 
-   hid_t file_id = H5Fopen(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
    hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
        
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -709,10 +709,10 @@ void CheMPS2::DMRGSCFunitary::loadU(){
 
 }
 
-void CheMPS2::DMRGSCFunitary::deleteStoredUnitary() const{
+void CheMPS2::DMRGSCFunitary::deleteStoredUnitary(const string filename) const{
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::DMRGSCF_unitaryStorageName;
+   temp << "rm " << filename;
    int info = system(temp.str().c_str());
    cout << "Info on DMRGSCF::Unitary rm call to system: " << info << endl;
 

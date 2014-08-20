@@ -97,6 +97,9 @@ renormalized operators: saving to disk, loading from disk, and updating.
 ```CheMPS2/DMRGSCFindices.cpp``` contains the index conversions for the
 DMRG-SCF algorithm.
 
+```CheMPS2/DMRGSCFoptions.cpp``` is a container class to pass the DMRGSCF
+options to the augmented Hessian Newton-Raphson routine.
+
 ```CheMPS2/DMRGSCFunitary.cpp``` contains the storage and handling of the
 unitary matrix and its nonredundant skew-symmetric parametrization
 required for the DMRG-SCF algorithm.
@@ -255,6 +258,9 @@ Correlations class.
 ```CheMPS2/include/DMRGSCFindices.h``` contains the definitions of the
 DMRGSCFindices class.
 
+```CheMPS2/include/DMRGSCFoptions.h``` contains the definitions of the
+DMRGSCFoptions container class.
+
 ```CheMPS2/include/DMRGSCFunitary.h``` contains the definitions of the
 DMRGSCFunitary class.
 
@@ -403,6 +409,11 @@ of ```tests/matrixelements/N2_CCPVDZ.dat```, the Edmiston-Ruedenberg cost
 function is maximized, by means of an augmented Hessian Newton-Raphson
 optimizer.
 
+```tests/test10.cpp``` is a copy of test8.cpp, with a slightly larger active
+space and which works with ordered localized orbitals instead of natural
+orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
+ordering based on the Fiedler vector with the exchange matrix as cost function.
+
 ```tests/matrixelements/CH4_N10_S0_c2v_I0.dat``` contains the matrix elements
 for test3.
 
@@ -416,7 +427,7 @@ for test1 and test5.
 for test6 and test7.
 
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
-for test8 and test9.
+for test8, test9, and test10.
 
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).
@@ -520,6 +531,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test7
     > ./test8
     > ./test9
+    > ./test10
 
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).

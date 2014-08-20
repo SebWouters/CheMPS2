@@ -155,6 +155,33 @@ void CheMPS2::CASSCF::setDMRG1DM(const int N){
 
 }
 
+void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, double * eigenvecs){
+
+   const int size = nOrbDMRG * nOrbDMRG;
+   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = 0.0; }
+   int passed = 0;
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+
+      const int NDMRG = iHandler->getNDMRG(irrep);
+      if (NDMRG>0){
+
+         double * blockUnit = unitary->getBlock(irrep);
+         double * blockEigs = eigenvecs + passed * ( 1 + nOrbDMRG );
+
+         for (int row=0; row<NDMRG; row++){
+            for (int col=0; col<NDMRG; col++){
+               blockEigs[row + nOrbDMRG * col] = blockUnit[col + NDMRG * row]; //Eigs = Unit^T
+            }
+         }
+
+      }
+
+      passed += NDMRG;
+
+   }
+
+}
+
 void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
 
    int size = nOrbDMRG * nOrbDMRG;
@@ -175,8 +202,8 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         if (irrep==0){ cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
-         else {         cout << "                       DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
+         if (irrep==0){ cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
+         else {         cout << "                       DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 

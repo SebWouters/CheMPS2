@@ -60,6 +60,7 @@ int main(void){
    const int printLevel = 2; //Print a little extra information
    CheMPS2::EdmistonRuedenberg theLocalizer(theHam, printLevel);
    const double Cost = theLocalizer.Optimize(workmem1, workmem2);
+   theLocalizer.FiedlerExchange(maxlinsize, workmem1, workmem2);
    
    //Deallocate stuff
    delete theHam;

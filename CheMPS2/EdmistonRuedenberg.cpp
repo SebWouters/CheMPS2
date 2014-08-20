@@ -27,6 +27,7 @@
 #include "Lapack.h"
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::max;
 
@@ -59,6 +60,14 @@ CheMPS2::EdmistonRuedenberg::~EdmistonRuedenberg(){
 }
 
 double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, const double gradThreshold, const int maxIter){
+
+   //Clear the unitary
+   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){
+      const int linsize = iHandler->getNORB(irrep);
+      double * block = unitary->getBlock(irrep);
+      for (int cnt=0; cnt<linsize*linsize; cnt++){ block[cnt] = 0.0; }
+      for (int cnt=0; cnt<linsize; cnt++){ block[cnt*(1+linsize)] = 1.0; }
+   }
 
    DMRGSCFVmatRotations theRotator(Ham, iHandler);
 
@@ -255,5 +264,154 @@ double CheMPS2::EdmistonRuedenberg::augmentedHessianNewtonRaphson(double * gradi
    return gradNorm;
 
 }
+
+void CheMPS2::EdmistonRuedenberg::Fiedler(const int irrep, int * reorder, double * laplacian, double * temp2){
+
+   //For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html
+
+   int linsize = iHandler->getNORB(irrep);
+   if (linsize<2){
+      cerr << "   EdmistonRuedenberg::Fiedler : linsize < 2 !" << endl;
+      return;
+   }
+   
+   //Preamble: linsize>=2 at this point
+   double * work = temp2;             //temp2 at least of size 4*linsize*linsize
+   int lwork     = 3*linsize*linsize; //3*linsize*linsize > 3*linsize-1 for linsize>=2
+   double * eigs = temp2 + lwork;     //has size linsize*linsize > linsize for linsize>=2
+   
+   //Calculate the eigenspectrum of the Laplacian
+   char jobz = 'V';
+   char uplo = 'U';
+   int info;
+   dsyev_(&jobz, &uplo, &linsize, laplacian, &linsize, eigs, work, &lwork, &info);
+   if (printLevel>1){
+      cout << "   EdmistonRuedenberg::Fiedler : Smallest eigs(Laplacian[" << irrep << "]) = [ " << eigs[0] << "  ,  " << eigs[1] << " ]." << endl;
+   }
+   
+   //The second eigenvector is the Fiedler vector
+   double * FiedlerVector     = laplacian + linsize;
+   double * FiedlerVectorCopy = laplacian;
+   for (int cnt=0; cnt<linsize; cnt++){ FiedlerVectorCopy[cnt] = FiedlerVector[cnt]; }
+   
+   //Find the Fiedler ordering
+   const double upperBound = 2.0; //Sum_i FiedlerVector[i]^2 = 1 --> fabs(FiedlerVector[i]) <= 1.0
+   for (int value=0; value<linsize; value++){
+      int index=0;
+      for (int cnt=1; cnt<linsize; cnt++){
+         if (FiedlerVectorCopy[cnt] < FiedlerVectorCopy[index]){ index = cnt; }
+      } //Index now corresponds to the smallest value in FiedlerVectorCopy
+      reorder[value] = index;
+      FiedlerVectorCopy[index] = upperBound; //Remove from the interesting entries in FiedlerVectorCopy
+   }
+   
+   if (printLevel>1){
+      bool isOK = true;
+      for (int cnt=0; cnt<linsize-1; cnt++){
+         if (FiedlerVector[reorder[cnt]] > FiedlerVector[reorder[cnt+1]]){ isOK = false; }
+      }
+      if (!isOK){
+         cerr << "   EdmistonRuedenberg::Fiedler : Reordered Fiedler vector is not OK = [ ";
+         for (int cnt=0; cnt<linsize-1; cnt++){ cerr << FiedlerVector[reorder[cnt]] << "  ,  "; }
+         cerr << FiedlerVector[reorder[linsize-1]] << " ]." << endl;
+      }
+      cout << "                                 Reorder[" << irrep << "] = [ ";
+      for (int cnt=0; cnt<linsize-1; cnt++){ cout << reorder[cnt] << "  ,  "; }
+      cout << reorder[linsize-1] << " ]." << endl;
+   }
+   
+   //Reorder the vectors in the unitary
+   double * blockU = unitary->getBlock(irrep);
+   for (int row=0; row<linsize; row++){
+      for (int col=0; col<linsize; col++){
+         work[row + linsize * col] = blockU[reorder[row] + linsize * col];
+      }
+   }
+   
+   int size = linsize*linsize;
+   int inc = 1;
+   dcopy_(&size, work, &inc, blockU, &inc);
+   
+   if (printLevel>1){
+      char trans = 'T';
+      char notrans = 'N';
+      double alpha = 1.0;
+      double beta = 0.0;
+      dgemm_(&trans, &notrans, &linsize, &linsize, &linsize, &alpha, blockU, &linsize, blockU, &linsize, &beta, work, &linsize);
+      double sum = 0.0;
+      for (int row=0; row<linsize; row++){
+         sum += (work[row+linsize*row]-1.0)*(work[row+linsize*row]-1.0);
+         for (int col=row+1; col<linsize; col++){
+            sum += work[row+linsize*col]*work[row+linsize*col] + work[col+linsize*row]*work[col+linsize*row];
+         }
+      }
+      sum = sqrt(sum);
+      cout << "                                 2-norm of Unitary[" << irrep << "]^T * Unitary[" << irrep << "] - I = " << sum << endl;
+   }
+
+}
+
+double CheMPS2::EdmistonRuedenberg::FiedlerExchangeCost() const{
+
+   double Cost = 0.0;
+   
+   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){
+      const int linsize = iHandler->getNORB(irrep);
+      if (linsize>1){
+         for (int row=0; row<linsize; row++){
+            for (int col=row+1; col<linsize; col++){
+               Cost += 2 * VmatRotated->get(irrep,irrep,irrep,irrep,row,col,col,row) * (col-row) * (col-row);
+            }
+         }
+      }
+   }
+   
+   return Cost;
+
+}
+
+void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double * temp1, double * temp2){
+
+   //For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html
+
+   if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at start = " << FiedlerExchangeCost() << endl; }
+   
+   int * reorder = new int[maxlinsize];
+
+   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){
+      
+      const int linsize = iHandler->getNORB(irrep);
+      if (linsize>1){
+      
+         //temp1 and temp2 both at least of size 4*linsize*linsize
+         double * laplacian = temp1;
+         
+         //Fill the weighted graph Laplacian
+         for (int row=0; row<linsize; row++){
+            laplacian[row*(1+linsize)] = 0.0;
+            for (int col=row+1; col<linsize; col++){
+               laplacian[row + linsize*col]  = - VmatRotated->get(irrep,irrep,irrep,irrep,row,col,col,row); //minus the exchange matrix
+               laplacian[col + linsize*row]  = laplacian[row + linsize*col]; //Symmetric matrix
+               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; //On diagonal : Minus the sum of the other terms on that row
+            }
+            for (int col=0; col<row; col++){
+               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; //On diagonal : Minus the sum of the other terms on that row
+            }
+         }
+         
+         Fiedler(irrep, reorder, laplacian, temp2);
+         
+      }
+   }
+   
+   delete [] reorder;
+   
+   DMRGSCFVmatRotations theRotator(Ham, iHandler);
+   theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+   
+   if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = " << FiedlerExchangeCost() << endl; }
+
+}
+
 
 

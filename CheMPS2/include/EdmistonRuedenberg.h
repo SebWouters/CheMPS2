@@ -51,6 +51,12 @@ namespace CheMPS2{
              \return The value of the optimized cost function */
          double Optimize(double * temp1, double * temp2, const double gradThreshold=EDMISTONRUED_gradThreshold, const int maxIter=EDMISTONRUED_maxIter);
          
+         //! Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per irrep)
+         /** \param maxlinsize max(dim(irrep(Ham)))
+             \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
+             \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
+         void FiedlerExchange(const int maxlinsize, double * temp1, double * temp2);
+         
          //! Get the pointer to the unitary to use in DMRGSCF
          /** \return Pointer to the unitary which defines the localized orbitals */
          DMRGSCFunitary * getUnitary();
@@ -82,6 +88,10 @@ namespace CheMPS2{
          
          //Calculate the cost function
          double costFunction() const;
+         
+         //Fiedler vector helper function
+         double FiedlerExchangeCost() const;
+         void Fiedler(const int irrep, int * reorder, double * laplacian, double * temp2);
          
    };
 }

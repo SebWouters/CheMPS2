@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 
 #include "CASSCF.h"
+#include "DMRGSCFoptions.h"
 
 using namespace std;
 
@@ -80,13 +81,16 @@ int main(void){
 
    //Run CASSCF
    int rootNum = 1; //Ground state only
-   bool doDIIS = true;
-   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, doDIIS);
+   CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
+   theDMRGSCFoptions->setDoDIIS(true);
+   theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
+   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
-   if (CheMPS2::DMRGSCF_storeUnitary){ koekoek.deleteStoredUnitary(); }
-   if (CheMPS2::DMRGSCF_storeDIIS){ koekoek.deleteStoredDIIS(); }
+   if (theDMRGSCFoptions->getStoreUnitary()){ koekoek.deleteStoredUnitary( theDMRGSCFoptions->getUnitaryStorageName() ); }
+   if (theDMRGSCFoptions->getStoreDIIS()){ koekoek.deleteStoredDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
    delete OptScheme;
+   delete theDMRGSCFoptions;
    
    //Check succes
    bool success = (fabs(Energy + 149.690485081255) < 1e-10) ? true : false;
