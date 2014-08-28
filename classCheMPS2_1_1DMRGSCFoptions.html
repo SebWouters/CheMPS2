@@ -153,6 +153,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a9f81d7a089fc4a239638d95d93c24099"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#a9f81d7a089fc4a239638d95d93c24099">getWhichActiveSpace</a> () const </td></tr>
 <tr class="memdesc:a9f81d7a089fc4a239638d95d93c24099"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get which active space should be considered in the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> routine.  <a href="#a9f81d7a089fc4a239638d95d93c24099">More...</a><br/></td></tr>
 <tr class="separator:a9f81d7a089fc4a239638d95d93c24099"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb3c7d12b054befbe92d704d6746f4be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#acb3c7d12b054befbe92d704d6746f4be">getDumpCorrelations</a> () const </td></tr>
+<tr class="memdesc:acb3c7d12b054befbe92d704d6746f4be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get whether the correlations and two-orbital mutual information should be printed.  <a href="#acb3c7d12b054befbe92d704d6746f4be">More...</a><br/></td></tr>
+<tr class="separator:acb3c7d12b054befbe92d704d6746f4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5836e6a2d9230a394bd919fffd4bfa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#ad5836e6a2d9230a394bd919fffd4bfa6">setDoDIIS</a> (const bool DoDIIS_in)</td></tr>
 <tr class="memdesc:ad5836e6a2d9230a394bd919fffd4bfa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set whether <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> should be performed.  <a href="#ad5836e6a2d9230a394bd919fffd4bfa6">More...</a><br/></td></tr>
 <tr class="separator:ad5836e6a2d9230a394bd919fffd4bfa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,6 +186,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a1077f981a28b793a9a6f5fe28b6ad6e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#a1077f981a28b793a9a6f5fe28b6ad6e8">setWhichActiveSpace</a> (const int WhichActiveSpace_in)</td></tr>
 <tr class="memdesc:a1077f981a28b793a9a6f5fe28b6ad6e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set which active space should be considered in the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> routine.  <a href="#a1077f981a28b793a9a6f5fe28b6ad6e8">More...</a><br/></td></tr>
 <tr class="separator:a1077f981a28b793a9a6f5fe28b6ad6e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601016c288f96a89628cc4137c18062c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#a601016c288f96a89628cc4137c18062c">setDumpCorrelations</a> (const bool DumpCorrelations_in)</td></tr>
+<tr class="memdesc:a601016c288f96a89628cc4137c18062c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set whether the correlations and two-orbital mutual information should be printed.  <a href="#a601016c288f96a89628cc4137c18062c">More...</a><br/></td></tr>
+<tr class="separator:a601016c288f96a89628cc4137c18062c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html">DMRGSCFoptions</a> class. </p>
@@ -202,9 +208,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 (9) UnitaryStorageName (string) : The filename to store the Orbital Rotation checkpoint <br/>
  <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> active space options: <br/>
 (10) WhichActiveSpace (int) : Determines which active space is used for the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). <br/>
+(11) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space <br/>
 </p>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8h_source.html#l00048">48</a> of file <a class="el" href="DMRGSCFoptions_8h_source.html">DMRGSCFoptions.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8h_source.html#l00049">49</a> of file <a class="el" href="DMRGSCFoptions_8h_source.html">DMRGSCFoptions.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="aa9eb8d4a08896d54e4323122984cee2a"></a>
 <div class="memitem">
@@ -222,7 +229,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the threshold for when <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> should start. </p>
 <dl class="section return"><dt>Returns</dt><dd>The threshold for the 2-norm of the update vector (NOT the gradient vector) for starting <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00042">42</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00043">43</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -242,7 +249,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> checkpoint filename. </p>
 <dl class="section return"><dt>Returns</dt><dd>The filename for the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> checkpoint </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00045">45</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00046">46</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -273,7 +280,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get whether <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> should be performed. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> should be performed </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00041">41</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00042">42</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -282,6 +289,37 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a208fba2b1dbb95bec171867d39917fc8_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a208fba2b1dbb95bec171867d39917fc8_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a208fba2b1dbb95bec171867d39917fc8_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a208fba2b1dbb95bec171867d39917fc8_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="acb3c7d12b054befbe92d704d6746f4be"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool CheMPS2::DMRGSCFoptions::getDumpCorrelations </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get whether the correlations and two-orbital mutual information should be printed. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether the correlations and two-orbital mutual information should be printed </dd></dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00052">52</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_acb3c7d12b054befbe92d704d6746f4be_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_acb3c7d12b054befbe92d704d6746f4be_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRGSCFoptions_acb3c7d12b054befbe92d704d6746f4be_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_acb3c7d12b054befbe92d704d6746f4be_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
 </div>
 </p>
@@ -304,13 +342,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the threshold for DMRGSCF convergence. </p>
 <dl class="section return"><dt>Returns</dt><dd>The threshold for the 2-norm of the gradient vector for DMRGSCF convergence </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00047">47</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00048">48</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a55ce3e1a48b8d977e53db9874c8fd7c6_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a55ce3e1a48b8d977e53db9874c8fd7c6_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a55ce3e1a48b8d977e53db9874c8fd7c6_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a55ce3e1a48b8d977e53db9874c8fd7c6_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -335,7 +373,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the maximum number of DMRGSCF iterations. </p>
 <dl class="section return"><dt>Returns</dt><dd>The maximum number of DMRGSCF iterations </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00046">46</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00047">47</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -355,13 +393,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the number of <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> update vectors which should be kept. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> update vectors which should be kept </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00043">43</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00044">44</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a57ed7e22a351ad6fc1621ff95106040a_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a57ed7e22a351ad6fc1621ff95106040a_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a57ed7e22a351ad6fc1621ff95106040a_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a57ed7e22a351ad6fc1621ff95106040a_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -386,13 +424,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get whether the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> checkpoint should be stored to disk. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> checkpoint should be stored to disk </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00044">44</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00045">45</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a59cdddf8451651c980aa49957c2897b5_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a59cdddf8451651c980aa49957c2897b5_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a59cdddf8451651c980aa49957c2897b5_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a59cdddf8451651c980aa49957c2897b5_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -417,13 +455,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get whether the Orbital Rotation checkpoint should be stored to disk. </p>
 <dl class="section return"><dt>Returns</dt><dd>Whether the Orbital Rotation checkpoint should be stored to disk </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00048">48</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00049">49</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -448,13 +486,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the Orbital Rotation checkpoint filename. </p>
 <dl class="section return"><dt>Returns</dt><dd>The filename for the Orbital Rotation checkpoint </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00049">49</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00050">50</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -479,13 +517,13 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get which active space should be considered in the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> routine. </p>
 <dl class="section return"><dt>Returns</dt><dd>Which active space should be considered in the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> routine. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00050">50</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00051">51</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
-<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-7-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,12,565,39"/></map>
@@ -516,7 +554,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00053">53</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00055">55</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -542,7 +580,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00056">56</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00058">58</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -568,7 +606,33 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00052">52</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00054">54</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a601016c288f96a89628cc4137c18062c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::DMRGSCFoptions::setDumpCorrelations </td>
+          <td>(</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>DumpCorrelations_in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set whether the correlations and two-orbital mutual information should be printed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">DumpCorrelations_in</td><td>Whether the correlations and two-orbital mutual information should be printed </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00064">64</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -594,7 +658,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00058">58</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00060">60</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -620,7 +684,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00057">57</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00059">59</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -646,7 +710,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00054">54</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00056">56</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -672,7 +736,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00055">55</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00057">57</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -698,7 +762,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00059">59</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00061">61</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -724,7 +788,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00060">60</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00062">62</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -750,7 +814,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00061">61</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFoptions_8cpp_source.html#l00063">63</a> of file <a class="el" href="DMRGSCFoptions_8cpp_source.html">DMRGSCFoptions.cpp</a>.</p>
 
 </div>
 </div>
@@ -764,7 +828,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html">DMRGSCFoptions</a></li>
-    <li class="footer">Generated on Wed Aug 20 2014 14:06:55 for CheMPS2 by
+    <li class="footer">Generated on Thu Aug 28 2014 11:09:51 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

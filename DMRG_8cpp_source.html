@@ -283,14 +283,14 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;         Energy = sweepleft(change, instruction);</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;         gettimeofday(&amp;end, NULL);</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;         <span class="keywordtype">double</span> elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; endl;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds.&quot;</span> &lt;&lt; endl;</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  The max. disc. weight at last sweep is &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;         <span class="keywordflow">if</span> (!change) change = <span class="keyword">true</span>; <span class="comment">//rest of sweeps: variable virtual dimensions</span></div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;         gettimeofday(&amp;start, NULL);</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;         Energy = sweepright(change, instruction);</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;         gettimeofday(&amp;end, NULL);</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; endl;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds.&quot;</span> &lt;&lt; endl;</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  The max. disc. weight at last sweep is &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, <span class="keyword">false</span>); }</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;         </div>
@@ -493,7 +493,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRG.cpp</b></li>
-    <li class="footer">Generated on Wed Aug 20 2014 14:06:54 for CheMPS2 by
+    <li class="footer">Generated on Thu Aug 28 2014 11:09:50 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

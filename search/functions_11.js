@@ -8,6 +8,7 @@ var searchData=
   ['setdiisstoragename',['setDIISStorageName',['../classCheMPS2_1_1DMRGSCFoptions.html#aabfdc28366e49402ebbaf977d154ebe7',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdim',['SetDim',['../classCheMPS2_1_1SyBookkeeper.html#ab496351a4cbc31f88be340d987d11406',1,'CheMPS2::SyBookkeeper']]],
   ['setdodiis',['setDoDIIS',['../classCheMPS2_1_1DMRGSCFoptions.html#ad5836e6a2d9230a394bd919fffd4bfa6',1,'CheMPS2::DMRGSCFoptions']]],
+  ['setdumpcorrelations',['setDumpCorrelations',['../classCheMPS2_1_1DMRGSCFoptions.html#a601016c288f96a89628cc4137c18062c',1,'CheMPS2::DMRGSCFoptions']]],
   ['seteconst',['setEconst',['../classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5',1,'CheMPS2::Hamiltonian']]],
   ['setgradientthreshold',['setGradientThreshold',['../classCheMPS2_1_1DMRGSCFoptions.html#a1f720e05cf2a445bfae8faed549f5e62',1,'CheMPS2::DMRGSCFoptions']]],
   ['setgroup',['setGroup',['../classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c',1,'CheMPS2::Irreps']]],

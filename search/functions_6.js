@@ -19,6 +19,7 @@ var searchData=
   ['getdiisstoragename',['getDIISStorageName',['../classCheMPS2_1_1DMRGSCFoptions.html#ae4f2901cf992d1a4100367f002af786c',1,'CheMPS2::DMRGSCFoptions']]],
   ['getdmrgcumulative',['getDMRGcumulative',['../classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018',1,'CheMPS2::DMRGSCFindices']]],
   ['getdodiis',['getDoDIIS',['../classCheMPS2_1_1DMRGSCFoptions.html#a208fba2b1dbb95bec171867d39917fc8',1,'CheMPS2::DMRGSCFoptions']]],
+  ['getdumpcorrelations',['getDumpCorrelations',['../classCheMPS2_1_1DMRGSCFoptions.html#acb3c7d12b054befbe92d704d6746f4be',1,'CheMPS2::DMRGSCFoptions']]],
   ['geteconst',['getEconst',['../classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab',1,'CheMPS2::Hamiltonian']]],
   ['geteconv',['getEconv',['../classCheMPS2_1_1ConvergenceScheme.html#a531e6d2a63b7fb8ad6d09bffd740687f',1,'CheMPS2::ConvergenceScheme']]],
   ['getfirstindex',['getFirstIndex',['../classCheMPS2_1_1DMRGSCFunitary.html#ae302e88ca4b9f938e8bb3fc0f3b39409',1,'CheMPS2::DMRGSCFunitary']]],
