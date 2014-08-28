@@ -35,6 +35,7 @@ namespace CheMPS2{
    const bool   DMRGSCF_debugPrint            = false;
    
    const int    DMRGSCF_whichActiveSpace      = 0;
+   const bool   DMRGSCF_dumpCorrelations      = false;
    
    const bool   DMRGSCF_doDIIS                = false;
    const double DMRGSCF_DIISgradientBranch    = 1e-2;

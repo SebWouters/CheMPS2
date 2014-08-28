@@ -176,6 +176,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          }
       }
       theDMRG->calc2DMandCorrelations();
+      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); }
       copy2DMover(theDMRG->get2DM());
       setDMRG1DM(N);
       

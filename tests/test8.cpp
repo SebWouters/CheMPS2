@@ -85,6 +85,7 @@ int main(void){
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
    theDMRGSCFoptions->setDoDIIS(true);
    theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
+   theDMRGSCFoptions->setDumpCorrelations(true);
    double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up

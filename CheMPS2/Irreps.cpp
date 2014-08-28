@@ -154,7 +154,7 @@ string CheMPS2::Irreps::getIrrepNamePrivate(const int nGroup, const int nIrrep){
    
    if (nGroup == 3){
       if (nIrrep == 0) return "A'";
-      if (nIrrep == 1) return "A''";
+      if (nIrrep == 1) return "A\"";
    }
    
    if (nGroup == 4){

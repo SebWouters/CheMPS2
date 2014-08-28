@@ -44,6 +44,7 @@ namespace CheMPS2{
     
     DMRG active space options: \n
     (10) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
+    (11) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space \n
 */
    class DMRGSCFoptions{
 
@@ -94,6 +95,10 @@ namespace CheMPS2{
          //! Get which active space should be considered in the DMRG routine
          /** \return Which active space should be considered in the DMRG routine. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). */
          int getWhichActiveSpace() const;
+         
+         //! Get whether the correlations and two-orbital mutual information should be printed
+         /** \return Whether the correlations and two-orbital mutual information should be printed */
+         bool getDumpCorrelations() const;
 
          //! Set whether DIIS should be performed
          /** \param DoDIIS_in Whether DIIS should be performed */
@@ -135,6 +140,10 @@ namespace CheMPS2{
          /** \param WhichActiveSpace_in Which active space should be considered in the DMRG routine. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). */
          void setWhichActiveSpace(const int WhichActiveSpace_in);
          
+         //! Set whether the correlations and two-orbital mutual information should be printed
+         /** \param DumpCorrelations_in Whether the correlations and two-orbital mutual information should be printed */
+         void setDumpCorrelations(const bool DumpCorrelations_in);
+         
       private:
       
          //See class information
@@ -150,6 +159,7 @@ namespace CheMPS2{
          string UnitaryStorageName;
          
          int    WhichActiveSpace;
+         bool   DumpCorrelations;
          
    };
 }
