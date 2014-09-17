@@ -596,76 +596,87 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;CMake generates makefiles based on the user<span class="stringliteral">&#39;s specifications:</span></div>
 <div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;<span class="stringliteral">    &gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3</span></div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;<span class="stringliteral">    </span></div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;<span class="stringliteral">Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.</span></div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;<span class="stringliteral">Option2 can be ```ON``` or ```OFF``` and is used to switch on the</span></div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;<span class="stringliteral">intel math kernel library.</span></div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;<span class="stringliteral">Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen</span></div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;<span class="stringliteral">documentation.</span></div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;<span class="stringliteral">If one or more of the required libraries are not found, please use the</span></div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;<span class="stringliteral">command</span></div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;<span class="stringliteral">    &gt; CMAKE_INCLUDE_PATH=option4 CMAKE_LIBRARY_PATH=option5 CXX=option1</span></div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;<span class="stringliteral">    cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3</span></div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;<span class="stringliteral">    </span></div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;<span class="stringliteral">instead, where option4 and option5 are respectively the missing</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;<span class="stringliteral">colon-separated include and library paths, e.g.</span></div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;<span class="stringliteral">    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/</span></div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;<span class="stringliteral">and</span></div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="stringliteral">    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.</span></div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;<span class="stringliteral">    -DCMAKE_INSTALL_PREFIX=option4</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;<span class="stringliteral">    </span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;<span class="stringliteral">Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.</span></div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;<span class="stringliteral">Option2 can be ```ON``` or ```OFF``` and is used to switch on the</span></div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;<span class="stringliteral">intel math kernel library.</span></div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;<span class="stringliteral">Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen</span></div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;<span class="stringliteral">documentation.</span></div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;<span class="stringliteral">Option4 is the prefix installation directory; typically ```/usr``` on</span></div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;<span class="stringliteral">Linux. The CheMPS2 library is then installed in ```prefix/lib``` and</span></div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;<span class="stringliteral">the headers (and source) in ```prefix/include/CheMPS2```.</span></div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;<span class="stringliteral">If one or more of the required libraries are not found, please use the</span></div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;<span class="stringliteral">command</span></div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;<span class="stringliteral">    &gt; CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1</span></div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;<span class="stringliteral">    cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3</span></div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;<span class="stringliteral">    -DCMAKE_INSTALL_PREFIX=option4</span></div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;<span class="stringliteral">    </span></div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;<span class="stringliteral">instead, where option5 and option6 are respectively the missing</span></div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;<span class="stringliteral">colon-separated include and library paths, e.g.</span></div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;<span class="stringliteral">    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/</span></div>
 <div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;<span class="stringliteral">To compile, run:</span></div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;<span class="stringliteral">and</span></div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;<span class="stringliteral">    &gt; make</span></div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;<span class="stringliteral">    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.</span></div>
 <div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="stringliteral">### 2. Testing CheMPS2</span></div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="stringliteral">To test CheMPS2, start in ```./build```, and run:</span></div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;<span class="stringliteral">    &gt; cd tests/</span></div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;<span class="stringliteral">    &gt; ./test1</span></div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;<span class="stringliteral">    &gt; ./test2</span></div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;<span class="stringliteral">    &gt; ./test3</span></div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;<span class="stringliteral">    &gt; ./test4</span></div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;<span class="stringliteral">    &gt; ./test5</span></div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;<span class="stringliteral">    &gt; ./test6</span></div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;<span class="stringliteral">    &gt; ./test7</span></div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;<span class="stringliteral">    &gt; ./test8</span></div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;<span class="stringliteral">    &gt; ./test9</span></div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<span class="stringliteral">    &gt; ./test10</span></div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;<span class="stringliteral">The tests should end with a line stating whether or not they succeeded.</span></div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;<span class="stringliteral">They only require a very limited amount of memory (order 10-100 MB).</span></div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;<span class="stringliteral">### 3. Doxygen documentation</span></div>
-<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;<span class="stringliteral">To build and view the Doxygen manual, the documentation flag should have</span></div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="stringliteral">been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:</span></div>
-<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;<span class="stringliteral">    &gt; make doc</span></div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;<span class="stringliteral">    &gt; cd LaTeX-documents</span></div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;<span class="stringliteral">    &gt; make</span></div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;<span class="stringliteral">    &gt; evince refman.pdf &amp;</span></div>
-<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="stringliteral">    &gt; cd ../html</span></div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="stringliteral">    &gt; firefox index.html &amp;</span></div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="stringliteral">To compile, run:</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="stringliteral">    &gt; make</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;<span class="stringliteral">To install, run:</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;<span class="stringliteral">    &gt; make install</span></div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;<span class="stringliteral">For non-standard installation directories, please remember to append</span></div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;<span class="stringliteral">the library path to LD_LIBRARY_PATH in your .bashrc.</span></div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;<span class="stringliteral">### 2. Testing CheMPS2</span></div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;<span class="stringliteral">To test CheMPS2, start in ```./build```, and run:</span></div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;<span class="stringliteral">    &gt; cd tests/</span></div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;<span class="stringliteral">    &gt; ./test1</span></div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;<span class="stringliteral">    &gt; ./test2</span></div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="stringliteral">    &gt; ./test3</span></div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;<span class="stringliteral">    &gt; ./test4</span></div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;<span class="stringliteral">    &gt; ./test5</span></div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;<span class="stringliteral">    &gt; ./test6</span></div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="stringliteral">    &gt; ./test7</span></div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;<span class="stringliteral">    &gt; ./test8</span></div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;<span class="stringliteral">    &gt; ./test9</span></div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;<span class="stringliteral">    &gt; ./test10</span></div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;<span class="stringliteral">The tests should end with a line stating whether or not they succeeded.</span></div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="stringliteral">They only require a very limited amount of memory (order 10-100 MB).</span></div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;<span class="stringliteral">### 3. Doxygen documentation</span></div>
 <div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;<span class="stringliteral">User manual</span></div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;<span class="stringliteral">-----------</span></div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;<span class="stringliteral">To build and view the Doxygen manual, the documentation flag should have</span></div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;<span class="stringliteral">been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:</span></div>
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;<span class="stringliteral">Doxygen output can be generated, see the section &quot;Build&quot; in README.md, or</span></div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;<span class="stringliteral">the [[Doxygen html output]](http://sebwouters.github.io/CheMPS2/index.html).</span></div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;<span class="stringliteral">For a more concise overview of the concepts and ideas used in CheMPS2,</span></div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;<span class="stringliteral">please read the code release paper &quot;CheMPS2: a free open-source spin-adapted</span></div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;<span class="stringliteral">implementation of the density matrix renormalization group for ab initio</span></div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;<span class="stringliteral">quantum chemistry&quot;, one of the references in CITATIONS.</span></div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;<span class="stringliteral">    &gt; make doc</span></div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;<span class="stringliteral">    &gt; cd LaTeX-documents</span></div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;<span class="stringliteral">    &gt; make</span></div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;<span class="stringliteral">    &gt; evince refman.pdf &amp;</span></div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;<span class="stringliteral">    &gt; cd ../html</span></div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;<span class="stringliteral">    &gt; firefox index.html &amp;</span></div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;<span class="stringliteral">User manual</span></div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;<span class="stringliteral">-----------</span></div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;<span class="stringliteral">Doxygen output can be generated, see the section &quot;Build&quot; in README.md, or</span></div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;<span class="stringliteral">the [[Doxygen html output]](http://sebwouters.github.io/CheMPS2/index.html).</span></div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="stringliteral">For a more concise overview of the concepts and ideas used in CheMPS2,</span></div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;<span class="stringliteral">please read the code release paper &quot;CheMPS2: a free open-source spin-adapted</span></div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="stringliteral">implementation of the density matrix renormalization group for ab initio</span></div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="stringliteral">quantum chemistry&quot;, one of the references in CITATIONS.</span></div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="stringliteral"></span></div>
 <div class="ttc" id="classCheMPS2_1_1Hamiltonian_html"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a></div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8h_source.html#l00053">Hamiltonian.h:53</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -673,7 +684,7 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>README.md</b></li>
-    <li class="footer">Generated on Thu Aug 28 2014 11:09:51 for CheMPS2 by
+    <li class="footer">Generated on Wed Sep 17 2014 16:18:08 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

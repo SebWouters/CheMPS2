@@ -277,16 +277,21 @@ $(document).ready(function(){initNavTree('index.html','');});
 &gt; cd build
 </pre><p>CMake generates makefiles based on the user's specifications: </p>
 <pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on doxygen documentation. If one or more of the required libraries are not found, please use the command </p>
-<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option4 CMAKE_LIBRARY_PATH=option5 CXX=option1
+-DCMAKE_INSTALL_PREFIX=option4
+</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on doxygen documentation. Option4 is the prefix installation directory; typically <code>/usr</code> on Linux. The CheMPS2 library is then installed in <code>prefix/lib</code> and the headers (and source) in <code>prefix/include/CheMPS2</code>. If one or more of the required libraries are not found, please use the command </p>
+<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-</pre><p>instead, where option4 and option5 are respectively the missing colon-separated include and library paths, e.g. </p>
+-DCMAKE_INSTALL_PREFIX=option4
+</pre><p>instead, where option5 and option6 are respectively the missing colon-separated include and library paths, e.g. </p>
 <pre class="fragment">CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
 </pre><p>and </p>
 <pre class="fragment">CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
 </pre><p>To compile, run: </p>
 <pre class="fragment">&gt; make
-</pre><h3>2. Testing CheMPS2</h3>
+</pre><p>To install, run: </p>
+<pre class="fragment">&gt; make install
+</pre><p>For non-standard installation directories, please remember to append the library path to LD_LIBRARY_PATH in your .bashrc.</p>
+<h3>2. Testing CheMPS2</h3>
 <p>To test CheMPS2, start in <code>./build</code>, and run: </p>
 <pre class="fragment">&gt; cd tests/
 &gt; ./test1
@@ -316,7 +321,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Aug 28 2014 11:09:59 for CheMPS2 by
+    <li class="footer">Generated on Wed Sep 17 2014 16:18:16 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
