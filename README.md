@@ -490,19 +490,24 @@ provide a minimal compilation. Start in ```./``` and run:
 CMake generates makefiles based on the user's specifications:
 
     > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
     
 Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
 Option2 can be ```ON``` or ```OFF``` and is used to switch on the
 intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
 documentation.
+Option4 is the prefix installation directory; typically ```/usr``` on
+Linux. The CheMPS2 library is then installed in ```prefix/lib``` and
+the headers (and source) in ```prefix/include/CheMPS2```.
 If one or more of the required libraries are not found, please use the
 command
 
-    > CMAKE_INCLUDE_PATH=option4 CMAKE_LIBRARY_PATH=option5 CXX=option1
+    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
     cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
     
-instead, where option4 and option5 are respectively the missing
+instead, where option5 and option6 are respectively the missing
 colon-separated include and library paths, e.g.
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
@@ -511,10 +516,13 @@ and
 
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
 
-
 To compile, run:
 
     > make
+
+To install, run:
+
+    > make install
 
 
 ### 2. Testing CheMPS2
