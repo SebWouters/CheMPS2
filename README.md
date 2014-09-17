@@ -524,6 +524,9 @@ To install, run:
 
     > make install
 
+For non-standard installation directories, please remember to append
+the library path to LD_LIBRARY_PATH in your .bashrc.
+
 
 ### 2. Testing CheMPS2
 
