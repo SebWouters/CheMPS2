@@ -34,8 +34,9 @@ namespace CheMPS2{
     
     The correlations class contains the following spin-summed correlation functions:
        - The spin correlation function \f$ C_{spin}(i,j) = 4 \left( \braket{ \hat{S}_i^z \hat{S}_j^z } - \braket{ \hat{S}_i^z } \braket{ \hat{S}_j^z } \right) \f$
-       - The density correlation function \f$ C_{dens}(i,j) = \braket{ \hat{n}_i \hat{n}_j } - \braket{ \hat{n}_i } \braket{ \hat{n}_j } \f$
        - The spin-flip correlation function \f$ C_{spinflip}(i,j) = \braket{ \hat{S}_i^+ \hat{S}_j^- } + \braket{ \hat{S}_i^- \hat{S}_j^+ } \f$
+       - The density correlation function \f$ C_{dens}(i,j) = \braket{ \hat{n}_i \hat{n}_j } - \braket{ \hat{n}_i } \braket{ \hat{n}_j } \f$
+       - The singlet diradical correlation function \f$ C_{dirad}(i,j) = \braket{\hat{d}_{i\uparrow} \hat{d}_{j\downarrow}} + \braket{ \hat{d}_{i\downarrow} \hat{d}_{j\uparrow}} - \braket{\hat{d}_{i\uparrow}}\braket{\hat{d}_{j\downarrow}} - \braket{\hat{d}_{i\downarrow} }\braket{\hat{d}_{j\uparrow}} \f$ with \f$ \hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1-\hat{n}_{i\overline{\sigma}}) \f$
     
     as well as the two-orbital mutual information:
     \f$ I(i,j) = \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left( 1 - \delta_{ij} \right) \f$. \n
@@ -91,6 +92,18 @@ namespace CheMPS2{
              \param col the second index
              \return the desired value */
          double getCspinflip_HAM(const int row, const int col) const;
+         
+         //! Get a Cdirad term, using the DMRG indices
+         /** \param row the first index
+             \param col the second index
+             \return the desired value */
+         double getCdirad_DMRG(const int row, const int col) const;
+
+         //! Get a Cdirad term, using the HAM indices
+         /** \param row the first index
+             \param col the second index
+             \return the desired value */
+         double getCdirad_HAM(const int row, const int col) const;
 
          //! Get a mutual information term, using the DMRG indices
          /** \param row the first index
@@ -114,7 +127,7 @@ namespace CheMPS2{
              \return The single-orbital entropy for this site */
          double SingleOrbitalEntropy_HAM(const int index) const;
          
-         //! Fill at the current step of the iterations the two-orbital mutual information
+         //! Fill at the current step of the iterations the two-orbital mutual information and the remaining part of Cdirad
          /** \param denT DMRG site-matrices
              \param Gtensors Tensors required for the calculation
              \param Ytensors Tensors required for the calculation
@@ -159,10 +172,13 @@ namespace CheMPS2{
          //The spin-flip correlation function
          double * Cspinflip;
          
+         //The singlet diradical correlation function
+         double * Cdirad;
+         
          //The two-orbital mutual information
          double * MutInfo;
          
-         //Helper function: fills OneRDM, Cspin, Cdens, Cspinflip, MutInfo
+         //Helper function: fills OneRDM, Cspin, Cdens, Cspinflip, and Cdirad (the latter only partially)
          void FillOneRDMSpinDensSpinflip();
          
          //Helper functions for FillSite

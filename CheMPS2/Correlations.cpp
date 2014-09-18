@@ -44,12 +44,14 @@ CheMPS2::Correlations::Correlations(const SyBookkeeper * denBKIn, const Problem 
    Cspin     = new double[L*L];
    Cdens     = new double[L*L];
    Cspinflip = new double[L*L];
+   Cdirad    = new double[L*L];
    MutInfo   = new double[L*L];
    
    for (int cnt=0; cnt<L*L; cnt++){ OneRDM[cnt]    = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cspin[cnt]     = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cdens[cnt]     = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cspinflip[cnt] = 0.0; }
+   for (int cnt=0; cnt<L*L; cnt++){ Cdirad[cnt]    = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ MutInfo[cnt]   = 0.0; }
    
    FillOneRDMSpinDensSpinflip();
@@ -62,6 +64,7 @@ CheMPS2::Correlations::~Correlations(){
    delete [] Cspin;
    delete [] Cdens;
    delete [] Cspinflip;
+   delete [] Cdirad;
    delete [] MutInfo;
 
 }
@@ -102,6 +105,14 @@ void CheMPS2::Correlations::FillOneRDMSpinDensSpinflip(){
       }
       Cspinflip[row + L*row] += OneRDM[row + L*row];
    }
+   
+   //Singlet diradical: partial fill
+   for (int row=0; row<L; row++){
+      for (int col=0; col<L; col++){
+         Cdirad[row + L*col] = - 0.5 * ( OneRDM[row + L*row] - the2DM->getTwoDMA_DMRG(row,row,row,row) )
+                                     * ( OneRDM[col + L*col] - the2DM->getTwoDMA_DMRG(col,col,col,col) );
+      }
+   }
 
 }
 
@@ -138,6 +149,18 @@ double CheMPS2::Correlations::getCspinflip_HAM(const int row, const int col) con
       return getCspinflip_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCspinflip_DMRG( row, col );
+
+}
+
+double CheMPS2::Correlations::getCdirad_DMRG(const int row, const int col) const{ return Cdirad[row + L*col]; }
+
+double CheMPS2::Correlations::getCdirad_HAM(const int row, const int col) const{
+
+   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
+   if ( Prob->gReorderD2h() ){
+      return getCdirad_DMRG( Prob->gf1(row), Prob->gf1(col) );
+   }
+   return getCdirad_DMRG( row, col );
 
 }
 
@@ -326,6 +349,8 @@ void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, Tens
       
       const double thisMutInfo = 0.5 * ( SingleOrbitalEntropy_DMRG(previousindex) + SingleOrbitalEntropy_DMRG(theindex) - entropy );
       MutInfo[previousindex + L * theindex] = MutInfo[theindex + L * previousindex] = thisMutInfo;
+      Cdirad[previousindex + L * theindex] += 2 * beta;
+      Cdirad[theindex + L * previousindex] += 2 * beta;
       
    }
    
@@ -591,11 +616,14 @@ void CheMPS2::Correlations::Print(const int precision, const int columnsPerLine)
    cout << "Spin correlation function = 4 * ( < S_i^z S_j^z > - < S_i^z > * < S_j^z > ) \nHamiltonian index order is used!\n" << endl;
    PrintTableNice( Cspin , precision, columnsPerLine );
    cout << "--------------------------------------------------------" << endl;
+   cout << "Spin-flip correlation function = < S_i^+ S_j^- > + < S_i^- S_j^+ > \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( Cspinflip , precision, columnsPerLine);
+   cout << "--------------------------------------------------------" << endl;
    cout << "Density correlation function = < n_i n_j > - < n_i > * < n_j > \nHamiltonian index order is used!\n" << endl;
    PrintTableNice( Cdens , precision, columnsPerLine );
    cout << "--------------------------------------------------------" << endl;
-   cout << "Spin-flip correlation function = < S_i^+ S_j^- > + < S_i^- S_j^+ > \nHamiltonian index order is used!\n" << endl;
-   PrintTableNice( Cspinflip , precision, columnsPerLine);
+   cout << "Singlet diradical correlation function = < d_i,up d_j,down > + < d_i,down d_j,up > - < d_i,up > * < d_j,down > - < d_i,down > * < d_j,up > \nHamiltonian index order is used!\n" << endl;
+   PrintTableNice( Cdirad , precision, columnsPerLine );
    cout << "--------------------------------------------------------" << endl;
    cout << "Two-orbital mutual information = 0.5 * ( s1(i) + s1(j) - s2(i,j) ) * ( 1 - delta(i,j) ) \nHamiltonian index order is used!\n" << endl;
    PrintTableNice( MutInfo , precision, columnsPerLine );
