@@ -162,9 +162,9 @@ void CheMPS2::DIIS::calculateParam(double * newParam){
 }
 
 
-void CheMPS2::DIIS::saveDIIS() const{
+void CheMPS2::DIIS::saveDIIS(const string filename) const{
 
-   hid_t file_id = H5Fcreate(CheMPS2::DMRGSCF_DIISstorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+   hid_t file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
    hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
    
    //The number of vectors saved
@@ -220,9 +220,9 @@ void CheMPS2::DIIS::saveDIIS() const{
 
 }
 
-void CheMPS2::DIIS::loadDIIS(){
+void CheMPS2::DIIS::loadDIIS(const string filename){
 
-   hid_t file_id = H5Fopen(CheMPS2::DMRGSCF_DIISstorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
    hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
    
    //The parameter vector sizes
@@ -286,10 +286,10 @@ void CheMPS2::DIIS::loadDIIS(){
 
 }
 
-void CheMPS2::DIIS::deleteStoredDIIS() const{
+void CheMPS2::DIIS::deleteStoredDIIS(const string filename) const{
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::DMRGSCF_DIISstorageName;
+   temp << "rm " << filename;
    int info = system(temp.str().c_str());
    cout << "Info on CASSCF::DIIS rm call to system: " << info << endl;
 

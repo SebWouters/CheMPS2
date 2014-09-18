@@ -53,6 +53,7 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
       x_linearlength += iHandler->getNOCC(irrep)*iHandler->getNDMRG(irrep) + iHandler->getNDMRG(irrep)*iHandler->getNVIRT(irrep) + iHandler->getNOCC(irrep)*iHandler->getNVIRT(irrep);
    }
+   if (x_linearlength==0){ return; }
    x_firstindex  = new int[x_linearlength];
    x_secondindex = new int[x_linearlength];
    int x_linearlength2 = 0;
@@ -95,9 +96,11 @@ CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
       
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){ delete [] unitary[irrep]; }
    delete [] unitary;
-      
-   delete [] x_firstindex;
-   delete [] x_secondindex;
+   
+   if (x_linearlength!=0){
+      delete [] x_firstindex;
+      delete [] x_secondindex;
+   }
       
 }
 
@@ -273,7 +276,7 @@ void CheMPS2::DMRGSCFunitary::updateUnitary(double * temp1, double * temp2, doub
 
 }
 
-void CheMPS2::DMRGSCFunitary::rotateUnitaryNOeigenvecs(double * eigenvecs, double * work){
+void CheMPS2::DMRGSCFunitary::rotateActiveSpaceVectors(double * eigenvecs, double * work){
 
    int passed = 0;
    int nOrbDMRG = iHandler->getDMRGcumulative(iHandler->getNirreps());
@@ -327,16 +330,18 @@ void CheMPS2::DMRGSCFunitary::CheckDeviationFromUnitary(double * work) const{
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
    
       int linsize = iHandler->getNORB(irrep);
-      dgemm_(&tran,&notr,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
-      double value = 0.0;
-      for (int cnt=0; cnt<linsize; cnt++){
-         value += (work[cnt*(1+linsize)]-1.0) * (work[cnt*(1+linsize)]-1.0);
-         for (int cnt2=cnt+1; cnt2<linsize; cnt2++){
-            value += work[cnt + cnt2*linsize] * work[cnt + cnt2*linsize] + work[cnt2 + cnt*linsize] * work[cnt2 + cnt*linsize];
+      if (linsize>0){
+         dgemm_(&tran,&notr,&linsize,&linsize,&linsize,&alpha,unitary[irrep],&linsize,unitary[irrep],&linsize,&beta,work,&linsize);
+         double value = 0.0;
+         for (int cnt=0; cnt<linsize; cnt++){
+            value += (work[cnt*(1+linsize)]-1.0) * (work[cnt*(1+linsize)]-1.0);
+            for (int cnt2=cnt+1; cnt2<linsize; cnt2++){
+               value += work[cnt + cnt2*linsize] * work[cnt + cnt2*linsize] + work[cnt2 + cnt*linsize] * work[cnt2 + cnt*linsize];
+            }
          }
+         value = sqrt(value);
+         cout << "   DMRGSCFunitary::CheckDeviationFromUnitary : 2-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
       }
-      value = sqrt(value);
-      cout << "   DMRGSCFunitary::CheckDeviationFromUnitary : 2-norm of unitary[" << irrep << "]^(dagger) * unitary[" << irrep << "] - I = " << value << endl;
       
    }
 
@@ -384,18 +389,40 @@ void CheMPS2::DMRGSCFunitary::getLog(double * vector, double * temp1, double * t
          dgemm_(&trans, &notra, &linsize, &linsize, &linsize, &alpha, work1, &linsize, unitary[irrep], &linsize, &beta, workLARGE, &linsize);
          dgemm_(&notra, &notra, &linsize, &linsize, &linsize, &alpha, workLARGE, &linsize, work1, &linsize, &beta, work3, &linsize);
          
-         //Work3 should contain 1x1 blocks containing [+/-1] and 2x2 blocks containing [[cos(u) sin(u)][-sin(u) cos(u)]].
+         //Work3 should contain 1x1 blocks containing [+/-1] and 2x2 blocks containing [[cos(u) sin(u)][-sin(u) cos(u)]] and is hence TRIDIAGONAL.
+         //If det(work3) = 1, a real-valued logarithm can be computed. If det(work3) = -1, the logarithm is complex valued.
+         double f_low = 1.0;
+         double f_high = work3[0];
+         for (int cnt=1; cnt<linsize; cnt++){
+            double temp = work3[cnt * (1 + linsize)] * f_high - work3[cnt + linsize*(cnt-1)] * work3[cnt-1 + linsize*cnt] * f_low;
+            f_low = f_high;
+            f_high = temp;
+         }
+         if (f_high < 0.0){
+            cerr << "   DMRGSCFunitary::getLog : Determinant of V^T*U*V for irrep " << irrep << " (should be +1 or -1) = " << f_high << endl;
+            cerr << "                            ln(U) will yield a complex skew-Hermitian matrix. The exponential of a linear" << endl;
+            cerr << "                            combination of such matrices will in general not be orthogonal (real-valued)." << endl;
+         } else {
+            if (CheMPS2::DMRGSCF_debugPrint){
+               cout << "   DMRGSCFunitary::getLog : Determinant of V^T*U*V for irrep " << irrep << " (should be +1 or -1) = " << f_high << endl;
+            }
+         }
+         
          //Fill work2 with ln(V^T U V) = ln(work3).
          for (int cnt=0; cnt<size; cnt++){ work2[cnt] = 0.0; }
          for (int cnt=0; cnt<linsize/2; cnt++){ //2x2 blocks
-            double cosinus = 0.5 * ( work3[2*cnt + linsize*2*cnt    ] + work3[2*cnt+1 + linsize*(2*cnt+1)] );
-            double sinus   = 0.5 * ( work3[2*cnt + linsize*(2*cnt+1)] - work3[2*cnt+1 + linsize*2*cnt    ] );
+            const double cosinus = 0.5 * ( work3[2*cnt + linsize*2*cnt    ] + work3[2*cnt+1 + linsize*(2*cnt+1)] );
+            const double sinus   = 0.5 * ( work3[2*cnt + linsize*(2*cnt+1)] - work3[2*cnt+1 + linsize*2*cnt    ] );
+            const double theta   = atan2( sinus, cosinus );
+            if (CheMPS2::DMRGSCF_debugPrint){
+               cout << "   DMRGSCFunitary::getLog : block = [ " << work3[2*cnt   + linsize*2*cnt] << " , " << work3[2*cnt   + linsize*(2*cnt+1)] << " ]" << endl;
+               cout << "                                    [ " << work3[2*cnt+1 + linsize*2*cnt] << " , " << work3[2*cnt+1 + linsize*(2*cnt+1)]
+                                                                << " ] and corresponds to theta = " << theta << endl;
+            }
             work3[2*cnt   + linsize*2*cnt    ] -= cosinus;
             work3[2*cnt+1 + linsize*(2*cnt+1)] -= cosinus;
             work3[2*cnt   + linsize*(2*cnt+1)] -= sinus;
             work3[2*cnt+1 + linsize*2*cnt    ] += sinus;
-            double theta   = atan2( sinus, cosinus );
-            if (CheMPS2::DMRGSCF_debugPrint){ cout << "   DMRGSCFunitary::getLog : 2x2 block which corresponds to theta = " << theta << endl; }
             work2[2*cnt   + linsize*(2*cnt+1)] = theta;
             work2[2*cnt+1 + linsize*2*cnt    ] = -theta;
          } //The rest are 1x1 blocks, corresponding to eigenvalue 1 --> ln(1) = 0 --> work2 does not need to be updated.
@@ -426,7 +453,6 @@ void CheMPS2::DMRGSCFunitary::getLog(double * vector, double * temp1, double * t
    
    }
    
-   //if (CheMPS2::DMRGSCF_debugPrint){
    if (true){
       DMRGSCFunitary temporaryU = DMRGSCFunitary(iHandler);
       temporaryU.updateUnitary(temp1, temp2, vector, false, false); //multiply = compact = false
@@ -573,9 +599,72 @@ void CheMPS2::DMRGSCFunitary::BCH(double * Xprev, double * step, double * Xnew, 
 
 }
 
-void CheMPS2::DMRGSCFunitary::saveU() const{
+void CheMPS2::DMRGSCFunitary::makeSureAllBlocksDetOne(double * temp1, double * temp2){
 
-   hid_t file_id = H5Fcreate(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+   for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+   
+      int linsize = iHandler->getNORB(irrep);
+      int size = linsize * linsize;
+      
+      if (linsize>1){
+         /* linsize >= 2; hence temp1 is at least of size 4*linsize*linsize
+            if linsize <= 1; there corresponds no block in xmatrix to it */
+         
+         double * work1     = temp1;          //linsize * linsize
+         //double * work2     = temp1 +   size; //linsize * linsize
+         double * work3     = temp1 + 2*size; //linsize * linsize
+         double * work4     = temp1 + 3*size; //linsize * linsize
+         
+         double * workLARGE = temp2;
+         int lworkLARGE     = 4*size;
+         
+         //S = U + U^T --> work1
+         for (int row=0; row<linsize; row++){
+            for (int col=0; col<linsize; col++){
+               work1[row + linsize * col] = unitary[irrep][row + linsize * col] + unitary[irrep][col + linsize * row];
+            }
+         }
+         
+         //Get the eigenvectors of S = U + U^T: eigvals in work4, eigvecs in work1.
+         char jobz = 'V'; //compute eigenvectors
+         char uplo = 'U';
+         int info;
+         dsyev_(&jobz, &uplo, &linsize, work1, &linsize, work4, workLARGE, &lworkLARGE, &info);
+         
+         //Transform the original orthogonal matrix with the real orthonormal eigenbasis of S --> the result V^T U V is stored in work3.
+         char trans = 'T';
+         char notra = 'N';
+         double alpha = 1.0;
+         double beta = 0.0; //set
+         dgemm_(&trans, &notra, &linsize, &linsize, &linsize, &alpha, work1, &linsize, unitary[irrep], &linsize, &beta, workLARGE, &linsize);
+         dgemm_(&notra, &notra, &linsize, &linsize, &linsize, &alpha, workLARGE, &linsize, work1, &linsize, &beta, work3, &linsize);
+         
+         /*  Work3 should contain
+                * 1x1 blocks containing [-1]
+                * 2x2 blocks containing [[cos(u) sin(u)][-sin(u) cos(u)]]
+                * 1x1 blocks containing [+1]
+             and is hence TRIDIAGONAL. Its determinant is easy to compute: */
+         double f_low = 1.0;
+         double f_high = work3[0];
+         for (int cnt=1; cnt<linsize; cnt++){
+            double temp = work3[cnt * (1 + linsize)] * f_high - work3[cnt + linsize*(cnt-1)] * work3[cnt-1 + linsize*cnt] * f_low;
+            f_low = f_high;
+            f_high = temp;
+         }
+         if (f_high < 0.0){ //f_high = det = -1
+            // U <-- diag(-1, 1, 1, 1, ...) * U : First row of U changes sign!
+            for (int cnt=0; cnt<linsize; cnt++){ unitary[irrep][0 + linsize * cnt] *= -1; }
+         }
+         
+      }
+   
+   }
+
+}
+
+void CheMPS2::DMRGSCFunitary::saveU(const string filename) const{
+
+   hid_t file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
    hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
    
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -598,9 +687,9 @@ void CheMPS2::DMRGSCFunitary::saveU() const{
 
 }
 
-void CheMPS2::DMRGSCFunitary::loadU(){
+void CheMPS2::DMRGSCFunitary::loadU(const string filename){
 
-   hid_t file_id = H5Fopen(CheMPS2::DMRGSCF_unitaryStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
    hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
        
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
@@ -620,10 +709,10 @@ void CheMPS2::DMRGSCFunitary::loadU(){
 
 }
 
-void CheMPS2::DMRGSCFunitary::deleteStoredUnitary() const{
+void CheMPS2::DMRGSCFunitary::deleteStoredUnitary(const string filename) const{
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::DMRGSCF_unitaryStorageName;
+   temp << "rm " << filename;
    int info = system(temp.str().c_str());
    cout << "Info on DMRGSCF::Unitary rm call to system: " << info << endl;
 

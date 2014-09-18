@@ -39,7 +39,7 @@ int main(void){
    struct stat stFileInfo;
    int intStat = stat(matrixelements.c_str(),&stFileInfo);
    if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_CCPVDZ.dat in tests/test8.cpp for the compiled binary test8 to work." << endl;
+      cout << "Please set the correct relative path to tests/matrixelements/N2_CCPVDZ.dat in tests/test10.cpp for the compiled binary test10 to work." << endl;
       return 628788;
    }
    
@@ -53,11 +53,11 @@ int main(void){
    Nocc[0] = Nocc[5] = 1;
    Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0;
    
-   NDMRG[0] = NDMRG[5] = 2;
+   NDMRG[0] = NDMRG[5] = 4;
    NDMRG[1] = NDMRG[4] = 0;
    NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 1;
    
-   Nvirt[0] = Nvirt[5] = 4;
+   Nvirt[0] = Nvirt[5] = 2;
    Nvirt[2] = Nvirt[3] = Nvirt[6] = Nvirt[7] = 2;
    Nvirt[1] = Nvirt[4] = 1;
    
@@ -84,8 +84,7 @@ int main(void){
    int rootNum = 1; //Ground state only
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
    theDMRGSCFoptions->setDoDIIS(true);
-   theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
-   theDMRGSCFoptions->setDumpCorrelations(true);
+   theDMRGSCFoptions->setWhichActiveSpace(2); //2 means localized orbitals
    double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
@@ -95,8 +94,8 @@ int main(void){
    delete theDMRGSCFoptions;
    
    //Check succes
-   bool success = (fabs(Energy + 109.103502335253) < 1e-10) ? true : false;
-   cout << "================> Did test 8 succeed : ";
+   bool success = (fabs(Energy + 109.15104350802) < 1e-10) ? true : false;
+   cout << "================> Did test 10 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
 

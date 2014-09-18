@@ -155,6 +155,33 @@ void CheMPS2::CASSCF::setDMRG1DM(const int N){
 
 }
 
+void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, double * eigenvecs){
+
+   const int size = nOrbDMRG * nOrbDMRG;
+   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = 0.0; }
+   int passed = 0;
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+
+      const int NDMRG = iHandler->getNDMRG(irrep);
+      if (NDMRG>0){
+
+         double * blockUnit = unitary->getBlock(irrep);
+         double * blockEigs = eigenvecs + passed * ( 1 + nOrbDMRG );
+
+         for (int row=0; row<NDMRG; row++){
+            for (int col=0; col<NDMRG; col++){
+               blockEigs[row + nOrbDMRG * col] = blockUnit[col + NDMRG * row]; //Eigs = Unit^T
+            }
+         }
+
+      }
+
+      passed += NDMRG;
+
+   }
+
+}
+
 void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
 
    int size = nOrbDMRG * nOrbDMRG;
@@ -175,7 +202,8 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ ";
+         if (irrep==0){ cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
+         else {         cout << "                       DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 
@@ -388,6 +416,31 @@ double CheMPS2::CASSCF::TmatRotated(const int index1, const int index2) const{
    if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
    
    return OneBodyMatrixElements[irrep1][index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * (index2 - iHandler->getOrigNOCCstart(irrep1))];
+
+}
+
+void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
+
+   //Constant part of the energy
+   double value = HamOrig->getEconst();
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      for (int orb=iHandler->getOrigNOCCstart(irrep); orb<iHandler->getOrigNDMRGstart(irrep); orb++){
+         value += 2 * TmatRotated(orb,orb) + QmatOCC(orb,orb);
+      }
+   }
+   HamDMRG->setEconst(value);
+   
+   //One-body terms: diagonal in the irreps
+   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+      const int passedORIG  = iHandler->getOrigNDMRGstart(irrep);
+      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
+      const int linsizeDMRG = iHandler->getNDMRG(irrep);
+      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
+         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
+            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, TmatRotated(passedORIG+cnt1, passedORIG+cnt2) + QmatOCC(passedORIG+cnt1, passedORIG+cnt2) );
+         }
+      }
+   }
 
 }
 

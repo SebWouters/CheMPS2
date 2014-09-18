@@ -62,17 +62,17 @@ namespace CheMPS2{
          double * getBlock(const int irrep);
          
          //! Update the unitary transformation
-         /** \param workmem1 Work memory
-             \param workmem2 Work memory
+         /** \param workmem1 Work memory of at least 4*max(dim(irrep(Ham)))^2
+             \param workmem2 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param vector The elements in X
              \param multiply Boolean whether exp(X)*U or exp(X) should become the new U. If multiply==true, U <-- exp(X)*U. If multiply==false, U <-- exp(X).
              \param compact Boolean which indicates how the elements X are stored */
          void updateUnitary(double * workmem1, double * workmem2, double * vector, const bool multiply, const bool compact);
          
-         //! Rotate the unitary matrix to the NO eigenbasis
-         /** \param eigenvecs The NO eigenbasis
-             \param work Work memory */
-         void rotateUnitaryNOeigenvecs(double * eigenvecs, double * work);
+         //! Rotate the unitary matrix
+         /** \param eigenvecs The rotation vectors, in a memory block of size nOrbDMRG^2
+             \param work Work memory, with size 2*max(dim(irrep(Ham)))^2 */
+         void rotateActiveSpaceVectors(double * eigenvecs, double * work);
          
          //! Calculate the two-norm of U^T*U - I
          /** \param work Work memory */
@@ -80,8 +80,8 @@ namespace CheMPS2{
          
          //! Obtain the logarithm of the unitary matrix
          /** \param vector Where the logarithm should be stored
-             \param temp1 Work memory
-             \param temp2 Work memory */
+             \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
+             \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
          void getLog(double * vector, double * temp1, double * temp2) const;
          
          //! Obtain the logarithm of the current unitary matrix based on the BCH formula
@@ -92,14 +92,22 @@ namespace CheMPS2{
              \param temp2 Work memory */
          void BCH(double * Xprev, double * step, double * Xnew, double * temp1, double * temp2) const;
          
+         //! Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1.
+         /** \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
+             \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
+         void makeSureAllBlocksDetOne(double * temp1, double * temp2);
+         
          //! Save the unitary to disk
-         void saveU() const;
+         /** \param filename Filename to store the unitary to */
+         void saveU(const string filename=DMRGSCF_unitaryStorageName) const;
          
          //! Load the unitary from disk
-         void loadU();
+         /** \param filename Filename to load the unitary from */
+         void loadU(const string filename=DMRGSCF_unitaryStorageName);
          
          //! Delete the stored unitary (on disk)
-         void deleteStoredUnitary() const;
+         /** \param filename Delete this file */
+         void deleteStoredUnitary(const string filename=DMRGSCF_unitaryStorageName) const;
 
          
       private:

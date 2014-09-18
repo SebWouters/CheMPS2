@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,11 +26,14 @@
 
 #include "DMRG.h"
 #include "Lapack.h"
+#include "TensorK.h"
+#include "TensorM.h"
+#include "TensorGYZ.h"
 
 using std::cout;
 using std::endl;
 
-void CheMPS2::DMRG::calc2DM(){
+void CheMPS2::DMRG::calc2DMandCorrelations(){
 
    //First get the whole MPS into left-canonical form
    int index = Prob->gL()-2;
@@ -56,20 +59,24 @@ void CheMPS2::DMRG::calc2DM(){
    denS->Split(MPS[index],MPS[index+1],OptScheme->getD(OptScheme->getNInstructions()-1),true,true);
    delete denS;
    
-   cout << "*********************" << endl;
-   cout << "** 2DM calculation **" << endl;
-   cout << "*********************" << endl;
+   cout << "**************************************" << endl;
+   cout << "** 2DM and Correlations calculation **" << endl;
+   cout << "**************************************" << endl;
    updateMovingRightSafe(index);
    
    TensorDiag * Norm = new TensorDiag(Prob->gL(), denBK);
    MPS[Prob->gL()-1]->QR(Norm);
    delete Norm;
    
-   //Then calculate step by step the 2DM
-   if (!the2DMallocated){
-      the2DMallocated = true;
-      the2DM = new TwoDM(denBK, Prob);
+   //Allocate space for the 2DM
+   if (the2DMallocated){
+      delete the2DM;
+      the2DMallocated = false;
    }
+   the2DM = new TwoDM(denBK, Prob);
+   the2DMallocated = true;
+   
+   //Then calculate step by step the 2DM
    for (int siteindex=Prob->gL()-1; siteindex>=0; siteindex--){
       the2DM->FillSite(MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors);
       if (siteindex>0){
@@ -88,9 +95,109 @@ void CheMPS2::DMRG::calc2DM(){
    double Energy2DMA = the2DM->calcEnergy();
    cout << "   Energy obtained by Heffective at edge = " << Energy << " and as Econst + 0.5*trace(2DM-A*Ham) = " << Energy2DMA << endl;
 
+   //Now the MPS has the gauge form CRRRRRRRRR
+   //Allocate space for the Correlations
+   if (theCorrAllocated){
+      delete theCorr;
+      theCorrAllocated = false;
+   }
+   theCorr = new Correlations(denBK, Prob, the2DM);
+   theCorrAllocated = true;
+   
+   //Then calculate step by step the mutual information.
+   //Define the following tensor arrays thereto. The native DMRG ones are at the edge and are hence small.
+   TensorGYZ ** Gtensors = new TensorGYZ * [Prob->gL()-1];
+   TensorGYZ ** Ytensors = new TensorGYZ * [Prob->gL()-1];
+   TensorGYZ ** Ztensors = new TensorGYZ * [Prob->gL()-1];
+   TensorK   ** Ktensors = new TensorK   * [Prob->gL()-1];
+   TensorM   ** Mtensors = new TensorM   * [Prob->gL()-1];
+   
+   //Do the actual work
+   for (int siteindex=1; siteindex<Prob->gL(); siteindex++){
+   
+      //Switch MPS gauge
+      TensorDiag * Right = new TensorDiag(siteindex, denBK);
+      MPS[siteindex-1]->QR(Right);
+      MPS[siteindex]->LeftMultiply(Right);
+      delete Right;
+      
+      //Update the tensors
+      const int dimL = denBK->gMaxDimAtBound(siteindex-1);
+      const int dimR = denBK->gMaxDimAtBound(siteindex);
+      double * workmemLR = new double[dimL*dimR];
+      for (int previousindex=0; previousindex<siteindex-1; previousindex++){
+         TensorGYZ * newG = new TensorGYZ(siteindex, 'G', denBK);
+         TensorGYZ * newY = new TensorGYZ(siteindex, 'Y', denBK);
+         TensorGYZ * newZ = new TensorGYZ(siteindex, 'Z', denBK);
+         TensorK   * newK = new TensorK(siteindex, denBK->gIrrep(previousindex), denBK);
+         TensorM   * newM = new TensorM(siteindex, denBK->gIrrep(previousindex), denBK);
+
+         newG->update(MPS[siteindex-1], Gtensors[previousindex], workmemLR);
+         newY->update(MPS[siteindex-1], Ytensors[previousindex], workmemLR);
+         newZ->update(MPS[siteindex-1], Ztensors[previousindex], workmemLR);
+         newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR, false);
+         newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR, false);
+         
+         delete Gtensors[previousindex];
+         delete Ytensors[previousindex];
+         delete Ztensors[previousindex];
+         delete Ktensors[previousindex];
+         delete Mtensors[previousindex];
+         
+         Gtensors[previousindex] = newG;
+         Ytensors[previousindex] = newY;
+         Ztensors[previousindex] = newZ;
+         Ktensors[previousindex] = newK;
+         Mtensors[previousindex] = newM;
+      }
+      delete [] workmemLR;
+      
+      //Construct the new tensors
+      Gtensors[siteindex-1] = new TensorGYZ(siteindex, 'G', denBK);
+      Ytensors[siteindex-1] = new TensorGYZ(siteindex, 'Y', denBK);
+      Ztensors[siteindex-1] = new TensorGYZ(siteindex, 'Z', denBK);
+      Ktensors[siteindex-1] = new TensorK(siteindex, denBK->gIrrep(siteindex-1), denBK);
+      Mtensors[siteindex-1] = new TensorM(siteindex, denBK->gIrrep(siteindex-1), denBK);
+      
+      Gtensors[siteindex-1]->construct(MPS[siteindex-1]);
+      Ytensors[siteindex-1]->construct(MPS[siteindex-1]);
+      Ztensors[siteindex-1]->construct(MPS[siteindex-1]);
+      Ktensors[siteindex-1]->construct(MPS[siteindex-1]);
+      Mtensors[siteindex-1]->construct(MPS[siteindex-1]);
+      
+      //Use the tensors to fill in the Correlations
+      theCorr->FillSite(MPS[siteindex], Gtensors, Ytensors, Ztensors, Ktensors, Mtensors);
+      
+   }
+   
+   //Clean-up
+   for (int previousindex=0; previousindex<Prob->gL()-1; previousindex++){
+      delete Gtensors[previousindex];
+      delete Ytensors[previousindex];
+      delete Ztensors[previousindex];
+      delete Ktensors[previousindex];
+      delete Mtensors[previousindex];
+   }
+   
+   delete [] Gtensors;
+   delete [] Ytensors;
+   delete [] Ztensors;
+   delete [] Ktensors;
+   delete [] Mtensors;
+   
+   cout << "   Single-orbital entropies (Hamiltonian index order is used!) = [ ";
+   for (int index=0; index < Prob->gL()-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
+   cout << theCorr->SingleOrbitalEntropy_HAM(Prob->gL()-1) << " ]." << endl;
+   
+   for (int power=0; power<=2; power++){
+      cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
+   }
+
 }
 
 CheMPS2::TwoDM * CheMPS2::DMRG::get2DM(){ return the2DM; }
+
+CheMPS2::Correlations * CheMPS2::DMRG::getCorrelations(){ return theCorr; }
 
 double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[Hamindex = Prob->gf2(DMRGindex)]
 

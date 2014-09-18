@@ -26,6 +26,8 @@
 
 #include "CASSCF.h"
 #include "Lapack.h"
+#include "DMRGSCFVmatRotations.h"
+#include "EdmistonRuedenberg.h"
 
 using std::string;
 using std::ifstream;
@@ -33,7 +35,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, const bool doDIIS){
+double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
 
    //Convergence variables
    double gradNorm = 1.0;
@@ -57,7 +59,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    for (int irrep=0; irrep<numberOfIrreps; irrep++){
       const int linsize_irrep = iHandler->getNORB(irrep);
       theDIISvectorParamSize += linsize_irrep*(linsize_irrep-1)/2;
-      if  (linsize_irrep > maxlinsize  )                                                        {  maxlinsize  = linsize_irrep; }
+      if  (linsize_irrep > maxlinsize  )                                                         {  maxlinsize  = linsize_irrep; }
       if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::DMRGSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
    }
    const bool doBlockWise = (maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
@@ -75,48 +77,62 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
    //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int sizeWorkmem1 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG * nOrbDMRG ); //For (2-body tfo , updateUnitary, calcNOON)
-   const int sizeWorkmem2 = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , (CheMPS2::DMRGSCF_rotate2DMtoNO) ? nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG : nOrbDMRG*(nOrbDMRG + 1) ); //For (2-body tfo, updateUnitary and rotateUnitaryNOeigenvecs, rotate2DMand1DM or calcNOON)
-   double * mem1 = new double[sizeWorkmem1];
-   double * mem2 = new double[sizeWorkmem2];
+   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
+   double * mem1 = new double[sizeWorkmem];
+   double * mem2 = new double[sizeWorkmem];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
    
+   //The two-body rotator and Edmiston-Ruedenberg active space localizer
+   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
+   EdmistonRuedenberg * theLocalizer = NULL;
+   if (theDMRGSCFoptions->getWhichActiveSpace()==2){ theLocalizer = new EdmistonRuedenberg(HamDMRG); }
+   
    //Load unitary from disk
-   if (CheMPS2::DMRGSCF_storeUnitary){
+   if (theDMRGSCFoptions->getStoreUnitary()){
       struct stat stFileInfo;
-      int intStat = stat(CheMPS2::DMRGSCF_unitaryStorageName.c_str(),&stFileInfo);
-      if (intStat==0){ unitary->loadU(); }
+      int intStat = stat((theDMRGSCFoptions->getUnitaryStorageName()).c_str(),&stFileInfo);
+      if (intStat==0){ unitary->loadU(theDMRGSCFoptions->getUnitaryStorageName()); }
    }
    
    //Load DIIS from disk
-   if ((doDIIS) && (CheMPS2::DMRGSCF_storeDIIS)){
+   if ((theDMRGSCFoptions->getDoDIIS()) && (theDMRGSCFoptions->getStoreDIIS())){
       struct stat stFileInfo;
-      int intStat = stat(CheMPS2::DMRGSCF_DIISstorageName.c_str(),&stFileInfo);
+      int intStat = stat((theDMRGSCFoptions->getDIISStorageName()).c_str(),&stFileInfo);
       if (intStat==0){
          if (theDIIS == NULL){
-            theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), CheMPS2::DMRGSCF_numDIISvecs);
+            theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
             theDIISparameterVector = new double[ theDIISvectorParamSize ];
          }
-         theDIIS->loadDIIS();
+         theDIIS->loadDIIS(theDMRGSCFoptions->getDIISStorageName());
       }
    }
+   
+   int nIterations = 0;
 
    /*******************************
    ***   Actual DMRGSCF loops   ***
    *******************************/
-   while (gradNorm > CheMPS2::DMRGSCF_gradientNormThreshold){
+   while ((gradNorm > theDMRGSCFoptions->getGradientThreshold()) && (nIterations < theDMRGSCFoptions->getMaxIterations())){
+   
+      nIterations++;
    
       //Update the unitary transformation
       if (unitary->getNumVariablesX() > 0){
       
          unitary->updateUnitary(mem1, mem2, gradient, true, true); //multiply = compact = true
          
-         if ((doDIIS) && (updateNorm <= CheMPS2::DMRGSCF_DIISgradientBranch)){
-            if (CheMPS2::DMRGSCF_rotate2DMtoNO){ cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl; }
+         if ((theDMRGSCFoptions->getDoDIIS()) && (updateNorm <= theDMRGSCFoptions->getDIISGradientBranch())){
+            if (theDMRGSCFoptions->getWhichActiveSpace()==1){
+               cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl;
+            }
+            if (theDMRGSCFoptions->getWhichActiveSpace()==2){
+               cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
+            }
             if (theDIIS == NULL){
-               theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), CheMPS2::DMRGSCF_numDIISvecs);
+               theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
                theDIISparameterVector = new double[ theDIISvectorParamSize ];
+               unitary->makeSureAllBlocksDetOne(mem1, mem2);
             }
             unitary->getLog(theDIISparameterVector, mem1, mem2);
             theDIIS->appendNew(gradient, theDIISparameterVector);
@@ -125,14 +141,29 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          }
          
       }
-      if ((CheMPS2::DMRGSCF_storeUnitary) && (gradNorm!=1.0)){ unitary->saveU(); }
-      if ((CheMPS2::DMRGSCF_storeDIIS) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS(); }
+      if ((theDMRGSCFoptions->getStoreUnitary()) && (gradNorm!=1.0)){ unitary->saveU( theDMRGSCFoptions->getUnitaryStorageName() ); }
+      if ((theDMRGSCFoptions->getStoreDIIS()) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
    
       //Fill HamDMRG
       buildQmatrixOCC();
       buildOneBodyMatrixElements();
-      if (doBlockWise){ fillHamDMRGBlockWise(HamDMRG, mem1, mem2, mem3, maxBlockSize); }
-      else {            fillHamDMRG(HamDMRG, mem1, mem2); }
+      fillConstAndTmatDMRG(HamDMRG);
+      if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
+      else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
+      
+      //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
+      if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
+         theLocalizer->Optimize(mem1, mem2); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+         theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
+         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), mem1);
+         unitary->rotateActiveSpaceVectors(mem1, mem2);
+         buildQmatrixOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
+         buildOneBodyMatrixElements();
+         fillConstAndTmatDMRG(HamDMRG);
+         if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
+         else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
+         cout << "   DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+      }
       
       //Do the DMRG sweeps, and calculate the 2DM
       DMRG * theDMRG = new DMRG(Prob,OptScheme);
@@ -144,23 +175,25 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
             Energy = theDMRG->Solve();
          }
       }
-      theDMRG->calc2DM();
+      theDMRG->calc2DMandCorrelations();
+      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); }
       copy2DMover(theDMRG->get2DM());
       setDMRG1DM(N);
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
       calcNOON(mem1, mem2);
-      if ((CheMPS2::DMRGSCF_rotate2DMtoNO) && (theDIIS==NULL)){ //When the DIIS has started, stop rotating the active space to NOs
+      if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
          rotate2DMand1DM(N, mem1, mem2);
-         unitary->rotateUnitaryNOeigenvecs(mem1, mem2);
+         unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildOneBodyMatrixElements();
+         cout << "   DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatrixACT();
-      if (doBlockWise){ fillVmatRotatedBlockWise(mem1, mem2, mem3, maxBlockSize, true); }
-      else{             fillVmatRotated(mem1, mem2); }
+      if (doBlockWise){ theRotator.fillVmatRotatedBlockWise(VmatRotated, unitary, mem1, mem2, mem3, maxBlockSize, true); }
+      else{             theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
       buildFmat();
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
@@ -183,6 +216,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    delete HamDMRG;
    delete [] gradient;
    if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
+   if (theLocalizer!=NULL){ delete theLocalizer; }
    
    return Energy;
 

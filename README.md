@@ -71,9 +71,6 @@ variables.
 ROHF energy; and one for fetching FCI coefficients to determine the point group
 symmetry of certain electronic states of the carbon dimer.
     
-```CheMPS2/CASSCFhamiltonianrotation.cpp``` contains the Hamiltonian rotation
-function, based on the CASSCF unitary matrix.
-    
 ```CheMPS2/CASSCFnewtonraphson.cpp``` contains all DMRG-SCF functions which
 are specific to the augmented Hessian Newton-Raphson update scheme,
 including the functions to calculate the gradient and Hessian.
@@ -81,6 +78,10 @@ including the functions to calculate the gradient and Hessian.
 ```CheMPS2/ConvergenceScheme.cpp``` contains all functions of the
 ConvergenceScheme class, which contains the instructions for the subsequent
 DMRG sweeps.
+
+```CheMPS2/Correlations.cpp``` contains all the functionality to calculate
+the spin, density, and spin-flip correlation functions as well as the
+two-orbital mutual information.
 
 ```CheMPS2/DIIS.cpp``` contains a DIIS convergence speed-up for DMRG-SCF.
 
@@ -96,12 +97,22 @@ renormalized operators: saving to disk, loading from disk, and updating.
 ```CheMPS2/DMRGSCFindices.cpp``` contains the index conversions for the
 DMRG-SCF algorithm.
 
+```CheMPS2/DMRGSCFoptions.cpp``` is a container class to pass the DMRGSCF
+options to the augmented Hessian Newton-Raphson routine.
+
 ```CheMPS2/DMRGSCFunitary.cpp``` contains the storage and handling of the
 unitary matrix and its nonredundant skew-symmetric parametrization
 required for the DMRG-SCF algorithm.
 
+```CheMPS2/DMRGSCFVmatRotations.cpp``` performs the two-body matrix element
+rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
+
 ```CheMPS2/DMRGtechnics.cpp``` contains the functions related to the 2-RDM
 and the excited-state calculations.
+
+```CheMPS2/EdmistonRuedenberg.cpp``` contains an orbital localization function
+based on the Edmiston-Ruedenberg cost function and an augmented Hessian
+Newton-Raphson optimizer.
 
 ```CheMPS2/FourIndex.cpp``` contains all functions of the FourIndex container
 class for the two-body matrix elements.
@@ -177,9 +188,19 @@ quantized operators, of which the particle symmetry sectors are equal.
 ```CheMPS2/TensorF1Dbase.cpp``` contains the common storage and handling
 functions of the TensorF1 and TensorD classes.
 
+```CheMPS2/TensorGYZ.cpp``` contains the contruct and update functions
+for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
+information.
+
+```CheMPS2/TensorK.cpp``` contains the contruct and update functions
+for the K-tensor. It is required for the two-orbital mutual information.
+
 ```CheMPS2/TensorL.cpp``` contains all TensorL functions. This class stores
 and handles the reduced spin-1/2 part of a single sandwiched second quantized
 operator.
+
+```CheMPS2/TensorM.cpp``` contains the contruct and update functions
+for the M-tensor. It is required for the two-orbital mutual information.
 
 ```CheMPS2/TensorO.cpp``` implements the storage and handling of the partial
 terms which are required to calculate the overlap between two MPSs.
@@ -227,6 +248,9 @@ class for the one-body matrix elements.
 ```CheMPS2/include/ConvergenceScheme.h``` contains the definitions of the
 ConvergenceScheme class.
 
+```CheMPS2/include/Correlations.h``` contains the definitions of the
+Correlations class.
+
 ```CheMPS2/include/DIIS.h``` contains the definitions of the DIIS class.
 
 ```CheMPS2/include/DMRG.h``` contains the definitions of the DMRG class.
@@ -234,8 +258,17 @@ ConvergenceScheme class.
 ```CheMPS2/include/DMRGSCFindices.h``` contains the definitions of the
 DMRGSCFindices class.
 
+```CheMPS2/include/DMRGSCFoptions.h``` contains the definitions of the
+DMRGSCFoptions container class.
+
 ```CheMPS2/include/DMRGSCFunitary.h``` contains the definitions of the
 DMRGSCFunitary class.
+
+```CheMPS2/include/DMRGSCFVmatRotations.h``` contains the definitions of the
+DMRGSCFVmatRotations class.
+
+```CheMPS2/include/EdmistonRuedenberg.h``` contains the definitions of the
+EdmistonRuedenberg class.
 
 ```CheMPS2/include/FourIndex.h``` contains the definitions of the FourIndex
 class.
@@ -288,10 +321,17 @@ TensorF1Dbase class.
 
 ```CheMPS2/include/TensorF1.h``` contains the definitions of the TensorF1 class.
 
+```CheMPS2/include/TensorGYZ.h``` contains the definitions of the TensorGYZ
+class.
+
 ```CheMPS2/include/Tensor.h``` contains the definitions of the virtual Tensor
 class.
 
+```CheMPS2/include/TensorK.h``` contains the definitions of the TensorK class.
+
 ```CheMPS2/include/TensorL.h``` contains the definitions of the TensorL class.
+
+```CheMPS2/include/TensorM.h``` contains the definitions of the TensorM class.
 
 ```CheMPS2/include/TensorO.h``` contains the definitions of the TensorO class.
 
@@ -364,6 +404,16 @@ and antibonding) are chosen as active space. A significant speedup is obtained
 with DIIS. This test is smaller than test6, and is included for debugging with
 valgrind.
 
+```tests/test9.cpp``` tests the Edmiston-Ruedenberg localizer. For all irreps
+of ```tests/matrixelements/N2_CCPVDZ.dat```, the Edmiston-Ruedenberg cost
+function is maximized, by means of an augmented Hessian Newton-Raphson
+optimizer.
+
+```tests/test10.cpp``` is a copy of test8.cpp, with a slightly larger active
+space and which works with ordered localized orbitals instead of natural
+orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
+ordering based on the Fiedler vector with the exchange matrix as cost function.
+
 ```tests/matrixelements/CH4_N10_S0_c2v_I0.dat``` contains the matrix elements
 for test3.
 
@@ -377,7 +427,7 @@ for test1 and test5.
 for test6 and test7.
 
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
-for test8.
+for test8, test9, and test10.
 
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).
@@ -440,19 +490,24 @@ provide a minimal compilation. Start in ```./``` and run:
 CMake generates makefiles based on the user's specifications:
 
     > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
     
 Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
 Option2 can be ```ON``` or ```OFF``` and is used to switch on the
 intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
 documentation.
+Option4 is the prefix installation directory; typically ```/usr``` on
+Linux. The CheMPS2 library is then installed in ```prefix/lib``` and
+the headers (and source) in ```prefix/include/CheMPS2```.
 If one or more of the required libraries are not found, please use the
 command
 
-    > CMAKE_INCLUDE_PATH=option4 CMAKE_LIBRARY_PATH=option5 CXX=option1
+    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
     cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
     
-instead, where option4 and option5 are respectively the missing
+instead, where option5 and option6 are respectively the missing
 colon-separated include and library paths, e.g.
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
@@ -461,10 +516,16 @@ and
 
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
 
-
 To compile, run:
 
     > make
+
+To install, run:
+
+    > make install
+
+For non-standard installation directories, please remember to append
+the library path to LD_LIBRARY_PATH in your .bashrc.
 
 
 ### 2. Testing CheMPS2
@@ -480,6 +541,8 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test6
     > ./test7
     > ./test8
+    > ./test9
+    > ./test10
 
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).

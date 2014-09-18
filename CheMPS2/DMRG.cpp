@@ -61,6 +61,9 @@ CheMPS2::DMRG::DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn){
    for (int cnt=0; cnt<Prob->gL()-1; cnt++){ isAllocated[cnt] = 0; }
    
    the2DMallocated = false;
+   the2DM = NULL;
+   theCorrAllocated = false;
+   theCorr = NULL;
    Exc_activated = false;
    
    setupBookkeeperAndMPS();
@@ -142,6 +145,7 @@ CheMPS2::DMRG::~DMRG(){
    }
    
    if (the2DMallocated){ delete the2DM; }
+   if (theCorrAllocated){ delete theCorr; }
 
 }
 
@@ -173,14 +177,14 @@ double CheMPS2::DMRG::Solve(){
          Energy = sweepleft(change, instruction);
          gettimeofday(&end, NULL);
          double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-         cout << "***  Elapsed wall time during last sweep is " << elapsed << endl;
+         cout << "***  Elapsed wall time during last sweep is " << elapsed << " seconds." << endl;
          cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
          if (!change) change = true; //rest of sweeps: variable virtual dimensions
          gettimeofday(&start, NULL);
          Energy = sweepright(change, instruction);
          gettimeofday(&end, NULL);
          elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-         cout << "***  Elapsed wall time during last sweep is " << elapsed << endl;
+         cout << "***  Elapsed wall time during last sweep is " << elapsed << " seconds." << endl;
          cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
          if (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, false); }
          

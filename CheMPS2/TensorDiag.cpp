@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 */
 
 #include "TensorDiag.h"
+#include "Lapack.h"
 
 CheMPS2::TensorDiag::TensorDiag(const int indexIn, const SyBookkeeper * denBKIn) : Tensor(){
 
@@ -97,5 +98,104 @@ double * CheMPS2::TensorDiag::gStorage(const int N1, const int TwoS1, const int 
 }
 
 int CheMPS2::TensorDiag::gIndex() const { return index; }
+
+void CheMPS2::TensorDiag::updateRight(const int ikappa, Tensor * denT, TensorDiag * diagPrevious, double * workmemLR){
+
+   int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+   for (int geval=0; geval<4; geval++){
+      int NL,TwoSL,IL;
+      switch(geval){
+         case 0:
+            NL = sectorN1[ikappa];
+            TwoSL = sectorTwoS1[ikappa];
+            IL = sectorI1[ikappa];
+            break;
+         case 1:
+            NL = sectorN1[ikappa]-2;
+            TwoSL = sectorTwoS1[ikappa];
+            IL = sectorI1[ikappa];
+            break;
+         case 2:
+            NL = sectorN1[ikappa]-1;
+            TwoSL = sectorTwoS1[ikappa]-1;
+            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            break;
+         case 3:
+            NL = sectorN1[ikappa]-1;
+            TwoSL = sectorTwoS1[ikappa]+1;
+            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            break;
+      }
+      int dimL = denBK->gCurrentDim(index-1,NL,TwoSL,IL);
+      if (dimL>0){
+
+         double * BlockT    = denT->gStorage(NL,TwoSL,IL,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
+         double * BlockDiag = diagPrevious->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+
+         //T^T * diag --> mem
+         char trans = 'T';
+         char notr = 'N';
+         double alpha = 1.0;
+         double beta = 0.0; //set
+         dgemm_(&trans,&notr,&dimR,&dimL,&dimL,&alpha,BlockT,&dimL,BlockDiag,&dimL,&beta,workmemLR,&dimR);
+
+         //mem * T --> storage
+         beta = 1.0; //add
+         dgemm_(&notr,&notr,&dimR,&dimR,&dimL,&alpha,workmemLR,&dimR,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimR);
+
+      }
+   }
+
+}
+
+void CheMPS2::TensorDiag::updateLeft(const int ikappa, Tensor * denT, TensorDiag * diagPrevious, double * workmemLR){
+
+   int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+   for (int geval=0; geval<4; geval++){
+      int NR,TwoSR,IR;
+      switch(geval){
+         case 0:
+            NR = sectorN1[ikappa];
+            TwoSR = sectorTwoS1[ikappa];
+            IR = sectorI1[ikappa];
+            break;
+         case 1:
+            NR = sectorN1[ikappa]+2;
+            TwoSR = sectorTwoS1[ikappa];
+            IR = sectorI1[ikappa];
+            break;
+         case 2:
+            NR = sectorN1[ikappa]+1;
+            TwoSR = sectorTwoS1[ikappa]-1;
+            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            break;
+         case 3:
+            NR = sectorN1[ikappa]+1;
+            TwoSR = sectorTwoS1[ikappa]+1;
+            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            break;
+      }
+      int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
+      if (dimR>0){
+
+         double * BlockT    = denT->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa],NR,TwoSR,IR);
+         double * BlockDiag = diagPrevious->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+
+         //factor * T * diag --> mem
+         char notr = 'N';
+         double alpha = (geval>1) ? (TwoSR+1.0)/(sectorTwoS1[ikappa]+1.0) : 1.0;
+         double beta = 0.0; //set
+         dgemm_(&notr,&notr,&dimL,&dimR,&dimR,&alpha,BlockT,&dimL,BlockDiag,&dimR,&beta,workmemLR,&dimL);
+
+         //mem * T^T --> storage
+         char trans = 'T';
+         alpha = 1.0;
+         beta = 1.0; //add
+         dgemm_(&notr,&trans,&dimL,&dimL,&dimR,&alpha,workmemLR,&dimL,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimL);
+
+      }
+   }
+
+}
 
 
