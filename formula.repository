@@ -22,3 +22,7 @@
 \form#21:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
 \form#22:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
 \form#23:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
+\form#24:$ C_{dirad}(i,j) = \sum_{\sigma} \braket{ \hat{n}_{i\sigma} (1-\hat{n}_{i -\sigma}) \hat{n}_{j -\sigma} (1-\hat{n}_{j\sigma})} - \braket{\hat{n}_{i\sigma} (1-\hat{n}_{i -\sigma})}\braket{\hat{n}_{j -\sigma} (1-\hat{n}_{j\sigma})} $
+\form#25:$ C_{dirad}(i,j) = \braket{\hat{d}_{i\uparrow} \hat{d}_{j\downarrow}} + \braket{ \hat{d}_{i\downarrow} \hat{d}_{j\uparrow}} - \braket{\hat{d}_{i\uparrow}}\braket{\hat{d}_{j\downarrow}} - \braket{\hat{d}_{i\downarrow} }\braket{\hat{d}_{j\uparrow}} $
+\form#26:$ \hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1-\hat{n}_{i\overline{sigma}}) $
+\form#27:$ \hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1-\hat{n}_{i\overline{\sigma}}) $

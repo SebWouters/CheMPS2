@@ -5,6 +5,8 @@ var classCheMPS2_1_1Correlations =
     [ "FillSite", "classCheMPS2_1_1Correlations.html#a5fa2dd8712c0b9359e5e8a14de50c105", null ],
     [ "getCdens_DMRG", "classCheMPS2_1_1Correlations.html#aeb62579405983674c4d129890bc32de0", null ],
     [ "getCdens_HAM", "classCheMPS2_1_1Correlations.html#a494210f45774ea1f3b1bbb0e8efef8a5", null ],
+    [ "getCdirad_DMRG", "classCheMPS2_1_1Correlations.html#aeff014364fc64f7c1a1cb817a514a97c", null ],
+    [ "getCdirad_HAM", "classCheMPS2_1_1Correlations.html#a6025f8729234cb11059ea444cf1515d0", null ],
     [ "getCspin_DMRG", "classCheMPS2_1_1Correlations.html#aac3405d9298596a6193f521a0bfea4ee", null ],
     [ "getCspin_HAM", "classCheMPS2_1_1Correlations.html#ad7ef007f7db38ade25c57efd1dfa9107", null ],
     [ "getCspinflip_DMRG", "classCheMPS2_1_1Correlations.html#a1b3efc7725967193c916044cd0cab54e", null ],

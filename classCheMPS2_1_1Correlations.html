@@ -140,6 +140,12 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ac56698f9c69276a9f24829904a50f0ed"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#ac56698f9c69276a9f24829904a50f0ed">getCspinflip_HAM</a> (const int row, const int col) const </td></tr>
 <tr class="memdesc:ac56698f9c69276a9f24829904a50f0ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Cspinflip term, using the HAM indices.  <a href="#ac56698f9c69276a9f24829904a50f0ed">More...</a><br/></td></tr>
 <tr class="separator:ac56698f9c69276a9f24829904a50f0ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeff014364fc64f7c1a1cb817a514a97c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#aeff014364fc64f7c1a1cb817a514a97c">getCdirad_DMRG</a> (const int row, const int col) const </td></tr>
+<tr class="memdesc:aeff014364fc64f7c1a1cb817a514a97c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Cdirad term, using the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> indices.  <a href="#aeff014364fc64f7c1a1cb817a514a97c">More...</a><br/></td></tr>
+<tr class="separator:aeff014364fc64f7c1a1cb817a514a97c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6025f8729234cb11059ea444cf1515d0"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#a6025f8729234cb11059ea444cf1515d0">getCdirad_HAM</a> (const int row, const int col) const </td></tr>
+<tr class="memdesc:a6025f8729234cb11059ea444cf1515d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Cdirad term, using the HAM indices.  <a href="#a6025f8729234cb11059ea444cf1515d0">More...</a><br/></td></tr>
+<tr class="separator:a6025f8729234cb11059ea444cf1515d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fd4628a95b8ca83f05f5b4ff27056a8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#a6fd4628a95b8ca83f05f5b4ff27056a8">getMutualInformation_DMRG</a> (const int row, const int col) const </td></tr>
 <tr class="memdesc:a6fd4628a95b8ca83f05f5b4ff27056a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a mutual information term, using the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> indices.  <a href="#a6fd4628a95b8ca83f05f5b4ff27056a8">More...</a><br/></td></tr>
 <tr class="separator:a6fd4628a95b8ca83f05f5b4ff27056a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,7 +159,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:a1cf618a098e75511dda2fb0d010dab2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the single-orbital entropy for a certain site, using hte HAM indices.  <a href="#a1cf618a098e75511dda2fb0d010dab2e">More...</a><br/></td></tr>
 <tr class="separator:a1cf618a098e75511dda2fb0d010dab2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fa2dd8712c0b9359e5e8a14de50c105"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#a5fa2dd8712c0b9359e5e8a14de50c105">FillSite</a> (<a class="el" href="classCheMPS2_1_1TensorT.html">TensorT</a> *denT, <a class="el" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> **Gtensors, <a class="el" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> **Ytensors, <a class="el" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> **Ztensors, <a class="el" href="classCheMPS2_1_1TensorK.html">TensorK</a> **Ktensors, <a class="el" href="classCheMPS2_1_1TensorM.html">TensorM</a> **Mtensors)</td></tr>
-<tr class="memdesc:a5fa2dd8712c0b9359e5e8a14de50c105"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill at the current step of the iterations the two-orbital mutual information.  <a href="#a5fa2dd8712c0b9359e5e8a14de50c105">More...</a><br/></td></tr>
+<tr class="memdesc:a5fa2dd8712c0b9359e5e8a14de50c105"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill at the current step of the iterations the two-orbital mutual information and the remaining part of Cdirad.  <a href="#a5fa2dd8712c0b9359e5e8a14de50c105">More...</a><br/></td></tr>
 <tr class="separator:a5fa2dd8712c0b9359e5e8a14de50c105"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e4a935011b95ad18b28b88ac56990fc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">MutualInformationDistance</a> (const double power) const </td></tr>
 <tr class="memdesc:a3e4a935011b95ad18b28b88ac56990fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return Idistance(power) (see return for definition)  <a href="#a3e4a935011b95ad18b28b88ac56990fc">More...</a><br/></td></tr>
@@ -169,8 +175,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>The correlations class contains the following spin-summed correlation functions:</p>
 <ul>
 <li>The spin correlation function <img class="formulaInl" alt="$ C_{spin}(i,j) = 4 \left( \braket{ \hat{S}_i^z \hat{S}_j^z } - \braket{ \hat{S}_i^z } \braket{ \hat{S}_j^z } \right) $" src="form_0.png"/></li>
-<li>The density correlation function <img class="formulaInl" alt="$ C_{dens}(i,j) = \braket{ \hat{n}_i \hat{n}_j } - \braket{ \hat{n}_i } \braket{ \hat{n}_j } $" src="form_1.png"/></li>
 <li>The spin-flip correlation function <img class="formulaInl" alt="$ C_{spinflip}(i,j) = \braket{ \hat{S}_i^+ \hat{S}_j^- } + \braket{ \hat{S}_i^- \hat{S}_j^+ } $" src="form_2.png"/></li>
+<li>The density correlation function <img class="formulaInl" alt="$ C_{dens}(i,j) = \braket{ \hat{n}_i \hat{n}_j } - \braket{ \hat{n}_i } \braket{ \hat{n}_j } $" src="form_1.png"/></li>
+<li>The singlet diradical correlation function <img class="formulaInl" alt="$ C_{dirad}(i,j) = \braket{\hat{d}_{i\uparrow} \hat{d}_{j\downarrow}} + \braket{ \hat{d}_{i\downarrow} \hat{d}_{j\uparrow}} - \braket{\hat{d}_{i\uparrow}}\braket{\hat{d}_{j\downarrow}} - \braket{\hat{d}_{i\downarrow} }\braket{\hat{d}_{j\uparrow}} $" src="form_25.png"/> with <img class="formulaInl" alt="$ \hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1-\hat{n}_{i\overline{\sigma}}) $" src="form_27.png"/></li>
 </ul>
 <p>as well as the two-orbital mutual information: <img class="formulaInl" alt="$ I(i,j) = \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left( 1 - \delta_{ij} \right) $" src="form_3.png"/>. <br/>
 For the latter see:</p>
@@ -179,7 +186,7 @@ For the latter see:</p>
 <li>Boguslawski, Legeza et al., JCTC 9, 2959 (2013) </li>
 </ul>
 
-<p>Definition at line <a class="el" href="Correlations_8h_source.html#l00046">46</a> of file <a class="el" href="Correlations_8h_source.html">Correlations.h</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8h_source.html#l00047">47</a> of file <a class="el" href="Correlations_8h_source.html">Correlations.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aeb2b17926e78c7735821a13c1faf6867"></a>
 <div class="memitem">
@@ -285,7 +292,7 @@ For the latter see:</p>
       </table>
 </div><div class="memdoc">
 
-<p>Fill at the current step of the iterations the two-orbital mutual information. </p>
+<p>Fill at the current step of the iterations the two-orbital mutual information and the remaining part of Cdirad. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">denT</td><td><a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> site-matrices </td></tr>
@@ -298,7 +305,7 @@ For the latter see:</p>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00197">197</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00220">220</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -358,7 +365,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00120">120</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00131">131</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -396,7 +403,83 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00122">122</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00133">133</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aeff014364fc64f7c1a1cb817a514a97c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double CheMPS2::Correlations::getCdirad_DMRG </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get a Cdirad term, using the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> indices. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row</td><td>the first index </td></tr>
+    <tr><td class="paramname">col</td><td>the second index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
+
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00155">155</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6025f8729234cb11059ea444cf1515d0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double CheMPS2::Correlations::getCdirad_HAM </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get a Cdirad term, using the HAM indices. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row</td><td>the first index </td></tr>
+    <tr><td class="paramname">col</td><td>the second index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
+
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00157">157</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +517,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00108">108</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00119">119</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -472,7 +555,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00110">110</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00121">121</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -510,7 +593,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00132">132</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00143">143</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -548,7 +631,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00134">134</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00145">145</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -586,7 +669,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00144">144</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00167">167</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -624,7 +707,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00146">146</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00169">169</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -651,7 +734,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$ Idistance(power) = sum_{ij} I(i,j) * \mid i-j \mid^{power} $" src="form_4.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00183">183</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00206">206</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -699,7 +782,7 @@ For the latter see:</p>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00588">588</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00613">613</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 <p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -737,7 +820,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The single-orbital entropy for this site </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00156">156</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00179">179</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 </div>
 </div>
@@ -764,7 +847,7 @@ For the latter see:</p>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The single-orbital entropy for this site </dd></dl>
 
-<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00174">174</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Correlations_8cpp_source.html#l00197">197</a> of file <a class="el" href="Correlations_8cpp_source.html">Correlations.cpp</a>.</p>
 
 <p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -789,7 +872,7 @@ For the latter see:</p>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Correlations.html">Correlations</a></li>
-    <li class="footer">Generated on Wed Sep 17 2014 16:18:08 for CheMPS2 by
+    <li class="footer">Generated on Thu Sep 18 2014 11:26:30 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

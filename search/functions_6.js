@@ -8,6 +8,8 @@ var searchData=
   ['getblock',['getBlock',['../classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b',1,'CheMPS2::DMRGSCFunitary']]],
   ['getcdens_5fdmrg',['getCdens_DMRG',['../classCheMPS2_1_1Correlations.html#aeb62579405983674c4d129890bc32de0',1,'CheMPS2::Correlations']]],
   ['getcdens_5fham',['getCdens_HAM',['../classCheMPS2_1_1Correlations.html#a494210f45774ea1f3b1bbb0e8efef8a5',1,'CheMPS2::Correlations']]],
+  ['getcdirad_5fdmrg',['getCdirad_DMRG',['../classCheMPS2_1_1Correlations.html#aeff014364fc64f7c1a1cb817a514a97c',1,'CheMPS2::Correlations']]],
+  ['getcdirad_5fham',['getCdirad_HAM',['../classCheMPS2_1_1Correlations.html#a6025f8729234cb11059ea444cf1515d0',1,'CheMPS2::Correlations']]],
   ['getcorrelations',['getCorrelations',['../classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264',1,'CheMPS2::DMRG']]],
   ['getcspin_5fdmrg',['getCspin_DMRG',['../classCheMPS2_1_1Correlations.html#aac3405d9298596a6193f521a0bfea4ee',1,'CheMPS2::Correlations']]],
   ['getcspin_5fham',['getCspin_HAM',['../classCheMPS2_1_1Correlations.html#ad7ef007f7db38ade25c57efd1dfa9107',1,'CheMPS2::Correlations']]],
