@@ -144,6 +144,9 @@ effective Hamiltonian times guess-vector multiplication.
 ```CheMPS2/HeffDiagrams5.cpp``` contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
+```CheMPS2/Initialize.cpp``` allows to set the seed of the random number
+generator and cout.precision (added for PyCheMPS2).
+
 ```CheMPS2/Irreps.cpp``` contains the Psi4 symmetry conventions.
 
 ```CheMPS2/PrintLicense.cpp``` contains a function which prints the license
@@ -281,6 +284,9 @@ class.
 
 ```CheMPS2/include/Heff.h``` contains the definitions of the Heff class.
 
+```CheMPS2/include/Initialize.h``` contains the definitions of the Initialize
+class.
+
 ```CheMPS2/include/Irreps.h``` contains the definitions of the Irrep class.
 
 ```CheMPS2/include/Lapack.h``` contains the definitions of the external BLAS
@@ -404,12 +410,7 @@ and antibonding) are chosen as active space. A significant speedup is obtained
 with DIIS. This test is smaller than test6, and is included for debugging with
 valgrind.
 
-```tests/test9.cpp``` tests the Edmiston-Ruedenberg localizer. For all irreps
-of ```tests/matrixelements/N2_CCPVDZ.dat```, the Edmiston-Ruedenberg cost
-function is maximized, by means of an augmented Hessian Newton-Raphson
-optimizer.
-
-```tests/test10.cpp``` is a copy of test8.cpp, with a slightly larger active
+```tests/test9.cpp``` is a copy of test8.cpp, with a slightly larger active
 space and which works with ordered localized orbitals instead of natural
 orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
 ordering based on the Fiedler vector with the exchange matrix as cost function.
@@ -427,7 +428,7 @@ for test1 and test5.
 for test6 and test7.
 
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
-for test8, test9, and test10.
+for test8 and test9.
 
 These test files illustrate how to use the CheMPS2 library.
 The tests only require a very limited amount of memory (order 10-100 MB).
@@ -542,7 +543,6 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test7
     > ./test8
     > ./test9
-    > ./test10
 
 The tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-100 MB).

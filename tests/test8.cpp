@@ -17,13 +17,12 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h> /*srand, rand*/
 #include <iostream>
-#include <time.h> /*time*/
 #include <math.h>
 #include <string.h>
 #include <sys/stat.h>
 
+#include "Initialize.h"
 #include "CASSCF.h"
 #include "DMRGSCFoptions.h"
 
@@ -31,8 +30,7 @@ using namespace std;
 
 int main(void){
 
-   cout.precision(15);
-   srand(time(NULL));
+   CheMPS2::Initialize::Init();
    
    //The path to the matrix elements
    string matrixelements = "../../tests/matrixelements/N2_CCPVDZ.dat";
