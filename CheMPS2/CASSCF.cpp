@@ -22,7 +22,6 @@
 #include <fstream>
 #include <string>
 #include <math.h>
-#include <sstream>
 
 #include "CASSCF.h"
 #include "Lapack.h"

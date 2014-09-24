@@ -38,8 +38,6 @@ namespace CheMPS2{
          
          //! Initialize the random number generator and the cout.precision
          static void Init();
-      
-      private:
 
    };
 }
