@@ -60,6 +60,178 @@ To acknowledge CheMPS2, please cite
         }
 
 
+Build
+-----
+
+### 1. Build CheMPS2 with CMake
+
+CheMPS2 can be built with CMake. The files
+
+    ./CMakeLists.txt
+    ./CheMPS2/CMakeLists.txt
+    ./tests/CMakeLists.txt
+    ./PyCheMPS2/CMakeLists.txt
+
+provide a minimal compilation. Start in ```./``` and run:
+
+    > mkdir build
+    > cd build
+    
+CMake generates makefiles based on the user's specifications:
+
+    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
+    
+Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
+Option2 can be ```ON``` or ```OFF``` and is used to switch on the
+intel math kernel library.
+Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
+documentation.
+Option4 is the prefix of the installation directory; typically
+```/usr``` on Linux. The CheMPS2 library is then installed in
+```prefix/lib``` and the headers in ```prefix/include/CheMPS2```.
+If one or more of the required libraries are not found, please use the
+command
+
+    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
+    cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
+    -DCMAKE_INSTALL_PREFIX=option4
+    
+instead, where option5 and option6 are respectively the missing
+colon-separated include and library paths, e.g.
+
+    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
+
+and
+
+    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/
+
+To compile, run:
+
+    > make
+
+To install, run:
+
+    > make install
+
+For non-standard installation directories, please remember to append
+the library path to ```LD_LIBRARY_PATH``` in your .bashrc.
+
+
+### 2. Testing CheMPS2
+
+To test CheMPS2, start in ```./build```, and run:
+
+    > cd tests/
+    > ./test1
+    > ./test2
+    > ./test3
+    > ./test4
+    > ./test5
+    > ./test6
+    > ./test7
+    > ./test8
+    > ./test9
+
+These cpp tests should end with a line stating whether or not they succeeded.
+They only require a very limited amount of memory (order 10-100 MB).
+
+
+### 3. Build PyCheMPS2 with Cython
+
+PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The
+installation above generated the file ```./build/setup.py```, in which
+the CheMPS2 library and include paths have been assigned. This section
+assumes that CheMPS2 has been installed as described above! Start in
+```./build```, and run:
+
+    > python setup.py build_ext -i
+
+
+### 4. Testing PyCheMPS2
+
+To test PyCheMPS2, start in ```./build```, and run:
+
+    > cd PyTests/
+    > python test1.py
+    > python test2.py
+    > python test3.py
+    > python test4.py
+    > python test5.py
+    > python test6.py
+    > python test7.py
+    > python test8.py
+    > python test9.py
+
+These tests do exactly the same thing as the cpp tests above, and illustrate
+the usage of the python interface to CheMPS2. The tests should end with a
+line stating whether or not they succeeded. They only require a very limited
+amount of memory (order 10-100 MB).
+
+
+### 5. Doxygen documentation
+
+To build and view the Doxygen manual, the documentation flag should have
+been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
+
+    > make doc
+    > cd LaTeX-documents
+    > make
+    > evince refman.pdf &
+    > cd ../html
+    > firefox index.html &
+
+
+User manual
+-----------
+
+Doxygen output can be generated, see the section "Build" in README.md, or
+the [[Doxygen html output]](http://sebwouters.github.io/CheMPS2/index.html).
+
+For a more concise overview of the concepts and ideas used in CheMPS2,
+please read the code release paper "CheMPS2: a free open-source spin-adapted
+implementation of the density matrix renormalization group for ab initio
+quantum chemistry", one of the references in CITATIONS.
+
+
+Matrix elements from Psi4
+-------------------------
+
+CheMPS2 has a Hamiltonian object which is able to read in matrix elements
+from a plugin to Psi4
+[[Psi4, Ab initio quantum chemistry]](http://www.psicode.org),
+which works on version psi4.0b5 and higher.
+
+To make use of this feature, build Psi4 with the plugin option, and then run:
+
+    > psi4 --new-plugin mointegrals
+    > cd mointegrals
+
+Now, replace the file ```mointegrals.cc``` with either:
+
+1. ```./mointegrals/mointegrals.cc_PRINT``` to print the matrix elements as
+   text. Examples of output generated with this plugin can be found in
+   ```./tests/matrixelements```
+
+2. ```./mointegrals/mointegrals.cc_SAVEHAM``` to store all unique matrix
+   elements (remember that there is eightfold permutation symmetry) in
+   binary form with HDF5. See the Doxygen manual for more information on
+   CheMPS2::Hamiltonian.
+
+For case 2, the ```Makefile``` should be adjusted. Replace
+    ```$(PSILIBS)```
+with
+    ```$(PSILIBS) -L${CheMPS2_BINARY_DIR}/CheMPS2/ -lCheMPS2```
+and replace
+    ```$(CXXINCLUDE)```
+with
+    ```$(CXXINCLUDE) -I${CheMPS2_SOURCE_DIR}/CheMPS2/include/```
+
+To compile the Psi4 plugin, run:
+
+    > make
+
+
 List of files in the CheMPS2 library
 ------------------------------------
 
@@ -143,6 +315,9 @@ effective Hamiltonian times guess-vector multiplication.
 
 ```CheMPS2/HeffDiagrams5.cpp``` contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
+
+```CheMPS2/Initialize.cpp``` allows to set the seed of the random number
+generator and cout.precision (added for PyCheMPS2).
 
 ```CheMPS2/Irreps.cpp``` contains the Psi4 symmetry conventions.
 
@@ -281,6 +456,9 @@ class.
 
 ```CheMPS2/include/Heff.h``` contains the definitions of the Heff class.
 
+```CheMPS2/include/Initialize.h``` contains the definitions of the Initialize
+class.
+
 ```CheMPS2/include/Irreps.h``` contains the definitions of the Irrep class.
 
 ```CheMPS2/include/Lapack.h``` contains the definitions of the external BLAS
@@ -370,47 +548,42 @@ generated from these comments.
 List of files to perform test runs
 ----------------------------------
 
-```tests/test1.cpp``` contains a ground state DMRG calculation of the ^1Ag
+```tests/test1.cpp.in``` contains a ground state DMRG calculation of the ^1Ag
 state of N2 (d2h symmetry) in the minimal STO-3G basis set.
 
-```tests/test2.cpp``` contains a ground state DMRG calculation of the ^1Ag
+```tests/test2.cpp.in``` contains a ground state DMRG calculation of the ^1Ag
 state of a linear H6 chain (d2h symmetry) in the 6-31G basis set.
 
-```tests/test3.cpp``` contains a ground state DMRG calculation of the ^1A1
+```tests/test3.cpp.in``` contains a ground state DMRG calculation of the ^1A1
 state of CH4 (c2v symmetry) in the STO-3G basis set.
 
-```tests/test4.cpp``` contains a ground state DMRG calculation of the ^6A
+```tests/test4.cpp.in``` contains a ground state DMRG calculation of the ^6A
 state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open
 boundary conditions, containing 9 fermions (just below half-filling).
 
-```tests/test5.cpp``` contains an excited state DMRG calculation in the ^1Ag
-symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The
-ground and two lowest excited states are determined.
+```tests/test5.cpp.in``` contains an excited state DMRG calculation in the
+^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set.
+The ground and two lowest excited states are determined.
 
-```tests/test6.cpp``` contains a DMRG-SCF ground state calculation of the ^1Ag
-state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals
-are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen
-as active space. A significant speedup is obtained with DIIS.
+```tests/test6.cpp.in``` contains a DMRG-SCF ground state calculation of the
+^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core
+orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are
+chosen as active space. A significant speedup is obtained with DIIS.
 
-```tests/test7.cpp``` reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
+```tests/test7.cpp.in``` reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
 stores these matrix elements to disk, reads them back in from disk, and
 compares the two versions.
 
-```tests/test8.cpp``` contains a DMRG-SCF ground state calculation of the ^1Ag
-state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals
-are kept frozen. The next two Ag and B1u orbitals (sigma bonding and
+```tests/test8.cpp.in``` contains a DMRG-SCF ground state calculation of the
+^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core
+orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and
 antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding
 and antibonding) are chosen as active space. A significant speedup is obtained
 with DIIS. This test is smaller than test6, and is included for debugging with
 valgrind.
 
-```tests/test9.cpp``` tests the Edmiston-Ruedenberg localizer. For all irreps
-of ```tests/matrixelements/N2_CCPVDZ.dat```, the Edmiston-Ruedenberg cost
-function is maximized, by means of an augmented Hessian Newton-Raphson
-optimizer.
-
-```tests/test10.cpp``` is a copy of test8.cpp, with a slightly larger active
-space and which works with ordered localized orbitals instead of natural
+```tests/test9.cpp.in``` is a copy of test8.cpp.in, with a slightly larger
+active space and which works with ordered localized orbitals instead of natural
 orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
 ordering based on the Fiedler vector with the exchange matrix as cost function.
 
@@ -427,147 +600,26 @@ for test1 and test5.
 for test6 and test7.
 
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
-for test8, test9, and test10.
+for test8 and test9.
 
-These test files illustrate how to use the CheMPS2 library.
-The tests only require a very limited amount of memory (order 10-100 MB).
+```PyCheMPS2/test1.py.in``` is the Python version of ```tests/test1.cpp.in```
 
+```PyCheMPS2/test2.py.in``` is the Python version of ```tests/test2.cpp.in```
 
-Matrix elements from Psi4
--------------------------
+```PyCheMPS2/test3.py.in``` is the Python version of ```tests/test3.cpp.in```
 
-CheMPS2 has a Hamiltonian object which is able to read in matrix elements
-from a plugin to Psi4
-[[Psi4, Ab initio quantum chemistry]](http://www.psicode.org),
-which works on version psi4.0b5 and higher.
+```PyCheMPS2/test4.py.in``` is the Python version of ```tests/test4.cpp.in```
 
-To make use of this feature, build Psi4 with the plugin option, and then run:
+```PyCheMPS2/test5.py.in``` is the Python version of ```tests/test5.cpp.in```
 
-    > psi4 --new-plugin mointegrals
-    > cd mointegrals
+```PyCheMPS2/test6.py.in``` is the Python version of ```tests/test6.cpp.in```
 
-Now, replace the file ```mointegrals.cc``` with either:
+```PyCheMPS2/test7.py.in``` is the Python version of ```tests/test7.cpp.in```
 
-1. ```./mointegrals/mointegrals.cc_PRINT``` to print the matrix elements as
-   text. Examples of output generated with this plugin can be found in
-   ```./tests/matrixelements```
+```PyCheMPS2/test8.py.in``` is the Python version of ```tests/test8.cpp.in```
 
-2. ```./mointegrals/mointegrals.cc_SAVEHAM``` to store all unique matrix
-   elements (remember that there is eightfold permutation symmetry) in
-   binary form with HDF5. See the Doxygen manual for more information on
-   CheMPS2::Hamiltonian.
+```PyCheMPS2/test9.py.in``` is the Python version of ```tests/test9.cpp.in```
 
-For case 2, the ```Makefile``` should be adjusted. Replace
-    ```$(PSILIBS)```
-with
-    ```$(PSILIBS) -L${CheMPS2_BINARY_DIR}/CheMPS2/ -lCheMPS2```
-and replace
-    ```$(CXXINCLUDE)```
-with
-    ```$(CXXINCLUDE) -I${CheMPS2_SOURCE_DIR}/CheMPS2/include/```
-
-To compile the Psi4 plugin, run:
-
-    > make
-
-
-Build
------
-
-### 1. Build CheMPS2 with CMake
-
-CheMPS2 can be built with CMake. The files
-
-    ./CMakeLists.txt
-    ./CheMPS2/CMakeLists.txt
-    ./tests/CMakeLists.txt
-
-provide a minimal compilation. Start in ```./``` and run:
-
-    > mkdir build
-    > cd build
-    
-CMake generates makefiles based on the user's specifications:
-
-    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-    -DCMAKE_INSTALL_PREFIX=option4
-    
-Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
-Option2 can be ```ON``` or ```OFF``` and is used to switch on the
-intel math kernel library.
-Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
-documentation.
-Option4 is the prefix installation directory; typically ```/usr``` on
-Linux. The CheMPS2 library is then installed in ```prefix/lib``` and
-the headers (and source) in ```prefix/include/CheMPS2```.
-If one or more of the required libraries are not found, please use the
-command
-
-    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
-    cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-    -DCMAKE_INSTALL_PREFIX=option4
-    
-instead, where option5 and option6 are respectively the missing
-colon-separated include and library paths, e.g.
-
-    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
-
-and
-
-    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/.
-
-To compile, run:
-
-    > make
-
-To install, run:
-
-    > make install
-
-For non-standard installation directories, please remember to append
-the library path to LD_LIBRARY_PATH in your .bashrc.
-
-
-### 2. Testing CheMPS2
-
-To test CheMPS2, start in ```./build```, and run:
-
-    > cd tests/
-    > ./test1
-    > ./test2
-    > ./test3
-    > ./test4
-    > ./test5
-    > ./test6
-    > ./test7
-    > ./test8
-    > ./test9
-    > ./test10
-
-The tests should end with a line stating whether or not they succeeded.
-They only require a very limited amount of memory (order 10-100 MB).
-
-### 3. Doxygen documentation
-
-To build and view the Doxygen manual, the documentation flag should have
-been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
-
-    > make doc
-    > cd LaTeX-documents
-    > make
-    > evince refman.pdf &
-    > cd ../html
-    > firefox index.html &
-
-
-User manual
------------
-
-Doxygen output can be generated, see the section "Build" in README.md, or
-the [[Doxygen html output]](http://sebwouters.github.io/CheMPS2/index.html).
-
-For a more concise overview of the concepts and ideas used in CheMPS2,
-please read the code release paper "CheMPS2: a free open-source spin-adapted
-implementation of the density matrix renormalization group for ab initio
-quantum chemistry", one of the references in CITATIONS.
+These test files illustrate how to use the CheMPS2 library. The tests only
+require a very limited amount of memory (order 10-100 MB).
 

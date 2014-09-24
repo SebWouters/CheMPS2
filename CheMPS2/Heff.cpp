@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
-#include <omp.h>
 
 #include "Heff.h"
 #include "Lapack.h"

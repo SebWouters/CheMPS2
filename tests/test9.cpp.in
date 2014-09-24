@@ -17,13 +17,11 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h> /*srand, rand*/
 #include <iostream>
-#include <time.h> /*time*/
 #include <math.h>
 #include <string.h>
-#include <sys/stat.h>
 
+#include "Initialize.h"
 #include "CASSCF.h"
 #include "DMRGSCFoptions.h"
 
@@ -31,17 +29,10 @@ using namespace std;
 
 int main(void){
 
-   cout.precision(15);
-   srand(time(NULL));
+   CheMPS2::Initialize::Init();
    
    //The path to the matrix elements
-   string matrixelements = "../../tests/matrixelements/O2_CCPVDZ.dat";
-   struct stat stFileInfo;
-   int intStat = stat(matrixelements.c_str(),&stFileInfo);
-   if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/O2_CCPVDZ.dat in tests/test6.cpp for the compiled binary test6 to work." << endl;
-      return 628788;
-   }
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2_CCPVDZ.dat";
    
    //Setup CASSCF
    CheMPS2::CASSCF koekoek(matrixelements);
@@ -53,12 +44,13 @@ int main(void){
    Nocc[0] = Nocc[5] = 1;
    Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0;
    
-   NDMRG[0] = NDMRG[5] = 2;
+   NDMRG[0] = NDMRG[5] = 4;
    NDMRG[1] = NDMRG[4] = 0;
-   NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 2;
+   NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 1;
    
-   Nvirt[0] = Nvirt[5] = 4;
-   Nvirt[1] = Nvirt[2] = Nvirt[3] = Nvirt[4] = Nvirt[6] = Nvirt[7] = 1;
+   Nvirt[0] = Nvirt[5] = 2;
+   Nvirt[2] = Nvirt[3] = Nvirt[6] = Nvirt[7] = 2;
+   Nvirt[1] = Nvirt[4] = 1;
    
    koekoek.setupStart(Nocc,NDMRG,Nvirt);
    
@@ -67,7 +59,7 @@ int main(void){
    delete [] Nvirt;
    
    //Setup symmetry sector
-   int N = 16;
+   int N = 14;
    int TwoS = 0;
    int Irrep = 0;
    
@@ -83,7 +75,7 @@ int main(void){
    int rootNum = 1; //Ground state only
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
    theDMRGSCFoptions->setDoDIIS(true);
-   theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
+   theDMRGSCFoptions->setWhichActiveSpace(2); //2 means localized orbitals
    double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
@@ -93,8 +85,8 @@ int main(void){
    delete theDMRGSCFoptions;
    
    //Check succes
-   bool success = (fabs(Energy + 149.690485081255) < 1e-10) ? true : false;
-   cout << "================> Did test 6 succeed : ";
+   bool success = (fabs(Energy + 109.15104350802) < 1e-10) ? true : false;
+   cout << "================> Did test 9 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
 

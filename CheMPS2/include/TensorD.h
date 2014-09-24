@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013 Sebastian Wouters
+   Copyright (C) 2013, 2014 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,10 +55,7 @@ namespace CheMPS2{
          /** \param alpha prefactor
              \param TermToAdd TensorF1Dbase to add */
          void AddATermTranspose(const double alpha, TensorF1Dbase * TermToAdd);
-         
-      private:
 
-         
    };
 }
 

@@ -79,10 +79,10 @@ namespace CheMPS2{
          double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
          
          //! CASSCF unitary rotation remove call
-         void deleteStoredUnitary(const string filename){ unitary->deleteStoredUnitary(filename); }
+         void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
          
          //! CASSCF DIIS vectors remove call
-         void deleteStoredDIIS(const string filename){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(filename); }}
+         void deleteStoredDIIS(const string filename=CheMPS2::DMRGSCF_DIISstorageName){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(filename); }}
          
       private:
       

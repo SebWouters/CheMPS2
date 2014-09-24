@@ -17,59 +17,63 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h> /*srand, rand*/
 #include <iostream>
-#include <time.h> /*time*/
 #include <math.h>
-#include <string.h>
-#include <sys/stat.h>
 
+#include "Initialize.h"
 #include "DMRG.h"
 
 using namespace std;
 
 int main(void){
 
-   cout.precision(15);
-   srand(time(NULL));
-
-   //The path to the matrix elements
-   string matrixelements = "../../tests/matrixelements/N2_N14_S0_d2h_I0.dat";
-   struct stat stFileInfo;
-   int intStat = stat(matrixelements.c_str(),&stFileInfo);
-   if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_N14_S0_d2h_I0.dat in tests/test5.cpp for the compiled binary test5 to work." << endl;
-      return 628788;
-   }
+   CheMPS2::Initialize::Init();
    
-   //The Hamiltonian
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);
+   //The Hamiltonian: 1D Hubbard model
+   int L = 10;
+   int Group = 0;
+   double U = 2.0;
+   double T = -1.0;
+   int * irreps = new int[L];
+   for (int cnt=0; cnt<L; cnt++){ irreps[cnt] = 0; }
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L,Group,irreps);
+   Ham->setEconst(0.0);
+   for (int cnt1=0; cnt1<L; cnt1++){
+      for (int cnt2=0; cnt2<L; cnt2++){
+         Ham->setTmat(cnt1,cnt2,0.0);
+         for (int cnt3=0; cnt3<L; cnt3++){
+            for (int cnt4=0; cnt4<L; cnt4++){
+               Ham->setVmat(cnt1,cnt2,cnt3,cnt4,0.0);
+            }
+         }
+      }
+   }
+   for (int cnt=0; cnt<L; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }
+   for (int cnt=0; cnt<L-1; cnt++){ Ham->setTmat(cnt,cnt+1,T); }
    
    //The targeted state
-   int TwoS = 0;
-   int N = 14;
+   int TwoS = 5;
+   int N = 9;
    int Irrep = 0;
    CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
-   Prob->SetupReorderD2h();
    
-   //The optimization scheme
-   int D = 1000;
-   double Econv = 1e-12;
-   int maxSweeps = 100;
-   double noisePrefactor = 0.0;
-   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(1);
+   //The convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
+   int D = 30;
+   double Econv = 1e-10;
+   int maxSweeps = 3;
+   double noisePrefactor = 0.1;
    OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
+   D = 1000;
+   maxSweeps = 10;
+   noisePrefactor = 0.0;
+   OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
    
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
-   double Energy0 = theDMRG->Solve();
-   
-   //Calculate the first two excited states
-   theDMRG->activateExcitations(10);
-   theDMRG->newExcitation(20.0);
-   double Energy1 = theDMRG->Solve();
-   theDMRG->newExcitation(20.0);
-   double Energy2 = theDMRG->Solve();
+   double Energy = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
+   theDMRG->getCorrelations()->Print();
    
    //Clean up
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
@@ -78,14 +82,11 @@ int main(void){
    delete OptScheme;
    delete Prob;
    delete Ham;
+   delete [] irreps;
    
    //Check succes
-   bool OK1 = (fabs(Energy0 + 107.648250974014)<1e-10)? true : false;
-   bool OK2 = (fabs(Energy1 + 106.944757308768)<1e-10)? true : false;
-   bool OK3 = (fabs(Energy2 + 106.92314213886 )<1e-10)? true : false;
-   
-   bool success = (OK1 && OK2 && OK3);
-   cout << "================> Did test 5 succeed : ";
+   bool success = (fabs(Energy + 6.24546701457254) < 1e-10) ? true : false;
+   cout << "================> Did test 4 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
 
