@@ -20,7 +20,6 @@
 #include <iostream>
 #include <math.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "Initialize.h"
 #include "DMRG.h"
@@ -32,13 +31,7 @@ int main(void){
    CheMPS2::Initialize::Init();
 
    //The path to the matrix elements
-   string matrixelements = "../../tests/matrixelements/N2_N14_S0_d2h_I0.dat";
-   struct stat stFileInfo;
-   int intStat = stat(matrixelements.c_str(),&stFileInfo);
-   if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_N14_S0_d2h_I0.dat in tests/test5.cpp for the compiled binary test5 to work." << endl;
-      return 628788;
-   }
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2_N14_S0_d2h_I0.dat";
    
    //The Hamiltonian
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);

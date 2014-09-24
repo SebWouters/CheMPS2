@@ -20,7 +20,6 @@
 #include <iostream>
 #include <math.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "Initialize.h"
 #include "DMRG.h"
@@ -30,27 +29,20 @@ using namespace std;
 int main(void){
 
    CheMPS2::Initialize::Init();
-  
+   
    //The path to the matrix elements
-   string matrixelements = "../../tests/matrixelements/N2_N14_S0_d2h_I0.dat";
-   struct stat stFileInfo;
-   int intStat = stat(matrixelements.c_str(),&stFileInfo);
-   if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_N14_S0_d2h_I0.dat in tests/test1.cpp for the compiled binary test1 to work." << endl;
-      return 628788;
-   }
- 
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4_N10_S0_c2v_I0.dat";
+   
    //The Hamiltonian
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);
    cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
-
+   
    //The targeted state
    int TwoS = 0;
-   int N = 14;
+   int N = 10;
    int Irrep = 0;
    CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
-   Prob->SetupReorderD2h();
-
+   
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
    int D = 30;
@@ -62,12 +54,12 @@ int main(void){
    maxSweeps = 10;
    noisePrefactor = 0.0;
    OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
-
+   
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
    double Energy = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
-
+   
    //Clean up
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
@@ -77,8 +69,8 @@ int main(void){
    delete Ham;
 
    //Check succes
-   bool success = (fabs(Energy + 107.648250974014) < 1e-10) ? true : false;
-   cout << "================> Did test 1 succeed : ";
+   bool success = (fabs(Energy + 39.8068131148456) < 1e-10) ? true : false;
+   cout << "================> Did test 3 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
 

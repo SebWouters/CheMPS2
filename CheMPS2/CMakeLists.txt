@@ -3,13 +3,8 @@ SET (BUILD_SHARED_LIBS ON)
 link_directories ($ENV{LD_LIBRARY_PATH})
 
 if (MKL)
-    set( ENV{BLA_VENDOR} "Intel10_64lp" )
+    set ( ENV{BLA_VENDOR} "Intel10_64lp" )
 endif (MKL)
-
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CheMPS2_SOURCE_DIR}/CMake/")
-
-find_package(LAPACK REQUIRED)
-find_package(GSL REQUIRED)
 
 include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/ ${HDF5_INCLUDE_DIRS})
 
@@ -19,6 +14,6 @@ add_library (CheMPS2 ${CHEMPS2LIB_SOURCE_FILES})
 
 target_link_libraries (CheMPS2 ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES} ${GSL_LIBRARIES})
 
-install (TARGETS CheMPS2 DESTINATION lib)
-install (DIRECTORY include/ DESTINATION include/CheMPS2 FILES_MATCHING PATTERN "*.h")
+install (TARGETS CheMPS2 DESTINATION ${CheMPS2_LIB_RELPATH})
+install (DIRECTORY include/ DESTINATION ${CheMPS2_INC_RELPATH} FILES_MATCHING PATTERN "*.h")
 

@@ -1,0 +1,242 @@
+#
+#   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+#   Copyright (C) 2013, 2014 Sebastian Wouters
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program; if not, write to the Free Software Foundation, Inc.,
+#   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+import numpy as np
+cimport numpy as np
+np.import_array()
+import ctypes
+
+cimport Init
+cimport ConvScheme
+cimport Ham
+cimport Prob
+cimport Corr
+cimport TwoRDM
+cimport DMRGsolver
+cimport DMRGSCFopt
+cimport DMRGSCF
+import ReadinHamiltonianPsi4
+
+cdef class PyInitialize:
+    cdef Init.Initialize * thisptr
+    def __cinit__(self):
+        self.thisptr = new Init.Initialize()
+    def __dealloc__(self):
+        del self.thisptr
+    def Init(self):
+        self.thisptr.Init()
+
+cdef class PyConvergenceScheme:
+    cdef ConvScheme.ConvergenceScheme * thisptr
+    def __cinit__(self, int nInstructions):
+        self.thisptr = new ConvScheme.ConvergenceScheme(nInstructions)
+    def __dealloc__(self):
+        del self.thisptr
+    def setInstruction(self, int instruction, int D, double Econv, int nMax, double noisePrefactor):
+        self.thisptr.setInstruction(instruction, D, Econv, nMax, noisePrefactor)
+    def getD(self, int instruction):
+        return self.thisptr.getD(instruction)
+    def getEconv(self, int instruction):
+        return self.thisptr.getEconv(instruction)
+    def getMaxSweeps(self, int instruction):
+        return self.thisptr.getMaxSweeps(instruction)
+    def getNoisePrefactor(self, int instruction):
+        return self.thisptr.getNoisePrefactor(instruction)
+
+cdef class PyHamiltonian:
+    cdef Ham.Hamiltonian * thisptr
+    def __cinit__(self, int Norbitals, int nGroup, OrbIrreps not None):
+        assert OrbIrreps.flags['C_CONTIGUOUS']
+        assert OrbIrreps.shape[0] == Norbitals
+        cdef np.ndarray[int, ndim=1, mode="c"] arr
+        arr = np.ascontiguousarray(OrbIrreps, dtype=ctypes.c_int)
+        self.thisptr = new Ham.Hamiltonian(Norbitals, nGroup, &arr[0])
+    def __dealloc__(self):
+        del self.thisptr
+    def getL(self):
+        return self.thisptr.getL()
+    def getNGroup(self):
+        return self.thisptr.getNGroup()
+    def getOrbitalIrrep(self, int orb):
+        return self.thisptr.getOrbitalIrrep(orb)
+    def setEconst(self, double value):
+        self.thisptr.setEconst(value)
+    def setTmat(self, int index1, int index2, double value):
+        self.thisptr.setTmat(index1, index2, value)
+    def setVmat(self, int index1, int index2, int index3, int index4, double value):
+        self.thisptr.setVmat(index1, index2, index3, index4, value)
+    def getEconst(self):
+        return self.thisptr.getEconst()
+    def getTmat(self, int index1, int index2):
+        return self.thisptr.getTmat(index1, index2)
+    def getVmat(self, int index1, int index2, int index3, int index4):
+        return self.thisptr.getVmat(index1, index2, index3, index4)
+    def save(self):
+        self.thisptr.save()
+    def read(self):
+        self.thisptr.read()
+        
+cdef class PyProblem:
+    cdef Prob.Problem * thisptr
+    def __cinit__(self, PyHamiltonian Hami, int TwoS, int N, int Irrep):
+        self.thisptr = new Prob.Problem(Hami.thisptr, TwoS, N, Irrep)
+    def __dealloc__(self):
+        del self.thisptr
+    def gL(self):
+        return self.thisptr.gL()
+    def gSy(self):
+        return self.thisptr.gSy()
+    def gIrrep(self, int orb):
+        return self.thisptr.gIrrep(orb)
+    def gTwoS(self):
+        return self.thisptr.gTwoS()
+    def gN(self):
+        return self.thisptr.gN()
+    def gIrrep(self):
+        return self.thisptr.gIrrep()
+    def gEconst(self):
+        return self.thisptr.gEconst()
+    def gMxElement(self, int index1, int index2, int index3, int index4):
+        return self.thisptr.gMxElement(index1, index2, index3, index4)
+    def SetupReorderD2h(self):
+        self.thisptr.SetupReorderD2h()
+        
+cdef class PyDMRG:
+    cdef DMRGsolver.DMRG * thisptr
+    def __cinit__(self, PyProblem Probl, PyConvergenceScheme OptScheme):
+        self.thisptr = new DMRGsolver.DMRG(Probl.thisptr, OptScheme.thisptr)
+    def __dealloc__(self):
+        del self.thisptr
+    def Solve(self):
+        return self.thisptr.Solve()
+    def calc2DMandCorrelations(self):
+        self.thisptr.calc2DMandCorrelations()
+    def deleteStoredMPS(self):
+        self.thisptr.deleteStoredMPS()
+    def deleteStoredOperators(self):
+        self.thisptr.deleteStoredOperators()
+    def activateExcitations(self, int nExcitations):
+        self.thisptr.activateExcitations(nExcitations)
+    def newExcitation(self, const double Eshift):
+        self.thisptr.newExcitation(Eshift)
+    #Access functions of the Corr.Correlations class
+    def getCspin(self, int row, int col):
+        return self.thisptr.getCorrelations().getCspin_HAM(row, col)
+    def getCdens(self, int row, int col):
+        return self.thisptr.getCorrelations().getCdens_HAM(row, col)
+    def getCspinflip(self, int row, int col):
+        return self.thisptr.getCorrelations().getCspinflip_HAM(row, col)
+    def getCdirad(self, int row, int col):
+        return self.thisptr.getCorrelations().getCdirad_HAM(row, col)
+    def getMutInfo(self, int row, int col):
+        return self.thisptr.getCorrelations().getMutualInformation_HAM(row, col)
+    def getSingleOrbEntropy(self, int index):
+        return self.thisptr.getCorrelations().SingleOrbitalEntropy_HAM(index)
+    def getMutInfoDistance(self, int power):
+        return self.thisptr.getCorrelations().MutualInformationDistance(power)
+    def printCorrelations(self):
+        self.thisptr.getCorrelations().Print()
+    #Access functions of the TwoRDM.TwoDM class
+    def get2DMA(self, int i1, int i2, int i3, int i4):
+        return self.thisptr.get2DM().getTwoDMA_HAM(i1, i2, i3, i4)
+    def get2DMB(self, int i1, int i2, int i3, int i4):
+        return self.thisptr.get2DM().getTwoDMB_HAM(i1, i2, i3, i4)
+    def get2DMenergy(self):
+        return self.thisptr.get2DM().calcEnergy()
+    def getDoubleTrace2DMA(self):
+        return self.thisptr.get2DM().doubletrace2DMA()
+    def save(self):
+        self.thisptr.get2DM().save()
+    def read(self):
+        self.thisptr.get2DM().read()
+    
+cdef class PyDMRGSCFoptions:
+    cdef DMRGSCFopt.DMRGSCFoptions * thisptr
+    def __cinit__(self):
+        self.thisptr = new DMRGSCFopt.DMRGSCFoptions()
+    def __dealloc__(self):
+        del self.thisptr
+    def getDoDIIS(self):
+        return self.thisptr.getDoDIIS()
+    def getDIISGradientBranch(self):
+        return self.thisptr.getDIISGradientBranch()
+    def getNumDIISVecs(self):
+        return self.thisptr.getNumDIISVecs()
+    def getStoreDIIS(self):
+        return self.thisptr.getStoreDIIS()
+    def getMaxIterations(self):
+        return self.thisptr.getMaxIterations()
+    def getGradientThreshold(self):
+        return self.thisptr.getGradientThreshold()
+    def getStoreUnitary(self):
+        return self.thisptr.getStoreUnitary()
+    def getWhichActiveSpace(self):
+        return self.thisptr.getWhichActiveSpace()
+    def getDumpCorrelations(self):
+        return self.thisptr.getDumpCorrelations()
+    def setDoDIIS(self, bint val):
+        self.thisptr.setDoDIIS(val)
+    def setDIISGradientBranch(self, double val):
+        self.thisptr.setDIISGradientBranch(val)
+    def setNumDIISVecs(self, int val):
+        self.thisptr.setNumDIISVecs(val)
+    def setStoreDIIS(self, bint val):
+        self.thisptr.setStoreDIIS(val)
+    def setMaxIterations(self, int val):
+        self.thisptr.setMaxIterations(val)
+    def setGradientThreshold(self, double val):
+        self.thisptr.setGradientThreshold(val)
+    def setStoreUnitary(self, bint val):
+        self.thisptr.setStoreUnitary(val)
+    def setWhichActiveSpace(self, int val):
+        self.thisptr.setWhichActiveSpace(val)
+    def setDumpCorrelations(self, bint val):
+        self.thisptr.setDumpCorrelations(val)
+        
+cdef class PyCASSCF:
+    cdef DMRGSCF.CASSCF * thisptr
+    def __cinit__(self, PyHamiltonian theHam, DOCC not None, SOCC not None):
+        assert DOCC.flags['C_CONTIGUOUS']
+        assert SOCC.flags['C_CONTIGUOUS']
+        cdef np.ndarray[int, ndim=1, mode="c"] arrDOCC
+        cdef np.ndarray[int, ndim=1, mode="c"] arrSOCC
+        arrDOCC = np.ascontiguousarray(DOCC, dtype=ctypes.c_int)
+        arrSOCC = np.ascontiguousarray(SOCC, dtype=ctypes.c_int)
+        self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &arrDOCC[0], &arrSOCC[0])
+    def __dealloc__(self):
+        del self.thisptr
+    def setupStart(self, Nocc not None, NDMRG not None, Nvirt not None):
+        assert Nocc.flags['C_CONTIGUOUS']
+        assert NDMRG.flags['C_CONTIGUOUS']
+        assert Nvirt.flags['C_CONTIGUOUS']
+        cdef np.ndarray[int, ndim=1, mode="c"] arrNocc
+        cdef np.ndarray[int, ndim=1, mode="c"] arrNDMRG
+        cdef np.ndarray[int, ndim=1, mode="c"] arrNvirt
+        arrNocc  = np.ascontiguousarray(Nocc,  dtype=ctypes.c_int)
+        arrNDMRG = np.ascontiguousarray(NDMRG, dtype=ctypes.c_int)
+        arrNvirt = np.ascontiguousarray(Nvirt, dtype=ctypes.c_int)
+        self.thisptr.setupStart(&arrNocc[0], &arrNDMRG[0], &arrNvirt[0])
+    def doCASSCFnewtonraphson(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
+        return self.thisptr.doCASSCFnewtonraphson(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
+    def deleteStoredUnitary(self):
+        self.thisptr.deleteStoredUnitary()
+    def deleteStoredDIIS(self):
+        self.thisptr.deleteStoredDIIS()
+        
+

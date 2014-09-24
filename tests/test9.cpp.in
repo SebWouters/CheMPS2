@@ -20,7 +20,6 @@
 #include <iostream>
 #include <math.h>
 #include <string.h>
-#include <sys/stat.h>
 
 #include "Initialize.h"
 #include "CASSCF.h"
@@ -33,13 +32,7 @@ int main(void){
    CheMPS2::Initialize::Init();
    
    //The path to the matrix elements
-   string matrixelements = "../../tests/matrixelements/N2_CCPVDZ.dat";
-   struct stat stFileInfo;
-   int intStat = stat(matrixelements.c_str(),&stFileInfo);
-   if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_CCPVDZ.dat in tests/test9.cpp for the compiled binary test9 to work." << endl;
-      return 628788;
-   }
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2_CCPVDZ.dat";
    
    //Setup CASSCF
    CheMPS2::CASSCF koekoek(matrixelements);
