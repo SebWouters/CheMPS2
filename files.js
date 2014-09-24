@@ -38,6 +38,8 @@ var files =
     [ "HeffDiagrams3.cpp", "HeffDiagrams3_8cpp_source.html", null ],
     [ "HeffDiagrams4.cpp", "HeffDiagrams4_8cpp_source.html", null ],
     [ "HeffDiagrams5.cpp", "HeffDiagrams5_8cpp_source.html", null ],
+    [ "Initialize.cpp", "Initialize_8cpp_source.html", null ],
+    [ "Initialize.h", "Initialize_8h_source.html", null ],
     [ "Irreps.cpp", "Irreps_8cpp_source.html", null ],
     [ "Irreps.h", "Irreps_8h_source.html", null ],
     [ "Lapack.h", "Lapack_8h_source.html", null ],

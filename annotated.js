@@ -14,6 +14,7 @@ var annotated =
       [ "FourIndex", "classCheMPS2_1_1FourIndex.html", "classCheMPS2_1_1FourIndex" ],
       [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html", "classCheMPS2_1_1Hamiltonian" ],
       [ "Heff", "classCheMPS2_1_1Heff.html", "classCheMPS2_1_1Heff" ],
+      [ "Initialize", "classCheMPS2_1_1Initialize.html", "classCheMPS2_1_1Initialize" ],
       [ "Irreps", "classCheMPS2_1_1Irreps.html", "classCheMPS2_1_1Irreps" ],
       [ "Problem", "classCheMPS2_1_1Problem.html", "classCheMPS2_1_1Problem" ],
       [ "Sobject", "classCheMPS2_1_1Sobject.html", "classCheMPS2_1_1Sobject" ],

@@ -134,14 +134,14 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a2ab912e50eb821fed2089e88692ec0b1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1">doCASSCFnewtonraphson</a> (const int Nelectrons, const int TwoS, const int Irrep, <a class="el" href="classCheMPS2_1_1ConvergenceScheme.html">ConvergenceScheme</a> *OptScheme, const int rootNum, <a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html">DMRGSCFoptions</a> *theDMRGSCFoptions)</td></tr>
 <tr class="memdesc:a2ab912e50eb821fed2089e88692ec0b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Does the state-specific <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> cycle with the augmented Hessian Newton-Raphson method.  <a href="#a2ab912e50eb821fed2089e88692ec0b1">More...</a><br/></td></tr>
 <tr class="separator:a2ab912e50eb821fed2089e88692ec0b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5d09078027fad94ceb82009cb78d328"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5d09078027fad94ceb82009cb78d328"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#ac5d09078027fad94ceb82009cb78d328">deleteStoredUnitary</a> (const string filename)</td></tr>
-<tr class="memdesc:ac5d09078027fad94ceb82009cb78d328"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> unitary rotation remove call. <br/></td></tr>
-<tr class="separator:ac5d09078027fad94ceb82009cb78d328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa18c04fed693d7f2384dc48769d17c94"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa18c04fed693d7f2384dc48769d17c94"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#aa18c04fed693d7f2384dc48769d17c94">deleteStoredDIIS</a> (const string filename)</td></tr>
-<tr class="memdesc:aa18c04fed693d7f2384dc48769d17c94"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> vectors remove call. <br/></td></tr>
-<tr class="separator:aa18c04fed693d7f2384dc48769d17c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe585ea6f4777137d2bbdd2b475caa6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe585ea6f4777137d2bbdd2b475caa6a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#afe585ea6f4777137d2bbdd2b475caa6a">deleteStoredUnitary</a> (const string filename=CheMPS2::DMRGSCF_unitaryStorageName)</td></tr>
+<tr class="memdesc:afe585ea6f4777137d2bbdd2b475caa6a"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> unitary rotation remove call. <br/></td></tr>
+<tr class="separator:afe585ea6f4777137d2bbdd2b475caa6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd8799e175329933a246dfee97e5dfb7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abd8799e175329933a246dfee97e5dfb7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#abd8799e175329933a246dfee97e5dfb7">deleteStoredDIIS</a> (const string filename=CheMPS2::DMRGSCF_DIISstorageName)</td></tr>
+<tr class="memdesc:abd8799e175329933a246dfee97e5dfb7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> vectors remove call. <br/></td></tr>
+<tr class="separator:abd8799e175329933a246dfee97e5dfb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> class. </p>
@@ -178,7 +178,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00035">35</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00034">34</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -233,7 +233,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00051">51</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00050">50</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -342,7 +342,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Get the number of irreps. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of irreps </dd></dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00127">127</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00126">126</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +386,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00533">533</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00532">532</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a></li>
-    <li class="footer">Generated on Thu Sep 18 2014 11:26:30 for CheMPS2 by
+    <li class="footer">Generated on Wed Sep 24 2014 16:11:27 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

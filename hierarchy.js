@@ -13,6 +13,7 @@ var hierarchy =
     [ "CheMPS2::FourIndex", "classCheMPS2_1_1FourIndex.html", null ],
     [ "CheMPS2::Hamiltonian", "classCheMPS2_1_1Hamiltonian.html", null ],
     [ "CheMPS2::Heff", "classCheMPS2_1_1Heff.html", null ],
+    [ "CheMPS2::Initialize", "classCheMPS2_1_1Initialize.html", null ],
     [ "CheMPS2::Irreps", "classCheMPS2_1_1Irreps.html", [
       [ "CheMPS2::SyBookkeeper", "classCheMPS2_1_1SyBookkeeper.html", null ]
     ] ],

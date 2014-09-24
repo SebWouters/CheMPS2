@@ -13,6 +13,7 @@ var searchData=
   ['_7efourindex',['~FourIndex',['../classCheMPS2_1_1FourIndex.html#a4988b7745b0ec4d5f86c4af89ba20430',1,'CheMPS2::FourIndex']]],
   ['_7ehamiltonian',['~Hamiltonian',['../classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51',1,'CheMPS2::Hamiltonian']]],
   ['_7eheff',['~Heff',['../classCheMPS2_1_1Heff.html#aaa1c2a606d65807f669b2a6cbbd9b510',1,'CheMPS2::Heff']]],
+  ['_7einitialize',['~Initialize',['../classCheMPS2_1_1Initialize.html#a22aa071276ce97432617d0da9a6a32cd',1,'CheMPS2::Initialize']]],
   ['_7eirreps',['~Irreps',['../classCheMPS2_1_1Irreps.html#a1bd119362f8477f5d2babe1404ca0826',1,'CheMPS2::Irreps']]],
   ['_7eproblem',['~Problem',['../classCheMPS2_1_1Problem.html#a9bc13e74cc92e3d697e9cc2ac589afc2',1,'CheMPS2::Problem']]],
   ['_7esobject',['~Sobject',['../classCheMPS2_1_1Sobject.html#a96e39bf1063bb31010cc5c753599f827',1,'CheMPS2::Sobject']]],

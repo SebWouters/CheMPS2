@@ -1,10 +1,10 @@
 var searchData=
 [
   ['debugcheck',['debugcheck',['../classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343',1,'CheMPS2::Hamiltonian']]],
-  ['deletestoreddiis',['deleteStoredDIIS',['../classCheMPS2_1_1CASSCF.html#aa18c04fed693d7f2384dc48769d17c94',1,'CheMPS2::CASSCF::deleteStoredDIIS()'],['../classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba',1,'CheMPS2::DIIS::deleteStoredDIIS()']]],
+  ['deletestoreddiis',['deleteStoredDIIS',['../classCheMPS2_1_1CASSCF.html#abd8799e175329933a246dfee97e5dfb7',1,'CheMPS2::CASSCF::deleteStoredDIIS()'],['../classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba',1,'CheMPS2::DIIS::deleteStoredDIIS()']]],
   ['deletestoredmps',['deleteStoredMPS',['../classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c',1,'CheMPS2::DMRG']]],
   ['deletestoredoperators',['deleteStoredOperators',['../classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6',1,'CheMPS2::DMRG']]],
-  ['deletestoredunitary',['deleteStoredUnitary',['../classCheMPS2_1_1CASSCF.html#ac5d09078027fad94ceb82009cb78d328',1,'CheMPS2::CASSCF::deleteStoredUnitary()'],['../classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb',1,'CheMPS2::DMRGSCFunitary::deleteStoredUnitary()']]],
+  ['deletestoredunitary',['deleteStoredUnitary',['../classCheMPS2_1_1CASSCF.html#afe585ea6f4777137d2bbdd2b475caa6a',1,'CheMPS2::CASSCF::deleteStoredUnitary()'],['../classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb',1,'CheMPS2::DMRGSCFunitary::deleteStoredUnitary()']]],
   ['denbk',['denBK',['../classCheMPS2_1_1Tensor.html#abecca6b02b8793a6dcc7b121e0e2a60c',1,'CheMPS2::Tensor']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html',1,'CheMPS2']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html#a9cbcd9c6176fdfe09844aa7c89d8e583',1,'CheMPS2::DIIS']]],
