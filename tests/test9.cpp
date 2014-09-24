@@ -37,7 +37,7 @@ int main(void){
    struct stat stFileInfo;
    int intStat = stat(matrixelements.c_str(),&stFileInfo);
    if (intStat != 0){
-      cout << "Please set the correct relative path to tests/matrixelements/N2_CCPVDZ.dat in tests/test10.cpp for the compiled binary test10 to work." << endl;
+      cout << "Please set the correct relative path to tests/matrixelements/N2_CCPVDZ.dat in tests/test9.cpp for the compiled binary test9 to work." << endl;
       return 628788;
    }
    
