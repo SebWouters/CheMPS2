@@ -88,8 +88,8 @@ intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
 documentation.
 Option4 is the prefix of the installation directory; typically
-```/usr``` on Linux. The CheMPS2 library is then installed in
-```prefix/lib``` and the headers in ```prefix/include/CheMPS2```.
+[```/usr```](/usr) on Linux. The CheMPS2 library is then installed in
+[```prefix/lib```](prefix/lib) and the headers in ```prefix/include/CheMPS2```.
 If one or more of the required libraries are not found, please use the
 command
 
@@ -143,7 +143,7 @@ PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The
 installation above generated the file ```./build/setup.py```, in which
 the CheMPS2 library and include paths have been assigned. This section
 assumes that CheMPS2 has been installed as described above! Start in
-```./build```, and run:
+[```./build```](./build), and run:
 
     > python setup.py build_ext -i
 
@@ -235,309 +235,309 @@ To compile the Psi4 plugin, run:
 List of files in the CheMPS2 library
 ------------------------------------
 
-```CheMPS2/CASSCF.cpp``` contains the constructor and destructor of the CASSCF
+[```CheMPS2/CASSCF.cpp```](CheMPS2/CASSCF.cpp) contains the constructor and destructor of the CASSCF
 class, as well as the functions which allow to update, get or set its
 variables.
     
-```CheMPS2/CASSCFdebug.cpp``` contains two functions: one for calculating the
+[```CheMPS2/CASSCFdebug.cpp```](CheMPS2/CASSCFdebug.cpp) contains two functions: one for calculating the
 ROHF energy; and one for fetching FCI coefficients to determine the point group
 symmetry of certain electronic states of the carbon dimer.
     
-```CheMPS2/CASSCFnewtonraphson.cpp``` contains all DMRG-SCF functions which
+[```CheMPS2/CASSCFnewtonraphson.cpp```](CheMPS2/CASSCFnewtonraphson.cpp) contains all DMRG-SCF functions which
 are specific to the augmented Hessian Newton-Raphson update scheme,
 including the functions to calculate the gradient and Hessian.
     
-```CheMPS2/ConvergenceScheme.cpp``` contains all functions of the
+[```CheMPS2/ConvergenceScheme.cpp```](CheMPS2/ConvergenceScheme.cpp) contains all functions of the
 ConvergenceScheme class, which contains the instructions for the subsequent
 DMRG sweeps.
 
-```CheMPS2/Correlations.cpp``` contains all the functionality to calculate
+[```CheMPS2/Correlations.cpp```](CheMPS2/Correlations.cpp) contains all the functionality to calculate
 the spin, density, and spin-flip correlation functions as well as the
 two-orbital mutual information.
 
-```CheMPS2/DIIS.cpp``` contains a DIIS convergence speed-up for DMRG-SCF.
+[```CheMPS2/DIIS.cpp```](CheMPS2/DIIS.cpp) contains a DIIS convergence speed-up for DMRG-SCF.
 
-```CheMPS2/DMRG.cpp``` contains the constructor and destructor of the DMRG
+[```CheMPS2/DMRG.cpp```](CheMPS2/DMRG.cpp) contains the constructor and destructor of the DMRG
 class, as well as the top-level sweep functions.
 
-```CheMPS2/DMRGmpsio.cpp``` contains the store and load functions for the DMRG
+[```CheMPS2/DMRGmpsio.cpp```](CheMPS2/DMRGmpsio.cpp) contains the store and load functions for the DMRG
 checkpoint file (the MPS).
 
-```CheMPS2/DMRGoperators.cpp``` contains all functions related to the DMRG
+[```CheMPS2/DMRGoperators.cpp```](CheMPS2/DMRGoperators.cpp) contains all functions related to the DMRG
 renormalized operators: saving to disk, loading from disk, and updating.
 
-```CheMPS2/DMRGSCFindices.cpp``` contains the index conversions for the
+[```CheMPS2/DMRGSCFindices.cpp```](CheMPS2/DMRGSCFindices.cpp) contains the index conversions for the
 DMRG-SCF algorithm.
 
-```CheMPS2/DMRGSCFoptions.cpp``` is a container class to pass the DMRGSCF
+[```CheMPS2/DMRGSCFoptions.cpp```](CheMPS2/DMRGSCFoptions.cpp) is a container class to pass the DMRGSCF
 options to the augmented Hessian Newton-Raphson routine.
 
-```CheMPS2/DMRGSCFunitary.cpp``` contains the storage and handling of the
+[```CheMPS2/DMRGSCFunitary.cpp```](CheMPS2/DMRGSCFunitary.cpp) contains the storage and handling of the
 unitary matrix and its nonredundant skew-symmetric parametrization
 required for the DMRG-SCF algorithm.
 
-```CheMPS2/DMRGSCFVmatRotations.cpp``` performs the two-body matrix element
+[```CheMPS2/DMRGSCFVmatRotations.cpp```](CheMPS2/DMRGSCFVmatRotations.cpp) performs the two-body matrix element
 rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
 
-```CheMPS2/DMRGtechnics.cpp``` contains the functions related to the 2-RDM
+[```CheMPS2/DMRGtechnics.cpp```](CheMPS2/DMRGtechnics.cpp) contains the functions related to the 2-RDM
 and the excited-state calculations.
 
-```CheMPS2/EdmistonRuedenberg.cpp``` contains an orbital localization function
+[```CheMPS2/EdmistonRuedenberg.cpp```](CheMPS2/EdmistonRuedenberg.cpp) contains an orbital localization function
 based on the Edmiston-Ruedenberg cost function and an augmented Hessian
 Newton-Raphson optimizer.
 
-```CheMPS2/FourIndex.cpp``` contains all functions of the FourIndex container
+[```CheMPS2/FourIndex.cpp```](CheMPS2/FourIndex.cpp) contains all functions of the FourIndex container
 class for the two-body matrix elements.
 
-```CheMPS2/Hamiltonian.cpp``` contains all functions of the Hamiltonian class,
+[```CheMPS2/Hamiltonian.cpp```](CheMPS2/Hamiltonian.cpp) contains all functions of the Hamiltonian class,
 including functions to get or set specific variables, as well as the save
 and load functions to store the Hamiltonian on disk.
 
-```CheMPS2/Heff.cpp``` contains the constructor and destructor of the Heff
+[```CheMPS2/Heff.cpp```](CheMPS2/Heff.cpp) contains the constructor and destructor of the Heff
 class, as well as the top-level functions to perform the effective Hamiltonian
 times guess-vector multiplication and Davidson's algorithm.
 
-```CheMPS2/HeffDiagonal.cpp``` contains the functions to calculate the diagonal
+[```CheMPS2/HeffDiagonal.cpp```](CheMPS2/HeffDiagonal.cpp) contains the functions to calculate the diagonal
 elements of the effective Hamiltonian. These are required as preconditioner in
 Davidson's algorithm.
     
-```CheMPS2/HeffDiagrams1.cpp``` contains a subset of functions to perform the 
+[```CheMPS2/HeffDiagrams1.cpp```](CheMPS2/HeffDiagrams1.cpp) contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
-```CheMPS2/HeffDiagrams2.cpp``` contains a subset of functions to perform the 
+[```CheMPS2/HeffDiagrams2.cpp```](CheMPS2/HeffDiagrams2.cpp) contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
-```CheMPS2/HeffDiagrams3.cpp``` contains a subset of functions to perform the 
+[```CheMPS2/HeffDiagrams3.cpp```](CheMPS2/HeffDiagrams3.cpp) contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
-```CheMPS2/HeffDiagrams4.cpp``` contains a subset of functions to perform the 
+[```CheMPS2/HeffDiagrams4.cpp```](CheMPS2/HeffDiagrams4.cpp) contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
-```CheMPS2/HeffDiagrams5.cpp``` contains a subset of functions to perform the 
+[```CheMPS2/HeffDiagrams5.cpp```](CheMPS2/HeffDiagrams5.cpp) contains a subset of functions to perform the 
 effective Hamiltonian times guess-vector multiplication.
 
-```CheMPS2/Initialize.cpp``` allows to set the seed of the random number
+[```CheMPS2/Initialize.cpp```](CheMPS2/Initialize.cpp) allows to set the seed of the random number
 generator and cout.precision (added for PyCheMPS2).
 
-```CheMPS2/Irreps.cpp``` contains the Psi4 symmetry conventions.
+[```CheMPS2/Irreps.cpp```](CheMPS2/Irreps.cpp) contains the Psi4 symmetry conventions.
 
-```CheMPS2/PrintLicense.cpp``` contains a function which prints the license
+[```CheMPS2/PrintLicense.cpp```](CheMPS2/PrintLicense.cpp) contains a function which prints the license
 disclaimer.
 
-```CheMPS2/Problem.cpp``` contains all Problem class functions. This wrapper
+[```CheMPS2/Problem.cpp```](CheMPS2/Problem.cpp) contains all Problem class functions. This wrapper
 class allows to set the desired symmetry sector for the DMRG algorithm.
 
-```CheMPS2/Sobject.cpp``` contains all Sobject class functions. This class
+[```CheMPS2/Sobject.cpp```](CheMPS2/Sobject.cpp) contains all Sobject class functions. This class
 constructs, stores, and decomposes the reduced two-site object.
 
-```CheMPS2/SyBookkeeper.cpp``` contains all SyBookkeeper functions. This class
+[```CheMPS2/SyBookkeeper.cpp```](CheMPS2/SyBookkeeper.cpp) contains all SyBookkeeper functions. This class
 keeps track of the FCI and DMRG virtual dimensions of all symmetry sectors at
 all boundaries.
 
-```CheMPS2/TensorA.cpp``` contains the TensorA functions. This class stores
+[```CheMPS2/TensorA.cpp```](CheMPS2/TensorA.cpp) contains the TensorA functions. This class stores
 and handles the complementary reduced spin-0 S0-tensors.
 
-```CheMPS2/TensorB.cpp``` contains the TensorB functions. This class stores
+[```CheMPS2/TensorB.cpp```](CheMPS2/TensorB.cpp) contains the TensorB functions. This class stores
 and handles the complementary reduced spin-1 S1-tensors.
 
-```CheMPS2/TensorC.cpp``` contains the TensorC functions. This class stores
+[```CheMPS2/TensorC.cpp```](CheMPS2/TensorC.cpp) contains the TensorC functions. This class stores
 and handles the complementary reduced spin-0 F0-tensors.
 
-```CheMPS2/TensorD.cpp``` contains the TensorB functions. This class stores
+[```CheMPS2/TensorD.cpp```](CheMPS2/TensorD.cpp) contains the TensorB functions. This class stores
 and handles the complementary reduced spin-1 F1-tensors.
 
-```CheMPS2/TensorDiag.cpp``` contains the TensorDiag functions. This storage
+[```CheMPS2/TensorDiag.cpp```](CheMPS2/TensorDiag.cpp) contains the TensorDiag functions. This storage
 class handles reduced tensors which are diagonal in the symmetry sectors.
 
-```CheMPS2/TensorF0Cbase.cpp``` contains the common storage and handling
+[```CheMPS2/TensorF0Cbase.cpp```](CheMPS2/TensorF0Cbase.cpp) contains the common storage and handling
 functions of the TensorF0 and TensorC classes.
 
-```CheMPS2/TensorF0.cpp``` contains all TensorF0 functions. This class
+[```CheMPS2/TensorF0.cpp```](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
 
-```CheMPS2/TensorF1.cpp``` contains all TensorF1 functions. This class
+[```CheMPS2/TensorF1.cpp```](CheMPS2/TensorF1.cpp) contains all TensorF1 functions. This class
 stores and handles the reduced spin-1 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
 
-```CheMPS2/TensorF1Dbase.cpp``` contains the common storage and handling
+[```CheMPS2/TensorF1Dbase.cpp```](CheMPS2/TensorF1Dbase.cpp) contains the common storage and handling
 functions of the TensorF1 and TensorD classes.
 
-```CheMPS2/TensorGYZ.cpp``` contains the contruct and update functions
+[```CheMPS2/TensorGYZ.cpp```](CheMPS2/TensorGYZ.cpp) contains the contruct and update functions
 for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
 information.
 
-```CheMPS2/TensorK.cpp``` contains the contruct and update functions
+[```CheMPS2/TensorK.cpp```](CheMPS2/TensorK.cpp) contains the contruct and update functions
 for the K-tensor. It is required for the two-orbital mutual information.
 
-```CheMPS2/TensorL.cpp``` contains all TensorL functions. This class stores
+[```CheMPS2/TensorL.cpp```](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores
 and handles the reduced spin-1/2 part of a single sandwiched second quantized
 operator.
 
-```CheMPS2/TensorM.cpp``` contains the contruct and update functions
+[```CheMPS2/TensorM.cpp```](CheMPS2/TensorM.cpp) contains the contruct and update functions
 for the M-tensor. It is required for the two-orbital mutual information.
 
-```CheMPS2/TensorO.cpp``` implements the storage and handling of the partial
+[```CheMPS2/TensorO.cpp```](CheMPS2/TensorO.cpp) implements the storage and handling of the partial
 terms which are required to calculate the overlap between two MPSs.
 
-```CheMPS2/TensorQ.cpp``` contains all TensorQ functions. This class stores
+[```CheMPS2/TensorQ.cpp```](CheMPS2/TensorQ.cpp) contains all TensorQ functions. This class stores
 and handles the complementary reduced spin-1/2 part of three sandwiched second
 quantized operators.
 
-```CheMPS2/TensorS0Abase.cpp``` contains the common storage and handling
+[```CheMPS2/TensorS0Abase.cpp```](CheMPS2/TensorS0Abase.cpp) contains the common storage and handling
 functions of the TensorS0 and TensorA classes.
 
-```CheMPS2/TensorS0.cpp``` contains all TensorS0 functions. This class
+[```CheMPS2/TensorS0.cpp```](CheMPS2/TensorS0.cpp) contains all TensorS0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors differ by 2.
 
-```CheMPS2/TensorS1Bbase.cpp``` contains the common storage and handling
+[```CheMPS2/TensorS1Bbase.cpp```](CheMPS2/TensorS1Bbase.cpp) contains the common storage and handling
 functions of the TensorS1 and TensorB classes.
 
-```CheMPS2/TensorS1.cpp``` contains all TensorS1 functions. This class
+[```CheMPS2/TensorS1.cpp```](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class
 stores and handles the reduced spin-1 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors differ by 2.
 
-```CheMPS2/TensorSwap.cpp``` contains the common storage and handling
+[```CheMPS2/TensorSwap.cpp```](CheMPS2/TensorSwap.cpp) contains the common storage and handling
 functions of the TensorL and TensorQ classes.
 
-```CheMPS2/TensorT.cpp``` contains all TensorT functions. This class
+[```CheMPS2/TensorT.cpp```](CheMPS2/TensorT.cpp) contains all TensorT functions. This class
 stores and handles the reduced part of an MPS site-tensor.
 
-```CheMPS2/TensorX.cpp``` contains all TensorX functions. This class
+[```CheMPS2/TensorX.cpp```](CheMPS2/TensorX.cpp) contains all TensorX functions. This class
 stores and handles the complementary reduced spin-0 part of four sandwiched
 second quantized operators, which is of course diagonal in the symmetry
 sectors.
 
-```CheMPS2/TwoDM.cpp``` contains all functions to calculate the
+[```CheMPS2/TwoDM.cpp```](CheMPS2/TwoDM.cpp) contains all functions to calculate the
 2-RDM from the DMRG-optimized MPS.
 
-```CheMPS2/TwoDMstorage.cpp``` contains all functions to store the
+[```CheMPS2/TwoDMstorage.cpp```](CheMPS2/TwoDMstorage.cpp) contains all functions to store the
 2-RDM from the DMRG-optimized MPS.
 
-```CheMPS2/TwoIndex.cpp``` contains all functions of the TwoIndex container
+[```CheMPS2/TwoIndex.cpp```](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container
 class for the one-body matrix elements.
     
-```CheMPS2/include/CASSCF.h``` contains the definitions of the CASSCF class.
+[```CheMPS2/include/CASSCF.h```](CheMPS2/include/CASSCF.h) contains the definitions of the CASSCF class.
 
-```CheMPS2/include/ConvergenceScheme.h``` contains the definitions of the
+[```CheMPS2/include/ConvergenceScheme.h```](CheMPS2/include/ConvergenceScheme.h) contains the definitions of the
 ConvergenceScheme class.
 
-```CheMPS2/include/Correlations.h``` contains the definitions of the
+[```CheMPS2/include/Correlations.h```](CheMPS2/include/Correlations.h) contains the definitions of the
 Correlations class.
 
-```CheMPS2/include/DIIS.h``` contains the definitions of the DIIS class.
+[```CheMPS2/include/DIIS.h```](CheMPS2/include/DIIS.h) contains the definitions of the DIIS class.
 
-```CheMPS2/include/DMRG.h``` contains the definitions of the DMRG class.
+[```CheMPS2/include/DMRG.h```](CheMPS2/include/DMRG.h) contains the definitions of the DMRG class.
 
-```CheMPS2/include/DMRGSCFindices.h``` contains the definitions of the
+[```CheMPS2/include/DMRGSCFindices.h```](CheMPS2/include/DMRGSCFindices.h) contains the definitions of the
 DMRGSCFindices class.
 
-```CheMPS2/include/DMRGSCFoptions.h``` contains the definitions of the
+[```CheMPS2/include/DMRGSCFoptions.h```](CheMPS2/include/DMRGSCFoptions.h) contains the definitions of the
 DMRGSCFoptions container class.
 
-```CheMPS2/include/DMRGSCFunitary.h``` contains the definitions of the
+[```CheMPS2/include/DMRGSCFunitary.h```](CheMPS2/include/DMRGSCFunitary.h) contains the definitions of the
 DMRGSCFunitary class.
 
-```CheMPS2/include/DMRGSCFVmatRotations.h``` contains the definitions of the
+[```CheMPS2/include/DMRGSCFVmatRotations.h```](CheMPS2/include/DMRGSCFVmatRotations.h) contains the definitions of the
 DMRGSCFVmatRotations class.
 
-```CheMPS2/include/EdmistonRuedenberg.h``` contains the definitions of the
+[```CheMPS2/include/EdmistonRuedenberg.h```](CheMPS2/include/EdmistonRuedenberg.h) contains the definitions of the
 EdmistonRuedenberg class.
 
-```CheMPS2/include/FourIndex.h``` contains the definitions of the FourIndex
+[```CheMPS2/include/FourIndex.h```](CheMPS2/include/FourIndex.h) contains the definitions of the FourIndex
 class.
 
-```CheMPS2/include/Gsl.h``` contains the definitions of the external GSL
+[```CheMPS2/include/Gsl.h```](CheMPS2/include/Gsl.h) contains the definitions of the external GSL
 routines.
 
-```CheMPS2/include/Hamiltonian.h``` contains the definitions of the Hamiltonian
+[```CheMPS2/include/Hamiltonian.h```](CheMPS2/include/Hamiltonian.h) contains the definitions of the Hamiltonian
 class.
 
-```CheMPS2/include/Heff.h``` contains the definitions of the Heff class.
+[```CheMPS2/include/Heff.h```](CheMPS2/include/Heff.h) contains the definitions of the Heff class.
 
-```CheMPS2/include/Initialize.h``` contains the definitions of the Initialize
+[```CheMPS2/include/Initialize.h```](CheMPS2/include/Initialize.h) contains the definitions of the Initialize
 class.
 
-```CheMPS2/include/Irreps.h``` contains the definitions of the Irrep class.
+[```CheMPS2/include/Irreps.h```](CheMPS2/include/Irreps.h) contains the definitions of the Irrep class.
 
-```CheMPS2/include/Lapack.h``` contains the definitions of the external BLAS
+[```CheMPS2/include/Lapack.h```](CheMPS2/include/Lapack.h) contains the definitions of the external BLAS
 and LAPACK routines.
 
-```CheMPS2/include/MyHDF5.h``` forces the use of the HDF5 1.8 API, e.g. 
+[```CheMPS2/include/MyHDF5.h```](CheMPS2/include/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. 
 H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.
 
-```CheMPS2/include/Options.h``` contains all the options of the CheMPS2
+[```CheMPS2/include/Options.h```](CheMPS2/include/Options.h) contains all the options of the CheMPS2
 namespace. Here the checkpoint storage names and folders can be set, as well
 as parameters related to memory usage and convergence.
 
-```CheMPS2/include/Problem.h``` contains the definitions of the Problem class.
+[```CheMPS2/include/Problem.h```](CheMPS2/include/Problem.h) contains the definitions of the Problem class.
 
-```CheMPS2/include/Sobject.h``` contains the definitions of the Sobject class.
+[```CheMPS2/include/Sobject.h```](CheMPS2/include/Sobject.h) contains the definitions of the Sobject class.
 
-```CheMPS2/include/SyBookkeeper.h``` contains the definitions of the
+[```CheMPS2/include/SyBookkeeper.h```](CheMPS2/include/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
 
-```CheMPS2/include/TensorA.h``` contains the definitions of the TensorA class.
+[```CheMPS2/include/TensorA.h```](CheMPS2/include/TensorA.h) contains the definitions of the TensorA class.
 
-```CheMPS2/include/TensorB.h``` contains the definitions of the TensorB class.
+[```CheMPS2/include/TensorB.h```](CheMPS2/include/TensorB.h) contains the definitions of the TensorB class.
 
-```CheMPS2/include/TensorC.h``` contains the definitions of the TensorC class.
+[```CheMPS2/include/TensorC.h```](CheMPS2/include/TensorC.h) contains the definitions of the TensorC class.
 
-```CheMPS2/include/TensorD.h``` contains the definitions of the TensorD class.
+[```CheMPS2/include/TensorD.h```](CheMPS2/include/TensorD.h) contains the definitions of the TensorD class.
 
-```CheMPS2/include/TensorDiag.h``` contains the definitions of the
+[```CheMPS2/include/TensorDiag.h```](CheMPS2/include/TensorDiag.h) contains the definitions of the
 TensorDiag class.
 
-```CheMPS2/include/TensorF0Cbase.h``` contains the definitions of the
+[```CheMPS2/include/TensorF0Cbase.h```](CheMPS2/include/TensorF0Cbase.h) contains the definitions of the
 TensorF0Cbase class.
 
-```CheMPS2/include/TensorF0.h``` contains the definitions of the TensorF0 class.
+[```CheMPS2/include/TensorF0.h```](CheMPS2/include/TensorF0.h) contains the definitions of the TensorF0 class.
 
-```CheMPS2/include/TensorF1Dbase.h``` contains the definitions of the
+[```CheMPS2/include/TensorF1Dbase.h```](CheMPS2/include/TensorF1Dbase.h) contains the definitions of the
 TensorF1Dbase class.
 
-```CheMPS2/include/TensorF1.h``` contains the definitions of the TensorF1 class.
+[```CheMPS2/include/TensorF1.h```](CheMPS2/include/TensorF1.h) contains the definitions of the TensorF1 class.
 
-```CheMPS2/include/TensorGYZ.h``` contains the definitions of the TensorGYZ
+[```CheMPS2/include/TensorGYZ.h```](CheMPS2/include/TensorGYZ.h) contains the definitions of the TensorGYZ
 class.
 
-```CheMPS2/include/Tensor.h``` contains the definitions of the virtual Tensor
+[```CheMPS2/include/Tensor.h```](CheMPS2/include/Tensor.h) contains the definitions of the virtual Tensor
 class.
 
-```CheMPS2/include/TensorK.h``` contains the definitions of the TensorK class.
+[```CheMPS2/include/TensorK.h```](CheMPS2/include/TensorK.h) contains the definitions of the TensorK class.
 
-```CheMPS2/include/TensorL.h``` contains the definitions of the TensorL class.
+[```CheMPS2/include/TensorL.h```](CheMPS2/include/TensorL.h) contains the definitions of the TensorL class.
 
-```CheMPS2/include/TensorM.h``` contains the definitions of the TensorM class.
+[```CheMPS2/include/TensorM.h```](CheMPS2/include/TensorM.h) contains the definitions of the TensorM class.
 
-```CheMPS2/include/TensorO.h``` contains the definitions of the TensorO class.
+[```CheMPS2/include/TensorO.h```](CheMPS2/include/TensorO.h) contains the definitions of the TensorO class.
 
-```CheMPS2/include/TensorQ.h``` contains the definitions of the TensorQ class.
+[```CheMPS2/include/TensorQ.h```](CheMPS2/include/TensorQ.h) contains the definitions of the TensorQ class.
 
-```CheMPS2/include/TensorS0Abase.h``` contains the definitions of the
+[```CheMPS2/include/TensorS0Abase.h```](CheMPS2/include/TensorS0Abase.h) contains the definitions of the
 TensorS0Abase class.
 
-```CheMPS2/include/TensorS0.h``` contains the definitions of the TensorS0 class.
+[```CheMPS2/include/TensorS0.h```](CheMPS2/include/TensorS0.h) contains the definitions of the TensorS0 class.
 
-```CheMPS2/include/TensorS1Bbase.h``` contains the definitions of the
+[```CheMPS2/include/TensorS1Bbase.h```](CheMPS2/include/TensorS1Bbase.h) contains the definitions of the
 TensorS1Bbase class.
 
-```CheMPS2/include/TensorS1.h``` contains the definitions of the TensorS1 class.
+[```CheMPS2/include/TensorS1.h```](CheMPS2/include/TensorS1.h) contains the definitions of the TensorS1 class.
 
-```CheMPS2/include/TensorSwap.h``` contains the definitions of the TensorSwap
+[```CheMPS2/include/TensorSwap.h```](CheMPS2/include/TensorSwap.h) contains the definitions of the TensorSwap
 class.
 
-```CheMPS2/include/TensorT.h``` contains the definitions of the TensorT class.
+[```CheMPS2/include/TensorT.h```](CheMPS2/include/TensorT.h) contains the definitions of the TensorT class.
 
-```CheMPS2/include/TensorX.h``` contains the definitions of the TensorX class.
+[```CheMPS2/include/TensorX.h```](CheMPS2/include/TensorX.h) contains the definitions of the TensorX class.
 
-```CheMPS2/include/TwoDM.h``` contains the definitions of the TwoDM class.
+[```CheMPS2/include/TwoDM.h```](CheMPS2/include/TwoDM.h) contains the definitions of the TwoDM class.
 
-```CheMPS2/include/TwoDMstorage.h``` contains the definitions of the
+[```CheMPS2/include/TwoDMstorage.h```](CheMPS2/include/TwoDMstorage.h) contains the definitions of the
 TwoDMstorage class.
 
-```CheMPS2/include/TwoIndex.h``` contains the definitions of the TwoIndex
+[```CheMPS2/include/TwoIndex.h```](CheMPS2/include/TwoIndex.h) contains the definitions of the TwoIndex
 class.
 
 Please note that these files are documented with Doxygen-readable comments.
@@ -548,33 +548,33 @@ generated from these comments.
 List of files to perform test runs
 ----------------------------------
 
-```tests/test1.cpp.in``` contains a ground state DMRG calculation of the ^1Ag
+[```tests/test1.cpp.in```](tests/test1.cpp.in) contains a ground state DMRG calculation of the ^1Ag
 state of N2 (d2h symmetry) in the minimal STO-3G basis set.
 
-```tests/test2.cpp.in``` contains a ground state DMRG calculation of the ^1Ag
+[```tests/test2.cpp.in```](tests/test2.cpp.in) contains a ground state DMRG calculation of the ^1Ag
 state of a linear H6 chain (d2h symmetry) in the 6-31G basis set.
 
-```tests/test3.cpp.in``` contains a ground state DMRG calculation of the ^1A1
+[```tests/test3.cpp.in```](tests/test3.cpp.in) contains a ground state DMRG calculation of the ^1A1
 state of CH4 (c2v symmetry) in the STO-3G basis set.
 
-```tests/test4.cpp.in``` contains a ground state DMRG calculation of the ^6A
+[```tests/test4.cpp.in```](tests/test4.cpp.in) contains a ground state DMRG calculation of the ^6A
 state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open
 boundary conditions, containing 9 fermions (just below half-filling).
 
-```tests/test5.cpp.in``` contains an excited state DMRG calculation in the
+[```tests/test5.cpp.in```](tests/test5.cpp.in) contains an excited state DMRG calculation in the
 ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set.
 The ground and two lowest excited states are determined.
 
-```tests/test6.cpp.in``` contains a DMRG-SCF ground state calculation of the
+[```tests/test6.cpp.in```](tests/test6.cpp.in) contains a DMRG-SCF ground state calculation of the
 ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core
 orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are
 chosen as active space. A significant speedup is obtained with DIIS.
 
-```tests/test7.cpp.in``` reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
+[```tests/test7.cpp.in```](tests/test7.cpp.in) reads in ```tests/matrixelements/O2_CCPVDZ.dat```,
 stores these matrix elements to disk, reads them back in from disk, and
 compares the two versions.
 
-```tests/test8.cpp.in``` contains a DMRG-SCF ground state calculation of the
+[```tests/test8.cpp.in```](tests/test8.cpp.in) contains a DMRG-SCF ground state calculation of the
 ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core
 orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and
 antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding
@@ -582,7 +582,7 @@ and antibonding) are chosen as active space. A significant speedup is obtained
 with DIIS. This test is smaller than test6, and is included for debugging with
 valgrind.
 
-```tests/test9.cpp.in``` is a copy of test8.cpp.in, with a slightly larger
+[```tests/test9.cpp.in```](tests/test9.cpp.in) is a copy of test8.cpp.in, with a slightly larger
 active space and which works with ordered localized orbitals instead of natural
 orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
 ordering based on the Fiedler vector with the exchange matrix as cost function.
@@ -602,23 +602,23 @@ for test6 and test7.
 ```tests/matrixelements/N2_CCPVDZ.dat``` contains the matrix elements
 for test8 and test9.
 
-```PyCheMPS2/test1.py.in``` is the Python version of ```tests/test1.cpp.in```
+[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is the Python version of ```tests/test1.cpp.in```
 
-```PyCheMPS2/test2.py.in``` is the Python version of ```tests/test2.cpp.in```
+[```PyCheMPS2/test2.py.in```](PyCheMPS2/test2.py.in) is the Python version of ```tests/test2.cpp.in```
 
-```PyCheMPS2/test3.py.in``` is the Python version of ```tests/test3.cpp.in```
+[```PyCheMPS2/test3.py.in```](PyCheMPS2/test3.py.in) is the Python version of ```tests/test3.cpp.in```
 
-```PyCheMPS2/test4.py.in``` is the Python version of ```tests/test4.cpp.in```
+[```PyCheMPS2/test4.py.in```](PyCheMPS2/test4.py.in) is the Python version of ```tests/test4.cpp.in```
 
-```PyCheMPS2/test5.py.in``` is the Python version of ```tests/test5.cpp.in```
+[```PyCheMPS2/test5.py.in```](PyCheMPS2/test5.py.in) is the Python version of ```tests/test5.cpp.in```
 
-```PyCheMPS2/test6.py.in``` is the Python version of ```tests/test6.cpp.in```
+[```PyCheMPS2/test6.py.in```](PyCheMPS2/test6.py.in) is the Python version of ```tests/test6.cpp.in```
 
-```PyCheMPS2/test7.py.in``` is the Python version of ```tests/test7.cpp.in```
+[```PyCheMPS2/test7.py.in```](PyCheMPS2/test7.py.in) is the Python version of ```tests/test7.cpp.in```
 
-```PyCheMPS2/test8.py.in``` is the Python version of ```tests/test8.cpp.in```
+[```PyCheMPS2/test8.py.in```](PyCheMPS2/test8.py.in) is the Python version of ```tests/test8.cpp.in```
 
-```PyCheMPS2/test9.py.in``` is the Python version of ```tests/test9.cpp.in```
+[```PyCheMPS2/test9.py.in```](PyCheMPS2/test9.py.in) is the Python version of ```tests/test9.cpp.in```
 
 These test files illustrate how to use the CheMPS2 library. The tests only
 require a very limited amount of memory (order 10-100 MB).
