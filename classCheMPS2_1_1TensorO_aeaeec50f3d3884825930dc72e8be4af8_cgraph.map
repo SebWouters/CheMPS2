@@ -1,8 +1,8 @@
 <map id="CheMPS2::TensorO::TensorO" name="CheMPS2::TensorO::TensorO">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#a00b1b29641aade9ff5f4ce68e46c8320" title="Get the min. possible particle number for a certain boundary. " alt="" coords="263,5,438,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#a39bc51595360d808a224ca6021ead99b" title="Get the max. possible particle number for a certain boundary. " alt="" coords="263,70,438,111"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#aa1a9f3397c15a44e10035f22161fc825" title="Get the min. possible spin value for a certain boundary and particle number. " alt="" coords="263,135,438,177"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb" title="Get the max. possible spin value for a certain boundary and particle number. " alt="" coords="263,201,438,242"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="253,266,448,307"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82" title="Get the current virtual dimensions. " alt="" coords="263,331,438,373"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#a00b1b29641aade9ff5f4ce68e46c8320" title="Get the min. possible particle number for a certain boundary." alt="" coords="263,5,438,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#a39bc51595360d808a224ca6021ead99b" title="Get the max. possible particle number for a certain boundary." alt="" coords="263,70,438,111"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#aa1a9f3397c15a44e10035f22161fc825" title="Get the min. possible spin value for a certain boundary and particle number." alt="" coords="263,135,438,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb" title="Get the max. possible spin value for a certain boundary and particle number." alt="" coords="263,201,438,242"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group." alt="" coords="253,266,448,307"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82" title="Get the current virtual dimensions." alt="" coords="263,331,438,373"/>
 </map>

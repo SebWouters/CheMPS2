@@ -1,4 +1,4 @@
 <map id="CheMPS2::Problem::Problem" name="CheMPS2::Problem::Problem">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="249,12,503,39"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="552,5,747,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group." alt="" coords="552,5,747,46"/>
 </map>
