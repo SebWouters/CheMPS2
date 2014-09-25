@@ -1,11 +1,11 @@
 <map id="CheMPS2::SyBookkeeper::SyBookkeeper" name="CheMPS2::SyBookkeeper::SyBookkeeper">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals." alt="" coords="231,5,428,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number." alt="" coords="229,56,429,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#a72189d68fe5a90d9b5e4f11aa752a393" title="Get twice the targeted spin." alt="" coords="242,107,417,149"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a39bc51595360d808a224ca6021ead99b" title="Get the max. possible particle number for a certain boundary." alt="" coords="242,173,417,214"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a00b1b29641aade9ff5f4ce68e46c8320" title="Get the min. possible particle number for a certain boundary." alt="" coords="242,238,417,279"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb" title="Get the max. possible spin value for a certain boundary and particle number." alt="" coords="242,303,417,345"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#aa1a9f3397c15a44e10035f22161fc825" title="Get the min. possible spin value for a certain boundary and particle number." alt="" coords="242,369,417,410"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group." alt="" coords="232,434,427,475"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#ae6bcbf2398cda17b45c02af73a02fc65" title="Get whether the desired symmetry sector is possible." alt="" coords="242,499,417,541"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="231,5,428,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number. " alt="" coords="229,56,429,83"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#a72189d68fe5a90d9b5e4f11aa752a393" title="Get twice the targeted spin. " alt="" coords="242,107,417,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a39bc51595360d808a224ca6021ead99b" title="Get the max. possible particle number for a certain boundary. " alt="" coords="242,173,417,214"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a00b1b29641aade9ff5f4ce68e46c8320" title="Get the min. possible particle number for a certain boundary. " alt="" coords="242,238,417,279"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb" title="Get the max. possible spin value for a certain boundary and particle number. " alt="" coords="242,303,417,345"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#aa1a9f3397c15a44e10035f22161fc825" title="Get the min. possible spin value for a certain boundary and particle number. " alt="" coords="242,369,417,410"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="232,434,427,475"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#ae6bcbf2398cda17b45c02af73a02fc65" title="Get whether the desired symmetry sector is possible. " alt="" coords="242,499,417,541"/>
 </map>

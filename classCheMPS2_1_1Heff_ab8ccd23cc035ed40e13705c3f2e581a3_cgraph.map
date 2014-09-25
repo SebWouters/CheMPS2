@@ -1,7 +1,7 @@
 <map id="CheMPS2::Heff::SolveDAVIDSON" name="CheMPS2::Heff::SolveDAVIDSON">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention." alt="" coords="287,5,497,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block." alt="" coords="280,56,504,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks." alt="" coords="294,107,490,133"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage." alt="" coords="295,157,489,184"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention." alt="" coords="287,208,497,235"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="287,5,497,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="280,56,504,83"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="294,107,490,133"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="295,157,489,184"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="287,208,497,235"/>
 </map>

@@ -1,4 +1,4 @@
 <map id="CheMPS2::Tensor::gStorage" name="CheMPS2::Tensor::gStorage">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorDiag.html#a47170a08cf4c82a89b688e12a8b89275" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving right." alt="" coords="245,5,403,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorDiag.html#aee82a1881caecda56a2c41ea40450070" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving left." alt="" coords="245,70,403,111"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorDiag.html#a47170a08cf4c82a89b688e12a8b89275" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving right. " alt="" coords="245,5,403,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorDiag.html#aee82a1881caecda56a2c41ea40450070" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving left. " alt="" coords="245,70,403,111"/>
 </map>
