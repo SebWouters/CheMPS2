@@ -88,8 +88,8 @@ intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
 documentation.
 Option4 is the prefix of the installation directory; typically
-[```/usr```](/usr) on Linux. The CheMPS2 library is then installed in
-[```prefix/lib```](prefix/lib) and the headers in ```prefix/include/CheMPS2```.
+```/usr``` on Linux. The CheMPS2 library is then installed in
+```prefix/lib``` and the headers in ```prefix/include/CheMPS2```.
 If one or more of the required libraries are not found, please use the
 command
 
@@ -143,7 +143,7 @@ PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The
 installation above generated the file ```./build/setup.py```, in which
 the CheMPS2 library and include paths have been assigned. This section
 assumes that CheMPS2 has been installed as described above! Start in
-[```./build```](./build), and run:
+```./build```, and run:
 
     > python setup.py build_ext -i
 
