@@ -31,7 +31,6 @@ cimport TwoRDM
 cimport DMRGsolver
 cimport DMRGSCFopt
 cimport DMRGSCF
-import ReadinHamiltonianPsi4
 
 cdef class PyInitialize:
     cdef Init.Initialize * thisptr
