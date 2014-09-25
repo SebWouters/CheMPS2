@@ -186,12 +186,12 @@ User manual
 -----------
 
 Doxygen output can be generated, see the section "Build" in README.md, or
-the [[Doxygen html output]](http://sebwouters.github.io/CheMPS2/index.html).
+the [Doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
 
 For a more concise overview of the concepts and ideas used in CheMPS2,
-please read the code release paper "CheMPS2: a free open-source spin-adapted
+please read the code release paper "[CheMPS2: a free open-source spin-adapted
 implementation of the density matrix renormalization group for ab initio
-quantum chemistry", one of the references in CITATIONS.
+quantum chemistry](http://doi.dx.org/10.1016/j.cpc.2014.01.019)", one of the references in CITATIONS.
 
 
 Matrix elements from Psi4
@@ -199,7 +199,7 @@ Matrix elements from Psi4
 
 CheMPS2 has a Hamiltonian object which is able to read in matrix elements
 from a plugin to Psi4
-[[Psi4, Ab initio quantum chemistry]](http://www.psicode.org),
+[Psi4, Ab initio quantum chemistry](http://www.psicode.org),
 which works on version psi4.0b5 and higher.
 
 To make use of this feature, build Psi4 with the plugin option, and then run:
