@@ -198,8 +198,7 @@ Matrix elements from Psi4
 -------------------------
 
 CheMPS2 has a Hamiltonian object which is able to read in matrix elements
-from a plugin to Psi4
-[Psi4, Ab initio quantum chemistry](http://www.psicode.org),
+from a plugin to [Psi4, Ab initio quantum chemistry](http://www.psicode.org),
 which works on version psi4.0b5 and higher.
 
 To make use of this feature, build Psi4 with the plugin option, and then run:
