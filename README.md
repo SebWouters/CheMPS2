@@ -42,23 +42,21 @@ To acknowledge CheMPS2, please cite
             doi = {10.1016/j.cpc.2014.01.019}
         }
 
-2. S. Wouters, P.A. Limacher, D. Van Neck and P.W. Ayers,
-   Longitudinal static optical properties of hydrogen chains: Finite field
-                extrapolations of matrix product state calculations,
-   The Journal of Chemical Physics 136, 134110 (2012),
-   [doi:10.1063/1.3700087](http://dx.doi.org/10.1063/1.3700087)
+2. S. Wouters and D. Van Neck,
+   The density matrix renormalization group for ab initio quantum chemistry,
+   The European Physical Journal D 68, 272 (2014),
+   [doi:10.1140/epjd/e2014-50500-1](http://dx.doi.org/10.1140/epjd/e2014-50500-1)
 
         @article{CheMPS2cite2,
-            author = {Sebastian Wouters and Peter A. Limacher and Dimitri {Van Neck} and Paul W. Ayers},
-            title = {Longitudinal static optical properties of hydrogen chains: Finite field extrapolations of matrix product state calculations},
-            journal = {The Journal of Chemical Physics},
-            year = {2012},
-            volume = {136},
-            number = {13}, 
-            pages = {134110},
-            doi = {10.1063/1.3700087} 
+            author = {Sebastian Wouters and Dimitri {Van Neck}},
+            title = {The density matrix renormalization group for ab initio quantum chemistry},
+            journal = {The European Physical Journal D},
+            year = {2014},
+            volume = {68},
+            number = {9},
+            pages = {272},
+            doi = {10.1140/epjd/e2014-50500-1}
         }
-
 
 Build
 -----
