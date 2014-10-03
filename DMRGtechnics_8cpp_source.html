@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <span class="keyword">delete</span> [] VeffTilde;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;   }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;   Energy += Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1">gEconst</a>();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keywordflow">if</span> (Energy&lt;MinEnergy){ MinEnergy = Energy; }</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;   denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df">Split</a>(MPS[index],MPS[index+1],OptScheme-&gt;<a class="code" href="classCheMPS2_1_1ConvergenceScheme.html#abb766295f71d3c1e3b9edc875504b317">getD</a>(OptScheme-&gt;<a class="code" href="classCheMPS2_1_1ConvergenceScheme.html#ab8c98d5388c415c42115084c5817e1dc">getNInstructions</a>()-1),<span class="keyword">true</span>,<span class="keyword">true</span>);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;   <span class="keyword">delete</span> denS;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;   </div>
@@ -575,7 +575,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGtechnics.cpp</b></li>
-    <li class="footer">Generated on Thu Sep 25 2014 18:05:38 for CheMPS2 by
+    <li class="footer">Generated on Fri Oct 3 2014 04:33:24 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

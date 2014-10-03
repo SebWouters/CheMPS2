@@ -259,14 +259,14 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;   </div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;Prob-&gt;gL()-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;   </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;   MinEnergy = 1e8;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;   TotalMinEnergy = 1e8;</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
 <div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">  161</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">CheMPS2::DMRG::Solve</a>(){</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;   <span class="keywordtype">bool</span> change = (MinEnergy&lt;1e8) ? <span class="keyword">true</span> : <span class="keyword">false</span>; <span class="comment">//1 sweep from right to left: fixed virtual dimensions</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;   <span class="keywordtype">bool</span> change = (TotalMinEnergy&lt;1e8) ? <span class="keyword">true</span> : <span class="keyword">false</span>; <span class="comment">//1 sweep from right to left: fixed virtual dimensions</span></div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;   </div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> instruction=0; instruction &lt; OptScheme-&gt;getNInstructions(); instruction++){</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;   </div>
@@ -283,179 +283,186 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;         Energy = sweepleft(change, instruction);</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;         gettimeofday(&amp;end, NULL);</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;         <span class="keywordtype">double</span> elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  The max. disc. weight at last sweep is &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;         <span class="keywordflow">if</span> (!change) change = <span class="keyword">true</span>; <span class="comment">//rest of sweeps: variable virtual dimensions</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;         gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;         Energy = sweepright(change, instruction);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;         gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Elapsed wall time during last sweep is &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  The max. disc. weight at last sweep is &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, <span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;         </div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;         nIterations++;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;         </div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;*** Number of leftright sweep iterations is &quot;</span> &lt;&lt; nIterations &lt;&lt; endl; </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***                The energy difference is &quot;</span> &lt;&lt; fabs(Energy-EnergyPrevious) &lt;&lt; endl;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***                           The energy is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;         <span class="keywordflow">if</span> (Exc_activated){ calcOverlapsWithLowerStates(); }</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;      </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;      }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Information on left sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;         <span class="keywordflow">if</span> (!change) change = <span class="keyword">true</span>; <span class="comment">//rest of sweeps: variable virtual dimensions</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;         gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;         Energy = sweepright(change, instruction);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;         gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Information on right sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, <span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;         </div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;         nIterations++;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;         </div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Energy difference with respect to previous leftright sweep = &quot;</span> &lt;&lt; fabs(Energy-EnergyPrevious) &lt;&lt; endl;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;         <span class="keywordflow">if</span> (Exc_activated){ calcOverlapsWithLowerStates(); }</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;      </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;****************************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***    Performed instruction &quot;</span> &lt;&lt; instruction &lt;&lt; endl;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***    Number of reduced DMRG basis states D = &quot;</span> &lt;&lt; OptScheme-&gt;getD(instruction) &lt;&lt; endl;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***    The min. energy during the sweeps is &quot;</span> &lt;&lt; MinEnergy &lt;&lt; endl;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***    The max. discarded weight during the last sweep is &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;****************************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;   }</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   </div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;   <span class="keywordflow">return</span> MinEnergy;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;}</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepleft(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction){</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = Prob-&gt;gL()-2; index&gt;0; index--){</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="comment">//Construct S</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * denS = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a>(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="comment">//Feed everything to the solver</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <a class="code" href="classCheMPS2_1_1Heff.html">Heff</a> Solver(denBK, Prob);</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;         VeffTilde = <span class="keyword">new</span> <span class="keywordtype">double</span>*[nStates-1];</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            VeffTilde[cnt] = <span class="keyword">new</span> <span class="keywordtype">double</span>[denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>())];</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            calcVeffTilde(VeffTilde[cnt], denS, cnt);</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;         }</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;      }</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;         <span class="comment">//calcOverlapsWithLowerStatesDuringSweeps_debug(VeffTilde, denS);</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){ <span class="keyword">delete</span> [] VeffTilde[cnt]; }</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;         <span class="keyword">delete</span> [] VeffTilde;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      }</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;      Energy += Prob-&gt;gEconst();</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;MinEnergy){ MinEnergy = Energy; }</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;      </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      <span class="keywordflow">if</span> (NoiseLevel&gt;0.0){ denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c">addNoise</a>(NoiseLevel); }</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df">Split</a>(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">false</span>,change);</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keyword">delete</span> denS;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="comment">//Print info</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      </div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      <span class="comment">//Prepare for next step</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      updateMovingLeftSafe(index);</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;   }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;   </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;}</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepright(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction){</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;   <span class="keywordtype">double</span> Energy=0.0;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = 0; index&lt;Prob-&gt;gL()-2; index++){</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="comment">//Construct S</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      Sobject * denS = <span class="keyword">new</span> Sobject(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      </div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      <span class="comment">//Feed everything to solver</span></div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      Heff Solver(denBK, Prob);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;         VeffTilde = <span class="keyword">new</span> <span class="keywordtype">double</span>*[nStates-1];</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            VeffTilde[cnt] = <span class="keyword">new</span> <span class="keywordtype">double</span>[denS-&gt;gKappa2index(denS-&gt;gNKappa())];</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;            calcVeffTilde(VeffTilde[cnt], denS, cnt);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;         }</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;         <span class="comment">//calcOverlapsWithLowerStatesDuringSweeps_debug(VeffTilde, denS);</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){ <span class="keyword">delete</span> [] VeffTilde[cnt]; }</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;         <span class="keyword">delete</span> [] VeffTilde;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;      }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;      </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;****************************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***  Information on completed instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***     The reduced virtual dimension DSU(2)               = &quot;</span> &lt;&lt; OptScheme-&gt;getD(instruction) &lt;&lt; endl;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***     Minimum energy encountered during all instructions = &quot;</span> &lt;&lt; TotalMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***     Minimum energy encountered during the last sweep   = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;***     Maximum discarded weight during the last sweep     = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;      cout &lt;&lt;    <span class="stringliteral">&quot;****************************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;   </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;   }</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;   </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;   <span class="keywordflow">return</span> TotalMinEnergy;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;}</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepleft(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction){</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;   LastMinEnergy = 1e8;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = Prob-&gt;gL()-2; index&gt;0; index--){</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="comment">//Construct S</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * denS = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a>(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;      </div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;      <span class="comment">//Feed everything to the solver</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;      <a class="code" href="classCheMPS2_1_1Heff.html">Heff</a> Solver(denBK, Prob);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;         VeffTilde = <span class="keyword">new</span> <span class="keywordtype">double</span>*[nStates-1];</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            VeffTilde[cnt] = <span class="keyword">new</span> <span class="keywordtype">double</span>[denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>())];</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            calcVeffTilde(VeffTilde[cnt], denS, cnt);</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;         }</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;      }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;         <span class="comment">//calcOverlapsWithLowerStatesDuringSweeps_debug(VeffTilde, denS);</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){ <span class="keyword">delete</span> [] VeffTilde[cnt]; }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;         <span class="keyword">delete</span> [] VeffTilde;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;      }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;      Energy += Prob-&gt;gEconst();</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      </div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="keywordflow">if</span> (NoiseLevel&gt;0.0){ denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c">addNoise</a>(NoiseLevel); }</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df">Split</a>(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">false</span>,change);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keyword">delete</span> denS;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      </div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <span class="comment">//Print info</span></div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;      <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      </div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="comment">//Prepare for next step</span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;      updateMovingLeftSafe(index);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;   }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;   </div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;}</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepright(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction){</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;   <span class="keywordtype">double</span> Energy=0.0;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;   LastMinEnergy = 1e8;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = 0; index&lt;Prob-&gt;gL()-2; index++){</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="comment">//Construct S</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      Sobject * denS = <span class="keyword">new</span> Sobject(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      </div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="comment">//Feed everything to solver</span></div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      Heff Solver(denBK, Prob);</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;         VeffTilde = <span class="keyword">new</span> <span class="keywordtype">double</span>*[nStates-1];</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            VeffTilde[cnt] = <span class="keyword">new</span> <span class="keywordtype">double</span>[denS-&gt;gKappa2index(denS-&gt;gNKappa())];</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;            calcVeffTilde(VeffTilde[cnt], denS, cnt);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;         }</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;      }</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      Energy += Prob-&gt;gEconst();</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;MinEnergy){ MinEnergy = Energy; }</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      </div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      <span class="keywordflow">if</span> (NoiseLevel&gt;0.0){ denS-&gt;addNoise(NoiseLevel); }</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;Split(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">true</span>,change);</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      <span class="keyword">delete</span> denS;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      </div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      <span class="comment">//Print info</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      <span class="comment">//Prepare for next step</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      updateMovingRightSafe(index);</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;   }</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;   </div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;}</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
-<div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">  311</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxExcIn){</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;   Exc_activated = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;   maxExc = maxExcIn;</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;   Exc_Eshifts = <span class="keyword">new</span> <span class="keywordtype">double</span>[maxExc];</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;   Exc_MPSs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorT.html">TensorT</a> ** [maxExc];</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;   Exc_BKs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * [maxExc];</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;   Exc_Overlaps = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> ** [maxExc];</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;         <span class="comment">//calcOverlapsWithLowerStatesDuringSweeps_debug(VeffTilde, denS);</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nStates-1; cnt++){ <span class="keyword">delete</span> [] VeffTilde[cnt]; }</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;         <span class="keyword">delete</span> [] VeffTilde;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      }</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      Energy += Prob-&gt;gEconst();</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      <span class="keywordflow">if</span> (NoiseLevel&gt;0.0){ denS-&gt;addNoise(NoiseLevel); }</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;Split(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">true</span>,change);</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      <span class="keyword">delete</span> denS;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      </div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="comment">//Print info</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      </div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="comment">//Prepare for next step</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      updateMovingRightSafe(index);</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;   }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;   </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;}</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
+<div class="line"><a name="l00318"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">  318</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxExcIn){</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;}</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;</div>
-<div class="line"><a name="l00322"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">  322</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> EshiftIn){</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;   <span class="keywordflow">if</span> (!Exc_activated){</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;   </div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;DMRG::activateExcitations has not been called yet!&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      </div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;   }</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;   Exc_activated = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;   maxExc = maxExcIn;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;   Exc_Eshifts = <span class="keyword">new</span> <span class="keywordtype">double</span>[maxExc];</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;   Exc_MPSs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorT.html">TensorT</a> ** [maxExc];</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;   Exc_BKs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * [maxExc];</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;   Exc_Overlaps = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> ** [maxExc];</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;}</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
+<div class="line"><a name="l00329"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">  329</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> EshiftIn){</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;   <span class="keywordflow">if</span> (nStates-1&lt;maxExc){</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;   <span class="keywordflow">if</span> (!Exc_activated){</div>
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;   </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      Exc_Eshifts[nStates-1] = EshiftIn;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      Exc_MPSs[nStates-1] = MPS;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      Exc_BKs[nStates-1] = denBK;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      Exc_Overlaps[nStates-1] = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> * [Prob-&gt;gL()-1];</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      deleteAllBoundaryOperators();</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      </div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      nStates++;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      setupBookkeeperAndMPS();</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      PreSolve();</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;   </div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;   } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;   </div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Max. number of excitations has been reached!&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;DMRG::activateExcitations has not been called yet!&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;   }</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;   <span class="keywordflow">if</span> (nStates-1&lt;maxExc){</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;   </div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      Exc_Eshifts[nStates-1] = EshiftIn;</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      Exc_MPSs[nStates-1] = MPS;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      Exc_BKs[nStates-1] = denBK;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      Exc_Overlaps[nStates-1] = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> * [Prob-&gt;gL()-1];</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      </div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;      deleteAllBoundaryOperators();</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      </div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      nStates++;</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;      </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;   }</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;}</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      setupBookkeeperAndMPS();</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;      PreSolve();</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;   </div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;   } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;   </div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Max. number of excitations has been reached!&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      </div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;   }</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;}</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1TensorO_html"><div class="ttname"><a href="classCheMPS2_1_1TensorO.html">CheMPS2::TensorO</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorO_8h_source.html#l00034">TensorO.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorD_html"><div class="ttname"><a href="classCheMPS2_1_1TensorD.html">CheMPS2::TensorD</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorD_8h_source.html#l00032">TensorD.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html">CheMPS2::TensorL</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8h_source.html#l00034">TensorL.h:34</a></div></div>
@@ -470,7 +477,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Sobject_html"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html">CheMPS2::Sobject</a></div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8h_source.html#l00034">Sobject.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a1dfbe469443fbf7daa49c1d0cb34425e"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">CheMPS2::Sobject::gNKappa</a></div><div class="ttdeci">int gNKappa() const </div><div class="ttdoc">Get the number of symmetry blocks. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00157">Sobject.cpp:157</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html">CheMPS2::TensorT</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8h_source.html#l00035">TensorT.h:35</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_acfb3123c72e3503f2d6c77dcf9eb141a"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a></div><div class="ttdeci">void newExcitation(const double EshiftIn)</div><div class="ttdoc">Push back current calculation and set everything up to calculate a (new) excitation. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00322">DMRG.cpp:322</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_acfb3123c72e3503f2d6c77dcf9eb141a"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a></div><div class="ttdeci">void newExcitation(const double EshiftIn)</div><div class="ttdoc">Push back current calculation and set everything up to calculate a (new) excitation. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00329">DMRG.cpp:329</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Heff_html"><div class="ttname"><a href="classCheMPS2_1_1Heff.html">CheMPS2::Heff</a></div><div class="ttdef"><b>Definition:</b> <a href="Heff_8h_source.html#l00045">Heff.h:45</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorX_html"><div class="ttname"><a href="classCheMPS2_1_1TensorX.html">CheMPS2::TensorX</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorX_8h_source.html#l00040">TensorX.h:40</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a687a29eab89ef3763af8c630b48e3bf6"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">CheMPS2::Sobject::Join</a></div><div class="ttdeci">void Join(TensorT *Tleft, TensorT *Tright)</div><div class="ttdoc">Join two sites to form a composite S-object. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00195">Sobject.cpp:195</a></div></div>
@@ -480,7 +487,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a3e7be26cd15d22f4e0a65a34616cbcdd"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">CheMPS2::Problem::gL</a></div><div class="ttdeci">int gL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00084">Problem.cpp:84</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_af75174435718b0b533712fbeb6568c71"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71">CheMPS2::DMRG::DMRG</a></div><div class="ttdeci">DMRG(Problem *Probin, ConvergenceScheme *OptSchemeIn)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00033">DMRG.cpp:33</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html"><div class="ttname"><a href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a></div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00035">Problem.h:35</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab442cbc43e2e5d877660859578849133"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a></div><div class="ttdeci">void activateExcitations(const int maxExcIn)</div><div class="ttdoc">Activate the necessary storage and machinery to handle excitations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00311">DMRG.cpp:311</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab442cbc43e2e5d877660859578849133"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a></div><div class="ttdeci">void activateExcitations(const int maxExcIn)</div><div class="ttdoc">Activate the necessary storage and machinery to handle excitations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00318">DMRG.cpp:318</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_abe701c20aeb97b48c237bed694d185b5"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5">CheMPS2::DMRG::~DMRG</a></div><div class="ttdeci">virtual ~DMRG()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00112">DMRG.cpp:112</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorC_html"><div class="ttname"><a href="classCheMPS2_1_1TensorC.html">CheMPS2::TensorC</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorC_8h_source.html#l00032">TensorC.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorB_html"><div class="ttname"><a href="classCheMPS2_1_1TensorB.html">CheMPS2::TensorB</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorB_8h_source.html#l00032">TensorB.h:32</a></div></div>
@@ -493,7 +500,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRG.cpp</b></li>
-    <li class="footer">Generated on Thu Sep 25 2014 18:05:38 for CheMPS2 by
+    <li class="footer">Generated on Fri Oct 3 2014 04:33:24 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

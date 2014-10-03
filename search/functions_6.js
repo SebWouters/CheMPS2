@@ -58,6 +58,7 @@ var searchData=
   ['getorignvirtstart',['getOrigNVIRTstart',['../classCheMPS2_1_1DMRGSCFindices.html#a440634b63107d8a02132ee4bcb7ef0b4',1,'CheMPS2::DMRGSCFindices']]],
   ['getsecondindex',['getSecondIndex',['../classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c',1,'CheMPS2::DMRGSCFunitary']]],
   ['getspecificcoefficient',['getSpecificCoefficient',['../classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e',1,'CheMPS2::DMRG']]],
+  ['getstartlocrandom',['getStartLocRandom',['../classCheMPS2_1_1DMRGSCFoptions.html#a874f361f6567bebf376a4d35095b4a98',1,'CheMPS2::DMRGSCFoptions']]],
   ['getstorediis',['getStoreDIIS',['../classCheMPS2_1_1DMRGSCFoptions.html#a59cdddf8451651c980aa49957c2897b5',1,'CheMPS2::DMRGSCFoptions']]],
   ['getstoreunitary',['getStoreUnitary',['../classCheMPS2_1_1DMRGSCFoptions.html#acea3d3f5a5abf8a4bdd509fc13a1a275',1,'CheMPS2::DMRGSCFoptions']]],
   ['gettmat',['getTmat',['../classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f',1,'CheMPS2::Hamiltonian']]],
