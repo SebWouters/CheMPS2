@@ -46,10 +46,11 @@ namespace CheMPS2{
          //! Maximize the Edmiston-Ruedenberg cost function
          /** \param temp1 Work memory of at least max(dim(irrep(Ham)))^4
              \param temp2 Work memory of at least max(dim(irrep(Ham)))^4
+             \param startFromRandomUnitary The name of the variable says it all. Useful if the point group symmetry is reduced to make use of locality in the DMRG calculations, but when the molecular orbitals still belong to the full point group.
              \param gradThreshold Stop if the norm of the gradient is smaller than this value
              \param maxIter Stop if maxIter iterations have been performed (when gradThreshold is not reached)
              \return The value of the optimized cost function */
-         double Optimize(double * temp1, double * temp2, const double gradThreshold=EDMISTONRUED_gradThreshold, const int maxIter=EDMISTONRUED_maxIter);
+         double Optimize(double * temp1, double * temp2, const bool startFromRandomUnitary, const double gradThreshold=EDMISTONRUED_gradThreshold, const int maxIter=EDMISTONRUED_maxIter);
          
          //! Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per irrep)
          /** \param maxlinsize max(dim(irrep(Ham)))

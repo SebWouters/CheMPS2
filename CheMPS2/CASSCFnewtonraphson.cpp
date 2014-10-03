@@ -153,7 +153,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       
       //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
       if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         theLocalizer->Optimize(mem1, mem2); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+         theLocalizer->Optimize(mem1, mem2, theDMRGSCFoptions->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
          fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);

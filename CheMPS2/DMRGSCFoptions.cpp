@@ -34,6 +34,7 @@ CheMPS2::DMRGSCFoptions::DMRGSCFoptions(){
    
    WhichActiveSpace   = CheMPS2::DMRGSCF_whichActiveSpace;
    DumpCorrelations   = CheMPS2::DMRGSCF_dumpCorrelations;
+   StartLocRandom     = CheMPS2::DMRGSCF_startLocRandom;
 
 }
 
@@ -50,6 +51,7 @@ bool   CheMPS2::DMRGSCFoptions::getStoreUnitary() const{       return StoreUnita
 string CheMPS2::DMRGSCFoptions::getUnitaryStorageName() const{ return UnitaryStorageName; }
 int    CheMPS2::DMRGSCFoptions::getWhichActiveSpace() const{   return WhichActiveSpace;   }
 bool   CheMPS2::DMRGSCFoptions::getDumpCorrelations() const{   return DumpCorrelations;   }
+bool   CheMPS2::DMRGSCFoptions::getStartLocRandom() const{     return StartLocRandom;     }
 
 void CheMPS2::DMRGSCFoptions::setDoDIIS(const bool DoDIIS_in){                           DoDIIS             = DoDIIS_in;             }
 void CheMPS2::DMRGSCFoptions::setDIISGradientBranch(const double DIISGradientBranch_in){ DIISGradientBranch = DIISGradientBranch_in; }
@@ -62,7 +64,7 @@ void CheMPS2::DMRGSCFoptions::setStoreUnitary(const bool StoreUnitary_in){      
 void CheMPS2::DMRGSCFoptions::setUnitaryStorageName(const string UnitaryStorageName_in){ UnitaryStorageName = UnitaryStorageName_in; }
 void CheMPS2::DMRGSCFoptions::setWhichActiveSpace(const int WhichActiveSpace_in){        WhichActiveSpace   = WhichActiveSpace_in;   }
 void CheMPS2::DMRGSCFoptions::setDumpCorrelations(const bool DumpCorrelations_in){       DumpCorrelations   = DumpCorrelations_in;   }
-
+void CheMPS2::DMRGSCFoptions::setStartLocRandom(const bool StartLocRandom_in){           StartLocRandom     = StartLocRandom_in;     }
 
 
 

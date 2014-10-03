@@ -45,6 +45,7 @@ namespace CheMPS2{
     DMRG active space options: \n
     (10) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
     (11) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space \n
+    (12) StartLocRandom (bool) : When localized orbitals are used, it is sometimes beneficial to start the localization procedure from a random unitary. A specific example is the reduction of the d2h point group of graphene nanoribbons to the cs point group, in order to make use of locality in the DMRG calculations. Since molecular orbitals will still belong to the full point group d2h, a random unitary helps in constructing localized orbitals which belong to the cs point group.
 */
    class DMRGSCFoptions{
 
@@ -99,6 +100,10 @@ namespace CheMPS2{
          //! Get whether the correlations and two-orbital mutual information should be printed
          /** \return Whether the correlations and two-orbital mutual information should be printed */
          bool getDumpCorrelations() const;
+         
+         //! Get whether the localization procedure should start from a random unitary
+         /** \return Whether the localization procedure should start from a random unitary */
+         bool getStartLocRandom() const;
 
          //! Set whether DIIS should be performed
          /** \param DoDIIS_in Whether DIIS should be performed */
@@ -144,6 +149,10 @@ namespace CheMPS2{
          /** \param DumpCorrelations_in Whether the correlations and two-orbital mutual information should be printed */
          void setDumpCorrelations(const bool DumpCorrelations_in);
          
+         //! Set whether the localization procedure should start from a random unitary
+         /** \param StartLocRandom_in Whether the localization procedure should start from a random unitary */
+         void setStartLocRandom(const bool StartLocRandom_in);
+         
       private:
       
          //See class information
@@ -160,6 +169,7 @@ namespace CheMPS2{
          
          int    WhichActiveSpace;
          bool   DumpCorrelations;
+         bool   StartLocRandom;
          
    };
 }
