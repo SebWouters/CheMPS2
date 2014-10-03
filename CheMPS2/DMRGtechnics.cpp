@@ -55,7 +55,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
       delete [] VeffTilde;
    }
    Energy += Prob->gEconst();
-   if (Energy<MinEnergy){ MinEnergy = Energy; }
+   if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
    denS->Split(MPS[index],MPS[index+1],OptScheme->getD(OptScheme->getNInstructions()-1),true,true);
    delete denS;
    

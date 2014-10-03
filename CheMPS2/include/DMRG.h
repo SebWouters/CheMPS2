@@ -120,8 +120,11 @@ namespace CheMPS2{
          //Pointer to the Problem --> constructed and destructed outside of this class
          Problem * Prob;
          
-         //Minimum energy encountered during the sweep algorithm (as opposed to the 2DM energy)
-         double MinEnergy;
+         //Minimum energy encountered during all performed micro-iterations (as opposed to the 2DM/edge energy)
+         double TotalMinEnergy;
+         
+         //Minimum energy encountered during the micro-iterations of the last performed sweep (as opposed to the 2DM/edge energy)
+         double LastMinEnergy;
          
          //Max. discarded weight of last sweep
          double MaxDiscWeightLastSweep;

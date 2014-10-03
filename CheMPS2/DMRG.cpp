@@ -153,14 +153,14 @@ void CheMPS2::DMRG::PreSolve(){
    
    for (int cnt=0; cnt<Prob->gL()-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }
    
-   MinEnergy = 1e8;
+   TotalMinEnergy = 1e8;
    MaxDiscWeightLastSweep = 0.0;
 
 }
 
 double CheMPS2::DMRG::Solve(){
 
-   bool change = (MinEnergy<1e8) ? true : false; //1 sweep from right to left: fixed virtual dimensions
+   bool change = (TotalMinEnergy<1e8) ? true : false; //1 sweep from right to left: fixed virtual dimensions
    
    for (int instruction=0; instruction < OptScheme->getNInstructions(); instruction++){
    
@@ -177,36 +177,39 @@ double CheMPS2::DMRG::Solve(){
          Energy = sweepleft(change, instruction);
          gettimeofday(&end, NULL);
          double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-         cout << "***  Elapsed wall time during last sweep is " << elapsed << " seconds." << endl;
-         cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
+         cout << "***  Information on left sweep " << nIterations << " of instruction " << instruction << ":" << endl;
+         cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
+         cout << "***     Minimum energy           = " << LastMinEnergy << endl;
+         cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
          if (!change) change = true; //rest of sweeps: variable virtual dimensions
          gettimeofday(&start, NULL);
          Energy = sweepright(change, instruction);
          gettimeofday(&end, NULL);
          elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-         cout << "***  Elapsed wall time during last sweep is " << elapsed << " seconds." << endl;
-         cout << "***  The max. disc. weight at last sweep is " << MaxDiscWeightLastSweep << endl;
+         cout << "***  Information on right sweep " << nIterations << " of instruction " << instruction << ":" << endl;
+         cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
+         cout << "***     Minimum energy           = " << LastMinEnergy << endl;
+         cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
          if (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, false); }
          
          nIterations++;
          
-         cout << "*** Number of leftright sweep iterations is " << nIterations << endl; 
-         cout << "***                The energy difference is " << fabs(Energy-EnergyPrevious) << endl;
-         cout << "***                           The energy is " << Energy << endl;
+         cout << "***  Energy difference with respect to previous leftright sweep = " << fabs(Energy-EnergyPrevious) << endl;
          if (Exc_activated){ calcOverlapsWithLowerStates(); }
       
       }
       
       cout <<    "****************************************************************************" << endl;
-      cout <<    "***    Performed instruction " << instruction << endl;
-      cout <<    "***    Number of reduced DMRG basis states D = " << OptScheme->getD(instruction) << endl;
-      cout <<    "***    The min. energy during the sweeps is " << MinEnergy << endl;
-      cout <<    "***    The max. discarded weight during the last sweep is " << MaxDiscWeightLastSweep << endl;
+      cout <<    "***  Information on completed instruction " << instruction << ":" << endl;
+      cout <<    "***     The reduced virtual dimension DSU(2)               = " << OptScheme->getD(instruction) << endl;
+      cout <<    "***     Minimum energy encountered during all instructions = " << TotalMinEnergy << endl;
+      cout <<    "***     Minimum energy encountered during the last sweep   = " << LastMinEnergy << endl;
+      cout <<    "***     Maximum discarded weight during the last sweep     = " << MaxDiscWeightLastSweep << endl;
       cout <<    "****************************************************************************" << endl;
    
    }
    
-   return MinEnergy;
+   return TotalMinEnergy;
 
 }
 
@@ -215,6 +218,7 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction){
    double Energy = 0.0;
    double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
    MaxDiscWeightLastSweep = 0.0;
+   LastMinEnergy = 1e8;
 
    for (int index = Prob->gL()-2; index>0; index--){
       //Construct S
@@ -238,7 +242,8 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction){
          delete [] VeffTilde;
       }
       Energy += Prob->gEconst();
-      if (Energy<MinEnergy){ MinEnergy = Energy; }
+      if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
+      if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
       
       //Decompose the S-object
       if (NoiseLevel>0.0){ denS->addNoise(NoiseLevel); }
@@ -264,6 +269,7 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction){
    double Energy=0.0;
    double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
    MaxDiscWeightLastSweep = 0.0;
+   LastMinEnergy = 1e8;
 
    for (int index = 0; index<Prob->gL()-2; index++){
       //Construct S
@@ -287,7 +293,8 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction){
          delete [] VeffTilde;
       }
       Energy += Prob->gEconst();
-      if (Energy<MinEnergy){ MinEnergy = Energy; }
+      if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
+      if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
       
       //Decompose the S-object
       if (NoiseLevel>0.0){ denS->addNoise(NoiseLevel); }
