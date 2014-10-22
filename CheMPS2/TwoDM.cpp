@@ -24,7 +24,6 @@
 #include "Lapack.h"
 #include "Gsl.h"
 #include "Options.h"
-#include "DMRG.h"
 
 using std::max;
 
