@@ -206,8 +206,8 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 &gt; cd mointegrals
 </pre><p>Now, replace the file <code>mointegrals.cc</code> with either:</p>
 <ol type="1">
-<li><code>./mointegrals/mointegrals.cc_PRINT</code> to print the matrix elements as text. Examples of output generated with this plugin can be found in <code>./tests/matrixelements</code></li>
-<li><code>./mointegrals/mointegrals.cc_SAVEHAM</code> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5. See the Doxygen manual for more information on <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a>.</li>
+<li><a href="mointegrals/mointegrals.cc_PRINT">```mointegrals/mointegrals.cc_PRINT```</a> to print the matrix elements as text. Examples of output generated with this plugin can be found in <a href="tests/matrixelements">```tests/matrixelements```</a></li>
+<li><a href="mointegrals/mointegrals.cc_SAVEHAM">```mointegrals/mointegrals.cc_SAVEHAM```</a> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5. See the Doxygen manual for more information on <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a>.</li>
 </ol>
 <p>For case 2, the <code>Makefile</code> should be adjusted. Replace <code></code> with <code> -L${CheMPS2_BINARY_DIR}/CheMPS2/ -lCheMPS2</code> and replace <code></code> with <code> -I${CheMPS2_SOURCE_DIR}/CheMPS2/include/</code></p>
 <p>To compile the Psi4 plugin, run: </p>
@@ -316,7 +316,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/include/TwoDM.h">```CheMPS2/include/TwoDM.h```</a> contains the definitions of the TwoDM class.</p>
 <p><a href="CheMPS2/include/TwoDMstorage.h">```CheMPS2/include/TwoDMstorage.h```</a> contains the definitions of the TwoDMstorage class.</p>
 <p><a href="CheMPS2/include/TwoIndex.h">```CheMPS2/include/TwoIndex.h```</a> contains the definitions of the TwoIndex class.</p>
-<p>Please note that these files are documented with Doxygen-readable comments. Search for the section "Build" in <code><a class="el" href="README_8md_source.html">README.md</a></code> to see how a manual can be generated from these comments.</p>
+<p>Please note that these files are documented with Doxygen-readable comments. Search for the section "Build" in <a class="el" href="README_8md_source.html">```README.md```</a> to see how a manual can be generated from these comments.</p>
 <h2>List of files to perform test runs </h2>
 <p><a href="tests/test1.cpp.in">```tests/test1.cpp.in```</a> contains a ground state DMRG calculation of the ^1Ag state of N2 (d2h symmetry) in the minimal STO-3G basis set.</p>
 <p><a href="tests/test2.cpp.in">```tests/test2.cpp.in```</a> contains a ground state DMRG calculation of the ^1Ag state of a linear H6 chain (d2h symmetry) in the 6-31G basis set.</p>
@@ -324,30 +324,30 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="tests/test4.cpp.in">```tests/test4.cpp.in```</a> contains a ground state DMRG calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open boundary conditions, containing 9 fermions (just below half-filling).</p>
 <p><a href="tests/test5.cpp.in">```tests/test5.cpp.in```</a> contains an excited state DMRG calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The ground and two lowest excited states are determined.</p>
 <p><a href="tests/test6.cpp.in">```tests/test6.cpp.in```</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A significant speedup is obtained with DIIS.</p>
-<p><a href="tests/test7.cpp.in">```tests/test7.cpp.in```</a> reads in <code>tests/matrixelements/O2_CCPVDZ.dat</code>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
+<p><a href="tests/test7.cpp.in">```tests/test7.cpp.in```</a> reads in <a href="tests/matrixelements/O2_CCPVDZ.dat">```tests/matrixelements/O2_CCPVDZ.dat```</a>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
 <p><a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
-<p><a href="tests/test9.cpp.in">```tests/test9.cpp.in```</a> is a copy of test8.cpp.in, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
-<p><code>tests/matrixelements/CH4_N10_S0_c2v_I0.dat</code> contains the matrix elements for test3.</p>
-<p><code>tests/matrixelements/H6_N6_S0_d2h_I0.dat</code> contains the matrix elements for test2.</p>
-<p><code>tests/matrixelements/N2_N14_S0_d2h_I0.dat</code> contains the matrix elements for test1 and test5.</p>
-<p><code>tests/matrixelements/O2_CCPVDZ.dat</code> contains the matrix elements for test6 and test7.</p>
-<p><code>tests/matrixelements/N2_CCPVDZ.dat</code> contains the matrix elements for test8 and test9.</p>
-<p><a href="PyCheMPS2/test1.py.in">```PyCheMPS2/test1.py.in```</a> is the Python version of <code>tests/test1.cpp.in</code></p>
-<p><a href="PyCheMPS2/test2.py.in">```PyCheMPS2/test2.py.in```</a> is the Python version of <code>tests/test2.cpp.in</code></p>
-<p><a href="PyCheMPS2/test3.py.in">```PyCheMPS2/test3.py.in```</a> is the Python version of <code>tests/test3.cpp.in</code></p>
-<p><a href="PyCheMPS2/test4.py.in">```PyCheMPS2/test4.py.in```</a> is the Python version of <code>tests/test4.cpp.in</code></p>
-<p><a href="PyCheMPS2/test5.py.in">```PyCheMPS2/test5.py.in```</a> is the Python version of <code>tests/test5.cpp.in</code></p>
-<p><a href="PyCheMPS2/test6.py.in">```PyCheMPS2/test6.py.in```</a> is the Python version of <code>tests/test6.cpp.in</code></p>
-<p><a href="PyCheMPS2/test7.py.in">```PyCheMPS2/test7.py.in```</a> is the Python version of <code>tests/test7.cpp.in</code></p>
-<p><a href="PyCheMPS2/test8.py.in">```PyCheMPS2/test8.py.in```</a> is the Python version of <code>tests/test8.cpp.in</code></p>
-<p><a href="PyCheMPS2/test9.py.in">```PyCheMPS2/test9.py.in```</a> is the Python version of <code>tests/test9.cpp.in</code></p>
+<p><a href="tests/test9.cpp.in">```tests/test9.cpp.in```</a> is a copy of <a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a>, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
+<p><a href="tests/matrixelements/CH4_N10_S0_c2v_I0.dat">```tests/matrixelements/CH4_N10_S0_c2v_I0.dat```</a> contains the matrix elements for test3.</p>
+<p><a href="tests/matrixelements/H6_N6_S0_d2h_I0.dat">```tests/matrixelements/H6_N6_S0_d2h_I0.dat```</a> contains the matrix elements for test2.</p>
+<p><a href="tests/matrixelements/N2_N14_S0_d2h_I0.dat">```tests/matrixelements/N2_N14_S0_d2h_I0.dat```</a> contains the matrix elements for test1 and test5.</p>
+<p><a href="tests/matrixelements/O2_CCPVDZ.dat">```tests/matrixelements/O2_CCPVDZ.dat```</a> contains the matrix elements for test6 and test7.</p>
+<p><a href="tests/matrixelements/N2_CCPVDZ.dat">```tests/matrixelements/N2_CCPVDZ.dat```</a> contains the matrix elements for test8 and test9.</p>
+<p><a href="PyCheMPS2/test1.py.in">```PyCheMPS2/test1.py.in```</a> is the Python version of <a href="tests/test1.cpp.in">```tests/test1.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test2.py.in">```PyCheMPS2/test2.py.in```</a> is the Python version of <a href="tests/test2.cpp.in">```tests/test2.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test3.py.in">```PyCheMPS2/test3.py.in```</a> is the Python version of <a href="tests/test3.cpp.in">```tests/test3.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test4.py.in">```PyCheMPS2/test4.py.in```</a> is the Python version of <a href="tests/test4.cpp.in">```tests/test4.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test5.py.in">```PyCheMPS2/test5.py.in```</a> is the Python version of <a href="tests/test5.cpp.in">```tests/test5.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test6.py.in">```PyCheMPS2/test6.py.in```</a> is the Python version of <a href="tests/test6.cpp.in">```tests/test6.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test7.py.in">```PyCheMPS2/test7.py.in```</a> is the Python version of <a href="tests/test7.cpp.in">```tests/test7.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test8.py.in">```PyCheMPS2/test8.py.in```</a> is the Python version of <a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test9.py.in">```PyCheMPS2/test9.py.in```</a> is the Python version of <a href="tests/test9.cpp.in">```tests/test9.cpp.in```</a></p>
 <p>These test files illustrate how to use the CheMPS2 library. The tests only require a very limited amount of memory (order 10-100 MB). </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Oct 3 2014 04:33:35 for CheMPS2 by
+    <li class="footer">Generated on Wed Oct 22 2014 00:20:45 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
