@@ -46,6 +46,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2")
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CheMPS2_SOURCE_DIR}/CMake/")
 
+link_directories ($ENV{LD_LIBRARY_PATH})
+if (MKL)
+    set ( ENV{BLA_VENDOR} "Intel10_64lp" )
+endif (MKL)
 find_package (HDF5   REQUIRED)
 find_package (LAPACK REQUIRED)
 find_package (GSL    REQUIRED)
