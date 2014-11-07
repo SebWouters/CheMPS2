@@ -228,6 +228,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/DMRGSCFVmatRotations.cpp">```CheMPS2/DMRGSCFVmatRotations.cpp```</a> performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.</p>
 <p><a href="CheMPS2/DMRGtechnics.cpp">```CheMPS2/DMRGtechnics.cpp```</a> contains the functions related to the 2-RDM and the excited-state calculations.</p>
 <p><a href="CheMPS2/EdmistonRuedenberg.cpp">```CheMPS2/EdmistonRuedenberg.cpp```</a> contains an orbital localization function based on the Edmiston-Ruedenberg cost function and an augmented Hessian Newton-Raphson optimizer.</p>
+<p><a href="CheMPS2/FCI.cpp">```CheMPS2/FCI.cpp```</a> contains a full configuration interaction solver based on Davidson's algorithm.</p>
 <p><a href="CheMPS2/FourIndex.cpp">```CheMPS2/FourIndex.cpp```</a> contains all functions of the FourIndex container class for the two-body matrix elements.</p>
 <p><a href="CheMPS2/Hamiltonian.cpp">```CheMPS2/Hamiltonian.cpp```</a> contains all functions of the Hamiltonian class, including functions to get or set specific variables, as well as the save and load functions to store the Hamiltonian on disk.</p>
 <p><a href="CheMPS2/Heff.cpp">```CheMPS2/Heff.cpp```</a> contains the constructor and destructor of the Heff class, as well as the top-level functions to perform the effective Hamiltonian times guess-vector multiplication and Davidson's algorithm.</p>
@@ -278,6 +279,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/include/DMRGSCFunitary.h">```CheMPS2/include/DMRGSCFunitary.h```</a> contains the definitions of the DMRGSCFunitary class.</p>
 <p><a href="CheMPS2/include/DMRGSCFVmatRotations.h">```CheMPS2/include/DMRGSCFVmatRotations.h```</a> contains the definitions of the DMRGSCFVmatRotations class.</p>
 <p><a href="CheMPS2/include/EdmistonRuedenberg.h">```CheMPS2/include/EdmistonRuedenberg.h```</a> contains the definitions of the EdmistonRuedenberg class.</p>
+<p><a href="CheMPS2/include/FCI.h">```CheMPS2/include/FCI.h```</a> contains the definitions of the FCI class.</p>
 <p><a href="CheMPS2/include/FourIndex.h">```CheMPS2/include/FourIndex.h```</a> contains the definitions of the FourIndex class.</p>
 <p><a href="CheMPS2/include/Gsl.h">```CheMPS2/include/Gsl.h```</a> contains the definitions of the external GSL routines.</p>
 <p><a href="CheMPS2/include/Hamiltonian.h">```CheMPS2/include/Hamiltonian.h```</a> contains the definitions of the Hamiltonian class.</p>
@@ -347,7 +349,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 7 2014 00:09:41 for CheMPS2 by
+    <li class="footer">Generated on Fri Nov 7 2014 00:30:34 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
