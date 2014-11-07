@@ -290,6 +290,9 @@ functions related to the 2-RDM and the excited-state calculations.
 an orbital localization function based on the Edmiston-Ruedenberg cost function
 and an augmented Hessian Newton-Raphson optimizer.
 
+[```CheMPS2/FCI.cpp```](CheMPS2/FCI.cpp) contains a full configuration
+interaction solver based on Davidson's algorithm.
+
 [```CheMPS2/FourIndex.cpp```](CheMPS2/FourIndex.cpp) contains all functions of
 the FourIndex container class for the two-body matrix elements.
 
@@ -461,6 +464,8 @@ DMRGSCFVmatRotations class.
 
 [```CheMPS2/include/EdmistonRuedenberg.h```](CheMPS2/include/EdmistonRuedenberg.h) contains the definitions of the
 EdmistonRuedenberg class.
+
+[```CheMPS2/include/FCI.h```](CheMPS2/include/FCI.h) contains the definitions of the FCI class.
 
 [```CheMPS2/include/FourIndex.h```](CheMPS2/include/FourIndex.h) contains the definitions of the FourIndex
 class.
