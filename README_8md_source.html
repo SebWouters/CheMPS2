@@ -238,7 +238,7 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="stringliteral">    &gt; ./test9</span></div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="stringliteral">These cpp tests should end with a line stating whether or not they succeeded.</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="stringliteral">They only require a very limited amount of memory (order 10-100 MB).</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="stringliteral">They only require a very limited amount of memory (order 10-120 MB).</span></div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="stringliteral">### 3. Build PyCheMPS2 with Cython</span></div>
@@ -270,7 +270,7 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="stringliteral">These tests do exactly the same thing as the cpp tests above, and illustrate</span></div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="stringliteral">the usage of the python interface to CheMPS2. The tests should end with a</span></div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="stringliteral">line stating whether or not they succeeded. They only require a very limited</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="stringliteral">amount of memory (order 10-100 MB).</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="stringliteral">amount of memory (order 10-120 MB).</span></div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="stringliteral">### 5. Doxygen documentation</span></div>
@@ -671,103 +671,102 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;<span class="stringliteral">List of files to perform test runs</span></div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;<span class="stringliteral">----------------------------------</span></div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="stringliteral">[```tests/test1.cpp.in```](tests/test1.cpp.in) contains a ground state DMRG</span></div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of N2 (d2h symmetry) in the minimal STO-3G basis</span></div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;<span class="stringliteral">set.</span></div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="stringliteral">[```tests/test1.cpp.in```](tests/test1.cpp.in) contains several DMRG ground</span></div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="stringliteral">state calculations in different symmetry sectors for the N2 molecule (d2h</span></div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;<span class="stringliteral">symmetry) in the minimal STO-3G basis set.</span></div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="stringliteral"></span></div>
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="stringliteral">[```tests/test2.cpp.in```](tests/test2.cpp.in) contains a ground state DMRG</span></div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of a linear H6 chain (d2h symmetry) in the 6-31G</span></div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;<span class="stringliteral">basis set.</span></div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;<span class="stringliteral">[```tests/test3.cpp.in```](tests/test3.cpp.in) contains a ground state DMRG</span></div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;<span class="stringliteral">calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</span></div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;<span class="stringliteral">[```tests/test4.cpp.in```](tests/test4.cpp.in) contains a ground state DMRG</span></div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;<span class="stringliteral">calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry)</span></div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;<span class="stringliteral">with 10 sites and open boundary conditions, containing 9 fermions (just below</span></div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;<span class="stringliteral">half-filling).</span></div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;<span class="stringliteral">[```tests/test5.cpp.in```](tests/test5.cpp.in) contains an excited state DMRG</span></div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;<span class="stringliteral">calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal</span></div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="stringliteral">STO-3G basis set. The ground and two lowest excited states are determined.</span></div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;<span class="stringliteral">[```tests/test6.cpp.in```](tests/test6.cpp.in) contains a DMRG-SCF ground state</span></div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set.</span></div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="stringliteral">The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;<span class="stringliteral">B3u orbitals are chosen as active space. A significant speedup is obtained with</span></div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="stringliteral">DIIS.</span></div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="stringliteral">[```tests/test7.cpp.in```](tests/test7.cpp.in) reads in</span></div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="stringliteral">[```tests/matrixelements/O2_CCPVDZ.dat```](tests/matrixelements/O2_CCPVDZ.dat),</span></div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="stringliteral">stores these matrix elements to disk, reads them back in from disk, and</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;<span class="stringliteral">compares the two versions.</span></div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in) contains a DMRG-SCF ground state</span></div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set.</span></div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;<span class="stringliteral">The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals</span></div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;<span class="stringliteral">(sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital</span></div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;<span class="stringliteral">(pi bonding and antibonding) are chosen as active space. A significant speedup</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;<span class="stringliteral">is obtained with DIIS. This test is smaller than test6, and is included for</span></div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;<span class="stringliteral">debugging with valgrind.</span></div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;<span class="stringliteral">[```tests/test9.cpp.in```](tests/test9.cpp.in) is a copy of</span></div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in), with a slightly larger active</span></div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;<span class="stringliteral">space and which works with ordered localized orbitals instead of natural</span></div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;<span class="stringliteral">orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the</span></div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;<span class="stringliteral">ordering based on the Fiedler vector with the exchange matrix as cost function.</span></div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;<span class="stringliteral">[```tests/matrixelements/CH4_N10_S0_c2v_I0.dat```](tests/matrixelements/CH4_N10_S0_c2v_I0.dat)</span></div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;<span class="stringliteral">contains the matrix elements for test3.</span></div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;<span class="stringliteral">[```tests/matrixelements/H6_N6_S0_d2h_I0.dat```](tests/matrixelements/H6_N6_S0_d2h_I0.dat)</span></div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;<span class="stringliteral">contains the matrix elements for test2.</span></div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;<span class="stringliteral">[```tests/matrixelements/N2_N14_S0_d2h_I0.dat```](tests/matrixelements/N2_N14_S0_d2h_I0.dat)</span></div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="stringliteral">contains the matrix elements for test1 and test5.</span></div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;<span class="stringliteral">[```tests/matrixelements/O2_CCPVDZ.dat```](tests/matrixelements/O2_CCPVDZ.dat)</span></div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;<span class="stringliteral">contains the matrix elements for test6 and test7.</span></div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;<span class="stringliteral">[```tests/matrixelements/N2_CCPVDZ.dat```](tests/matrixelements/N2_CCPVDZ.dat)</span></div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;<span class="stringliteral">contains the matrix elements for test8 and test9.</span></div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;<span class="stringliteral">[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;<span class="stringliteral">[```tests/test1.cpp.in```](tests/test1.cpp.in)</span></div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;<span class="stringliteral">[```PyCheMPS2/test2.py.in```](PyCheMPS2/test2.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;<span class="stringliteral">[```tests/test2.cpp.in```](tests/test2.cpp.in)</span></div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;<span class="stringliteral">[```PyCheMPS2/test3.py.in```](PyCheMPS2/test3.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="stringliteral">[```tests/test3.cpp.in```](tests/test3.cpp.in)</span></div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="stringliteral">[```PyCheMPS2/test4.py.in```](PyCheMPS2/test4.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="stringliteral">[```tests/test4.cpp.in```](tests/test4.cpp.in)</span></div>
-<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="stringliteral">[```PyCheMPS2/test5.py.in```](PyCheMPS2/test5.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;<span class="stringliteral">[```tests/test5.cpp.in```](tests/test5.cpp.in)</span></div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;<span class="stringliteral">[```PyCheMPS2/test6.py.in```](PyCheMPS2/test6.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="stringliteral">[```tests/test6.cpp.in```](tests/test6.cpp.in)</span></div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="stringliteral">[```PyCheMPS2/test7.py.in```](PyCheMPS2/test7.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;<span class="stringliteral">[```tests/test7.cpp.in```](tests/test7.cpp.in)</span></div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="stringliteral">[```PyCheMPS2/test8.py.in```](PyCheMPS2/test8.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in)</span></div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="stringliteral">[```PyCheMPS2/test9.py.in```](PyCheMPS2/test9.py.in) is the Python version of</span></div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;<span class="stringliteral">[```tests/test9.cpp.in```](tests/test9.cpp.in)</span></div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;<span class="stringliteral">These test files illustrate how to use the CheMPS2 library. The tests only</span></div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="stringliteral">require a very limited amount of memory (order 10-100 MB).</span></div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="stringliteral">calculation of the ^1A1 state of H2O (c2v symmetry) in the 6-31G basis set.</span></div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;<span class="stringliteral">[```tests/test3.cpp.in```](tests/test3.cpp.in) contains a ground state DMRG</span></div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;<span class="stringliteral">calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</span></div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;<span class="stringliteral">[```tests/test4.cpp.in```](tests/test4.cpp.in) contains a ground state DMRG</span></div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;<span class="stringliteral">calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry)</span></div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;<span class="stringliteral">with 10 sites and open boundary conditions, containing 9 fermions (just below</span></div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;<span class="stringliteral">half-filling).</span></div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;<span class="stringliteral">[```tests/test5.cpp.in```](tests/test5.cpp.in) contains an excited state DMRG</span></div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;<span class="stringliteral">calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal</span></div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;<span class="stringliteral">STO-3G basis set. The ground and two lowest excited states are determined.</span></div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="stringliteral">[```tests/test6.cpp.in```](tests/test6.cpp.in) contains a DMRG-SCF ground state</span></div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set.</span></div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;<span class="stringliteral">The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and</span></div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="stringliteral">B3u orbitals are chosen as active space. A significant speedup is obtained with</span></div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;<span class="stringliteral">DIIS.</span></div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;<span class="stringliteral">[```tests/test7.cpp.in```](tests/test7.cpp.in) reads in</span></div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="stringliteral">[```tests/matrixelements/O2_CCPVDZ.dat```](tests/matrixelements/O2_CCPVDZ.dat),</span></div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="stringliteral">stores these matrix elements to disk, reads them back in from disk, and</span></div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="stringliteral">compares the two versions.</span></div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in) contains a DMRG-SCF ground state</span></div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="stringliteral">calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set.</span></div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;<span class="stringliteral">The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals</span></div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;<span class="stringliteral">(sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital</span></div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;<span class="stringliteral">(pi bonding and antibonding) are chosen as active space. A significant speedup</span></div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;<span class="stringliteral">is obtained with DIIS. This test is smaller than test6, and is included for</span></div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;<span class="stringliteral">debugging with valgrind.</span></div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;<span class="stringliteral">[```tests/test9.cpp.in```](tests/test9.cpp.in) is a copy of</span></div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in), with a slightly larger active</span></div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;<span class="stringliteral">space and which works with ordered localized orbitals instead of natural</span></div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;<span class="stringliteral">orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the</span></div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;<span class="stringliteral">ordering based on the Fiedler vector with the exchange matrix as cost function.</span></div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;<span class="stringliteral">[```tests/matrixelements/CH4_N10_S0_c2v_I0.dat```](tests/matrixelements/CH4_N10_S0_c2v_I0.dat)</span></div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;<span class="stringliteral">contains the matrix elements for test3.</span></div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;<span class="stringliteral">[```tests/matrixelements/H2O_631G_eq.dat```](tests/matrixelements/H2O_631G_eq.dat)</span></div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;<span class="stringliteral">contains the matrix elements for test2.</span></div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;<span class="stringliteral">[```tests/matrixelements/N2_N14_S0_d2h_I0.dat```](tests/matrixelements/N2_N14_S0_d2h_I0.dat)</span></div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;<span class="stringliteral">contains the matrix elements for test1 and test5.</span></div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;<span class="stringliteral">[```tests/matrixelements/O2_CCPVDZ.dat```](tests/matrixelements/O2_CCPVDZ.dat)</span></div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;<span class="stringliteral">contains the matrix elements for test6 and test7.</span></div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;<span class="stringliteral">[```tests/matrixelements/N2_CCPVDZ.dat```](tests/matrixelements/N2_CCPVDZ.dat)</span></div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;<span class="stringliteral">contains the matrix elements for test8 and test9.</span></div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;<span class="stringliteral">[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is a Python implementation</span></div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;<span class="stringliteral">of a part of [```tests/test1.cpp.in```](tests/test1.cpp.in)</span></div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;<span class="stringliteral">[```PyCheMPS2/test2.py.in```](PyCheMPS2/test2.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;<span class="stringliteral">[```tests/test2.cpp.in```](tests/test2.cpp.in)</span></div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;<span class="stringliteral">[```PyCheMPS2/test3.py.in```](PyCheMPS2/test3.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;<span class="stringliteral">[```tests/test3.cpp.in```](tests/test3.cpp.in)</span></div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="stringliteral">[```PyCheMPS2/test4.py.in```](PyCheMPS2/test4.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="stringliteral">[```tests/test4.cpp.in```](tests/test4.cpp.in)</span></div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;<span class="stringliteral">[```PyCheMPS2/test5.py.in```](PyCheMPS2/test5.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="stringliteral">[```tests/test5.cpp.in```](tests/test5.cpp.in)</span></div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;<span class="stringliteral">[```PyCheMPS2/test6.py.in```](PyCheMPS2/test6.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;<span class="stringliteral">[```tests/test6.cpp.in```](tests/test6.cpp.in)</span></div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="stringliteral">[```PyCheMPS2/test7.py.in```](PyCheMPS2/test7.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="stringliteral">[```tests/test7.cpp.in```](tests/test7.cpp.in)</span></div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="stringliteral">[```PyCheMPS2/test8.py.in```](PyCheMPS2/test8.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="stringliteral">[```tests/test8.cpp.in```](tests/test8.cpp.in)</span></div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="stringliteral">[```PyCheMPS2/test9.py.in```](PyCheMPS2/test9.py.in) is the Python version of</span></div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="stringliteral">[```tests/test9.cpp.in```](tests/test9.cpp.in)</span></div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="stringliteral">These test files illustrate how to use the CheMPS2 library. The tests only</span></div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;<span class="stringliteral">require a very limited amount of memory (order 10-120 MB).</span></div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="stringliteral"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>README.md</b></li>
-    <li class="footer">Generated on Wed Oct 22 2014 00:20:34 for CheMPS2 by
+    <li class="footer">Generated on Fri Nov 7 2014 00:09:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

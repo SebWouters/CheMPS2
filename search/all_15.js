@@ -10,6 +10,7 @@ var searchData=
   ['_7edmrgscfunitary',['~DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#aceba497a828617733e83f00fc2766163',1,'CheMPS2::DMRGSCFunitary']]],
   ['_7edmrgscfvmatrotations',['~DMRGSCFVmatRotations',['../classCheMPS2_1_1DMRGSCFVmatRotations.html#a546f098c690b6df4b1e8a63ac462aa26',1,'CheMPS2::DMRGSCFVmatRotations']]],
   ['_7eedmistonruedenberg',['~EdmistonRuedenberg',['../classCheMPS2_1_1EdmistonRuedenberg.html#a5d012081f089d72c472ced2ae7bdaaf0',1,'CheMPS2::EdmistonRuedenberg']]],
+  ['_7efci',['~FCI',['../classCheMPS2_1_1FCI.html#adbc5264ad1dd857cdd5ba99e749c761a',1,'CheMPS2::FCI']]],
   ['_7efourindex',['~FourIndex',['../classCheMPS2_1_1FourIndex.html#a4988b7745b0ec4d5f86c4af89ba20430',1,'CheMPS2::FourIndex']]],
   ['_7ehamiltonian',['~Hamiltonian',['../classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51',1,'CheMPS2::Hamiltonian']]],
   ['_7eheff',['~Heff',['../classCheMPS2_1_1Heff.html#aaa1c2a606d65807f669b2a6cbbd9b510',1,'CheMPS2::Heff']]],

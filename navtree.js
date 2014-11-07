@@ -20,8 +20,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51",
-"classCheMPS2_1_1TensorSwap.html"
+"classCheMPS2_1_1FCI.html#adbc5264ad1dd857cdd5ba99e749c761a",
+"classCheMPS2_1_1TensorS1Bbase.html#a303971537dced8c2e0395b0994a689ac"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

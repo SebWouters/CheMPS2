@@ -168,7 +168,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:a5203e4ac44a9c369974d9f817f634ddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the max. possible spin value for a certain boundary and particle number.  <a href="#a5203e4ac44a9c369974d9f817f634ddb">More...</a><br/></td></tr>
 <tr class="separator:a5203e4ac44a9c369974d9f817f634ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f5e333529c89f6f5f2ce2f11e082c49"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1SyBookkeeper.html#a6f5e333529c89f6f5f2ce2f11e082c49">gFCIdim</a> (const int bound, const int N, const int TwoS, const int Icnt) const </td></tr>
-<tr class="memdesc:a6f5e333529c89f6f5f2ce2f11e082c49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the FCI virtual dimensions (bound by cutoff)  <a href="#a6f5e333529c89f6f5f2ce2f11e082c49">More...</a><br/></td></tr>
+<tr class="memdesc:a6f5e333529c89f6f5f2ce2f11e082c49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> virtual dimensions (bound by cutoff)  <a href="#a6f5e333529c89f6f5f2ce2f11e082c49">More...</a><br/></td></tr>
 <tr class="separator:a6f5e333529c89f6f5f2ce2f11e082c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44ff8a4f047febaab0674a239c982715"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1SyBookkeeper.html#a44ff8a4f047febaab0674a239c982715">gD</a> () const </td></tr>
 <tr class="memdesc:a44ff8a4f047febaab0674a239c982715"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the total (reduced) virtual dimension.  <a href="#a44ff8a4f047febaab0674a239c982715">More...</a><br/></td></tr>
@@ -236,8 +236,8 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <dl class="section date"><dt>Date</dt><dd>February 14, 2013</dd></dl>
 <p>The <a class="el" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> class keeps track of all the symmetry at the boundaries. This includes:</p>
 <ul>
-<li>the FCI virtual dimensions per symmetry sector</li>
-<li>an extra consistency check (next to the one in <a class="el" href="Problem_8cpp_source.html">Problem.cpp</a>) to check whether the desired symmetry in the <a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> class is possible (non-zero FCI dimensions)</li>
+<li>the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> virtual dimensions per symmetry sector</li>
+<li>an extra consistency check (next to the one in <a class="el" href="Problem_8cpp_source.html">Problem.cpp</a>) to check whether the desired symmetry in the <a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> class is possible (non-zero <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> dimensions)</li>
 <li>the current virtual dimensions per symmetry sector, so everyone can check the current dimensions here. </li>
 </ul>
 
@@ -409,7 +409,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
       </table>
 </div><div class="memdoc">
 
-<p>Get the FCI virtual dimensions (bound by cutoff) </p>
+<p>Get the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> virtual dimensions (bound by cutoff) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bound</td><td>The boundary index </td></tr>
@@ -887,7 +887,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a></li>
-    <li class="footer">Generated on Wed Oct 22 2014 00:20:35 for CheMPS2 by
+    <li class="footer">Generated on Fri Nov 7 2014 00:09:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

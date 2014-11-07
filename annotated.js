@@ -11,6 +11,7 @@ var annotated =
       [ "DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", "classCheMPS2_1_1DMRGSCFunitary" ],
       [ "DMRGSCFVmatRotations", "classCheMPS2_1_1DMRGSCFVmatRotations.html", "classCheMPS2_1_1DMRGSCFVmatRotations" ],
       [ "EdmistonRuedenberg", "classCheMPS2_1_1EdmistonRuedenberg.html", "classCheMPS2_1_1EdmistonRuedenberg" ],
+      [ "FCI", "classCheMPS2_1_1FCI.html", "classCheMPS2_1_1FCI" ],
       [ "FourIndex", "classCheMPS2_1_1FourIndex.html", "classCheMPS2_1_1FourIndex" ],
       [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html", "classCheMPS2_1_1Hamiltonian" ],
       [ "Heff", "classCheMPS2_1_1Heff.html", "classCheMPS2_1_1Heff" ],
