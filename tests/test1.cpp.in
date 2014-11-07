@@ -70,13 +70,14 @@ int main(void){
       CheMPS2::ConvergenceScheme OptScheme(1);
       //OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
       OptScheme.setInstruction(0, 2000, 1e-10, 100, 0.0);
-      CheMPS2::DMRG theDMRG(Prob, &OptScheme);
-      EDMRG[counter] = theDMRG.Solve();
-      theDMRG.calc2DMandCorrelations();
-      if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG.deleteStoredMPS(); }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG.deleteStoredOperators(); }
+      CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, &OptScheme);
+      EDMRG[counter] = theDMRG->Solve();
+      theDMRG->calc2DMandCorrelations();
+      if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
       
       //Clean up
+      delete theDMRG;
       delete Prob;
 
    }
