@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef CORRELATIONS_H
-#define CORRELATIONS_H
+#ifndef CORRELATIONS_CHEMPS2_H
+#define CORRELATIONS_CHEMPS2_H
 
 #include "SyBookkeeper.h"
 #include "Problem.h"

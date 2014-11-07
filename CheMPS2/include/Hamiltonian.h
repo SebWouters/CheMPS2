@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef HAMILTONIAN_H
-#define HAMILTONIAN_H
+#ifndef HAMILTONIAN_CHEMPS2_H
+#define HAMILTONIAN_CHEMPS2_H
 
 #include <string>
 

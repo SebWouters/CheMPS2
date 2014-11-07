@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef DIIS_H
-#define DIIS_H
+#ifndef DIIS_CHEMPS2_H
+#define DIIS_CHEMPS2_H
 
 #include "Options.h"
 

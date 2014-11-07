@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef FOURINDEX_H
-#define FOURINDEX_H
+#ifndef FOURINDEX_CHEMPS2_H
+#define FOURINDEX_CHEMPS2_H
 
 #include "Irreps.h"
 

@@ -23,6 +23,7 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "FCI.h"
 
 using namespace std;
 
@@ -56,20 +57,48 @@ int main(void){
    OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
    
    //Run ground state calculation
-   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
-   double Energy = theDMRG->Solve();
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+   const double EnergyDMRG = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    
-   //Clean up
+   //Calculate FCI reference energy and compare the DMRG and FCI 2-RDMs
+   const int FCIverbose = 1;
+   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Prob, FCIverbose);
+   double * inoutput = new double[theFCI->getVecLength()];
+   const int NLowEnergyDet = 1;
+   theFCI->GSSmallCISpace(NLowEnergyDet, inoutput);
+   const double EnergyFCI = theFCI->GSDavidson(inoutput);
+   const int L = Ham->getL();
+   double * TwoDMspace = new double[ L*L*L*L ];
+   theFCI->Fill2RDM(inoutput, TwoDMspace);
+   double RMSerror2DM = 0.0;
+   for (int orb1=0; orb1<L; orb1++){
+      for (int orb2=0; orb2<L; orb2++){
+         for (int orb3=0; orb3<L; orb3++){
+            for (int orb4=0; orb4<L; orb4++){
+               const double difference = TwoDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
+                                       - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
+               RMSerror2DM += difference * difference;
+            }
+         }
+      }
+   }
+   delete [] TwoDMspace;
+   delete [] inoutput;
+   RMSerror2DM = sqrt(RMSerror2DM);
+   cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDMs = " << RMSerror2DM << endl;
+   
+   //Clean up DMRG and FCI
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
+   delete theFCI;
    delete Prob;
    delete Ham;
 
-   //Check succes
-   bool success = (fabs(Energy + 39.8068131148456) < 1e-10) ? true : false;
+   //Check success
+   bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) && ( RMSerror2DM < 1e-6 )) ? true : false;
    cout << "================> Did test 3 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }

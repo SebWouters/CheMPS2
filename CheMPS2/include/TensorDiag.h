@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TENSORDIAG_H
-#define TENSORDIAG_H
+#ifndef TENSORDIAG_CHEMPS2_H
+#define TENSORDIAG_CHEMPS2_H
 
 #include "Tensor.h"
 #include "SyBookkeeper.h"

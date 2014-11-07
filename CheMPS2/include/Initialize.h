@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef INITIALIZE_H
-#define INITIALIZE_H
+#ifndef INITIALIZE_CHEMPS2_H
+#define INITIALIZE_CHEMPS2_H
 
 namespace CheMPS2{
 /** Initialize class.

@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TWODM_H
-#define TWODM_H
+#ifndef TWODM_CHEMPS2_H
+#define TWODM_CHEMPS2_H
 
 #include "TensorT.h"
 #include "TensorL.h"

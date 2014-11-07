@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef HEFF_H
-#define HEFF_H
+#ifndef HEFF_CHEMPS2_H
+#define HEFF_CHEMPS2_H
 
 #include "TensorL.h"
 #include "TensorA.h"

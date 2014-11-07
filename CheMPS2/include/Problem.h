@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef PROBLEM_H
-#define PROBLEM_H
+#ifndef PROBLEM_CHEMPS2_H
+#define PROBLEM_CHEMPS2_H
 
 #include "Hamiltonian.h"
 

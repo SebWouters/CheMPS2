@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TWODMSTORAGE_H
-#define TWODMSTORAGE_H
+#ifndef TWODMSTORAGE_CHEMPS2_H
+#define TWODMSTORAGE_CHEMPS2_H
 
 #include "Irreps.h"
 

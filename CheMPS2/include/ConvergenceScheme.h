@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef CONVERGENCESCHEME_H
-#define CONVERGENCESCHEME_H
+#ifndef CONVERGENCESCHEME_CHEMPS2_H
+#define CONVERGENCESCHEME_CHEMPS2_H
 
 namespace CheMPS2{
 /** ConvergenceScheme class.

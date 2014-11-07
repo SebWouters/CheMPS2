@@ -132,7 +132,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test9
 
 These cpp tests should end with a line stating whether or not they succeeded.
-They only require a very limited amount of memory (order 10-100 MB).
+They only require a very limited amount of memory (order 10-120 MB).
 
 
 ### 3. Build PyCheMPS2 with Cython
@@ -164,7 +164,7 @@ To test PyCheMPS2, start in ```./build```, and run:
 These tests do exactly the same thing as the cpp tests above, and illustrate
 the usage of the python interface to CheMPS2. The tests should end with a
 line stating whether or not they succeeded. They only require a very limited
-amount of memory (order 10-100 MB).
+amount of memory (order 10-120 MB).
 
 
 ### 5. Doxygen documentation
@@ -565,13 +565,12 @@ manual can be generated from these comments.
 List of files to perform test runs
 ----------------------------------
 
-[```tests/test1.cpp.in```](tests/test1.cpp.in) contains a ground state DMRG
-calculation of the ^1Ag state of N2 (d2h symmetry) in the minimal STO-3G basis
-set.
+[```tests/test1.cpp.in```](tests/test1.cpp.in) contains several DMRG ground
+state calculations in different symmetry sectors for the N2 molecule (d2h
+symmetry) in the minimal STO-3G basis set.
 
 [```tests/test2.cpp.in```](tests/test2.cpp.in) contains a ground state DMRG
-calculation of the ^1Ag state of a linear H6 chain (d2h symmetry) in the 6-31G
-basis set.
+calculation of the ^1A1 state of H2O (c2v symmetry) in the 6-31G basis set.
 
 [```tests/test3.cpp.in```](tests/test3.cpp.in) contains a ground state DMRG
 calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.
@@ -613,7 +612,7 @@ ordering based on the Fiedler vector with the exchange matrix as cost function.
 [```tests/matrixelements/CH4_N10_S0_c2v_I0.dat```](tests/matrixelements/CH4_N10_S0_c2v_I0.dat)
 contains the matrix elements for test3.
 
-[```tests/matrixelements/H6_N6_S0_d2h_I0.dat```](tests/matrixelements/H6_N6_S0_d2h_I0.dat)
+[```tests/matrixelements/H2O_631G_eq.dat```](tests/matrixelements/H2O_631G_eq.dat)
 contains the matrix elements for test2.
 
 [```tests/matrixelements/N2_N14_S0_d2h_I0.dat```](tests/matrixelements/N2_N14_S0_d2h_I0.dat)
@@ -625,8 +624,8 @@ contains the matrix elements for test6 and test7.
 [```tests/matrixelements/N2_CCPVDZ.dat```](tests/matrixelements/N2_CCPVDZ.dat)
 contains the matrix elements for test8 and test9.
 
-[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is the Python version of
-[```tests/test1.cpp.in```](tests/test1.cpp.in)
+[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is a Python implementation
+of a part of [```tests/test1.cpp.in```](tests/test1.cpp.in)
 
 [```PyCheMPS2/test2.py.in```](PyCheMPS2/test2.py.in) is the Python version of
 [```tests/test2.cpp.in```](tests/test2.cpp.in)
@@ -653,5 +652,5 @@ contains the matrix elements for test8 and test9.
 [```tests/test9.cpp.in```](tests/test9.cpp.in)
 
 These test files illustrate how to use the CheMPS2 library. The tests only
-require a very limited amount of memory (order 10-100 MB).
+require a very limited amount of memory (order 10-120 MB).
 

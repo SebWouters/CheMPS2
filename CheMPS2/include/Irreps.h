@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef IRREPS_H
-#define IRREPS_H
+#ifndef IRREPS_CHEMPS2_H
+#define IRREPS_CHEMPS2_H
 
 #include <string>
 using std::string;

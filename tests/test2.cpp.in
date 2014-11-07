@@ -23,6 +23,7 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "FCI.h"
 
 using namespace std;
 
@@ -31,46 +32,57 @@ int main(void){
    CheMPS2::Initialize::Init();
    
    //The path to the matrix elements
-   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/H6_N6_S0_d2h_I0.dat";
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/H2O_631G_eq.dat";
    
    //The Hamiltonian
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);
    cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
    
    //The targeted state
-   int TwoS = 0;
-   int N = 6;
-   int Irrep = 0;
+   const int TwoS = 0;
+   const int N = 10;
+   const int Irrep = 0;
    CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
-   Prob->SetupReorderD2h();
    
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
-   int D = 30;
+   int D = 100;
    double Econv = 1e-10;
    int maxSweeps = 3;
    double noisePrefactor = 0.1;
    OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
-   D = 1000;
+   D = 3000;
    maxSweeps = 10;
    noisePrefactor = 0.0;
    OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
    
    //Run ground state calculation
-   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
-   double Energy = theDMRG->Solve();
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+   const double EnergyDMRG = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    
-   //Clean up
+   //Clean up DMRG
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
+   
+   //Calculate FCI reference energy
+   const int FCIverbose = 1;
+   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Prob, FCIverbose);
+   double * inoutput = new double[theFCI->getVecLength()];
+   const int NLowEnergyDet = 1;
+   theFCI->GSSmallCISpace(NLowEnergyDet, inoutput);
+   const double EnergyFCI = theFCI->GSDavidson(inoutput);
+   delete [] inoutput;
+   
+   //Clean up FCI
+   delete theFCI;
    delete Prob;
    delete Ham;
    
    //Check succes
-   bool success = (fabs(Energy + 3.33351730146068) < 1e-10) ? true : false;
+   bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) ? true : false;
    cout << "================> Did test 2 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }

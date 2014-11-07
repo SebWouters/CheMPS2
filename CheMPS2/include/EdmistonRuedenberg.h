@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef EDMISTONRUEDENBERG_H
-#define EDMISTONRUEDENBERG_H
+#ifndef EDMISTONRUEDENBERG_CHEMPS2_H
+#define EDMISTONRUEDENBERG_CHEMPS2_H
 
 #include "Options.h"
 #include "DMRGSCFunitary.h"

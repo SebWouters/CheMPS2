@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TENSOR_H
-#define TENSOR_H
+#ifndef TENSOR_CHEMPS2_H
+#define TENSOR_CHEMPS2_H
 
 #include "SyBookkeeper.h"
 

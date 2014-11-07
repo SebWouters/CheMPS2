@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef SYBOOKKEEPER_H
-#define SYBOOKKEEPER_H
+#ifndef SYBOOKKEEPER_CHEMPS2_H
+#define SYBOOKKEEPER_CHEMPS2_H
 
 #include "Problem.h"
 #include "Irreps.h"
