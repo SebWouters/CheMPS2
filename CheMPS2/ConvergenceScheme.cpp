@@ -18,25 +18,19 @@
 */
 
 #include <stdlib.h>
-#include <iostream>
+#include <assert.h>
 
 #include "ConvergenceScheme.h"
-
-using std::cerr;
-using std::endl;
 
 CheMPS2::ConvergenceScheme::ConvergenceScheme(const int nInstructions){
 
    this->nInstructions = nInstructions;
-
-   if (nInstructions > 0){
-      nD              = new int[   nInstructions];
-      fEconv          = new double[nInstructions];
-      nMaxSweeps      = new int[   nInstructions];
-      fNoisePrefactor = new double[nInstructions];
-   } else {
-      cerr << "CheMPS2::ConvergenceScheme::ConvergenceScheme  ::  The number of desired instructions was " << nInstructions << endl;
-   }
+   
+   assert( nInstructions>0 );
+   nD              = new int[   nInstructions];
+   fEconv          = new double[nInstructions];
+   nMaxSweeps      = new int[   nInstructions];
+   fNoisePrefactor = new double[nInstructions];
 
 }
 
@@ -53,22 +47,17 @@ int CheMPS2::ConvergenceScheme::getNInstructions(){ return nInstructions; }
          
 void CheMPS2::ConvergenceScheme::setInstruction(const int instruction, const int D, const double Econv, const int nMax, const double noisePrefactor){
 
-   if ((instruction < 0) || (instruction >= nInstructions)){
-      cerr << "CheMPS2::ConvergenceScheme::setInstruction  ::  The instruction number was " << instruction << "/" << nInstructions << endl;
-      return;
-   }
+   assert( instruction>=0 );
+   assert( instruction<nInstructions );
+   assert( D>0 );
+   assert( Econv>0.0 );
+   assert( nMax>0 );
+   assert( noisePrefactor>=0.0 );
    
-   if ((D>0) && (Econv>0.0) && (nMax>0) && (noisePrefactor>=0.0)){
-      nD[             instruction] = D;
-      fEconv[         instruction] = Econv;
-      nMaxSweeps[     instruction] = nMax;
-      fNoisePrefactor[instruction] = noisePrefactor;
-   } else {
-      cerr << "CheMPS2::ConvergenceScheme::setInstruction  ::  D was " << D << endl;
-      cerr << "CheMPS2::ConvergenceScheme::setInstruction  ::  Econv was " << Econv << endl;
-      cerr << "CheMPS2::ConvergenceScheme::setInstruction  ::  nMax was " << nMax << endl;
-      cerr << "CheMPS2::ConvergenceScheme::setInstruction  ::  noisePrefactor was " << noisePrefactor << endl;
-   }
+                nD[instruction] = D;
+            fEconv[instruction] = Econv;
+        nMaxSweeps[instruction] = nMax;
+   fNoisePrefactor[instruction] = noisePrefactor;
 
 }
 

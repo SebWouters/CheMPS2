@@ -54,7 +54,7 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
    int * OrbIrreps = new int[L];
    for (int cnt=0; cnt<L; cnt++){ OrbIrreps[cnt] = HamIn->getOrbitalIrrep(cnt); }
 
-   HamOrig    = new Hamiltonian(L, SyGroup, OrbIrreps);
+   HamOrig = new Hamiltonian(L, SyGroup, OrbIrreps);
    
    delete [] OrbIrreps;
    
@@ -201,8 +201,8 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         if (irrep==0){ cout << "   DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
-         else {         cout << "                       DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
+         if (irrep==0){ cout << "DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
+         else {         cout << "                    DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 
@@ -574,7 +574,7 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    //Print what we have just set up.
    iHandler->Print();
    
-   cout << "   DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
+   cout << "DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
 
 }
 

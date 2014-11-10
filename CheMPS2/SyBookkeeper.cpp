@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <math.h>
 
@@ -72,7 +73,7 @@ CheMPS2::SyBookkeeper::SyBookkeeper(const Problem * Probin, const int Din) : Irr
    ScaleCurrentDim(Din);
    
    if (CheMPS2::SYBK_debugPrint) print();
-   if (!IsPossible()){ cout << "The desired symmetry is NOT possible." << endl; }
+   assert( IsPossible() );
 
 }
 

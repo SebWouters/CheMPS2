@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 
 #include "Problem.h"
@@ -75,7 +76,7 @@ void CheMPS2::Problem::SetupReorderD2h(){
             }
          }
       }
-      if (DMRGOrb != Ham->getL()){ cout << "Something went wrong in Problem::SetupReorderD2h." << endl; }
+      assert( DMRGOrb==Ham->getL() );
       
    }
 

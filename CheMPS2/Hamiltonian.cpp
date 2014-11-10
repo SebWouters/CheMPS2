@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -36,9 +37,8 @@ using std::ifstream;
 CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const int * OrbIrreps){
 
    L = Norbitals;
-   if ((nGroup<0) || (nGroup>7)){
-      cout << "Error at Hamiltonian::Hamiltonian : nGroup out of bound." << endl;
-   }
+   assert( nGroup>=0 );
+   assert( nGroup<=7 );
    SymmInfo.setGroup(nGroup);
    
    orb2irrep = new int[L];
@@ -47,9 +47,8 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
    irrep2num_orb = new int[nIrreps];
    for (int cnt=0; cnt<nIrreps; cnt++) irrep2num_orb[cnt] = 0;
    for (int cnt=0; cnt<L; cnt++){
-      if ((OrbIrreps[cnt]<0) || (OrbIrreps[cnt]>=nIrreps)){
-         cout << "Error at Hamiltonian::Hamiltonian : OrbIrreps[cnt] out of bound." << endl;
-      }
+      assert( OrbIrreps[cnt]>=0 );
+      assert( OrbIrreps[cnt]<nIrreps );
       orb2irrep[cnt] = OrbIrreps[cnt];
       orb2indexSy[cnt] = irrep2num_orb[orb2irrep[cnt]];
       irrep2num_orb[orb2irrep[cnt]]++;
@@ -82,13 +81,8 @@ double CheMPS2::Hamiltonian::getEconst() const{ return Econst; }
 
 void CheMPS2::Hamiltonian::setTmat(const int index1, const int index2, const double val){
 
-   if (orb2irrep[index1]==orb2irrep[index2]){
-      Tmat->set(orb2irrep[index1], orb2indexSy[index1], orb2indexSy[index2], val);
-      return;
-   } else {
-      if (val==0.0) return;
-      cout << "Error at Hamiltonian::setTmat: sy1 != sy2 and val != 0.0" << endl;
-   }
+   assert( orb2irrep[index1]==orb2irrep[index2] );
+   Tmat->set(orb2irrep[index1], orb2indexSy[index1], orb2indexSy[index2], val);
 
 }
 
@@ -104,25 +98,15 @@ double CheMPS2::Hamiltonian::getTmat(const int index1, const int index2) const{
 
 void CheMPS2::Hamiltonian::setVmat(const int index1, const int index2, const int index3, const int index4, const double val){
 
-   if ( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) ){
-      Vmat->set(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
-      return;
-   } else {
-      if (val==0.0) return;
-      cout << "Error at Hamiltonian::setVmat: sy1 x sy2 != sy3 x sy4 and val != 0.0" << endl;
-   }
+   assert( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) );
+   Vmat->set(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
 
 }
 
 void CheMPS2::Hamiltonian::addToVmat(const int index1, const int index2, const int index3, const int index4, const double val){
 
-   if ( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) ){
-      Vmat->add(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
-      return;
-   } else {
-      if (val==0.0) return;
-      cout << "Error at Hamiltonian::addToVmat: sy1 x sy2 != sy3 x sy4 and val != 0.0" << endl;
-   }
+   assert( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) );
+   Vmat->add(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
 
 }
 
@@ -202,20 +186,20 @@ void CheMPS2::Hamiltonian::read(){
          hid_t dataset_id = H5Dopen(group_id, "L", H5P_DEFAULT);
          int Lagain;
          H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &Lagain);
-         if (L!=Lagain) cout << "Error at Hamiltonian::read : Number of orbitals mismatch." << endl;
+         assert( L==Lagain );
          
          //The group number
          hid_t dataset_id2 = H5Dopen(group_id, "nGroup", H5P_DEFAULT);
          int nGroup;
          H5Dread(dataset_id2, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &nGroup);
-         if (nGroup!=SymmInfo.getGroupNumber()) cout << "Error at Hamiltonian::read : Group number mismatch." << endl;
+         assert( nGroup==SymmInfo.getGroupNumber() );
          
          //orb2irrep
          hid_t dataset_id3 = H5Dopen(group_id, "orb2irrep", H5P_DEFAULT);
          int * orb2irrepAgain = new int[L];
          H5Dread(dataset_id3, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, orb2irrepAgain);
          for (int cnt=0; cnt<L; cnt++){
-            if (orb2irrep[cnt]!=orb2irrepAgain[cnt]) cout << "Error at Hamiltonian::read : Mismatch in one of the orbital irreps." << endl;
+            assert( orb2irrep[cnt]==orb2irrepAgain[cnt] );
          }
          delete [] orb2irrepAgain;
          

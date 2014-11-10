@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -30,7 +31,6 @@
 
 using std::string;
 using std::ifstream;
-using std::cerr;
 using std::cout;
 using std::endl;
 
@@ -88,7 +88,7 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
          }
       }
    }
-   if (x_linearlength != x_linearlength2){ cerr << "DMRGSCFunitary::DMRGSCFunitary : The number of variables is different!" << endl; }
+   assert( x_linearlength==x_linearlength2 );
 
 }
 
@@ -133,8 +133,8 @@ void CheMPS2::DMRGSCFunitary::buildSkewSymmX(const int irrep, double * result, d
          for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
             int index1 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
             int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
-            int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            const int xsolindex = getLinearIndex(index1,index2);
+            assert( xsolindex!=-1 );
             index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             result[ index1 + linsize*index2 ] = Xelem[xsolindex];
@@ -145,8 +145,8 @@ void CheMPS2::DMRGSCFunitary::buildSkewSymmX(const int irrep, double * result, d
          for (int cntVirt=0; cntVirt<iHandler->getNVIRT(irrep); cntVirt++){
             int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
             int index2 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
-            int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            const int xsolindex = getLinearIndex(index1,index2);
+            assert( xsolindex!=-1 );
             index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             result[ index1 + linsize*index2 ] = Xelem[xsolindex];
@@ -157,8 +157,8 @@ void CheMPS2::DMRGSCFunitary::buildSkewSymmX(const int irrep, double * result, d
          for (int cntVirt=0; cntVirt<iHandler->getNVIRT(irrep); cntVirt++){
             int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
             int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
-            int xsolindex = getLinearIndex(index1,index2);
-            if (xsolindex==-1){ cerr << "DMRGSCFunitary::buildSkewSymmX : xsolindex==-1" << endl; }
+            const int xsolindex = getLinearIndex(index1,index2);
+            assert( xsolindex!=-1 );
             index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
             result[ index1 + linsize*index2 ] = Xelem[xsolindex];
@@ -398,14 +398,9 @@ void CheMPS2::DMRGSCFunitary::getLog(double * vector, double * temp1, double * t
             f_low = f_high;
             f_high = temp;
          }
-         if (f_high < 0.0){
-            cerr << "   DMRGSCFunitary::getLog : Determinant of V^T*U*V for irrep " << irrep << " (should be +1 or -1) = " << f_high << endl;
-            cerr << "                            ln(U) will yield a complex skew-Hermitian matrix. The exponential of a linear" << endl;
-            cerr << "                            combination of such matrices will in general not be orthogonal (real-valued)." << endl;
-         } else {
-            if (CheMPS2::DMRGSCF_debugPrint){
-               cout << "   DMRGSCFunitary::getLog : Determinant of V^T*U*V for irrep " << irrep << " (should be +1 or -1) = " << f_high << endl;
-            }
+         assert( f_high>0.0 );
+         if (CheMPS2::DMRGSCF_debugPrint){
+            cout << "   DMRGSCFunitary::getLog : Determinant of V^T*U*V for irrep " << irrep << " (should be +1) = " << f_high << endl;
          }
          
          //Fill work2 with ln(V^T U V) = ln(work3).

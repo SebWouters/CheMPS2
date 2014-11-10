@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <math.h>
 #include <algorithm>
@@ -27,7 +28,6 @@
 #include "Lapack.h"
 
 using std::cout;
-using std::cerr;
 using std::endl;
 using std::max;
 
@@ -277,10 +277,7 @@ void CheMPS2::EdmistonRuedenberg::Fiedler(const int irrep, int * reorder, double
    //For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html
 
    int linsize = iHandler->getNORB(irrep);
-   if (linsize<2){
-      cerr << "   EdmistonRuedenberg::Fiedler : linsize < 2 !" << endl;
-      return;
-   }
+   assert( linsize>=2 );
    
    //Preamble: linsize>=2 at this point
    double * work = temp2;             //temp2 at least of size 4*linsize*linsize
@@ -317,11 +314,7 @@ void CheMPS2::EdmistonRuedenberg::Fiedler(const int irrep, int * reorder, double
       for (int cnt=0; cnt<linsize-1; cnt++){
          if (FiedlerVector[reorder[cnt]] > FiedlerVector[reorder[cnt+1]]){ isOK = false; }
       }
-      if (!isOK){
-         cerr << "   EdmistonRuedenberg::Fiedler : Reordered Fiedler vector is not OK = [ ";
-         for (int cnt=0; cnt<linsize-1; cnt++){ cerr << FiedlerVector[reorder[cnt]] << "  ,  "; }
-         cerr << FiedlerVector[reorder[linsize-1]] << " ]." << endl;
-      }
+      assert( isOK );
       cout << "                                 Reorder[" << irrep << "] = [ ";
       for (int cnt=0; cnt<linsize-1; cnt++){ cout << reorder[cnt] << "  ,  "; }
       cout << reorder[linsize-1] << " ]." << endl;

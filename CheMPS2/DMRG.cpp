@@ -24,23 +24,19 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <assert.h>
 
 #include "DMRG.h"
 
 using std::cout;
 using std::endl;
 
-CheMPS2::DMRG::DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn){
+CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
 
    PrintLicense();
-
-   if (Probin->checkConsistency()){
-      Prob = Probin;
-   } else {
-      cout << "DMRG::DMRG : The Problem consistency check failed." << endl;
-      Prob = NULL;
-   }
-
+   
+   assert( ProbIn->checkConsistency() );
+   Prob = ProbIn;
    OptScheme = OptSchemeIn;
    RNstorage = rand();
    nStates = 1;
@@ -77,12 +73,8 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
    sstream << "CheMPS2_MPS" << nStates-1 << ".h5";
    MPSstoragename.assign( sstream.str() );
    
-   denBK = new SyBookkeeper(Prob,OptScheme->getD(0));
-   if (!(denBK->IsPossible())){
-      delete denBK;
-      cout << "DMRG::DMRG : The desired symmetry is not possible." << endl;
-      denBK = NULL; //Now all the rest will fail too.
-   }
+   denBK = new SyBookkeeper(Prob, OptScheme->getD(0));
+   assert( denBK->IsPossible() );
    
    struct stat stFileInfo;
    int intStat = stat(MPSstoragename.c_str(),&stFileInfo);
@@ -111,7 +103,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
 
 CheMPS2::DMRG::~DMRG(){
 
-   if (denBK!=NULL) delete denBK;
+   delete denBK;
    
    deleteAllBoundaryOperators();
    
@@ -162,12 +154,12 @@ double CheMPS2::DMRG::Solve(){
 
    bool change = (TotalMinEnergy<1e8) ? true : false; //1 sweep from right to left: fixed virtual dimensions
    
+   double Energy = 0.0;
+   
    for (int instruction=0; instruction < OptScheme->getNInstructions(); instruction++){
    
-      double Energy = 0.0;
-      double EnergyPrevious = 1.0;
-   
       int nIterations = 0;
+      double EnergyPrevious = Energy + 10 * OptScheme->getEconv(instruction); //Guarantees that there's always at least 1 left-right sweep
       
       while ( (fabs(Energy-EnergyPrevious) > OptScheme->getEconv(instruction) ) && ( nIterations < OptScheme->getMaxSweeps(instruction) )){
       

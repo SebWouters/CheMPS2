@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -140,12 +141,12 @@ void CheMPS2::TwoIndex::read(const std::string name){
             hid_t attribute_id1 = H5Aopen_by_name(group_id,"IrrepSizes", "nGroup", H5P_DEFAULT, H5P_DEFAULT);
             int nGroup;
             H5Aread(attribute_id1, H5T_NATIVE_INT, &nGroup);
-            if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at TwoIndex::read : nGroup doesn't match." << std::endl;
+            assert( nGroup==SymmInfo.getGroupNumber() );
             
             hid_t attribute_id2 = H5Aopen_by_name(group_id,"IrrepSizes", "nIrreps", H5P_DEFAULT, H5P_DEFAULT);
             int nIrreps;
             H5Aread(attribute_id2, H5T_NATIVE_INT, &nIrreps);
-            if (nGroup != SymmInfo.getGroupNumber()) std::cout << "Error at TwoIndex::read : nIrreps doesn't match." << std::endl;
+            assert( nIrreps==SymmInfo.getNumberOfIrreps() );
 
             H5Aclose(attribute_id1);
             H5Aclose(attribute_id2);
@@ -153,7 +154,7 @@ void CheMPS2::TwoIndex::read(const std::string name){
          int * IsizesAgain = new int[SymmInfo.getNumberOfIrreps()];
          H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, IsizesAgain);
          for (int cnt=0; cnt<SymmInfo.getNumberOfIrreps(); cnt++){
-            if (IsizesAgain[cnt]!=Isizes[cnt]) std::cout << "Error at TwoIndex::read : One of the Isizes doesn't match." << std::endl;
+            assert( IsizesAgain[cnt]==Isizes[cnt] );
          }
          delete [] IsizesAgain;
          H5Dclose(dataset_id);

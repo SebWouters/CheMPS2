@@ -124,10 +124,10 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          
          if ((theDMRGSCFoptions->getDoDIIS()) && (updateNorm <= theDMRGSCFoptions->getDIISGradientBranch())){
             if (theDMRGSCFoptions->getWhichActiveSpace()==1){
-               cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl;
+               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl;
             }
             if (theDMRGSCFoptions->getWhichActiveSpace()==2){
-               cout << "   DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
+               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
             if (theDIIS == NULL){
                theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
@@ -162,7 +162,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          fillConstAndTmatDMRG(HamDMRG);
          if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
          else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
-         cout << "   DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
       
       //Do the DMRG sweeps, and calculate the 2DM
@@ -187,7 +187,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildOneBodyMatrixElements();
-         cout << "   DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
+         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
@@ -257,8 +257,8 @@ double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNor
    dsyev_(&jobz,&uplo,&aug_linlength,hessian,&aug_linlength,eigen,work,&size,&info);
    
    if (CheMPS2::DMRGSCF_debugPrint){
-      cout << "   DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << eigen[0] << endl;
-      cout << "   DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
+      cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << eigen[0] << endl;
+      cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
    }
    double scalar = 1.0/hessian[x_linearlength];
    int inc = 1;
@@ -269,7 +269,7 @@ double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNor
    updateNorm[0] = 0.0;
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ updateNorm[0] += gradient[cnt] * gradient[cnt]; }
    updateNorm[0] = sqrt(updateNorm[0]);
-   cout << "   DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
+   cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
    
    delete [] hessian;
    delete [] eigen;
@@ -288,7 +288,7 @@ double CheMPS2::CASSCF::calcGradient(double * gradient){
    double gradNorm = 0.0;
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
    gradNorm = sqrt(gradNorm);
-   cout << "   DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
+   cout << "DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
    return gradNorm;
 
 }

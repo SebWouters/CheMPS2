@@ -248,9 +248,7 @@ double CheMPS2::Heff::SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, Tensor
    if (Sobjectnorm==0.0){
       for (int cnt=0; cnt<length_vec; cnt++){ t_vec[cnt] = ((double) rand())/RAND_MAX; }
       if (CheMPS2::HEFF_debugPrint){
-         cout << "WARNING AT HEFF : S-object with zero norm was replaced with random vector." << endl;
-         cout << "                  Note that DMRG::checkSobject() allows to validate the S-object." << endl;
-         cout<<  "                  This should be a rare (but possible) warning." << endl;
+         cout << "WARNING AT HEFF : S-object with zero norm was replaced with random vector. This should be a rare (but possible) warning." << endl;
       }
    }
    //End checking whether the S-object contains anything

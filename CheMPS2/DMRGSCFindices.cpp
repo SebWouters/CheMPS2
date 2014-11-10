@@ -18,11 +18,11 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 
 #include "DMRGSCFindices.h"
 
-using std::cerr;
 using std::cout;
 using std::endl;
 
@@ -40,27 +40,27 @@ CheMPS2::DMRGSCFindices::DMRGSCFindices(const int L, const int Group, int * NOCC
    NORBcumulative  = new int[Nirreps+1];
    NDMRGcumulative = new int[Nirreps+1];
    
-   int sum_check = 0;
+   int totalNumOrbs = 0;
    NORBcumulative[0]  = 0;
    NDMRGcumulative[0] = 0;
    for (int irrep=0; irrep<Nirreps; irrep++){
    
-      if (NOCCin[irrep]  < 0){ cerr << "DMRGSCFindices::DMRGSCFindices : NOCC["  << irrep << "] = " << NOCCin[ irrep] << endl; }
-      if (NDMRGin[irrep] < 0){ cerr << "DMRGSCFindices::DMRGSCFindices : NDMRG[" << irrep << "] = " << NDMRGin[irrep] << endl; }
-      if (NVIRTin[irrep] < 0){ cerr << "DMRGSCFindices::DMRGSCFindices : NVIRT[" << irrep << "] = " << NVIRTin[irrep] << endl; }
+      assert( NOCCin [irrep]>=0 );
+      assert( NDMRGin[irrep]>=0 );
+      assert( NVIRTin[irrep]>=0 );
       
       NORB[ irrep] = NOCCin[ irrep] + NDMRGin[irrep] + NVIRTin[irrep];
       NOCC[ irrep] = NOCCin[ irrep];
       NDMRG[irrep] = NDMRGin[irrep];
       NVIRT[irrep] = NVIRTin[irrep];
       
-      sum_check += NORB[irrep];
+      totalNumOrbs += NORB[irrep];
       
       NORBcumulative[ irrep+1] = NORBcumulative[ irrep] + NORB[irrep];
       NDMRGcumulative[irrep+1] = NDMRGcumulative[irrep] + NDMRG[irrep];
       
    }
-   if (sum_check != L){ cerr << "DMRGSCFindices::DMRGSCFindices : Sum over all OCC, DMRG and VIRT orbitals is not L." << endl; }
+   assert( totalNumOrbs==L );
    
    irrepOfEachDMRGorbital = new int[NDMRGcumulative[Nirreps]];
    for (int irrep=0; irrep<Nirreps; irrep++){

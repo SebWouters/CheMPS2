@@ -362,7 +362,7 @@ S1-tensors.
 functions. This class stores and handles the complementary reduced spin-0
 F0-tensors.
 
-[```CheMPS2/TensorD.cpp```](CheMPS2/TensorD.cpp) contains the TensorB
+[```CheMPS2/TensorD.cpp```](CheMPS2/TensorD.cpp) contains the TensorD
 functions. This class stores and handles the complementary reduced spin-1
 F1-tensors.
 

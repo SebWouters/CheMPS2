@@ -18,13 +18,13 @@
 */
 
 #include <stdlib.h>
+#include <assert.h>
 #include <iostream>
 #include <math.h>
 
 #include "CASSCF.h"
 
 using std::cout;
-using std::cerr;
 using std::endl;
 
 void CheMPS2::CASSCF::checkHF(){
@@ -109,11 +109,11 @@ void CheMPS2::CASSCF::PrintCoeff_C2(DMRG * theDMRG){
          }
       }
       if (irrep==7){ //B3u
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B3u orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B3u orbitals not allowed.
          coeff1[passed+0] = 2; //1 B3u : double for | 1pi_x^2 >
       }
       if (irrep==6){ //B2u
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B2u orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B2u orbitals not allowed.
          coeff2[passed+0] = 2; //1 B2u : double for | 1pi_y^2 >
       }
       passed += iHandler->getNDMRG(irrep);
@@ -138,19 +138,19 @@ void CheMPS2::CASSCF::PrintCoeff_C2(DMRG * theDMRG){
          }
       }
       if (irrep==7){ //B3u
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B3u orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B3u orbitals not allowed.
          coeff3[passed+0] = 1; //1 B3u : single for | 1pi_x^1 1pi_x^{*1} >
       }
       if (irrep==6){ //B2u
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B2u orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B2u orbitals not allowed.
          coeff4[passed+0] = 1; //1 B2u : single for | 1pi_y^1 1pi_y^{*1} >
       }
       if (irrep==2){ //B2g
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B2g orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B2g orbitals not allowed.
          coeff3[passed+0] = 1; //1 B2g : single for | 1pi_x^1 1pi_x^{*1} >
       }
       if (irrep==3){ //B3g
-         if (iHandler->getNOCC(irrep) > 0){ cerr << "CASSCF::PrintCoeff_C2 : condensed B3g orbitals not allowed." << endl; }
+         assert( iHandler->getNOCC(irrep)==0 ); //Condensed B3g orbitals not allowed.
          coeff4[passed+0] = 1; //1 B3g : single for | 1pi_y^1 1pi_y^{*1} >
       }
       passed += iHandler->getNDMRG(irrep);
