@@ -113,6 +113,7 @@ namespace CheMPS2{
          //! Set this FCI vector to an operator acting on a previous FCI vector
          /** \param whichOperator With which operator should be acted on the other FCI state: 0 means creator, 1 means annihilator, 2 means particle number
              \param isUp Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron
+             \param orbIndex Orbital index on which the operator acts
              \param thisVector Vector with length getVecLength() where the result of the operation should be stored
              \param otherFCI FCI instance which corresponds to the FCI vector on which is acted
              \param otherVector Vector with length otherFCI->getVecLength() which contains the FCI vector on which is acted */
