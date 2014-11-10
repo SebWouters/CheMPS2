@@ -29,12 +29,13 @@ using std::endl;
 #include "Irreps.h"
 #include "Lapack.h"
 
-CheMPS2::FCI::FCI(CheMPS2::Problem * Prob, const int FCIverbose_in){
+CheMPS2::FCI::FCI(Problem * Prob, const int FCIverbose_in){
 
    // Amount of output
    FCIverbose = FCIverbose_in;
 
    // Number of orbitals
+   assert( Prob->checkConsistency() );
    L = Prob->gL();
    assert( L <= CHAR_BIT * sizeof(unsigned int) );
 
@@ -44,12 +45,12 @@ CheMPS2::FCI::FCI(CheMPS2::Problem * Prob, const int FCIverbose_in){
    TargetIrrep       = Prob->gIrrep();
    IrrepProductTable = new int[ NumIrreps * NumIrreps ];
    orb2irrep         = new int[ L ];
-   for (int row = 0; row < NumIrreps; row++){
-      for (int col = 0; col < NumIrreps; col++){
+   for (unsigned int row = 0; row < NumIrreps; row++){
+      for (unsigned int col = 0; col < NumIrreps; col++){
          IrrepProductTable[ row + NumIrreps * col ] = myIrreps.directProd( row , col );
       }
    }
-   for (int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Prob->gIrrep( orb ); }
+   for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Prob->gIrrep( orb ); }
    
    // Number of up and down electrons: only spin projection symmetry is used
    Nel_up   = ( Prob->gN() + Prob->gTwoS() )/2;
@@ -58,10 +59,58 @@ CheMPS2::FCI::FCI(CheMPS2::Problem * Prob, const int FCIverbose_in){
    // Copy the Hamiltonian over for speed
    Econstant = Prob->gEconst();
    Hmat = new double[ L * L * L * L ];
-   for (int orb1 = 0; orb1 < L; orb1++){
-      for (int orb2 = 0; orb2 < L; orb2++){
-         for (int orb3 = 0; orb3 < L; orb3++){
-            for (int orb4 = 0; orb4 < L; orb4++){
+   for (unsigned int orb1 = 0; orb1 < L; orb1++){
+      for (unsigned int orb2 = 0; orb2 < L; orb2++){
+         for (unsigned int orb3 = 0; orb3 < L; orb3++){
+            for (unsigned int orb4 = 0; orb4 < L; orb4++){
+               Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] = Prob->gMxElement( orb1 , orb2 , orb3 , orb4 );
+            }
+         }
+      }
+   }
+   
+   // Set all other internal variables
+   Startup();
+   if ( FCIverbose > 0 ){ cout << "FCI::FCI : Number of variables in the FCI vector = " << getVecLength() << endl; }
+
+}
+
+CheMPS2::FCI::FCI(Problem * Prob, const unsigned int theNel_up, const unsigned int theNel_down, const int FCIverbose_in){
+
+   // Amount of output
+   FCIverbose = FCIverbose_in;
+
+   // Number of orbitals
+   assert( Prob->checkConsistency() );
+   L = Prob->gL();
+   assert( L <= CHAR_BIT * sizeof(unsigned int) );
+   assert( theNel_up>=0 );
+   assert( theNel_down>=0 );
+   assert( theNel_up<=L );
+   assert( theNel_down<=L );
+   Nel_up = theNel_up;
+   Nel_down = theNel_down;
+
+   // Everything which has to do with irreps
+   CheMPS2::Irreps myIrreps( Prob->gSy() );
+   NumIrreps         = myIrreps.getNumberOfIrreps();
+   TargetIrrep       = Prob->gIrrep();
+   IrrepProductTable = new int[ NumIrreps * NumIrreps ];
+   orb2irrep         = new int[ L ];
+   for (unsigned int row = 0; row < NumIrreps; row++){
+      for (unsigned int col = 0; col < NumIrreps; col++){
+         IrrepProductTable[ row + NumIrreps * col ] = myIrreps.directProd( row , col );
+      }
+   }
+   for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Prob->gIrrep( orb ); }
+   
+   // Copy the Hamiltonian over
+   Econstant = Prob->gEconst();
+   Hmat = new double[ L * L * L * L ];
+   for (unsigned int orb1 = 0; orb1 < L; orb1++){
+      for (unsigned int orb2 = 0; orb2 < L; orb2++){
+         for (unsigned int orb3 = 0; orb3 < L; orb3++){
+            for (unsigned int orb4 = 0; orb4 < L; orb4++){
                Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] = Prob->gMxElement( orb1 , orb2 , orb3 , orb4 );
             }
          }
@@ -79,7 +128,7 @@ CheMPS2::FCI::~FCI(){
    delete [] IrrepProductTable;
    delete [] orb2irrep;
    delete [] Hmat;
-   for (int irrep=0; irrep<NumIrreps; irrep++){
+   for (unsigned int irrep=0; irrep<NumIrreps; irrep++){
       delete [] str2cnt_up[irrep];
       delete [] str2cnt_down[irrep];
       delete [] cnt2str_up[irrep];
@@ -95,19 +144,31 @@ CheMPS2::FCI::~FCI(){
 
 }
 
-unsigned long long CheMPS2::FCI::getVecLength() const{ return jumps[NumIrreps]; }
+unsigned int CheMPS2::FCI::getL() const{ return L; }
 
-int CheMPS2::FCI::IrrepProduct(const int Irrep_row, const int Irrep_col) const{ return IrrepProductTable[ Irrep_row + NumIrreps * Irrep_col ]; }
+unsigned int CheMPS2::FCI::getNel_up() const{ return Nel_up; }
 
-double CheMPS2::FCI::gEconst() const{ return Econstant; }
+unsigned int CheMPS2::FCI::getNel_down() const{ return Nel_down; }
 
-double CheMPS2::FCI::gHmat(const int orb1, const int orb2, const int orb3, const int orb4) const{ return Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ]; }
+unsigned long long CheMPS2::FCI::getVecLength() const{ return jumps[ NumIrreps ]; }
+
+unsigned int CheMPS2::FCI::getNumIrreps() const{ return NumIrreps; }
+
+int CheMPS2::FCI::getTargetIrrep() const{ return TargetIrrep; }
+
+int CheMPS2::FCI::getIrrepProduct(const int Irrep_row, const int Irrep_col) const{ return IrrepProductTable[ Irrep_row + NumIrreps * Irrep_col ]; }
+
+int CheMPS2::FCI::getOrb2Irrep(const int orb) const{ return orb2irrep[ orb ]; }
+
+double CheMPS2::FCI::getEconst() const{ return Econstant; }
+
+double CheMPS2::FCI::getHmat(const int orb1, const int orb2, const int orb3, const int orb4) const{ return Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ]; }
 
 void CheMPS2::FCI::Startup(){
 
    // Variable which is only needed in Startup: 2^L
    unsigned int TwoPowL = 1;
-   for (int orb = 0; orb < L; orb++){ TwoPowL *= 2; }
+   for (unsigned int orb = 0; orb < L; orb++){ TwoPowL *= 2; }
 
    // Create a bunch of stuff
    numPerIrrep_up   = new unsigned int[ NumIrreps];
@@ -117,7 +178,7 @@ void CheMPS2::FCI::Startup(){
    cnt2str_up       = new unsigned int*[NumIrreps];
    cnt2str_down     = new unsigned int*[NumIrreps];
 
-   for (int irrep = 0; irrep < NumIrreps; irrep++){
+   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
       numPerIrrep_up  [ irrep ] = 0;
       numPerIrrep_down[ irrep ] = 0;
       str2cnt_up  [ irrep ] = new int[ TwoPowL ];
@@ -131,17 +192,17 @@ void CheMPS2::FCI::Startup(){
    
       // Find the number of particles and the irrep which correspond to each basis vector
       str2bits( L , string , bits );
-      int Nparticles = 0;
+      unsigned int Nparticles = 0;
       int Irrep = 0;
-      for (int orb=0; orb<L; orb++){
+      for (unsigned int orb=0; orb<L; orb++){
          if (bits[orb]){
             Nparticles++;
-            Irrep = IrrepProduct( Irrep , orb2irrep[ orb ] );
+            Irrep = getIrrepProduct( Irrep , orb2irrep[ orb ] );
          }
       }
       
       // If allowed: set the corresponding str2cnt to the correct counter and keep track of the number of allowed vectors
-      for (int irr = 0; irr < NumIrreps; irr++){
+      for (unsigned int irr = 0; irr < NumIrreps; irr++){
          str2cnt_up  [ irr ][ string ] = -1;
          str2cnt_down[ irr ][ string ] = -1;
       }
@@ -159,7 +220,7 @@ void CheMPS2::FCI::Startup(){
    delete [] bits; // Delete temporary helper array
    
    // Fill the reverse info array: cnt2str
-   for (int irrep = 0; irrep < NumIrreps; irrep++){
+   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
    
       if ( FCIverbose > 1 ){
          cout << "FCI::Startup : For irrep " << irrep << " there are " << numPerIrrep_up  [ irrep ] << " alpha Slater determinants and "
@@ -183,8 +244,8 @@ void CheMPS2::FCI::Startup(){
    // Jumps contains information on irrep of a FCI array index
    jumps = new unsigned long long[ NumIrreps+1 ];
    jumps[ 0 ] = 0;
-   for (int irrep = 0; irrep < NumIrreps; irrep++){
-      const int irrep_down = IrrepProduct( irrep , TargetIrrep );
+   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
+      const int irrep_down = getIrrepProduct( irrep , TargetIrrep );
       unsigned long long temp  = numPerIrrep_up  [ irrep      ];
                          temp *= numPerIrrep_down[ irrep_down ];
       jumps[ irrep+1 ] = jumps[ irrep ] + temp;
@@ -194,7 +255,7 @@ void CheMPS2::FCI::Startup(){
 
 void CheMPS2::FCI::str2bits(const unsigned int Lval, const unsigned int string, int * bits){
 
-   for (int bit = 0; bit < Lval; bit++){ bits[ bit ] = ( string & ( 1 << bit ) ) >> bit; }
+   for (unsigned int bit = 0; bit < Lval; bit++){ bits[ bit ] = ( string & ( 1 << bit ) ) >> bit; }
 
 }
 
@@ -202,7 +263,7 @@ unsigned int CheMPS2::FCI::bits2str(const unsigned int Lval, int * bits){
 
    unsigned int factor = 1;
    unsigned int result = 0;
-   for (int bit = 0; bit < Lval; bit++){
+   for (unsigned int bit = 0; bit < Lval; bit++){
       result += bits[ bit ] * factor;
       factor *= 2;
    }
@@ -221,7 +282,7 @@ int CheMPS2::FCI::getUpIrrepOfCounter(const unsigned long long counter) const{
 void CheMPS2::FCI::getBitsOfCounter(const unsigned long long counter, int * bits_up, int * bits_down) const{
 
    const int irrep_up   = getUpIrrepOfCounter( counter );
-   const int irrep_down = IrrepProduct( irrep_up , TargetIrrep );
+   const int irrep_down = getIrrepProduct( irrep_up , TargetIrrep );
    
    const unsigned int count_up   = ( counter - jumps[ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
    const unsigned int count_down = ( counter - jumps[ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
@@ -231,6 +292,102 @@ void CheMPS2::FCI::getBitsOfCounter(const unsigned long long counter, int * bits
    
    str2bits( L , string_up   , bits_up   );
    str2bits( L , string_down , bits_down );
+
+}
+
+double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector) const{
+
+   const unsigned string_up   = bits2str(L, bits_up  );
+   const unsigned string_down = bits2str(L, bits_down);
+   
+   int irrep_up   = 0;
+   int irrep_down = 0;
+   for (unsigned int cnt=0; cnt<L; cnt++){
+      if ( bits_up  [ cnt ] ){ irrep_up   = getIrrepProduct( irrep_up   , getOrb2Irrep( cnt ) ); }
+      if ( bits_down[ cnt ] ){ irrep_down = getIrrepProduct( irrep_down , getOrb2Irrep( cnt ) ); }
+   }
+   
+   const int counter_up   = str2cnt_up  [ irrep_up   ][ string_up   ];
+   const int counter_down = str2cnt_down[ irrep_down ][ string_down ];
+   
+   if (( counter_up == -1 ) || ( counter_down == -1 )){ return 0.0; }
+   
+   return vector[ jumps[ irrep_up ] + counter_up + numPerIrrep_up[ irrep_up ] * counter_down ];
+
+}
+
+void CheMPS2::FCI::ActWithOperator(const int whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, FCI * otherFCI, double * otherVector){
+
+   assert( whichOperator>=0 );
+   assert( whichOperator<=2 );
+   assert( orbIndex>=0 );
+   assert( orbIndex<L  );
+
+   const unsigned long long vecLength = getVecLength();
+
+   if ((whichOperator<2 ) && ( getTargetIrrep() != getIrrepProduct( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) ))){
+      FCIdclear( vecLength , thisVector );
+      return;
+   }
+   if ((whichOperator==2 ) && ( ( getTargetIrrep() != otherFCI->getTargetIrrep() ) || ( vecLength != otherFCI->getVecLength() ) )){
+      FCIdclear( vecLength , thisVector );
+      return;
+   }
+
+   int * bits_up    = new int[ L ];
+   int * bits_down  = new int[ L ];
+   
+   for (unsigned long long counter = 0; counter < vecLength; counter++){
+   
+      // Clear the corresponding entry
+      thisVector[ counter ] = 0.0;
+      
+      // Get the bits corresponding to this counter
+      getBitsOfCounter( counter , bits_up , bits_down );
+      
+      // Fetch the corresponding coefficient
+      if ( isUp ){ // Down (beta) electron
+      
+         if (( whichOperator==0 ) && ( bits_up[ orbIndex ] == 1 )){ // Operator = creator
+            bits_up[ orbIndex ] = 0;
+            int phase = 1;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         }
+         if (( whichOperator==1 ) && ( bits_up[ orbIndex ] == 0 )){ // Operator = annihilator
+            bits_up[ orbIndex ] = 1;
+            int phase = 1;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         }
+         if ( whichOperator==2 ){ // Operator = particle number
+            thisVector[ counter ] = bits_up[ orbIndex ] * otherVector[ counter ];
+         }
+         
+      } else { // Down (beta) electron
+      
+         if (( whichOperator==0 ) && ( bits_down[ orbIndex ] == 1 )){ // Operator = creator
+            bits_down[ orbIndex ] = 0;
+            int phase = (( Nel_up % 2 ) == 0) ? 1 : -1;
+            for (unsigned int cnt = 0; cnt<orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         }
+         if (( whichOperator==1 ) && ( bits_down[ orbIndex ] == 0 )){ // Operator = annihilator
+            bits_down[ orbIndex ] = 1;
+            int phase = (( Nel_up % 2 ) == 0) ? 1 : -1;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         }
+         if ( whichOperator==2 ){ // Operator = particle number
+            thisVector[ counter ] = bits_down[ orbIndex ] * otherVector[ counter ];
+         }
+      
+      }
+
+   }
+   
+   delete [] bits_up;
+   delete [] bits_down;
 
 }
 
@@ -252,7 +409,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
       
          //Find the irrep_up and irrep_down
          const int irrep_out_up   = getUpIrrepOfCounter( outcounter );
-         const int irrep_out_down = IrrepProduct( irrep_out_up , TargetIrrep );
+         const int irrep_out_down = getIrrepProduct( irrep_out_up , TargetIrrep );
          
          //Find the counters for the alpha and the beta electrons
          const unsigned int outcount_up   = ( outcounter - jumps[ irrep_out_up ] ) % numPerIrrep_up[ irrep_out_up ];
@@ -264,7 +421,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
          str2bits(L, string_out_up,   bits_up  );
          str2bits(L, string_out_down, bits_down);
          
-         //The Hamiltonian is given under the form H = 0.5 * sum_{ijkl sigma tau} gHmat(i,j,k,l) a^+_{i sigma} a^+_{j tau} a_{l tau} a_{k sigma}
+         //The Hamiltonian is given under the form H = 0.5 * sum_{ijkl sigma tau} getHmat(i,j,k,l) a^+_{i sigma} a^+_{j tau} a_{l tau} a_{k sigma}
          //The product of the orbital irreps of the electrons which get removed should be equal to the product of the ones which are added again !!
          
          /*
@@ -276,22 +433,22 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
             const unsigned long long incounter_offset = jumps[ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
             
             //Loop i<j to remove from the output vector
-            for (int orbi = 0; orbi < L-1; orbi++){
+            for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_up[ orbi ] ){
                   bits_up[ orbi ] = 0;
                   int phase_ij = 1;
-                  for (int orbj = orbi+1; orbj < L; orbj++){
+                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
                      if ( bits_up[ orbj ] ){
                         bits_up[ orbj ] = 0;
-                        const int IrrepProd_ij = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
+                        const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
                         //Loop k<l to add again to the output vector
-                        for (int orbk = 0; orbk < L-1; orbk++){
+                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_up[ orbk ]) ){
                               bits_up[ orbk ] = 1;
                               int phase_kl = 1;
-                              for (int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == IrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
+                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
+                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
                                     bits_up[ orbl ] = 1;
                                     
                                     //find the corresponding string and counter
@@ -299,7 +456,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
                                     const int incount_up = str2cnt_up[ irrep_out_up ][ string_in_up ];
                                     
                                     //Add the contribution
-                                    const double factor = phase_ij * phase_kl * ( gHmat(orbi, orbj, orbk, orbl) - gHmat(orbi, orbj, orbl, orbk) );
+                                    const double factor = phase_ij * phase_kl * ( getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk) );
                                     output[ outcounter ] += factor * input[ incounter_offset + incount_up ];
                                     
                                     bits_up[ orbl ] = 0;
@@ -328,22 +485,22 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
             const unsigned long long incounter_offset = jumps[ irrep_out_up ] + outcount_up;
             
             //Loop i<j to remove from the output vector
-            for (int orbi = 0; orbi < L-1; orbi++){
+            for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_down[ orbi ] ){
                   bits_down[ orbi ] = 0;
                   int phase_ij = 1;
-                  for (int orbj = orbi+1; orbj < L; orbj++){
+                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
                      if ( bits_down[ orbj ] ){
                         bits_down[ orbj ] = 0;
-                        const int IrrepProd12 = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
+                        const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
                         //Loop k<l to add again to the output vector
-                        for (int orbk = 0; orbk < L-1; orbk++){
+                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_down[ orbk ]) ){
                               bits_down[ orbk ] = 1;
                               int phase_kl = 1;
-                              for (int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == IrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
+                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
+                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
                                     bits_down[ orbl ] = 1;
                                     
                                     //find the corresponding string and counter
@@ -351,7 +508,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
                                     const int incount_down = str2cnt_down[ irrep_out_down ][ string_in_down ];
                                     
                                     //Add the contribution
-                                    const double factor = phase_ij * phase_kl * ( gHmat(orbi, orbj, orbk, orbl) - gHmat(orbi, orbj, orbl, orbk) );
+                                    const double factor = phase_ij * phase_kl * ( getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk) );
                                     output[ outcounter ] += factor * input[ incounter_offset + numPerIrrep_up[ irrep_out_up ] * incount_down ];
                                     
                                     bits_down[ orbl ] = 0;
@@ -379,41 +536,41 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
          
             //Loop orbi to REMOVE an UP electron from the output vector
             int phase_i = 1;
-            for (int orbi = 0; orbi < L; orbi++){
+            for (unsigned int orbi = 0; orbi < L; orbi++){
                if ( bits_up[ orbi ] ){
                   bits_up[ orbi ] = 0;
                   
                   //Loop orbk to ADD an UP electron again to the output vector
                   int phase_k = 1;
-                  for (int orbk = 0; orbk < L; orbk++){
+                  for (unsigned int orbk = 0; orbk < L; orbk++){
                      if ( !(bits_up[ orbk ]) ){
                         bits_up[ orbk ] = 1;
-                        const int IrrepProd_ik = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
-                        const int irrep_in_up = IrrepProduct( irrep_out_up , IrrepProd_ik );
+                        const int IrrepProd_ik = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
+                        const int irrep_in_up = getIrrepProduct( irrep_out_up , IrrepProd_ik );
                         const unsigned int string_in_up = bits2str(L, bits_up);
                         const int incount_up = str2cnt_up[ irrep_in_up ][ string_in_up ];
                         const int phase_ik = phase_i * phase_k;
                         
                         //Loop orbj to REMOVE a DOWN electron from the output vector
                         int phase_j = 1;
-                        for (int orbj = 0; orbj < L; orbj++){
+                        for (unsigned int orbj = 0; orbj < L; orbj++){
                            if ( bits_down[ orbj ] ){
                               bits_down[ orbj ] = 0;
 
                               //Loop orbl to ADD a DOWN electron again to the output vector
                               int phase_l = 1;
-                              for (int orbl = 0; orbl < L; orbl++){
-                                 const int IrrepProd_jl = IrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
+                              for (unsigned int orbl = 0; orbl < L; orbl++){
+                                 const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
                                  if (( bits_down[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
                                     bits_down[ orbl ] = 1;
                                     
-                                    const int irrep_in_down = IrrepProduct( irrep_out_down , IrrepProd_jl );
+                                    const int irrep_in_down = getIrrepProduct( irrep_out_down , IrrepProd_jl );
                                     const unsigned int string_in_down = bits2str(L, bits_down);
                                     const int incount_down = str2cnt_down[ irrep_in_down ][ string_in_down ];
                                     
                                     //Add the contribution
                                     const unsigned long long incounter = jumps[ irrep_in_up ] + incount_up + numPerIrrep_up[ irrep_in_up ] * incount_down;
-                                    const double factor = phase_ik * phase_j * phase_l * gHmat(orbi, orbj, orbk, orbl);
+                                    const double factor = phase_ik * phase_j * phase_l * getHmat(orbi, orbj, orbk, orbl);
                                     output[ outcounter ] += factor * input[ incounter ];
                                     
                                     bits_down[ orbl ] = 0;
@@ -472,7 +629,7 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
       
          //Find the bra up and down irreps, counters, strings, and bit sequences
          const int bra_irrep_up   = getUpIrrepOfCounter( counter );
-         const int bra_irrep_down = IrrepProduct( bra_irrep_up , TargetIrrep );
+         const int bra_irrep_down = getIrrepProduct( bra_irrep_up , TargetIrrep );
          const unsigned int bra_cnt_irrep_up   = ( counter - jumps[ bra_irrep_up ] ) % numPerIrrep_up[ bra_irrep_up ];
          const unsigned int bra_cnt_irrep_down = ( counter - jumps[ bra_irrep_up ] ) / numPerIrrep_up[ bra_irrep_up ];
          const unsigned int bra_string_up   = cnt2str_up  [ bra_irrep_up   ][ bra_cnt_irrep_up   ];
@@ -485,22 +642,22 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
             const unsigned long long ket_offset = jumps[ bra_irrep_up ] + numPerIrrep_up[ bra_irrep_up ] * bra_cnt_irrep_down;
             
             //Loop i<j to remove from the output vector
-            for (int orbi = 0; orbi < L-1; orbi++){
+            for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_up[ orbi ] ){
                   bits_up[ orbi ] = 0;
                   int phase_ij = 1;
-                  for (int orbj = orbi+1; orbj < L; orbj++){
+                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
                      if ( bits_up[ orbj ] ){
                         bits_up[ orbj ] = 0;
-                        const int IrrepProd_ij = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
+                        const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
                         //Loop k<l to add again to the output vector
-                        for (int orbk = 0; orbk < L-1; orbk++){
+                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_up[ orbk ]) ){
                               bits_up[ orbk ] = 1;
                               int phase_kl = 1;
-                              for (int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == IrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
+                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
+                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
                                     bits_up[ orbl ] = 1;
                                     
                                     //Find the corresponding string and counter
@@ -536,22 +693,22 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
             const unsigned long long ket_offset = jumps[ bra_irrep_up ] + bra_cnt_irrep_up;
             
             //Loop i<j to remove from the output vector
-            for (int orbi = 0; orbi < L-1; orbi++){
+            for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_down[ orbi ] ){
                   bits_down[ orbi ] = 0;
                   int phase_ij = 1;
-                  for (int orbj = orbi+1; orbj < L; orbj++){
+                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
                      if ( bits_down[ orbj ] ){
                         bits_down[ orbj ] = 0;
-                        const int IrrepProd12 = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
+                        const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
                         //Loop k<l to add again to the output vector
-                        for (int orbk = 0; orbk < L-1; orbk++){
+                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_down[ orbk ]) ){
                               bits_down[ orbk ] = 1;
                               int phase_kl = 1;
-                              for (int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == IrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
+                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
+                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
                                     bits_down[ orbl ] = 1;
                                     
                                     //Find the corresponding string and counter
@@ -588,35 +745,35 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
          
             //Loop orbi to REMOVE an UP electron from the output vector
             int phase_i = 1;
-            for (int orbi = 0; orbi < L; orbi++){
+            for (unsigned int orbi = 0; orbi < L; orbi++){
                if ( bits_up[ orbi ] ){
                   bits_up[ orbi ] = 0;
                   
                   //Loop orbk to ADD an UP electron again to the output vector
                   int phase_k = 1;
-                  for (int orbk = 0; orbk < L; orbk++){
+                  for (unsigned int orbk = 0; orbk < L; orbk++){
                      if ( !(bits_up[ orbk ]) ){
                         bits_up[ orbk ] = 1;
-                        const int IrrepProd_ik = IrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
-                        const int ket_irrep_up = IrrepProduct( bra_irrep_up , IrrepProd_ik );
+                        const int IrrepProd_ik = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
+                        const int ket_irrep_up = getIrrepProduct( bra_irrep_up , IrrepProd_ik );
                         const unsigned int ket_string_up = bits2str( L , bits_up );
                         const int ket_cnt_irrep_up = str2cnt_up[ ket_irrep_up ][ ket_string_up ];
                         const int phase_ik = phase_i * phase_k;
                         
                         //Loop orbj to REMOVE a DOWN electron from the output vector
                         int phase_j = 1;
-                        for (int orbj = 0; orbj < L; orbj++){
+                        for (unsigned int orbj = 0; orbj < L; orbj++){
                            if ( bits_down[ orbj ] ){
                               bits_down[ orbj ] = 0;
 
                               //Loop orbl to ADD a DOWN electron again to the output vector
                               int phase_l = 1;
-                              for (int orbl = 0; orbl < L; orbl++){
-                                 const int IrrepProd_jl = IrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
+                              for (unsigned int orbl = 0; orbl < L; orbl++){
+                                 const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
                                  if (( bits_down[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
                                     bits_down[ orbl ] = 1;
                                     
-                                    const int ket_irrep_down = IrrepProduct( bra_irrep_down , IrrepProd_jl );
+                                    const int ket_irrep_down = getIrrepProduct( bra_irrep_down , IrrepProd_jl );
                                     const unsigned int ket_string_down = bits2str( L , bits_down );
                                     const int ket_cnt_irrep_down = str2cnt_down[ ket_irrep_down ][ ket_string_down ];
                                     
@@ -663,7 +820,7 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
    }
    
    // Calculate the FCI energy
-   double FCIenergy = gEconst();
+   double FCIenergy = getEconst();
    for (int loop = 0; loop < Lpow4; loop++){ FCIenergy += 0.5 * TwoRDM[ loop ] * Hmat[ loop ]; }
    if ( FCIverbose > 0 ){ cout << "FCI::Fill2DM : Econstant + 0.5 * trace( 2-RDM * Hmat ) = " << FCIenergy << endl; }
    return FCIenergy;
@@ -687,11 +844,11 @@ void CheMPS2::FCI::HamDiag(double * diag) const{
          getBitsOfCounter( counter , bits_up , bits_down ); // Fetch the corresponding bits
          
          // Diag( Ham ) = sum_{i} h_{iiii} n_i,up n_i,down + sum_{i<j} h_{ijij} n_i,TOT n_j,TOT - sum_{i<j} h_{ijji} ( n_i,up n_j,up + n_i,down n_j,down )
-         for (int orb1 = 0; orb1 < L; orb1++){
-            diag[ counter ] += bits_up[ orb1 ] * bits_down[ orb1 ] * gHmat( orb1 , orb1 , orb1 , orb1 );
-            for (int orb2 = orb1+1; orb2 < L; orb2++){
-               diag[ counter ] += ( bits_up[ orb1 ] + bits_down[ orb1 ] ) * ( bits_up[ orb2 ] + bits_down[ orb2 ] ) * gHmat( orb1 , orb2 , orb1 , orb2 );
-               diag[ counter ] -= ( bits_up[ orb1 ] * bits_up[ orb2 ] + bits_down[ orb1 ] * bits_down[ orb2 ] ) * gHmat( orb1 , orb2 , orb2 , orb1 );
+         for (unsigned int orb1 = 0; orb1 < L; orb1++){
+            diag[ counter ] += bits_up[ orb1 ] * bits_down[ orb1 ] * getHmat( orb1 , orb1 , orb1 , orb1 );
+            for (unsigned int orb2 = orb1+1; orb2 < L; orb2++){
+               diag[ counter ] += ( bits_up[ orb1 ] + bits_down[ orb1 ] ) * ( bits_up[ orb2 ] + bits_down[ orb2 ] ) * getHmat( orb1 , orb2 , orb1 , orb2 );
+               diag[ counter ] -= ( bits_up[ orb1 ] * bits_up[ orb2 ] + bits_down[ orb1 ] * bits_down[ orb2 ] ) * getHmat( orb1 , orb2 , orb2 , orb1 );
             
             }
          }
@@ -705,7 +862,7 @@ void CheMPS2::FCI::HamDiag(double * diag) const{
 
 }
 
-double CheMPS2::FCI::GSSmallCISpace(const int Nslaters, double * vec) const{
+double CheMPS2::FCI::GSSmallCISpace(const unsigned int Nslaters, double * vec) const{
 
    // Just make sure that we don't do anything stupid for small FCI vector spaces
    const unsigned long long vecLength = getVecLength();
@@ -764,7 +921,7 @@ double CheMPS2::FCI::GSSmallCISpace(const int Nslaters, double * vec) const{
    int info;
    dsyev_( &jobz , &uplo , &numSlaters , CIham , &numSlaters , vec , work , &lwork , &info );
    delete [] work;
-   const double CIenergy = vec[0] + gEconst();
+   const double CIenergy = vec[0] + getEconst();
    if ( FCIverbose > 0 ){ cout << "FCI::GSSmallCISpace : Small CI space (" << numSlaters << " determinants) diagonalization yields energy = " << CIenergy << endl; }
    
    // Copy lowest energy vector
@@ -789,7 +946,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    int count_creat_down = 0;
    
    // Find the differences between bra and ket, and store them in the arrays annih/creat
-   for (int orb = 0; orb < L; orb++){
+   for (unsigned int orb = 0; orb < L; orb++){
       if ( bits_bra_up[ orb ] != bits_ket_up[ orb ] ){
          if ( bits_ket_up[ orb ] ){ // Electron is annihilated in the ket
             if ( count_annih_up == 2 ){ return 0.0; }
@@ -826,11 +983,11 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    if (( count_annih_up == 0 ) && ( count_annih_down == 0 )){ // |bra> == |ket>
    
       double result = 0.0;
-      for (int orb1 = 0; orb1 < L; orb1++){
-         result += gHmat(orb1, orb1, orb1, orb1) * bits_ket_up[ orb1 ] * bits_ket_down[ orb1 ];
-         for (int orb2 = orb1+1; orb2 < L; orb2++){
-            result += ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] ) * ( bits_ket_up[ orb2 ] + bits_ket_down[ orb2 ] ) * gHmat(orb1, orb2, orb1, orb2);
-            result -= ( bits_ket_up[ orb1 ] * bits_ket_up[ orb2 ] + bits_ket_down[ orb1 ] * bits_ket_down[ orb2 ] ) * gHmat(orb1, orb2, orb2, orb1);
+      for (unsigned int orb1 = 0; orb1 < L; orb1++){
+         result += getHmat(orb1, orb1, orb1, orb1) * bits_ket_up[ orb1 ] * bits_ket_down[ orb1 ];
+         for (unsigned int orb2 = orb1+1; orb2 < L; orb2++){
+            result += ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] ) * ( bits_ket_up[ orb2 ] + bits_ket_down[ orb2 ] ) * getHmat(orb1, orb2, orb1, orb2);
+            result -= ( bits_ket_up[ orb1 ] * bits_ket_up[ orb2 ] + bits_ket_down[ orb1 ] * bits_ket_down[ orb2 ] ) * getHmat(orb1, orb2, orb2, orb1);
          }
       }
       return result;
@@ -844,9 +1001,9 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbl = annih_up[ 0 ];
    
       double result = 0.0;
-      for (int orb1 = 0; orb1 < L; orb1++){
-         result += gHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
-                 - gHmat(orb1, orbj, orbl, orb1) * bits_ket_up[ orb1 ];
+      for (unsigned int orb1 = 0; orb1 < L; orb1++){
+         result += getHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
+                 - getHmat(orb1, orbj, orbl, orb1) * bits_ket_up[ orb1 ];
       }
       int phase = 1;
       if ( orbj < orbl ){ for (int orbital = orbj+1; orbital < orbl; orbital++){ if ( bits_ket_up[ orbital ] ){ phase *= -1; } } }
@@ -862,9 +1019,9 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbl = annih_down[ 0 ];
    
       double result = 0.0;
-      for (int orb1 = 0; orb1 < L; orb1++){
-         result += gHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
-                 - gHmat(orb1, orbj, orbl, orb1) * bits_ket_down[ orb1 ];
+      for (unsigned int orb1 = 0; orb1 < L; orb1++){
+         result += getHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
+                 - getHmat(orb1, orbj, orbl, orb1) * bits_ket_down[ orb1 ];
       }
       int phase = 1;
       if ( orbj < orbl ){ for (int orbital = orbj+1; orbital < orbl; orbital++){ if ( bits_ket_down[ orbital ] ){ phase *= -1; } } }
@@ -882,7 +1039,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_up[ 0 ];
       const int orbl = annih_up[ 1 ];
       
-      double result = gHmat(orbi, orbj, orbk, orbl) - gHmat(orbi, orbj, orbl, orbk);
+      double result = getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk);
       int phase = 1;
       for (int orbital = orbk+1; orbital < orbl; orbital++){ if ( bits_ket_up[ orbital ] ){ phase *= -1; } } // Fermion phases orbk and orbl measured in the ket
       for (int orbital = orbi+1; orbital < orbj; orbital++){ if ( bits_bra_up[ orbital ] ){ phase *= -1; } } // Fermion phases orbi and orbj measured in the bra
@@ -899,7 +1056,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_down[ 0 ];
       const int orbl = annih_down[ 1 ];
       
-      double result = gHmat(orbi, orbj, orbk, orbl) - gHmat(orbi, orbj, orbl, orbk);
+      double result = getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk);
       int phase = 1;
       for (int orbital = orbk+1; orbital < orbl; orbital++){ if ( bits_ket_down[ orbital ] ){ phase *= -1; } } // Fermion phases orbk and orbl measured in the ket
       for (int orbital = orbi+1; orbital < orbj; orbital++){ if ( bits_bra_down[ orbital ] ){ phase *= -1; } } // Fermion phases orbi and orbj measured in the bra
@@ -915,7 +1072,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_up  [ 0 ];
       const int orbl = annih_down[ 0 ];
       
-      double result = gHmat(orbi, orbj, orbk, orbl);
+      double result = getHmat(orbi, orbj, orbk, orbl);
       int phase = 1;
       if ( orbi < orbk ){ for (int orbital = orbi+1; orbital < orbk; orbital++){ if ( bits_ket_up  [ orbital ] ){ phase *= -1; } } }
       if ( orbk < orbi ){ for (int orbital = orbk+1; orbital < orbi; orbital++){ if ( bits_ket_up  [ orbital ] ){ phase *= -1; } } }
@@ -1077,7 +1234,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
       }
       int lda = DAVIDSON_NUM_VEC;
       dsyev_(&jobz,&uplo,&num_vec,mxM_vecs,&lda,mxM_eigs,mxM_work,&mxM_lwork,&info); //ascending order of eigs
-      if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Current lowest eigenvalue = " << mxM_eigs[0] + gEconst() << endl; }
+      if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Current lowest eigenvalue = " << mxM_eigs[0] + getEconst() << endl; }
       
       //7. Calculate u and r. r is stored in t_vec, u in u_vec.
       FCIdclear(length_vec, t_vec);
@@ -1097,7 +1254,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
       if (rnorm > rtol){
       
          //9a. Calculate the new t_vec based on the residual of the lowest eigenvalue, to add to the vecs.
-         for (int cnt=0; cnt<length_vec; cnt++){
+         for (unsigned long long cnt=0; cnt<length_vec; cnt++){
             if (fabs(Diag[cnt] - mxM_eigs[0])> DAVIDSON_PRECOND_CUTOFF ){
                work_vec[cnt] = u_vec[cnt]/(Diag[cnt] - mxM_eigs[0]); // work_vec = K^(-1) u_vec
             } else {
@@ -1106,7 +1263,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
          }
          alpha = - FCIddot(length_vec, work_vec, t_vec) / FCIddot(length_vec, work_vec, u_vec); // alpha = - (u^T K^(-1) r) / (u^T K^(-1) u)
          FCIdaxpy(length_vec, alpha, u_vec, t_vec); // t_vec = r - (u^T K^(-1) r) / (u^T K^(-1) u) u
-         for (int cnt=0; cnt<length_vec; cnt++){
+         for (unsigned long long cnt=0; cnt<length_vec; cnt++){
             if (fabs(Diag[cnt] - mxM_eigs[0])> DAVIDSON_PRECOND_CUTOFF ){
                t_vec[cnt] = - t_vec[cnt]/(Diag[cnt] - mxM_eigs[0]); //t_vec = - K^(-1) (r - (u^T K^(-1) r) / (u^T K^(-1) u) u)
             } else {
@@ -1134,7 +1291,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
                if (!Reortho_Allocated) Reortho_Eigenvecs = new double[length_vec * DAVIDSON_NUM_VEC_KEEP];
                FCIdcopy(length_vec, u_vec, Reortho_Eigenvecs);
                for (int cnt=1; cnt<DAVIDSON_NUM_VEC_KEEP; cnt++){
-                  for (int irow=0; irow<length_vec; irow++){
+                  for (unsigned long long irow=0; irow<length_vec; irow++){
                      Reortho_Eigenvecs[irow + length_vec * cnt] = 0.0;
                      for (int ivec=0; ivec<DAVIDSON_NUM_VEC; ivec++){
                         Reortho_Eigenvecs[irow + length_vec * cnt] += vecs[ivec][irow] * mxM_vecs[ivec + DAVIDSON_NUM_VEC * cnt];
@@ -1201,7 +1358,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
       
    }
    
-   const double FCIenergy = mxM_eigs[0] + gEconst();
+   const double FCIenergy = mxM_eigs[0] + getEconst();
    if ( inoutput != NULL ){ FCIdcopy(length_vec, u_vec, inoutput); }
    
    if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Number of matrix-vector products which were required = " << nIterations << endl; }

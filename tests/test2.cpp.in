@@ -71,7 +71,7 @@ int main(void){
    const int FCIverbose = 1;
    CheMPS2::FCI * theFCI = new CheMPS2::FCI(Prob, FCIverbose);
    double * inoutput = new double[theFCI->getVecLength()];
-   const int NLowEnergyDet = 1;
+   const unsigned int NLowEnergyDet = 1;
    theFCI->GSSmallCISpace(NLowEnergyDet, inoutput);
    const double EnergyFCI = theFCI->GSDavidson(inoutput);
    delete [] inoutput;

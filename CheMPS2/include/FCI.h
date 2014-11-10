@@ -38,12 +38,50 @@ namespace CheMPS2{
              \param FCIverbose The FCI verbose level: 0 print nothing, 1 print start and solution, 2 print everything */
          FCI(CheMPS2::Problem * Prob, const int FCIverbose=2);
          
+         //! Constructor
+         /** \param Prob The problem contains the Hamiltonian, as well as the irrep which should be targeted. Nel_up and Nel_down are specified specifically now.
+             \param Nel_up The number of up or alpha electrons of the new FCI object
+             \param Nel_down The number of down or beta electrons of the new FCI object
+             \param FCIverbose The FCI verbose level: 0 print nothing, 1 print start and solution, 2 print everything */
+         FCI(CheMPS2::Problem * Prob, const unsigned int Nel_up, const unsigned int Nel_down, const int FCIverbose=2);
+         
          //! Destructor
          virtual ~FCI();
+         
+         //! Getter for the number of orbitals
+         /** \return The number of orbitals */
+         unsigned int getL() const;
+
+         //! Getter for the number of up or alpha electrons
+         /** \return The number of up or alpha electrons */
+         unsigned int getNel_up() const;
+
+         //! Getter for the number of down or beta electrons
+         /** \return The number of down or beta electrons */
+         unsigned int getNel_down() const;
          
          //! Getter for the number of variables in the FCI vector
          /** \return The number of variables in the FCI vector */
          unsigned long long getVecLength() const;
+         
+         //! Get the number of irreps
+         /** \return The number of irreps */
+         unsigned int getNumIrreps() const;
+         
+         //! Get the target irrep
+         /** \return The target irrep */
+         int getTargetIrrep() const;
+         
+         //! Get the direct product of two irreps
+         /** \param Irrep_row The first irrep
+             \param Irrep_col The second irrep
+             \return The direct product Irrep_row x Irrep_col */
+         int getIrrepProduct(const int Irrep_row, const int Irrep_col) const;
+         
+         //! Get an orbital irrep
+         /** \param orb The orbital index
+             \return The irrep of orbital orb */
+         int getOrb2Irrep(const int orb) const;
          
          //! Calculates the FCI ground state with Davidson's algorithm
          /** \param inoutput If inoutput!=NULL, vector with getVecLength() variables which contains on exit the solution of the FCI calculation
@@ -54,7 +92,7 @@ namespace CheMPS2{
          /** \param Nslaters The number of low-energy Slater determinants to consider
              \param vec Vector with getVecLength() variables which contains on exit the solution of the small CI calculation
              \return The small CI ground state energy */
-         double GSSmallCISpace(const int Nslaters, double * vec) const;
+         double GSSmallCISpace(const unsigned int Nslaters, double * vec) const;
       
          //! Function which performs the Hamiltonian times Vector product
          /** \param input The vector on which the Hamiltonian should act
@@ -65,17 +103,32 @@ namespace CheMPS2{
          /** \param diag Vector with getVecLength() variables which contains on exit the diagonal elements of the FCI Hamiltonian */
          void HamDiag(double * diag) const;
          
+         //! Function which returns a FCI coefficient
+         /** \param bits_up The bit string representation of the up or alpha electron Slater determinant
+             \param bits_down The bit string representation of the down or beta electron Slater determinant
+             \param vector The FCI vector with getVecLength() variables from which a coefficient is desired
+             \return The corresponding FCI coefficient; 0.0 if something is not OK */
+         double getFCIcoeff(int * bits_up, int * bits_down, double * vector) const;
+         
+         //! Set this FCI vector to an operator acting on a previous FCI vector
+         /** \param whichOperator With which operator should be acted on the other FCI state: 0 means creator, 1 means annihilator, 2 means particle number
+             \param isUp Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron
+             \param thisVector Vector with length getVecLength() where the result of the operation should be stored
+             \param otherFCI FCI instance which corresponds to the FCI vector on which is acted
+             \param otherVector Vector with length otherFCI->getVecLength() which contains the FCI vector on which is acted */
+         void ActWithOperator(const int whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, FCI * otherFCI, double * otherVector);
+         
          //! Function which returns the 2-body matrix elements (in physics notation: orb1(r1) * orb2(r2) * orb3(r1) * orb4(r2) / |r1-r2|); the 1-body matrix elements are absorbed in the 2-body matrix elements as explained in the Problem class
          /** \param orb1 First orbital index (electron at position r1)
              \param orb2 Second orbital index (electron at position r2)
              \param orb3 Third orbital index (electron at position r1)
              \param orb4 Fourth orbital index (electron at position r2)
              \return The desired 2-body matrix element, augmented with the 1-body matrix elements */
-         double gHmat(const int orb1, const int orb2, const int orb3, const int orb4) const;
+         double getHmat(const int orb1, const int orb2, const int orb3, const int orb4) const;
          
          //! Function which returns the nuclear repulsion energy
          /** \return The nuclear repulsion energy */
-         double gEconst() const;
+         double getEconst() const;
          
          //! Construct the (spin-summed) 2-RDM of a FCI vector
          /** \param vector The FCI vector
@@ -139,7 +192,6 @@ namespace CheMPS2{
          int TargetIrrep;
          int * IrrepProductTable;
          int * orb2irrep;
-         int IrrepProduct(const int Irrep_row, const int Irrep_col) const;
          
          //The number of orbitals
          unsigned int L;
