@@ -276,11 +276,11 @@ namespace CheMPS2{
              \param temp2 Workspace of size getVecLength() */
          void CGOperator(const double alpha, const double beta, const double eta, double * precon, double * in, double * temp, double * temp2, double * out) const;
          
-         //! Calculates (without approximation) precon = [(alpha + beta * Hamiltonian)^2 + eta^2]^{ -1/2 } (Econstant is taken into account!!)
+         //! Calculates (without approximation) precon = (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)
          /** \param alpha The parameter alpha of the operator
              \param beta The parameter beta of the operator
              \param eta The parameter eta of the operator
-             \param precon Array of size getVecLength(), which contains on exit [(alpha + beta * Hamiltonian)^2 + eta^2]^{ -1/2 }
+             \param precon Array of size getVecLength(), which contains on exit (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 }
              \param workspace Workspace of size getVecLength() */
          void CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const;
       
