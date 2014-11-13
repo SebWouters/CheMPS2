@@ -64,6 +64,7 @@ int main(void){
       const int NLowEnergyDet = 1;
       theFCI.GSSmallCISpace(NLowEnergyDet, inoutput);
       EFCI[counter] = theFCI.GSDavidson(inoutput);
+      theFCI.CalcSpinSquared(inoutput);
       delete [] inoutput;
       
       //To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)

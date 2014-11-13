@@ -68,6 +68,7 @@ int main(void){
    const int NLowEnergyDet = 1;
    theFCI->GSSmallCISpace(NLowEnergyDet, inoutput);
    const double EnergyFCI = theFCI->GSDavidson(inoutput);
+   theFCI->CalcSpinSquared(inoutput);
    const int L = Ham->getL();
    double * TwoDMspace = new double[ L*L*L*L ];
    theFCI->Fill2RDM(inoutput, TwoDMspace);

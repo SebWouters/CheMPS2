@@ -74,6 +74,7 @@ int main(void){
    const int NLowEnergyDet = 1;
    theFCI->GSSmallCISpace(NLowEnergyDet, inoutput);
    const double EnergyFCI = theFCI->GSDavidson(inoutput);
+   theFCI->CalcSpinSquared(inoutput);
    delete [] inoutput;
    
    //Clean up FCI
