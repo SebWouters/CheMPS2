@@ -239,7 +239,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:af8496a386028b2eb6ef686817372857c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate out = precon * [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2] * precon * in (Econstant is taken into account!!)  <a href="#af8496a386028b2eb6ef686817372857c">More...</a><br/></td></tr>
 <tr class="separator:af8496a386028b2eb6ef686817372857c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a2132305764e7aa07cf765bec5668e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ad3a2132305764e7aa07cf765bec5668e">CGDiagPrecond</a> (const double alpha, const double beta, const double eta, double *precon, double *workspace) const </td></tr>
-<tr class="memdesc:ad3a2132305764e7aa07cf765bec5668e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates (without approximation) precon = [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2]^{ -1/2 } (Econstant is taken into account!!)  <a href="#ad3a2132305764e7aa07cf765bec5668e">More...</a><br/></td></tr>
+<tr class="memdesc:ad3a2132305764e7aa07cf765bec5668e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)  <a href="#ad3a2132305764e7aa07cf765bec5668e">More...</a><br/></td></tr>
 <tr class="separator:ad3a2132305764e7aa07cf765bec5668e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -720,13 +720,13 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates (without approximation) precon = [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2]^{ -1/2 } (Econstant is taken into account!!) </p>
+<p>Calculates (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">alpha</td><td>The parameter alpha of the operator </td></tr>
     <tr><td class="paramname">beta</td><td>The parameter beta of the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The parameter eta of the operator </td></tr>
-    <tr><td class="paramname">precon</td><td>Array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, which contains on exit [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2]^{ -1/2 } </td></tr>
+    <tr><td class="paramname">precon</td><td>Array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, which contains on exit (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } </td></tr>
     <tr><td class="paramname">workspace</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
   </table>
   </dd>
@@ -1998,7 +1998,7 @@ Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Wed Nov 12 2014 23:05:37 for CheMPS2 by
+    <li class="footer">Generated on Wed Nov 12 2014 23:13:54 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
