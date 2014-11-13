@@ -124,11 +124,11 @@ $(document).ready(function(){initNavTree('DMRGSCFindices_8cpp_source.html','');}
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;DMRGSCFindices.h&quot;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">using</span> std::cerr;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;DMRGSCFindices.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">using</span> std::cout;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">using</span> std::endl;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
@@ -146,27 +146,27 @@ $(document).ready(function(){initNavTree('DMRGSCFindices_8cpp_source.html','');}
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   NORBcumulative  = <span class="keyword">new</span> <span class="keywordtype">int</span>[Nirreps+1];</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;   NDMRGcumulative = <span class="keyword">new</span> <span class="keywordtype">int</span>[Nirreps+1];</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;   </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;   <span class="keywordtype">int</span> sum_check = 0;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;   <span class="keywordtype">int</span> totalNumOrbs = 0;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;   NORBcumulative[0]  = 0;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;   NDMRGcumulative[0] = 0;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;Nirreps; irrep++){</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;   </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keywordflow">if</span> (NOCCin[irrep]  &lt; 0){ cerr &lt;&lt; <span class="stringliteral">&quot;DMRGSCFindices::DMRGSCFindices : NOCC[&quot;</span>  &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] = &quot;</span> &lt;&lt; NOCCin[ irrep] &lt;&lt; endl; }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keywordflow">if</span> (NDMRGin[irrep] &lt; 0){ cerr &lt;&lt; <span class="stringliteral">&quot;DMRGSCFindices::DMRGSCFindices : NDMRG[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] = &quot;</span> &lt;&lt; NDMRGin[irrep] &lt;&lt; endl; }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      <span class="keywordflow">if</span> (NVIRTin[irrep] &lt; 0){ cerr &lt;&lt; <span class="stringliteral">&quot;DMRGSCFindices::DMRGSCFindices : NVIRT[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] = &quot;</span> &lt;&lt; NVIRTin[irrep] &lt;&lt; endl; }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      assert( NOCCin [irrep]&gt;=0 );</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      assert( NDMRGin[irrep]&gt;=0 );</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;      assert( NVIRTin[irrep]&gt;=0 );</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;      </div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      NORB[ irrep] = NOCCin[ irrep] + NDMRGin[irrep] + NVIRTin[irrep];</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      NOCC[ irrep] = NOCCin[ irrep];</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;      NDMRG[irrep] = NDMRGin[irrep];</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      NVIRT[irrep] = NVIRTin[irrep];</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      sum_check += NORB[irrep];</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      totalNumOrbs += NORB[irrep];</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      </div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      NORBcumulative[ irrep+1] = NORBcumulative[ irrep] + NORB[irrep];</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      NDMRGcumulative[irrep+1] = NDMRGcumulative[irrep] + NDMRG[irrep];</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;   }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;   <span class="keywordflow">if</span> (sum_check != L){ cerr &lt;&lt; <span class="stringliteral">&quot;DMRGSCFindices::DMRGSCFindices : Sum over all OCC, DMRG and VIRT orbitals is not L.&quot;</span> &lt;&lt; endl; }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;   assert( totalNumOrbs==L );</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;   </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;   irrepOfEachDMRGorbital = <span class="keyword">new</span> <span class="keywordtype">int</span>[NDMRGcumulative[Nirreps]];</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;Nirreps; irrep++){</div>
@@ -254,7 +254,7 @@ $(document).ready(function(){initNavTree('DMRGSCFindices_8cpp_source.html','');}
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGSCFindices.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 7 2014 00:30:25 for CheMPS2 by
+    <li class="footer">Generated on Wed Nov 12 2014 23:05:36 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

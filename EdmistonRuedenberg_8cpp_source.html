@@ -124,16 +124,16 @@ $(document).ready(function(){initNavTree('EdmistonRuedenberg_8cpp_source.html','
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;EdmistonRuedenberg.h&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;DMRGSCFVmatRotations.h&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">using</span> std::cout;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">using</span> std::cerr;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;algorithm&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;EdmistonRuedenberg.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;DMRGSCFVmatRotations.h&quot;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">using</span> std::cout;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">using</span> std::endl;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">using</span> std::max;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
@@ -383,174 +383,167 @@ $(document).ready(function(){initNavTree('EdmistonRuedenberg_8cpp_source.html','
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;   <span class="comment">//For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html</span></div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;   <span class="keywordtype">int</span> linsize = iHandler-&gt;getNORB(irrep);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;   <span class="keywordflow">if</span> (linsize&lt;2){</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      cerr &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::Fiedler : linsize &lt; 2 !&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;   }</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;   </div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;   <span class="comment">//Preamble: linsize&gt;=2 at this point</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;   <span class="keywordtype">double</span> * work = temp2;             <span class="comment">//temp2 at least of size 4*linsize*linsize</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;   <span class="keywordtype">int</span> lwork     = 3*linsize*linsize; <span class="comment">//3*linsize*linsize &gt; 3*linsize-1 for linsize&gt;=2</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;   <span class="keywordtype">double</span> * eigs = temp2 + lwork;     <span class="comment">//has size linsize*linsize &gt; linsize for linsize&gt;=2</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;   </div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   <span class="comment">//Calculate the eigenspectrum of the Laplacian</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   <span class="keywordtype">char</span> jobz = <span class="charliteral">&#39;V&#39;</span>;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   <span class="keywordtype">char</span> uplo = <span class="charliteral">&#39;U&#39;</span>;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;   <span class="keywordtype">int</span> info;</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;   dsyev_(&amp;jobz, &amp;uplo, &amp;linsize, laplacian, &amp;linsize, eigs, work, &amp;lwork, &amp;info);</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::Fiedler : Smallest eigs(Laplacian[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;]) = [ &quot;</span> &lt;&lt; eigs[0] &lt;&lt; <span class="stringliteral">&quot;  ,  &quot;</span> &lt;&lt; eigs[1] &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;   }</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;   </div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;   <span class="comment">//The second eigenvector is the Fiedler vector</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;   <span class="keywordtype">double</span> * FiedlerVector     = laplacian + linsize;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;   <span class="keywordtype">double</span> * FiedlerVectorCopy = laplacian;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize; cnt++){ FiedlerVectorCopy[cnt] = FiedlerVector[cnt]; }</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;   </div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;   <span class="comment">//Find the Fiedler ordering</span></div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> upperBound = 2.0; <span class="comment">//Sum_i FiedlerVector[i]^2 = 1 --&gt; fabs(FiedlerVector[i]) &lt;= 1.0</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> value=0; value&lt;linsize; value++){</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">int</span> index=0;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;linsize; cnt++){</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;         <span class="keywordflow">if</span> (FiedlerVectorCopy[cnt] &lt; FiedlerVectorCopy[index]){ index = cnt; }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      } <span class="comment">//Index now corresponds to the smallest value in FiedlerVectorCopy</span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      reorder[value] = index;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      FiedlerVectorCopy[index] = upperBound; <span class="comment">//Remove from the interesting entries in FiedlerVectorCopy</span></div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;   }</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;   </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <span class="keywordtype">bool</span> isOK = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize-1; cnt++){</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;         <span class="keywordflow">if</span> (FiedlerVector[reorder[cnt]] &gt; FiedlerVector[reorder[cnt+1]]){ isOK = <span class="keyword">false</span>; }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      }</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="keywordflow">if</span> (!isOK){</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;         cerr &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::Fiedler : Reordered Fiedler vector is not OK = [ &quot;</span>;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize-1; cnt++){ cerr &lt;&lt; FiedlerVector[reorder[cnt]] &lt;&lt; <span class="stringliteral">&quot;  ,  &quot;</span>; }</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;         cerr &lt;&lt; FiedlerVector[reorder[linsize-1]] &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      }</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;                                 Reorder[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] = [ &quot;</span>;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize-1; cnt++){ cout &lt;&lt; reorder[cnt] &lt;&lt; <span class="stringliteral">&quot;  ,  &quot;</span>; }</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      cout &lt;&lt; reorder[linsize-1] &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;   }</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;   </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;   <span class="comment">//Reorder the vectors in the unitary</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;   <span class="keywordtype">double</span> * blockU = unitary-&gt;getBlock(irrep);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=0; col&lt;linsize; col++){</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;         work[row + linsize * col] = blockU[reorder[row] + linsize * col];</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      }</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;   }</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;   </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;   <span class="keywordtype">int</span> size = linsize*linsize;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;   <span class="keywordtype">int</span> inc = 1;</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;   dcopy_(&amp;size, work, &amp;inc, blockU, &amp;inc);</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;   </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;      <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;      <span class="keywordtype">double</span> alpha = 1.0;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;      <span class="keywordtype">double</span> beta = 0.0;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      dgemm_(&amp;trans, &amp;notrans, &amp;linsize, &amp;linsize, &amp;linsize, &amp;alpha, blockU, &amp;linsize, blockU, &amp;linsize, &amp;beta, work, &amp;linsize);</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;      <span class="keywordtype">double</span> sum = 0.0;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;         sum += (work[row+linsize*row]-1.0)*(work[row+linsize*row]-1.0);</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            sum += work[row+linsize*col]*work[row+linsize*col] + work[col+linsize*row]*work[col+linsize*row];</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;         }</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      }</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      sum = sqrt(sum);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;                                 2-norm of Unitary[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;]^T * Unitary[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] - I = &quot;</span> &lt;&lt; sum &lt;&lt; endl;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;   }</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;}</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="keywordtype">double</span> CheMPS2::EdmistonRuedenberg::FiedlerExchangeCost()<span class="keyword"> const</span>{</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;   <span class="keywordtype">double</span> Cost = 0.0;</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;   </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;SymmInfo.getNumberOfIrreps(); irrep++){</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> linsize = iHandler-&gt;getNORB(irrep);</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      <span class="keywordflow">if</span> (linsize&gt;1){</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;               Cost += 2 * VmatRotated-&gt;get(irrep,irrep,irrep,irrep,row,col,col,row) * (col-row) * (col-row);</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            }</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;         }</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      }</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;   }</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;   </div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;   <span class="keywordflow">return</span> Cost;</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;}</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
-<div class="line"><a name="l00380"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">  380</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxlinsize, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2){</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;   <span class="comment">//For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html</span></div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;0){ cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::FiedlerExchange : Cost function at start = &quot;</span> &lt;&lt; FiedlerExchangeCost() &lt;&lt; endl; }</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;   </div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;   <span class="keywordtype">int</span> * reorder = <span class="keyword">new</span> <span class="keywordtype">int</span>[maxlinsize];</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;SymmInfo.getNumberOfIrreps(); irrep++){</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> linsize = iHandler-&gt;getNORB(irrep);</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      <span class="keywordflow">if</span> (linsize&gt;1){</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      </div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;         <span class="comment">//temp1 and temp2 both at least of size 4*linsize*linsize</span></div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;         <span class="keywordtype">double</span> * laplacian = temp1;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;         </div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;         <span class="comment">//Fill the weighted graph Laplacian</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            laplacian[row*(1+linsize)] = 0.0;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;               laplacian[row + linsize*col]  = - VmatRotated-&gt;get(irrep,irrep,irrep,irrep,row,col,col,row); <span class="comment">//minus the exchange matrix</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;               laplacian[col + linsize*row]  = laplacian[row + linsize*col]; <span class="comment">//Symmetric matrix</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; <span class="comment">//On diagonal : Minus the sum of the other terms on that row</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;            }</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=0; col&lt;row; col++){</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; <span class="comment">//On diagonal : Minus the sum of the other terms on that row</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;            }</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;         }</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;         </div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;         Fiedler(irrep, reorder, laplacian, temp2);</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;         </div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      }</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;   }</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;   </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;   <span class="keyword">delete</span> [] reorder;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;   </div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;   <a class="code" href="classCheMPS2_1_1DMRGSCFVmatRotations.html">DMRGSCFVmatRotations</a> theRotator(Ham, iHandler);</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;   theRotator.<a class="code" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16">fillVmatRotated</a>(VmatRotated, unitary, temp1, temp2);</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;   </div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;0){ cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = &quot;</span> &lt;&lt; FiedlerExchangeCost() &lt;&lt; endl; }</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;   assert( linsize&gt;=2 );</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;   </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;   <span class="comment">//Preamble: linsize&gt;=2 at this point</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;   <span class="keywordtype">double</span> * work = temp2;             <span class="comment">//temp2 at least of size 4*linsize*linsize</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;   <span class="keywordtype">int</span> lwork     = 3*linsize*linsize; <span class="comment">//3*linsize*linsize &gt; 3*linsize-1 for linsize&gt;=2</span></div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;   <span class="keywordtype">double</span> * eigs = temp2 + lwork;     <span class="comment">//has size linsize*linsize &gt; linsize for linsize&gt;=2</span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;   </div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;   <span class="comment">//Calculate the eigenspectrum of the Laplacian</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;   <span class="keywordtype">char</span> jobz = <span class="charliteral">&#39;V&#39;</span>;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;   <span class="keywordtype">char</span> uplo = <span class="charliteral">&#39;U&#39;</span>;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   <span class="keywordtype">int</span> info;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   dsyev_(&amp;jobz, &amp;uplo, &amp;linsize, laplacian, &amp;linsize, eigs, work, &amp;lwork, &amp;info);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::Fiedler : Smallest eigs(Laplacian[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;]) = [ &quot;</span> &lt;&lt; eigs[0] &lt;&lt; <span class="stringliteral">&quot;  ,  &quot;</span> &lt;&lt; eigs[1] &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;   }</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;   </div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;   <span class="comment">//The second eigenvector is the Fiedler vector</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;   <span class="keywordtype">double</span> * FiedlerVector     = laplacian + linsize;</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;   <span class="keywordtype">double</span> * FiedlerVectorCopy = laplacian;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize; cnt++){ FiedlerVectorCopy[cnt] = FiedlerVector[cnt]; }</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;   </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;   <span class="comment">//Find the Fiedler ordering</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> upperBound = 2.0; <span class="comment">//Sum_i FiedlerVector[i]^2 = 1 --&gt; fabs(FiedlerVector[i]) &lt;= 1.0</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> value=0; value&lt;linsize; value++){</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <span class="keywordtype">int</span> index=0;</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;linsize; cnt++){</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;         <span class="keywordflow">if</span> (FiedlerVectorCopy[cnt] &lt; FiedlerVectorCopy[index]){ index = cnt; }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      } <span class="comment">//Index now corresponds to the smallest value in FiedlerVectorCopy</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      reorder[value] = index;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      FiedlerVectorCopy[index] = upperBound; <span class="comment">//Remove from the interesting entries in FiedlerVectorCopy</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;   }</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;   </div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      <span class="keywordtype">bool</span> isOK = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize-1; cnt++){</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;         <span class="keywordflow">if</span> (FiedlerVector[reorder[cnt]] &gt; FiedlerVector[reorder[cnt+1]]){ isOK = <span class="keyword">false</span>; }</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      }</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      assert( isOK );</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;                                 Reorder[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] = [ &quot;</span>;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;linsize-1; cnt++){ cout &lt;&lt; reorder[cnt] &lt;&lt; <span class="stringliteral">&quot;  ,  &quot;</span>; }</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      cout &lt;&lt; reorder[linsize-1] &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;   }</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;   </div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;   <span class="comment">//Reorder the vectors in the unitary</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;   <span class="keywordtype">double</span> * blockU = unitary-&gt;getBlock(irrep);</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=0; col&lt;linsize; col++){</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;         work[row + linsize * col] = blockU[reorder[row] + linsize * col];</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      }</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;   }</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;   </div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;   <span class="keywordtype">int</span> size = linsize*linsize;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;   <span class="keywordtype">int</span> inc = 1;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;   dcopy_(&amp;size, work, &amp;inc, blockU, &amp;inc);</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;   </div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;1){</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      <span class="keywordtype">double</span> alpha = 1.0;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      <span class="keywordtype">double</span> beta = 0.0;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;      dgemm_(&amp;trans, &amp;notrans, &amp;linsize, &amp;linsize, &amp;linsize, &amp;alpha, blockU, &amp;linsize, blockU, &amp;linsize, &amp;beta, work, &amp;linsize);</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      <span class="keywordtype">double</span> sum = 0.0;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;         sum += (work[row+linsize*row]-1.0)*(work[row+linsize*row]-1.0);</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;            sum += work[row+linsize*col]*work[row+linsize*col] + work[col+linsize*row]*work[col+linsize*row];</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;         }</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;      }</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;      sum = sqrt(sum);</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;                                 2-norm of Unitary[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;]^T * Unitary[&quot;</span> &lt;&lt; irrep &lt;&lt; <span class="stringliteral">&quot;] - I = &quot;</span> &lt;&lt; sum &lt;&lt; endl;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;   }</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;}</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="keywordtype">double</span> CheMPS2::EdmistonRuedenberg::FiedlerExchangeCost()<span class="keyword"> const</span>{</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;   <span class="keywordtype">double</span> Cost = 0.0;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;   </div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;SymmInfo.getNumberOfIrreps(); irrep++){</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> linsize = iHandler-&gt;getNORB(irrep);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      <span class="keywordflow">if</span> (linsize&gt;1){</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;               Cost += 2 * VmatRotated-&gt;get(irrep,irrep,irrep,irrep,row,col,col,row) * (col-row) * (col-row);</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            }</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;         }</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      }</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;   }</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;   </div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;   <span class="keywordflow">return</span> Cost;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
+<div class="line"><a name="l00373"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">  373</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxlinsize, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2){</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;   <span class="comment">//For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;0){ cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::FiedlerExchange : Cost function at start = &quot;</span> &lt;&lt; FiedlerExchangeCost() &lt;&lt; endl; }</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;   </div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;   <span class="keywordtype">int</span> * reorder = <span class="keyword">new</span> <span class="keywordtype">int</span>[maxlinsize];</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;SymmInfo.getNumberOfIrreps(); irrep++){</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      </div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> linsize = iHandler-&gt;getNORB(irrep);</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      <span class="keywordflow">if</span> (linsize&gt;1){</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      </div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;         <span class="comment">//temp1 and temp2 both at least of size 4*linsize*linsize</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;         <span class="keywordtype">double</span> * laplacian = temp1;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;         </div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;         <span class="comment">//Fill the weighted graph Laplacian</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> row=0; row&lt;linsize; row++){</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;            laplacian[row*(1+linsize)] = 0.0;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=row+1; col&lt;linsize; col++){</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;               laplacian[row + linsize*col]  = - VmatRotated-&gt;get(irrep,irrep,irrep,irrep,row,col,col,row); <span class="comment">//minus the exchange matrix</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;               laplacian[col + linsize*row]  = laplacian[row + linsize*col]; <span class="comment">//Symmetric matrix</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; <span class="comment">//On diagonal : Minus the sum of the other terms on that row</span></div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            }</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> col=0; col&lt;row; col++){</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;               laplacian[row + linsize*row] -= laplacian[row + linsize*col]; <span class="comment">//On diagonal : Minus the sum of the other terms on that row</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;         }</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;         </div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;         Fiedler(irrep, reorder, laplacian, temp2);</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;         </div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      }</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;   }</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;   </div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;   <span class="keyword">delete</span> [] reorder;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;   </div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;   <a class="code" href="classCheMPS2_1_1DMRGSCFVmatRotations.html">DMRGSCFVmatRotations</a> theRotator(Ham, iHandler);</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;   theRotator.<a class="code" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16">fillVmatRotated</a>(VmatRotated, unitary, temp1, temp2);</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;   </div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;   <span class="keywordflow">if</span> (printLevel&gt;0){ cout &lt;&lt; <span class="stringliteral">&quot;   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = &quot;</span> &lt;&lt; FiedlerExchangeCost() &lt;&lt; endl; }</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;}</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_aca6fdd79557f9189153258daad5fbe8c"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c">CheMPS2::Irreps::setGroup</a></div><div class="ttdeci">bool setGroup(const int nGroup)</div><div class="ttdoc">Set the group. </div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00054">Irreps.cpp:54</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFindices_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFindices.html">CheMPS2::DMRGSCFindices</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFindices_8h_source.html#l00032">DMRGSCFindices.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_afd3d1b65e870aad920125c05606c4a7d"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps::getNumberOfIrreps</a></div><div class="ttdeci">int getNumberOfIrreps() const </div><div class="ttdoc">Get the number of irreps for the currently activated group. </div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00114">Irreps.cpp:114</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_a5d012081f089d72c472ced2ae7bdaaf0"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#a5d012081f089d72c472ced2ae7bdaaf0">CheMPS2::EdmistonRuedenberg::~EdmistonRuedenberg</a></div><div class="ttdeci">virtual ~EdmistonRuedenberg()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00054">EdmistonRuedenberg.cpp:54</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_ae2fd288381bda86ab5c07e1d793aa3fd"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd">CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg</a></div><div class="ttdeci">EdmistonRuedenberg(Hamiltonian *HamIn, const int printLevelIn=1)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00034">EdmistonRuedenberg.cpp:34</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a02130b2901a5a3c05171d4f7dd5fa4cd"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd">CheMPS2::Hamiltonian::getOrbitalIrrep</a></div><div class="ttdeci">int getOrbitalIrrep(const int nOrb) const </div><div class="ttdoc">Get an orbital irrep number. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00077">Hamiltonian.cpp:77</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a02130b2901a5a3c05171d4f7dd5fa4cd"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd">CheMPS2::Hamiltonian::getOrbitalIrrep</a></div><div class="ttdeci">int getOrbitalIrrep(const int nOrb) const </div><div class="ttdoc">Get an orbital irrep number. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00076">Hamiltonian.cpp:76</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1FourIndex_html"><div class="ttname"><a href="classCheMPS2_1_1FourIndex.html">CheMPS2::FourIndex</a></div><div class="ttdef"><b>Definition:</b> <a href="FourIndex_8h_source.html#l00034">FourIndex.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFVmatRotations_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFVmatRotations.html">CheMPS2::DMRGSCFVmatRotations</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFVmatRotations_8h_source.html#l00034">DMRGSCFVmatRotations.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_af02cbffdb428682c4d53cf6c862fdb02"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02">CheMPS2::EdmistonRuedenberg::getUnitary</a></div><div class="ttdeci">DMRGSCFunitary * getUnitary()</div><div class="ttdoc">Get the pointer to the unitary to use in DMRGSCF. </div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00149">EdmistonRuedenberg.cpp:149</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_ad73febba415f3bcbef367b587d5bcc0d"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a></div><div class="ttdeci">void FiedlerExchange(const int maxlinsize, double *temp1, double *temp2)</div><div class="ttdoc">Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i...</div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00380">EdmistonRuedenberg.cpp:380</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_ad73febba415f3bcbef367b587d5bcc0d"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a></div><div class="ttdeci">void FiedlerExchange(const int maxlinsize, double *temp1, double *temp2)</div><div class="ttdoc">Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i...</div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00373">EdmistonRuedenberg.cpp:373</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Hamiltonian_html"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a></div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8h_source.html#l00053">Hamiltonian.h:53</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1EdmistonRuedenberg_html_af52e7bc01e8f31e9b605ec4130f0337c"><div class="ttname"><a href="classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c">CheMPS2::EdmistonRuedenberg::Optimize</a></div><div class="ttdeci">double Optimize(double *temp1, double *temp2, const bool startFromRandomUnitary, const double gradThreshold=EDMISTONRUED_gradThreshold, const int maxIter=EDMISTONRUED_maxIter)</div><div class="ttdoc">Maximize the Edmiston-Ruedenberg cost function. </div><div class="ttdef"><b>Definition:</b> <a href="EdmistonRuedenberg_8cpp_source.html#l00062">EdmistonRuedenberg.cpp:62</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFVmatRotations_html_a5471bb0feb5a00c8619cb9ff25978b16"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16">CheMPS2::DMRGSCFVmatRotations::fillVmatRotated</a></div><div class="ttdeci">void fillVmatRotated(FourIndex *VmatRotated, DMRGSCFunitary *unitary, double *mem1, double *mem2) const </div><div class="ttdoc">Fill the rotated two-body matrix elements, based on HamOrig and unitary. Do entire blocks at once...</div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFVmatRotations_8cpp_source.html#l00041">DMRGSCFVmatRotations.cpp:41</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a8c18f51ded63810e316f1834853dce21"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21">CheMPS2::Hamiltonian::getNGroup</a></div><div class="ttdeci">int getNGroup() const </div><div class="ttdoc">Get the group number. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00075">Hamiltonian.cpp:75</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a8c18f51ded63810e316f1834853dce21"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21">CheMPS2::Hamiltonian::getNGroup</a></div><div class="ttdeci">int getNGroup() const </div><div class="ttdoc">Get the group number. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00074">Hamiltonian.cpp:74</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html">CheMPS2::DMRGSCFunitary</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8h_source.html#l00034">DMRGSCFunitary.h:34</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a101963cfa8f06abe798a7ae79faab618"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618">CheMPS2::Hamiltonian::getL</a></div><div class="ttdeci">int getL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00073">Hamiltonian.cpp:73</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a101963cfa8f06abe798a7ae79faab618"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618">CheMPS2::Hamiltonian::getL</a></div><div class="ttdeci">int getL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00072">Hamiltonian.cpp:72</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>EdmistonRuedenberg.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 7 2014 00:30:25 for CheMPS2 by
+    <li class="footer">Generated on Wed Nov 12 2014 23:05:36 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

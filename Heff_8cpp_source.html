@@ -354,235 +354,233 @@ $(document).ready(function(){initNavTree('Heff_8cpp_source.html','');});
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   <span class="keywordflow">if</span> (Sobjectnorm==0.0){</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){ t_vec[cnt] = ((double) rand())/RAND_MAX; }</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <span class="keywordflow">if</span> (CheMPS2::HEFF_debugPrint){</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;WARNING AT HEFF : S-object with zero norm was replaced with random vector.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;                  Note that DMRG::checkSobject() allows to validate the S-object.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;         cout&lt;&lt;  <span class="stringliteral">&quot;                  This should be a rare (but possible) warning.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      }</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;   }</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;   <span class="comment">//End checking whether the S-object contains anything</span></div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;   </div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;   <span class="keywordtype">double</span> * HeffDiag = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;   fillHeffDiag(HeffDiag, denS, Ctensors, Dtensors, F0tensors, F1tensors, Xtensors, nLower, VeffTilde);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;   </div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;   <span class="keywordtype">double</span> * Reortho_Lowdin = NULL;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;   <span class="keywordtype">double</span> * Reortho_Overlap_eigs = NULL;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;   <span class="keywordtype">double</span> * Reortho_Overlap = NULL;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;   <span class="keywordtype">double</span> * Reortho_Eigenvecs = NULL;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;   <span class="keywordtype">bool</span> Reortho_Allocated = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;WARNING AT HEFF : S-object with zero norm was replaced with random vector. This should be a rare (but possible) warning.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;   }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;   <span class="comment">//End checking whether the S-object contains anything</span></div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;   </div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;   <span class="keywordtype">double</span> * HeffDiag = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;   fillHeffDiag(HeffDiag, denS, Ctensors, Dtensors, F0tensors, F1tensors, Xtensors, nLower, VeffTilde);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;   </div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;   <span class="keywordtype">double</span> * Reortho_Lowdin = NULL;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;   <span class="keywordtype">double</span> * Reortho_Overlap_eigs = NULL;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;   <span class="keywordtype">double</span> * Reortho_Overlap = NULL;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;   <span class="keywordtype">double</span> * Reortho_Eigenvecs = NULL;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;   <span class="keywordtype">bool</span> Reortho_Allocated = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;   </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;   <span class="keywordtype">int</span> nIterations = 0;</div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;   </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;   <span class="keywordtype">int</span> nIterations = 0;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;   </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;   <span class="keywordflow">while</span> (rnorm &gt; rtol){</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="comment">//1. Orthogonalize the new t_vec w.r.t. the old basis</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;         <span class="keywordtype">double</span> min_overlap = - ddot_(&amp;length_vec,t_vec,&amp;inc1,vecs[cnt],&amp;inc1);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;         daxpy_(&amp;length_vec,&amp;min_overlap,vecs[cnt],&amp;inc1,t_vec,&amp;inc1);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      }</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;   </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="comment">//2. Normalize the t_vec</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      <span class="keywordtype">char</span> norm = <span class="charliteral">&#39;F&#39;</span>;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      <span class="keywordtype">double</span> alpha = 1.0/dlange_(&amp;norm,&amp;length_vec,&amp;inc1,t_vec,&amp;length_vec,t_vec); <span class="comment">//work not referenced as Frobenius norm</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      dscal_(&amp;length_vec,&amp;alpha,t_vec,&amp;inc1);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;      <span class="comment">//3. T_vec becomes part of vecs</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;      <span class="keywordflow">if</span> (num_vec&lt;num_allocated){</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;         <span class="keywordtype">double</span> * temp = vecs[num_vec];</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;         vecs[num_vec] = t_vec;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;         t_vec = temp;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;         vecs[num_allocated] = t_vec;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;         Hvecs[num_allocated] = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;         t_vec = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;         num_allocated++;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      }</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      makeHeff(vecs[num_vec], Hvecs[num_vec], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      nIterations++;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      </div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="comment">//4. mxM contains the Hamiltonian in the basis &quot;vecs&quot;</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;         mxM[cnt + DAVIDSON_NUM_VEC * num_vec] = ddot_(&amp;length_vec,vecs[num_vec],&amp;inc1,Hvecs[cnt],&amp;inc1);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;         mxM[num_vec + DAVIDSON_NUM_VEC * cnt] = mxM[cnt + DAVIDSON_NUM_VEC * num_vec];</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      }</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      mxM[num_vec + DAVIDSON_NUM_VEC * num_vec] = ddot_(&amp;length_vec,vecs[num_vec],&amp;inc1,Hvecs[num_vec],&amp;inc1);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      </div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      <span class="comment">//5. When t-vec was added to vecs, the number of vecs was actually increased by one. For convenience (doing 4.), only now the number is incremented.</span></div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      num_vec++;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      </div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="comment">//6. Calculate the eigenvalues and vectors of mxM</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">char</span> jobz = <span class="charliteral">&#39;V&#39;</span>;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordtype">char</span> uplo = <span class="charliteral">&#39;U&#39;</span>;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="keywordtype">int</span> info;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt1=0; cnt1&lt;num_vec; cnt1++){</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt2=0; cnt2&lt;num_vec; cnt2++){</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            mxM_vecs[cnt1 + DAVIDSON_NUM_VEC * cnt2] = mxM[cnt1 + DAVIDSON_NUM_VEC * cnt2];</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;         }</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="keywordtype">int</span> lda = DAVIDSON_NUM_VEC;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      dsyev_(&amp;jobz,&amp;uplo,&amp;num_vec,mxM_vecs,&amp;lda,mxM_eigs,mxM_work,&amp;mxM_lwork,&amp;info); <span class="comment">//ascending order of eigs</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      <span class="comment">//7. Calculate u and r. r is stored in t_vec, u in u_vec.</span></div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;         t_vec[cnt] = 0.0;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;         u_vec[cnt] = 0.0;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      }</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;         <span class="keywordtype">double</span> alpha = mxM_vecs[cnt]; <span class="comment">//eigenvector with lowest eigenvalue, hence mxM_vecs[cnt + DAVIDSON_NUM_VEC * 0]</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha,Hvecs[cnt],&amp;inc1,t_vec,&amp;inc1);</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha, vecs[cnt],&amp;inc1,u_vec,&amp;inc1);</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      }</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      alpha = -mxM_eigs[0];</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      daxpy_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1,t_vec,&amp;inc1);</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      </div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;      <span class="comment">//8. Calculate the norm of r</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      rnorm = dlange_(&amp;norm,&amp;length_vec,&amp;inc1,t_vec,&amp;length_vec,t_vec);</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      </div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <span class="comment">//9. In case convergence is not yet reached: prepare for the following iteration</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      <span class="keywordflow">if</span> (rnorm &gt; rtol){</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      </div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;         <span class="comment">//9a. Calculate the new t_vec based on the residual of the lowest eigenvalue, to add to the vecs.</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            <span class="keywordflow">if</span> (fabs(HeffDiag[cnt] - mxM_eigs[0])&gt; CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;               work_vec[cnt] = u_vec[cnt]/(HeffDiag[cnt] - mxM_eigs[0]); <span class="comment">// work_vec = K^(-1) u_vec</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;               work_vec[cnt] = u_vec[cnt]/ CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;               <span class="keywordflow">if</span> (CheMPS2::HEFF_debugPrint) cout &lt;&lt; <span class="stringliteral">&quot;|(HeffDiag[&quot;</span> &lt;&lt; cnt &lt;&lt; <span class="stringliteral">&quot;] - mxM_eigs[0])| = &quot;</span> &lt;&lt; fabs(HeffDiag[cnt] - mxM_eigs[0]) &lt;&lt; endl;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;            }</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;         }</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;         alpha = - ddot_(&amp;length_vec,work_vec,&amp;inc1,t_vec,&amp;inc1)/ddot_(&amp;length_vec,work_vec,&amp;inc1,u_vec,&amp;inc1); <span class="comment">// alpha = - (u^T K^(-1) r) / (u^T K^(-1) u)</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1,t_vec,&amp;inc1); <span class="comment">// t_vec = r - (u^T K^(-1) r) / (u^T K^(-1) u) u</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            <span class="keywordflow">if</span> (fabs(HeffDiag[cnt] - mxM_eigs[0])&gt; CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;               t_vec[cnt] = - t_vec[cnt]/(HeffDiag[cnt] - mxM_eigs[0]); <span class="comment">//t_vec = - K^(-1) (r - (u^T K^(-1) r) / (u^T K^(-1) u) u)</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;               t_vec[cnt] = - t_vec[cnt]/ CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            }</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;         }</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;         </div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;         <span class="comment">// 9b. When the maximum number of vectors is reached: construct the one with lowest eigenvalue &amp; restart</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;         <span class="keywordflow">if</span> (num_vec == DAVIDSON_NUM_VEC){</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;         </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;            <span class="keywordflow">if</span> (DAVIDSON_NUM_VEC_KEEP&lt;=1){</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;            </div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;               alpha = 1.0/dlange_(&amp;norm,&amp;length_vec,&amp;inc1,u_vec,&amp;length_vec,u_vec); <span class="comment">//work not referenced as Frobenius norm</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;               dscal_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1);</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;               dcopy_(&amp;length_vec,u_vec,&amp;inc1,vecs[0],&amp;inc1);</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;               makeHeff(vecs[0], Hvecs[0], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;               nIterations++;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;               mxM[0] = ddot_(&amp;length_vec,vecs[0],&amp;inc1,Hvecs[0],&amp;inc1);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;   <span class="keywordflow">while</span> (rnorm &gt; rtol){</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      <span class="comment">//1. Orthogonalize the new t_vec w.r.t. the old basis</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;         <span class="keywordtype">double</span> min_overlap = - ddot_(&amp;length_vec,t_vec,&amp;inc1,vecs[cnt],&amp;inc1);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;         daxpy_(&amp;length_vec,&amp;min_overlap,vecs[cnt],&amp;inc1,t_vec,&amp;inc1);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      }</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;   </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      <span class="comment">//2. Normalize the t_vec</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;      <span class="keywordtype">char</span> norm = <span class="charliteral">&#39;F&#39;</span>;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      <span class="keywordtype">double</span> alpha = 1.0/dlange_(&amp;norm,&amp;length_vec,&amp;inc1,t_vec,&amp;length_vec,t_vec); <span class="comment">//work not referenced as Frobenius norm</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;      dscal_(&amp;length_vec,&amp;alpha,t_vec,&amp;inc1);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      </div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;      <span class="comment">//3. T_vec becomes part of vecs</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;      <span class="keywordflow">if</span> (num_vec&lt;num_allocated){</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;         <span class="keywordtype">double</span> * temp = vecs[num_vec];</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;         vecs[num_vec] = t_vec;</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;         t_vec = temp;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;      } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;         vecs[num_allocated] = t_vec;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;         Hvecs[num_allocated] = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;         t_vec = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec];</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;         num_allocated++;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;      }</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;      makeHeff(vecs[num_vec], Hvecs[num_vec], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;      nIterations++;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;      </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      <span class="comment">//4. mxM contains the Hamiltonian in the basis &quot;vecs&quot;</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;         mxM[cnt + DAVIDSON_NUM_VEC * num_vec] = ddot_(&amp;length_vec,vecs[num_vec],&amp;inc1,Hvecs[cnt],&amp;inc1);</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;         mxM[num_vec + DAVIDSON_NUM_VEC * cnt] = mxM[cnt + DAVIDSON_NUM_VEC * num_vec];</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      }</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      mxM[num_vec + DAVIDSON_NUM_VEC * num_vec] = ddot_(&amp;length_vec,vecs[num_vec],&amp;inc1,Hvecs[num_vec],&amp;inc1);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      <span class="comment">//5. When t-vec was added to vecs, the number of vecs was actually increased by one. For convenience (doing 4.), only now the number is incremented.</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      num_vec++;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <span class="comment">//6. Calculate the eigenvalues and vectors of mxM</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="keywordtype">char</span> jobz = <span class="charliteral">&#39;V&#39;</span>;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordtype">char</span> uplo = <span class="charliteral">&#39;U&#39;</span>;</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">int</span> info;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt1=0; cnt1&lt;num_vec; cnt1++){</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt2=0; cnt2&lt;num_vec; cnt2++){</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;            mxM_vecs[cnt1 + DAVIDSON_NUM_VEC * cnt2] = mxM[cnt1 + DAVIDSON_NUM_VEC * cnt2];</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;         }</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      }</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      <span class="keywordtype">int</span> lda = DAVIDSON_NUM_VEC;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      dsyev_(&amp;jobz,&amp;uplo,&amp;num_vec,mxM_vecs,&amp;lda,mxM_eigs,mxM_work,&amp;mxM_lwork,&amp;info); <span class="comment">//ascending order of eigs</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      </div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <span class="comment">//7. Calculate u and r. r is stored in t_vec, u in u_vec.</span></div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;         t_vec[cnt] = 0.0;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;         u_vec[cnt] = 0.0;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      }</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_vec; cnt++){</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;         <span class="keywordtype">double</span> alpha = mxM_vecs[cnt]; <span class="comment">//eigenvector with lowest eigenvalue, hence mxM_vecs[cnt + DAVIDSON_NUM_VEC * 0]</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha,Hvecs[cnt],&amp;inc1,t_vec,&amp;inc1);</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha, vecs[cnt],&amp;inc1,u_vec,&amp;inc1);</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      alpha = -mxM_eigs[0];</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      daxpy_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1,t_vec,&amp;inc1);</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      </div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <span class="comment">//8. Calculate the norm of r</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      rnorm = dlange_(&amp;norm,&amp;length_vec,&amp;inc1,t_vec,&amp;length_vec,t_vec);</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;      </div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      <span class="comment">//9. In case convergence is not yet reached: prepare for the following iteration</span></div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      <span class="keywordflow">if</span> (rnorm &gt; rtol){</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      </div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;         <span class="comment">//9a. Calculate the new t_vec based on the residual of the lowest eigenvalue, to add to the vecs.</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;            <span class="keywordflow">if</span> (fabs(HeffDiag[cnt] - mxM_eigs[0])&gt; CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;               work_vec[cnt] = u_vec[cnt]/(HeffDiag[cnt] - mxM_eigs[0]); <span class="comment">// work_vec = K^(-1) u_vec</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;               work_vec[cnt] = u_vec[cnt]/ CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ;</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;               <span class="keywordflow">if</span> (CheMPS2::HEFF_debugPrint) cout &lt;&lt; <span class="stringliteral">&quot;|(HeffDiag[&quot;</span> &lt;&lt; cnt &lt;&lt; <span class="stringliteral">&quot;] - mxM_eigs[0])| = &quot;</span> &lt;&lt; fabs(HeffDiag[cnt] - mxM_eigs[0]) &lt;&lt; endl;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;            }</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;         }</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         alpha = - ddot_(&amp;length_vec,work_vec,&amp;inc1,t_vec,&amp;inc1)/ddot_(&amp;length_vec,work_vec,&amp;inc1,u_vec,&amp;inc1); <span class="comment">// alpha = - (u^T K^(-1) r) / (u^T K^(-1) u)</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;         daxpy_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1,t_vec,&amp;inc1); <span class="comment">// t_vec = r - (u^T K^(-1) r) / (u^T K^(-1) u) u</span></div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;length_vec; cnt++){</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            <span class="keywordflow">if</span> (fabs(HeffDiag[cnt] - mxM_eigs[0])&gt; CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;               t_vec[cnt] = - t_vec[cnt]/(HeffDiag[cnt] - mxM_eigs[0]); <span class="comment">//t_vec = - K^(-1) (r - (u^T K^(-1) r) / (u^T K^(-1) u) u)</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;               t_vec[cnt] = - t_vec[cnt]/ CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ;</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            }</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;         }</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;         </div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;         <span class="comment">// 9b. When the maximum number of vectors is reached: construct the one with lowest eigenvalue &amp; restart</span></div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;         <span class="keywordflow">if</span> (num_vec == DAVIDSON_NUM_VEC){</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;         </div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;            <span class="keywordflow">if</span> (DAVIDSON_NUM_VEC_KEEP&lt;=1){</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;            </div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;               alpha = 1.0/dlange_(&amp;norm,&amp;length_vec,&amp;inc1,u_vec,&amp;length_vec,u_vec); <span class="comment">//work not referenced as Frobenius norm</span></div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;               dscal_(&amp;length_vec,&amp;alpha,u_vec,&amp;inc1);</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;               dcopy_(&amp;length_vec,u_vec,&amp;inc1,vecs[0],&amp;inc1);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;               makeHeff(vecs[0], Hvecs[0], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;               nIterations++;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;               mxM[0] = ddot_(&amp;length_vec,vecs[0],&amp;inc1,Hvecs[0],&amp;inc1);</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;            </div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;               num_vec = 1;</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;            </div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;               num_vec = 1;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;            } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;            </div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;            </div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;               <span class="comment">//Construct the lowest DAVIDSON_NUM_VEC_KEEP eigenvectors</span></div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Eigenvecs = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec * DAVIDSON_NUM_VEC_KEEP];</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;               dcopy_(&amp;length_vec,u_vec,&amp;inc1,Reortho_Eigenvecs,&amp;inc1);</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;DAVIDSON_NUM_VEC_KEEP; cnt++){</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irow=0; irow&lt;length_vec; irow++){</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                     Reortho_Eigenvecs[irow + length_vec * cnt] = 0.0;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC; ivec++){</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                        Reortho_Eigenvecs[irow + length_vec * cnt] += vecs[ivec][irow] * mxM_vecs[ivec + DAVIDSON_NUM_VEC * cnt];</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                     }</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                  }</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;               }</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;               </div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;               <span class="comment">//Reorthonormalize them</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;               <span class="comment">//Reortho: Calculate the overlap matrix</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Overlap = <span class="keyword">new</span> <span class="keywordtype">double</span>[DAVIDSON_NUM_VEC_KEEP * DAVIDSON_NUM_VEC_KEEP];</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;               <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;               <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;               <span class="keywordtype">int</span> DVDS_KEEP = DAVIDSON_NUM_VEC_KEEP;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;               <span class="keywordtype">double</span> one = 1.0;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;               <span class="keywordtype">double</span> zero = 0.0; <span class="comment">//set</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;               dgemm_(&amp;trans,&amp;notr,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;length_vec,&amp;one,Reortho_Eigenvecs,&amp;length_vec, Reortho_Eigenvecs,&amp;length_vec,&amp;zero,Reortho_Overlap,&amp;DVDS_KEEP);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;               </div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;               <span class="comment">//Reortho: Calculate the Lowdin tfo</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Overlap_eigs = <span class="keyword">new</span> <span class="keywordtype">double</span>[DVDS_KEEP];</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;               dsyev_(&amp;jobz,&amp;uplo,&amp;DVDS_KEEP,Reortho_Overlap,&amp;DVDS_KEEP,Reortho_Overlap_eigs,mxM_work,&amp;mxM_lwork,&amp;info); <span class="comment">//ascending order of eigs</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> icnt=0; icnt&lt;DVDS_KEEP; icnt++){</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;                  Reortho_Overlap_eigs[icnt] = pow(Reortho_Overlap_eigs[icnt],-0.25);</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;                  dscal_(&amp;DVDS_KEEP, Reortho_Overlap_eigs+icnt, Reortho_Overlap+DVDS_KEEP*icnt, &amp;inc1);</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;               }</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Lowdin = <span class="keyword">new</span> <span class="keywordtype">double</span>[DVDS_KEEP*DVDS_KEEP];</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;               dgemm_(&amp;notr,&amp;trans,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;one,Reortho_Overlap,&amp;DVDS_KEEP,Reortho_Overlap,&amp;DVDS_KEEP,&amp;zero,Reortho_Lowdin,&amp;DVDS_KEEP);</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;               </div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;               <span class="comment">//Reortho: Put the Lowdin tfo eigenvecs in vecs</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC_KEEP; ivec++){</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;                  dscal_(&amp;length_vec,&amp;zero,vecs[ivec],&amp;inc1);</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec2=0; ivec2&lt;DAVIDSON_NUM_VEC_KEEP; ivec2++){</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;                     daxpy_(&amp;length_vec,Reortho_Lowdin + ivec2 + DAVIDSON_NUM_VEC_KEEP * ivec,Reortho_Eigenvecs + length_vec * ivec2, &amp;inc1, vecs[ivec], &amp;inc1);</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;                  }</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;               }</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;               <span class="comment">//Construct the lowest DAVIDSON_NUM_VEC_KEEP eigenvectors</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Eigenvecs = <span class="keyword">new</span> <span class="keywordtype">double</span>[length_vec * DAVIDSON_NUM_VEC_KEEP];</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;               dcopy_(&amp;length_vec,u_vec,&amp;inc1,Reortho_Eigenvecs,&amp;inc1);</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;DAVIDSON_NUM_VEC_KEEP; cnt++){</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irow=0; irow&lt;length_vec; irow++){</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;                     Reortho_Eigenvecs[irow + length_vec * cnt] = 0.0;</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                     <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC; ivec++){</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                        Reortho_Eigenvecs[irow + length_vec * cnt] += vecs[ivec][irow] * mxM_vecs[ivec + DAVIDSON_NUM_VEC * cnt];</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                     }</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                  }</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;               }</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;               </div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;               <span class="comment">//Reorthonormalize them</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;               <span class="comment">//Reortho: Calculate the overlap matrix</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Overlap = <span class="keyword">new</span> <span class="keywordtype">double</span>[DAVIDSON_NUM_VEC_KEEP * DAVIDSON_NUM_VEC_KEEP];</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;               <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;               <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;               <span class="keywordtype">int</span> DVDS_KEEP = DAVIDSON_NUM_VEC_KEEP;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;               <span class="keywordtype">double</span> one = 1.0;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;               <span class="keywordtype">double</span> zero = 0.0; <span class="comment">//set</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;               dgemm_(&amp;trans,&amp;notr,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;length_vec,&amp;one,Reortho_Eigenvecs,&amp;length_vec, Reortho_Eigenvecs,&amp;length_vec,&amp;zero,Reortho_Overlap,&amp;DVDS_KEEP);</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;               </div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;               <span class="comment">//Reortho: Calculate the Lowdin tfo</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Overlap_eigs = <span class="keyword">new</span> <span class="keywordtype">double</span>[DVDS_KEEP];</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;               dsyev_(&amp;jobz,&amp;uplo,&amp;DVDS_KEEP,Reortho_Overlap,&amp;DVDS_KEEP,Reortho_Overlap_eigs,mxM_work,&amp;mxM_lwork,&amp;info); <span class="comment">//ascending order of eigs</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> icnt=0; icnt&lt;DVDS_KEEP; icnt++){</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                  Reortho_Overlap_eigs[icnt] = pow(Reortho_Overlap_eigs[icnt],-0.25);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                  dscal_(&amp;DVDS_KEEP, Reortho_Overlap_eigs+icnt, Reortho_Overlap+DVDS_KEEP*icnt, &amp;inc1);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;               }</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Lowdin = <span class="keyword">new</span> <span class="keywordtype">double</span>[DVDS_KEEP*DVDS_KEEP];</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;               dgemm_(&amp;notr,&amp;trans,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;DVDS_KEEP,&amp;one,Reortho_Overlap,&amp;DVDS_KEEP,Reortho_Overlap,&amp;DVDS_KEEP,&amp;zero,Reortho_Lowdin,&amp;DVDS_KEEP);</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;               </div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;               <span class="comment">//Reortho: Put the Lowdin tfo eigenvecs in vecs</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC_KEEP; ivec++){</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;                  dscal_(&amp;length_vec,&amp;zero,vecs[ivec],&amp;inc1);</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec2=0; ivec2&lt;DAVIDSON_NUM_VEC_KEEP; ivec2++){</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;                     daxpy_(&amp;length_vec,Reortho_Lowdin + ivec2 + DAVIDSON_NUM_VEC_KEEP * ivec,Reortho_Eigenvecs + length_vec * ivec2, &amp;inc1, vecs[ivec], &amp;inc1);</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;                  }</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;               }</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;               </div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Allocated = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;               </div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;               <span class="keywordflow">if</span> (!Reortho_Allocated) Reortho_Allocated = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;               </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;               <span class="comment">//Construct the H*vecs</span></div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;DAVIDSON_NUM_VEC_KEEP; cnt++){</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;                  makeHeff(vecs[cnt], Hvecs[cnt], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;                  nIterations++;</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;               }</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;               </div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;               <span class="comment">//Build MxM</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC_KEEP; ivec++){</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec2=ivec; ivec2&lt;DAVIDSON_NUM_VEC_KEEP; ivec2++){</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;                     mxM[ivec + DAVIDSON_NUM_VEC * ivec2] = ddot_(&amp;length_vec, vecs[ivec], &amp;inc1, Hvecs[ivec2], &amp;inc1);</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;                     mxM[ivec2 + DAVIDSON_NUM_VEC * ivec] = mxM[ivec + DAVIDSON_NUM_VEC * ivec2];</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;                  }</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;               }</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;               </div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;               <span class="comment">//Set num_vec</span></div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;               num_vec = DAVIDSON_NUM_VEC_KEEP;</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;            </div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;            }</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;         }</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;      }</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      </div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;   }</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;               <span class="comment">//Construct the H*vecs</span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;DAVIDSON_NUM_VEC_KEEP; cnt++){</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;                  makeHeff(vecs[cnt], Hvecs[cnt], denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nLower, VeffTilde);</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;                  nIterations++;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;               }</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;               </div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;               <span class="comment">//Build MxM</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec=0; ivec&lt;DAVIDSON_NUM_VEC_KEEP; ivec++){</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ivec2=ivec; ivec2&lt;DAVIDSON_NUM_VEC_KEEP; ivec2++){</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;                     mxM[ivec + DAVIDSON_NUM_VEC * ivec2] = ddot_(&amp;length_vec, vecs[ivec], &amp;inc1, Hvecs[ivec2], &amp;inc1);</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;                     mxM[ivec2 + DAVIDSON_NUM_VEC * ivec] = mxM[ivec + DAVIDSON_NUM_VEC * ivec2];</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;                  }</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;               }</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;               </div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;               <span class="comment">//Set num_vec</span></div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;               num_vec = DAVIDSON_NUM_VEC_KEEP;</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;            </div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;            }</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;         }</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;      }</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      </div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;   }</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;   </div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;   <span class="keywordflow">if</span> (CheMPS2::HEFF_debugPrint) cout &lt;&lt; <span class="stringliteral">&quot;   Stats: nIt(DAVIDSON) = &quot;</span> &lt;&lt; nIterations &lt;&lt; endl;</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;   </div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;   <span class="keywordflow">if</span> (CheMPS2::HEFF_debugPrint) cout &lt;&lt; <span class="stringliteral">&quot;   Stats: nIt(DAVIDSON) = &quot;</span> &lt;&lt; nIterations &lt;&lt; endl;</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;   </div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;   <span class="keywordtype">double</span> eigenvalue = mxM_eigs[0]; <span class="comment">//mxM_eigs[0] and u_vec are eigenvalue and vector</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;   dcopy_(&amp;length_vec,u_vec,&amp;inc1,denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9">gStorage</a>(),&amp;inc1);</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;   </div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_allocated; cnt++){</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;      <span class="keyword">delete</span> [] vecs[cnt];</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;      <span class="keyword">delete</span> [] Hvecs[cnt];</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;   }</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;   <span class="keyword">delete</span> [] vecs;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;   <span class="keyword">delete</span> [] Hvecs;</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;   <span class="keyword">delete</span> [] t_vec;</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;   <span class="keyword">delete</span> [] u_vec;</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;   <span class="keyword">delete</span> [] work_vec;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;   <span class="keyword">delete</span> [] mxM;</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;   <span class="keyword">delete</span> [] mxM_eigs;</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;   <span class="keyword">delete</span> [] mxM_vecs;</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;   <span class="keyword">delete</span> [] mxM_work;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;   <span class="keyword">delete</span> [] HeffDiag;</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;   </div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;   <span class="keywordflow">if</span> (Reortho_Allocated){</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;      <span class="keyword">delete</span> [] Reortho_Eigenvecs;</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keyword">delete</span> [] Reortho_Overlap;</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      <span class="keyword">delete</span> [] Reortho_Overlap_eigs;</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;      <span class="keyword">delete</span> [] Reortho_Lowdin;</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;   }</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;   </div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;   <span class="comment">//convert denS-&gt;gStorage() to program conventions</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;   denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24">symm2prog</a>();</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;   </div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;   <span class="keywordflow">return</span> eigenvalue;</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;   <span class="keywordtype">double</span> eigenvalue = mxM_eigs[0]; <span class="comment">//mxM_eigs[0] and u_vec are eigenvalue and vector</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;   dcopy_(&amp;length_vec,u_vec,&amp;inc1,denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9">gStorage</a>(),&amp;inc1);</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;   </div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;num_allocated; cnt++){</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;      <span class="keyword">delete</span> [] vecs[cnt];</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;      <span class="keyword">delete</span> [] Hvecs[cnt];</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;   }</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;   <span class="keyword">delete</span> [] vecs;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;   <span class="keyword">delete</span> [] Hvecs;</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;   <span class="keyword">delete</span> [] t_vec;</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;   <span class="keyword">delete</span> [] u_vec;</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;   <span class="keyword">delete</span> [] work_vec;</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;   <span class="keyword">delete</span> [] mxM;</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;   <span class="keyword">delete</span> [] mxM_eigs;</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;   <span class="keyword">delete</span> [] mxM_vecs;</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;   <span class="keyword">delete</span> [] mxM_work;</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;   <span class="keyword">delete</span> [] HeffDiag;</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;   </div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;   <span class="keywordflow">if</span> (Reortho_Allocated){</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;      <span class="keyword">delete</span> [] Reortho_Eigenvecs;</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;      <span class="keyword">delete</span> [] Reortho_Overlap;</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;      <span class="keyword">delete</span> [] Reortho_Overlap_eigs;</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keyword">delete</span> [] Reortho_Lowdin;</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;   }</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;   </div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;   <span class="comment">//convert denS-&gt;gStorage() to program conventions</span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;   denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24">symm2prog</a>();</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;   </div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;   <span class="keywordflow">return</span> eigenvalue;</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;}</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;}</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;<span class="keywordtype">int</span> CheMPS2::Heff::phase(<span class="keyword">const</span> <span class="keywordtype">int</span> TwoTimesPower){</div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="keywordtype">int</span> CheMPS2::Heff::phase(<span class="keyword">const</span> <span class="keywordtype">int</span> TwoTimesPower){</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;   <span class="keywordflow">return</span> (((TwoTimesPower/2)%2)!=0)?-1:1;</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;   <span class="keywordflow">return</span> (((TwoTimesPower/2)%2)!=0)?-1:1;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;}</div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;}</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;</div>
 <div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1TensorD_html"><div class="ttname"><a href="classCheMPS2_1_1TensorD.html">CheMPS2::TensorD</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorD_8h_source.html#l00032">TensorD.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Heff_html_ade178b3ffb362e0b407f50e6393e6f1c"><div class="ttname"><a href="classCheMPS2_1_1Heff.html#ade178b3ffb362e0b407f50e6393e6f1c">CheMPS2::Heff::Heff</a></div><div class="ttdeci">Heff(const SyBookkeeper *denBKIn, const Problem *ProbIn)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="Heff_8cpp_source.html#l00032">Heff.cpp:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html">CheMPS2::TensorL</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8h_source.html#l00034">TensorL.h:34</a></div></div>
@@ -613,7 +611,7 @@ $(document).ready(function(){initNavTree('Heff_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>Heff.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 7 2014 00:30:25 for CheMPS2 by
+    <li class="footer">Generated on Wed Nov 12 2014 23:05:36 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

@@ -124,19 +124,19 @@ $(document).ready(function(){initNavTree('DIIS_8cpp_source.html','');});
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;MyHDF5.h&quot;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;DIIS.h&quot;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">using</span> std::string;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">using</span> std::ifstream;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">using</span> std::cerr;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;fstream&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;sstream&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;MyHDF5.h&quot;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;DIIS.h&quot;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">using</span> std::string;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">using</span> std::ifstream;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">using</span> std::cout;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">using</span> std::endl;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
@@ -336,21 +336,21 @@ $(document).ready(function(){initNavTree('DIIS_8cpp_source.html','');});
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;   hid_t dataset_id2 = H5Dopen(group_id, <span class="stringliteral">&quot;numVarsParam&quot;</span>, H5P_DEFAULT);</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;   H5Dread(dataset_id2, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &amp;numVarsBIS);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;   H5Dclose(dataset_id2);</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;   <span class="keywordflow">if</span> (numVarsParam != numVarsBIS) cerr &lt;&lt; <span class="stringliteral">&quot;Error at DIIS::loadDIIS : numVarsParam doesn&#39;t match.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;   assert( numVarsParam==numVarsBIS );</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;   </div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;   <span class="comment">//The error vector sizes</span></div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;   hid_t dataset_id5 = H5Dopen(group_id, <span class="stringliteral">&quot;numVarsError&quot;</span>, H5P_DEFAULT);</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;   H5Dread(dataset_id5, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &amp;numVarsBIS);</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;   H5Dclose(dataset_id5);</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;   <span class="keywordflow">if</span> (numVarsError != numVarsBIS) cerr &lt;&lt; <span class="stringliteral">&quot;Error at DIIS::loadDIIS : numVarsError doesn&#39;t match.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;   assert( numVarsError==numVarsBIS );</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;   </div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;   <span class="comment">//The number of vectors saved</span></div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;   <span class="keywordtype">int</span> currentNumVecsBIS;</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;   hid_t dataset_id1 = H5Dopen(group_id, <span class="stringliteral">&quot;currentNumVecs&quot;</span>, H5P_DEFAULT);</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;   H5Dread(dataset_id1, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &amp;currentNumVecsBIS);</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;   H5Dclose(dataset_id1);</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;   <span class="keywordflow">if</span> (currentNumVecsBIS &gt; numVecs) cerr &lt;&lt; <span class="stringliteral">&quot;Error at DIIS::loadDIIS : currentNumVecs is too large.&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;   <span class="keywordflow">if</span> (currentNumVecsBIS &lt; 0)       cerr &lt;&lt; <span class="stringliteral">&quot;Error at DIIS::loadDIIS : currentNumVecs is smaller than zero.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;   assert( currentNumVecsBIS&lt;=numVecs );</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;   assert( currentNumVecsBIS&gt;=0 );</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   </div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;   <span class="comment">//Create just enough storage for the vectors to be loaded</span></div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;   <span class="keywordflow">if</span> (currentNumVecs &lt; currentNumVecsBIS){</div>
@@ -421,7 +421,7 @@ $(document).ready(function(){initNavTree('DIIS_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DIIS.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 7 2014 00:30:25 for CheMPS2 by
+    <li class="footer">Generated on Wed Nov 12 2014 23:05:36 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

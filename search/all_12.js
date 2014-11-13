@@ -36,6 +36,7 @@ var searchData=
   ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3',1,'CheMPS2::Heff']]],
   ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
   ['storage',['storage',['../classCheMPS2_1_1Tensor.html#ae38c4be492a8bf729d472e5a0c1d6d12',1,'CheMPS2::Tensor']]],
+  ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#af36d52d8316d93b3990980576c763d65',1,'CheMPS2::FCI']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html',1,'CheMPS2']]],
   ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]]
