@@ -3,13 +3,15 @@ var classCheMPS2_1_1FCI =
     [ "FCI", "classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda", null ],
     [ "FCI", "classCheMPS2_1_1FCI.html#a2d10244bdc047271cc75c15da2c77005", null ],
     [ "~FCI", "classCheMPS2_1_1FCI.html#adbc5264ad1dd857cdd5ba99e749c761a", null ],
-    [ "ActWithSecondQuantizedOperator", "classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea", null ],
+    [ "ActWithNumberOperator", "classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca", null ],
+    [ "ActWithSecondQuantizedOperator", "classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb", null ],
     [ "CalcSpinSquared", "classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f", null ],
     [ "CGAlphaPlusBetaHAM", "classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b", null ],
     [ "CGCoreSolver", "classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2", null ],
     [ "CGDiagPrecond", "classCheMPS2_1_1FCI.html#ad3a2132305764e7aa07cf765bec5668e", null ],
     [ "CGOperator", "classCheMPS2_1_1FCI.html#af8496a386028b2eb6ef686817372857c", null ],
     [ "CGSolveSystem", "classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805", null ],
+    [ "DensityResponseGF", "classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0", null ],
     [ "DiagHam", "classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144", null ],
     [ "DiagHamSquared", "classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e", null ],
     [ "Fill2RDM", "classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4", null ],
@@ -29,5 +31,6 @@ var classCheMPS2_1_1FCI =
     [ "getVecLength", "classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317", null ],
     [ "GSDavidson", "classCheMPS2_1_1FCI.html#a2501e84f004015b098b5ff806869fa88", null ],
     [ "GSSmallCISpace", "classCheMPS2_1_1FCI.html#a870a90481d3d92fd688c3dd35175e505", null ],
-    [ "HamTimesVec", "classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee", null ]
+    [ "HamTimesVec", "classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee", null ],
+    [ "RetardedGF", "classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc", null ]
 ];

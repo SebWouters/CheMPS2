@@ -1,5 +1,6 @@
 <map id="CheMPS2::Problem::checkConsistency" name="CheMPS2::Problem::checkConsistency">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71" title="Constructor. " alt="" coords="317,5,497,32"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda" title="Constructor. " alt="" coords="335,56,478,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="309,107,504,133"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="311,107,502,133"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="309,157,504,184"/>
 </map>

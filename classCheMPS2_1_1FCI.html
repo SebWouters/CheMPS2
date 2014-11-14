@@ -163,18 +163,27 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a870a90481d3d92fd688c3dd35175e505"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a870a90481d3d92fd688c3dd35175e505">GSSmallCISpace</a> (const unsigned int Nslaters, double *vec) const </td></tr>
 <tr class="memdesc:a870a90481d3d92fd688c3dd35175e505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the CI ground state in a small space of low-energy Slater determinants with lapack's dsyev.  <a href="#a870a90481d3d92fd688c3dd35175e505">More...</a><br/></td></tr>
 <tr class="separator:a870a90481d3d92fd688c3dd35175e505"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
-<tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
-<tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc6dd7f25a070912a4223cbdd4bbd6ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea">ActWithSecondQuantizedOperator</a> (const char whichOperator, const bool isUp, const unsigned int orbIndex, double *thisVector, <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *otherFCI, double *otherVector)</td></tr>
-<tr class="memdesc:abc6dd7f25a070912a4223cbdd4bbd6ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to an operator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#abc6dd7f25a070912a4223cbdd4bbd6ea">More...</a><br/></td></tr>
-<tr class="separator:abc6dd7f25a070912a4223cbdd4bbd6ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4">Fill2RDM</a> (double *vector, double *TwoRDM) const </td></tr>
 <tr class="memdesc:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the (spin-summed) 2-RDM of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#a36e81090d6d9c12eb8e86f65ce1e66b4">More...</a><br/></td></tr>
 <tr class="separator:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6d07ca52369591cf7a7676c7181b45f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f">CalcSpinSquared</a> (double *vector) const </td></tr>
 <tr class="memdesc:ac6d07ca52369591cf7a7676c7181b45f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Measure S(S+1) (spin squared)  <a href="#ac6d07ca52369591cf7a7676c7181b45f">More...</a><br/></td></tr>
 <tr class="separator:ac6d07ca52369591cf7a7676c7181b45f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
+<tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
+<tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb">ActWithSecondQuantizedOperator</a> (const char whichOperator, const bool isUp, const unsigned int orbIndex, double *thisVector, const <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *otherFCI, double *otherVector) const </td></tr>
+<tr class="memdesc:ac33683cb6adf2063e7fe0fc908c3febb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to a creator/annihilator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#ac33683cb6adf2063e7fe0fc908c3febb">More...</a><br/></td></tr>
+<tr class="separator:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7b47739c602e3351baca282bdc715ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca">ActWithNumberOperator</a> (const unsigned int orbIndex, double *resultVector, double *sourceVector) const </td></tr>
+<tr class="memdesc:ac7b47739c602e3351baca282bdc715ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the result <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to the number operator of a specific site acting on a source <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#ac7b47739c602e3351baca282bdc715ca">More...</a><br/></td></tr>
+<tr class="separator:ac7b47739c602e3351baca282bdc715ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc">RetardedGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF) const </td></tr>
+<tr class="memdesc:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition)  <a href="#aaa00a4720e4796700dc9ebd83aa71cfc">More...</a><br/></td></tr>
+<tr class="separator:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0">DensityResponseGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF) const </td></tr>
+<tr class="memdesc:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition)  <a href="#a132bbdf8fb4063a5199c7cbbbdccc0e0">More...</a><br/></td></tr>
+<tr class="separator:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f">getFCIcoeff</a> (int *bits_up, int *bits_down, double *vector) const </td></tr>
 <tr class="memdesc:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient.  <a href="#a87f310673fe8b183cb4a5bf3d3051f9f">More...</a><br/></td></tr>
 <tr class="separator:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -361,7 +370,51 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="abc6dd7f25a070912a4223cbdd4bbd6ea"></a>
+<a class="anchor" id="ac7b47739c602e3351baca282bdc715ca"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::FCI::ActWithNumberOperator </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>orbIndex</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>resultVector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>sourceVector</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the result <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to the number operator of a specific site acting on a source <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">orbIndex</td><td>Orbital index of the number operator </td></tr>
+    <tr><td class="paramname">resultVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> where the result of the operation should be stored </td></tr>
+    <tr><td class="paramname">sourceVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> on which the number operator acts </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00319">319</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac33683cb6adf2063e7fe0fc908c3febb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -392,7 +445,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *&#160;</td>
           <td class="paramname"><em>otherFCI</em>, </td>
         </tr>
         <tr>
@@ -404,15 +457,15 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to an operator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
+<p>Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to a creator/annihilator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">whichOperator</td><td>With which operator should be acted on the other <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> state: C means creator, A means annihilator, N means particle number </td></tr>
+    <tr><td class="paramname">whichOperator</td><td>With which operator should be acted on the other <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> state: C means creator and A means annihilator </td></tr>
     <tr><td class="paramname">isUp</td><td>Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron </td></tr>
     <tr><td class="paramname">orbIndex</td><td>Orbital index on which the operator acts </td></tr>
     <tr><td class="paramname">thisVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> where the result of the operation should be stored </td></tr>
@@ -422,16 +475,27 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00319">319</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00338">338</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
 <div id="dynsection-2-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-2-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_abc6dd7f25a070912a4223cbdd4bbd6ea_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_abc6dd7f25a070912a4223cbdd4bbd6ea_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_abc6dd7f25a070912a4223cbdd4bbd6ea_cgraph" id="classCheMPS2_1_1FCI_abc6dd7f25a070912a4223cbdd4bbd6ea_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="293,5,438,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="265,56,466,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. " alt="" coords="265,107,465,133"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="271,157,460,184"/></map>
+<div class="center"><img src="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph" id="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="293,5,438,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="265,56,466,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="271,107,460,133"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" id="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="265,12,455,39"/></map>
 </div>
 </p>
 
@@ -506,7 +570,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Measured value of S(S+1) </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00828">828</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00870">870</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +629,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01830">1830</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01872">1872</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -666,7 +730,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01790">1790</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01832">1832</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -732,7 +796,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01856">1856</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01898">1898</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -819,7 +883,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01841">1841</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01883">1883</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -891,7 +955,97 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01716">1716</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01758">1758</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" id="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="273,5,463,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a132bbdf8fb4063a5199c7cbbbdccc0e0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::FCI::DensityResponseGF </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>omega</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>eta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>orb_alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>orb_beta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>GSenergy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>GSvector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>RePartGF</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>ImPartGF</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">omega</td><td>The frequency value </td></tr>
+    <tr><td class="paramname">eta</td><td>The regularization parameter (... + I*eta in the denominator) </td></tr>
+    <tr><td class="paramname">orb_alpha</td><td>The first orbital index </td></tr>
+    <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
+    <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
+    <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the density response Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the density response Green's function </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02065">2065</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -917,7 +1071,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00934">934</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00976">976</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -943,7 +1097,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00969">969</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01011">1011</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1002,7 +1156,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01436">1436</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01478">1478</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1047,7 +1201,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01452">1452</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01494">1494</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1099,7 +1253,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01412">1412</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01454">1454</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1152,7 +1306,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The inproduct &lt; vec1 | vec2 &gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01420">1420</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01462">1462</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1358,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01444">1444</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01486">1486</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1250,7 +1404,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The 2-norm of vec </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01430">1430</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01472">1472</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1288,7 +1442,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The energy of the given <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector, calculated by contraction of the 2-RDM with Hmat </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00606">606</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00648">648</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1333,7 +1487,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01460">1460</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01502">1502</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1444,14 +1598,14 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00298">298</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" id="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea" title="Set this FCI vector to an operator acting on a previous FCI vector. " alt="" coords="243,5,453,46"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="243,5,453,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="502,12,693,39"/></map>
 </div>
 </p>
 
@@ -1565,14 +1719,14 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00147">147</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" id="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea" title="Set this FCI vector to an operator acting on a previous FCI vector. " alt="" coords="200,5,411,46"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="200,5,411,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="459,12,650,39"/></map>
 </div>
 </p>
 
@@ -1654,7 +1808,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> element which connects the given two Slater determinants </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01264">1264</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01306">1306</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1763,14 +1917,14 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00157">157</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" id="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea" title="Set this FCI vector to an operator acting on a previous FCI vector. " alt="" coords="256,5,467,46"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="256,5,467,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="515,12,706,39"/></map>
 </div>
 </p>
 
@@ -1821,14 +1975,14 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00153">153</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph" id="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda" title="Constructor. " alt="" coords="287,5,430,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#abc6dd7f25a070912a4223cbdd4bbd6ea" title="Set this FCI vector to an operator acting on a previous FCI vector. " alt="" coords="253,57,464,98"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda" title="Constructor. " alt="" coords="278,5,421,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="254,56,445,83"/></map>
 </div>
 </p>
 
@@ -1857,7 +2011,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The ground state energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01466">1466</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01508">1508</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1895,7 +2049,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The small CI ground state energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01188">1188</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01230">1230</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1932,7 +2086,111 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00394">394</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00430">430</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaa00a4720e4796700dc9ebd83aa71cfc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::FCI::RetardedGF </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>omega</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>eta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>orb_alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>orb_beta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>isUp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>GSenergy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>GSvector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *&#160;</td>
+          <td class="paramname"><em>Ham</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>RePartGF</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>ImPartGF</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">omega</td><td>The frequency value </td></tr>
+    <tr><td class="paramname">eta</td><td>The regularization parameter (... + I*eta in the denominator) </td></tr>
+    <tr><td class="paramname">orb_alpha</td><td>The first orbital index </td></tr>
+    <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
+    <tr><td class="paramname">isUp</td><td>Whether or not the spin projection value of the second quantized operators is up (alpha) </td></tr>
+    <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
+    <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
+    <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, which contains the matrix elements </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the retarded Green's function </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01928">1928</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-9-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph" id="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="246,12,501,39"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. " alt="" coords="273,63,473,89"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="268,114,479,155"/><area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculates the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with ..." alt="" coords="264,180,483,207"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="553,5,748,46"/><area shape="rect" id="node6" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="578,71,723,97"/><area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="550,121,751,148"/><area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="556,172,745,199"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -1998,7 +2256,7 @@ Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Wed Nov 12 2014 23:13:54 for CheMPS2 by
+    <li class="footer">Generated on Fri Nov 14 2014 00:02:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
