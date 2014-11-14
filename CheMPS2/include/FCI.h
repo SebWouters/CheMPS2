@@ -110,25 +110,6 @@ namespace CheMPS2{
              \return The small CI ground state energy */
          double GSSmallCISpace(const unsigned int Nslaters, double * vec) const;
          
-         //! Calculates the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with conjugate gradient
-         /** \param alpha The real part of the scalar in the operator
-             \param beta The prefactor of the Hamiltonian in the operator
-             \param eta The imaginary part of the scalar in the operator
-             \param RHS The real-valued right-hand side of the equation with length getVecLength()
-             \param RealSol If not NULL, on exit this array of length getVecLength() contains the real part of the solution
-             \param ImagSol If not NULL, on exit this array of length getVecLength() contains the imaginary part of the solution
-             \param checkError If true, at the end the RMS error without preconditioner will be printed */
-         void CGSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError=true) const;
-         
-         //! Set this FCI vector to an operator acting on a previous FCI vector
-         /** \param whichOperator With which operator should be acted on the other FCI state: C means creator, A means annihilator, N means particle number
-             \param isUp Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron
-             \param orbIndex Orbital index on which the operator acts
-             \param thisVector Vector with length getVecLength() where the result of the operation should be stored
-             \param otherFCI FCI instance which corresponds to the FCI vector on which is acted
-             \param otherVector Vector with length otherFCI->getVecLength() which contains the FCI vector on which is acted */
-         void ActWithSecondQuantizedOperator(const char whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, FCI * otherFCI, double * otherVector);
-         
          //! Construct the (spin-summed) 2-RDM of a FCI vector
          /** \param vector The FCI vector
              \param TwoRDM To store the 2-RDM; needs to be of size L^4 (L = number of orbitals); irrep symmetry shows in 2-RDM elements being zero; physics notation (see gHmat)
@@ -139,6 +120,55 @@ namespace CheMPS2{
          /** \param vector The FCI vector
              \return Measured value of S(S+1) */
          double CalcSpinSquared(double * vector) const;
+         
+         //! Calculates the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with conjugate gradient
+         /** \param alpha The real part of the scalar in the operator
+             \param beta The prefactor of the Hamiltonian in the operator
+             \param eta The imaginary part of the scalar in the operator
+             \param RHS The real-valued right-hand side of the equation with length getVecLength()
+             \param RealSol If not NULL, on exit this array of length getVecLength() contains the real part of the solution
+             \param ImagSol If not NULL, on exit this array of length getVecLength() contains the imaginary part of the solution
+             \param checkError If true, at the end the RMS error without preconditioner will be printed */
+         void CGSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError=true) const;
+         
+         //! Set this FCI vector to a creator/annihilator acting on a previous FCI vector
+         /** \param whichOperator With which operator should be acted on the other FCI state: C means creator and A means annihilator
+             \param isUp Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron
+             \param orbIndex Orbital index on which the operator acts
+             \param thisVector Vector with length getVecLength() where the result of the operation should be stored
+             \param otherFCI FCI instance which corresponds to the FCI vector on which is acted
+             \param otherVector Vector with length otherFCI->getVecLength() which contains the FCI vector on which is acted */
+         void ActWithSecondQuantizedOperator(const char whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, const FCI * otherFCI, double * otherVector) const;
+         
+         //! Set the result FCI vector to the number operator of a specific site acting on a source FCI vector
+         /** \param orbIndex Orbital index of the number operator
+             \param resultVector Vector with length getVecLength() where the result of the operation should be stored
+             \param sourceVector Vector with length getVecLength() on which the number operator acts */
+         void ActWithNumberOperator(const unsigned int orbIndex, double * resultVector, double * sourceVector) const;
+         
+         //! Calculate the retarded Green's function (see FCI.cpp for exact definition)
+         /** \param omega The frequency value
+             \param eta The regularization parameter (... + I*eta in the denominator)
+             \param orb_alpha The first orbital index
+             \param orb_beta The second orbital index
+             \param isUp Whether or not the spin projection value of the second quantized operators is up (alpha)
+             \param GSenergy The ground state energy returned by GSDavidson
+             \param GSvector The ground state vector as calculated by GSDavidson
+             \param Ham The Hamiltonian, which contains the matrix elements
+             \param RePartGF If not NULL, on exit RePartGF[0] contains the real part of the retarded Green's function
+             \param ImPartGF If not NULL, on exit ImPartGF[0] contains the imaginary part of the retarded Green's function */
+         void RetardedGF(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF) const;
+         
+         //! Calculate the density response Green's function (see FCI.cpp for exact definition)
+         /** \param omega The frequency value
+             \param eta The regularization parameter (... + I*eta in the denominator)
+             \param orb_alpha The first orbital index
+             \param orb_beta The second orbital index
+             \param GSenergy The ground state energy returned by GSDavidson
+             \param GSvector The ground state vector as calculated by GSDavidson
+             \param RePartGF If not NULL, on exit RePartGF[0] contains the real part of the density response Green's function
+             \param ImPartGF If not NULL, on exit ImPartGF[0] contains the imaginary part of the density response Green's function */
+         void DensityResponseGF(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF) const;
          
 //==========> Functions which involve bitstring representations
          
