@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "Irreps.h"
-#include "Hamiltonian.h"
-#include "Problem.h"
+#include "CheMPS2/Irreps.h"
+#include "CheMPS2/Hamiltonian.h"
+#include "CheMPS2/Problem.h"
 
 using namespace std;
 

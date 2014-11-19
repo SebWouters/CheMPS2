@@ -132,7 +132,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test8
     > ./test9
 
-These cpp tests should end with a line stating whether or not they succeeded.
+These c++ tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-120 MB).
 
 
@@ -145,6 +145,10 @@ assumes that CheMPS2 has been installed as described above! Start in
 ```./build```, and run:
 
     > python setup.py build_ext -i
+    
+Note that the python interface chooses the installed library before the
+local compilation. If you have pulled a newer version of CheMPS2, please
+install the c++ library first, before building PyCheMPS2 with Cython!
 
 
 ### 4. Testing PyCheMPS2
@@ -162,7 +166,7 @@ To test PyCheMPS2, start in ```./build```, and run:
     > python test8.py
     > python test9.py
 
-These tests do exactly the same thing as the cpp tests above, and illustrate
+These tests do exactly the same thing as the c++ tests above, and illustrate
 the usage of the python interface to CheMPS2. The tests should end with a
 line stating whether or not they succeeded. They only require a very limited
 amount of memory (order 10-120 MB).
@@ -208,28 +212,55 @@ To make use of this feature, build Psi4 with the plugin option, and then run:
 
 Now, replace the file ```mointegrals.cc``` with either:
 
-1. [```mointegrals/mointegrals.cc_PRINT```](mointegrals/mointegrals.cc_PRINT)
+1. [```psi4plugins/mointegrals.cc_PRINT```](psi4plugins/mointegrals.cc_PRINT)
    to print the matrix elements as text. Examples of output generated with this
    plugin can be found in [```tests/matrixelements```](tests/matrixelements)
 
-2. [```mointegrals/mointegrals.cc_SAVEHAM```](mointegrals/mointegrals.cc_SAVEHAM)
+2. [```psi4plugins/mointegrals.cc_SAVEHAM```](psi4plugins/mointegrals.cc_SAVEHAM)
    to store all unique matrix elements (remember that there is eightfold
    permutation symmetry) in binary form with HDF5. See the Doxygen manual for
    more information on CheMPS2::Hamiltonian.
 
-For case 2, the ```Makefile``` should be adjusted. Replace
-    ```$(PSILIBS)```
-with
-    ```$(PSILIBS) -L${CheMPS2_BINARY_DIR}/CheMPS2/ -lCheMPS2```
-and replace
-    ```$(CXXINCLUDE)```
-with
-    ```$(CXXINCLUDE) -I${CheMPS2_SOURCE_DIR}/CheMPS2/include/```
+For case 2, CheMPS2 should be installed as described above, and the
+```Makefile``` should be adjusted. Change the line
 
-To compile the Psi4 plugin, run:
+    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin```
+    
+to
+
+    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lCheMPS2```.
+
+To compile the plugin, run:
 
     > make
 
+
+DMRG-CI calculations with Psi4
+------------------------------
+
+DMRG-CI calculations can also be performed with Psi4. To make use of this
+feature, build Psi4 with the plugin option, and then run:
+
+    > psi4 --new-plugin dmrgci
+    > cd dmrgci
+    
+Now, replace the file ```dmrgci.cc``` with 
+[```psi4plugins/dmrgci.cc```](psi4plugins/dmrgci.cc). For the compilation of
+this plugin, the same instructions as above should be followed (i.e. linking to
+libCheMPS2).
+
+Example input files to use the plugin are provided in
+
+1. [```psi4plugins/N2.dat```](psi4plugins/N2.dat)
+
+2. [```psi4plugins/H2O.dat```](psi4plugins/H2O.dat)
+
+After compilation of the dmrgci plugin, place these input files one directory
+higher than the plugin. In that folder, run:
+
+    > psi4 N2.dat
+    > psi4 H2O.dat
+   
 
 List of files in the CheMPS2 library
 ------------------------------------
@@ -292,7 +323,8 @@ an orbital localization function based on the Edmiston-Ruedenberg cost function
 and an augmented Hessian Newton-Raphson optimizer.
 
 [```CheMPS2/FCI.cpp```](CheMPS2/FCI.cpp) contains a full configuration
-interaction solver based on Davidson's algorithm.
+interaction solver based on Davidson's algorithm. It also contains the
+functionality to calculate Green's functions.
 
 [```CheMPS2/FourIndex.cpp```](CheMPS2/FourIndex.cpp) contains all functions of
 the FourIndex container class for the two-body matrix elements.
