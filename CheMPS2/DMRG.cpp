@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <assert.h>
+#include <unistd.h>
 
 #include "DMRG.h"
 
@@ -38,7 +39,7 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
    assert( ProbIn->checkConsistency() );
    Prob = ProbIn;
    OptScheme = OptSchemeIn;
-   RNstorage = rand();
+   thePID = getpid();
    nStates = 1;
 
    Ltensors = new TensorL ** [Prob->gL()-1];

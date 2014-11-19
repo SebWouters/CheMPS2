@@ -86,7 +86,7 @@ namespace CheMPS2{
          //! Call "rm CheMPS2_MPS*.h5"
          void deleteStoredMPS();
          
-         //! Call "rm + localTmpPath + CheMPS2_ + RNstorage + *.h5"
+         //! Call "rm + localTmpPath + CheMPS2_ + thePID + *.h5"
          void deleteStoredOperators();
          
          //! Activate the necessary storage and machinery to handle excitations
@@ -115,7 +115,7 @@ namespace CheMPS2{
          bool loadedMPS;
          
          //Integer to distinguish storage between different calculations
-         int RNstorage;
+         int thePID;
       
          //Pointer to the Problem --> constructed and destructed outside of this class
          Problem * Prob;
