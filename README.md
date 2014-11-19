@@ -83,11 +83,12 @@ CMake generates makefiles based on the user's specifications:
 Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
 Option2 can be ```ON``` or ```OFF``` and is used to switch on the
 intel math kernel library.
-Option3 can be ```ON``` or ```OFF``` and is used to switch on doxygen
-documentation.
+Option3 can be ```ON``` or ```OFF``` and is used to switch on the possibility
+to compile the doxygen documentation.
 Option4 is the prefix of the installation directory; typically
-```/usr``` on Linux. The CheMPS2 library is then installed in
-```prefix/lib``` and the headers in ```prefix/include/CheMPS2```.
+```/usr``` or ```/usr/local``` on Linux. On my computer, the CheMPS2 library
+is then installed in ```prefix/lib/x86_64-linux-gnu/``` and the headers
+in ```prefix/include/CheMPS2```.
 If one or more of the required libraries are not found, please use the
 command
 
