@@ -146,9 +146,8 @@ assumes that CheMPS2 has been installed as described above! Start in
 
     > python setup.py build_ext -i
     
-Note that the python interface chooses the installed library before the
-local compilation. If you have pulled a newer version of CheMPS2, please
-install the c++ library first, before building PyCheMPS2 with Cython!
+If you have pulled a newer version of CheMPS2, please remember to
+(re)install the c++ library first, before building PyCheMPS2 with Cython!
 
 
 ### 4. Testing PyCheMPS2
