@@ -191,10 +191,9 @@ Doxygen output can be generated, see the section "Build" in README.md, or
 the [Doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
 
 For a more concise overview of the concepts and ideas used in CheMPS2,
-please read the code release paper "[CheMPS2: a free open-source spin-adapted
-implementation of the density matrix renormalization group for ab initio
-quantum chemistry](http://doi.dx.org/10.1016/j.cpc.2014.01.019)", one of the
-references in CITATIONS.
+please read the code release paper
+[CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry](http://dx.doi.org/10.1016/j.cpc.2014.01.019),
+one of the references in CITATIONS.
 
 
 Matrix elements from Psi4
