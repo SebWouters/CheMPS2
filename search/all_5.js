@@ -1,9 +1,8 @@
 var searchData=
 [
   ['fci',['FCI',['../classCheMPS2_1_1FCI.html',1,'CheMPS2']]],
-  ['fci',['FCI',['../classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda',1,'CheMPS2::FCI::FCI(CheMPS2::Problem *Prob, const int FCIverbose=2)'],['../classCheMPS2_1_1FCI.html#a2d10244bdc047271cc75c15da2c77005',1,'CheMPS2::FCI::FCI(CheMPS2::Problem *Prob, const unsigned int Nel_up, const unsigned int Nel_down, const int FCIverbose=2)']]],
+  ['fci',['FCI',['../classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87',1,'CheMPS2::FCI']]],
   ['fcidaxpy',['FCIdaxpy',['../classCheMPS2_1_1FCI.html#a13fb133d50973bd6696f7c7bdd6c0165',1,'CheMPS2::FCI']]],
-  ['fcidclear',['FCIdclear',['../classCheMPS2_1_1FCI.html#ac0f7fea99e156006d63a280e2ef9950f',1,'CheMPS2::FCI']]],
   ['fcidcopy',['FCIdcopy',['../classCheMPS2_1_1FCI.html#aa04f67fdf87635e136088d0c0fdf6733',1,'CheMPS2::FCI']]],
   ['fciddot',['FCIddot',['../classCheMPS2_1_1FCI.html#a2747f044cb0e2fb4ae9965451ddc84d5',1,'CheMPS2::FCI']]],
   ['fcidscal',['FCIdscal',['../classCheMPS2_1_1FCI.html#a81a1fa5b70e4bd0c834f85c38ecf829c',1,'CheMPS2::FCI']]],

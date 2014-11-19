@@ -1,4 +1,4 @@
 <map id="CheMPS2::FCI::getTargetIrrep" name="CheMPS2::FCI::getTargetIrrep">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="256,5,467,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="515,12,706,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="256,5,467,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="515,12,706,39"/>
 </map>

@@ -1,9 +1,0 @@
-<map id="CheMPS2::FCI::FCI" name="CheMPS2::FCI::FCI">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="198,5,453,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="501,23,696,65"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="245,107,405,133"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="241,157,410,184"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="236,208,415,235"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="228,259,423,285"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="216,309,435,336"/>
-</map>

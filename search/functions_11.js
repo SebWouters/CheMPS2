@@ -30,7 +30,7 @@ var searchData=
   ['solve',['Solve',['../classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2',1,'CheMPS2::DMRG']]],
   ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3',1,'CheMPS2::Heff']]],
   ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
-  ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#af36d52d8316d93b3990980576c763d65',1,'CheMPS2::FCI']]],
+  ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e',1,'CheMPS2::FCI']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],
   ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]]
 ];

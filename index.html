@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </pre><p>CMake generates makefiles based on the user's specifications: </p>
 <pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 -DCMAKE_INSTALL_PREFIX=option4
-</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on doxygen documentation. Option4 is the prefix of the installation directory; typically <code>/usr</code> on Linux. The CheMPS2 library is then installed in <code>prefix/lib</code> and the headers in <code>prefix/include/CheMPS2</code>. If one or more of the required libraries are not found, please use the command </p>
+</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation. Option4 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, the CheMPS2 library is then installed in <code>prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>prefix/include/CheMPS2</code>. If one or more of the required libraries are not found, please use the command </p>
 <pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 -DCMAKE_INSTALL_PREFIX=option4
@@ -349,7 +349,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 14 2014 00:02:28 for CheMPS2 by
+    <li class="footer">Generated on Tue Nov 18 2014 22:44:11 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

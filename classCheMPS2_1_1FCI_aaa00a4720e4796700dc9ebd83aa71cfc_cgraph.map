@@ -1,10 +1,8 @@
 <map id="CheMPS2::FCI::RetardedGF" name="CheMPS2::FCI::RetardedGF">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="246,12,501,39"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. " alt="" coords="273,63,473,89"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="268,114,479,155"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculates the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with ..." alt="" coords="264,180,483,207"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="553,5,748,46"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="578,71,723,97"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="550,121,751,148"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="556,172,745,199"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="255,5,455,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="249,57,460,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with c..." alt="" coords="245,123,464,149"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="541,13,686,40"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="513,64,714,91"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="519,115,708,141"/>
 </map>

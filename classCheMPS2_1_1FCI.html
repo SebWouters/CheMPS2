@@ -107,6 +107,7 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1FCI.html','');});
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classCheMPS2_1_1FCI-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">CheMPS2::FCI Class Reference</div>  </div>
@@ -117,12 +118,9 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1FCI.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6732e08ef3d229d8305b0f6af3f13eda"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda">FCI</a> (<a class="el" href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a> *Prob, const int FCIverbose=2)</td></tr>
-<tr class="memdesc:a6732e08ef3d229d8305b0f6af3f13eda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a6732e08ef3d229d8305b0f6af3f13eda">More...</a><br/></td></tr>
-<tr class="separator:a6732e08ef3d229d8305b0f6af3f13eda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d10244bdc047271cc75c15da2c77005"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a2d10244bdc047271cc75c15da2c77005">FCI</a> (<a class="el" href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a> *Prob, const unsigned int Nel_up, const unsigned int Nel_down, const int FCIverbose=2)</td></tr>
-<tr class="memdesc:a2d10244bdc047271cc75c15da2c77005"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a2d10244bdc047271cc75c15da2c77005">More...</a><br/></td></tr>
-<tr class="separator:a2d10244bdc047271cc75c15da2c77005"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d47d6038adaa1a5b3ab6d4624976b87"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87">FCI</a> (<a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, const unsigned int Nel_up, const unsigned int Nel_down, const int TargetIrrep, const double maxMemWorkMB=100.0, const int FCIverbose=2)</td></tr>
+<tr class="memdesc:a7d47d6038adaa1a5b3ab6d4624976b87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a7d47d6038adaa1a5b3ab6d4624976b87">More...</a><br/></td></tr>
+<tr class="separator:a7d47d6038adaa1a5b3ab6d4624976b87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbc5264ad1dd857cdd5ba99e749c761a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adbc5264ad1dd857cdd5ba99e749c761a"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#adbc5264ad1dd857cdd5ba99e749c761a">~FCI</a> ()</td></tr>
 <tr class="memdesc:adbc5264ad1dd857cdd5ba99e749c761a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -136,108 +134,90 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ab053ef3d951302e880c79f690a77dc9b"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab053ef3d951302e880c79f690a77dc9b">getNel_down</a> () const </td></tr>
 <tr class="memdesc:ab053ef3d951302e880c79f690a77dc9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for the number of down or beta electrons.  <a href="#ab053ef3d951302e880c79f690a77dc9b">More...</a><br/></td></tr>
 <tr class="separator:ab053ef3d951302e880c79f690a77dc9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4165b4fe1d0323f3d51014096602317"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317">getVecLength</a> () const </td></tr>
-<tr class="memdesc:ab4165b4fe1d0323f3d51014096602317"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for the number of variables in the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#ab4165b4fe1d0323f3d51014096602317">More...</a><br/></td></tr>
-<tr class="separator:ab4165b4fe1d0323f3d51014096602317"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e153d335d6500f4758212e203f7d682"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682">getVecLength</a> (const int irrep_center) const </td></tr>
+<tr class="memdesc:a6e153d335d6500f4758212e203f7d682"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for the number of variables in the vector " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j.  <a href="#a6e153d335d6500f4758212e203f7d682">More...</a><br/></td></tr>
+<tr class="separator:a6e153d335d6500f4758212e203f7d682"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad921697e69e7ebc3f554ebe4613b30d6"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ad921697e69e7ebc3f554ebe4613b30d6">getNumIrreps</a> () const </td></tr>
 <tr class="memdesc:ad921697e69e7ebc3f554ebe4613b30d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of irreps.  <a href="#ad921697e69e7ebc3f554ebe4613b30d6">More...</a><br/></td></tr>
 <tr class="separator:ad921697e69e7ebc3f554ebe4613b30d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae876dae50220954a3ed8fd72813e28db"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db">getTargetIrrep</a> () const </td></tr>
 <tr class="memdesc:ae876dae50220954a3ed8fd72813e28db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the target irrep.  <a href="#ae876dae50220954a3ed8fd72813e28db">More...</a><br/></td></tr>
 <tr class="separator:ae876dae50220954a3ed8fd72813e28db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a776e660d58900bff263aec9fb2ac8b33"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a776e660d58900bff263aec9fb2ac8b33">getIrrepProduct</a> (const int Irrep_row, const int Irrep_col) const </td></tr>
-<tr class="memdesc:a776e660d58900bff263aec9fb2ac8b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of two irreps.  <a href="#a776e660d58900bff263aec9fb2ac8b33">More...</a><br/></td></tr>
-<tr class="separator:a776e660d58900bff263aec9fb2ac8b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d55b73a60bb7adba1272211c484fd04"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a8d55b73a60bb7adba1272211c484fd04">getIrrepProduct</a> (const int Irrep1, const int Irrep2) const </td></tr>
+<tr class="memdesc:a8d55b73a60bb7adba1272211c484fd04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of two irreps.  <a href="#a8d55b73a60bb7adba1272211c484fd04">More...</a><br/></td></tr>
+<tr class="separator:a8d55b73a60bb7adba1272211c484fd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79c9426a1f2d8a4b918adad9ffa89894"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a79c9426a1f2d8a4b918adad9ffa89894">getOrb2Irrep</a> (const int orb) const </td></tr>
 <tr class="memdesc:a79c9426a1f2d8a4b918adad9ffa89894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an orbital irrep.  <a href="#a79c9426a1f2d8a4b918adad9ffa89894">More...</a><br/></td></tr>
 <tr class="separator:a79c9426a1f2d8a4b918adad9ffa89894"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bcfd3030a1c4ea08a159e99d457046d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a3bcfd3030a1c4ea08a159e99d457046d">getHmat</a> (const int orb1, const int orb2, const int orb3, const int orb4) const </td></tr>
-<tr class="memdesc:a3bcfd3030a1c4ea08a159e99d457046d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the 2-body matrix elements (in physics notation: orb1(r1) * orb2(r2) * orb3(r1) * orb4(r2) / |r1-r2|); the 1-body matrix elements are absorbed in the 2-body matrix elements as explained in the <a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> class.  <a href="#a3bcfd3030a1c4ea08a159e99d457046d">More...</a><br/></td></tr>
-<tr class="separator:a3bcfd3030a1c4ea08a159e99d457046d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56cbdfb4af815c382559c888a32e67ac"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a56cbdfb4af815c382559c888a32e67ac">getERI</a> (const int orb1, const int orb2, const int orb3, const int orb4) const </td></tr>
+<tr class="memdesc:a56cbdfb4af815c382559c888a32e67ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the electron repulsion integral (in chemists notation: integral dr1 dr2 orb1(r1) * orb2(r1) * orb3(r2) * orb4(r2) / |r1-r2|)  <a href="#a56cbdfb4af815c382559c888a32e67ac">More...</a><br/></td></tr>
+<tr class="separator:a56cbdfb4af815c382559c888a32e67ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada6d8ff3debe7a82fe843785a2b2d84e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ada6d8ff3debe7a82fe843785a2b2d84e">getGmat</a> (const int orb1, const int orb2) const </td></tr>
+<tr class="memdesc:ada6d8ff3debe7a82fe843785a2b2d84e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the AUGMENTED one-body matrix elements ( G_{ij} = T_{ij} - 0.5 * sum_k ERI_{ikkj} ; see Chem. Phys. Lett. 111 (4-5), 315-321 (1984) )  <a href="#ada6d8ff3debe7a82fe843785a2b2d84e">More...</a><br/></td></tr>
+<tr class="separator:ada6d8ff3debe7a82fe843785a2b2d84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9df11199ab6633de3df7b9c1c51001a"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a">getEconst</a> () const </td></tr>
 <tr class="memdesc:ad9df11199ab6633de3df7b9c1c51001a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the nuclear repulsion energy.  <a href="#ad9df11199ab6633de3df7b9c1c51001a">More...</a><br/></td></tr>
 <tr class="separator:ad9df11199ab6633de3df7b9c1c51001a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2501e84f004015b098b5ff806869fa88"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a2501e84f004015b098b5ff806869fa88">GSDavidson</a> (double *inoutput=NULL) const </td></tr>
-<tr class="memdesc:a2501e84f004015b098b5ff806869fa88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> ground state with Davidson's algorithm.  <a href="#a2501e84f004015b098b5ff806869fa88">More...</a><br/></td></tr>
-<tr class="separator:a2501e84f004015b098b5ff806869fa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a870a90481d3d92fd688c3dd35175e505"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a870a90481d3d92fd688c3dd35175e505">GSSmallCISpace</a> (const unsigned int Nslaters, double *vec) const </td></tr>
-<tr class="memdesc:a870a90481d3d92fd688c3dd35175e505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the CI ground state in a small space of low-energy Slater determinants with lapack's dsyev.  <a href="#a870a90481d3d92fd688c3dd35175e505">More...</a><br/></td></tr>
-<tr class="separator:a870a90481d3d92fd688c3dd35175e505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0335191db1dec9127bcad548fa6f1da3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a0335191db1dec9127bcad548fa6f1da3">GSDavidson</a> (double *inoutput=NULL, const int DAVIDSON_NUM_VEC=CheMPS2::HEFF_DAVIDSON_NUM_VEC) const </td></tr>
+<tr class="memdesc:a0335191db1dec9127bcad548fa6f1da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> ground state with Davidson's algorithm.  <a href="#a0335191db1dec9127bcad548fa6f1da3">More...</a><br/></td></tr>
+<tr class="separator:a0335191db1dec9127bcad548fa6f1da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a748644c42be72710e38631e169b642cc"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a748644c42be72710e38631e169b642cc">LowestEnergyDeterminant</a> () const </td></tr>
+<tr class="memdesc:a748644c42be72710e38631e169b642cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the global counter of the Slater determinant with the lowest energy.  <a href="#a748644c42be72710e38631e169b642cc">More...</a><br/></td></tr>
+<tr class="separator:a748644c42be72710e38631e169b642cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4">Fill2RDM</a> (double *vector, double *TwoRDM) const </td></tr>
-<tr class="memdesc:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the (spin-summed) 2-RDM of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#a36e81090d6d9c12eb8e86f65ce1e66b4">More...</a><br/></td></tr>
+<tr class="memdesc:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct the (spin-summed) 2-RDM of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i,sigma a^+j,tau a_l,tau a_k,sigma &gt; = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ].  <a href="#a36e81090d6d9c12eb8e86f65ce1e66b4">More...</a><br/></td></tr>
 <tr class="separator:a36e81090d6d9c12eb8e86f65ce1e66b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6d07ca52369591cf7a7676c7181b45f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f">CalcSpinSquared</a> (double *vector) const </td></tr>
 <tr class="memdesc:ac6d07ca52369591cf7a7676c7181b45f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Measure S(S+1) (spin squared)  <a href="#ac6d07ca52369591cf7a7676c7181b45f">More...</a><br/></td></tr>
 <tr class="separator:ac6d07ca52369591cf7a7676c7181b45f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
-<tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
-<tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb">ActWithSecondQuantizedOperator</a> (const char whichOperator, const bool isUp, const unsigned int orbIndex, double *thisVector, const <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *otherFCI, double *otherVector) const </td></tr>
-<tr class="memdesc:ac33683cb6adf2063e7fe0fc908c3febb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to a creator/annihilator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#ac33683cb6adf2063e7fe0fc908c3febb">More...</a><br/></td></tr>
-<tr class="separator:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7b47739c602e3351baca282bdc715ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca">ActWithNumberOperator</a> (const unsigned int orbIndex, double *resultVector, double *sourceVector) const </td></tr>
-<tr class="memdesc:ac7b47739c602e3351baca282bdc715ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the result <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to the number operator of a specific site acting on a source <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector.  <a href="#ac7b47739c602e3351baca282bdc715ca">More...</a><br/></td></tr>
-<tr class="separator:ac7b47739c602e3351baca282bdc715ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc">RetardedGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF) const </td></tr>
-<tr class="memdesc:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition)  <a href="#aaa00a4720e4796700dc9ebd83aa71cfc">More...</a><br/></td></tr>
+<tr class="memdesc:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for the exact definition)  <a href="#aaa00a4720e4796700dc9ebd83aa71cfc">More...</a><br/></td></tr>
 <tr class="separator:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0">DensityResponseGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF) const </td></tr>
-<tr class="memdesc:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition)  <a href="#a132bbdf8fb4063a5199c7cbbbdccc0e0">More...</a><br/></td></tr>
+<tr class="memdesc:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for the exact definition)  <a href="#a132bbdf8fb4063a5199c7cbbbdccc0e0">More...</a><br/></td></tr>
 <tr class="separator:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f">getFCIcoeff</a> (int *bits_up, int *bits_down, double *vector) const </td></tr>
-<tr class="memdesc:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient.  <a href="#a87f310673fe8b183cb4a5bf3d3051f9f">More...</a><br/></td></tr>
-<tr class="separator:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72ea3aaa481b70b9d5848e7b5a6a7ee9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a72ea3aaa481b70b9d5848e7b5a6a7ee9">getBitsOfCounter</a> (const unsigned long long counter, int *bits_up, int *bits_down) const </td></tr>
-<tr class="memdesc:a72ea3aaa481b70b9d5848e7b5a6a7ee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the bit representation of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> index.  <a href="#a72ea3aaa481b70b9d5848e7b5a6a7ee9">More...</a><br/></td></tr>
-<tr class="separator:a72ea3aaa481b70b9d5848e7b5a6a7ee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f0e1e483ba321dcf7e4304caf18f87c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a4f0e1e483ba321dcf7e4304caf18f87c">getUpIrrepOfCounter</a> (const unsigned long long counter) const </td></tr>
-<tr class="memdesc:a4f0e1e483ba321dcf7e4304caf18f87c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the irrep of the up Slater determinant to which a certain <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient belongs.  <a href="#a4f0e1e483ba321dcf7e4304caf18f87c">More...</a><br/></td></tr>
-<tr class="separator:a4f0e1e483ba321dcf7e4304caf18f87c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c0f90a70e494cc8d2908f4c5bb2fb25"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a1c0f90a70e494cc8d2908f4c5bb2fb25">GetMatrixElement</a> (int *bits_bra_up, int *bits_bra_down, int *bits_ket_up, int *bits_ket_down, int *work1, int *work2, int *work3, int *work4) const </td></tr>
-<tr class="memdesc:a1c0f90a70e494cc8d2908f4c5bb2fb25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sandwich the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> between two Slater determinants (return a specific element) (without Econstant!!)  <a href="#a1c0f90a70e494cc8d2908f4c5bb2fb25">More...</a><br/></td></tr>
-<tr class="separator:a1c0f90a70e494cc8d2908f4c5bb2fb25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96e5332d478b2d00133372ba425b14ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee">HamTimesVec</a> (double *input, double *output) const </td></tr>
-<tr class="memdesc:a96e5332d478b2d00133372ba425b14ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which performs the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times Vector product (without Econstant!!)  <a href="#a96e5332d478b2d00133372ba425b14ee">More...</a><br/></td></tr>
-<tr class="separator:a96e5332d478b2d00133372ba425b14ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
+<tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
+<tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a7baa6a75e09d6055abb48bb012a1227c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a7baa6a75e09d6055abb48bb012a1227c">FillRandom</a> (const unsigned long long vecLength, double *vec)</td></tr>
+<tr class="memdesc:a7baa6a75e09d6055abb48bb012a1227c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given.  <a href="#a7baa6a75e09d6055abb48bb012a1227c">More...</a><br/></td></tr>
+<tr class="separator:a7baa6a75e09d6055abb48bb012a1227c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a030bc8d72d2f0c1fcaf570ab397c49a9"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a030bc8d72d2f0c1fcaf570ab397c49a9">ClearVector</a> (const unsigned long long vecLength, double *vec)</td></tr>
+<tr class="memdesc:a030bc8d72d2f0c1fcaf570ab397c49a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the entries of a vector to zero.  <a href="#a030bc8d72d2f0c1fcaf570ab397c49a9">More...</a><br/></td></tr>
+<tr class="separator:a030bc8d72d2f0c1fcaf570ab397c49a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
 <tr class="memitem:abe702e621bfaec9302f81561cde3c144"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144">DiagHam</a> (double *diag) const </td></tr>
 <tr class="memdesc:abe702e621bfaec9302f81561cde3c144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> (without Econstant!!) = Slater determinant energies.  <a href="#abe702e621bfaec9302f81561cde3c144">More...</a><br/></td></tr>
 <tr class="separator:abe702e621bfaec9302f81561cde3c144"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dd256cb52e3b7a16ce5895dc012664e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e">DiagHamSquared</a> (double *output) const </td></tr>
 <tr class="memdesc:a5dd256cb52e3b7a16ce5895dc012664e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> squared (without Econstant!!)  <a href="#a5dd256cb52e3b7a16ce5895dc012664e">More...</a><br/></td></tr>
 <tr class="separator:a5dd256cb52e3b7a16ce5895dc012664e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
-Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af36d52d8316d93b3990980576c763d65"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#af36d52d8316d93b3990980576c763d65">str2bits</a> (const unsigned int L, const unsigned int bitstring, int *bits)</td></tr>
-<tr class="memdesc:af36d52d8316d93b3990980576c763d65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertor between two representations of a same spin-projection Slater determinant.  <a href="#af36d52d8316d93b3990980576c763d65">More...</a><br/></td></tr>
-<tr class="separator:af36d52d8316d93b3990980576c763d65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a263c1ed0642cf2c51974e310216c33b1"><td class="memItemLeft" align="right" valign="top">static unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a263c1ed0642cf2c51974e310216c33b1">bits2str</a> (const unsigned int L, int *bits)</td></tr>
-<tr class="memdesc:a263c1ed0642cf2c51974e310216c33b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertor between two representations of a same spin-projection Slater determinant.  <a href="#a263c1ed0642cf2c51974e310216c33b1">More...</a><br/></td></tr>
-<tr class="separator:a263c1ed0642cf2c51974e310216c33b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7baa6a75e09d6055abb48bb012a1227c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a7baa6a75e09d6055abb48bb012a1227c">FillRandom</a> (const unsigned long long vecLength, double *vec)</td></tr>
-<tr class="memdesc:a7baa6a75e09d6055abb48bb012a1227c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given (as for the Hubbard model in the site basis)  <a href="#a7baa6a75e09d6055abb48bb012a1227c">More...</a><br/></td></tr>
-<tr class="separator:a7baa6a75e09d6055abb48bb012a1227c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a2747f044cb0e2fb4ae9965451ddc84d5">FCIddot</a> (const unsigned long long vecLength, double *vec1, double *vec2)</td></tr>
-<tr class="memdesc:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take the inproduct of two very long vectors.  <a href="#a2747f044cb0e2fb4ae9965451ddc84d5">More...</a><br/></td></tr>
-<tr class="separator:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0f7fea99e156006d63a280e2ef9950f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac0f7fea99e156006d63a280e2ef9950f">FCIdclear</a> (const unsigned long long vecLength, double *vec)</td></tr>
-<tr class="memdesc:ac0f7fea99e156006d63a280e2ef9950f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear a very long vector.  <a href="#ac0f7fea99e156006d63a280e2ef9950f">More...</a><br/></td></tr>
-<tr class="separator:ac0f7fea99e156006d63a280e2ef9950f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa04f67fdf87635e136088d0c0fdf6733"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aa04f67fdf87635e136088d0c0fdf6733">FCIdcopy</a> (const unsigned long long vecLength, double *origin, double *target)</td></tr>
-<tr class="memdesc:aa04f67fdf87635e136088d0c0fdf6733"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy a very long vector.  <a href="#aa04f67fdf87635e136088d0c0fdf6733">More...</a><br/></td></tr>
-<tr class="separator:aa04f67fdf87635e136088d0c0fdf6733"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a787cf671e2d257d98cb46657d05e25c0"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a787cf671e2d257d98cb46657d05e25c0">FCIfrobeniusnorm</a> (const unsigned long long vecLength, double *vec)</td></tr>
-<tr class="memdesc:a787cf671e2d257d98cb46657d05e25c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the 2-norm of a very long vector.  <a href="#a787cf671e2d257d98cb46657d05e25c0">More...</a><br/></td></tr>
-<tr class="separator:a787cf671e2d257d98cb46657d05e25c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13fb133d50973bd6696f7c7bdd6c0165"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a13fb133d50973bd6696f7c7bdd6c0165">FCIdaxpy</a> (const unsigned long long vecLength, const double alpha, double *vec_x, double *vec_y)</td></tr>
-<tr class="memdesc:a13fb133d50973bd6696f7c7bdd6c0165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do lapack's daxpy for a very long vector.  <a href="#a13fb133d50973bd6696f7c7bdd6c0165">More...</a><br/></td></tr>
-<tr class="separator:a13fb133d50973bd6696f7c7bdd6c0165"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a81a1fa5b70e4bd0c834f85c38ecf829c">FCIdscal</a> (const unsigned long long vecLength, const double alpha, double *vec)</td></tr>
-<tr class="memdesc:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do lapack's dscal for a very long vector.  <a href="#a81a1fa5b70e4bd0c834f85c38ecf829c">More...</a><br/></td></tr>
-<tr class="separator:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
+<tr class="memitem:a96e5332d478b2d00133372ba425b14ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee">HamTimesVec</a> (double *input, double *output) const </td></tr>
+<tr class="memdesc:a96e5332d478b2d00133372ba425b14ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which performs the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times Vector product (without Econstant!!) making use of the (ij|kl) = (ji|kl) = (ij|lk) = (ji|lk) symmetry of the electron repulsion integrals.  <a href="#a96e5332d478b2d00133372ba425b14ee">More...</a><br/></td></tr>
+<tr class="separator:a96e5332d478b2d00133372ba425b14ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf8c063a9d17fe98f0bcaba1281c648f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#adf8c063a9d17fe98f0bcaba1281c648f">GetMatrixElement</a> (int *bits_bra_up, int *bits_bra_down, int *bits_ket_up, int *bits_ket_down, int *work) const </td></tr>
+<tr class="memdesc:adf8c063a9d17fe98f0bcaba1281c648f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sandwich the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> between two Slater determinants (return a specific element) (without Econstant!!)  <a href="#adf8c063a9d17fe98f0bcaba1281c648f">More...</a><br/></td></tr>
+<tr class="separator:adf8c063a9d17fe98f0bcaba1281c648f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f">getFCIcoeff</a> (int *bits_up, int *bits_down, double *vector) const </td></tr>
+<tr class="memdesc:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient.  <a href="#a87f310673fe8b183cb4a5bf3d3051f9f">More...</a><br/></td></tr>
+<tr class="separator:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a258401fbd7000fd62455914746c4c246"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a258401fbd7000fd62455914746c4c246">getBitsOfCounter</a> (const int irrep_center, const unsigned long long counter, int *bits_up, int *bits_down) const </td></tr>
+<tr class="memdesc:a258401fbd7000fd62455914746c4c246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the bit representation of a global counter corresponding to " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j.  <a href="#a258401fbd7000fd62455914746c4c246">More...</a><br/></td></tr>
+<tr class="separator:a258401fbd7000fd62455914746c4c246"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9b96226cf824b8e9abe3c7924f48c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#adb9b96226cf824b8e9abe3c7924f48c0">getUpIrrepOfCounter</a> (const int irrep_center, const unsigned long long counter) const </td></tr>
+<tr class="memdesc:adb9b96226cf824b8e9abe3c7924f48c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the irrep of the up Slater determinant of a global counter corresponding to " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j.  <a href="#adb9b96226cf824b8e9abe3c7924f48c0">More...</a><br/></td></tr>
+<tr class="separator:adb9b96226cf824b8e9abe3c7924f48c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb">ActWithSecondQuantizedOperator</a> (const char whichOperator, const bool isUp, const unsigned int orbIndex, double *thisVector, const <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> *otherFCI, double *otherVector) const </td></tr>
+<tr class="memdesc:ac33683cb6adf2063e7fe0fc908c3febb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set thisVector to a creator/annihilator acting on otherVector.  <a href="#ac33683cb6adf2063e7fe0fc908c3febb">More...</a><br/></td></tr>
+<tr class="separator:ac33683cb6adf2063e7fe0fc908c3febb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7b47739c602e3351baca282bdc715ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca">ActWithNumberOperator</a> (const unsigned int orbIndex, double *resultVector, double *sourceVector) const </td></tr>
+<tr class="memdesc:ac7b47739c602e3351baca282bdc715ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set resultVector to the number operator of a specific site acting on sourceVector.  <a href="#ac7b47739c602e3351baca282bdc715ca">More...</a><br/></td></tr>
+<tr class="separator:ac7b47739c602e3351baca282bdc715ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe4f50a1de6b4c6a6be2f7e8dd4b91e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2">CGCoreSolver</a> (const double alpha, const double beta, const double eta, double *precon, double *Sol, double *RESID, double *PVEC, double *OxPVEC, double *temp, double *temp2) const </td></tr>
 <tr class="memdesc:afe4f50a1de6b4c6a6be2f7e8dd4b91e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the solution of the system Operator |Sol&gt; = |RESID&gt; with Operator = precon * [ ( alpha + beta * H )^2 + eta^2 ] * precon.  <a href="#afe4f50a1de6b4c6a6be2f7e8dd4b91e2">More...</a><br/></td></tr>
 <tr class="separator:afe4f50a1de6b4c6a6be2f7e8dd4b91e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,8 +228,32 @@ Protected Member Functions</h2></td></tr>
 <tr class="memdesc:af8496a386028b2eb6ef686817372857c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate out = precon * [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2] * precon * in (Econstant is taken into account!!)  <a href="#af8496a386028b2eb6ef686817372857c">More...</a><br/></td></tr>
 <tr class="separator:af8496a386028b2eb6ef686817372857c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a2132305764e7aa07cf765bec5668e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ad3a2132305764e7aa07cf765bec5668e">CGDiagPrecond</a> (const double alpha, const double beta, const double eta, double *precon, double *workspace) const </td></tr>
-<tr class="memdesc:ad3a2132305764e7aa07cf765bec5668e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)  <a href="#ad3a2132305764e7aa07cf765bec5668e">More...</a><br/></td></tr>
+<tr class="memdesc:ad3a2132305764e7aa07cf765bec5668e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)  <a href="#ad3a2132305764e7aa07cf765bec5668e">More...</a><br/></td></tr>
 <tr class="separator:ad3a2132305764e7aa07cf765bec5668e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:aee672b186854b9fdaf2402203892852e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e">str2bits</a> (const unsigned int Lvalue, const unsigned int bitstring, int *bits)</td></tr>
+<tr class="memdesc:aee672b186854b9fdaf2402203892852e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertor between two representations of a same spin-projection Slater determinant.  <a href="#aee672b186854b9fdaf2402203892852e">More...</a><br/></td></tr>
+<tr class="separator:aee672b186854b9fdaf2402203892852e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc4c041ecd01c3610624b92dcf1ed5b"><td class="memItemLeft" align="right" valign="top">static unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#adfc4c041ecd01c3610624b92dcf1ed5b">bits2str</a> (const unsigned int Lvalue, int *bits)</td></tr>
+<tr class="memdesc:adfc4c041ecd01c3610624b92dcf1ed5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertor between two representations of a same spin-projection Slater determinant.  <a href="#adfc4c041ecd01c3610624b92dcf1ed5b">More...</a><br/></td></tr>
+<tr class="separator:adfc4c041ecd01c3610624b92dcf1ed5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a2747f044cb0e2fb4ae9965451ddc84d5">FCIddot</a> (const unsigned long long vecLength, double *vec1, double *vec2)</td></tr>
+<tr class="memdesc:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Take the inproduct of two vectors.  <a href="#a2747f044cb0e2fb4ae9965451ddc84d5">More...</a><br/></td></tr>
+<tr class="separator:a2747f044cb0e2fb4ae9965451ddc84d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa04f67fdf87635e136088d0c0fdf6733"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aa04f67fdf87635e136088d0c0fdf6733">FCIdcopy</a> (const unsigned long long vecLength, double *origin, double *target)</td></tr>
+<tr class="memdesc:aa04f67fdf87635e136088d0c0fdf6733"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy a vector.  <a href="#aa04f67fdf87635e136088d0c0fdf6733">More...</a><br/></td></tr>
+<tr class="separator:aa04f67fdf87635e136088d0c0fdf6733"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a787cf671e2d257d98cb46657d05e25c0"><td class="memItemLeft" align="right" valign="top">static double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a787cf671e2d257d98cb46657d05e25c0">FCIfrobeniusnorm</a> (const unsigned long long vecLength, double *vec)</td></tr>
+<tr class="memdesc:a787cf671e2d257d98cb46657d05e25c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the 2-norm of a vector.  <a href="#a787cf671e2d257d98cb46657d05e25c0">More...</a><br/></td></tr>
+<tr class="separator:a787cf671e2d257d98cb46657d05e25c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13fb133d50973bd6696f7c7bdd6c0165"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a13fb133d50973bd6696f7c7bdd6c0165">FCIdaxpy</a> (const unsigned long long vecLength, const double alpha, double *vec_x, double *vec_y)</td></tr>
+<tr class="memdesc:a13fb133d50973bd6696f7c7bdd6c0165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do lapack's daxpy vec_y += alpha * vec_x.  <a href="#a13fb133d50973bd6696f7c7bdd6c0165">More...</a><br/></td></tr>
+<tr class="separator:a13fb133d50973bd6696f7c7bdd6c0165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a81a1fa5b70e4bd0c834f85c38ecf829c">FCIdscal</a> (const unsigned long long vecLength, const double alpha, double *vec)</td></tr>
+<tr class="memdesc:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do lapack's dscal vec *= alpha.  <a href="#a81a1fa5b70e4bd0c834f85c38ecf829c">More...</a><br/></td></tr>
+<tr class="separator:a81a1fa5b70e4bd0c834f85c38ecf829c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> class. </p>
@@ -259,63 +263,15 @@ Protected Member Functions</h2></td></tr>
 
 <p>Definition at line <a class="el" href="FCI_8h_source.html#l00032">32</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a6732e08ef3d229d8305b0f6af3f13eda"></a>
+<a class="anchor" id="a7d47d6038adaa1a5b3ab6d4624976b87"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">CheMPS2::FCI::FCI </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a> *&#160;</td>
-          <td class="paramname"><em>Prob</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>FCIverbose</em> = <code>2</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Constructor. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Prob</td><td>The problem contains the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, as well as the symmetry sector which should be targeted </td></tr>
-    <tr><td class="paramname">FCIverbose</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> verbose level: 0 print nothing, 1 print start and solution, 2 print everything </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00032">32</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_a6732e08ef3d229d8305b0f6af3f13eda_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a6732e08ef3d229d8305b0f6af3f13eda_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_a6732e08ef3d229d8305b0f6af3f13eda_cgraph" id="classCheMPS2_1_1FCI_a6732e08ef3d229d8305b0f6af3f13eda_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="198,12,453,39"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="245,63,405,89"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="241,113,410,140"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="236,164,415,191"/><area shape="rect" id="node7" href="classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="244,215,407,241"/><area shape="rect" id="node8" href="classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="232,265,419,292"/><area shape="rect" id="node9" href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="228,316,423,343"/><area shape="rect" id="node10" href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="216,367,435,393"/><area shape="rect" id="node11" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. " alt="" coords="225,417,425,444"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="501,5,696,46"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a2d10244bdc047271cc75c15da2c77005"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">CheMPS2::FCI::FCI </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a> *&#160;</td>
-          <td class="paramname"><em>Prob</em>, </td>
+          <td class="paramtype"><a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *&#160;</td>
+          <td class="paramname"><em>Ham</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -333,6 +289,18 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>TargetIrrep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>maxMemWorkMB</em> = <code>100.0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>FCIverbose</em> = <code>2</code>&#160;</td>
         </tr>
         <tr>
@@ -346,24 +314,26 @@ Protected Member Functions</h2></td></tr>
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Prob</td><td>The problem contains the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, as well as the irrep which should be targeted. Nel_up and Nel_down are specified specifically now. </td></tr>
-    <tr><td class="paramname">Nel_up</td><td>The number of up or alpha electrons of the new <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> object </td></tr>
-    <tr><td class="paramname">Nel_down</td><td>The number of down or beta electrons of the new <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> object </td></tr>
+    <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> matrix elements </td></tr>
+    <tr><td class="paramname">Nel_up</td><td>The number of up (alpha) electrons </td></tr>
+    <tr><td class="paramname">Nel_down</td><td>The number of down (beta) electrons </td></tr>
+    <tr><td class="paramname">TargetIrrep</td><td>The targeted point group irrep </td></tr>
+    <tr><td class="paramname">maxMemWorkMB</td><td>Maximum workspace size in MB to be used for matrix vector product (this does not include the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vectors as stored for example in GSDavidson!!) </td></tr>
     <tr><td class="paramname">FCIverbose</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> verbose level: 0 print nothing, 1 print start and solution, 2 print everything </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00078">78</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00032">32</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_a2d10244bdc047271cc75c15da2c77005_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a2d10244bdc047271cc75c15da2c77005_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_a2d10244bdc047271cc75c15da2c77005_cgraph" id="classCheMPS2_1_1FCI_a2d10244bdc047271cc75c15da2c77005_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="198,5,453,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="501,23,696,65"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="245,107,405,133"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="241,157,410,184"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="236,208,415,235"/><area shape="rect" id="node7" href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="228,259,423,285"/><area shape="rect" id="node8" href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="216,309,435,336"/></map>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph" id="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="198,5,357,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="198,70,357,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="198,135,357,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="198,201,357,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="198,266,357,307"/><area shape="rect" id="node7" href="classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="198,331,357,373"/></map>
 </div>
 </p>
 
@@ -373,6 +343,9 @@ Protected Member Functions</h2></td></tr>
 <a class="anchor" id="ac7b47739c602e3351baca282bdc715ca"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::ActWithNumberOperator </td>
@@ -398,25 +371,33 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Set the result <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to the number operator of a specific site acting on a source <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
+<p>Set resultVector to the number operator of a specific site acting on sourceVector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">orbIndex</td><td>Orbital index of the number operator </td></tr>
-    <tr><td class="paramname">resultVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> where the result of the operation should be stored </td></tr>
-    <tr><td class="paramname">sourceVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> on which the number operator acts </td></tr>
+    <tr><td class="paramname">resultVector</td><td>Vector with length getVecLength(0) where the result of the operation should be stored </td></tr>
+    <tr><td class="paramname">sourceVector</td><td>Vector with length getVecLength(0) on which the number operator acts </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00319">319</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01712">1712</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ac33683cb6adf2063e7fe0fc908c3febb"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::ActWithSecondQuantizedOperator </td>
@@ -460,48 +441,53 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Set this <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector to a creator/annihilator acting on a previous <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
+<p>Set thisVector to a creator/annihilator acting on otherVector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">whichOperator</td><td>With which operator should be acted on the other <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> state: C means creator and A means annihilator </td></tr>
     <tr><td class="paramname">isUp</td><td>Boolean which denotes if the operator corresponds to an up (alpha) or down (beta) electron </td></tr>
     <tr><td class="paramname">orbIndex</td><td>Orbital index on which the operator acts </td></tr>
-    <tr><td class="paramname">thisVector</td><td>Vector with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> where the result of the operation should be stored </td></tr>
-    <tr><td class="paramname">otherFCI</td><td><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> instance which corresponds to the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector on which is acted </td></tr>
-    <tr><td class="paramname">otherVector</td><td>Vector with length otherFCI-&gt;<a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> which contains the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector on which is acted </td></tr>
+    <tr><td class="paramname">thisVector</td><td>Vector with length getVecLength(0) where the result of the operation should be stored </td></tr>
+    <tr><td class="paramname">otherFCI</td><td><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> instance which corresponds to the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector otherVector on which is acted </td></tr>
+    <tr><td class="paramname">otherVector</td><td>Vector with length otherFCI-&gt;getVecLength(0) which contains the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector on which is acted </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00338">338</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01731">1731</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph" id="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="293,5,438,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="265,56,466,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="271,107,460,133"/></map>
 </div>
 </p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" id="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="265,12,455,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="265,12,455,39"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a263c1ed0642cf2c51974e310216c33b1"></a>
+<a class="anchor" id="adfc4c041ecd01c3610624b92dcf1ed5b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -512,7 +498,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">unsigned int CheMPS2::FCI::bits2str </td>
           <td>(</td>
           <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>L</em>, </td>
+          <td class="paramname"><em>Lvalue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -528,7 +514,7 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -536,14 +522,14 @@ Protected Member Functions</h2></td></tr>
 <p>Convertor between two representations of a same spin-projection Slater determinant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">L</td><td>The number of orbitals </td></tr>
-    <tr><td class="paramname">bits</td><td>Array with the L bits which should be combined to a single integer </td></tr>
+    <tr><td class="paramname">Lvalue</td><td>The number of orbitals </td></tr>
+    <tr><td class="paramname">bits</td><td>Array with the Lvalue bits which should be combined to a single integer </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The single integer which represents the bits in bits </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00262">262</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00415">415</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -564,13 +550,13 @@ Protected Member Functions</h2></td></tr>
 <p>Measure S(S+1) (spin squared) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector </td></tr>
+    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector of length getVecLength(0) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Measured value of S(S+1) </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00870">870</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00930">930</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -623,13 +609,13 @@ Protected Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">alpha</td><td>The parameter alpha of the operator </td></tr>
     <tr><td class="paramname">beta</td><td>The parameter beta of the operator </td></tr>
-    <tr><td class="paramname">in</td><td>On entry the vector of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> on which the operator should be applied; unchanged on exit </td></tr>
-    <tr><td class="paramname">out</td><td>Array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, which contains on exit (alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>) * in </td></tr>
+    <tr><td class="paramname">in</td><td>On entry the vector of size getVecLength(0) on which the operator should be applied; unchanged on exit </td></tr>
+    <tr><td class="paramname">out</td><td>Array of size getVecLength(0), which contains on exit (alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>) * in </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01872">1872</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01937">1937</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -720,17 +706,17 @@ Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">beta</td><td>The parameter beta of the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The parameter eta of the operator </td></tr>
     <tr><td class="paramname">precon</td><td>The diagonal preconditioner </td></tr>
-    <tr><td class="paramname">Sol</td><td>On exit the solution is stored in this array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">RESID</td><td>On entry the RHS of the equation is stored in this array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, on exit is is overwritten </td></tr>
-    <tr><td class="paramname">PVEC</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">OxPVEC</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">temp</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">temp2</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
+    <tr><td class="paramname">Sol</td><td>On entry this array of size getVecLength(0) contains the initial guess; on exit the solution is stored here </td></tr>
+    <tr><td class="paramname">RESID</td><td>On entry the RHS of the equation is stored in this array of size getVecLength(0), on exit it is overwritten </td></tr>
+    <tr><td class="paramname">PVEC</td><td>Workspace of size getVecLength(0) </td></tr>
+    <tr><td class="paramname">OxPVEC</td><td>Workspace of size getVecLength(0) </td></tr>
+    <tr><td class="paramname">temp</td><td>Workspace of size getVecLength(0) </td></tr>
+    <tr><td class="paramname">temp2</td><td>Workspace of size getVecLength(0) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01832">1832</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01897">1897</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -784,19 +770,19 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Calculates (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!) </p>
+<p>Calculate (without approximation) precon = (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">alpha</td><td>The parameter alpha of the operator </td></tr>
     <tr><td class="paramname">beta</td><td>The parameter beta of the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The parameter eta of the operator </td></tr>
-    <tr><td class="paramname">precon</td><td>Array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, which contains on exit (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } </td></tr>
-    <tr><td class="paramname">workspace</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
+    <tr><td class="paramname">precon</td><td>Array of size getVecLength(0), which contains on exit (diag[(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2])^{ -1/2 } </td></tr>
+    <tr><td class="paramname">workspace</td><td>Workspace of size getVecLength(0) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01898">1898</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01963">1963</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -875,15 +861,15 @@ Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">beta</td><td>The parameter beta of the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The parameter eta of the operator </td></tr>
     <tr><td class="paramname">precon</td><td>The diagonal preconditioner </td></tr>
-    <tr><td class="paramname">in</td><td>On entry the vector of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> on which the operator should be applied; unchanged on exit </td></tr>
-    <tr><td class="paramname">out</td><td>Array of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a>, which contains on exit precon * [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2] * precon * in </td></tr>
-    <tr><td class="paramname">temp</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">temp2</td><td>Workspace of size <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
+    <tr><td class="paramname">in</td><td>On entry the vector of size getVecLength(0) on which the operator should be applied; unchanged on exit </td></tr>
+    <tr><td class="paramname">out</td><td>Array of size getVecLength(0), which contains on exit precon * [(alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>)^2 + eta^2] * precon * in </td></tr>
+    <tr><td class="paramname">temp</td><td>Workspace of size getVecLength(0) </td></tr>
+    <tr><td class="paramname">temp2</td><td>Workspace of size getVecLength(0) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01883">1883</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01948">1948</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -941,32 +927,77 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculates the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient. </p>
+<p>Calculate the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">alpha</td><td>The real part of the scalar in the operator </td></tr>
-    <tr><td class="paramname">beta</td><td>The prefactor of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> in the operator </td></tr>
+    <tr><td class="paramname">beta</td><td>The real-valued prefactor of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> in the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The imaginary part of the scalar in the operator </td></tr>
-    <tr><td class="paramname">RHS</td><td>The real-valued right-hand side of the equation with length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
-    <tr><td class="paramname">RealSol</td><td>If not NULL, on exit this array of length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> contains the real part of the solution </td></tr>
-    <tr><td class="paramname">ImagSol</td><td>If not NULL, on exit this array of length <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> contains the imaginary part of the solution </td></tr>
-    <tr><td class="paramname">checkError</td><td>If true, at the end the RMS error without preconditioner will be printed </td></tr>
+    <tr><td class="paramname">RHS</td><td>The real-valued right-hand side of the equation with length getVecLength(0) </td></tr>
+    <tr><td class="paramname">RealSol</td><td>If not NULL, on exit this array of length getVecLength(0) contains the real part of the solution </td></tr>
+    <tr><td class="paramname">ImagSol</td><td>If not NULL, on exit this array of length getVecLength(0) contains the imaginary part of the solution </td></tr>
+    <tr><td class="paramname">checkError</td><td>If true, the RMS error without preconditioner will be calculated and printed after convergence </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01758">1758</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01823">1823</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" id="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="273,5,463,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="273,5,463,32"/></map>
 </div>
 </p>
+
+</div>
+</div>
+<a class="anchor" id="a030bc8d72d2f0c1fcaf570ab397c49a9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::FCI::ClearVector </td>
+          <td>(</td>
+          <td class="paramtype">const unsigned long long&#160;</td>
+          <td class="paramname"><em>vecLength</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>vec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the entries of a vector to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
+    <tr><td class="paramname">vec</td><td>The vector which has to be set to zero </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01443">1443</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1030,7 +1061,7 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition) </p>
+<p>Calculate the density response Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for the exact definition) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">omega</td><td>The frequency value </td></tr>
@@ -1045,13 +1076,16 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02065">2065</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02114">2114</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="abe702e621bfaec9302f81561cde3c144"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::DiagHam </td>
@@ -1061,23 +1095,31 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Function which returns the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> (without Econstant!!) = Slater determinant energies. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">diag</td><td>Vector with <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> variables which contains on exit the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> </td></tr>
+    <tr><td class="paramname">diag</td><td>Vector with getVecLength(0) variables which contains on exit the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00976">976</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00990">990</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a5dd256cb52e3b7a16ce5895dc012664e"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::DiagHamSquared </td>
@@ -1087,17 +1129,22 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Function which returns the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> squared (without Econstant!!) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">output</td><td>Vector with <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> variables which contains on exit the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> squared </td></tr>
+    <tr><td class="paramname">output</td><td>Vector with getVecLength(0) variables which contains on exit the diagonal elements of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> squared </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01011">1011</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01026">1026</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1140,12 +1187,12 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Do lapack's daxpy for a very long vector. </p>
+<p>Do lapack's daxpy vec_y += alpha * vec_x. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
@@ -1156,52 +1203,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01478">1478</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac0f7fea99e156006d63a280e2ef9950f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CheMPS2::FCI::FCIdclear </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned long long&#160;</td>
-          <td class="paramname"><em>vecLength</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>vec</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Clear a very long vector. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
-    <tr><td class="paramname">vec</td><td>The vector which has to be set to zero </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01494">1494</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01425">1425</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1238,12 +1240,12 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Copy a very long vector. </p>
+<p>Copy a vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
@@ -1253,7 +1255,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01454">1454</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01403">1403</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1290,12 +1292,12 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Take the inproduct of two very long vectors. </p>
+<p>Take the inproduct of two vectors. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
@@ -1306,7 +1308,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The inproduct &lt; vec1 | vec2 &gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01462">1462</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01411">1411</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1343,12 +1345,12 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Do lapack's dscal for a very long vector. </p>
+<p>Do lapack's dscal vec *= alpha. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
@@ -1358,7 +1360,7 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01486">1486</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01434">1434</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1389,12 +1391,12 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate the 2-norm of a very long vector. </p>
+<p>Calculate the 2-norm of a vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vecLength</td><td>The vector length </td></tr>
@@ -1404,7 +1406,7 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The 2-norm of vec </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01472">1472</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01419">1419</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1432,17 +1434,17 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Construct the (spin-summed) 2-RDM of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
+<p>Construct the (spin-summed) 2-RDM of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i,sigma a^+j,tau a_l,tau a_k,sigma &gt; = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector </td></tr>
-    <tr><td class="paramname">TwoRDM</td><td>To store the 2-RDM; needs to be of size L^4 (L = number of orbitals); irrep symmetry shows in 2-RDM elements being zero; physics notation (see gHmat) </td></tr>
+    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector of length getVecLength(0) </td></tr>
+    <tr><td class="paramname">TwoRDM</td><td>To store the 2-RDM; needs to be of size <a class="el" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. ">getL()</a>^4; point group symmetry shows in 2-RDM elements being zero </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The energy of the given <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector, calculated by contraction of the 2-RDM with Hmat </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The energy of the given <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector, calculated by contraction of the 2-RDM with Gmat and ERI </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00648">648</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00736">736</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1478,26 +1480,35 @@ Protected Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given (as for the Hubbard model in the site basis) </p>
+<p>Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vecLength</td><td>The length of the vector; normally <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> </td></tr>
+    <tr><td class="paramname">vecLength</td><td>The length of the vector; when used for GSDavidson it should be getVecLength(0) </td></tr>
     <tr><td class="paramname">vec</td><td>The vector to fill with random numbers </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01502">1502</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01449">1449</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a72ea3aaa481b70b9d5848e7b5a6a7ee9"></a>
+<a class="anchor" id="a258401fbd7000fd62455914746c4c246"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::getBitsOfCounter </td>
           <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>irrep_center</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const unsigned long long&#160;</td>
           <td class="paramname"><em>counter</em>, </td>
         </tr>
@@ -1519,25 +1530,34 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Find the bit representation of a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> index. </p>
+<p>Find the bit representation of a global counter corresponding to " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">counter</td><td>The given <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> index </td></tr>
+    <tr><td class="paramname">irrep_center</td><td>The single electron excitation irrep I_i x I_j </td></tr>
+    <tr><td class="paramname">counter</td><td>The given global counter corresponding to " E_ij | FCI vector &gt; " </td></tr>
     <tr><td class="paramname">bits_up</td><td>Array of length L to store the bit representation of the up (alpha) electrons in </td></tr>
     <tr><td class="paramname">bits_down</td><td>Array of length L to store the bit representation of the down (beta) electrons in </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00282">282</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00435">435</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ad9df11199ab6633de3df7b9c1c51001a"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">double CheMPS2::FCI::getEconst </td>
@@ -1546,77 +1566,29 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Function which returns the nuclear repulsion energy. </p>
 <dl class="section return"><dt>Returns</dt><dd>The nuclear repulsion energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00163">163</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00102">102</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a87f310673fe8b183cb4a5bf3d3051f9f"></a>
+<a class="anchor" id="a56cbdfb4af815c382559c888a32e67ac"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double CheMPS2::FCI::getFCIcoeff </td>
-          <td>(</td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>bits_up</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>bits_down</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>vector</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">bits_up</td><td>The bit string representation of the up or alpha electron Slater determinant </td></tr>
-    <tr><td class="paramname">bits_down</td><td>The bit string representation of the down or beta electron Slater determinant </td></tr>
-    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector with <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> variables from which a coefficient is desired </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The corresponding <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient; 0.0 if something is not OK </dd></dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00298">298</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" id="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="243,5,453,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="502,12,693,39"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a3bcfd3030a1c4ea08a159e99d457046d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double CheMPS2::FCI::getHmat </td>
+          <td class="memname">double CheMPS2::FCI::getERI </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>orb1</em>, </td>
@@ -1645,39 +1617,53 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Function which returns the 2-body matrix elements (in physics notation: orb1(r1) * orb2(r2) * orb3(r1) * orb4(r2) / |r1-r2|); the 1-body matrix elements are absorbed in the 2-body matrix elements as explained in the <a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> class. </p>
+<p>Function which returns the electron repulsion integral (in chemists notation: integral dr1 dr2 orb1(r1) * orb2(r1) * orb3(r2) * orb4(r2) / |r1-r2|) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">orb1</td><td>First orbital index (electron at position r1) </td></tr>
-    <tr><td class="paramname">orb2</td><td>Second orbital index (electron at position r2) </td></tr>
-    <tr><td class="paramname">orb3</td><td>Third orbital index (electron at position r1) </td></tr>
+    <tr><td class="paramname">orb2</td><td>Second orbital index (electron at position r1) </td></tr>
+    <tr><td class="paramname">orb3</td><td>Third orbital index (electron at position r2) </td></tr>
     <tr><td class="paramname">orb4</td><td>Fourth orbital index (electron at position r2) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The desired 2-body matrix element, augmented with the 1-body matrix elements </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The desired electron repulsion integral </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00165">165</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00092">92</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a776e660d58900bff263aec9fb2ac8b33"></a>
+<a class="anchor" id="a87f310673fe8b183cb4a5bf3d3051f9f"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int CheMPS2::FCI::getIrrepProduct </td>
+          <td class="memname">double CheMPS2::FCI::getFCIcoeff </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>Irrep_row</em>, </td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>bits_up</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>Irrep_col</em>&#160;</td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>bits_down</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>vector</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1685,25 +1671,137 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bits_up</td><td>The bit string representation of the up or alpha electron Slater determinant </td></tr>
+    <tr><td class="paramname">bits_down</td><td>The bit string representation of the down or beta electron Slater determinant </td></tr>
+    <tr><td class="paramname">vector</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector with getVecLength(0) variables from which a coefficient is desired </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The corresponding <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient; 0.0 if bits_up and bits_down do not form a valid <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> determinant </dd></dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00453">453</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" id="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="243,5,453,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="502,12,693,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="ada6d8ff3debe7a82fe843785a2b2d84e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double CheMPS2::FCI::getGmat </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>orb1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>orb2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Function which returns the AUGMENTED one-body matrix elements ( G_{ij} = T_{ij} - 0.5 * sum_k ERI_{ikkj} ; see Chem. Phys. Lett. 111 (4-5), 315-321 (1984) ) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">orb1</td><td>First orbital index </td></tr>
+    <tr><td class="paramname">orb2</td><td>Second orbital index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The desired AUGMENTED one-body matrix element </dd></dl>
+
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00098">98</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a8d55b73a60bb7adba1272211c484fd04"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int CheMPS2::FCI::getIrrepProduct </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>Irrep1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>Irrep2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get the direct product of two irreps. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Irrep_row</td><td>The first irrep </td></tr>
-    <tr><td class="paramname">Irrep_col</td><td>The second irrep </td></tr>
+    <tr><td class="paramname">Irrep1</td><td>The first irrep </td></tr>
+    <tr><td class="paramname">Irrep2</td><td>The second irrep </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The direct product Irrep_row x Irrep_col </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The direct product Irrep1 x Irrep2 </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00159">159</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00079">79</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="aebb431f39d1a3fa0be120bdf90d2d152"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int CheMPS2::FCI::getL </td>
@@ -1712,29 +1810,37 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Getter for the number of orbitals. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of orbitals </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00147">147</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00052">52</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" id="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="200,5,411,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="459,12,650,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="200,5,411,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="459,12,650,39"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a1c0f90a70e494cc8d2908f4c5bb2fb25"></a>
+<a class="anchor" id="adf8c063a9d17fe98f0bcaba1281c648f"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">double CheMPS2::FCI::GetMatrixElement </td>
@@ -1764,25 +1870,7 @@ Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>work1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>work2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>work3</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>work4</em>&#160;</td>
+          <td class="paramname"><em>work</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1790,31 +1878,36 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Sandwich the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> between two Slater determinants (return a specific element) (without Econstant!!) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">bits_bra_up</td><td>Bit representation of the &lt;bra| Slater determinant of the up (alpha) electrons </td></tr>
-    <tr><td class="paramname">bits_bra_down</td><td>Bit representation of the &lt;bra| Slater determinant of the down (beta) electrons </td></tr>
-    <tr><td class="paramname">bits_ket_up</td><td>Bit representation of the |ket&gt; Slater determinant of the up (alpha) electrons </td></tr>
-    <tr><td class="paramname">bits_ket_down</td><td>Bit representation of the |ket&gt; Slater determinant of the down (beta) electrons </td></tr>
-    <tr><td class="paramname">work1</td><td>Work array of length 2 </td></tr>
-    <tr><td class="paramname">work2</td><td>Work array of length 2 </td></tr>
-    <tr><td class="paramname">work3</td><td>Work array of length 2 </td></tr>
-    <tr><td class="paramname">work4</td><td>Work array of length 2 </td></tr>
+    <tr><td class="paramname">bits_bra_up</td><td>Bit representation of the &lt;bra| Slater determinant of the up (alpha) electrons (length L) </td></tr>
+    <tr><td class="paramname">bits_bra_down</td><td>Bit representation of the &lt;bra| Slater determinant of the down (beta) electrons (length L) </td></tr>
+    <tr><td class="paramname">bits_ket_up</td><td>Bit representation of the |ket&gt; Slater determinant of the up (alpha) electrons (length L) </td></tr>
+    <tr><td class="paramname">bits_ket_down</td><td>Bit representation of the |ket&gt; Slater determinant of the down (beta) electrons (length L) </td></tr>
+    <tr><td class="paramname">work</td><td>Work array of length 8 </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> element which connects the given two Slater determinants </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01306">1306</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01257">1257</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ab053ef3d951302e880c79f690a77dc9b"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int CheMPS2::FCI::getNel_down </td>
@@ -1823,18 +1916,26 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Getter for the number of down or beta electrons. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of down or beta electrons </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00151">151</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00060">60</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="af9a42f848d031c78869bf46229f2bf11"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int CheMPS2::FCI::getNel_up </td>
@@ -1843,18 +1944,26 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Getter for the number of up or alpha electrons. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of up or alpha electrons </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00149">149</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00056">56</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ad921697e69e7ebc3f554ebe4613b30d6"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">unsigned int CheMPS2::FCI::getNumIrreps </td>
@@ -1863,18 +1972,26 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get the number of irreps. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of irreps </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00155">155</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00069">69</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a79c9426a1f2d8a4b918adad9ffa89894"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int CheMPS2::FCI::getOrb2Irrep </td>
@@ -1884,6 +2001,11 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get an orbital irrep. </p>
@@ -1895,13 +2017,16 @@ Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The irrep of orbital orb </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00161">161</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00084">84</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="ae876dae50220954a3ed8fd72813e28db"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">int CheMPS2::FCI::getTargetIrrep </td>
@@ -1910,85 +2035,124 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Get the target irrep. </p>
 <dl class="section return"><dt>Returns</dt><dd>The target irrep </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00157">157</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00073">73</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
+
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" id="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="256,5,467,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="515,12,706,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="adb9b96226cf824b8e9abe3c7924f48c0"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int CheMPS2::FCI::getUpIrrepOfCounter </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>irrep_center</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned long long&#160;</td>
+          <td class="paramname"><em>counter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Find the irrep of the up Slater determinant of a global counter corresponding to " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">irrep_center</td><td>The single electron excitation irrep I_i x I_j </td></tr>
+    <tr><td class="paramname">counter</td><td>The given global counter corresponding to " E_ij | FCI vector &gt; " </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The corresponding irrep of the up Slater determinant </dd></dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00427">427</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6e153d335d6500f4758212e203f7d682"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long CheMPS2::FCI::getVecLength </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>irrep_center</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Getter for the number of variables in the vector " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">irrep_center</td><td>The single electron excitation irrep I_i x I_j </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of variables in the corresponding vector </dd></dl>
+
+<p>Definition at line <a class="el" href="FCI_8h_source.html#l00065">65</a> of file <a class="el" href="FCI_8h_source.html">FCI.h</a>.</p>
 
 <p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
 <div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-7-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" id="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="256,5,467,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="515,12,706,39"/></map>
+<div class="center"><img src="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph" id="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for the exact definition) " alt="" coords="254,5,445,32"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="a4f0e1e483ba321dcf7e4304caf18f87c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int CheMPS2::FCI::getUpIrrepOfCounter </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned long long&#160;</td>
-          <td class="paramname"><em>counter</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Find the irrep of the up Slater determinant to which a certain <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient belongs. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">counter</td><td>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient index </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The corresponding irrep of the up Slater determinant </dd></dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00274">274</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ab4165b4fe1d0323f3d51014096602317"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long long CheMPS2::FCI::getVecLength </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Getter for the number of variables in the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector. </p>
-<dl class="section return"><dt>Returns</dt><dd>The number of variables in the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector </dd></dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00153">153</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
-</div>
-<div id="dynsection-8-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph" id="classCheMPS2_1_1FCI_ab4165b4fe1d0323f3d51014096602317_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6732e08ef3d229d8305b0f6af3f13eda" title="Constructor. " alt="" coords="278,5,421,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (see FCI.cpp for exact definition) " alt="" coords="254,56,445,83"/></map>
-</div>
-</p>
-
-</div>
-</div>
-<a class="anchor" id="a2501e84f004015b098b5ff806869fa88"></a>
+<a class="anchor" id="a0335191db1dec9127bcad548fa6f1da3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1996,40 +2160,13 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">double CheMPS2::FCI::GSDavidson </td>
           <td>(</td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>inoutput</em> = <code>NULL</code></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Calculates the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> ground state with Davidson's algorithm. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">inoutput</td><td>If inoutput!=NULL, vector with <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> variables which contains on exit the solution of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> calculation </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The ground state energy </dd></dl>
-
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01508">1508</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a870a90481d3d92fd688c3dd35175e505"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double CheMPS2::FCI::GSSmallCISpace </td>
-          <td>(</td>
-          <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>Nslaters</em>, </td>
+          <td class="paramname"><em>inoutput</em> = <code>NULL</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>vec</em>&#160;</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>DAVIDSON_NUM_VEC</em> = <code>CheMPS2::HEFF_DAVIDSON_NUM_VEC</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2039,23 +2176,26 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculates the CI ground state in a small space of low-energy Slater determinants with lapack's dsyev. </p>
+<p>Calculates the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> ground state with Davidson's algorithm. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Nslaters</td><td>The number of low-energy Slater determinants to consider </td></tr>
-    <tr><td class="paramname">vec</td><td>Vector with <a class="el" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. ">getVecLength()</a> variables which contains on exit the solution of the small CI calculation </td></tr>
+    <tr><td class="paramname">inoutput</td><td>If inoutput!=NULL, vector with getVecLength(0) variables which contains the initial guess at the start, and on exit the solution of the <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> calculation </td></tr>
+    <tr><td class="paramname">DAVIDSON_NUM_VEC</td><td>The maximum number of vectors to use in Davidson's algorithm; adjustable in case memory becomes an issue </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The small CI ground state energy </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The ground state energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01230">1230</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01455">1455</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
 <a class="anchor" id="a96e5332d478b2d00133372ba425b14ee"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void CheMPS2::FCI::HamTimesVec </td>
@@ -2075,18 +2215,43 @@ Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Function which performs the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times Vector product (without Econstant!!) </p>
+<p>Function which performs the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times Vector product (without Econstant!!) making use of the (ij|kl) = (ji|kl) = (ij|lk) = (ji|lk) symmetry of the electron repulsion integrals. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">input</td><td>The vector on which the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> should act </td></tr>
-    <tr><td class="paramname">output</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times input on exit </td></tr>
+    <tr><td class="paramname">input</td><td>The vector of length getVecLength(0) on which the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> should act </td></tr>
+    <tr><td class="paramname">output</td><td>Vector of length getVecLength(0) which contains on exit the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> times input </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00430">430</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00548">548</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a748644c42be72710e38631e169b642cc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long CheMPS2::FCI::LowestEnergyDeterminant </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the global counter of the Slater determinant with the lowest energy. </p>
+<dl class="section return"><dt>Returns</dt><dd>The global counter of the Slater determinant with the lowest energy </dd></dl>
+
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01235">1235</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2162,14 +2327,14 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for exact definition) </p>
+<p>Calculate the retarded Green's function (see <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a> for the exact definition) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">omega</td><td>The frequency value </td></tr>
     <tr><td class="paramname">eta</td><td>The regularization parameter (... + I*eta in the denominator) </td></tr>
     <tr><td class="paramname">orb_alpha</td><td>The first orbital index </td></tr>
     <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
-    <tr><td class="paramname">isUp</td><td>Whether or not the spin projection value of the second quantized operators is up (alpha) </td></tr>
+    <tr><td class="paramname">isUp</td><td>If true, the spin projection value of the second quantized operators is up (alpha), otherwise it will be down (beta) </td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
     <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, which contains the matrix elements </td></tr>
@@ -2179,22 +2344,22 @@ Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01928">1928</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01993">1993</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
-<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-9-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph" id="classCheMPS2_1_1FCI_aaa00a4720e4796700dc9ebd83aa71cfc_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="246,12,501,39"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ab4165b4fe1d0323f3d51014096602317" title="Getter for the number of variables in the FCI vector. " alt="" coords="273,63,473,89"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set this FCI vector to a creator/annihilator acting on a previous FCI vector. " alt="" coords="268,114,479,155"/><area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculates the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with ..." alt="" coords="264,180,483,207"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="553,5,748,46"/><area shape="rect" id="node6" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="578,71,723,97"/><area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="550,121,751,148"/><area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="556,172,745,199"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="255,5,455,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="249,57,460,98"/><area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with c..." alt="" coords="245,123,464,149"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="541,13,686,40"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="513,64,714,91"/><area shape="rect" id="node6" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="519,115,708,141"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="af36d52d8316d93b3990980576c763d65"></a>
+<a class="anchor" id="aee672b186854b9fdaf2402203892852e"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -2205,7 +2370,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">void CheMPS2::FCI::str2bits </td>
           <td>(</td>
           <td class="paramtype">const unsigned int&#160;</td>
-          <td class="paramname"><em>L</em>, </td>
+          <td class="paramname"><em>Lvalue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2227,7 +2392,7 @@ Protected Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -2235,14 +2400,14 @@ Protected Member Functions</h2></td></tr>
 <p>Convertor between two representations of a same spin-projection Slater determinant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">L</td><td>The number of orbitals </td></tr>
+    <tr><td class="paramname">Lvalue</td><td>The number of orbitals </td></tr>
     <tr><td class="paramname">bitstring</td><td>The input integer, whos bits are the occupation numbers of the orbitals </td></tr>
-    <tr><td class="paramname">bits</td><td>Contains on exit the L bits of bitstring </td></tr>
+    <tr><td class="paramname">bits</td><td>Contains on exit the Lvalue bits of bitstring </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00256">256</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00409">409</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2256,7 +2421,7 @@ Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Fri Nov 14 2014 00:02:18 for CheMPS2 by
+    <li class="footer">Generated on Tue Nov 18 2014 22:44:04 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
