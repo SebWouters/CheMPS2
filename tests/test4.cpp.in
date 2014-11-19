@@ -84,8 +84,11 @@ int main(void){
    delete OptScheme;
    
    //Calculate FCI reference energy
+   const int Nel_up   = ( N + TwoS ) / 2;
+   const int Nel_down = ( N - TwoS ) / 2;
+   const double maxMemWorkMB = 10.0;
    const int FCIverbose = 1;
-   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Prob, FCIverbose);
+   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
    const double EnergyFCI = theFCI->GSDavidson(NULL);
    
    //Clean up FCI

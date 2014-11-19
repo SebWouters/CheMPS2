@@ -53,24 +53,29 @@ int main(void){
    TwoS[5] = 2; Irreps[5] = 6;
    
    for (int counter=0; counter<nSectors; counter++){
-
+      
+      //Perform full configuration interation
+      const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
+      const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
+      const double maxMemWorkMB = 10.0;
+      const int FCIverbose = 1;
+      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
+      double * inoutput = new double[theFCI->getVecLength(0)];
+      theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
+      inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+      EFCI[counter] = theFCI->GSDavidson(inoutput);
+      theFCI->CalcSpinSquared(inoutput);
+      delete [] inoutput;
+      delete theFCI;
+      
       //The targeted symmetry sector and the Hamiltonian form together a FCI problem
       CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS[counter], Nelec, Irreps[counter]);
       
-      //Perform full configuration interation
-      const int FCIverbose = 1;
-      CheMPS2::FCI theFCI(Prob, FCIverbose);
-      double * inoutput = new double[theFCI.getVecLength()];
-      const unsigned int NLowEnergyDet = 1;
-      theFCI.GSSmallCISpace(NLowEnergyDet, inoutput);
-      EFCI[counter] = theFCI.GSDavidson(inoutput);
-      theFCI.CalcSpinSquared(inoutput);
-      delete [] inoutput;
-      
       //To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
       CheMPS2::ConvergenceScheme OptScheme(1);
-      //OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+      //Instructions can be set with OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
       OptScheme.setInstruction(0, 2000, 1e-10, 100, 0.0);
+      
       CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, &OptScheme);
       EDMRG[counter] = theDMRG->Solve();
       theDMRG->calc2DMandCorrelations();

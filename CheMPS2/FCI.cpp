@@ -29,72 +29,24 @@ using std::endl;
 #include "Irreps.h"
 #include "Lapack.h"
 
-CheMPS2::FCI::FCI(Problem * Prob, const int FCIverbose_in){
+CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigned int theNel_down, const int TargetIrrep_in, const double maxMemWorkMB_in, const int FCIverbose_in){
 
-   // Amount of output
-   FCIverbose = FCIverbose_in;
-
-   // Number of orbitals
-   assert( Prob->checkConsistency() );
-   L = Prob->gL();
-   assert( L <= CHAR_BIT * sizeof(unsigned int) );
-
-   // Everything which has to do with irreps
-   CheMPS2::Irreps myIrreps( Prob->gSy() );
-   NumIrreps         = myIrreps.getNumberOfIrreps();
-   TargetIrrep       = Prob->gIrrep();
-   IrrepProductTable = new int[ NumIrreps * NumIrreps ];
-   orb2irrep         = new int[ L ];
-   for (unsigned int row = 0; row < NumIrreps; row++){
-      for (unsigned int col = 0; col < NumIrreps; col++){
-         IrrepProductTable[ row + NumIrreps * col ] = myIrreps.directProd( row , col );
-      }
-   }
-   for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Prob->gIrrep( orb ); }
-   
-   // Number of up and down electrons: only spin projection symmetry is used
-   Nel_up   = ( Prob->gN() + Prob->gTwoS() )/2;
-   Nel_down = ( Prob->gN() - Prob->gTwoS() )/2;
-   
-   // Copy the Hamiltonian over for speed
-   Econstant = Prob->gEconst();
-   Hmat = new double[ L * L * L * L ];
-   for (unsigned int orb1 = 0; orb1 < L; orb1++){
-      for (unsigned int orb2 = 0; orb2 < L; orb2++){
-         for (unsigned int orb3 = 0; orb3 < L; orb3++){
-            for (unsigned int orb4 = 0; orb4 < L; orb4++){
-               Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] = Prob->gMxElement( orb1 , orb2 , orb3 , orb4 );
-            }
-         }
-      }
-   }
-   
-   // Set all other internal variables
-   Startup();
-   if ( FCIverbose > 0 ){ cout << "FCI::FCI : Number of variables in the FCI vector = " << getVecLength() << endl; }
-
-}
-
-CheMPS2::FCI::FCI(Problem * Prob, const unsigned int theNel_up, const unsigned int theNel_down, const int FCIverbose_in){
-
-   // Amount of output
-   FCIverbose = FCIverbose_in;
-
-   // Number of orbitals
-   assert( Prob->checkConsistency() );
-   L = Prob->gL();
-   assert( L <= CHAR_BIT * sizeof(unsigned int) );
-   assert( theNel_up>=0 );
-   assert( theNel_down>=0 );
-   assert( theNel_up<=L );
-   assert( theNel_down<=L );
-   Nel_up = theNel_up;
+   // Copy the basic information
+   FCIverbose   = FCIverbose_in;
+   maxMemWorkMB = maxMemWorkMB_in;
+   L = Ham->getL();
+   assert( theNel_up    >= 0 );
+   assert( theNel_down  >= 0 );
+   assert( theNel_up    <= L );
+   assert( theNel_down  <= L );
+   assert( maxMemWorkMB >  0.0 );
+   Nel_up   = theNel_up;
    Nel_down = theNel_down;
-
-   // Everything which has to do with irreps
-   CheMPS2::Irreps myIrreps( Prob->gSy() );
+   
+   // Construct the irrep product table and the list with the orbitals irreps
+   CheMPS2::Irreps myIrreps( Ham->getNGroup() );
    NumIrreps         = myIrreps.getNumberOfIrreps();
-   TargetIrrep       = Prob->gIrrep();
+   TargetIrrep       = TargetIrrep_in;
    IrrepProductTable = new int[ NumIrreps * NumIrreps ];
    orb2irrep         = new int[ L ];
    for (unsigned int row = 0; row < NumIrreps; row++){
@@ -102,33 +54,45 @@ CheMPS2::FCI::FCI(Problem * Prob, const unsigned int theNel_up, const unsigned i
          IrrepProductTable[ row + NumIrreps * col ] = myIrreps.directProd( row , col );
       }
    }
-   for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Prob->gIrrep( orb ); }
-   
-   // Copy the Hamiltonian over
-   Econstant = Prob->gEconst();
-   Hmat = new double[ L * L * L * L ];
+   for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Ham->getOrbitalIrrep( orb ); }
+
+   /* Copy the Hamiltonian over:
+         G_ij = T_ij - 0.5 \sum_k <ik|kj> and ERI_{ijkl} = <ij|kl>
+         <ij|kl> is the electron repulsion integral, int dr1 dr2 i(r1) j(r1) k(r2) l(r2) / |r1-r2| */
+   Econstant = Ham->getEconst();
+   Gmat = new double[ L * L ];
+   ERI  = new double[ L * L * L * L ];
    for (unsigned int orb1 = 0; orb1 < L; orb1++){
       for (unsigned int orb2 = 0; orb2 < L; orb2++){
+         double tempvar = 0.0;
          for (unsigned int orb3 = 0; orb3 < L; orb3++){
+            tempvar += Ham->getVmat( orb1, orb3, orb3, orb2 );
             for (unsigned int orb4 = 0; orb4 < L; orb4++){
-               Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] = Prob->gMxElement( orb1 , orb2 , orb3 , orb4 );
+               // CheMPS2::Hamiltonian uses physics notation ; ERI chemists notation.
+               ERI[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] = Ham->getVmat( orb1 , orb3 , orb2 , orb4 );
             }
          }
+         Gmat[ orb1 + L * orb2 ] = Ham->getTmat( orb1 , orb2 ) - 0.5 * tempvar;
       }
    }
    
    // Set all other internal variables
-   Startup();
-   if ( FCIverbose > 0 ){ cout << "FCI::FCI : Number of variables in the FCI vector = " << getVecLength() << endl; }
+   StartupCountersVsBitstrings();
+   StartupLookupTables();
+   StartupIrrepCenter();
 
 }
 
 CheMPS2::FCI::~FCI(){
-
+   
+   // FCI::FCI
    delete [] IrrepProductTable;
    delete [] orb2irrep;
-   delete [] Hmat;
-   for (unsigned int irrep=0; irrep<NumIrreps; irrep++){
+   delete [] Gmat;
+   delete [] ERI;
+   
+   // FCI::StartupCountersVsBitstrings
+   for ( unsigned int irrep=0; irrep<NumIrreps; irrep++ ){
       delete [] str2cnt_up[irrep];
       delete [] str2cnt_down[irrep];
       delete [] cnt2str_up[irrep];
@@ -140,44 +104,56 @@ CheMPS2::FCI::~FCI(){
    delete [] cnt2str_down;
    delete [] numPerIrrep_up;
    delete [] numPerIrrep_down;
-   delete [] jumps;
+   
+   // FCI::StartupLookupTables
+   for ( unsigned int irrep=0; irrep<NumIrreps; irrep++ ){
+      delete [] lookup_cnt_alpha[irrep];
+      delete [] lookup_cnt_beta[irrep];
+      delete [] lookup_irrep_alpha[irrep];
+      delete [] lookup_irrep_beta[irrep];
+      delete [] lookup_sign_alpha[irrep];
+      delete [] lookup_sign_beta[irrep];
+   }
+   delete [] lookup_cnt_alpha;
+   delete [] lookup_cnt_beta;
+   delete [] lookup_irrep_alpha;
+   delete [] lookup_irrep_beta;
+   delete [] lookup_sign_alpha;
+   delete [] lookup_sign_beta;
+   
+   // FCI::StartupIrrepCenter
+   for ( unsigned int irrep=0; irrep<NumIrreps; irrep++ ){
+      delete [] irrep_center_crea_orb[irrep];
+      delete [] irrep_center_anni_orb[irrep];
+      delete [] irrep_center_jumps[irrep];
+   }
+   delete [] irrep_center_crea_orb;
+   delete [] irrep_center_anni_orb;
+   delete [] irrep_center_jumps;
+   delete [] irrep_center_num;
+   delete [] HXVworksmall;
+   delete [] HXVworkbig1;
+   delete [] HXVworkbig2;
 
 }
 
-unsigned int CheMPS2::FCI::getL() const{ return L; }
+void CheMPS2::FCI::StartupCountersVsBitstrings(){
 
-unsigned int CheMPS2::FCI::getNel_up() const{ return Nel_up; }
-
-unsigned int CheMPS2::FCI::getNel_down() const{ return Nel_down; }
-
-unsigned long long CheMPS2::FCI::getVecLength() const{ return jumps[ NumIrreps ]; }
-
-unsigned int CheMPS2::FCI::getNumIrreps() const{ return NumIrreps; }
-
-int CheMPS2::FCI::getTargetIrrep() const{ return TargetIrrep; }
-
-int CheMPS2::FCI::getIrrepProduct(const int Irrep_row, const int Irrep_col) const{ return IrrepProductTable[ Irrep_row + NumIrreps * Irrep_col ]; }
-
-int CheMPS2::FCI::getOrb2Irrep(const int orb) const{ return orb2irrep[ orb ]; }
-
-double CheMPS2::FCI::getEconst() const{ return Econstant; }
-
-double CheMPS2::FCI::getHmat(const int orb1, const int orb2, const int orb3, const int orb4) const{ return Hmat[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ]; }
-
-void CheMPS2::FCI::Startup(){
-
-   // Variable which is only needed in Startup: 2^L
+   // Can you represent the alpha and beta Slater determinants as unsigned integers?
+   assert( L <= CHAR_BIT * sizeof(unsigned int) );
+   
+   // Variable which is only needed here: 2^L
    unsigned int TwoPowL = 1;
    for (unsigned int orb = 0; orb < L; orb++){ TwoPowL *= 2; }
 
-   // Create a bunch of stuff
-   numPerIrrep_up   = new unsigned int[ NumIrreps];
-   numPerIrrep_down = new unsigned int[ NumIrreps];
-   str2cnt_up       = new int*[NumIrreps];
-   str2cnt_down     = new int*[NumIrreps];
-   cnt2str_up       = new unsigned int*[NumIrreps];
-   cnt2str_down     = new unsigned int*[NumIrreps];
-
+   // Create the required arrays to perform the conversions between counters and bitstrings
+   numPerIrrep_up     = new unsigned int[ NumIrreps ];
+   numPerIrrep_down   = new unsigned int[ NumIrreps ];
+   str2cnt_up         = new int*[ NumIrreps ];
+   str2cnt_down       = new int*[ NumIrreps ];
+   cnt2str_up         = new unsigned int*[ NumIrreps ];
+   cnt2str_down       = new unsigned int*[ NumIrreps ];
+   
    for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
       numPerIrrep_up  [ irrep ] = 0;
       numPerIrrep_down[ irrep ] = 0;
@@ -195,14 +171,14 @@ void CheMPS2::FCI::Startup(){
       unsigned int Nparticles = 0;
       int Irrep = 0;
       for (unsigned int orb=0; orb<L; orb++){
-         if (bits[orb]){
+         if ( bits[orb] ){
             Nparticles++;
-            Irrep = getIrrepProduct( Irrep , orb2irrep[ orb ] );
+            Irrep = getIrrepProduct( Irrep , getOrb2Irrep( orb ) );
          }
       }
       
       // If allowed: set the corresponding str2cnt to the correct counter and keep track of the number of allowed vectors
-      for (unsigned int irr = 0; irr < NumIrreps; irr++){
+      for ( unsigned int irr = 0; irr < NumIrreps; irr++ ){
          str2cnt_up  [ irr ][ bitstring ] = -1;
          str2cnt_down[ irr ][ bitstring ] = -1;
       }
@@ -217,40 +193,217 @@ void CheMPS2::FCI::Startup(){
    
    }
    
-   delete [] bits; // Delete temporary helper array
-   
    // Fill the reverse info array: cnt2str
-   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
+   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
    
-      if ( FCIverbose > 1 ){
+      if ( FCIverbose>1 ){
          cout << "FCI::Startup : For irrep " << irrep << " there are " << numPerIrrep_up  [ irrep ] << " alpha Slater determinants and "
                                                                        << numPerIrrep_down[ irrep ] <<  " beta Slater determinants." << endl;
       }
-                                                                              
+      
       cnt2str_up  [ irrep ] = new unsigned int[ numPerIrrep_up  [ irrep ] ];
       cnt2str_down[ irrep ] = new unsigned int[ numPerIrrep_down[ irrep ] ];
-      
       for (unsigned int bitstring = 0; bitstring < TwoPowL; bitstring++){
-         if ( str2cnt_up[ irrep ][ bitstring ] != -1 ){
-            cnt2str_up[ irrep ][ str2cnt_up[ irrep ][ bitstring ] ] = bitstring;
+         if ( str2cnt_up  [ irrep ][ bitstring ] != -1 ){ cnt2str_up  [ irrep ][ str2cnt_up  [ irrep ][ bitstring ] ] = bitstring; }
+         if ( str2cnt_down[ irrep ][ bitstring ] != -1 ){ cnt2str_down[ irrep ][ str2cnt_down[ irrep ][ bitstring ] ] = bitstring; }
+      }
+   
+   }
+   
+   delete [] bits; // Delete temporary helper array
+
+}
+
+void CheMPS2::FCI::StartupLookupTables(){
+
+   // Create a bunch of stuff
+   lookup_cnt_alpha   = new int*[ NumIrreps ];
+   lookup_cnt_beta    = new int*[ NumIrreps ];
+   lookup_irrep_alpha = new int*[ NumIrreps ];
+   lookup_irrep_beta  = new int*[ NumIrreps ];
+   lookup_sign_alpha  = new int*[ NumIrreps ];
+   lookup_sign_beta   = new int*[ NumIrreps ];
+   
+   int * bits = new int[ L ]; // Temporary helper array
+   
+   // Quick lookup tables for " sign | new > = E^spinproj_{ij} | old >
+   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+      
+      lookup_cnt_alpha  [ irrep ] = new int[ L * L * numPerIrrep_up[ irrep ] ];
+      lookup_irrep_alpha[ irrep ] = new int[ L * L * numPerIrrep_up[ irrep ] ];
+      lookup_sign_alpha [ irrep ] = new int[ L * L * numPerIrrep_up[ irrep ] ];
+      
+      for ( unsigned int cnt_new_alpha = 0; cnt_new_alpha < numPerIrrep_up[ irrep ]; cnt_new_alpha++ ){
+      
+         for ( unsigned int i = 0; i < L; i++ ){
+            for ( unsigned int j = 0; j < L; j++){
+               // Check for the sign. If no check for sign, you multiply with sign 0 and everything should be OK...
+               lookup_cnt_alpha  [irrep][ i + L * ( j + L * cnt_new_alpha ) ] = 0;
+               lookup_irrep_alpha[irrep][ i + L * ( j + L * cnt_new_alpha ) ] = 0;
+               lookup_sign_alpha [irrep][ i + L * ( j + L * cnt_new_alpha ) ] = 0;
+            }
          }
-         if ( str2cnt_down[ irrep ][ bitstring ] != -1 ){
-            cnt2str_down[ irrep ][ str2cnt_down[ irrep ][ bitstring ] ] = bitstring;
+      
+         str2bits( L , cnt2str_up[ irrep ][ cnt_new_alpha ] , bits );
+      
+         int phase_creator = 1;
+         for ( unsigned int creator = 0; creator < L; creator++ ){
+            if ( bits[ creator ] ){
+               bits[ creator ] = 0;
+                  
+               int phase_annihilator = 1;
+               for ( unsigned int annihilator = 0; annihilator < L; annihilator++ ){
+                  if ( !(bits[ annihilator ]) ){
+                     bits[ annihilator ] = 1;
+                     
+                     const int irrep_old = getIrrepProduct( irrep , getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) );
+                     const int cnt_old = str2cnt_up[ irrep_old ][ bits2str( L , bits ) ];
+                     const int phase = phase_creator * phase_annihilator;
+                     
+                     lookup_cnt_alpha  [irrep][ creator + L * ( annihilator + L * cnt_new_alpha ) ] = cnt_old;
+                     lookup_irrep_alpha[irrep][ creator + L * ( annihilator + L * cnt_new_alpha ) ] = irrep_old;
+                     lookup_sign_alpha [irrep][ creator + L * ( annihilator + L * cnt_new_alpha ) ] = phase;
+                     
+                     bits[ annihilator ] = 0;
+                  } else {
+                     phase_annihilator *= -1;
+                  }
+               }
+               
+               bits[ creator ] = 1;
+               phase_creator *= -1;
+            }
+         }
+      }
+      
+      lookup_cnt_beta  [ irrep ] = new int[ L * L * numPerIrrep_down[ irrep ] ];
+      lookup_irrep_beta[ irrep ] = new int[ L * L * numPerIrrep_down[ irrep ] ];
+      lookup_sign_beta [ irrep ] = new int[ L * L * numPerIrrep_down[ irrep ] ];
+      
+      for ( unsigned int cnt_new_beta = 0; cnt_new_beta < numPerIrrep_down[ irrep ]; cnt_new_beta++ ){
+      
+         for ( unsigned int i = 0; i < L; i++ ){
+            for ( unsigned int j = 0; j < L; j++ ){
+               // Check for the sign. If no check for sign, you multiply with sign and everything should be OK...
+               lookup_cnt_beta  [irrep][ i + L * ( j + L * cnt_new_beta ) ] = 0;
+               lookup_irrep_beta[irrep][ i + L * ( j + L * cnt_new_beta ) ] = 0;
+               lookup_sign_beta [irrep][ i + L * ( j + L * cnt_new_beta ) ] = 0;
+            }
+         }
+      
+         str2bits( L , cnt2str_down[ irrep ][ cnt_new_beta ] , bits );
+      
+         int phase_creator = 1;
+         for ( unsigned int creator = 0; creator < L; creator++ ){
+            if ( bits[ creator ] ){
+               bits[ creator ] = 0;
+                  
+               int phase_annihilator = 1;
+               for ( unsigned int annihilator = 0; annihilator < L; annihilator++ ){
+                  if ( !(bits[ annihilator ]) ){
+                     bits[ annihilator ] = 1;
+                     
+                     const int irrep_old = getIrrepProduct( irrep , getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) );
+                     const int cnt_old = str2cnt_down[ irrep_old ][ bits2str( L , bits ) ];
+                     const int phase = phase_creator * phase_annihilator;
+                     
+                     lookup_cnt_beta  [irrep][ creator + L * ( annihilator + L * cnt_new_beta ) ] = cnt_old;
+                     lookup_irrep_beta[irrep][ creator + L * ( annihilator + L * cnt_new_beta ) ] = irrep_old;
+                     lookup_sign_beta [irrep][ creator + L * ( annihilator + L * cnt_new_beta ) ] = phase;
+                     
+                     bits[ annihilator ] = 0;
+                  } else {
+                     phase_annihilator *= -1;
+                  }
+               }
+               
+               bits[ creator ] = 1;
+               phase_creator *= -1;
+            }
+         }
+      }
+      
+   }
+   
+   delete [] bits; // Delete temporary helper array
+
+}
+
+void CheMPS2::FCI::StartupIrrepCenter(){
+
+   // Find the orbital combinations which can form a center irrep
+   irrep_center_num      = new unsigned int [ NumIrreps ];
+   irrep_center_crea_orb = new unsigned int*[ NumIrreps ];
+   irrep_center_anni_orb = new unsigned int*[ NumIrreps ];
+   
+   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+      const int irrep_center_const_signed = irrep_center;
+   
+      irrep_center_num[ irrep_center ] = 0;
+      for ( unsigned int creator = 0; creator < L; creator++ ){
+         for ( unsigned int annihilator = creator; annihilator < L; annihilator++ ){
+            if ( getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
+               irrep_center_num[ irrep_center ] += 1;
+            }
+         }
+      }
+      irrep_center_crea_orb[ irrep_center ] = new unsigned int[ irrep_center_num[ irrep_center ] ];
+      irrep_center_anni_orb[ irrep_center ] = new unsigned int[ irrep_center_num[ irrep_center ] ];
+      irrep_center_num[ irrep_center ] = 0;
+      for ( unsigned int creator = 0; creator < L; creator++ ){
+         for ( unsigned int annihilator = creator; annihilator < L; annihilator++){
+            if ( getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
+               irrep_center_crea_orb[ irrep_center ][ irrep_center_num[ irrep_center ] ] = creator;
+               irrep_center_anni_orb[ irrep_center ][ irrep_center_num[ irrep_center ] ] = annihilator;
+               irrep_center_num[ irrep_center ] += 1;
+            }
          }
       }
    
    }
    
-   // Jumps contains information on irrep of a FCI array index
-   jumps = new unsigned long long[ NumIrreps+1 ];
-   jumps[ 0 ] = 0;
-   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
-      const int irrep_down = getIrrepProduct( irrep , TargetIrrep );
-      unsigned long long temp  = numPerIrrep_up  [ irrep      ];
-                         temp *= numPerIrrep_down[ irrep_down ];
-      jumps[ irrep+1 ] = jumps[ irrep ] + temp;
+   irrep_center_jumps = new unsigned long long*[ NumIrreps ];
+   HXVsizeWorkspace = 0;
+   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   
+      irrep_center_jumps[ irrep_center ] = new unsigned long long[ NumIrreps+1 ];
+      const int localTargetIrrep = getIrrepProduct( irrep_center , getTargetIrrep() );
+      irrep_center_jumps[ irrep_center ][ 0 ] = 0;
+      for ( unsigned int irrep_up = 0; irrep_up < NumIrreps; irrep_up++ ){
+         const int irrep_down = getIrrepProduct( irrep_up , localTargetIrrep );
+         unsigned long long temp  = numPerIrrep_up  [ irrep_up   ];
+                            temp *= numPerIrrep_down[ irrep_down ];
+         irrep_center_jumps[ irrep_center ][ irrep_up+1 ] = irrep_center_jumps[ irrep_center ][ irrep_up ] + temp;
+      }
+      if ( irrep_center_num[ irrep_center ] * irrep_center_jumps[ irrep_center ][ NumIrreps ] > HXVsizeWorkspace ){
+         HXVsizeWorkspace = irrep_center_num[ irrep_center ] * irrep_center_jumps[ irrep_center ][ NumIrreps ];
+      }
    }
-
+   if ( FCIverbose>0 ){
+      cout << "FCI::Startup : Number of variables in the FCI vector = " << getVecLength(0) << endl;
+      unsigned long long numberOfBytes = 2 * sizeof(double) * HXVsizeWorkspace;
+      
+      cout << "FCI::Startup : Without additional loops the FCI matrix-vector product requires a workspace of " << 1e-6 * numberOfBytes << " MB memory." << endl;
+      if ( maxMemWorkMB < 1e-6 * numberOfBytes ){
+         HXVsizeWorkspace = (unsigned long long) ceil( ( maxMemWorkMB * 1e6 ) / ( 2 * sizeof(double ) ) );
+         numberOfBytes = 2 * sizeof(double) * HXVsizeWorkspace;
+         cout << "               For practical purposes, the workspace is constrained to " << 1e-6 * numberOfBytes << " MB memory." << endl;
+      }
+   }
+   HXVworksmall = new double[ L * L * L * L ];
+   HXVworkbig1  = new double[ HXVsizeWorkspace ];
+   HXVworkbig2  = new double[ HXVsizeWorkspace ];
+   
+   // Check for the lapack routines { dgemm_ , daxpy_ , dscal_ , dcopy_ , ddot_ }
+   unsigned long long maxVecLength = 0;
+   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+      if ( getVecLength( irrep ) > maxVecLength ){
+         maxVecLength = getVecLength( irrep );
+      }
+   }
+   const unsigned int max_integer = INT_MAX;
+   assert( max_integer >= maxVecLength );
+   
 }
 
 void CheMPS2::FCI::str2bits(const unsigned int Lval, const unsigned int bitstring, int * bits){
@@ -271,21 +424,23 @@ unsigned int CheMPS2::FCI::bits2str(const unsigned int Lval, int * bits){
 
 }
 
-int CheMPS2::FCI::getUpIrrepOfCounter(const unsigned long long counter) const{
+int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned long long counter) const{
 
    int irrep_up = NumIrreps;
-   while ( counter < jumps[ irrep_up-1 ] ){ irrep_up--; }
+   while ( counter < irrep_center_jumps[ irrep_center ][ irrep_up-1 ] ){ irrep_up--; }
    return irrep_up-1;
    
 }
 
-void CheMPS2::FCI::getBitsOfCounter(const unsigned long long counter, int * bits_up, int * bits_down) const{
+void CheMPS2::FCI::getBitsOfCounter(const int irrep_center, const unsigned long long counter, int * bits_up, int * bits_down) const{
 
-   const int irrep_up   = getUpIrrepOfCounter( counter );
-   const int irrep_down = getIrrepProduct( irrep_up , TargetIrrep );
+   const int localTargetIrrep = getIrrepProduct( irrep_center , TargetIrrep );
    
-   const unsigned int count_up   = ( counter - jumps[ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
-   const unsigned int count_down = ( counter - jumps[ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
+   const int irrep_up   = getUpIrrepOfCounter( irrep_center , counter );
+   const int irrep_down = getIrrepProduct( irrep_up , localTargetIrrep );
+   
+   const unsigned int count_up   = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
+   const unsigned int count_down = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
    
    const unsigned int string_up   = cnt2str_up  [ irrep_up   ][ count_up   ];
    const unsigned int string_down = cnt2str_down[ irrep_down ][ count_down ];
@@ -302,9 +457,9 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    
    int irrep_up   = 0;
    int irrep_down = 0;
-   for (unsigned int cnt=0; cnt<L; cnt++){
-      if ( bits_up  [ cnt ] ){ irrep_up   = getIrrepProduct( irrep_up   , getOrb2Irrep( cnt ) ); }
-      if ( bits_down[ cnt ] ){ irrep_down = getIrrepProduct( irrep_down , getOrb2Irrep( cnt ) ); }
+   for ( unsigned int orb = 0; orb < L; orb++ ){
+      if ( bits_up  [ orb ] ){ irrep_up   = getIrrepProduct( irrep_up   , getOrb2Irrep( orb ) ); }
+      if ( bits_down[ orb ] ){ irrep_down = getIrrepProduct( irrep_down , getOrb2Irrep( orb ) ); }
    }
    
    const int counter_up   = str2cnt_up  [ irrep_up   ][ string_up   ];
@@ -312,668 +467,529 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    
    if (( counter_up == -1 ) || ( counter_down == -1 )){ return 0.0; }
    
-   return vector[ jumps[ irrep_up ] + counter_up + numPerIrrep_up[ irrep_up ] * counter_down ];
+   return vector[ irrep_center_jumps[ 0 ][ irrep_up ] + counter_up + numPerIrrep_up[ irrep_up ] * counter_down ];
 
 }
 
-void CheMPS2::FCI::ActWithNumberOperator(const unsigned int orbIndex, double * resultVector, double * sourceVector) const{
+/*void CheMPS2::FCI::CheckHamDEBUG() const{
 
-   assert( orbIndex>=0 );
-   assert( orbIndex<L  );
-
-   int * bits_up    = new int[ L ];
-   int * bits_down  = new int[ L ];
-
-   const unsigned long long vecLength = getVecLength();
-   for (unsigned long long counter = 0; counter < vecLength; counter++){
-      getBitsOfCounter( counter , bits_up , bits_down );
-      resultVector[ counter ] = ( bits_up[ orbIndex ] + bits_down[ orbIndex ] ) * sourceVector[ counter ];
+   const unsigned long long vecLength = getVecLength( 0 );
+   
+   // Building Ham by HamTimesVec
+   double * HamHXV = new double[ vecLength * vecLength ];
+   double * workspace = new double[ vecLength ];
+   for (unsigned long long count = 0; count < vecLength; count++){
+   
+      ClearVector( vecLength , workspace );
+      workspace[ count ] = 1.0;
+      HamTimesVec( workspace , HamHXV + count*vecLength );
+   
    }
    
-   delete [] bits_up;
-   delete [] bits_down;
-
-}
-
-void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, const FCI * otherFCI, double * otherVector) const{
-
-   assert( ( whichOperator=='C' ) || ( whichOperator=='A' ) ); //Operator should be a (C) Creator, or (A) Annihilator
-   assert( orbIndex>=0 );
-   assert( orbIndex<L  );
-   assert( L==otherFCI->getL() );
-
-   const unsigned long long vecLength = getVecLength();
-
-   if ( getTargetIrrep() != getIrrepProduct( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) )){
-      FCIdclear( vecLength , thisVector );
-      return;
+   // Building Diag by HamDiag
+   DiagHam( workspace );
+   double RMSdiagdifference = 0.0;
+   for (unsigned long long row = 0; row < vecLength; row++){
+      double diff = workspace[ row ] - HamHXV[ row + vecLength * row ];
+      RMSdiagdifference += diff * diff;
    }
-
-   int * bits_up    = new int[ L ];
-   int * bits_down  = new int[ L ];
+   RMSdiagdifference = sqrt( RMSdiagdifference );
+   cout << "The RMS difference of DiagHam() and diag(HamHXV) = " << RMSdiagdifference << endl;
    
-   if (( whichOperator=='C') && ( isUp )){
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
-         
-         getBitsOfCounter( counter , bits_up , bits_down );
-         
-         if ( bits_up[ orbIndex ] == 1 ){ // Operator = creator_up
-            bits_up[ orbIndex ] = 0;
-            int phase = 1;
-            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
-            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
-         } else {
-            thisVector[ counter ] = 0.0;
-         }
-         
+   // Building Ham by getMatrixElement
+   int * work     = new int[ 8 ];
+   int * ket_up   = new int[ L ];
+   int * ket_down = new int[ L ];
+   int * bra_up   = new int[ L ];
+   int * bra_down = new int[ L ];
+   double RMSconstructiondiff = 0.0;
+   for (unsigned long long row = 0; row < vecLength; row++){
+      for (unsigned long long col = 0; col < vecLength; col++){
+         getBitsOfCounter( 0 , row , bra_up , bra_down );
+         getBitsOfCounter( 0 , col , ket_up , ket_down );
+         double tempvar = HamHXV[ row + vecLength * col ] - GetMatrixElement( bra_up , bra_down , ket_up , ket_down , work );
+         RMSconstructiondiff += tempvar * tempvar;
       }
    }
+   cout << "The RMS difference of HamHXV - HamMXELEM = " << RMSconstructiondiff << endl;
+   delete [] work;
+   delete [] ket_up;
+   delete [] ket_down;
+   delete [] bra_up;
+   delete [] bra_down;
    
-   if (( whichOperator=='C') && ( !(isUp) )){
-      const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
-
-         getBitsOfCounter( counter , bits_up , bits_down );
-
-         if ( bits_down[ orbIndex ] == 1 ){ // Operator = creator_down
-            bits_down[ orbIndex ] = 0;
-            int phase = startphase;
-            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
-            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
-         } else {
-            thisVector[ counter ] = 0.0;
-         }
-
-      }
+   // Building Ham^2 by HamTimesVec
+   double * workspace2 = new double[ vecLength ];
+   for (unsigned long long count = 0; count < vecLength; count++){
+   
+      ClearVector( vecLength , workspace );
+      workspace[ count ] = 1.0;
+      HamTimesVec( workspace , workspace2 );
+      HamTimesVec( workspace2 , HamHXV + count*vecLength );
+   
    }
    
-   if (( whichOperator=='A') && ( isUp )){
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
-
-         getBitsOfCounter( counter , bits_up , bits_down );
-         
-         if ( bits_up[ orbIndex ] == 0 ){ // Operator = annihilator_up
-            bits_up[ orbIndex ] = 1;
-            int phase = 1;
-            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
-            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
-         } else {
-            thisVector[ counter ] = 0.0;
-         }
-
-      }
+   // Building diag( Ham^2 ) by DiagHamSquared
+   DiagHamSquared( workspace );
+   double RMSdiagdifference2 = 0.0;
+   for (unsigned long long row = 0; row < vecLength; row++){
+      double diff = workspace[ row ] - HamHXV[ row + vecLength * row ];
+      RMSdiagdifference2 += diff * diff;
    }
+   RMSdiagdifference2 = sqrt( RMSdiagdifference2 );
+   cout << "The RMS difference of DiagHamSquared() and diag(HamSquared by HXV) = " << RMSdiagdifference2 << endl;
    
-   if (( whichOperator=='A') && ( !(isUp) )){
-      const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+   delete [] workspace2;
+   delete [] workspace;
+   delete [] HamHXV;
 
-         getBitsOfCounter( counter , bits_up , bits_down );
-         
-         if ( bits_down[ orbIndex ] == 0 ){ // Operator = annihilator_down
-            bits_down[ orbIndex ] = 1;
-            int phase = startphase;
-            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
-            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
-         } else {
-            thisVector[ counter ] = 0.0;
-         }
-         
-      }
-   }
-   
-   delete [] bits_up;
-   delete [] bits_down;
-
-}
+}*/
 
 void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
 
-   /* TODO : Implement a Ham x Vec based on
+   ClearVector( getVecLength( 0 ) , output );
+
+   // P.J. Knowles and N.C. Handy, A new determinant-based full configuration interaction method, Chemical Physics Letters 111 (4-5), 315-321 (1984)
    
-      P.J. Knowles and N.C. Handy, A new determinant-based full configuration interaction method, Chemical Physics Letters 111 (4-5), 315-321 (1984)
-      
-      and construct similar adaptations of DiagHam, DiagHamSquared, CalcSpinSquared, ActWithSecondQuantizedOperator, getMatrixElement */
+   // irrep_center is the center irrep of the ERI : (ij|kl) --> irrep_center = I_i x I_j = I_k x I_l
+   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   
+      const unsigned long long localVecLength = getVecLength( irrep_center );
+      const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
+      const unsigned int numPairs = irrep_center_num[ irrep_center ];
 
-   #pragma omp parallel
-   {
+      const unsigned int space_per_vectorpiece = (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);
+      unsigned int numIterations = localVecLength / space_per_vectorpiece;
+      if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
 
-      int * bits_up    = new int[ L ];
-      int * bits_down  = new int[ L ];
+      for ( unsigned int iteration = 0; iteration < numIterations; iteration++ ){
       
-      const unsigned long long vecLength = getVecLength();
-      
-      #pragma omp for schedule(static)
-      for (unsigned long long outcounter = 0; outcounter < vecLength; outcounter++){
-      
-         //Clear the currently considered entry of the output vector
-         output[ outcounter ] = 0.0;
-      
-         //Find the irrep_up and irrep_down
-         const int irrep_out_up   = getUpIrrepOfCounter( outcounter );
-         const int irrep_out_down = getIrrepProduct( irrep_out_up , TargetIrrep );
+         const unsigned long long veccounter_start = iteration * space_per_vectorpiece;
+         const unsigned long long guess_stop       = ( iteration + 1 ) * space_per_vectorpiece;
+         const unsigned long long veccounter_stop  = ( guess_stop > localVecLength ) ? localVecLength : guess_stop;
+   
+         /******************************************************************************************************************************
+          *   First build workbig1[ i<=j + size(i<=j) * veccounter ] = E_{i<=j} + ( 1 - delta_i==j ) E_{j>i} (irrep_center) | input >  *
+          ******************************************************************************************************************************/
+         const unsigned long long loopsize = numPairs * ( veccounter_stop - veccounter_start );
+         #pragma omp parallel for schedule(static)
+         for ( unsigned long long loopvariable = 0; loopvariable < loopsize; loopvariable++ ){
          
-         //Find the counters for the alpha and the beta electrons
-         const unsigned int outcount_up   = ( outcounter - jumps[ irrep_out_up ] ) % numPerIrrep_up[ irrep_out_up ];
-         const unsigned int outcount_down = ( outcounter - jumps[ irrep_out_up ] ) / numPerIrrep_up[ irrep_out_up ];
-         
-         //Get the bits corresponding to this counter: since we already have most steps of "getBitsOfCounter" : copy the last steps here instead of calling the function
-         const unsigned int string_out_up   = cnt2str_up  [ irrep_out_up   ][ outcount_up   ];
-         const unsigned int string_out_down = cnt2str_down[ irrep_out_down ][ outcount_down ];
-         str2bits(L, string_out_up,   bits_up  );
-         str2bits(L, string_out_down, bits_down);
-         
-         //The Hamiltonian is given under the form H = 0.5 * sum_{ijkl sigma tau} getHmat(i,j,k,l) a^+_{i sigma} a^+_{j tau} a_{l tau} a_{k sigma}
-         //The product of the orbital irreps of the electrons which get removed should be equal to the product of the ones which are added again !!
-         
-         /*
-            Case 1: sigma and tau are up
-            The Hamiltonian can be rewritten as sum_{ i<j , k<l } ( h_ijkl - h_ijlk ) a^+_{i up} a^+_{j up} a_{l up} a_{k up}
-            The Slater determinant for the down electrons does not change. As a result the irreps for the up and down determinants cannot change either!
-         */
-         {
-            const unsigned long long incounter_offset = jumps[ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
+            const unsigned int pair               = loopvariable % numPairs;
+            const unsigned long long veccounter   = veccounter_start + ( loopvariable / numPairs );
+            const unsigned int creator            = irrep_center_crea_orb[ irrep_center ][ pair ];
+            const unsigned int annihilator        = irrep_center_anni_orb[ irrep_center ][ pair ];
+            const int irrep_new_up                = getUpIrrepOfCounter( irrep_center , veccounter );
+            const int irrep_new_down              = getIrrepProduct( irrep_new_up , localTargetIrrep );
+            const unsigned int count_new_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) % numPerIrrep_up[ irrep_new_up ];
+            const unsigned int count_new_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) / numPerIrrep_up[ irrep_new_up ];
             
-            //Loop i<j to remove from the output vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_up[ orbi ] ){
-                  bits_up[ orbi ] = 0;
-                  int phase_ij = 1;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_up[ orbj ] ){
-                        bits_up[ orbj ] = 0;
-                        const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the output vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_up[ orbk ]) ){
-                              bits_up[ orbk ] = 1;
-                              int phase_kl = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_up[ orbl ] = 1;
-                                    
-                                    //find the corresponding string and counter
-                                    const unsigned int string_in_up = bits2str(L, bits_up);
-                                    const int incount_up = str2cnt_up[ irrep_out_up ][ string_in_up ];
-                                    
-                                    //Add the contribution
-                                    const double factor = phase_ij * phase_kl * ( getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk) );
-                                    output[ outcounter ] += factor * input[ incounter_offset + incount_up ];
-                                    
-                                    bits_up[ orbl ] = 0;
-                                 }
-                                 if ( bits_up[ orbl ] ){ phase_kl *= -1; }
-                              }
-                              bits_up[ orbk ] = 0;
-                           }
-                        }
-                        bits_up[ orbj ] = 1;
-                        phase_ij *= -1;
-                     }
-                  }
-                  bits_up[ orbi ] = 1;
-               }
-            }
-         
-         }
-         
-         /* 
-            Case 2: sigma and tau are down
-            The Hamiltonian can be rewritten as sum_{ i<j , k<l } ( h_ijkl - h_ijlk ) a^+_{i down} a^+_{j down} a_{l down} a_{k down}
-            The Slater determinant for the up electrons does not change. As a result the irreps for the up and down determinants cannot change either!
-         */
-         {
-            const unsigned long long incounter_offset = jumps[ irrep_out_up ] + outcount_up;
+            double myResult = 0.0;
             
-            //Loop i<j to remove from the output vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_down[ orbi ] ){
-                  bits_down[ orbi ] = 0;
-                  int phase_ij = 1;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_down[ orbj ] ){
-                        bits_down[ orbj ] = 0;
-                        const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the output vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_down[ orbk ]) ){
-                              bits_down[ orbk ] = 1;
-                              int phase_kl = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_down[ orbl ] = 1;
-                                    
-                                    //find the corresponding string and counter
-                                    const unsigned int string_in_down = bits2str(L, bits_down);
-                                    const int incount_down = str2cnt_down[ irrep_out_down ][ string_in_down ];
-                                    
-                                    //Add the contribution
-                                    const double factor = phase_ij * phase_kl * ( getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk) );
-                                    output[ outcounter ] += factor * input[ incounter_offset + numPerIrrep_up[ irrep_out_up ] * incount_down ];
-                                    
-                                    bits_down[ orbl ] = 0;
-                                 }
-                                 if ( bits_down[ orbl ] ){ phase_kl *= -1; }
-                              }
-                              bits_down[ orbk ] = 0;
-                           }
-                        }
-                        bits_down[ orbj ] = 1;
-                        phase_ij *= -1;
-                     }
-                  }
-                  bits_down[ orbi ] = 1;
-               }
+            {
+               // E^{alpha}_{creator <= annihilator}
+               const int entry_up     = creator + L * ( annihilator + L * count_new_up );
+               const int sign_up      = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
+               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+               myResult += sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               
+               // E^{beta}_{creator <= annihilator}
+               const int entry_down   = creator + L * ( annihilator + L * count_new_down );
+               const int sign_down    = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+               const int cnt_old_down = lookup_cnt_beta [ irrep_new_down ][ entry_down ];
+               myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
             }
+            
+            if ( annihilator > creator ){
+               // E^{alpha}_{annihilator > creator}
+               const int entry_up     = annihilator + L * ( creator + L * count_new_up );
+               const int sign_up      = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
+               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+               myResult += sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               
+               // E^{beta}_{annihilator > creator}
+               const int entry_down   = annihilator + L * ( creator + L * count_new_down );
+               const int sign_down    = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+               const int cnt_old_down = lookup_cnt_beta [ irrep_new_down ][ entry_down ];
+               myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+            }
+            
+            HXVworkbig1[ loopvariable ] = myResult;
             
          }
          
-         /*
-            Case 3: sigma and tau are different
-            The Hamiltonian can be rewritten as sum_{ ijkl } h_ijkl * ( a^+_{i up} a_{k up} ) * ( a^+_{j down} a_{l down} )
-         */
-         {
+         /************************************************
+          *   If irrep_center==0, do the one-body terms  *
+          ************************************************/
+         if ( irrep_center==0 ){
+            for ( unsigned int pair = 0; pair < numPairs; pair++ ){
+               HXVworksmall[ pair ] = getGmat( irrep_center_crea_orb[ irrep_center ][ pair ] , irrep_center_anni_orb[ irrep_center ][ pair ] );
+            }
+            char trans  = 'T';
+            char notran = 'N';
+            double one  = 1.0;
+            int mdim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+            int kdim = numPairs;
+            int ndim = 1;
+            dgemm_( &trans, &notran, &mdim, &ndim, &kdim, &one, HXVworkbig1, &kdim, HXVworksmall, &kdim, &one, output + veccounter_start, &mdim );
+         }
          
-            //Loop orbi to REMOVE an UP electron from the output vector
-            int phase_i = 1;
-            for (unsigned int orbi = 0; orbi < L; orbi++){
-               if ( bits_up[ orbi ] ){
-                  bits_up[ orbi ] = 0;
-                  
-                  //Loop orbk to ADD an UP electron again to the output vector
-                  int phase_k = 1;
-                  for (unsigned int orbk = 0; orbk < L; orbk++){
-                     if ( !(bits_up[ orbk ]) ){
-                        bits_up[ orbk ] = 1;
-                        const int IrrepProd_ik = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
-                        const int irrep_in_up = getIrrepProduct( irrep_out_up , IrrepProd_ik );
-                        const unsigned int string_in_up = bits2str(L, bits_up);
-                        const int incount_up = str2cnt_up[ irrep_in_up ][ string_in_up ];
-                        const int phase_ik = phase_i * phase_k;
-                        
-                        //Loop orbj to REMOVE a DOWN electron from the output vector
-                        int phase_j = 1;
-                        for (unsigned int orbj = 0; orbj < L; orbj++){
-                           if ( bits_down[ orbj ] ){
-                              bits_down[ orbj ] = 0;
-
-                              //Loop orbl to ADD a DOWN electron again to the output vector
-                              int phase_l = 1;
-                              for (unsigned int orbl = 0; orbl < L; orbl++){
-                                 const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
-                                 if (( bits_down[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
-                                    bits_down[ orbl ] = 1;
-                                    
-                                    const int irrep_in_down = getIrrepProduct( irrep_out_down , IrrepProd_jl );
-                                    const unsigned int string_in_down = bits2str(L, bits_down);
-                                    const int incount_down = str2cnt_down[ irrep_in_down ][ string_in_down ];
-                                    
-                                    //Add the contribution
-                                    const unsigned long long incounter = jumps[ irrep_in_up ] + incount_up + numPerIrrep_up[ irrep_in_up ] * incount_down;
-                                    const double factor = phase_ik * phase_j * phase_l * getHmat(orbi, orbj, orbk, orbl);
-                                    output[ outcounter ] += factor * input[ incounter ];
-                                    
-                                    bits_down[ orbl ] = 0;
-                                 }
-                                 if ( bits_down[ orbl ] ){ phase_l *= -1; }
-                              }
-                              bits_down[ orbj ] = 1;
-                              phase_j *= -1;
-                           }
-                        }
-                        
-                        bits_up[ orbk ] = 0;
-                        
-                     } else { phase_k *= -1; }
-                  }
-                  
-                  bits_up[ orbi ] = 1;
-                  phase_i *= -1;
+         /****************************************************************************************************************************
+          *   Now build workbig2[ i<=j + size(i<=j) * veccounter] = 0.5 * ( i<=j | k<=l ) * workbig1[ k<=l + size(k<=l) * counter ]  *
+          ****************************************************************************************************************************/
+         {
+            for ( unsigned int pair1 = 0; pair1 < numPairs; pair1++ ){
+               for ( unsigned int pair2 = 0; pair2 < numPairs; pair2++ ){
+                  HXVworksmall[ pair1 + numPairs * pair2 ]
+                     = 0.5 * getERI( irrep_center_crea_orb[ irrep_center ][ pair1 ] , irrep_center_anni_orb[ irrep_center ][ pair1 ] ,
+                                     irrep_center_crea_orb[ irrep_center ][ pair2 ] , irrep_center_anni_orb[ irrep_center ][ pair2 ] );
                }
             }
-         
+            char notran = 'N';
+            double one  = 1.0;
+            double zero = 0.0;
+            int mdim = numPairs;
+            int kdim = numPairs;
+            int ndim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+            dgemm_( &notran , &notran , &mdim , &ndim , &kdim , &one , HXVworksmall , &mdim , HXVworkbig1 , &kdim , &zero , HXVworkbig2 , &mdim );
          }
-      
+         
+         /*************************************************************************************************************
+          *   Finally do output <-- E_{i<=j} + (1 - delta_{i==j}) E_{j>i} workbig2[ i<=j + size(i<=j) * veccounter ]  *
+          *************************************************************************************************************/
+         for ( unsigned int pair = 0; pair < numPairs; pair++ ){
+         
+            const unsigned int orbi = irrep_center_crea_orb[ irrep_center ][ pair ];
+            const unsigned int orbj = irrep_center_anni_orb[ irrep_center ][ pair ];
+
+            #pragma omp parallel for schedule(static) // The given E_{i<=j}^{alpha} connects exactly one veccounter with one location_new
+            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+               const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
+               const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+               const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+               const int entry_up                = orbj + L * ( orbi + L * count_old_up );
+               const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ entry_up ];
+               if ( sign_up != 0 ){ // Required for thread safety
+                  const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+                  const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+                  const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
+                  output[ location_new ] += sign_up * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
+               }
+            }
+            
+            #pragma omp parallel for schedule(static) // The given E_{i<=j}^{beta} connects exactly one veccounter with one location_new
+            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+               const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
+               const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+               const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+               const int entry_down              = orbj + L * ( orbi + L * count_old_down );
+               const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
+               const int sign_down               = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+               if ( sign_down != 0 ){ // Required for thread safety
+                  const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
+                  const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
+                  output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
+               }
+            }
+            
+            if ( orbj > orbi ){
+            
+               #pragma omp parallel for schedule(static) // The given E_{j>i}^{alpha} connects exactly one veccounter with one location_new
+               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+                  const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
+                  const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+                  const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+                  const int entry_up                = orbi + L * ( orbj + L * count_old_up );
+                  const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ entry_up ];
+                  if ( sign_up != 0 ){ // Required for thread safety
+                     const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+                     const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+                     const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
+                     output[ location_new ] += sign_up * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
+                  }
+               }
+               
+               #pragma omp parallel for schedule(static) // The given E_{j>i}^{beta} connects exactly one veccounter with one location_new
+               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+                  const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
+                  const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+                  const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+                  const int entry_down              = orbi + L * ( orbj + L * count_old_down );
+                  const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
+                  const int sign_down               = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+                  if ( sign_down != 0 ){ // Required for thread safety
+                     const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
+                     const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
+                     output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
+                  }
+               }
+            }
+            
+         }
       }
-      
-      delete [] bits_up;
-      delete [] bits_down;
-   
    }
 
 }
 
 double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
 
-   // Clear the output 2DM
-   const unsigned int Lpow4 = L*L*L*L;
-   for (unsigned int loop = 0; loop < Lpow4; loop++){ TwoRDM[ loop ] = 0.0; }
+   ClearVector( L*L*L*L , TwoRDM );
 
-   #pragma omp parallel
-   {
-
-      int * bits_up    = new int[ L ];
-      int * bits_down  = new int[ L ];
-      
-      // Each thread gets its own local 2DM
-      double * local2DM = new double[ Lpow4 ];
-      for (unsigned int loop = 0; loop < Lpow4; loop++){ local2DM[ loop ] = 0.0; }
-      
-      // Now each thread can fill its own local 2DM, based on a slight modification of HamTimesVec
-      const unsigned long long vecLength = getVecLength();
-      
-      #pragma omp for schedule(static)
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
-      
-         //Find the bra up and down irreps, counters, strings, and bit sequences
-         const int bra_irrep_up   = getUpIrrepOfCounter( counter );
-         const int bra_irrep_down = getIrrepProduct( bra_irrep_up , TargetIrrep );
-         const unsigned int bra_cnt_irrep_up   = ( counter - jumps[ bra_irrep_up ] ) % numPerIrrep_up[ bra_irrep_up ];
-         const unsigned int bra_cnt_irrep_down = ( counter - jumps[ bra_irrep_up ] ) / numPerIrrep_up[ bra_irrep_up ];
-         const unsigned int bra_string_up   = cnt2str_up  [ bra_irrep_up   ][ bra_cnt_irrep_up   ];
-         const unsigned int bra_string_down = cnt2str_down[ bra_irrep_down ][ bra_cnt_irrep_down ];
-         str2bits( L , bra_string_up   , bits_up   );
-         str2bits( L , bra_string_down , bits_down );
-         
-         // 1: Both spin projections up ==> Down Slater same ==> irreps up and down same for bra and ket
-         {
-            const unsigned long long ket_offset = jumps[ bra_irrep_up ] + numPerIrrep_up[ bra_irrep_up ] * bra_cnt_irrep_down;
-            
-            //Loop i<j to remove from the output vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_up[ orbi ] ){
-                  bits_up[ orbi ] = 0;
-                  int phase_ij = 1;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_up[ orbj ] ){
-                        bits_up[ orbj ] = 0;
-                        const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the output vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_up[ orbk ]) ){
-                              bits_up[ orbk ] = 1;
-                              int phase_kl = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_up[ orbl ]) ) && ( IrrepProd_ij == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_up[ orbl ] = 1;
-                                    
-                                    //Find the corresponding string and counter
-                                    const unsigned int ket_string_up = bits2str( L , bits_up );
-                                    const int ket_cnt_irrep_up = str2cnt_up[ bra_irrep_up ][ ket_string_up ];
-                                    
-                                    //Add the contribution
-                                    const double element = phase_ij * phase_kl * vector[ counter ] * vector[ ket_offset + ket_cnt_irrep_up ];
-                                    local2DM[ orbi + L * ( orbj + L * ( orbk + L * orbl ) ) ] += element;
-                                    local2DM[ orbi + L * ( orbj + L * ( orbl + L * orbk ) ) ] -= element;
-                                    local2DM[ orbj + L * ( orbi + L * ( orbl + L * orbk ) ) ] += element;
-                                    local2DM[ orbj + L * ( orbi + L * ( orbk + L * orbl ) ) ] -= element;
-                                    
-                                    bits_up[ orbl ] = 0;
-                                 }
-                                 if ( bits_up[ orbl ] ){ phase_kl *= -1; }
-                              }
-                              bits_up[ orbk ] = 0;
-                           }
-                        }
-                        bits_up[ orbj ] = 1;
-                        phase_ij *= -1;
-                     }
-                  }
-                  bits_up[ orbi ] = 1;
-               }
-            }
-         
-         }
-         
-         // 2: Both spin projections down ==> Up Slater same ==> irreps up and down same for bra and ket
-         {
-            const unsigned long long ket_offset = jumps[ bra_irrep_up ] + bra_cnt_irrep_up;
-            
-            //Loop i<j to remove from the output vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_down[ orbi ] ){
-                  bits_down[ orbi ] = 0;
-                  int phase_ij = 1;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_down[ orbj ] ){
-                        bits_down[ orbj ] = 0;
-                        const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the output vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_down[ orbk ]) ){
-                              bits_down[ orbk ] = 1;
-                              int phase_kl = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_down[ orbl ]) ) && ( IrrepProd12 == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_down[ orbl ] = 1;
-                                    
-                                    //Find the corresponding string and counter
-                                    const unsigned int ket_string_down = bits2str( L , bits_down );
-                                    const int ket_cnt_irrep_down = str2cnt_down[ bra_irrep_down ][ ket_string_down ];
-                                    
-                                    //Add the contribution
-                                    const unsigned long long ketcounter = ket_offset + numPerIrrep_up[ bra_irrep_up ] * ket_cnt_irrep_down;
-                                    const double element = phase_ij * phase_kl * vector[ counter ] * vector[ ketcounter ];
-                                    local2DM[ orbi + L * ( orbj + L * ( orbk + L * orbl ) ) ] += element;
-                                    local2DM[ orbi + L * ( orbj + L * ( orbl + L * orbk ) ) ] -= element;
-                                    local2DM[ orbj + L * ( orbi + L * ( orbl + L * orbk ) ) ] += element;
-                                    local2DM[ orbj + L * ( orbi + L * ( orbk + L * orbl ) ) ] -= element;
-                                    
-                                    bits_down[ orbl ] = 0;
-                                 }
-                                 if ( bits_down[ orbl ] ){ phase_kl *= -1; }
-                              }
-                              bits_down[ orbk ] = 0;
-                           }
-                        }
-                        bits_down[ orbj ] = 1;
-                        phase_ij *= -1;
-                     }
-                  }
-                  bits_down[ orbi ] = 1;
-               }
-            }
-            
-         }
-         
-         // 3: sigma and tau are different in a^+_{i,sigma} a^+_{j,tau} a_{l,tau} a_{k,sigma}
-         {
-         
-            //Loop orbi to REMOVE an UP electron from the output vector
-            int phase_i = 1;
-            for (unsigned int orbi = 0; orbi < L; orbi++){
-               if ( bits_up[ orbi ] ){
-                  bits_up[ orbi ] = 0;
-                  
-                  //Loop orbk to ADD an UP electron again to the output vector
-                  int phase_k = 1;
-                  for (unsigned int orbk = 0; orbk < L; orbk++){
-                     if ( !(bits_up[ orbk ]) ){
-                        bits_up[ orbk ] = 1;
-                        const int IrrepProd_ik = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
-                        const int ket_irrep_up = getIrrepProduct( bra_irrep_up , IrrepProd_ik );
-                        const unsigned int ket_string_up = bits2str( L , bits_up );
-                        const int ket_cnt_irrep_up = str2cnt_up[ ket_irrep_up ][ ket_string_up ];
-                        const int phase_ik = phase_i * phase_k;
-                        
-                        //Loop orbj to REMOVE a DOWN electron from the output vector
-                        int phase_j = 1;
-                        for (unsigned int orbj = 0; orbj < L; orbj++){
-                           if ( bits_down[ orbj ] ){
-                              bits_down[ orbj ] = 0;
-
-                              //Loop orbl to ADD a DOWN electron again to the output vector
-                              int phase_l = 1;
-                              for (unsigned int orbl = 0; orbl < L; orbl++){
-                                 const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
-                                 if (( bits_down[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
-                                    bits_down[ orbl ] = 1;
-                                    
-                                    const int ket_irrep_down = getIrrepProduct( bra_irrep_down , IrrepProd_jl );
-                                    const unsigned int ket_string_down = bits2str( L , bits_down );
-                                    const int ket_cnt_irrep_down = str2cnt_down[ ket_irrep_down ][ ket_string_down ];
-                                    
-                                    //Add the contribution
-                                    const unsigned long long ketcounter = jumps[ ket_irrep_up ] + ket_cnt_irrep_up
-                                                                        + numPerIrrep_up[ ket_irrep_up ] * ket_cnt_irrep_down;
-                                    const double element = phase_ik * phase_j * phase_l * vector[ counter ] * vector[ ketcounter ];
-                                    local2DM[ orbi + L * ( orbj + L * ( orbk + L * orbl ) ) ] += element;
-                                    local2DM[ orbj + L * ( orbi + L * ( orbl + L * orbk ) ) ] += element;
-                                    
-                                    bits_down[ orbl ] = 0;
-                                 }
-                                 if ( bits_down[ orbl ] ){ phase_l *= -1; }
-                              }
-                              bits_down[ orbj ] = 1;
-                              phase_j *= -1;
-                           }
-                        }
-                        
-                        bits_up[ orbk ] = 0;
-                        
-                     } else { phase_k *= -1; }
-                  }
-                  
-                  bits_up[ orbi ] = 1;
-                  phase_i *= -1;
-               }
-            }
-         
-         }
-      
-      }
-      
-      delete [] bits_up;
-      delete [] bits_down;
-      
-      #pragma omp critical
-      {
-         for (unsigned int loop = 0; loop < Lpow4; loop++){ TwoRDM[ loop ] += local2DM[ loop ]; }
-      }
-      
-      delete [] local2DM;
+   // Based HamTimesVec: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+j,tau a_l,tau a_l,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
    
+   // irrep_center is the center irrep of the ERI : <ij|kl> --> irrep_center = I_i x I_j = I_k x I_l
+   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   
+      const unsigned long long localVecLength = getVecLength( irrep_center );
+      const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
+      const unsigned int numPairs = irrep_center_num[ irrep_center ];
+      
+      const unsigned int space_per_vectorpiece = (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);
+      unsigned int numIterations = localVecLength / space_per_vectorpiece;
+      if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
+
+      for ( unsigned int iteration = 0; iteration < numIterations; iteration++ ){
+      
+         const unsigned long long veccounter_start = iteration * space_per_vectorpiece;
+         const unsigned long long guess_stop       = ( iteration + 1 ) * space_per_vectorpiece;
+         const unsigned long long veccounter_stop  = ( guess_stop > localVecLength ) ? localVecLength : guess_stop;
+   
+         /*************************************************************************************************
+          *   First build workbig1[ i<=j + size(i<=j) * veccounter ] = E_{i<=j} (irrep_center) | input >  *
+          *************************************************************************************************/
+         const unsigned long long loopsize = numPairs * ( veccounter_stop - veccounter_start );
+         #pragma omp parallel for schedule(static)
+         for ( unsigned long long loopvariable = 0; loopvariable < loopsize; loopvariable++ ){
+         
+            const unsigned int pair               = loopvariable % numPairs;
+            const unsigned long long veccounter   = veccounter_start + ( loopvariable / numPairs );
+            const unsigned int creator            = irrep_center_crea_orb[ irrep_center ][ pair ];
+            const unsigned int annihilator        = irrep_center_anni_orb[ irrep_center ][ pair ];
+            const int irrep_new_up                = getUpIrrepOfCounter( irrep_center , veccounter );
+            const int irrep_new_down              = getIrrepProduct( irrep_new_up , localTargetIrrep );
+            const unsigned int count_new_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) % numPerIrrep_up[ irrep_new_up ];
+            const unsigned int count_new_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) / numPerIrrep_up[ irrep_new_up ];
+
+            // E^{alpha}_{creator <= annihilator}
+            const int entry_up = creator + L * ( annihilator + L * count_new_up );
+            const int sign_up  = lookup_sign_alpha[ irrep_new_up ][ entry_up ];
+            const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+            const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+            double myResult = sign_up * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+            
+            // E^{beta}_{creator <= annihilator}
+            const int entry_down = creator + L * ( annihilator + L * count_new_down );
+            const int sign_down = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+            const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
+            myResult += sign_down * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+            
+            HXVworkbig1[ loopvariable ] = myResult;
+            
+         }
+         
+         /************************************************
+          *   If irrep_center==0, do the one-body terms  *
+          ************************************************/
+         if ( irrep_center==0 ){
+            
+            int mdim = numPairs;
+            int kdim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+            int ndim = 1;
+            
+            char notran = 'N';
+            double one  = 1.0;
+            double zero = 0.0;
+            dgemm_( &notran, &notran, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, vector + veccounter_start, &kdim, &zero, HXVworksmall, &mdim );
+            
+            for ( unsigned int pair = 0; pair < numPairs; pair++ ){
+               const unsigned int orb1 = irrep_center_crea_orb[ irrep_center ][ pair ];
+               const unsigned int orb2 = irrep_center_anni_orb[ irrep_center ][ pair ];
+               for ( unsigned int orbk = 0; orbk < L; orbk++ ){
+                  TwoRDM[ orb1 + L * ( orbk + L * ( orbk + L * orb2 ) ) ] -= HXVworksmall[ pair ];
+               }
+               if ( orb2 > orb1 ){
+                  for ( unsigned int orbk = 0; orbk < L; orbk++ ){
+                     TwoRDM[ orb2 + L * ( orbk + L * ( orbk + L * orb1 ) ) ] -= HXVworksmall[ pair ];
+                  }
+               }
+            }
+            
+         }
+         
+         /*********************************************************************
+          *   Finally do E_{i<=k} workbig1[ j<=l + size(j<=l) * veccounter ]  *
+          *              E_{k> i} workbig1[ j<=l + size(j<=l) * veccounter ]  *
+          *********************************************************************/
+         const unsigned int numPairsSquared = numPairs * numPairs;
+         #pragma omp parallel for schedule(static) //Thread safe since each thread can only write to its own location in TwoRDM
+         for ( unsigned int pairproduct = 0; pairproduct < numPairsSquared; pairproduct++ ){
+         
+            const unsigned int pair1 = pairproduct % numPairs;
+            const unsigned int pair2 = pairproduct / numPairs;
+            const unsigned int orb_i = irrep_center_crea_orb[ irrep_center ][ pair1 ];
+            const unsigned int orb_k = irrep_center_anni_orb[ irrep_center ][ pair1 ];
+            const unsigned int orb_j = irrep_center_crea_orb[ irrep_center ][ pair2 ];
+            const unsigned int orb_l = irrep_center_anni_orb[ irrep_center ][ pair2 ];
+            // orb_i <= orb_k and orb_j <= orb_l
+            
+            double myResult = 0.0;
+            
+            // E_{i<=k} E_{j<=l} vector
+            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+            
+               const unsigned long long location_old = pair2 + numPairs * ( veccounter - veccounter_start );
+               const int irrep_old_up                = getUpIrrepOfCounter( irrep_center , veccounter );
+               const int irrep_old_down              = getIrrepProduct( irrep_old_up , localTargetIrrep );
+               const unsigned int count_old_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+               const unsigned int count_old_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+               
+               // E^{alpha}_{i<=k}
+               const int entry_up     = orb_k + L * ( orb_i + L * count_old_up );
+               const int sign_up      = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
+               const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+               const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+               myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+               
+               // E^{beta}_{i<=k}
+               const int entry_down   = orb_k + L * ( orb_i + L * count_old_down );
+               const int sign_down    = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+               const int cnt_new_down = lookup_cnt_beta [ irrep_old_down ][ entry_down ];
+               myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+            }
+            
+            TwoRDM[ orb_i + L * ( orb_j + L * ( orb_k + L * orb_l ) ) ] += myResult; // i<=k and j<=l
+            
+            if ( orb_k > orb_i ){
+            
+               myResult = 0.0;
+               
+               // E_{k>i} E_{j<=l} vector
+               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
+               
+                  const unsigned long long location_old = pair2 + numPairs * ( veccounter - veccounter_start );
+                  const int irrep_old_up                = getUpIrrepOfCounter( irrep_center , veccounter );
+                  const int irrep_old_down              = getIrrepProduct( irrep_old_up , localTargetIrrep );
+                  const unsigned int count_old_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
+                  const unsigned int count_old_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
+                  
+                  // E^{alpha}_{k>i}
+                  const int entry_up = orb_i + L * ( orb_k + L * count_old_up );
+                  const int sign_up      = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
+                  const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+                  const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+                  myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+                  
+                  // E^{beta}_{k>i}
+                  const int entry_down   = orb_i + L * ( orb_k + L * count_old_down );
+                  const int sign_down    = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+                  const int cnt_new_down = lookup_cnt_beta [ irrep_old_down ][ entry_down ];
+                  myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+               }
+            
+               TwoRDM[ orb_k + L * ( orb_j + L * ( orb_i + L * orb_l ) ) ] += myResult; // "i>k" and j<=l
+               
+            }
+         }
+      }
    }
    
+   // For Gamma^2_{ijkl} the elements with i,k anything and j<=l are set: fill the rest
+   for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
+      for ( unsigned int orb3 = 0; orb3 < L; orb3++ ){
+         for ( unsigned int orb2 = 0; orb2 < L-1; orb2++ ){
+            for ( unsigned int orb4 = orb2+1; orb4 < L; orb4++ ){
+               TwoRDM[ orb3 + L * ( orb4 + L * ( orb1 + L * orb2 ) ) ] = TwoRDM[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ];
+            }
+         }
+      }
+   }
+
    // Calculate the FCI energy
    double FCIenergy = getEconst();
-   for (unsigned int loop = 0; loop < Lpow4; loop++){ FCIenergy += 0.5 * TwoRDM[ loop ] * Hmat[ loop ]; }
-   if ( FCIverbose > 0 ){ cout << "FCI::Fill2DM : Econstant + 0.5 * trace( 2-RDM * Hmat ) = " << FCIenergy << endl; }
+   for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
+      for ( unsigned int orb2 = 0; orb2 < L; orb2++ ){
+         double tempvar = 0.0;
+         double tempvar2 = 0.0;
+         for ( unsigned int orb3 = 0; orb3 < L; orb3++ ){
+            tempvar  += getERI( orb1 , orb3 , orb3 , orb2 );
+            tempvar2 += TwoRDM[ orb1 + L * ( orb3 + L * ( orb2 + L * orb3 ) ) ];
+            for ( unsigned int orb4 = 0; orb4 < L; orb4++ ){
+               FCIenergy += 0.5 * TwoRDM[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] * getERI( orb1 , orb3 , orb2 , orb4 );
+            }
+         }
+         FCIenergy += ( getGmat( orb1 , orb2 ) + 0.5 * tempvar ) * tempvar2 / ( Nel_up + Nel_down - 1.0);
+      }
+   }
+   if ( FCIverbose > 0 ){ cout << "FCI::Fill2RDM : Energy based on 2-RDM = " << FCIenergy << endl; }
    return FCIenergy;
 
 }
 
 double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
 
-   // The total values
-   double totalSzSz   = 0.0;
-   double totalS2rest = 0.0;
-
-   #pragma omp parallel
-   {
-
-      int * bits_up    = new int[ L ];
-      int * bits_down  = new int[ L ];
+   const unsigned long long vecLength = getVecLength( 0 );
+   double result = 0.0;
       
-      // Each thread gets its own variables
-      double mySzSz   = 0.0;
-      double myS2rest = 0.0;
-      
-      const unsigned long long vecLength = getVecLength();
-      
-      #pragma omp for schedule(static)
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
-      
-         getBitsOfCounter( counter , bits_up , bits_down );
-         const double vector_counter_squared = vector[ counter ] * vector[ counter ];
+   #pragma omp parallel for schedule(static) reduction(+:result)
+   for ( unsigned long long counter = 0; counter < vecLength; counter++ ){
+      for ( unsigned int orbi = 0; orbi < L; orbi++ ){
          
-         //First the diagonal parts
-         for (unsigned int orbi = 0; orbi < L; orbi++){
-            const double tempvar = ( bits_up[ orbi ] + bits_down[ orbi ] - 2 * bits_up[ orbi ] * bits_down[ orbi ] ) * vector_counter_squared;
-            mySzSz   += 0.25 * tempvar;
-            myS2rest += 0.5  * tempvar;
-            for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-               mySzSz += 0.5 * ( bits_up[ orbi ] - bits_down[ orbi ] ) * ( bits_up[ orbj ] - bits_down[ orbj ] ) * vector_counter_squared;
-            }
-         }
+         const int irrep_up     = getUpIrrepOfCounter( 0 , counter );
+         const int irrep_down   = getIrrepProduct( irrep_up , TargetIrrep );
+         const int count_up     = ( counter - irrep_center_jumps[ 0 ][ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
+         const int count_down   = ( counter - irrep_center_jumps[ 0 ][ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
          
-         //And then the off-diagonal parts
-         for (unsigned int orbi = 0; orbi < L-1; orbi++){
+         // Diagonal terms
+         const int diff_ii = lookup_sign_alpha[ irrep_up   ][ orbi + L * ( orbi + L * count_up   ) ]
+                           - lookup_sign_beta [ irrep_down ][ orbi + L * ( orbi + L * count_down ) ]; //Signed integers so subtracting is OK
+         const double vector_at_counter_squared = vector[ counter ] * vector[ counter ];
+         result += 0.75 * diff_ii * diff_ii * vector_at_counter_squared;
          
-            // a_i,up^+ a_i,down a_j,down^+ a_j,up = a_i,up^+ a_j,up a_i,down a_j,down^+
-            if (( bits_up[ orbi ] ) && ( !(bits_down[ orbi ]) )){
-               bits_up  [ orbi ] = 0;
-               bits_down[ orbi ] = 1;
-               int phase = -1; // For a_j,down^+ passing a_i,down^+
-               for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                  if (( bits_down[ orbj ] ) && ( !(bits_up[ orbj ]) )){
-                     bits_up  [ orbj ] = 1;
-                     bits_down[ orbj ] = 0;
-                     
-                     myS2rest += phase * vector[ counter ] * getFCIcoeff( bits_up , bits_down , vector );
-                     
-                     bits_up  [ orbj ] = 0;
-                     bits_down[ orbj ] = 1;
-                  }
-                  if ( bits_up  [ orbj ] ){ phase *= -1; }
-                  if ( bits_down[ orbj ] ){ phase *= -1; }
-               }
-               bits_up  [ orbi ] = 1;
-               bits_down[ orbi ] = 0;
-            }
-
-            // a_i,down^+ a_i,up a_j,up^+ a_j,down = a_i,up a_j,up^+ a_i,down^+ a_j,down
-            if (( !(bits_up[ orbi ]) ) && ( bits_down[ orbi ] )){
-               bits_up  [ orbi ] = 1;
-               bits_down[ orbi ] = 0;
-               int phase = -1; // For a_j,up^+ passing a_i,up^+
-               for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                  if (( bits_up[ orbj ] ) && ( !(bits_down[ orbj ]) )){
-                     bits_up  [ orbj ] = 0;
-                     bits_down[ orbj ] = 1;
-                     
-                     myS2rest += phase * vector[ counter ] * getFCIcoeff( bits_up , bits_down , vector );
-                     
-                     bits_up  [ orbj ] = 1;
-                     bits_down[ orbj ] = 0;
-                  }
-                  if ( bits_up  [ orbj ] ){ phase *= -1; }
-                  if ( bits_down[ orbj ] ){ phase *= -1; }
-               }
-               bits_up  [ orbi ] = 0;
-               bits_down[ orbi ] = 1;
-            }
+         for ( unsigned int orbj = orbi+1; orbj < L; orbj++ ){
+         
+            // Sz Sz
+            const int diff_jj = lookup_sign_alpha[ irrep_up   ][ orbj + L * ( orbj + L * count_up   ) ]
+                              - lookup_sign_beta [ irrep_down ][ orbj + L * ( orbj + L * count_down ) ]; //Signed integers so subtracting is OK
+            result += 0.5 * diff_ii * diff_jj * vector_at_counter_squared;
             
+            const int irrep_up_bis = getIrrepProduct( irrep_up , getIrrepProduct( getOrb2Irrep( orbi ) , getOrb2Irrep( orbj ) ) );
+            
+            // - ( a_i,up^+ a_j,up )( a_j,down^+ a_i,down )
+            const int entry_down_ji = orbj + L * ( orbi + L * count_down );
+            const int sign_down_ji  = lookup_sign_beta [ irrep_down ][ entry_down_ji ];
+            const int cnt_down_ji   = lookup_cnt_beta  [ irrep_down ][ entry_down_ji ];
+            const int entry_up_ij   = orbi + L * ( orbj + L * count_up );
+            const int sign_up_ij    = lookup_sign_alpha[ irrep_up ][ entry_up_ij ];
+            const int cnt_up_ij     = lookup_cnt_alpha [ irrep_up ][ entry_up_ij ];
+            result -= sign_down_ji * sign_up_ij * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ij + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ji ] * vector[ counter ];
+
+            // - ( a_j,up^+ a_i,up )( a_i,down^+ a_j,down )
+            const int entry_down_ij = orbi + L * ( orbj + L * count_down );
+            const int sign_down_ij  = lookup_sign_beta[ irrep_down ][ entry_down_ij ];
+            const int cnt_down_ij   = lookup_cnt_beta [ irrep_down ][ entry_down_ij ];
+            const int entry_up_ji   = orbj + L * ( orbi + L * count_up );
+            const int sign_up_ji    = lookup_sign_alpha[ irrep_up ][ entry_up_ji ];
+            const int cnt_up_ji     = lookup_cnt_alpha [ irrep_up ][ entry_up_ji ];
+            result -= sign_down_ij * sign_up_ji * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ji + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ij ] * vector[ counter ];
+         
          }
       }
-      
-      #pragma omp critical
-      {
-         totalSzSz   += mySzSz;
-         totalS2rest += myS2rest;
-      }
-      
-      delete [] bits_up;
-      delete [] bits_down;
-   
    }
    
-   const double calcS_squared = totalS2rest + totalSzSz;
    if ( FCIverbose > 0 ){
-      const double intendedS         = 0.5 * ( getNel_up() - getNel_down() );
-      const double intendedS_squared = intendedS * ( intendedS + 1.0 );
-      cout << "FCI::CalcSpinSquared : For intended spin " << intendedS << " the measured S(S+1) = " << calcS_squared
-                                                                       << " and intented S(S+1) = " << intendedS_squared << endl;
+      const double intendedS = fabs( 0.5 * Nel_up - 0.5 * Nel_down ); // Be careful with subtracting unsigned integers...
+      cout << "FCI::CalcSpinSquared : For intended spin " << intendedS
+           << " the measured S(S+1) = " << result << " and intended S(S+1) = " << intendedS * (intendedS + 1.0) << endl;
    }
-   return calcS_squared;
+   return result;
 
 }
 
 void CheMPS2::FCI::DiagHam(double * diag) const{
+
+   const unsigned long long vecLength = getVecLength( 0 );
 
    #pragma omp parallel
    {
@@ -981,23 +997,22 @@ void CheMPS2::FCI::DiagHam(double * diag) const{
       int * bits_up   = new int[ L ];
       int * bits_down = new int[ L ];
       
-      const unsigned long long vecLength = getVecLength();
-      
       #pragma omp for schedule(static)
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for ( unsigned long long counter = 0; counter < vecLength; counter++ ){
       
-         diag[ counter ] = 0.0; // Clear the current entry
-         getBitsOfCounter( counter , bits_up , bits_down ); // Fetch the corresponding bits
+         double myResult = 0.0;
+         getBitsOfCounter( 0 , counter , bits_up , bits_down ); // Fetch the corresponding bits
          
-         // Diag( Ham ) = sum_{i} h_{iiii} n_i,up n_i,down + sum_{i<j} h_{ijij} n_i,TOT n_j,TOT - sum_{i<j} h_{ijji} ( n_i,up n_j,up + n_i,down n_j,down )
-         for (unsigned int orb1 = 0; orb1 < L; orb1++){
-            diag[ counter ] += bits_up[ orb1 ] * bits_down[ orb1 ] * getHmat( orb1 , orb1 , orb1 , orb1 );
-            for (unsigned int orb2 = orb1+1; orb2 < L; orb2++){
-               diag[ counter ] += ( bits_up[ orb1 ] + bits_down[ orb1 ] ) * ( bits_up[ orb2 ] + bits_down[ orb2 ] ) * getHmat( orb1 , orb2 , orb1 , orb2 );
-               diag[ counter ] -= ( bits_up[ orb1 ] * bits_up[ orb2 ] + bits_down[ orb1 ] * bits_down[ orb2 ] ) * getHmat( orb1 , orb2 , orb2 , orb1 );
-            
+         for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
+            const int n_tot_orb1 = bits_up[ orb1 ] + bits_down[ orb1 ];
+            myResult += n_tot_orb1 * getGmat( orb1 , orb1 );
+            for ( unsigned int orb2 = 0; orb2 < L; orb2++ ){
+               myResult += 0.5 * n_tot_orb1 * ( bits_up[ orb2 ] + bits_down[ orb2 ] ) * getERI( orb1 , orb1 , orb2 , orb2 );
+               myResult += 0.5 * ( n_tot_orb1 - bits_up[ orb1 ] * bits_up[ orb2 ] - bits_down[ orb1 ] * bits_down[ orb2 ] ) * getERI( orb1 , orb2 , orb2 , orb1 );
             }
          }
+         
+         diag[ counter ] = myResult;
          
       }
       
@@ -1009,6 +1024,8 @@ void CheMPS2::FCI::DiagHam(double * diag) const{
 }
 
 void CheMPS2::FCI::DiagHamSquared(double * output) const{
+
+   const unsigned long long vecLength = getVecLength( 0 );
    
    /*
       Completeness relation strategy to calculate the diagonal elements of Ham*Ham:
@@ -1020,37 +1037,29 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
    
    #pragma omp parallel
    {
-   
-      const unsigned long long vecLength = getVecLength();
 
       int * bits_up_ket    = new int[ L ];
       int * bits_down_ket  = new int[ L ];
       int * bits_up_bra    = new int[ L ];
       int * bits_down_bra  = new int[ L ];
-      int * work1 = new int[ 2 ];
-      int * work2 = new int[ 2 ];
-      int * work3 = new int[ 2 ];
-      int * work4 = new int[ 2 ];
+      int * work = new int[ 8 ];
       bool * workspace = new bool[ vecLength ];
       
       #pragma omp for schedule(static)
       for (unsigned long long outcounter = 0; outcounter < vecLength; outcounter++){
       
-         //Clear the currently considered entry of the output vector
-         output[ outcounter ] = 0.0;
+         double myResult = 0.0;
          
          //Workspace keeps track that a det2 is used only once for the completeness relation
          for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ workspace[ cnt ] = true; }
       
          //Find the irrep_up and irrep_down
-         const int irrep_out_up   = getUpIrrepOfCounter( outcounter );
+         const int irrep_out_up   = getUpIrrepOfCounter( 0 , outcounter );
          const int irrep_out_down = getIrrepProduct( irrep_out_up , TargetIrrep );
          
          //Find the counters for the alpha and the beta electrons
-         const unsigned int outcount_up   = ( outcounter - jumps[ irrep_out_up ] ) % numPerIrrep_up[ irrep_out_up ];
-         const unsigned int outcount_down = ( outcounter - jumps[ irrep_out_up ] ) / numPerIrrep_up[ irrep_out_up ];
-         
-         //Get the bits corresponding to this counter: since we already have most steps of "getBitsOfCounter" : copy the last steps here instead of calling the function
+         const unsigned int outcount_up   = ( outcounter - irrep_center_jumps[ 0 ][ irrep_out_up ] ) % numPerIrrep_up[ irrep_out_up ];
+         const unsigned int outcount_down = ( outcounter - irrep_center_jumps[ 0 ][ irrep_out_up ] ) / numPerIrrep_up[ irrep_out_up ];
          const unsigned int string_out_up   = cnt2str_up  [ irrep_out_up   ][ outcount_up   ];
          const unsigned int string_out_down = cnt2str_down[ irrep_out_down ][ outcount_down ];
          str2bits(L, string_out_up,   bits_up_ket  );
@@ -1061,14 +1070,11 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
             bits_down_bra[ cnt ] = bits_down_ket[ cnt ];
          }
          
-         //The Hamiltonian is given under the form H = 0.5 * sum_{ijkl sigma tau} getHmat(i,j,k,l) a^+_{i sigma} a^+_{j tau} a_{l tau} a_{k sigma}
-         //The product of the orbital irreps of the electrons which get removed should be equal to the product of the ones which are added again !!
-         
-         // Case 1: sigma and tau are up
+         // Case 1: Acting with a^+_i,up a^+_j,up a_l,up a_k,up
          {
-            const unsigned long long incounter_offset = jumps[ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
+            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
             
-            //Loop i<j to remove from the output vector
+            //Loop i<j to remove from the vector
             for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_up_bra[ orbi ] ){
                   bits_up_bra[ orbi ] = 0;
@@ -1077,7 +1083,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                         bits_up_bra[ orbj ] = 0;
                         const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
-                        //Loop k<l to add again to the output vector
+                        //Loop k<l to add again to the vector
                         for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_up_bra[ orbk ]) ){
                               bits_up_bra[ orbk ] = 1;
@@ -1090,9 +1096,9 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                                     const unsigned long long incounter = incounter_offset + str2cnt_up[ irrep_out_up ][ string_in_up ];
                                     
                                     if ( workspace[ incounter ] ){
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work1, work2, work3, work4);
-                                       output[ outcounter ] += factor * factor;
                                        workspace[ incounter ] = false;
+                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
+                                       myResult += factor * factor;
                                     }
                                     
                                     bits_up_bra[ orbl ] = 0;
@@ -1110,11 +1116,11 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
          
          }
          
-         // Case 2: sigma and tau are down
+         // Case 2: Acting with a^+_i,down a^+_j,down a_l,down a_k,down
          {
-            const unsigned long long incounter_offset = jumps[ irrep_out_up ] + outcount_up;
+            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + outcount_up;
             
-            //Loop i<j to remove from the output vector
+            //Loop i<j to remove from the vector
             for (unsigned int orbi = 0; orbi < L-1; orbi++){
                if ( bits_down_bra[ orbi ] ){
                   bits_down_bra[ orbi ] = 0;
@@ -1123,7 +1129,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                         bits_down_bra[ orbj ] = 0;
                         const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
                         
-                        //Loop k<l to add again to the output vector
+                        //Loop k<l to add again to the vector
                         for (unsigned int orbk = 0; orbk < L-1; orbk++){
                            if ( !(bits_down_bra[ orbk ]) ){
                               bits_down_bra[ orbk ] = 1;
@@ -1136,9 +1142,9 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                                     const unsigned long long incounter = incounter_offset + numPerIrrep_up[ irrep_out_up ] * str2cnt_down[ irrep_out_down ][ string_in_down ];
                                     
                                     if ( workspace[ incounter ] ){
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work1, work2, work3, work4);
-                                       output[ outcounter ] += factor * factor;
                                        workspace[ incounter ] = false;
+                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
+                                       myResult += factor * factor;
                                     }
                                     
                                     bits_down_bra[ orbl ] = 0;
@@ -1156,15 +1162,15 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
             
          }
          
-         // Case 3: sigma and tau are different
+         // Case 1: Acting with a^+_i,up a_k,up a^+_j,down a_l,down
          {
          
-            //Loop orbi to REMOVE an UP electron from the output vector
+            //Loop orbi to REMOVE an UP electron from the vector
             for (unsigned int orbi = 0; orbi < L; orbi++){
                if ( bits_up_bra[ orbi ] ){
                   bits_up_bra[ orbi ] = 0;
                   
-                  //Loop orbk to ADD an UP electron again to the output vector
+                  //Loop orbk to ADD an UP electron again to the vector
                   for (unsigned int orbk = 0; orbk < L; orbk++){
                      if ( !(bits_up_bra[ orbk ]) ){
                         bits_up_bra[ orbk ] = 1;
@@ -1173,12 +1179,12 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                         const unsigned int string_in_up = bits2str(L, bits_up_bra);
                         const int incount_up = str2cnt_up[ irrep_in_up ][ string_in_up ];
                         
-                        //Loop orbj to REMOVE a DOWN electron from the output vector
+                        //Loop orbj to REMOVE a DOWN electron from the vector
                         for (unsigned int orbj = 0; orbj < L; orbj++){
                            if ( bits_down_bra[ orbj ] ){
                               bits_down_bra[ orbj ] = 0;
 
-                              //Loop orbl to ADD a DOWN electron again to the output vector
+                              //Loop orbl to ADD a DOWN electron again to the vector
                               for (unsigned int orbl = 0; orbl < L; orbl++){
                                  const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
                                  if (( bits_down_bra[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
@@ -1187,12 +1193,12 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                                     const int irrep_in_down = getIrrepProduct( irrep_out_down , IrrepProd_jl );
                                     const unsigned int string_in_down = bits2str(L, bits_down_bra);
                                     const int incount_down = str2cnt_down[ irrep_in_down ][ string_in_down ];
-                                    const unsigned long long incounter = jumps[ irrep_in_up ] + incount_up + numPerIrrep_up[ irrep_in_up ] * incount_down;
+                                    const unsigned long long incounter = irrep_center_jumps[ 0 ][ irrep_in_up ] + incount_up + numPerIrrep_up[ irrep_in_up ] * incount_down;
                                     
                                     if ( workspace[ incounter ] ){
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work1, work2, work3, work4);
-                                       output[ outcounter ] += factor * factor;
                                        workspace[ incounter ] = false;
+                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
+                                       myResult += factor * factor;
                                     }
                                     
                                     bits_down_bra[ orbl ] = 0;
@@ -1209,6 +1215,8 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
             }
          
          }
+         
+         output[ outcounter ] = myResult;
       
       }
       
@@ -1216,10 +1224,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
       delete [] bits_down_ket;
       delete [] bits_up_bra;
       delete [] bits_down_bra;
-      delete [] work1;
-      delete [] work2;
-      delete [] work3;
-      delete [] work4;
+      delete [] work;
       delete [] workspace;
    
    }
@@ -1227,88 +1232,39 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
 }
 
 
-double CheMPS2::FCI::GSSmallCISpace(const unsigned int Nslaters, double * vec) const{
+unsigned long long CheMPS2::FCI::LowestEnergyDeterminant() const{
 
-   // Just make sure that we don't do anything stupid for small FCI vector spaces
-   const unsigned long long vecLength = getVecLength();
-   int numSlaters = ( Nslaters > vecLength ) ? vecLength : Nslaters;
+   const unsigned long long vecLength = getVecLength( 0 );
+   double * energies = new double[ vecLength ];
 
-   // Fetch the Slater determinant energies (diagonal elements of the FCI Hamiltonian)
-   DiagHam( vec );
+   // Fetch the Slater determinant energies
+   DiagHam( energies );
    
-   // Find the maximum Slater determinant energy
-   double max_E = vec[0];
-   for (unsigned long long count = 1; count < vecLength; count++){ if ( vec[ count ] > max_E ){ max_E = vec[ count ]; } }
-   
-   // Find the lowest energy determinants; this destroys vec
-   unsigned long long * LowEnergyDeterminants = new unsigned long long[ numSlaters ];
-   for (int det = 0; det < numSlaters; det++){
-      unsigned long long ID = 0;
-      for (unsigned long long count = 1; count < vecLength; count++){
-         if ( vec[ count ] < vec[ ID ] ){ ID = count; }
-      }
-      LowEnergyDeterminants[ det ] = ID;
-      vec[ ID ] = max_E + 1.0;
-   }
-   
-   // Construct the CI Hamiltonian
-   double * CIham = new double[ numSlaters * numSlaters ];
-   int * bits_ket_up   = new int[ L ];
-   int * bits_ket_down = new int[ L ];
-   int * bits_bra_up   = new int[ L ];
-   int * bits_bra_down = new int[ L ];
-   int * work1 = new int[ 2 ];
-   int * work2 = new int[ 2 ];
-   int * work3 = new int[ 2 ];
-   int * work4 = new int[ 2 ];
-   for (int row = 0; row < numSlaters; row++){
-      getBitsOfCounter( LowEnergyDeterminants[ row ] , bits_bra_up , bits_bra_down );
-      for (int col = row; col < numSlaters; col++){
-         getBitsOfCounter( LowEnergyDeterminants[ col ] , bits_ket_up , bits_ket_down );
-         CIham[ row + numSlaters * col ] = GetMatrixElement( bits_bra_up , bits_bra_down , bits_ket_up , bits_ket_down , work1 , work2 , work3 , work4 );
-         CIham[ col + numSlaters * row ] = CIham[ row + numSlaters * col ];
+   // Find the determinant with minimum energy
+   unsigned long long minEindex = 0;
+   for ( unsigned long long count = 1; count < vecLength; count++ ){
+      if ( energies[ count ] < energies[ minEindex ] ){
+         minEindex = count;
       }
    }
-   delete [] work1;
-   delete [] work2;
-   delete [] work3;
-   delete [] work4;
-   delete [] bits_ket_up;
-   delete [] bits_ket_down;
-   delete [] bits_bra_up;
-   delete [] bits_bra_down;
    
-   // Diagonalize CIham: use double * vec to store the eigenvalues
-   char jobz = 'V';
-   char uplo = 'U';
-   int lwork = 3 * numSlaters - 1;
-   double * work = new double[ lwork ];
-   int info;
-   dsyev_( &jobz , &uplo , &numSlaters , CIham , &numSlaters , vec , work , &lwork , &info );
-   delete [] work;
-   const double CIenergy = vec[0] + getEconst();
-   if ( FCIverbose > 0 ){ cout << "FCI::GSSmallCISpace : Small CI space (" << numSlaters << " determinants) diagonalization yields energy = " << CIenergy << endl; }
+   delete [] energies;
    
-   // Copy lowest energy vector
-   FCIdclear( vecLength , vec );
-   for (int det = 0; det < numSlaters; det++){
-      vec[ LowEnergyDeterminants[ det ] ] = CIham[ det ];
-   }
-   
-   // Clear memory
-   delete [] CIham;
-   delete [] LowEnergyDeterminants;
-   
-   return CIenergy;
+   return minEindex;
 
 }
 
-double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, int * bits_ket_up, int * bits_ket_down, int * annih_up, int * creat_up, int * annih_down, int * creat_down) const{
+double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, int * bits_ket_up, int * bits_ket_down, int * work) const{
    
    int count_annih_up   = 0;
    int count_creat_up   = 0;
    int count_annih_down = 0;
    int count_creat_down = 0;
+   
+   int * annih_up   = work;
+   int * creat_up   = work+2;
+   int * annih_down = work+4;
+   int * creat_down = work+6;
    
    // Find the differences between bra and ket, and store them in the arrays annih/creat
    for (unsigned int orb = 0; orb < L; orb++){
@@ -1344,31 +1300,29 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    if ( count_annih_up + count_annih_down > 2 ){ return 0.0; }
    if ( count_creat_up + count_creat_down > 2 ){ return 0.0; }
    
-   // Diag( Ham ) = sum_i h_{iiii} n_i,up n_i,down + sum_{i<j} h_{ijij} n_i,TOT n_j,TOT - sum_{i<j} h_{ijji} ( n_i,up n_j,up + n_i,down n_j,down )
-   if (( count_annih_up == 0 ) && ( count_annih_down == 0 )){ // |bra> == |ket>
+   if (( count_annih_up == 0 ) && ( count_annih_down == 0 )){ // |bra> == |ket>  -->  copy from DiagHam( )
    
       double result = 0.0;
-      for (unsigned int orb1 = 0; orb1 < L; orb1++){
-         result += getHmat(orb1, orb1, orb1, orb1) * bits_ket_up[ orb1 ] * bits_ket_down[ orb1 ];
-         for (unsigned int orb2 = orb1+1; orb2 < L; orb2++){
-            result += ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] ) * ( bits_ket_up[ orb2 ] + bits_ket_down[ orb2 ] ) * getHmat(orb1, orb2, orb1, orb2);
-            result -= ( bits_ket_up[ orb1 ] * bits_ket_up[ orb2 ] + bits_ket_down[ orb1 ] * bits_ket_down[ orb2 ] ) * getHmat(orb1, orb2, orb2, orb1);
+      for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
+         const int n_tot_orb1 = bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ];
+         result += n_tot_orb1 * getGmat( orb1 , orb1 );
+         for ( unsigned int orb2 = 0; orb2 < L; orb2++ ){
+            result += 0.5 * n_tot_orb1 * ( bits_ket_up[ orb2 ] + bits_ket_down[ orb2 ] ) * getERI( orb1 , orb1 , orb2 , orb2 )
+            + 0.5 * ( n_tot_orb1 - bits_ket_up[ orb1 ] * bits_ket_up[ orb2 ] - bits_ket_down[ orb1 ] * bits_ket_down[ orb2 ] ) * getERI( orb1 , orb2 , orb2 , orb1 );
          }
       }
       return result;
       
    }
    
-   // sum_{i ; j!=l} sum_{sigma} ( h_{ijil} - h_{ijli} delta_{sigma,up} ) a^+_j,up a_l,up n_i,sigma
    if (( count_annih_up == 1 ) && ( count_annih_down == 0 )){ // |bra> = a^+_j,up a_l,up |ket>
    
       const int orbj = creat_up[ 0 ];
       const int orbl = annih_up[ 0 ];
    
-      double result = 0.0;
+      double result = getGmat( orbj , orbl );
       for (unsigned int orb1 = 0; orb1 < L; orb1++){
-         result += getHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
-                 - getHmat(orb1, orbj, orbl, orb1) * bits_ket_up[ orb1 ];
+         result += getERI(orbj, orb1, orb1, orbl) * ( 0.5 - bits_ket_up[ orb1 ] ) + getERI(orb1, orb1, orbj, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] );
       }
       int phase = 1;
       if ( orbj < orbl ){ for (int orbital = orbj+1; orbital < orbl; orbital++){ if ( bits_ket_up[ orbital ] ){ phase *= -1; } } }
@@ -1377,16 +1331,14 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    
    }
    
-   // sum_{i ; j!=l} sum_{sigma} ( h_{ijil} - h_{ijli} delta_{sigma,down} ) a^+_j,down a_l,down n_i,sigma
    if (( count_annih_up == 0 ) && ( count_annih_down == 1 )){ // |bra> = a^+_j,down a_l,down |ket>
    
       const int orbj = creat_down[ 0 ];
       const int orbl = annih_down[ 0 ];
    
-      double result = 0.0;
+      double result = getGmat( orbj , orbl );
       for (unsigned int orb1 = 0; orb1 < L; orb1++){
-         result += getHmat(orb1, orbj, orb1, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] )
-                 - getHmat(orb1, orbj, orbl, orb1) * bits_ket_down[ orb1 ];
+         result += getERI(orbj, orb1, orb1, orbl) * ( 0.5 - bits_ket_down[ orb1 ] ) + getERI(orb1, orb1, orbj, orbl) * ( bits_ket_up[ orb1 ] + bits_ket_down[ orb1 ] );
       }
       int phase = 1;
       if ( orbj < orbl ){ for (int orbital = orbj+1; orbital < orbl; orbital++){ if ( bits_ket_down[ orbital ] ){ phase *= -1; } } }
@@ -1395,7 +1347,6 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    
    }
    
-   // sum_{i < j ; k < l} ( h_{ijkl} - h_{ijlk} ) a_^+_i,up a^+_j,up a_l,up a_k,up
    if (( count_annih_up == 2 ) && ( count_annih_down == 0 )){
    
       // creat and annih are filled in increasing orbital index
@@ -1404,7 +1355,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_up[ 0 ];
       const int orbl = annih_up[ 1 ];
       
-      double result = getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk);
+      double result = getERI(orbi, orbk, orbj, orbl) - getERI(orbi, orbl, orbj, orbk);
       int phase = 1;
       for (int orbital = orbk+1; orbital < orbl; orbital++){ if ( bits_ket_up[ orbital ] ){ phase *= -1; } } // Fermion phases orbk and orbl measured in the ket
       for (int orbital = orbi+1; orbital < orbj; orbital++){ if ( bits_bra_up[ orbital ] ){ phase *= -1; } } // Fermion phases orbi and orbj measured in the bra
@@ -1412,7 +1363,6 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    
    }
    
-   // sum_{i < j ; k < l} ( h_{ijkl} - h_{ijlk} ) a_^+_i,down a^+_j,down a_l,down a_k,down
    if (( count_annih_up == 0 ) && ( count_annih_down == 2 )){
    
       // creat and annih are filled in increasing orbital index
@@ -1421,7 +1371,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_down[ 0 ];
       const int orbl = annih_down[ 1 ];
       
-      double result = getHmat(orbi, orbj, orbk, orbl) - getHmat(orbi, orbj, orbl, orbk);
+      double result = getERI(orbi, orbk, orbj, orbl) - getERI(orbi, orbl, orbj, orbk);
       int phase = 1;
       for (int orbital = orbk+1; orbital < orbl; orbital++){ if ( bits_ket_down[ orbital ] ){ phase *= -1; } } // Fermion phases orbk and orbl measured in the ket
       for (int orbital = orbi+1; orbital < orbj; orbital++){ if ( bits_bra_down[ orbital ] ){ phase *= -1; } } // Fermion phases orbi and orbj measured in the bra
@@ -1429,7 +1379,6 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
    
    }
    
-   // sum_{ijkl} h_{ijkl} ( a_^+_i,up a_k,up ) ( a^+_j,down a_l,down )
    if (( count_annih_up == 1 ) && ( count_annih_down == 1 )){
    
       const int orbi = creat_up  [ 0 ];
@@ -1437,7 +1386,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
       const int orbk = annih_up  [ 0 ];
       const int orbl = annih_down[ 0 ];
       
-      double result = getHmat(orbi, orbj, orbk, orbl);
+      double result = getERI(orbi, orbk, orbj, orbl);
       int phase = 1;
       if ( orbi < orbk ){ for (int orbital = orbi+1; orbital < orbk; orbital++){ if ( bits_ket_up  [ orbital ] ){ phase *= -1; } } }
       if ( orbk < orbi ){ for (int orbital = orbk+1; orbital < orbi; orbital++){ if ( bits_ket_up  [ orbital ] ){ phase *= -1; } } }
@@ -1453,19 +1402,17 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
 
 void CheMPS2::FCI::FCIdcopy(const unsigned long long vecLength, double * origin, double * target){
 
-   // TODO : Use lapack under the hood
-
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ target[cnt] = origin[cnt]; }
+   int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+   int inc = 1;
+   dcopy_( &length , origin , &inc , target , &inc );
 
 }
 
 double CheMPS2::FCI::FCIddot(const unsigned long long vecLength, double * vec1, double * vec2){
 
-   // TODO : Use lapack under the hood
-
-   double result = 0.0;
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ result += vec1[cnt] * vec2[cnt]; }
-   return result;
+   int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+   int inc = 1;
+   return ddot_( &length , vec1 , &inc , vec2 , &inc );
 
 }
 
@@ -1477,42 +1424,43 @@ double CheMPS2::FCI::FCIfrobeniusnorm(const unsigned long long vecLength, double
 
 void CheMPS2::FCI::FCIdaxpy(const unsigned long long vecLength, const double alpha, double * vec_x, double * vec_y){
 
-   // TODO : Use lapack under the hood
-
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ vec_y[cnt] += alpha * vec_x[cnt]; }
+   double factor = alpha;
+   int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+   int inc = 1;
+   daxpy_( &length , &factor , vec_x , &inc , vec_y , &inc );
 
 }
 
 void CheMPS2::FCI::FCIdscal(const unsigned long long vecLength, const double alpha, double * vec){
 
-   // TODO : Use lapack under the hood
-
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ vec[cnt] = alpha * vec[cnt]; }
+   double factor = alpha;
+   int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+   int inc = 1;
+   dscal_( &length , &factor , vec , &inc );
 
 }
 
-void CheMPS2::FCI::FCIdclear(const unsigned long long vecLength, double * vec){
+void CheMPS2::FCI::ClearVector(const unsigned long long vecLength, double * vec){
 
-   // TODO : Use lapack under the hood
-
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ vec[cnt] = 0.0; }
+   for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = 0.0; }
 
 }
 
 void CheMPS2::FCI::FillRandom(const unsigned long long vecLength, double * vec){
 
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ vec[cnt] = ( 2.0 * rand() - 1.0 ) / RAND_MAX; }
+   for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = ( ( 2.0 * rand() ) / RAND_MAX ) - 1.0; }
 
 }
 
-double CheMPS2::FCI::GSDavidson(double * inoutput) const{
+double CheMPS2::FCI::GSDavidson(double * inoutput, const int DAVIDSON_NUM_VEC) const{
 
-   const int DAVIDSON_NUM_VEC           = CheMPS2::HEFF_DAVIDSON_NUM_VEC;
    const int DAVIDSON_NUM_VEC_KEEP      = CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP;
    const double DAVIDSON_RTOL_BASE      = CheMPS2::HEFF_DAVIDSON_RTOL_BASE;
    const double DAVIDSON_PRECOND_CUTOFF = CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+   
+   assert( DAVIDSON_NUM_VEC > DAVIDSON_NUM_VEC_KEEP );
 
-   const unsigned long long length_vec = getVecLength();
+   const unsigned long long length_vec = getVecLength( 0 );
    int num_vec = 0;
    double ** vecs  = new double*[DAVIDSON_NUM_VEC];
    double ** Hvecs = new double*[DAVIDSON_NUM_VEC];
@@ -1602,8 +1550,8 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
       if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Current lowest eigenvalue = " << mxM_eigs[0] + getEconst() << endl; }
       
       //7. Calculate u and r. r is stored in t_vec, u in u_vec.
-      FCIdclear(length_vec, t_vec);
-      FCIdclear(length_vec, u_vec);
+      ClearVector(length_vec, t_vec);
+      ClearVector(length_vec, u_vec);
       for (int cnt=0; cnt<num_vec; cnt++){
          double alpha = mxM_vecs[cnt]; //eigenvector with lowest eigenvalue, hence mxM_vecs[cnt + DAVIDSON_NUM_VEC * 0]
          FCIdaxpy(length_vec, alpha, Hvecs[cnt], t_vec);
@@ -1691,7 +1639,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
                
                //Reortho: Put the Lowdin tfo eigenvecs in vecs
                for (int ivec=0; ivec<DAVIDSON_NUM_VEC_KEEP; ivec++){
-                  FCIdclear(length_vec, vecs[ivec]);
+                  ClearVector(length_vec, vecs[ivec]);
                   for (int ivec2=0; ivec2<DAVIDSON_NUM_VEC_KEEP; ivec2++){
                      FCIdaxpy(length_vec, Reortho_Lowdin[ ivec2 + DAVIDSON_NUM_VEC_KEEP * ivec ], Reortho_Eigenvecs + length_vec * ivec2, vecs[ivec]);
                   }
@@ -1755,9 +1703,126 @@ double CheMPS2::FCI::GSDavidson(double * inoutput) const{
 
 }
 
+/*********************************************************************************
+ *                                                                               *
+ *   Below this block all functions are for the Green's function calculations.   *
+ *                                                                               *
+ *********************************************************************************/
+
+void CheMPS2::FCI::ActWithNumberOperator(const unsigned int orbIndex, double * resultVector, double * sourceVector) const{
+
+   assert( orbIndex>=0 );
+   assert( orbIndex<L  );
+
+   int * bits_up    = new int[ L ];
+   int * bits_down  = new int[ L ];
+
+   const unsigned long long vecLength = getVecLength( 0 );
+   for (unsigned long long counter = 0; counter < vecLength; counter++){
+      getBitsOfCounter( 0 , counter , bits_up , bits_down );
+      resultVector[ counter ] = ( bits_up[ orbIndex ] + bits_down[ orbIndex ] ) * sourceVector[ counter ];
+   }
+   
+   delete [] bits_up;
+   delete [] bits_down;
+
+}
+
+void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, const FCI * otherFCI, double * otherVector) const{
+
+   assert( ( whichOperator=='C' ) || ( whichOperator=='A' ) ); //Operator should be a (C) Creator, or (A) Annihilator
+   assert( orbIndex>=0 );
+   assert( orbIndex<L  );
+   assert( L==otherFCI->getL() );
+
+   const unsigned long long vecLength = getVecLength( 0 );
+
+   if ( getTargetIrrep() != getIrrepProduct( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) )){
+      ClearVector( vecLength , thisVector );
+      return;
+   }
+
+   int * bits_up    = new int[ L ];
+   int * bits_down  = new int[ L ];
+   
+   if (( whichOperator=='C') && ( isUp )){
+      for (unsigned long long counter = 0; counter < vecLength; counter++){
+         
+         getBitsOfCounter( 0 , counter , bits_up , bits_down );
+         
+         if ( bits_up[ orbIndex ] == 1 ){ // Operator = creator_up
+            bits_up[ orbIndex ] = 0;
+            int phase = 1;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         } else {
+            thisVector[ counter ] = 0.0;
+         }
+         
+      }
+   }
+   
+   if (( whichOperator=='C') && ( !(isUp) )){
+      const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
+      for (unsigned long long counter = 0; counter < vecLength; counter++){
+
+         getBitsOfCounter( 0 , counter , bits_up , bits_down );
+
+         if ( bits_down[ orbIndex ] == 1 ){ // Operator = creator_down
+            bits_down[ orbIndex ] = 0;
+            int phase = startphase;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         } else {
+            thisVector[ counter ] = 0.0;
+         }
+
+      }
+   }
+   
+   if (( whichOperator=='A') && ( isUp )){
+      for (unsigned long long counter = 0; counter < vecLength; counter++){
+
+         getBitsOfCounter( 0 , counter , bits_up , bits_down );
+         
+         if ( bits_up[ orbIndex ] == 0 ){ // Operator = annihilator_up
+            bits_up[ orbIndex ] = 1;
+            int phase = 1;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_up[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         } else {
+            thisVector[ counter ] = 0.0;
+         }
+
+      }
+   }
+   
+   if (( whichOperator=='A') && ( !(isUp) )){
+      const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
+      for (unsigned long long counter = 0; counter < vecLength; counter++){
+
+         getBitsOfCounter( 0 , counter , bits_up , bits_down );
+         
+         if ( bits_down[ orbIndex ] == 0 ){ // Operator = annihilator_down
+            bits_down[ orbIndex ] = 1;
+            int phase = startphase;
+            for (unsigned int cnt = 0; cnt < orbIndex; cnt++){ if ( bits_down[ cnt ] ){ phase *= -1; } }
+            thisVector[ counter ] = phase * otherFCI->getFCIcoeff( bits_up , bits_down , otherVector );
+         } else {
+            thisVector[ counter ] = 0.0;
+         }
+         
+      }
+   }
+   
+   delete [] bits_up;
+   delete [] bits_down;
+
+}
+
 void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError) const{
 
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    
    // Create a few helper arrays
    double * RESID  = new double[ vecLength ];
@@ -1801,7 +1866,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
       
    }
    
-   if (checkError){
+   if (( checkError ) && ( FCIverbose > 0 )){
       for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ precon[ cnt ] = 1.0; }
       double RMSerror = 0.0;
       if ( RealSol != NULL ){
@@ -1831,7 +1896,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 
 void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const double eta, double * precon, double * Sol, double * RESID, double * PVEC, double * OxPVEC, double * temp, double * temp2) const{
 
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    const double CGRESIDUALTHRESHOLD = 10.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
    if ( FCIverbose>1 ){ cout << "FCI::CGCoreSolver : The residual norm for convergence = " << CGRESIDUALTHRESHOLD << endl; }
 
@@ -1857,7 +1922,7 @@ void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const dou
       FCIdaxpy( vecLength , -alpha_k , OxPVEC , RESID );                       // r_{k+1} = r_k - alpha_k * A * p_k
       const double rkplus1T_rkplus1 = FCIddot( vecLength , RESID , RESID );
       const double beta_k = rkplus1T_rkplus1 / rkT_rk ;                        // beta_k = r_{k+1}^T * r_{k+1} / ( r_k^T * r_k )
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
+      for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){
          PVEC[ cnt ] = RESID[ cnt ] + beta_k * PVEC[ cnt ];                    // p_{k+1} = r_{k+1} + beta_k * p_k
       }
       count_k++;
@@ -1872,7 +1937,7 @@ void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const dou
 void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const{
 
    HamTimesVec( in , out );
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    const double prefactor = alpha + beta * getEconst(); // HamTimesVec does only the parts with second quantized operators
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
       out[ cnt ] = prefactor * in[ cnt ] + beta * out[ cnt ]; // out = ( alpha + beta * H ) * in
@@ -1882,7 +1947,7 @@ void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, dou
 
 void CheMPS2::FCI::CGOperator(const double alpha, const double beta, const double eta, double * precon, double * in, double * temp, double * temp2, double * out) const{
 
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
       temp[ cnt ] = precon[ cnt ] * in[ cnt ];                 // temp  = precon * in
    }
@@ -1897,12 +1962,12 @@ void CheMPS2::FCI::CGOperator(const double alpha, const double beta, const doubl
 
 void CheMPS2::FCI::CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const{
 
-   // With operator = [ ( alpha + beta * H )^2 + eta*eta ] the preconditioner becomes 1 / sqrt( diag ( operator ) ).
+   // With operator = [ ( alpha + beta * H )^2 + eta*eta ] ; precon becomes 1 / sqrt( diag ( operator ) ).
    
    DiagHam( precon );
    DiagHamSquared( workspace );
    
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    const double alpha_bis = alpha + beta * getEconst();
    const double factor1 = alpha_bis * alpha_bis + eta * eta;
    const double factor2 = 2 * alpha_bis * beta;
@@ -1947,52 +2012,44 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
    {
       const unsigned int addNelUP   = getNel_up()   + ((isUp) ? 1 : 0);
       const unsigned int addNelDOWN = getNel_down() + ((isUp) ? 0 : 1);
-      const char creator   = 'C';
+      const char creator = 'C';
+      const int addIrrep = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_beta ) );
       
       if (( addNelUP<=L ) && ( addNelDOWN<=L )){
       
-         const int addTwoS    = ( addNelUP > addNelDOWN ) ? addNelUP - addNelDOWN : addNelDOWN - addNelUP;
-         const int addN       = addNelUP + addNelDOWN;
-         const int addIrrep   = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_beta ) );
+         // First calculate | addBetaVector > = a^+_beta,spin | GSvector >
+         CheMPS2::FCI additionFCI( Ham , addNelUP , addNelDOWN , addIrrep , maxMemWorkMB , FCIverbose );
+         const unsigned long long addVecLength = additionFCI.getVecLength( 0 );
+         double * addBetaVector = new double[ addVecLength ];
+         additionFCI.ActWithSecondQuantizedOperator( creator , isUp , orb_beta , addBetaVector , this , GSvector );
          
-         CheMPS2::Problem ProbAddition( Ham , addTwoS , addN , addIrrep );
+         // Now calculate the solution to [ omega - Ham + E_0 + I*eta ] | Solution > = | addBetaVector >
+         double * RealPartSolution = NULL;
+         double * ImagPartSolution = NULL;
+         if ( RePartGF != NULL ){ RealPartSolution = new double[ addVecLength ]; }
+         if ( ImPartGF != NULL ){ ImagPartSolution = new double[ addVecLength ]; }
+         const double avalue = omega + GSenergy; // Map [ omega - Ham + E_0 + I*eta ] to [ a + b*Ham + I*eta ]
+         const double bvalue = -1.0;
+         additionFCI.CGSolveSystem( avalue , bvalue , eta , addBetaVector , RealPartSolution , ImagPartSolution );
          
-         if ( ProbAddition.checkConsistency() ){ // Can I add an extra electron in orb_beta ?
-         
-            // First calculate | addBetaVector > = a^+_beta,spin | GSvector >
-            CheMPS2::FCI additionFCI( &ProbAddition , addNelUP , addNelDOWN , FCIverbose );
-            const unsigned long long addVecLength = additionFCI.getVecLength();
-            double * addBetaVector = new double[ addVecLength ];
-            additionFCI.ActWithSecondQuantizedOperator( creator , isUp , orb_beta , addBetaVector , this , GSvector );
-            
-            // Now calculate the solution to [ omega - Ham + E_0 + I*eta ] | Solution > = | addBetaVector >
-            double * RealPartSolution = NULL;
-            double * ImagPartSolution = NULL;
-            if ( RePartGF != NULL ){ RealPartSolution = new double[ addVecLength ]; }
-            if ( ImPartGF != NULL ){ ImagPartSolution = new double[ addVecLength ]; }
-            const double avalue = omega + GSenergy; // Map [ omega - Ham + E_0 + I*eta ] to [ a + b*Ham + I*eta ]
-            const double bvalue = -1.0;
-            additionFCI.CGSolveSystem( avalue , bvalue , eta , addBetaVector , RealPartSolution , ImagPartSolution );
-            
-            // Then obtain | addAlphaVector > = a^+_alpha,spin | GSvector >
-            double * addAlphaVector = NULL;
-            if ( orb_alpha == orb_beta ){ addAlphaVector = addBetaVector; }
-            else {
-               addAlphaVector = new double[ addVecLength ];
-               additionFCI.ActWithSecondQuantizedOperator( creator , isUp , orb_alpha , addAlphaVector , this , GSvector );
-            }
-            
-            // Calculate < addAlphaVector | Solution >
-            if ( RePartGF != NULL ){ RePartGF[0] += FCIddot( addVecLength , addAlphaVector , RealPartSolution ); }
-            if ( ImPartGF != NULL ){ ImPartGF[0] += FCIddot( addVecLength , addAlphaVector , ImagPartSolution ); }
-            
-            // Clean up
-            if ( RePartGF != NULL ){ delete [] RealPartSolution; }
-            if ( ImPartGF != NULL ){ delete [] ImagPartSolution; }
-            if ( orb_alpha != orb_beta ){ delete [] addAlphaVector; }
-            delete [] addBetaVector;
-      
+         // Then obtain | addAlphaVector > = a^+_alpha,spin | GSvector >
+         double * addAlphaVector = NULL;
+         if ( orb_alpha == orb_beta ){ addAlphaVector = addBetaVector; }
+         else {
+            addAlphaVector = new double[ addVecLength ];
+            additionFCI.ActWithSecondQuantizedOperator( creator , isUp , orb_alpha , addAlphaVector , this , GSvector );
          }
+         
+         // Calculate < addAlphaVector | Solution >
+         if ( RePartGF != NULL ){ RePartGF[0] += FCIddot( addVecLength , addAlphaVector , RealPartSolution ); }
+         if ( ImPartGF != NULL ){ ImPartGF[0] += FCIddot( addVecLength , addAlphaVector , ImagPartSolution ); }
+         
+         // Clean up
+         if ( RePartGF != NULL ){ delete [] RealPartSolution; }
+         if ( ImPartGF != NULL ){ delete [] ImagPartSolution; }
+         if ( orb_alpha != orb_beta ){ delete [] addAlphaVector; }
+         delete [] addBetaVector;
+            
       }
    }
    
@@ -2006,50 +2063,42 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
       
          const unsigned int removeNelUP   = getNel_up()   - ((isUp) ? 1 : 0);
          const unsigned int removeNelDOWN = getNel_down() - ((isUp) ? 0 : 1);
-         const char annihilator  = 'A';
-      
-         const int removeTwoS    = ( removeNelUP > removeNelDOWN ) ? removeNelUP - removeNelDOWN : removeNelDOWN - removeNelUP;
-         const int removeN       = removeNelUP + removeNelDOWN;
-         const int removeIrrep   = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_alpha ) );
+         const char annihilator = 'A';
+         const int removeIrrep  = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_alpha ) );
          
-         CheMPS2::Problem ProbRemoval( Ham , removeTwoS, removeN, removeIrrep );
+         // First calculate | removeAlphaVector > = a_alpha,spin | GSvector >
+         CheMPS2::FCI removalFCI( Ham , removeNelUP , removeNelDOWN , removeIrrep , maxMemWorkMB , FCIverbose );
+         const unsigned long long removeVecLength = removalFCI.getVecLength( 0 );
+         double * removeAlphaVector = new double[ removeVecLength ];
+         removalFCI.ActWithSecondQuantizedOperator( annihilator , isUp , orb_alpha , removeAlphaVector , this , GSvector );
          
-         if ( ProbRemoval.checkConsistency() ){ // Can I actually remove an electron from orb_alpha?
+         // Now calculate the solution to [ omega + Ham - E_0 + I*eta ] | Solution > = | removeAlphaVector >
+         double * RealPartSolution = NULL;
+         double * ImagPartSolution = NULL;
+         if ( RePartGF != NULL ){ RealPartSolution = new double[ removeVecLength ]; }
+         if ( ImPartGF != NULL ){ ImagPartSolution = new double[ removeVecLength ]; }
+         const double avalue = omega - GSenergy; // Map [ omega + Ham - E_0 + I*eta ] to [ a + b*Ham + I*eta ]
+         const double bvalue = 1.0;
+         removalFCI.CGSolveSystem( avalue , bvalue , eta , removeAlphaVector , RealPartSolution , ImagPartSolution );
          
-            // First calculate | removeAlphaVector > = a_alpha,spin | GSvector >
-            CheMPS2::FCI removalFCI( &ProbRemoval , removeNelUP , removeNelDOWN , FCIverbose );
-            const unsigned long long removeVecLength = removalFCI.getVecLength();
-            double * removeAlphaVector = new double[ removeVecLength ];
-            removalFCI.ActWithSecondQuantizedOperator( annihilator , isUp , orb_alpha , removeAlphaVector , this , GSvector );
-            
-            // Now calculate the solution to [ omega + Ham - E_0 + I*eta ] | Solution > = | removeAlphaVector >
-            double * RealPartSolution = NULL;
-            double * ImagPartSolution = NULL;
-            if ( RePartGF != NULL ){ RealPartSolution = new double[ removeVecLength ]; }
-            if ( ImPartGF != NULL ){ ImagPartSolution = new double[ removeVecLength ]; }
-            const double avalue = omega - GSenergy; // Map [ omega + Ham - E_0 + I*eta ] to [ a + b*Ham + I*eta ]
-            const double bvalue = 1.0;
-            removalFCI.CGSolveSystem( avalue , bvalue , eta , removeAlphaVector , RealPartSolution , ImagPartSolution );
-            
-            // Then obtain | removeBetaVector > = a_beta,spin | GSvector >
-            double * removeBetaVector = NULL;
-            if ( orb_alpha == orb_beta ){ removeBetaVector = removeAlphaVector; }
-            else {
-               removeBetaVector = new double[ removeVecLength ];
-               removalFCI.ActWithSecondQuantizedOperator( annihilator , isUp , orb_beta , removeBetaVector , this , GSvector );
-            }
-            
-            // Calculate < removeBetaVector | Solution > ; the removal part is #####  ADDED  ##### (not subtracted!)
-            if ( RePartGF != NULL ){ RePartGF[0] += FCIddot( removeVecLength , removeBetaVector , RealPartSolution ); }
-            if ( ImPartGF != NULL ){ ImPartGF[0] += FCIddot( removeVecLength , removeBetaVector , ImagPartSolution ); }
-            
-            // Clean up
-            if ( RePartGF != NULL ){ delete [] RealPartSolution; }
-            if ( ImPartGF != NULL ){ delete [] ImagPartSolution; }
-            if ( orb_alpha != orb_beta ){ delete [] removeBetaVector; }
-            delete [] removeAlphaVector;
-      
+         // Then obtain | removeBetaVector > = a_beta,spin | GSvector >
+         double * removeBetaVector = NULL;
+         if ( orb_alpha == orb_beta ){ removeBetaVector = removeAlphaVector; }
+         else {
+            removeBetaVector = new double[ removeVecLength ];
+            removalFCI.ActWithSecondQuantizedOperator( annihilator , isUp , orb_beta , removeBetaVector , this , GSvector );
          }
+         
+         // Calculate < removeBetaVector | Solution > ; the removal part is #####  ADDED  ##### (not subtracted!)
+         if ( RePartGF != NULL ){ RePartGF[0] += FCIddot( removeVecLength , removeBetaVector , RealPartSolution ); }
+         if ( ImPartGF != NULL ){ ImPartGF[0] += FCIddot( removeVecLength , removeBetaVector , ImagPartSolution ); }
+         
+         // Clean up
+         if ( RePartGF != NULL ){ delete [] RealPartSolution; }
+         if ( ImPartGF != NULL ){ delete [] ImagPartSolution; }
+         if ( orb_alpha != orb_beta ){ delete [] removeBetaVector; }
+         delete [] removeAlphaVector;
+            
       }
    }
    
@@ -2079,7 +2128,7 @@ void CheMPS2::FCI::DensityResponseGF(const double omega, const double eta, const
    
    // Find densityAlphaVector = ( n_alpha - <0| n_alpha |0> ) |0>
    //  and densityBetaVector  = ( n_beta  - <0| n_beta  |0> ) |0>
-   const unsigned long long vecLength = getVecLength();
+   const unsigned long long vecLength = getVecLength( 0 );
    double * densityAlphaVector = new double[ vecLength ];
    double * workspace          = new double[ vecLength ];
    {
