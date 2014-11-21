@@ -550,7 +550,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> IR = 0; IR &lt; denBK-&gt;getNumberOfIrreps(); IR++){</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;         </div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;            <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(theindex+1, NR, TwoSR, IR);</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> IL = denBK-&gt;directProd( IR, denBK-&gt;gIrrep(theindex) );</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> IL = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( IR, denBK-&gt;gIrrep(theindex) );</div>
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;            </div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;            <span class="keywordflow">if</span> (dimR&gt;0){</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;            </div>
@@ -595,7 +595,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;         </div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;            <span class="keywordtype">int</span> dimR   = denBK-&gt;gCurrentDim(theindex+1, NR, TwoSR, IR);</div>
 <div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;            <span class="keywordtype">int</span> dimLup = denBK-&gt;gCurrentDim(theindex,   NR, TwoSR, IR);</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd( IR, denBK-&gt;gIrrep(theindex) );</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( IR, denBK-&gt;gIrrep(theindex) );</div>
 <div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;            </div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;            <span class="keywordflow">if</span> ((dimR&gt;0) &amp;&amp; (dimLup&gt;0)){</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;            </div>
@@ -641,7 +641,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;         </div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;            <span class="keywordtype">int</span> dimR     = denBK-&gt;gCurrentDim(theindex+1, NR,   TwoSR, IR);</div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;            <span class="keywordtype">int</span> dimLdown = denBK-&gt;gCurrentDim(theindex,   NR-2, TwoSR, IR);</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> ILup = denBK-&gt;directProd( IR, denBK-&gt;gIrrep(theindex) );</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> ILup = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( IR, denBK-&gt;gIrrep(theindex) );</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;            </div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;            <span class="keywordflow">if</span> ((dimR&gt;0) &amp;&amp; (dimLdown&gt;0)){</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;            </div>
@@ -759,6 +759,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a1b3efc7725967193c916044cd0cab54e"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a1b3efc7725967193c916044cd0cab54e">CheMPS2::Correlations::getCspinflip_DMRG</a></div><div class="ttdeci">double getCspinflip_DMRG(const int row, const int col) const </div><div class="ttdoc">Get a Cspinflip term, using the DMRG indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00143">Correlations.cpp:143</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a3e4a935011b95ad18b28b88ac56990fc"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">CheMPS2::Correlations::MutualInformationDistance</a></div><div class="ttdeci">double MutualInformationDistance(const double power) const </div><div class="ttdoc">Return Idistance(power) (see return for definition) </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00206">Correlations.cpp:206</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html"><div class="ttname"><a href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a></div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00035">Problem.h:35</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_aeb62579405983674c4d129890bc32de0"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#aeb62579405983674c4d129890bc32de0">CheMPS2::Correlations::getCdens_DMRG</a></div><div class="ttdeci">double getCdens_DMRG(const int row, const int col) const </div><div class="ttdoc">Get a Cdens term, using the DMRG indices. </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00131">Correlations.cpp:131</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html_aff6ffb8d891d6380a7b2770348a0dcd7"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7">CheMPS2::SyBookkeeper::gL</a></div><div class="ttdeci">int gL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8cpp_source.html#l00108">SyBookkeeper.cpp:108</a></div></div>
@@ -772,7 +773,7 @@ $(document).ready(function(){initNavTree('Correlations_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>Correlations.cpp</b></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:03 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:48 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

@@ -34,7 +34,7 @@ var searchData=
   ['getgroupnumber',['getGroupNumber',['../classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0',1,'CheMPS2::Irreps']]],
   ['getirrepname',['getIrrepName',['../classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4',1,'CheMPS2::Irreps']]],
   ['getirrepofeachdmrgorbital',['getIrrepOfEachDMRGorbital',['../classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d',1,'CheMPS2::DMRGSCFindices']]],
-  ['getirrepproduct',['getIrrepProduct',['../classCheMPS2_1_1FCI.html#a8d55b73a60bb7adba1272211c484fd04',1,'CheMPS2::FCI']]],
+  ['getirrepproduct',['getIrrepProduct',['../classCheMPS2_1_1FCI.html#a0f796c17feed28899734cac395903e2c',1,'CheMPS2::FCI']]],
   ['getisactivated',['getIsActivated',['../classCheMPS2_1_1Irreps.html#a4417e98f495d58ac530c73366667e1ae',1,'CheMPS2::Irreps']]],
   ['getl',['getL',['../classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27',1,'CheMPS2::DMRGSCFindices::getL()'],['../classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152',1,'CheMPS2::FCI::getL()'],['../classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618',1,'CheMPS2::Hamiltonian::getL()']]],
   ['getlastlinco',['getLastLinco',['../classCheMPS2_1_1DIIS.html#a8ae6de96166c26ea34c2b34c96848aab',1,'CheMPS2::DIIS']]],

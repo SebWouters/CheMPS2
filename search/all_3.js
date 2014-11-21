@@ -11,7 +11,7 @@ var searchData=
   ['diaghamsquared',['DiagHamSquared',['../classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e',1,'CheMPS2::FCI']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html#a9cbcd9c6176fdfe09844aa7c89d8e583',1,'CheMPS2::DIIS']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html',1,'CheMPS2']]],
-  ['directprod',['directProd',['../classCheMPS2_1_1Irreps.html#af639c441270cd0762cb68479ee6a82a6',1,'CheMPS2::Irreps']]],
+  ['directprod',['directProd',['../classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047',1,'CheMPS2::Irreps']]],
   ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html',1,'CheMPS2']]],
   ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71',1,'CheMPS2::DMRG']]],
   ['dmrgscfindices',['DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html',1,'CheMPS2']]],

@@ -5,5 +5,5 @@
 <area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb" title="Get the max. possible spin value for a certain boundary and particle number. " alt="" coords="226,201,401,242"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="216,266,411,307"/>
 <area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82" title="Get the current virtual dimensions. " alt="" coords="226,331,401,373"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#af639c441270cd0762cb68479ee6a82a6" title="Get the direct product of the irreps with numbers n1 and n2 for the currently activated group..." alt="" coords="218,397,409,424"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="218,397,409,424"/>
 </map>

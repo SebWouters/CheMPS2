@@ -204,7 +204,7 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   Clear();</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;   </div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ikappa=0; ikappa&lt;nKappa; ikappa++){</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> IDR = denBK-&gt;directProd(Idiff,sectorI1[ikappa]);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> IDR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(Idiff,sectorI1[ikappa]);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="keywordtype">int</span> dimUR = denBK-&gt;gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <span class="keywordtype">int</span> dimDR = denBK-&gt;gCurrentDim(index, sectorN1[ikappa]+2, sectorTwoS1[ikappa], IDR             );</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      </div>
@@ -216,26 +216,26 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;               TwoSLU = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;               ILU = sectorI1[ikappa];</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;               TwoSLD = sectorTwoS1[ikappa]-1;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;               ILD = denBK-&gt;directProd( ILU, denL-&gt;gIdiff() );</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;               ILD = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( ILU, denL-&gt;gIdiff() );</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            <span class="keywordflow">case</span> 1:</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;               NLU = sectorN1[ikappa];</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;               TwoSLU = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;               ILU = sectorI1[ikappa];</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;               TwoSLD = sectorTwoS1[ikappa]+1;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;               ILD = denBK-&gt;directProd( ILU, denL-&gt;gIdiff() );</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;               ILD = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( ILU, denL-&gt;gIdiff() );</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;            <span class="keywordflow">case</span> 2:</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;               NLU = sectorN1[ikappa]-1;</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;               TwoSLU = sectorTwoS1[ikappa]-1;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;               ILU = denBK-&gt;directProd( sectorI1[ikappa] , denBK-&gt;gIrrep(index-1) );</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;               ILU = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denBK-&gt;gIrrep(index-1) );</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;               TwoSLD = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;               ILD = IDR;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            <span class="keywordflow">case</span> 3:</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;               NLU = sectorN1[ikappa]-1;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;               TwoSLU = sectorTwoS1[ikappa]+1;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;               ILU = denBK-&gt;directProd( sectorI1[ikappa] , denBK-&gt;gIrrep(index-1) );</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;               ILU = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denBK-&gt;gIrrep(index-1) );</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;               TwoSLD = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;               ILD = IDR;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;               <span class="keywordflow">break</span>;</div>
@@ -277,7 +277,7 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;   Clear();</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;   </div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ikappa=0; ikappa&lt;nKappa; ikappa++){</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> IDL = denBK-&gt;directProd(Idiff,sectorI1[ikappa]);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> IDL = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(Idiff,sectorI1[ikappa]);</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keywordtype">int</span> dimUL = denBK-&gt;gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="keywordtype">int</span> dimDL = denBK-&gt;gCurrentDim(index, sectorN1[ikappa]+2, sectorTwoS1[ikappa], IDL             );</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      </div>
@@ -287,14 +287,14 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            <span class="keywordflow">case</span> 0:</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;               NRU = sectorN1[ikappa]+1;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;               TwoSRU = sectorTwoS1[ikappa]-1;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;               IRU = denBK-&gt;directProd( sectorI1[ikappa] , denBK-&gt;gIrrep(index) );</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;               IRU = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denBK-&gt;gIrrep(index) );</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;               TwoSRD = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;               IRD = IDL;</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            <span class="keywordflow">case</span> 1:</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;               NRU = sectorN1[ikappa]+1;</div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;               TwoSRU = sectorTwoS1[ikappa]+1;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;               IRU = denBK-&gt;directProd( sectorI1[ikappa] , denBK-&gt;gIrrep(index) );</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;               IRU = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denBK-&gt;gIrrep(index) );</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;               TwoSRD = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;               IRD = IDL;</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;               <span class="keywordflow">break</span>;</div>
@@ -303,14 +303,14 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;               TwoSRU = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;               IRU = sectorI1[ikappa];</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;               TwoSRD = sectorTwoS1[ikappa]-1;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;               IRD = denBK-&gt;directProd( sectorI1[ikappa] , denL-&gt;gIdiff() );</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;               IRD = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denL-&gt;gIdiff() );</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            <span class="keywordflow">case</span> 3:</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;               NRU = sectorN1[ikappa]+2;</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;               TwoSRU = sectorTwoS1[ikappa];</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;               IRU = sectorI1[ikappa];</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;               TwoSRD = sectorTwoS1[ikappa]+1;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;               IRD = denBK-&gt;directProd( sectorI1[ikappa] , denL-&gt;gIdiff() );</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;               IRD = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ikappa] , denL-&gt;gIdiff() );</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;               <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;         }</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;         <span class="keywordtype">int</span> dimRU = denBK-&gt;gCurrentDim(index+1, NRU,   TwoSRU, IRU);</div>
@@ -351,6 +351,7 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1TensorS0_html_ace3bc035b03bcbf1b0a8f94b96977465"><div class="ttname"><a href="classCheMPS2_1_1TensorS0.html#ace3bc035b03bcbf1b0a8f94b96977465">CheMPS2::TensorS0::~TensorS0</a></div><div class="ttdeci">virtual ~TensorS0()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TensorS0_8cpp_source.html#l00030">TensorS0.cpp:30</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html">CheMPS2::TensorT</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8h_source.html#l00035">TensorT.h:35</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorS0Abase_html"><div class="ttname"><a href="classCheMPS2_1_1TensorS0Abase.html">CheMPS2::TensorS0Abase</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorS0Abase_8h_source.html#l00033">TensorS0Abase.h:33</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorS0_html_a862df3a3f5650891950e20ee80729cda"><div class="ttname"><a href="classCheMPS2_1_1TensorS0.html#a862df3a3f5650891950e20ee80729cda">CheMPS2::TensorS0::TensorS0</a></div><div class="ttdeci">TensorS0(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper *denBKIn)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="TensorS0_8cpp_source.html#l00026">TensorS0.cpp:26</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
@@ -359,7 +360,7 @@ $(document).ready(function(){initNavTree('TensorS0_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TensorS0.cpp</b></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:04 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:50 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

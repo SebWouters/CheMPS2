@@ -143,9 +143,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ae876dae50220954a3ed8fd72813e28db"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db">getTargetIrrep</a> () const </td></tr>
 <tr class="memdesc:ae876dae50220954a3ed8fd72813e28db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the target irrep.  <a href="#ae876dae50220954a3ed8fd72813e28db">More...</a><br/></td></tr>
 <tr class="separator:ae876dae50220954a3ed8fd72813e28db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d55b73a60bb7adba1272211c484fd04"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a8d55b73a60bb7adba1272211c484fd04">getIrrepProduct</a> (const int Irrep1, const int Irrep2) const </td></tr>
-<tr class="memdesc:a8d55b73a60bb7adba1272211c484fd04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of two irreps.  <a href="#a8d55b73a60bb7adba1272211c484fd04">More...</a><br/></td></tr>
-<tr class="separator:a8d55b73a60bb7adba1272211c484fd04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79c9426a1f2d8a4b918adad9ffa89894"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a79c9426a1f2d8a4b918adad9ffa89894">getOrb2Irrep</a> (const int orb) const </td></tr>
 <tr class="memdesc:a79c9426a1f2d8a4b918adad9ffa89894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an orbital irrep.  <a href="#a79c9426a1f2d8a4b918adad9ffa89894">More...</a><br/></td></tr>
 <tr class="separator:a79c9426a1f2d8a4b918adad9ffa89894"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,6 +179,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a0f796c17feed28899734cac395903e2c"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a0f796c17feed28899734cac395903e2c">getIrrepProduct</a> (const int Irrep1, const int Irrep2)</td></tr>
+<tr class="memdesc:a0f796c17feed28899734cac395903e2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of two irreps (Psi4's convention is used): product( irrep1 , irrep2 ) = irrep1 XOR irrep2.  <a href="#a0f796c17feed28899734cac395903e2c">More...</a><br/></td></tr>
+<tr class="separator:a0f796c17feed28899734cac395903e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7baa6a75e09d6055abb48bb012a1227c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a7baa6a75e09d6055abb48bb012a1227c">FillRandom</a> (const unsigned long long vecLength, double *vec)</td></tr>
 <tr class="memdesc:a7baa6a75e09d6055abb48bb012a1227c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given.  <a href="#a7baa6a75e09d6055abb48bb012a1227c">More...</a><br/></td></tr>
 <tr class="separator:a7baa6a75e09d6055abb48bb012a1227c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -333,7 +333,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph" id="classCheMPS2_1_1FCI_a7d47d6038adaa1a5b3ab6d4624976b87_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="198,5,357,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="198,70,357,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="198,135,357,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="198,201,357,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="198,266,357,307"/><area shape="rect" id="node7" href="classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="198,331,357,373"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="198,5,357,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="198,70,357,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="198,135,357,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="198,201,357,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="198,266,357,307"/><area shape="rect" id="node8" href="classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="198,331,357,373"/><area shape="rect" id="node7" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="406,273,597,300"/></map>
 </div>
 </p>
 
@@ -388,7 +388,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01712">1712</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01705">1705</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -461,7 +461,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01731">1731</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01724">1724</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -529,7 +529,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The single integer which represents the bits in bits </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00415">415</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00408">408</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,7 +556,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Measured value of S(S+1) </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00930">930</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00923">923</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -615,7 +615,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01937">1937</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01930">1930</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -716,7 +716,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01897">1897</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01890">1890</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -782,7 +782,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01963">1963</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01956">1956</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -869,7 +869,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01948">1948</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01941">1941</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -941,7 +941,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01823">1823</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01816">1816</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -997,7 +997,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01443">1443</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01436">1436</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1076,7 +1076,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02114">2114</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02107">2107</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1110,7 +1110,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00990">990</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00983">983</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1144,7 +1144,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01026">1026</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01019">1019</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1203,7 +1203,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01425">1425</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01418">1418</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1255,7 +1255,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01403">1403</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01396">1396</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1308,7 +1308,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The inproduct &lt; vec1 | vec2 &gt; </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01411">1411</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01404">1404</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1360,7 +1360,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01434">1434</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01427">1427</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1406,7 +1406,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The 2-norm of vec </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01419">1419</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01412">1412</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1444,7 +1444,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The energy of the given <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> vector, calculated by contraction of the 2-RDM with Gmat and ERI </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00736">736</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00729">729</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1489,7 +1489,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01449">1449</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01442">1442</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1548,7 +1548,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00435">435</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00428">428</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1689,7 +1689,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The corresponding <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient; 0.0 if bits_up and bits_down do not form a valid <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> determinant </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00453">453</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00446">446</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -1750,7 +1750,7 @@ Static Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a8d55b73a60bb7adba1272211c484fd04"></a>
+<a class="anchor" id="a0f796c17feed28899734cac395903e2c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1758,7 +1758,7 @@ Static Protected Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int CheMPS2::FCI::getIrrepProduct </td>
+          <td class="memname">static int CheMPS2::FCI::getIrrepProduct </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>Irrep1</em>, </td>
@@ -1772,17 +1772,17 @@ Static Protected Member Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td> const</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get the direct product of two irreps. </p>
+<p>Get the direct product of two irreps (Psi4's convention is used): product( irrep1 , irrep2 ) = irrep1 XOR irrep2. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Irrep1</td><td>The first irrep </td></tr>
@@ -1898,7 +1898,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> element which connects the given two Slater determinants </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01257">1257</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01250">1250</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2102,7 +2102,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The corresponding irrep of the up Slater determinant </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00427">427</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00420">420</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2186,7 +2186,7 @@ Static Protected Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The ground state energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01455">1455</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01448">1448</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2231,7 +2231,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00548">548</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00541">541</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2251,7 +2251,7 @@ Static Protected Member Functions</h2></td></tr>
 <p>Return the global counter of the Slater determinant with the lowest energy. </p>
 <dl class="section return"><dt>Returns</dt><dd>The global counter of the Slater determinant with the lowest energy </dd></dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01235">1235</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01228">1228</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2344,7 +2344,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01993">1993</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01986">1986</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -2407,7 +2407,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00409">409</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l00402">402</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2421,7 +2421,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:04 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:50 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

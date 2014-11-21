@@ -199,7 +199,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep2 = Prob-&gt;gIrrep(cnt2);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep3 = Prob-&gt;gIrrep(cnt3);</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep4 = Prob-&gt;gIrrep(cnt4);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;   <span class="keywordflow">if</span> ( denBK-&gt;directProd(irrep1, irrep2) == denBK-&gt;directProd(irrep3, irrep4) ){</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;   <span class="keywordflow">if</span> ( <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(irrep1, irrep2) == <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(irrep3, irrep4) ){</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      <span class="keywordflow">return</span> TwoDMA-&gt;get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   }</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;   </div>
@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep2 = Prob-&gt;gIrrep(cnt2);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep3 = Prob-&gt;gIrrep(cnt3);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> irrep4 = Prob-&gt;gIrrep(cnt4);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;   <span class="keywordflow">if</span> ( denBK-&gt;directProd(irrep1, irrep2) == denBK-&gt;directProd(irrep3, irrep4) ){</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;   <span class="keywordflow">if</span> ( <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(irrep1, irrep2) == <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(irrep3, irrep4) ){</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <span class="keywordflow">return</span> TwoDMB-&gt;get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;   }</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;   </div>
@@ -402,7 +402,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> k_index = j_index + col;</div>
 <div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> I_g = denBK-&gt;gIrrep(g_index);</div>
 <div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;         <span class="keywordflow">if</span> (denBK-&gt;directProd(I_g, denBK-&gt;gIrrep(theindex)) == denBK-&gt;directProd(denBK-&gt;gIrrep(j_index), denBK-&gt;gIrrep(k_index))){</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;         <span class="keywordflow">if</span> (<a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(I_g, denBK-&gt;gIrrep(theindex)) == <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(denBK-&gt;gIrrep(j_index), denBK-&gt;gIrrep(k_index))){</div>
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            <span class="comment">//Diagrams 13,14,15 and 16</span></div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">double</span> d13 = doD13(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][k_index-j_index][j_index-theindex-1],</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                                     workmem, workmem2, I_g) * prefactorSpin;</div>
@@ -495,7 +495,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> IL = 0; IL&lt;denBK-&gt;getNumberOfIrreps(); IL++){</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSR = TwoSL-1; TwoSR&lt;=TwoSL+1; TwoSR+=2){</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;            </div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;               <span class="keywordtype">int</span> IRup = denBK-&gt;directProd(IL, denBK-&gt;gIrrep(theindex)); </div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;               <span class="keywordtype">int</span> IRup = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL, denBK-&gt;gIrrep(theindex)); </div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;               </div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;               <span class="keywordtype">int</span> dimL     = denBK-&gt;gCurrentDim(theindex,  NL,  TwoSL,IL);</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;               <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+1,NL+2,TwoSL,IL);</div>
@@ -619,7 +619,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> IL = 0; IL&lt;denBK-&gt;getNumberOfIrreps(); IL++){</div>
 <div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSR=TwoSL-1; TwoSR&lt;=TwoSL+1; TwoSR+=2){</div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;               </div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;               <span class="keywordtype">int</span> IR = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;               <span class="keywordtype">int</span> IR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;               <span class="keywordtype">int</span> dimL     = denBK-&gt;gCurrentDim(theindex,  NL,  TwoSL,IL);</div>
 <div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;               <span class="keywordtype">int</span> dimR     = denBK-&gt;gCurrentDim(theindex+1,NL+1,TwoSR,IR);</div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;            </div>
@@ -661,7 +661,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRup=TwoSL-1; TwoSRup&lt;=TwoSL+1; TwoSRup+=2){</div>
 <div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRdown=TwoSL-1; TwoSRdown&lt;=TwoSL+1; TwoSRdown+=2){</div>
 <div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;               </div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;                  <span class="keywordtype">int</span> IR = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;                  <span class="keywordtype">int</span> IR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;                  <span class="keywordtype">int</span> dimL     = denBK-&gt;gCurrentDim(theindex,  NL,  TwoSL,    IL);</div>
 <div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;                  <span class="keywordtype">int</span> dimRup   = denBK-&gt;gCurrentDim(theindex+1,NL+1,TwoSRup,  IR);</div>
 <div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;                  <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+1,NL+1,TwoSRdown,IR);</div>
@@ -709,7 +709,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;         </div>
 <div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;               </div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;               <span class="keywordtype">int</span> IR = denBK-&gt;directProd(ILup,denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;               <span class="keywordtype">int</span> IR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;               <span class="keywordtype">int</span> dimLdown = denBK-&gt;gCurrentDim(theindex,   NLup-1, TwoSLdown, IR);</div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;               <span class="keywordtype">int</span> dimR     = denBK-&gt;gCurrentDim(theindex+1, NLup+1, TwoSLdown, IR);</div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;            </div>
@@ -759,7 +759,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;         </div>
 <div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;                  </div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;                  <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup,Irrep_g);</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;                  <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,Irrep_g);</div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;                  </div>
 <div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;                  <span class="keywordtype">int</span> dimLdown = denBK-&gt;gCurrentDim(theindex,   NL-1, TwoSLdown, Idown);</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;                  <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+1, NL+1, TwoSLdown, Idown);</div>
@@ -811,9 +811,9 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;            <span class="keywordtype">int</span> dimLup = denBK-&gt;gCurrentDim(theindex, NL, TwoSLup, ILup);</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;            </div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;               <span class="keywordtype">int</span> IRup   = denBK-&gt;directProd(ILup,   denBK-&gt;gIrrep(theindex));</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(ILup,   Irrep_g);</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(ILdown, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;               <span class="keywordtype">int</span> IRup   = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   Irrep_g);</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILdown, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;         </div>
 <div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRup=TwoSLup-1; TwoSRup&lt;=TwoSLup+1; TwoSRup+=2){</div>
@@ -879,7 +879,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;            <span class="keywordtype">int</span> dimRup = denBK-&gt;gCurrentDim(theindex+1, NL, TwoSLup, ILup);</div>
 <div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;            <span class="keywordflow">if</span> ((dimLup&gt;0) &amp;&amp; (dimRup&gt;0)){</div>
 <div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;            </div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;               <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup, Irrep_g);</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;               <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, Irrep_g);</div>
 <div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;         </div>
 <div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;                        </div>
@@ -935,8 +935,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;            </div>
 <div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;            <span class="keywordflow">if</span> ((dimLup&gt;0) &amp;&amp; (dimRup&gt;0)){</div>
 <div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;            </div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(ILup,   Irrep_g);</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(ILdown, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   Irrep_g);</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILdown, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;         </div>
 <div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;                        </div>
@@ -990,8 +990,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;            </div>
 <div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;            </div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;               <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup, Irrep_g);</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;               <span class="keywordtype">int</span> IRup  = denBK-&gt;directProd(ILup, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;               <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, Irrep_g);</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;               <span class="keywordtype">int</span> IRup  = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;         </div>
 <div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;                  </div>
@@ -1048,8 +1048,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;            </div>
 <div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;            <span class="keywordflow">if</span> ((dimLup&gt;0) &amp;&amp; (dimRup&gt;0)){</div>
 <div class="line"><a name="l00944"></a><span class="lineno">  944</span>&#160;            </div>
-<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(ILup,   Irrep_g);</div>
-<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(ILdown, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00945"></a><span class="lineno">  945</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   Irrep_g);</div>
+<div class="line"><a name="l00946"></a><span class="lineno">  946</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILdown, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00947"></a><span class="lineno">  947</span>&#160;         </div>
 <div class="line"><a name="l00948"></a><span class="lineno">  948</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l00949"></a><span class="lineno">  949</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRdown=TwoSLdown-1; TwoSRdown&lt;=TwoSLdown+1; TwoSRdown+=2){</div>
@@ -1106,8 +1106,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l01000"></a><span class="lineno"> 1000</span>&#160;            </div>
 <div class="line"><a name="l01001"></a><span class="lineno"> 1001</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l01002"></a><span class="lineno"> 1002</span>&#160;            </div>
-<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;               <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup, Irrep_g);</div>
-<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;               <span class="keywordtype">int</span> IRup  = denBK-&gt;directProd(ILup, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l01003"></a><span class="lineno"> 1003</span>&#160;               <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, Irrep_g);</div>
+<div class="line"><a name="l01004"></a><span class="lineno"> 1004</span>&#160;               <span class="keywordtype">int</span> IRup  = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l01005"></a><span class="lineno"> 1005</span>&#160;         </div>
 <div class="line"><a name="l01006"></a><span class="lineno"> 1006</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l01007"></a><span class="lineno"> 1007</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRup=TwoSLup-1; TwoSRup&lt;=TwoSLup+1; TwoSRup+=2){</div>
@@ -1165,8 +1165,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l01059"></a><span class="lineno"> 1059</span>&#160;            </div>
 <div class="line"><a name="l01060"></a><span class="lineno"> 1060</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l01061"></a><span class="lineno"> 1061</span>&#160;            </div>
-<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(ILup,   Irrep_g);</div>
-<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(ILdown, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l01062"></a><span class="lineno"> 1062</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   Irrep_g);</div>
+<div class="line"><a name="l01063"></a><span class="lineno"> 1063</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILdown, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l01064"></a><span class="lineno"> 1064</span>&#160;         </div>
 <div class="line"><a name="l01065"></a><span class="lineno"> 1065</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l01066"></a><span class="lineno"> 1066</span>&#160;                  </div>
@@ -1222,8 +1222,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;            </div>
 <div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;            </div>
-<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;               <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup, Irrep_g);</div>
-<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;               <span class="keywordtype">int</span> IRup  = denBK-&gt;directProd(ILup, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;               <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, Irrep_g);</div>
+<div class="line"><a name="l01120"></a><span class="lineno"> 1120</span>&#160;               <span class="keywordtype">int</span> IRup  = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l01121"></a><span class="lineno"> 1121</span>&#160;         </div>
 <div class="line"><a name="l01122"></a><span class="lineno"> 1122</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l01123"></a><span class="lineno"> 1123</span>&#160;                  </div>
@@ -1282,8 +1282,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l01176"></a><span class="lineno"> 1176</span>&#160;            </div>
 <div class="line"><a name="l01177"></a><span class="lineno"> 1177</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l01178"></a><span class="lineno"> 1178</span>&#160;            </div>
-<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(ILup,   Irrep_g);</div>
-<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(ILdown, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l01179"></a><span class="lineno"> 1179</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup,   Irrep_g);</div>
+<div class="line"><a name="l01180"></a><span class="lineno"> 1180</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILdown, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l01181"></a><span class="lineno"> 1181</span>&#160;         </div>
 <div class="line"><a name="l01182"></a><span class="lineno"> 1182</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l01183"></a><span class="lineno"> 1183</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRdown=TwoSLdown-1; TwoSRdown&lt;=TwoSLdown+1; TwoSRdown+=2){</div>
@@ -1350,8 +1350,8 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;            </div>
 <div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;            <span class="keywordflow">if</span> (dimLup&gt;0){</div>
 <div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            </div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;               <span class="keywordtype">int</span> Idown = denBK-&gt;directProd(ILup, Irrep_g);</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;               <span class="keywordtype">int</span> IRup  = denBK-&gt;directProd(ILup, denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;               <span class="keywordtype">int</span> Idown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, Irrep_g);</div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;               <span class="keywordtype">int</span> IRup  = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(ILup, denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;         </div>
 <div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;               <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSLdown=TwoSLup-1; TwoSLdown&lt;=TwoSLup+1; TwoSLdown+=2){</div>
 <div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoSRup=TwoSLup-1; TwoSRup&lt;=TwoSLup+1; TwoSRup+=2){</div>
@@ -1411,7 +1411,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_ae76f74e153484c87b54d4c4152283752"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#ae76f74e153484c87b54d4c4152283752">CheMPS2::TwoDM::~TwoDM</a></div><div class="ttdeci">virtual ~TwoDM()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00049">TwoDM.cpp:49</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html">CheMPS2::TensorL</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8h_source.html#l00034">TensorL.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorF1_html"><div class="ttname"><a href="classCheMPS2_1_1TensorF1.html">CheMPS2::TensorF1</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorF1_8h_source.html#l00035">TensorF1.h:35</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Irreps_html_afd3d1b65e870aad920125c05606c4a7d"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps::getNumberOfIrreps</a></div><div class="ttdeci">int getNumberOfIrreps() const </div><div class="ttdoc">Get the number of irreps for the currently activated group. </div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00114">Irreps.cpp:114</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_afd3d1b65e870aad920125c05606c4a7d"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps::getNumberOfIrreps</a></div><div class="ttdeci">int getNumberOfIrreps() const </div><div class="ttdoc">Get the number of irreps for the currently activated group. </div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00094">Irreps.cpp:94</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorS1_html"><div class="ttname"><a href="classCheMPS2_1_1TensorS1.html">CheMPS2::TensorS1</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorS1_8h_source.html#l00035">TensorS1.h:35</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_a279b51f0616ab58f2a2893681b4cab71"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71">CheMPS2::TensorT::gIndex</a></div><div class="ttdeci">int gIndex() const </div><div class="ttdoc">Get the location index. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00153">TensorT.cpp:153</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_ad7615a0d2458408de29de4b8b88868f1"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#ad7615a0d2458408de29de4b8b88868f1">CheMPS2::TwoDM::getTwoDMB_DMRG</a></div><div class="ttdeci">double getTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const </div><div class="ttdoc">Get a 2DM_B term, using the DMRG indices. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00104">TwoDM.cpp:104</a></div></div>
@@ -1422,6 +1422,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Problem_html_ac09cc027ab9b41132096e9bd14b549ff"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff">CheMPS2::Problem::gIrrep</a></div><div class="ttdeci">int gIrrep(const int nOrb) const </div><div class="ttdoc">Get an orbital irrep. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00088">Problem.cpp:88</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_a2cb905399d199f45e7101e3927933005"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005">CheMPS2::TwoDM::getTwoDMA_DMRG</a></div><div class="ttdeci">double getTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const </div><div class="ttdoc">Get a 2DM_A term, using the DMRG indices. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00089">TwoDM.cpp:89</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html">CheMPS2::TwoDMstorage</a></div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8h_source.html#l00032">TwoDMstorage.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html"><div class="ttname"><a href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a></div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00035">Problem.h:35</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_adbf8c64ef9c9f687c51fded841961e88"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#adbf8c64ef9c9f687c51fded841961e88">CheMPS2::TwoDM::getTwoDMB_HAM</a></div><div class="ttdeci">double getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const </div><div class="ttdoc">Get a 2DM_B term, using the HAM indices. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00129">TwoDM.cpp:129</a></div></div>
@@ -1439,7 +1440,7 @@ $(document).ready(function(){initNavTree('TwoDM_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TwoDM.cpp</b></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:04 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:50 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

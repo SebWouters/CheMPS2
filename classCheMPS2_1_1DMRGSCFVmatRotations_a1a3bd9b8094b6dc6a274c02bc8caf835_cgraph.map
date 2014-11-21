@@ -1,4 +1,5 @@
 <map id="CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG" name="CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="299,5,496,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="318,70,477,111"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="545,35,735,62"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="299,24,496,65"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="318,89,477,131"/>
 </map>

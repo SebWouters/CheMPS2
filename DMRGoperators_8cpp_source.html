@@ -586,7 +586,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;         S0tensors[index][cnt2] = <span class="keyword">new</span> TensorS0 * [index-cnt2+1];</div>
 <div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;         <span class="keywordflow">if</span> (cnt2&gt;0){ S1tensors[index][cnt2] = <span class="keyword">new</span> TensorS1 * [index-cnt2+1]; }</div>
 <div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt3=0; cnt3&lt;(index-cnt2+1); cnt3++){</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Iprod = denBK-&gt;directProd(denBK-&gt;gIrrep(index-cnt2-cnt3),denBK-&gt;gIrrep(index-cnt3));</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Iprod = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(denBK-&gt;gIrrep(index-cnt2-cnt3),denBK-&gt;gIrrep(index-cnt3));</div>
 <div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;            F0tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorF0(index+1,Iprod,movingRight,denBK);</div>
 <div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;            F1tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorF1(index+1,Iprod,movingRight,denBK);</div>
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;            S0tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorS0(index+1,Iprod,movingRight,denBK);</div>
@@ -606,7 +606,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;         Ctensors[index][cnt2] = <span class="keyword">new</span> TensorC * [Prob-&gt;gL()-1-index-cnt2];</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;         Dtensors[index][cnt2] = <span class="keyword">new</span> TensorD * [Prob-&gt;gL()-1-index-cnt2];</div>
 <div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt3=0; cnt3&lt;Prob-&gt;gL()-1-index-cnt2; cnt3++){</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Idiff = denBK-&gt;directProd(denBK-&gt;gIrrep(index+1+cnt2+cnt3),denBK-&gt;gIrrep(index+1+cnt3));</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Idiff = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(denBK-&gt;gIrrep(index+1+cnt2+cnt3),denBK-&gt;gIrrep(index+1+cnt3));</div>
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;            Atensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorA(index+1,Idiff,movingRight,denBK);</div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;            <span class="keywordflow">if</span> (cnt2&gt;0){ Btensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorB(index+1,Idiff,movingRight,denBK); }</div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            Ctensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorC(index+1,Idiff,movingRight,denBK);</div>
@@ -650,7 +650,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;         S0tensors[index][cnt2] = <span class="keyword">new</span> TensorS0 * [Prob-&gt;gL()-1-index-cnt2];</div>
 <div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;         <span class="keywordflow">if</span> (cnt2&gt;0){ S1tensors[index][cnt2] = <span class="keyword">new</span> TensorS1 * [Prob-&gt;gL()-1-index-cnt2]; }</div>
 <div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt3=0; cnt3&lt;Prob-&gt;gL()-1-index-cnt2; cnt3++){</div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Iprod = denBK-&gt;directProd(denBK-&gt;gIrrep(index+1+cnt3),denBK-&gt;gIrrep(index+1+cnt2+cnt3));</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Iprod = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(denBK-&gt;gIrrep(index+1+cnt3),denBK-&gt;gIrrep(index+1+cnt2+cnt3));</div>
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;            F0tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorF0(index+1,Iprod,movingRight,denBK);</div>
 <div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;            F1tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorF1(index+1,Iprod,movingRight,denBK);</div>
 <div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;            S0tensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorS0(index+1,Iprod,movingRight,denBK);</div>
@@ -670,7 +670,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;         Ctensors[index][cnt2] = <span class="keyword">new</span> TensorC * [index + 1 - cnt2];</div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;         Dtensors[index][cnt2] = <span class="keyword">new</span> TensorD * [index + 1 - cnt2];</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt3=0; cnt3&lt;index+1-cnt2; cnt3++){</div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Idiff = denBK-&gt;directProd(denBK-&gt;gIrrep(index-cnt2-cnt3),denBK-&gt;gIrrep(index-cnt3));</div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> Idiff = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(denBK-&gt;gIrrep(index-cnt2-cnt3),denBK-&gt;gIrrep(index-cnt3));</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;            Atensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorA(index+1,Idiff,movingRight,denBK);</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;            <span class="keywordflow">if</span> (cnt2&gt;0){ Btensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorB(index+1,Idiff,movingRight,denBK); }</div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;            Ctensors[index][cnt2][cnt3] = <span class="keyword">new</span> TensorC(index+1,Idiff,movingRight,denBK);</div>
@@ -724,7 +724,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> Cbound = movingRight ? Prob-&gt;gL()-1-index : index+1;</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;   std::stringstream thefilename;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; RNstorage &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;   </div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;   <span class="comment">//The hdf5 file</span></div>
 <div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;   hid_t file_id = H5Fcreate(thefilename.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);</div>
@@ -834,7 +834,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> Cbound = movingRight ? Prob-&gt;gL()-1-index : index+1;</div>
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;   std::stringstream thefilename;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; RNstorage &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;   </div>
 <div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;   <span class="comment">//The hdf5 file</span></div>
 <div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;   hid_t file_id = H5Fopen(thefilename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);</div>
@@ -982,20 +982,21 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00876"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">  876</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a>(){</div>
 <div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;</div>
 <div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;   std::stringstream temp;</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;   temp &lt;&lt; <span class="stringliteral">&quot;rm &quot;</span> &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; RNstorage &lt;&lt; <span class="stringliteral">&quot;*.h5&quot;</span>;</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;   temp &lt;&lt; <span class="stringliteral">&quot;rm &quot;</span> &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span> &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;*.h5&quot;</span>;</div>
 <div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;   <span class="keywordtype">int</span> info = system(temp.str().c_str());</div>
 <div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Info on DMRG::operators rm call to system: &quot;</span> &lt;&lt; info &lt;&lt; endl;</div>
 <div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;</div>
 <div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;}</div>
 <div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;</div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_a2254cc31b5d9497694ea2229226b7bd6"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a></div><div class="ttdeci">void deleteStoredOperators()</div><div class="ttdoc">Call &quot;rm + localTmpPath + CheMPS2_ + RNstorage + *.h5&quot;. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGoperators_8cpp_source.html#l00876">DMRGoperators.cpp:876</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_a2254cc31b5d9497694ea2229226b7bd6"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a></div><div class="ttdeci">void deleteStoredOperators()</div><div class="ttdoc">Call &quot;rm + localTmpPath + CheMPS2_ + thePID + *.h5&quot;. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGoperators_8cpp_source.html#l00876">DMRGoperators.cpp:876</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGoperators.cpp</b></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:03 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:48 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

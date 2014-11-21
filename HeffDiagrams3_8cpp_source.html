@@ -143,7 +143,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;   <span class="keywordtype">int</span> IR = denS-&gt;gIR(ikappa);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;   <span class="keywordtype">int</span> theindex = denS-&gt;gIndex();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   <span class="keywordtype">int</span> ILdown = denBK-&gt;<a class="code" href="classCheMPS2_1_1Irreps.html#af639c441270cd0762cb68479ee6a82a6">directProd</a>(IL,denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">gIrrep</a>(theindex));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">gIrrep</a>(theindex));</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;   <span class="keywordtype">int</span> TwoS2 = (N2==1)?1:0;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;   </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;   <span class="keywordtype">int</span> dimR = denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">gCurrentDim</a>(theindex+2,NR,TwoSR,IR);</div>
@@ -276,7 +276,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;   <span class="keywordtype">int</span> IR = denS-&gt;gIR(ikappa);</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;   </div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;   <span class="keywordtype">int</span> theindex = denS-&gt;gIndex();</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;   <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(theindex+1));</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;   <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(theindex+1));</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;   <span class="keywordtype">int</span> TwoS1 = (N1==1)?1:0;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;   </div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;   <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(theindex+2,NR,TwoSR,IR);</div>
@@ -422,8 +422,8 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">double</span> factor = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);</div>
 <div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      </div>
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> l_index=theindex+2; l_index&lt;Prob-&gt;gL(); l_index++){</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(l_index));</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(l_index));</div>
 <div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;               <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL+1, TwoSLdown, ILdown, N1, N2, TwoJ, NR+1, TwoSRdown, IRdown);</div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;               <span class="keywordflow">if</span> (memSkappa!=-1){</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                  <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);</div>
@@ -457,8 +457,8 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">double</span> factor = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;      </div>
 <div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> l_index=theindex+2; l_index&lt;Prob-&gt;gL(); l_index++){</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(l_index));</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(l_index));</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;               <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL-1, TwoSLdown, ILdown, N1, N2, TwoJ, NR-1, TwoSRdown, IRdown);</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;               <span class="keywordflow">if</span> (memSkappa!=-1){</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;                  <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);</div>
@@ -575,7 +575,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;   <span class="keywordtype">int</span> IR = denS-&gt;gIR(ikappa);</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;   </div>
 <div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;   <span class="keywordtype">int</span> theindex = denS-&gt;gIndex();</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;   <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(theindex));</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;   <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(theindex));</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;   <span class="keywordtype">int</span> TwoS2 = (N2==1)?1:0;</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;   </div>
 <div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;   <span class="keywordtype">int</span> dimL   = denBK-&gt;gCurrentDim(theindex,  NL,TwoSL,IL);</div>
@@ -708,7 +708,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;   <span class="keywordtype">int</span> IR = denS-&gt;gIR(ikappa);</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;   </div>
 <div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;   <span class="keywordtype">int</span> theindex = denS-&gt;gIndex();</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;   <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(theindex+1));</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;   <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(theindex+1));</div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;   <span class="keywordtype">int</span> TwoS1 = (N1==1)?1:0;</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;   </div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;   <span class="keywordtype">int</span> dimL   = denBK-&gt;gCurrentDim(theindex,  NL,TwoSL,IL);</div>
@@ -854,8 +854,8 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">double</span> factor = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);</div>
 <div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;      </div>
 <div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> l_index=0; l_index&lt;theindex; l_index++){</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(l_index));</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(l_index));</div>
 <div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;               <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL+1, TwoSLdown, ILdown, N1, N2, TwoJ, NR+1, TwoSRdown, IRdown);</div>
 <div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;               <span class="keywordflow">if</span> (memSkappa!=-1){</div>
 <div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;            </div>
@@ -890,8 +890,8 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">double</span> factor = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);</div>
 <div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;      </div>
 <div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> l_index=0; l_index&lt;theindex; l_index++){</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;               <span class="keywordtype">int</span> ILdown = denBK-&gt;directProd(IL,denBK-&gt;gIrrep(l_index));</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;               <span class="keywordtype">int</span> IRdown = denBK-&gt;directProd(IR,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;               <span class="keywordtype">int</span> ILdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(l_index));</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;               <span class="keywordtype">int</span> IRdown = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IR,denBK-&gt;gIrrep(l_index));</div>
 <div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;               <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL-1, TwoSLdown, ILdown, N1, N2, TwoJ, NR-1, TwoSRdown, IRdown);</div>
 <div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;               <span class="keywordflow">if</span> (memSkappa!=-1){</div>
 <div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;                  <span class="keywordtype">int</span> dimRdown = denBK-&gt;gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);</div>
@@ -921,15 +921,15 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html_ab9e13e1079e56b1ee12d4ed82b8c7d82"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">CheMPS2::SyBookkeeper::gCurrentDim</a></div><div class="ttdeci">int gCurrentDim(const int bound, const int N, const int TwoS, const int Icnt) const </div><div class="ttdoc">Get the current virtual dimensions. </div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8cpp_source.html#l00128">SyBookkeeper.cpp:128</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html_ab06fa32f4e352d248ebfe67d850a574a"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">CheMPS2::SyBookkeeper::gIrrep</a></div><div class="ttdeci">int gIrrep(const int nOrb) const </div><div class="ttdoc">Get an orbital irrep. </div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8cpp_source.html#l00110">SyBookkeeper.cpp:110</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Irreps_html_af639c441270cd0762cb68479ee6a82a6"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#af639c441270cd0762cb68479ee6a82a6">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">int directProd(const int n1, const int n2) const </div><div class="ttdoc">Get the direct product of the irreps with numbers n1 and n2 for the currently activated group...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00196">Irreps.cpp:196</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_af3ad2a73da9b8af05d145b448cf8bc36"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36">CheMPS2::Problem::gMxElement</a></div><div class="ttdeci">double gMxElement(const int alpha, const int beta, const int gamma, const int delta) const </div><div class="ttdoc">Get a specific interaction matrix element. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00107">Problem.cpp:107</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>HeffDiagrams3.cpp</b></li>
-    <li class="footer">Generated on Tue Nov 18 2014 22:44:03 for CheMPS2 by
+    <li class="footer">Generated on Thu Nov 20 2014 22:50:49 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

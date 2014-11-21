@@ -19,7 +19,6 @@ var classCheMPS2_1_1FCI =
     [ "getERI", "classCheMPS2_1_1FCI.html#a56cbdfb4af815c382559c888a32e67ac", null ],
     [ "getFCIcoeff", "classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f", null ],
     [ "getGmat", "classCheMPS2_1_1FCI.html#ada6d8ff3debe7a82fe843785a2b2d84e", null ],
-    [ "getIrrepProduct", "classCheMPS2_1_1FCI.html#a8d55b73a60bb7adba1272211c484fd04", null ],
     [ "getL", "classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152", null ],
     [ "GetMatrixElement", "classCheMPS2_1_1FCI.html#adf8c063a9d17fe98f0bcaba1281c648f", null ],
     [ "getNel_down", "classCheMPS2_1_1FCI.html#ab053ef3d951302e880c79f690a77dc9b", null ],
