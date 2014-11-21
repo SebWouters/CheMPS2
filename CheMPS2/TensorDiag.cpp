@@ -118,12 +118,12 @@ void CheMPS2::TensorDiag::updateRight(const int ikappa, Tensor * denT, TensorDia
          case 2:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]-1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
          case 3:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]+1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
       }
       int dimL = denBK->gCurrentDim(index-1,NL,TwoSL,IL);
@@ -167,12 +167,12 @@ void CheMPS2::TensorDiag::updateLeft(const int ikappa, Tensor * denT, TensorDiag
          case 2:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]-1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
          case 3:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]+1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
       }
       int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);

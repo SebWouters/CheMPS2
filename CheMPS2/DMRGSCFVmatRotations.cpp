@@ -43,9 +43,9 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatRotated(FourIndex * VmatRotated, DMR
    //Two-body terms --> use eightfold permutation symmetry
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
       for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
-         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         const int productSymm = Irreps::directProd(irrep1,irrep2);
          for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
-            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            const int irrep4 = Irreps::directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
                int linsize1 = iHandler->getNORB(irrep1);
@@ -114,9 +114,9 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFu
    //Two-body terms --> use eightfold permutation symmetry in the irreps :-)
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
       for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
-         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         const int productSymm = Irreps::directProd(irrep1,irrep2);
          for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
-            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            const int irrep4 = Irreps::directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
                int linsizeDMRG1 = iHandler->getNDMRG(irrep1);
@@ -201,9 +201,9 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise(FourIndex * VmatRot
    ***********************************************************/
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
       for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
-         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         const int productSymm = Irreps::directProd(irrep1,irrep2);
          for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
-            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            const int irrep4 = Irreps::directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
                const int linsize1 = iHandler->getNORB(irrep1);
@@ -569,9 +569,9 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRGBlockWise(Hamiltonian * HamDMRG,
    ***********************************************************/
    for (int irrep1 = 0; irrep1<numberOfIrreps; irrep1++){
       for (int irrep2 = irrep1; irrep2<numberOfIrreps; irrep2++){
-         const int productSymm = SymmInfo.directProd(irrep1,irrep2);
+         const int productSymm = Irreps::directProd(irrep1,irrep2);
          for (int irrep3 = irrep1; irrep3<numberOfIrreps; irrep3++){
-            const int irrep4 = SymmInfo.directProd(productSymm,irrep3);
+            const int irrep4 = Irreps::directProd(productSymm,irrep3);
             if (irrep4>=irrep2){
             
                const int linsizeDMRG1 = iHandler->getNDMRG(irrep1);

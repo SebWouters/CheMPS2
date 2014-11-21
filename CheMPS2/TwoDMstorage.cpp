@@ -54,13 +54,13 @@ long long CheMPS2::TwoDMstorage::calcNumberOfElements(const bool allocate){
       if (allocate){ storage[Icenter] = new long long * [NumIrreps]; } //ALLOCATION
       
       for (int I_i=0; I_i<NumIrreps; I_i++){
-         const int I_j = SymmInfo.directProd(Icenter,I_i);
+         const int I_j = Irreps::directProd(Icenter,I_i);
          if ((I_i <= I_j) && (Isizes[I_i]>0) && (Isizes[I_j]>0)){ //I_i <= I_j and both I_i and I_j have orbitals
          
             if (allocate){ storage[Icenter][I_i] = new long long[NumIrreps - I_i]; } //ALLOCATION
          
             for (int I_k=I_i; I_k<NumIrreps; I_k++){ //I_i <= I_k
-               const int I_l = SymmInfo.directProd(Icenter,I_k);
+               const int I_l = Irreps::directProd(Icenter,I_k);
                if ((I_i <= I_l) && (Isizes[I_k]>0) && (Isizes[I_l]>0)){ //I_i <= I_l and both I_k and I_l have orbitals
                
                   storage[Icenter][I_i][I_k - I_i] = theTotalSize;
@@ -101,9 +101,9 @@ double CheMPS2::TwoDMstorage::get(const int irrep_i, const int irrep_j, const in
 
 long long CheMPS2::TwoDMstorage::getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
 
-   const int Icenter = SymmInfo.directProd(irrep_i,irrep_j);
+   const int Icenter = Irreps::directProd(irrep_i,irrep_j);
 
-   if ( Icenter == SymmInfo.directProd(irrep_k,irrep_l) ){
+   if ( Icenter == Irreps::directProd(irrep_k,irrep_l) ){
 
       if ((irrep_i <= irrep_j) && (irrep_i <= irrep_k) && (irrep_i <= irrep_l)){ // Irrep I_i is the smallest : (ijkl)
          return storage[Icenter][irrep_i][irrep_k - irrep_i] + i + Isizes[irrep_i] * ( j + Isizes[irrep_j] * ( k + Isizes[irrep_k] * l ) );

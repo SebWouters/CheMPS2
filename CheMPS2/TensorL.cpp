@@ -44,7 +44,7 @@ void CheMPS2::TensorL::makenewRight(TensorT * denT){
    Clear();
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      int IDR = denBK->directProd(Idiff,sectorI1[ikappa]);
+      int IDR = Irreps::directProd(Idiff,sectorI1[ikappa]);
       int dimUR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimDR = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], IDR             );
       
@@ -90,7 +90,7 @@ void CheMPS2::TensorL::makenewLeft(TensorT * denT){
    Clear();
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      int IDL = denBK->directProd(Idiff,sectorI1[ikappa]);
+      int IDL = Irreps::directProd(Idiff,sectorI1[ikappa]);
       int dimUL = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimDL = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], IDL             );
       

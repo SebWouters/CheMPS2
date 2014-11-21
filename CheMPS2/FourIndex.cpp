@@ -53,11 +53,11 @@ long long CheMPS2::FourIndex::calcNumberOfUniqueElements(const bool allocate){
    for (int Icenter=0; Icenter<SymmInfo.getNumberOfIrreps(); Icenter++){
       if (allocate){ storage[Icenter] = new long long***[SymmInfo.getNumberOfIrreps()]; }
       for (int I_i=0; I_i<SymmInfo.getNumberOfIrreps(); I_i++){
-         int I_j = SymmInfo.directProd(Icenter,I_i);
+         int I_j = Irreps::directProd(Icenter,I_i);
          if ((Isizes[I_i]>0)&&(Isizes[I_j]>0)){
             if (allocate){ storage[Icenter][I_i] = new long long**[SymmInfo.getNumberOfIrreps()]; }
             for (int I_k=I_i; I_k<SymmInfo.getNumberOfIrreps(); I_k++){
-               int I_l = SymmInfo.directProd(Icenter,I_k);
+               int I_l = Irreps::directProd(Icenter,I_k);
                if ((Isizes[I_k]>0)&&(Isizes[I_l]>0)){
                   if ((I_i <= I_j) && (I_j <= I_l)){
                      if (Icenter == 0){ // I_i = I_j and I_k = I_l
@@ -171,7 +171,7 @@ double CheMPS2::FourIndex::get(const int irrep_i, const int irrep_j, const int i
 
 long long CheMPS2::FourIndex::getPointer(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
 
-   if (SymmInfo.directProd(irrep_i,irrep_j)==SymmInfo.directProd(irrep_k,irrep_l)){
+   if (Irreps::directProd(irrep_i,irrep_j)==Irreps::directProd(irrep_k,irrep_l)){
 
       if ((irrep_i <= irrep_j) && (irrep_i <= irrep_k) && (irrep_j <= irrep_l)){ // (ijkl irrep ordering)
          return getPtrIrrepOrderOK(irrep_i,irrep_j,irrep_k,irrep_l,i,j,k,l);
@@ -214,7 +214,7 @@ long long CheMPS2::FourIndex::getPointer(const int irrep_i, const int irrep_j, c
 long long CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const {
 
    //I_i <= I_j <= I_l and I_i <= I_k
-   int Icenter = SymmInfo.directProd(irrep_i,irrep_j);
+   int Icenter = Irreps::directProd(irrep_i,irrep_j);
    
    if (Icenter>0){ // I_i < I_j and I_k != I_l
    

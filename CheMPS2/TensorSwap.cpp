@@ -37,7 +37,7 @@ CheMPS2::TensorSwap::TensorSwap(const int indexIn, const int IdiffIn, const bool
          for (int IU=0; IU<denBK->getNumberOfIrreps(); IU++){
             int dimU = denBK->gCurrentDim(index,NU,TwoSU,IU);
             if (dimU>0){
-               int ID = denBK->directProd(Idiff,IU);
+               int ID = Irreps::directProd(Idiff,IU);
                for (int TwoSD = TwoSU-1; TwoSD<=TwoSU+1; TwoSD+=2){
                   if (TwoSD>=0){
                      int dimD = denBK->gCurrentDim(index,NU+1,TwoSD,ID);
@@ -64,7 +64,7 @@ CheMPS2::TensorSwap::TensorSwap(const int indexIn, const int IdiffIn, const bool
          for (int IU=0; IU<denBK->getNumberOfIrreps(); IU++){
             int dimU = denBK->gCurrentDim(index,NU,TwoSU,IU);
             if (dimU>0){
-               int ID = denBK->directProd(Idiff,IU);
+               int ID = Irreps::directProd(Idiff,IU);
                for (int TwoSD = TwoSU-1; TwoSD<=TwoSU+1; TwoSD+=2){
                   if (TwoSD>=0){
                      int dimD = denBK->gCurrentDim(index,NU+1,TwoSD,ID);
@@ -104,7 +104,7 @@ double * CheMPS2::TensorSwap::gStorage() { return storage; }
       
 int CheMPS2::TensorSwap::gKappa(const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2) const{
 
-   if ((denBK->directProd(I1,Idiff))!=I2) return -1;
+   if ((Irreps::directProd(I1,Idiff))!=I2) return -1;
    if (N2!=N1+1) return -1;
 
    for (int cnt=0; cnt<nKappa; cnt++){
@@ -148,7 +148,7 @@ void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT *
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUR = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-      int IDR = denBK->directProd(sectorI1[ikappa],Idiff);
+      int IDR = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimDR = denBK->gCurrentDim(index,sectorN1[ikappa]+1,sectorTwoSD[ikappa],IDR);
       
       for (int geval=0; geval<5; geval++){
@@ -171,23 +171,23 @@ void CheMPS2::TensorSwap::updateMovingRight(TensorSwap * SwapPrevious, TensorT *
             case 2: //N = 1, both TwoJLs minus one
                NUL = sectorN1[ikappa] - 1;
                TwoSUL = sectorTwoS1[ikappa] - 1;
-               IUL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
+               IUL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
                TwoSDL = sectorTwoSD[ikappa] - 1;
-               IDL = denBK->directProd( IDR , denBK->gIrrep(index-1) );
+               IDL = Irreps::directProd( IDR , denBK->gIrrep(index-1) );
                break;
             case 3: //N = 1, both TwoJLs plus one
                NUL = sectorN1[ikappa] - 1;
                TwoSUL = sectorTwoS1[ikappa] + 1;
-               IUL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
+               IUL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
                TwoSDL = sectorTwoSD[ikappa] + 1;
-               IDL = denBK->directProd( IDR , denBK->gIrrep(index-1) );
+               IDL = Irreps::directProd( IDR , denBK->gIrrep(index-1) );
                break;
             case 4: //N = 1, TwoJLs are swap of TwoJRs
                NUL = sectorN1[ikappa] - 1;
                TwoSUL = sectorTwoSD[ikappa];
-               IUL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
+               IUL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
                TwoSDL = sectorTwoS1[ikappa];
-               IDL = denBK->directProd( IDR , denBK->gIrrep(index-1) );
+               IDL = Irreps::directProd( IDR , denBK->gIrrep(index-1) );
                break;
          }
          int dimUL = denBK->gCurrentDim(index-1,NUL,  TwoSUL,IUL);
@@ -229,7 +229,7 @@ void CheMPS2::TensorSwap::updateMovingLeft(TensorSwap * SwapPrevious, TensorT * 
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUL = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-      int IDL = denBK->directProd(sectorI1[ikappa],Idiff);
+      int IDL = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimDL = denBK->gCurrentDim(index,sectorN1[ikappa]+1,sectorTwoSD[ikappa],IDL);
       
       for (int geval=0; geval<5; geval++){
@@ -252,23 +252,23 @@ void CheMPS2::TensorSwap::updateMovingLeft(TensorSwap * SwapPrevious, TensorT * 
             case 2: //N = 1, both TwoJRs minus one
                NUR = sectorN1[ikappa] + 1;
                TwoSUR = sectorTwoS1[ikappa] - 1;
-               IUR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index));
+               IUR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index));
                TwoSDR = sectorTwoSD[ikappa] - 1;
-               IDR = denBK->directProd( IDL , denBK->gIrrep(index) );
+               IDR = Irreps::directProd( IDL , denBK->gIrrep(index) );
                break;
             case 3: //N = 1, both TwoJRs plus one
                NUR = sectorN1[ikappa] + 1;
                TwoSUR = sectorTwoS1[ikappa] + 1;
-               IUR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index));
+               IUR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index));
                TwoSDR = sectorTwoSD[ikappa] + 1;
-               IDR = denBK->directProd( IDL , denBK->gIrrep(index) );
+               IDR = Irreps::directProd( IDL , denBK->gIrrep(index) );
                break;
             case 4: //N = 1, TwoJRs are swap of TwoJLs
                NUR = sectorN1[ikappa] + 1;
                TwoSUR = sectorTwoSD[ikappa];
-               IUR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index));
+               IUR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index));
                TwoSDR = sectorTwoS1[ikappa];
-               IDR = denBK->directProd( IDL , denBK->gIrrep(index) );
+               IDR = Irreps::directProd( IDL , denBK->gIrrep(index) );
                break;
          }
          int dimUR = denBK->gCurrentDim(index+1,NUR,  TwoSUR,IUR);

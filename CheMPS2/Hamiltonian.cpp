@@ -98,21 +98,21 @@ double CheMPS2::Hamiltonian::getTmat(const int index1, const int index2) const{
 
 void CheMPS2::Hamiltonian::setVmat(const int index1, const int index2, const int index3, const int index4, const double val){
 
-   assert( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) );
+   assert( Irreps::directProd(orb2irrep[index1],orb2irrep[index2]) == Irreps::directProd(orb2irrep[index3],orb2irrep[index4]) );
    Vmat->set(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
 
 }
 
 void CheMPS2::Hamiltonian::addToVmat(const int index1, const int index2, const int index3, const int index4, const double val){
 
-   assert( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) );
+   assert( Irreps::directProd(orb2irrep[index1],orb2irrep[index2]) == Irreps::directProd(orb2irrep[index3],orb2irrep[index4]) );
    Vmat->add(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4], val);
 
 }
 
 double CheMPS2::Hamiltonian::getVmat(const int index1, const int index2, const int index3, const int index4) const{
 
-   if ( SymmInfo.directProd(orb2irrep[index1],orb2irrep[index2]) == SymmInfo.directProd(orb2irrep[index3],orb2irrep[index4]) ){
+   if ( Irreps::directProd(orb2irrep[index1],orb2irrep[index2]) == Irreps::directProd(orb2irrep[index3],orb2irrep[index4]) ){
       return Vmat->get(orb2irrep[index1], orb2irrep[index2], orb2irrep[index3], orb2irrep[index4], orb2indexSy[index1], orb2indexSy[index2], orb2indexSy[index3], orb2indexSy[index4]);
    }
 

@@ -46,7 +46,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    char notrans = 'N';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5A1
    if ((N1==0) && (N2==0)){
@@ -61,7 +61,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -77,8 +77,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -137,7 +137,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -153,8 +153,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -212,7 +212,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -228,8 +228,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -280,7 +280,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
             
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
               
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -296,8 +296,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                               
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                         int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -357,7 +357,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    char notrans = 'N';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5B1
    if ((N1==1) && (N2==1)){
@@ -371,7 +371,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
            
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -387,8 +387,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                               
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                               
                         int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -444,7 +444,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -460,8 +460,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -518,7 +518,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -534,8 +534,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -587,7 +587,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
    
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -603,8 +603,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -667,7 +667,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    char trans = 'T';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5C1
    if ((N1==1) && (N2==0)){
@@ -682,7 +682,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
    
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -698,8 +698,8 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -751,7 +751,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -767,8 +767,8 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -820,7 +820,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -836,8 +836,8 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                         int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -886,7 +886,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -902,8 +902,8 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -965,7 +965,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    char trans = 'T';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5D1
    if ((N1==0) && (N2==1)){
@@ -980,7 +980,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -996,8 +996,8 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1049,7 +1049,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                  
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                   
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1065,8 +1065,8 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                               
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                               
                         int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1117,7 +1117,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1133,8 +1133,8 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1185,7 +1185,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1201,8 +1201,8 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1264,7 +1264,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    char trans = 'T';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5E1
    if ((N1==0) && (N2==1)){
@@ -1278,7 +1278,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                 
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1294,8 +1294,8 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -1347,7 +1347,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1363,8 +1363,8 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -1416,7 +1416,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                   
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                   
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1432,8 +1432,8 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                               
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                               
                         int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -1482,7 +1482,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
 
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1498,8 +1498,8 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -1561,7 +1561,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    char trans = 'T';
    int inc = 1;
    
-   int IprodMID = denBK->directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
+   int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5F1
    if ((N1==1) && (N2==0)){
@@ -1575,7 +1575,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1591,8 +1591,8 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1642,7 +1642,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                  
-               int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+               int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                bool leftOK = false;
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1658,8 +1658,8 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                      if (denBK->gIrrep(l_alpha) == Irrep){
                               
-                        int ILdown = denBK->directProd(IL, Irrep);
-                        int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                        int ILdown = Irreps::directProd(IL, Irrep);
+                        int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                           
                         int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                         int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1709,7 +1709,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                     int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                     int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                      bool leftOK = false;
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1725,8 +1725,8 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                         for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                            if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                              int ILdown = denBK->directProd(IL, Irrep);
-                              int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                              int ILdown = Irreps::directProd(IL, Irrep);
+                              int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                               int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                               int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -1777,7 +1777,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
-                  int IrrepTimesMid = denBK->directProd(Irrep,IprodMID);
+                  int IrrepTimesMid = Irreps::directProd(Irrep,IprodMID);
                
                   bool leftOK = false;
                   for (int l_alpha=0; l_alpha<theindex; l_alpha++){
@@ -1793,8 +1793,8 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                      for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                         if (denBK->gIrrep(l_alpha) == Irrep){
                            
-                           int ILdown = denBK->directProd(IL, Irrep);
-                           int IRdown = denBK->directProd(IR, IrrepTimesMid);
+                           int ILdown = Irreps::directProd(IL, Irrep);
+                           int IRdown = Irreps::directProd(IR, IrrepTimesMid);
                            
                            int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                            int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);

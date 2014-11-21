@@ -49,7 +49,7 @@ void CheMPS2::TensorQ::AddTermSimpleRight(TensorT * denT){
    const double mxElement = Prob->gMxElement(index-1,index-1,index-1,site);
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int ID = denBK->directProd(Idiff,sectorI1[ikappa]);
+      const int ID = Irreps::directProd(Idiff,sectorI1[ikappa]);
       int dimRU = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimRD = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
       int dimL  = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, sectorTwoSD[ikappa], ID);
@@ -76,7 +76,7 @@ void CheMPS2::TensorQ::AddTermSimpleLeft(TensorT * denT){
    const double mxElement = Prob->gMxElement(site,index,index,index);
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int ID = denBK->directProd(Idiff,sectorI1[ikappa]);
+      const int ID = Irreps::directProd(Idiff,sectorI1[ikappa]);
       int dimLU = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimLD = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
       int dimR  = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);
@@ -115,7 +115,7 @@ void CheMPS2::TensorQ::AddTermsLRight(TensorL ** Ltensors, TensorT * denT, doubl
    if (OneToAdd){
       for (int ikappa=0; ikappa<nKappa; ikappa++){
    
-         const int ID = denBK->directProd(sectorI1[ikappa],Idiff);
+         const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
          int dimRU = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimRD = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
       
@@ -194,8 +194,8 @@ void CheMPS2::TensorQ::AddTermsLRight(TensorL ** Ltensors, TensorT * denT, doubl
          for (int TwoSLU=sectorTwoS1[ikappa]-1; TwoSLU<=sectorTwoS1[ikappa]+1; TwoSLU+=2){
             for (int TwoSLD=sectorTwoSD[ikappa]-1; TwoSLD<=sectorTwoSD[ikappa]+1; TwoSLD+=2){
                if ((TwoSLD>=0) && (TwoSLU>=0) && (abs(TwoSLD-TwoSLU)<2)){
-                  const int ILU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
-                  const int ILD = denBK->directProd(ID,              denBK->gIrrep(index-1));
+                  const int ILU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
+                  const int ILD = Irreps::directProd(ID,              denBK->gIrrep(index-1));
                   dimLU = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, TwoSLU, ILU);
                   dimLD = denBK->gCurrentDim(index-1, sectorN1[ikappa]  , TwoSLD, ILD);
                   if ((dimLU>0) && (dimLD>0)){
@@ -250,7 +250,7 @@ void CheMPS2::TensorQ::AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double
    if (OneToAdd){
       for (int ikappa=0; ikappa<nKappa; ikappa++){
    
-         const int ID = denBK->directProd(sectorI1[ikappa],Idiff);
+         const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
          int dimLU = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimLD = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
       
@@ -329,8 +329,8 @@ void CheMPS2::TensorQ::AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double
          for (int TwoSRU=sectorTwoS1[ikappa]-1; TwoSRU<=sectorTwoS1[ikappa]+1; TwoSRU+=2){
             for (int TwoSRD=sectorTwoSD[ikappa]-1; TwoSRD<=sectorTwoSD[ikappa]+1; TwoSRD+=2){
                if ((TwoSRD>=0) && (TwoSRU>=0) && (abs(TwoSRD-TwoSRU)<2)){
-                  const int IRU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index));
-                  const int IRD = denBK->directProd(ID,              denBK->gIrrep(index));
+                  const int IRU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index));
+                  const int IRD = Irreps::directProd(ID,              denBK->gIrrep(index));
                   dimRU = denBK->gCurrentDim(index+1, sectorN1[ikappa]+1, TwoSRU, IRU);
                   dimRD = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, TwoSRD, IRD);
                   if ((dimRU>0) && (dimRD>0)){
@@ -386,12 +386,12 @@ void CheMPS2::TensorQ::AddTermsAB(TensorA * denA, TensorB * denB, TensorT * denT
 void CheMPS2::TensorQ::AddTermsABRight(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int ID = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimRU = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimRD = denBK->gCurrentDim(index, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
    
       //case 1
-      const int ILU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
+      const int ILU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
       for (int TwoSLU=sectorTwoS1[ikappa]-1; TwoSLU<=sectorTwoS1[ikappa]+1; TwoSLU+=2){
          int dimLU = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, TwoSLU,              ILU);
          int dimLD = denBK->gCurrentDim(index-1, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
@@ -438,7 +438,7 @@ void CheMPS2::TensorQ::AddTermsABRight(TensorA * denA, TensorB * denB, TensorT *
       }
 
       //case 2
-      const int ILD = denBK->directProd(ID,denBK->gIrrep(index-1));
+      const int ILD = Irreps::directProd(ID,denBK->gIrrep(index-1));
       for (int TwoSLD=sectorTwoSD[ikappa]-1; TwoSLD<=sectorTwoSD[ikappa]+1; TwoSLD+=2){
          int dimLU = denBK->gCurrentDim(index-1, sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimLD = denBK->gCurrentDim(index-1, sectorN1[ikappa],   TwoSLD,              ILD);
@@ -489,12 +489,12 @@ void CheMPS2::TensorQ::AddTermsABRight(TensorA * denA, TensorB * denB, TensorT *
 void CheMPS2::TensorQ::AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int ID  = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int ID  = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimLU = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimLD = denBK->gCurrentDim(index, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ID);
    
       //case 1
-      const int IRD = denBK->directProd(ID, denBK->gIrrep(index));
+      const int IRD = Irreps::directProd(ID, denBK->gIrrep(index));
       for (int TwoSRD=sectorTwoSD[ikappa]-1; TwoSRD<=sectorTwoSD[ikappa]+1; TwoSRD+=2){
          int dimRU = denBK->gCurrentDim(index+1, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimRD = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, TwoSRD,              IRD);
@@ -541,7 +541,7 @@ void CheMPS2::TensorQ::AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * 
       }
 
       //case 2
-      const int IRU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index));
+      const int IRU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index));
       for (int TwoSRU=sectorTwoS1[ikappa]-1; TwoSRU<=sectorTwoS1[ikappa]+1; TwoSRU+=2){
          int dimRU = denBK->gCurrentDim(index+1, sectorN1[ikappa]+1, TwoSRU,              IRU);
          int dimRD = denBK->gCurrentDim(index+1, sectorN1[ikappa]+3, sectorTwoSD[ikappa], ID);
@@ -599,12 +599,12 @@ void CheMPS2::TensorQ::AddTermsCD(TensorC * denC, TensorD * denD, TensorT * denT
 void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int IRD  = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int IRD  = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimRU = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimRD = denBK->gCurrentDim(index, sectorN1[ikappa]+1, sectorTwoSD[ikappa], IRD);
    
       //case 1
-      const int ILD = denBK->directProd(IRD,denBK->gIrrep(index-1));
+      const int ILD = Irreps::directProd(IRD,denBK->gIrrep(index-1));
       for (int TwoSLD=sectorTwoSD[ikappa]-1; TwoSLD<=sectorTwoSD[ikappa]+1; TwoSLD+=2){
          int dimLU = denBK->gCurrentDim(index-1, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimLD = denBK->gCurrentDim(index-1, sectorN1[ikappa], TwoSLD,              ILD);
@@ -642,7 +642,7 @@ void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT *
       }
 
       //case 2
-      const int ILU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
+      const int ILU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index-1));
       for (int TwoSLU=sectorTwoS1[ikappa]-1; TwoSLU<=sectorTwoS1[ikappa]+1; TwoSLU+=2){
          int dimLU = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, TwoSLU,              ILU);
          int dimLD = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, sectorTwoSD[ikappa], IRD);
@@ -686,12 +686,12 @@ void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT *
 void CheMPS2::TensorQ::AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int ILD  = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int ILD  = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimLU = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimLD = denBK->gCurrentDim(index, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD);
    
       //case 1
-      const int IRU = denBK->directProd(sectorI1[ikappa],denBK->gIrrep(index));
+      const int IRU = Irreps::directProd(sectorI1[ikappa],denBK->gIrrep(index));
       for (int TwoSRU=sectorTwoS1[ikappa]-1; TwoSRU<=sectorTwoS1[ikappa]+1; TwoSRU+=2){
          int dimRU = denBK->gCurrentDim(index+1, sectorN1[ikappa]+1, TwoSRU, IRU);
          int dimRD = denBK->gCurrentDim(index+1, sectorN1[ikappa]+1, sectorTwoSD[ikappa], ILD);
@@ -729,7 +729,7 @@ void CheMPS2::TensorQ::AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * 
       }
 
       //case 2
-      const int IRD = denBK->directProd(ILD,denBK->gIrrep(index));
+      const int IRD = Irreps::directProd(ILD,denBK->gIrrep(index));
       for (int TwoSRD=sectorTwoSD[ikappa]-1; TwoSRD<=sectorTwoSD[ikappa]+1; TwoSRD+=2){
          int dimRU = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);
          int dimRD = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, TwoSRD,              IRD);

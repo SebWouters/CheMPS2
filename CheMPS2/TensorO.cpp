@@ -195,12 +195,12 @@ void CheMPS2::TensorO::updateRight(const int ikappa, TensorT * denTup, TensorT *
          case 2:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]-1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
          case 3:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]+1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
       }
       
@@ -242,12 +242,12 @@ void CheMPS2::TensorO::updateLeft(const int ikappa, TensorT * denTup, TensorT * 
          case 2:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]-1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
          case 3:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]+1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
       }
       
@@ -289,12 +289,12 @@ void CheMPS2::TensorO::updateRight(const int ikappa, TensorT * denTup, TensorT *
          case 2:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]-1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
          case 3:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]+1;
-            IL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
       }
       
@@ -342,12 +342,12 @@ void CheMPS2::TensorO::updateLeft(const int ikappa, TensorT * denTup, TensorT * 
          case 2:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]-1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
          case 3:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]+1;
-            IR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
       }
       

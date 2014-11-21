@@ -93,7 +93,7 @@ double CheMPS2::TwoDM::getTwoDMA_DMRG(const int cnt1, const int cnt2, const int 
    const int irrep2 = Prob->gIrrep(cnt2);
    const int irrep3 = Prob->gIrrep(cnt3);
    const int irrep4 = Prob->gIrrep(cnt4);
-   if ( denBK->directProd(irrep1, irrep2) == denBK->directProd(irrep3, irrep4) ){
+   if ( Irreps::directProd(irrep1, irrep2) == Irreps::directProd(irrep3, irrep4) ){
       return TwoDMA->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
    }
    
@@ -108,7 +108,7 @@ double CheMPS2::TwoDM::getTwoDMB_DMRG(const int cnt1, const int cnt2, const int 
    const int irrep2 = Prob->gIrrep(cnt2);
    const int irrep3 = Prob->gIrrep(cnt3);
    const int irrep4 = Prob->gIrrep(cnt4);
-   if ( denBK->directProd(irrep1, irrep2) == denBK->directProd(irrep3, irrep4) ){
+   if ( Irreps::directProd(irrep1, irrep2) == Irreps::directProd(irrep3, irrep4) ){
       return TwoDMB->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
    }
    
@@ -296,7 +296,7 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
          const int k_index = j_index + col;
          const int I_g = denBK->gIrrep(g_index);
 
-         if (denBK->directProd(I_g, denBK->gIrrep(theindex)) == denBK->directProd(denBK->gIrrep(j_index), denBK->gIrrep(k_index))){
+         if (Irreps::directProd(I_g, denBK->gIrrep(theindex)) == Irreps::directProd(denBK->gIrrep(j_index), denBK->gIrrep(k_index))){
             //Diagrams 13,14,15 and 16
             const double d13 = doD13(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][k_index-j_index][j_index-theindex-1],
                                      workmem, workmem2, I_g) * prefactorSpin;
@@ -389,7 +389,7 @@ double CheMPS2::TwoDM::doD2(TensorT * denT, TensorL * Lright, double * workmem){
          for (int IL = 0; IL<denBK->getNumberOfIrreps(); IL++){
             for (int TwoSR = TwoSL-1; TwoSR<=TwoSL+1; TwoSR+=2){
             
-               int IRup = denBK->directProd(IL, denBK->gIrrep(theindex)); 
+               int IRup = Irreps::directProd(IL, denBK->gIrrep(theindex)); 
                
                int dimL     = denBK->gCurrentDim(theindex,  NL,  TwoSL,IL);
                int dimRdown = denBK->gCurrentDim(theindex+1,NL+2,TwoSL,IL);
@@ -513,7 +513,7 @@ double CheMPS2::TwoDM::doD5(TensorT * denT, TensorF0 * F0right, double * workmem
          for (int IL = 0; IL<denBK->getNumberOfIrreps(); IL++){
             for (int TwoSR=TwoSL-1; TwoSR<=TwoSL+1; TwoSR+=2){
                
-               int IR = denBK->directProd(IL,denBK->gIrrep(theindex));
+               int IR = Irreps::directProd(IL,denBK->gIrrep(theindex));
                int dimL     = denBK->gCurrentDim(theindex,  NL,  TwoSL,IL);
                int dimR     = denBK->gCurrentDim(theindex+1,NL+1,TwoSR,IR);
             
@@ -555,7 +555,7 @@ double CheMPS2::TwoDM::doD6(TensorT * denT, TensorF1 * F1right, double * workmem
             for (int TwoSRup=TwoSL-1; TwoSRup<=TwoSL+1; TwoSRup+=2){
                for (int TwoSRdown=TwoSL-1; TwoSRdown<=TwoSL+1; TwoSRdown+=2){
                
-                  int IR = denBK->directProd(IL,denBK->gIrrep(theindex));
+                  int IR = Irreps::directProd(IL,denBK->gIrrep(theindex));
                   int dimL     = denBK->gCurrentDim(theindex,  NL,  TwoSL,    IL);
                   int dimRup   = denBK->gCurrentDim(theindex+1,NL+1,TwoSRup,  IR);
                   int dimRdown = denBK->gCurrentDim(theindex+1,NL+1,TwoSRdown,IR);
@@ -603,7 +603,7 @@ double CheMPS2::TwoDM::doD7(TensorT * denT, TensorL * Lleft, double * workmem){
          
             for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                
-               int IR = denBK->directProd(ILup,denBK->gIrrep(theindex));
+               int IR = Irreps::directProd(ILup,denBK->gIrrep(theindex));
                int dimLdown = denBK->gCurrentDim(theindex,   NLup-1, TwoSLdown, IR);
                int dimR     = denBK->gCurrentDim(theindex+1, NLup+1, TwoSLdown, IR);
             
@@ -653,7 +653,7 @@ double CheMPS2::TwoDM::doD8(TensorT * denT, TensorL * Lleft, TensorL * Lright, d
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   
-                  int Idown = denBK->directProd(ILup,Irrep_g);
+                  int Idown = Irreps::directProd(ILup,Irrep_g);
                   
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, Idown);
                   int dimRdown = denBK->gCurrentDim(theindex+1, NL+1, TwoSLdown, Idown);
@@ -705,9 +705,9 @@ void CheMPS2::TwoDM::doD9andD10andD11(TensorT * denT, TensorL * Lleft, TensorL *
             int dimLup = denBK->gCurrentDim(theindex, NL, TwoSLup, ILup);
             if (dimLup>0){
             
-               int IRup   = denBK->directProd(ILup,   denBK->gIrrep(theindex));
-               int ILdown = denBK->directProd(ILup,   Irrep_g);
-               int IRdown = denBK->directProd(ILdown, denBK->gIrrep(theindex));
+               int IRup   = Irreps::directProd(ILup,   denBK->gIrrep(theindex));
+               int ILdown = Irreps::directProd(ILup,   Irrep_g);
+               int IRdown = Irreps::directProd(ILdown, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   for (int TwoSRup=TwoSLup-1; TwoSRup<=TwoSLup+1; TwoSRup+=2){
@@ -773,7 +773,7 @@ double CheMPS2::TwoDM::doD12(TensorT * denT, TensorL * Lleft, TensorL * Lright, 
             int dimRup = denBK->gCurrentDim(theindex+1, NL, TwoSLup, ILup);
             if ((dimLup>0) && (dimRup>0)){
             
-               int Idown = denBK->directProd(ILup, Irrep_g);
+               int Idown = Irreps::directProd(ILup, Irrep_g);
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                         
@@ -829,8 +829,8 @@ double CheMPS2::TwoDM::doD13(TensorT * denT, TensorL * Lleft, TensorS0 * S0right
             
             if ((dimLup>0) && (dimRup>0)){
             
-               int ILdown = denBK->directProd(ILup,   Irrep_g);
-               int IRdown = denBK->directProd(ILdown, denBK->gIrrep(theindex));
+               int ILdown = Irreps::directProd(ILup,   Irrep_g);
+               int IRdown = Irreps::directProd(ILdown, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                         
@@ -884,8 +884,8 @@ double CheMPS2::TwoDM::doD14(TensorT * denT, TensorL * Lleft, TensorS0 * S0right
             
             if (dimLup>0){
             
-               int Idown = denBK->directProd(ILup, Irrep_g);
-               int IRup  = denBK->directProd(ILup, denBK->gIrrep(theindex));
+               int Idown = Irreps::directProd(ILup, Irrep_g);
+               int IRup  = Irreps::directProd(ILup, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   
@@ -942,8 +942,8 @@ double CheMPS2::TwoDM::doD15(TensorT * denT, TensorL * Lleft, TensorS1 * S1right
             
             if ((dimLup>0) && (dimRup>0)){
             
-               int ILdown = denBK->directProd(ILup,   Irrep_g);
-               int IRdown = denBK->directProd(ILdown, denBK->gIrrep(theindex));
+               int ILdown = Irreps::directProd(ILup,   Irrep_g);
+               int IRdown = Irreps::directProd(ILdown, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   for (int TwoSRdown=TwoSLdown-1; TwoSRdown<=TwoSLdown+1; TwoSRdown+=2){
@@ -1000,8 +1000,8 @@ double CheMPS2::TwoDM::doD16(TensorT * denT, TensorL * Lleft, TensorS1 * S1right
             
             if (dimLup>0){
             
-               int Idown = denBK->directProd(ILup, Irrep_g);
-               int IRup  = denBK->directProd(ILup, denBK->gIrrep(theindex));
+               int Idown = Irreps::directProd(ILup, Irrep_g);
+               int IRup  = Irreps::directProd(ILup, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   for (int TwoSRup=TwoSLup-1; TwoSRup<=TwoSLup+1; TwoSRup+=2){
@@ -1059,8 +1059,8 @@ double CheMPS2::TwoDM::doD17orD21(TensorT * denT, TensorL * Lleft, TensorF0 * F0
             
             if (dimLup>0){
             
-               int ILdown = denBK->directProd(ILup,   Irrep_g);
-               int IRdown = denBK->directProd(ILdown, denBK->gIrrep(theindex));
+               int ILdown = Irreps::directProd(ILup,   Irrep_g);
+               int IRdown = Irreps::directProd(ILdown, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   
@@ -1116,8 +1116,8 @@ double CheMPS2::TwoDM::doD18orD22(TensorT * denT, TensorL * Lleft, TensorF0 * F0
             
             if (dimLup>0){
             
-               int Idown = denBK->directProd(ILup, Irrep_g);
-               int IRup  = denBK->directProd(ILup, denBK->gIrrep(theindex));
+               int Idown = Irreps::directProd(ILup, Irrep_g);
+               int IRup  = Irreps::directProd(ILup, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   
@@ -1176,8 +1176,8 @@ double CheMPS2::TwoDM::doD19orD23(TensorT * denT, TensorL * Lleft, TensorF1 * F1
             
             if (dimLup>0){
             
-               int ILdown = denBK->directProd(ILup,   Irrep_g);
-               int IRdown = denBK->directProd(ILdown, denBK->gIrrep(theindex));
+               int ILdown = Irreps::directProd(ILup,   Irrep_g);
+               int IRdown = Irreps::directProd(ILdown, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   for (int TwoSRdown=TwoSLdown-1; TwoSRdown<=TwoSLdown+1; TwoSRdown+=2){
@@ -1244,8 +1244,8 @@ double CheMPS2::TwoDM::doD20orD24(TensorT * denT, TensorL * Lleft, TensorF1 * F1
             
             if (dimLup>0){
             
-               int Idown = denBK->directProd(ILup, Irrep_g);
-               int IRup  = denBK->directProd(ILup, denBK->gIrrep(theindex));
+               int Idown = Irreps::directProd(ILup, Irrep_g);
+               int IRup  = Irreps::directProd(ILup, denBK->gIrrep(theindex));
          
                for (int TwoSLdown=TwoSLup-1; TwoSLdown<=TwoSLup+1; TwoSLdown+=2){
                   for (int TwoSRup=TwoSLup-1; TwoSRup<=TwoSLup+1; TwoSRup+=2){

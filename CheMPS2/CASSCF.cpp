@@ -72,7 +72,7 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
             int I3 = HamIn->getOrbitalIrrep(cnt3);
             for (int cnt4=cnt2; cnt4<L; cnt4++){
                int I4 = HamIn->getOrbitalIrrep(cnt4);
-               if (SymmInfo.directProd(I1,I2) == SymmInfo.directProd(I3,I4)){
+               if (Irreps::directProd(I1,I2) == Irreps::directProd(I3,I4)){
                   HamOrig->setVmat(cnt,cnt2,cnt3,cnt4,HamIn->getVmat(cnt,cnt2,cnt3,cnt4));
                }
             }

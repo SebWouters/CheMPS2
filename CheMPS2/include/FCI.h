@@ -72,11 +72,11 @@ namespace CheMPS2{
          /** \return The target irrep */
          int getTargetIrrep() const{ return TargetIrrep; }
          
-         //! Get the direct product of two irreps
+         //! Get the direct product of two irreps (Psi4's convention is used): product( irrep1 , irrep2 ) = irrep1 XOR irrep2.
          /** \param Irrep1 The first irrep
              \param Irrep2 The second irrep
              \return The direct product Irrep1 x Irrep2 */
-         int getIrrepProduct(const int Irrep1, const int Irrep2) const{ return IrrepProductTable[ Irrep1 + NumIrreps * Irrep2 ]; }
+         static int getIrrepProduct(const int Irrep1, const int Irrep2){ return Irrep1 ^ Irrep2; }
          
          //! Get an orbital irrep
          /** \param orb The orbital index
@@ -344,9 +344,6 @@ namespace CheMPS2{
          
          //! The targeted irrep of the total FCI wavefunction ( 0 <= TargetIrrep < NumIrreps )
          int TargetIrrep;
-         
-         //! The irrep product table: irrep_product = irrep_1 x irrep_2 = IrrepProductTable[ irrep_1 + NumIrreps * irrep_2 ]
-         int * IrrepProductTable;
          
          //! Array of length L which contains for each orbital the irrep ( 0 <= orb < L : 0 <= orb2irrep[ orb ] < NumIrreps )
          int * orb2irrep;

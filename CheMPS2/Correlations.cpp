@@ -444,7 +444,7 @@ double CheMPS2::Correlations::diagram3(TensorT * denT, TensorGYZ * denG, double 
          for (int IR = 0; IR < denBK->getNumberOfIrreps(); IR++){
          
             int dimR = denBK->gCurrentDim(theindex+1, NR, TwoSR, IR);
-            const int IL = denBK->directProd( IR, denBK->gIrrep(theindex) );
+            const int IL = Irreps::directProd( IR, denBK->gIrrep(theindex) );
             
             if (dimR>0){
             
@@ -489,7 +489,7 @@ double CheMPS2::Correlations::diagram4(TensorT * denT, TensorSwap * denK, double
          
             int dimR   = denBK->gCurrentDim(theindex+1, NR, TwoSR, IR);
             int dimLup = denBK->gCurrentDim(theindex,   NR, TwoSR, IR);
-            const int ILdown = denBK->directProd( IR, denBK->gIrrep(theindex) );
+            const int ILdown = Irreps::directProd( IR, denBK->gIrrep(theindex) );
             
             if ((dimR>0) && (dimLup>0)){
             
@@ -535,7 +535,7 @@ double CheMPS2::Correlations::diagram5(TensorT * denT, TensorSwap * denM, double
          
             int dimR     = denBK->gCurrentDim(theindex+1, NR,   TwoSR, IR);
             int dimLdown = denBK->gCurrentDim(theindex,   NR-2, TwoSR, IR);
-            const int ILup = denBK->directProd( IR, denBK->gIrrep(theindex) );
+            const int ILup = Irreps::directProd( IR, denBK->gIrrep(theindex) );
             
             if ((dimR>0) && (dimLdown>0)){
             

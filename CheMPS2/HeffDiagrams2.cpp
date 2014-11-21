@@ -49,8 +49,8 @@ void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double *
       for (int l_alpha=0; l_alpha<theindex; l_alpha++){
          for (int l_beta=l_alpha; l_beta<theindex; l_beta++){
          
-            int ILdown = denBK->directProd(IL,S0tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
-            int IRdown = denBK->directProd(IR,Atensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
+            int ILdown = Irreps::directProd(IL,S0tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
+            int IRdown = Irreps::directProd(IR,Atensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
             int memSkappa = denS->gKappa(NL-2,TwoSL,ILdown,N1,N2,TwoJ,NR-2,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -81,8 +81,8 @@ void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double *
       for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
          for (int l_delta=l_gamma; l_delta<Prob->gL(); l_delta++){
          
-            int ILdown = denBK->directProd(IL,Atensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
-            int IRdown = denBK->directProd(IR,S0tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
+            int ILdown = Irreps::directProd(IL,Atensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
+            int IRdown = Irreps::directProd(IR,S0tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
             int memSkappa = denS->gKappa(NL-2,TwoSL,ILdown,N1,N2,TwoJ,NR-2,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -136,8 +136,8 @@ void CheMPS2::Heff::addDiagram2a2spin0(const int ikappa, double * memS, double *
       for (int l_alpha=0; l_alpha<theindex; l_alpha++){
          for (int l_beta=l_alpha; l_beta<theindex; l_beta++){
          
-            int ILdown = denBK->directProd(IL,S0tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
-            int IRdown = denBK->directProd(IR,Atensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
+            int ILdown = Irreps::directProd(IL,S0tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
+            int IRdown = Irreps::directProd(IR,Atensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
             int memSkappa = denS->gKappa(NL+2,TwoSL,ILdown,N1,N2,TwoJ,NR+2,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -168,8 +168,8 @@ void CheMPS2::Heff::addDiagram2a2spin0(const int ikappa, double * memS, double *
       for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
          for (int l_delta=l_gamma; l_delta<Prob->gL(); l_delta++){
          
-            int ILdown = denBK->directProd(IL,Atensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
-            int IRdown = denBK->directProd(IR,S0tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
+            int ILdown = Irreps::directProd(IL,Atensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
+            int IRdown = Irreps::directProd(IR,S0tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
             int memSkappa = denS->gKappa(NL+2,TwoSL,ILdown,N1,N2,TwoJ,NR+2,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -231,8 +231,8 @@ void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double *
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_beta=l_alpha+1; l_beta<theindex; l_beta++){
          
-                     int ILdown = denBK->directProd(IL,S1tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
-                     int IRdown = denBK->directProd(IR,Btensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,S1tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,Btensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
                      int memSkappa = denS->gKappa(NL-2,TwoSLdown,ILdown,N1,N2,TwoJ,NR-2,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -274,8 +274,8 @@ void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double *
                for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
                   for (int l_delta=l_gamma+1; l_delta<Prob->gL(); l_delta++){
          
-                     int ILdown = denBK->directProd(IL,Btensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
-                     int IRdown = denBK->directProd(IR,S1tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,Btensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,S1tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
                      int memSkappa = denS->gKappa(NL-2,TwoSLdown,ILdown,N1,N2,TwoJ,NR-2,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -340,8 +340,8 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_beta=l_alpha+1; l_beta<theindex; l_beta++){
          
-                     int ILdown = denBK->directProd(IL,S1tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
-                     int IRdown = denBK->directProd(IR,Btensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,S1tensors[theindex-1][l_beta-l_alpha][theindex-1-l_beta]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,Btensors[theindex+1][l_beta-l_alpha][theindex+1-l_beta]->gIdiff());
                      int memSkappa = denS->gKappa(NL+2,TwoSLdown,ILdown,N1,N2,TwoJ,NR+2,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -383,8 +383,8 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
                for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
                   for (int l_delta=l_gamma+1; l_delta<Prob->gL(); l_delta++){
          
-                     int ILdown = denBK->directProd(IL,Btensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
-                     int IRdown = denBK->directProd(IR,S1tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,Btensors[theindex-1][l_delta-l_gamma][l_gamma-theindex]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,S1tensors[theindex+1][l_delta-l_gamma][l_gamma-theindex-2]->gIdiff());
                      int memSkappa = denS->gKappa(NL+2,TwoSLdown,ILdown,N1,N2,TwoJ,NR+2,TwoSRdown,IRdown);
              
                      if (memSkappa!=-1){
@@ -441,8 +441,8 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
       for (int l_gamma=0; l_gamma<theindex; l_gamma++){
          for (int l_alpha=l_gamma+1; l_alpha<theindex; l_alpha++){
          
-            int ILdown = denBK->directProd(IL,F0tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gIdiff());
-            int IRdown = denBK->directProd(IR,Ctensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gIdiff());
+            int ILdown = Irreps::directProd(IL,F0tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gIdiff());
+            int IRdown = Irreps::directProd(IR,Ctensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gIdiff());
             int memSkappa = denS->gKappa(NL,TwoSL,ILdown,N1,N2,TwoJ,NR,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -472,8 +472,8 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
       for (int l_alpha=0; l_alpha<theindex; l_alpha++){
          for (int l_gamma=l_alpha; l_gamma<theindex; l_gamma++){
          
-            int ILdown = denBK->directProd(IL,F0tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gIdiff());
-            int IRdown = denBK->directProd(IR,Ctensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gIdiff());
+            int ILdown = Irreps::directProd(IL,F0tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gIdiff());
+            int IRdown = Irreps::directProd(IR,Ctensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gIdiff());
             int memSkappa = denS->gKappa(NL,TwoSL,ILdown,N1,N2,TwoJ,NR,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -505,8 +505,8 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
       for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
          for (int l_beta=l_delta+1; l_beta<Prob->gL(); l_beta++){
          
-            int ILdown = denBK->directProd(IL,Ctensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gIdiff());
-            int IRdown = denBK->directProd(IR,F0tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gIdiff());
+            int ILdown = Irreps::directProd(IL,Ctensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gIdiff());
+            int IRdown = Irreps::directProd(IR,F0tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gIdiff());
             int memSkappa = denS->gKappa(NL,TwoSL,ILdown,N1,N2,TwoJ,NR,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -536,8 +536,8 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
       for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
          for (int l_delta=l_beta; l_delta<Prob->gL(); l_delta++){
          
-            int ILdown = denBK->directProd(IL,Ctensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gIdiff());
-            int IRdown = denBK->directProd(IR,F0tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gIdiff());
+            int ILdown = Irreps::directProd(IL,Ctensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gIdiff());
+            int IRdown = Irreps::directProd(IR,F0tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gIdiff());
             int memSkappa = denS->gKappa(NL,TwoSL,ILdown,N1,N2,TwoJ,NR,TwoSR,IRdown);
             
             if (memSkappa!=-1){
@@ -600,8 +600,8 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                for (int l_gamma=0; l_gamma<theindex; l_gamma++){
                   for (int l_alpha=l_gamma+1; l_alpha<theindex; l_alpha++){
          
-                     int ILdown = denBK->directProd(IL,F1tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gIdiff());
-                     int IRdown = denBK->directProd(IR,Dtensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,F1tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,Dtensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gIdiff());
                      int memSkappa = denS->gKappa(NL,TwoSLdown,ILdown,N1,N2,TwoJ,NR,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -633,8 +633,8 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_gamma=l_alpha; l_gamma<theindex; l_gamma++){
          
-                     int ILdown = denBK->directProd(IL,F1tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gIdiff());
-                     int IRdown = denBK->directProd(IR,Dtensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,F1tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,Dtensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gIdiff());
                      int memSkappa = denS->gKappa(NL,TwoSLdown,ILdown,N1,N2,TwoJ,NR,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -676,8 +676,8 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
                   for (int l_beta=l_delta+1; l_beta<Prob->gL(); l_beta++){
          
-                     int ILdown = denBK->directProd(IL,Dtensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gIdiff());
-                     int IRdown = denBK->directProd(IR,F1tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,Dtensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,F1tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gIdiff());
                      int memSkappa = denS->gKappa(NL,TwoSLdown,ILdown,N1,N2,TwoJ,NR,TwoSRdown,IRdown);
             
                      if (memSkappa!=-1){
@@ -709,8 +709,8 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                   for (int l_delta=l_beta; l_delta<Prob->gL(); l_delta++){
          
-                     int ILdown = denBK->directProd(IL,Dtensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gIdiff());
-                     int IRdown = denBK->directProd(IR,F1tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gIdiff());
+                     int ILdown = Irreps::directProd(IL,Dtensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gIdiff());
+                     int IRdown = Irreps::directProd(IR,F1tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gIdiff());
                      int memSkappa = denS->gKappa(NL,TwoSLdown,ILdown,N1,N2,TwoJ,NR,TwoSRdown,IRdown);
                      
                      if (memSkappa!=-1){

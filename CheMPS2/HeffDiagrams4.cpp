@@ -42,7 +42,7 @@ void CheMPS2::Heff::addDiagram4A1and4A2spin0(const int ikappa, double * memS, do
    int dimLup = denBK->gCurrentDim(theindex  ,NL,TwoSL,IL);
    int dimR   = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
    
-   int ILdown = denBK->directProd(IL,Atens->gIdiff());
+   int ILdown = Irreps::directProd(IL,Atens->gIdiff());
    
    char trans = 'T';
    char notrans = 'N';
@@ -183,7 +183,7 @@ void CheMPS2::Heff::addDiagram4A1and4A2spin1(const int ikappa, double * memS, do
    int dimLup = denBK->gCurrentDim(theindex  ,NL,TwoSL,IL);
    int dimR   = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
    
-   int ILdown = denBK->directProd(IL,Btens->gIdiff());
+   int ILdown = Irreps::directProd(IL,Btens->gIdiff());
    
    char trans = 'T';
    char notrans = 'N';
@@ -358,7 +358,7 @@ void CheMPS2::Heff::addDiagram4A3and4A4spin0(const int ikappa, double * memS, do
    int dimLup = denBK->gCurrentDim(theindex  ,NL,TwoSL,IL);
    int dimR   = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
    
-   int ILdown = denBK->directProd(IL,Ctens->gIdiff());
+   int ILdown = Irreps::directProd(IL,Ctens->gIdiff());
    
    char trans = 'T';
    char notrans = 'N';
@@ -504,7 +504,7 @@ void CheMPS2::Heff::addDiagram4A3and4A4spin1(const int ikappa, double * memS, do
    int dimLup = denBK->gCurrentDim(theindex  ,NL,TwoSL,IL);
    int dimR   = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
    
-   int ILdown = denBK->directProd(IL,Dtens->gIdiff());
+   int ILdown = Irreps::directProd(IL,Dtens->gIdiff());
    
    char trans = 'T';
    char notrans = 'N';
@@ -702,8 +702,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin0(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL-2, TwoSL, ILdown, 1, N2, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -740,8 +740,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL-2, TwoSL, ILdown, 2, N2, TwoS2, NR-1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -776,8 +776,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL+2, TwoSL, ILdown, 0, N2, TwoS2, NR+1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -815,8 +815,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin0(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL+2, TwoSL, ILdown, 1, N2, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -880,8 +880,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin1(const int ikappa, double * memS, do
    
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL-2, TwoSLdown, ILdown, 1, N2, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -919,8 +919,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL-2, TwoSLdown, ILdown, 2, N2, TwoS2, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -957,8 +957,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL+2, TwoSLdown, ILdown, 0, N2, TwoS2, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -998,8 +998,8 @@ void CheMPS2::Heff::addDiagram4B1and4B2spin1(const int ikappa, double * memS, do
    
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex][0]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL+2, TwoSLdown, ILdown, 1, N2, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -1060,8 +1060,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL, TwoSL, ILdown, 0, N2, TwoS2, NR-1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1100,8 +1100,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin0(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSL, ILdown, 1, N2, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1141,8 +1141,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin0(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSL, ILdown, 1, N2, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1179,8 +1179,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin0(const int ikappa, double * memS, do
     
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex][0]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL, TwoSL, ILdown, 2, N2, TwoS2, NR+1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1241,8 +1241,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, 0, N2, TwoS2, NR-1, TwoSRdown, IRdown);
              
                   if (memSkappa!=-1){
@@ -1283,8 +1283,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin1(const int ikappa, double * memS, do
     
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, 1, N2, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -1326,8 +1326,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin1(const int ikappa, double * memS, do
     
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, 1, N2, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -1366,8 +1366,8 @@ void CheMPS2::Heff::addDiagram4B3and4B4spin1(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex][0]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, 2, N2, TwoS2, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1430,8 +1430,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin0(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL-2, TwoSL, ILdown, N1, 1, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1466,8 +1466,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
        
-               int ILdown = denBK->directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL-2, TwoSL, ILdown, N1, 2, TwoS1, NR-1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1501,8 +1501,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL+2, TwoSL, ILdown, N1, 0, TwoS1, NR+1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1539,8 +1539,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin0(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Aleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL+2, TwoSL, ILdown, N1, 1, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1603,8 +1603,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin1(const int ikappa, double * memS, do
    
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL-2, TwoSLdown, ILdown, N1, 1, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -1641,8 +1641,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL-2, TwoSLdown, ILdown, N1, 2, TwoS1, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1678,8 +1678,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL+2, TwoSLdown, ILdown, N1, 0, TwoS1, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1718,8 +1718,8 @@ void CheMPS2::Heff::addDiagram4C1and4C2spin1(const int ikappa, double * memS, do
    
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Bleft[l_index-theindex-1][1]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL+2, TwoSLdown, ILdown, N1, 1, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -1779,8 +1779,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin0(const int ikappa, double * memS, do
    
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL, TwoSL, ILdown, N1, 0, TwoS1, NR-1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1818,8 +1818,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin0(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSL, ILdown, N1, 1, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1858,8 +1858,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin0(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSL, ILdown, N1, 1, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -1895,8 +1895,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin0(const int ikappa, double * memS, do
     
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-               int ILdown = denBK->directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
-               int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+               int ILdown = Irreps::directProd(IL, Cleft[l_index-theindex-1][1]->gIdiff() );
+               int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                int memSkappa = denS->gKappa(NL, TwoSL, ILdown, N1, 2, TwoS1, NR+1, TwoSRdown, IRdown);
                
                if (memSkappa!=-1){
@@ -1957,8 +1957,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin1(const int ikappa, double * memS, do
    
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, N1, 0, TwoS1, NR-1, TwoSRdown, IRdown);
              
                   if (memSkappa!=-1){
@@ -1999,8 +1999,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin1(const int ikappa, double * memS, do
     
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, N1, 1, TwoJdown, NR-1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -2042,8 +2042,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin1(const int ikappa, double * memS, do
     
                   for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                     int ILdown = denBK->directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
-                     int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                     int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
+                     int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                      int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, N1, 1, TwoJdown, NR+1, TwoSRdown, IRdown);
                
                      if (memSkappa!=-1){
@@ -2082,8 +2082,8 @@ void CheMPS2::Heff::addDiagram4C3and4C4spin1(const int ikappa, double * memS, do
     
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
       
-                  int ILdown = denBK->directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
-                  int IRdown = denBK->directProd(IR, denBK->gIrrep(l_index) );
+                  int ILdown = Irreps::directProd(IL, Dleft[l_index-theindex-1][1]->gIdiff() );
+                  int IRdown = Irreps::directProd(IR, denBK->gIrrep(l_index) );
                   int memSkappa = denS->gKappa(NL, TwoSLdown, ILdown, N1, 2, TwoS1, NR+1, TwoSRdown, IRdown);
                
                   if (memSkappa!=-1){
@@ -2133,7 +2133,7 @@ void CheMPS2::Heff::addDiagram4D(const int ikappa, double * memS, double * memHe
    char notrans = 'N';
    int inc = 1;
    double beta = 1.0; //add
-   int ILdown = denBK->directProd(IL, denBK->gIrrep(theindex+1));
+   int ILdown = Irreps::directProd(IL, denBK->gIrrep(theindex+1));
    
    //4D1A and 4D1B
    if ((N1==0) && (N2>0)){
@@ -2388,8 +2388,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
          
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
             
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                
@@ -2448,8 +2448,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
          
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
             
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                
@@ -2517,8 +2517,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
             
                   for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
             
-                     int ILdown = denBK->directProd(IL,Irrep);
-                     int IRdown = denBK->directProd(IR,Irrep);
+                     int ILdown = Irreps::directProd(IL,Irrep);
+                     int IRdown = Irreps::directProd(IR,Irrep);
                      int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                
@@ -2578,8 +2578,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                   
@@ -2647,8 +2647,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
                   
                   for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                     int ILdown = denBK->directProd(IL,Irrep);
-                     int IRdown = denBK->directProd(IR,Irrep);
+                     int ILdown = Irreps::directProd(IL,Irrep);
+                     int IRdown = Irreps::directProd(IR,Irrep);
                      int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                   
@@ -2708,8 +2708,8 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                   
@@ -2780,7 +2780,7 @@ void CheMPS2::Heff::addDiagram4F(const int ikappa, double * memS, double * memHe
    char notrans = 'N';
    int inc = 1;
    double beta = 1.0; //add
-   int IRdown = denBK->directProd(IR, denBK->gIrrep(theindex+1)); //I_{L} must be equal to I_{i+1}
+   int IRdown = Irreps::directProd(IR, denBK->gIrrep(theindex+1)); //I_{L} must be equal to I_{i+1}
    
    //4F1A and 4F1B
    if ((N1==2) && (N2<2)){
@@ -3024,7 +3024,7 @@ void CheMPS2::Heff::addDiagram4G(const int ikappa, double * memS, double * memHe
    char notrans = 'N';
    int inc = 1;
    double beta = 1.0; //add
-   int IRdown = denBK->directProd(IR, denBK->gIrrep(theindex)); //I_{L} must be equal to I_{i+1}
+   int IRdown = Irreps::directProd(IR, denBK->gIrrep(theindex)); //I_{L} must be equal to I_{i+1}
    
    //4G1A and 4G1B
    if ((N1<2) && (N2==2)){
@@ -3282,8 +3282,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                   
@@ -3345,8 +3345,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                   
@@ -3417,8 +3417,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                   for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                     int ILdown = denBK->directProd(IL,Irrep);
-                     int IRdown = denBK->directProd(IR,Irrep);
+                     int ILdown = Irreps::directProd(IL,Irrep);
+                     int IRdown = Irreps::directProd(IR,Irrep);
                      int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                   
@@ -3482,8 +3482,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL-1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR-1,TwoSRdown,IRdown);
                   
@@ -3554,8 +3554,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                   for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                     int ILdown = denBK->directProd(IL,Irrep);
-                     int IRdown = denBK->directProd(IR,Irrep);
+                     int ILdown = Irreps::directProd(IL,Irrep);
+                     int IRdown = Irreps::directProd(IR,Irrep);
                      int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                   
@@ -3619,8 +3619,8 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                   
                for (int Irrep=0; Irrep < (denBK->getNumberOfIrreps()); Irrep++){
                
-                  int ILdown = denBK->directProd(IL,Irrep);
-                  int IRdown = denBK->directProd(IR,Irrep);
+                  int ILdown = Irreps::directProd(IL,Irrep);
+                  int IRdown = Irreps::directProd(IR,Irrep);
                   int dimLdown = denBK->gCurrentDim(theindex,  NL+1,TwoSLdown,ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2,NR+1,TwoSRdown,IRdown);
                   
@@ -3692,7 +3692,7 @@ void CheMPS2::Heff::addDiagram4I(const int ikappa, double * memS, double * memHe
    
    char trans = 'T';
    char notrans = 'N';
-   int ILdown = denBK->directProd(IL,denBK->gIrrep(theindex));
+   int ILdown = Irreps::directProd(IL,denBK->gIrrep(theindex));
    int inc = 1;
    double beta = 1.0; //add
    
@@ -3930,7 +3930,7 @@ void CheMPS2::Heff::addDiagram4J1and4J2spin0(const int ikappa, double * memS, do
    
    char trans = 'T';
    char notrans = 'N';
-   int IRdown = denBK->directProd(IR,Aright->gIdiff());
+   int IRdown = Irreps::directProd(IR,Aright->gIdiff());
 
    //4J1A.spin0
    if ((N1==0) && (N2==0)){
@@ -4070,7 +4070,7 @@ void CheMPS2::Heff::addDiagram4J1and4J2spin1(const int ikappa, double * memS, do
    
    char trans = 'T';
    char notrans = 'N';
-   int IRdown = denBK->directProd(IR,Bright->gIdiff());
+   int IRdown = Irreps::directProd(IR,Bright->gIdiff());
 
    //4J1A.spin1
    if ((N1==0) && (N2==0)){ //TwoSL = TwoSR --> TwoSR can be what it wants to be.
@@ -4227,7 +4227,7 @@ void CheMPS2::Heff::addDiagram4J3and4J4spin0(const int ikappa, double * memS, do
    int TwoSR = denS->gTwoSR(ikappa);
    int IR = denS->gIR(ikappa);
 
-   int IRdown = denBK->directProd(IR,Cright->gIdiff());
+   int IRdown = Irreps::directProd(IR,Cright->gIdiff());
    int theindex = denS->gIndex();
    
    int dimRdown = denBK->gCurrentDim(theindex+2,NR,TwoSR,IRdown);
@@ -4368,7 +4368,7 @@ void CheMPS2::Heff::addDiagram4J3and4J4spin1(const int ikappa, double * memS, do
    char trans = 'T';
    char notrans = 'N';
 
-   int IRdown = denBK->directProd(IR,Dright->gIdiff());
+   int IRdown = Irreps::directProd(IR,Dright->gIdiff());
    
    for (int TwoSRdown=TwoSR-2; TwoSRdown<=TwoSR+2; TwoSRdown+=2){
    
@@ -4512,8 +4512,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSR,     IRdown);
@@ -4552,8 +4552,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSR,     IRdown);
@@ -4593,8 +4593,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSR,     IRdown);
@@ -4631,8 +4631,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Aright[theindex+1-l_index][0]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSR,     IRdown);
@@ -4692,8 +4692,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSR,     IRdown);
@@ -4732,8 +4732,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSR,     IRdown);
@@ -4773,8 +4773,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSR,     IRdown);
@@ -4811,8 +4811,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Aright[theindex-l_index][1]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSR,     IRdown);
@@ -4873,8 +4873,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSRdown, IRdown);
@@ -4915,8 +4915,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSRdown, IRdown);
@@ -4958,8 +4958,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSRdown, IRdown);
@@ -4998,8 +4998,8 @@ void CheMPS2::Heff::addDiagram4K1and4K2spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Bright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSRdown, IRdown);
@@ -5060,8 +5060,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSRdown, IRdown);
@@ -5101,8 +5101,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR-2, TwoSRdown, IRdown);
@@ -5143,8 +5143,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSRdown, IRdown);
@@ -5182,8 +5182,8 @@ void CheMPS2::Heff::addDiagram4L1and4L2spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Bright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR+2, TwoSRdown, IRdown);
@@ -5243,8 +5243,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5283,8 +5283,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5324,8 +5324,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5362,8 +5362,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Cright[theindex+1-l_index][0]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5423,8 +5423,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5463,8 +5463,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5504,8 +5504,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin0(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5542,8 +5542,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin0(const int ikappa, double * memS, do
          
             for (int l_index=0; l_index<theindex; l_index++){
                
-               int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
+               int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR, Cright[theindex-l_index][1]->gIdiff() );
                
                int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSR,     IRdown);
@@ -5604,8 +5604,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5645,8 +5645,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5687,8 +5687,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5726,8 +5726,8 @@ void CheMPS2::Heff::addDiagram4K3and4K4spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Dright[theindex+1-l_index][0]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5788,8 +5788,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5829,8 +5829,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL+1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5871,8 +5871,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin1(const int ikappa, double * memS, do
          
                   for (int l_index=0; l_index<theindex; l_index++){
                
-                     int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                     int IRdown = denBK->directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
+                     int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                     int IRdown = Irreps::directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
                
                      int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                      int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);
@@ -5910,8 +5910,8 @@ void CheMPS2::Heff::addDiagram4L3and4L4spin1(const int ikappa, double * memS, do
          
                for (int l_index=0; l_index<theindex; l_index++){
                
-                  int ILdown = denBK->directProd(IL, denBK->gIrrep(l_index));
-                  int IRdown = denBK->directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
+                  int ILdown = Irreps::directProd(IL, denBK->gIrrep(l_index));
+                  int IRdown = Irreps::directProd(IR, Dright[theindex-l_index][1]->gIdiff() );
                
                   int dimLdown = denBK->gCurrentDim(theindex,   NL-1, TwoSLdown, ILdown);
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR,   TwoSRdown, IRdown);

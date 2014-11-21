@@ -47,8 +47,8 @@ CheMPS2::Sobject::Sobject(const int indexIn, const int IlocalIn1, const int Iloc
                for (int N1=0; N1<=2; N1++){
                   for (int N2=0; N2<=2; N2++){
                      int NR = NL+N1+N2;
-                     int IR = ((N1==1)?(denBK->directProd(IL,Ilocal1)):IL); //IR as intermediary
-                         IR = ((N2==1)?(denBK->directProd(IR,Ilocal2)):IR);
+                     int IR = ((N1==1)?(Irreps::directProd(IL,Ilocal1)):IL); //IR as intermediary
+                         IR = ((N2==1)?(Irreps::directProd(IR,Ilocal2)):IR);
                      for (int TwoJ = ((N1+N2)%2); TwoJ<=(((N1==1)&&(N2==1))?2:((N1+N2)%2)) ; TwoJ+=2){
                         for (int TwoSR = TwoSL-TwoJ; TwoSR <= TwoSL+TwoJ; TwoSR+=2){
                            if (TwoSR>=0){
@@ -88,8 +88,8 @@ CheMPS2::Sobject::Sobject(const int indexIn, const int IlocalIn1, const int Iloc
                for (int N1=0; N1<=2; N1++){
                   for (int N2=0; N2<=2; N2++){
                      const int NR = NL+N1+N2;
-                     int IR = ((N1==1)?(denBK->directProd(IL,Ilocal1)):IL); //IR as intermediary
-                         IR = ((N2==1)?(denBK->directProd(IR,Ilocal2)):IR); //IR final result
+                     int IR = ((N1==1)?(Irreps::directProd(IL,Ilocal1)):IL); //IR as intermediary
+                         IR = ((N2==1)?(Irreps::directProd(IR,Ilocal2)):IR); //IR final result
                      for (int TwoJ = ((N1+N2)%2); TwoJ<=(((N1==1)&&(N2==1))?2:((N1+N2)%2)) ; TwoJ+=2){
                         for (int TwoSR = TwoSL-TwoJ; TwoSR <= TwoSL+TwoJ; TwoSR+=2){
                            if (TwoSR>=0){
@@ -198,7 +198,7 @@ void CheMPS2::Sobject::Join(TensorT * Tleft, TensorT * Tright){
    #pragma omp parallel for schedule(dynamic)
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int NM = sectorNL[ikappa] + sectorN1[ikappa];
-      int IM = ((sectorN1[ikappa]==1)?(denBK->directProd(sectorIL[ikappa],Ilocal1)):sectorIL[ikappa]);
+      int IM = ((sectorN1[ikappa]==1)?(Irreps::directProd(sectorIL[ikappa],Ilocal1)):sectorIL[ikappa]);
       
       int nCases = 1; // number of TwoJM possibilities --> most cases 1, in the case of the next line: 2
       if ((sectorTwoSR[ikappa]==sectorTwoSL[ikappa]) && (sectorN1[ikappa]==1) && (sectorN2[ikappa]==1) && (sectorTwoSR[ikappa]>=1)) nCases = 2;
@@ -300,7 +300,7 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       for (int NL=SplitSectNM[iCenter]-2; NL<=SplitSectNM[iCenter]; NL++){
          for (int TwoSL=SplitSectTwoJM[iCenter]-((NL==SplitSectNM[iCenter]-1)?1:0); TwoSL<SplitSectTwoJM[iCenter]+2; TwoSL+=2){
             if (TwoSL>=0){
-               int IL = ((NL==SplitSectNM[iCenter]-1)?denBK->directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+               int IL = ((NL==SplitSectNM[iCenter]-1)?Irreps::directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
                if (dimL>0){
                   DimLtotal[iCenter] += dimL;
@@ -312,7 +312,7 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       for (int NR=SplitSectNM[iCenter]; NR<=SplitSectNM[iCenter]+2; NR++){
          for (int TwoSR=SplitSectTwoJM[iCenter]-((NR==SplitSectNM[iCenter]+1)?1:0); TwoSR<SplitSectTwoJM[iCenter]+2; TwoSR+=2){
             if (TwoSR>=0){
-               int IR = ((NR==SplitSectNM[iCenter]+1)?denBK->directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+               int IR = ((NR==SplitSectNM[iCenter]+1)?Irreps::directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                int dimR = denBK->gCurrentDim(index+2,NR,TwoSR,IR);
                if (dimR>0){
                   DimRtotal[iCenter] += dimR;
@@ -337,14 +337,14 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
          for (int NL=SplitSectNM[iCenter]-2; NL<=SplitSectNM[iCenter]; NL++){
             for (int TwoSL=SplitSectTwoJM[iCenter]-((NL==SplitSectNM[iCenter]-1)?1:0); TwoSL<SplitSectTwoJM[iCenter]+2; TwoSL+=2){
                if (TwoSL>=0){
-                  int IL = ((NL==SplitSectNM[iCenter]-1)?denBK->directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+                  int IL = ((NL==SplitSectNM[iCenter]-1)?Irreps::directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                   int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
                   if (dimL>0){
                      dimRtotal2 = 0;
                      for (int NR=SplitSectNM[iCenter]; NR<=SplitSectNM[iCenter]+2; NR++){
                         for (int TwoSR=SplitSectTwoJM[iCenter]-((NR==SplitSectNM[iCenter]+1)?1:0); TwoSR<SplitSectTwoJM[iCenter]+2; TwoSR+=2){
                            if (TwoSR>=0){
-                              int IR = ((NR==SplitSectNM[iCenter]+1)?denBK->directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+                              int IR = ((NR==SplitSectNM[iCenter]+1)?Irreps::directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                               int dimR = denBK->gCurrentDim(index+2,NR,TwoSR,IR);
                               if (dimR>0){
                                  //Loop over contributing TwoJ's
@@ -472,7 +472,7 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
          for (int NL=SplitSectNM[iCenter]-2; NL<=SplitSectNM[iCenter]; NL++){
             for (int TwoSL=SplitSectTwoJM[iCenter]-((NL==SplitSectNM[iCenter]-1)?1:0); TwoSL<SplitSectTwoJM[iCenter]+2; TwoSL+=2){
                if (TwoSL>=0){
-                  int IL = ((NL==SplitSectNM[iCenter]-1)?denBK->directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+                  int IL = ((NL==SplitSectNM[iCenter]-1)?Irreps::directProd(Ilocal1,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                   int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
                   if (dimL>0){
                      double * TleftBlock = Tleft->gStorage(NL,TwoSL,IL,SplitSectNM[iCenter],SplitSectTwoJM[iCenter],SplitSectIM[iCenter]);
@@ -498,7 +498,7 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
          for (int NR=SplitSectNM[iCenter]; NR<=SplitSectNM[iCenter]+2; NR++){
             for (int TwoSR=SplitSectTwoJM[iCenter]-((NR==SplitSectNM[iCenter]+1)?1:0); TwoSR<SplitSectTwoJM[iCenter]+2; TwoSR+=2){
                if (TwoSR>=0){
-                  int IR = ((NR==SplitSectNM[iCenter]+1)?denBK->directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
+                  int IR = ((NR==SplitSectNM[iCenter]+1)?Irreps::directProd(Ilocal2,SplitSectIM[iCenter]):SplitSectIM[iCenter]);
                   int dimR = denBK->gCurrentDim(index+2,NR,TwoSR,IR);
                   if (dimR>0){
                      double * TrightBlock = Tright->gStorage(SplitSectNM[iCenter],SplitSectTwoJM[iCenter],SplitSectIM[iCenter],NR,TwoSR,IR);

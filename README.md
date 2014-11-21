@@ -259,6 +259,13 @@ higher than the plugin. In that folder, run:
     > psi4 N2.dat
     > psi4 H2O.dat
    
+   
+DMRG-SCF calculations with PySCF
+--------------------------------
+
+[PySCF](https://github.com/sunqm/pyscf) now also has an interface to perform
+DMRG-SCF calculations using CheMPS2.
+   
 
 List of files in the CheMPS2 library
 ------------------------------------

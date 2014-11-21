@@ -46,7 +46,7 @@ void CheMPS2::TensorD::AddATermTranspose(const double alpha, TensorF1Dbase * Ter
       int fase = ((((sectorTwoS1[ikappa]-sectorTwoSD[ikappa])/2)%2)!=0)?-1:1;
       const double prefactor = alpha * fase * ((movingRight)?sqrt((sectorTwoS1[ikappa]+1.0)/(sectorTwoSD[ikappa]+1.0)):sqrt((sectorTwoSD[ikappa]+1.0)/(sectorTwoS1[ikappa]+1.0)));
       int dimU = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-      int ID = denBK->directProd(sectorI1[ikappa],Idiff);
+      int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimD = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoSD[ikappa], ID);
       
       double * BlockToAdd = TermToAdd->gStorage(sectorN1[ikappa], sectorTwoSD[ikappa], ID, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);

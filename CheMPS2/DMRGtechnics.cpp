@@ -209,7 +209,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[H
       int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(cnt) : cnt;
       nTot += coeff[HamIndex];
       twoStot += (coeff[HamIndex]==1)?1:0;
-      if (coeff[HamIndex]==1){ iTot = denBK->directProd(iTot,denBK->gIrrep(cnt)); }
+      if (coeff[HamIndex]==1){ iTot = Irreps::directProd(iTot,denBK->gIrrep(cnt)); }
    }
    if ( Prob->gN() != nTot ){
       cout << "Ndesired = " << Prob->gN() << " and nTot in int * coeff = " << nTot << endl;
@@ -253,7 +253,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[H
       int TwoSR, IR;
       if (coeff[HamIndex]==1){
          TwoSR = TwoSL + 1;
-         IR = denBK->directProd(IL,denBK->gIrrep(cnt));
+         IR = Irreps::directProd(IL,denBK->gIrrep(cnt));
       } else {
          TwoSR = TwoSL;
          IR = IL;

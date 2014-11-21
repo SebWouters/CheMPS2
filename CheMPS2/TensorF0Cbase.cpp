@@ -36,7 +36,7 @@ CheMPS2::TensorF0Cbase::TensorF0Cbase(const int indexIn, const int IdiffIn, cons
          for (int IU=0; IU<denBK->getNumberOfIrreps(); IU++){
             int dimU = denBK->gCurrentDim(index,NU,TwoSU,IU);
             if (dimU>0){
-               int ID = denBK->directProd(Idiff,IU);
+               int ID = Irreps::directProd(Idiff,IU);
                int dimD = denBK->gCurrentDim(index,NU,TwoSU,ID);
                if (dimD>0){
                   nKappa++;
@@ -58,7 +58,7 @@ CheMPS2::TensorF0Cbase::TensorF0Cbase(const int indexIn, const int IdiffIn, cons
          for (int IU=0; IU<denBK->getNumberOfIrreps(); IU++){
             int dimU = denBK->gCurrentDim(index,NU,TwoSU,IU);
             if (dimU>0){
-               int ID = denBK->directProd(Idiff,IU);
+               int ID = Irreps::directProd(Idiff,IU);
                int dimD = denBK->gCurrentDim(index,NU,TwoSU,ID);
                if (dimD>0){
                   sectorN1[nKappa] = NU;
@@ -92,7 +92,7 @@ double * CheMPS2::TensorF0Cbase::gStorage() { return storage; }
       
 int CheMPS2::TensorF0Cbase::gKappa(const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2) const{
 
-   if ((denBK->directProd(I1,Idiff))!=I2) return -1;
+   if ((Irreps::directProd(I1,Idiff))!=I2) return -1;
    if (N2!=N1) return -1;
    if (TwoS2!=TwoS1) return -1;
 
@@ -137,7 +137,7 @@ void CheMPS2::TensorF0Cbase::updateMovingRight(TensorF0Cbase * F0CbasePrevious, 
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-      const int IDR = denBK->directProd(sectorI1[ikappa], Idiff);
+      const int IDR = Irreps::directProd(sectorI1[ikappa], Idiff);
       int dimDR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], IDR);
       
       for (int geval=0; geval<4; geval++){
@@ -158,14 +158,14 @@ void CheMPS2::TensorF0Cbase::updateMovingRight(TensorF0Cbase * F0CbasePrevious, 
             case 2: //N = 1
                NL = sectorN1[ikappa] - 1;
                TwoSL = sectorTwoS1[ikappa] - 1;
-               IUL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
-               IDL = denBK->directProd( IDR , denBK->gIrrep(index-1) );
+               IUL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
+               IDL = Irreps::directProd( IDR , denBK->gIrrep(index-1) );
                break;
             case 3: //N = 1
                NL = sectorN1[ikappa] - 1;
                TwoSL = sectorTwoS1[ikappa] + 1;
-               IUL = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
-               IDL = denBK->directProd( IDR , denBK->gIrrep(index-1) );
+               IUL = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1));
+               IDL = Irreps::directProd( IDR , denBK->gIrrep(index-1) );
                break;
          }
          int dimUL = denBK->gCurrentDim(index-1,NL,TwoSL,IUL);
@@ -201,7 +201,7 @@ void CheMPS2::TensorF0Cbase::updateMovingLeft(TensorF0Cbase * F0CbasePrevious, T
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUL = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-      const int IDL = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int IDL = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimDL = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],IDL);
       
       for (int geval=0; geval<4; geval++){
@@ -222,14 +222,14 @@ void CheMPS2::TensorF0Cbase::updateMovingLeft(TensorF0Cbase * F0CbasePrevious, T
             case 2: //N = 1
                NR = sectorN1[ikappa] + 1;
                TwoSR = sectorTwoS1[ikappa] - 1;
-               IUR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
-               IDR = denBK->directProd( IDL , denBK->gIrrep(index) );
+               IUR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+               IDR = Irreps::directProd( IDL , denBK->gIrrep(index) );
                break;
             case 3: //N = 1
                NR = sectorN1[ikappa] + 1;
                TwoSR = sectorTwoS1[ikappa] + 1;
-               IUR = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
-               IDR = denBK->directProd( IDL , denBK->gIrrep(index) );
+               IUR = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+               IDR = Irreps::directProd( IDL , denBK->gIrrep(index) );
                break;
          }
          int dimUR = denBK->gCurrentDim(index+1,NR,TwoSR,IUR);

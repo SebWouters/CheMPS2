@@ -54,7 +54,7 @@ void CheMPS2::TensorGYZ::construct(TensorT * denT){
       if (identity=='G'){
          NL    = sectorN1[ikappa]-1;
          TwoSL = sectorTwoS1[ikappa]-1;
-         IL    = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+         IL    = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
          alpha = sqrt(0.5);
       }
 

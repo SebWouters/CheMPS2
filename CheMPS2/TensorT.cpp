@@ -47,7 +47,7 @@ void CheMPS2::TensorT::AllocateAllArrays(){
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
                      if (TwoSR>=0){
-                        int IR = (NR==NL+1)?(denBK->directProd(IL,Ilocal)):IL ;
+                        int IR = (NR==NL+1)?(Irreps::directProd(IL,Ilocal)):IL ;
                         int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                         if (dimR>0) nKappa++;
                      }
@@ -76,7 +76,7 @@ void CheMPS2::TensorT::AllocateAllArrays(){
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
                      if (TwoSR>=0){
-                        int IR = (NR==NL+1)?(denBK->directProd(IL,Ilocal)):IL ;
+                        int IR = (NR==NL+1)?(Irreps::directProd(IL,Ilocal)):IL ;
                         int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                         if (dimR>0){
                            sectorN1[nKappa] = NL;
@@ -414,7 +414,7 @@ bool CheMPS2::TensorT::CheckLeftNormal() const{
                bool firsttime = true;
                for (int NL=NR-2; NL<=NR; NL++){
                   for (int TwoSL=TwoSR-((NR==NL+1)?1:0); TwoSL<TwoSR+2; TwoSL+=2){
-                     int IL = (NR==NL+1)?(denBK->directProd(Ilocal,IR)):IR;
+                     int IL = (NR==NL+1)?(Irreps::directProd(Ilocal,IR)):IR;
                      int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
                      if (dimL>0){
                         double * Block = storage + kappa2index[gKappa(NL,TwoSL,IL,NR,TwoSR,IR)];
@@ -455,7 +455,7 @@ bool CheMPS2::TensorT::CheckRightNormal() const{
                bool firsttime = true;
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
-                     int IR = (NR==NL+1)?(denBK->directProd(Ilocal,IL)):IL;
+                     int IR = (NR==NL+1)?(Irreps::directProd(Ilocal,IL)):IL;
                      int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                      if (dimR>0){
                         double * Block = storage + kappa2index[gKappa(NL,TwoSL,IL,NR,TwoSR,IR)];

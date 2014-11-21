@@ -47,13 +47,7 @@ CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigne
    CheMPS2::Irreps myIrreps( Ham->getNGroup() );
    NumIrreps         = myIrreps.getNumberOfIrreps();
    TargetIrrep       = TargetIrrep_in;
-   IrrepProductTable = new int[ NumIrreps * NumIrreps ];
    orb2irrep         = new int[ L ];
-   for (unsigned int row = 0; row < NumIrreps; row++){
-      for (unsigned int col = 0; col < NumIrreps; col++){
-         IrrepProductTable[ row + NumIrreps * col ] = myIrreps.directProd( row , col );
-      }
-   }
    for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Ham->getOrbitalIrrep( orb ); }
 
    /* Copy the Hamiltonian over:
@@ -86,7 +80,6 @@ CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigne
 CheMPS2::FCI::~FCI(){
    
    // FCI::FCI
-   delete [] IrrepProductTable;
    delete [] orb2irrep;
    delete [] Gmat;
    delete [] ERI;

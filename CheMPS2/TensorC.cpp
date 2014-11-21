@@ -43,7 +43,7 @@ void CheMPS2::TensorC::AddATermTranspose(const double alpha, TensorF0Cbase * Ter
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimU = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-      const int ID = denBK->directProd(sectorI1[ikappa],Idiff);
+      const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
       int dimD = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],ID);
       
       double * BlockToAdd = TermToAdd->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],ID,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);

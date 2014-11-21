@@ -480,7 +480,7 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
          S0tensors[index][cnt2] = new TensorS0 * [index-cnt2+1];
          if (cnt2>0){ S1tensors[index][cnt2] = new TensorS1 * [index-cnt2+1]; }
          for (int cnt3=0; cnt3<(index-cnt2+1); cnt3++){
-            const int Iprod = denBK->directProd(denBK->gIrrep(index-cnt2-cnt3),denBK->gIrrep(index-cnt3));
+            const int Iprod = Irreps::directProd(denBK->gIrrep(index-cnt2-cnt3),denBK->gIrrep(index-cnt3));
             F0tensors[index][cnt2][cnt3] = new TensorF0(index+1,Iprod,movingRight,denBK);
             F1tensors[index][cnt2][cnt3] = new TensorF1(index+1,Iprod,movingRight,denBK);
             S0tensors[index][cnt2][cnt3] = new TensorS0(index+1,Iprod,movingRight,denBK);
@@ -500,7 +500,7 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
          Ctensors[index][cnt2] = new TensorC * [Prob->gL()-1-index-cnt2];
          Dtensors[index][cnt2] = new TensorD * [Prob->gL()-1-index-cnt2];
          for (int cnt3=0; cnt3<Prob->gL()-1-index-cnt2; cnt3++){
-            const int Idiff = denBK->directProd(denBK->gIrrep(index+1+cnt2+cnt3),denBK->gIrrep(index+1+cnt3));
+            const int Idiff = Irreps::directProd(denBK->gIrrep(index+1+cnt2+cnt3),denBK->gIrrep(index+1+cnt3));
             Atensors[index][cnt2][cnt3] = new TensorA(index+1,Idiff,movingRight,denBK);
             if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorB(index+1,Idiff,movingRight,denBK); }
             Ctensors[index][cnt2][cnt3] = new TensorC(index+1,Idiff,movingRight,denBK);
@@ -544,7 +544,7 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
          S0tensors[index][cnt2] = new TensorS0 * [Prob->gL()-1-index-cnt2];
          if (cnt2>0){ S1tensors[index][cnt2] = new TensorS1 * [Prob->gL()-1-index-cnt2]; }
          for (int cnt3=0; cnt3<Prob->gL()-1-index-cnt2; cnt3++){
-            const int Iprod = denBK->directProd(denBK->gIrrep(index+1+cnt3),denBK->gIrrep(index+1+cnt2+cnt3));
+            const int Iprod = Irreps::directProd(denBK->gIrrep(index+1+cnt3),denBK->gIrrep(index+1+cnt2+cnt3));
             F0tensors[index][cnt2][cnt3] = new TensorF0(index+1,Iprod,movingRight,denBK);
             F1tensors[index][cnt2][cnt3] = new TensorF1(index+1,Iprod,movingRight,denBK);
             S0tensors[index][cnt2][cnt3] = new TensorS0(index+1,Iprod,movingRight,denBK);
@@ -564,7 +564,7 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
          Ctensors[index][cnt2] = new TensorC * [index + 1 - cnt2];
          Dtensors[index][cnt2] = new TensorD * [index + 1 - cnt2];
          for (int cnt3=0; cnt3<index+1-cnt2; cnt3++){
-            const int Idiff = denBK->directProd(denBK->gIrrep(index-cnt2-cnt3),denBK->gIrrep(index-cnt3));
+            const int Idiff = Irreps::directProd(denBK->gIrrep(index-cnt2-cnt3),denBK->gIrrep(index-cnt3));
             Atensors[index][cnt2][cnt3] = new TensorA(index+1,Idiff,movingRight,denBK);
             if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorB(index+1,Idiff,movingRight,denBK); }
             Ctensors[index][cnt2][cnt3] = new TensorC(index+1,Idiff,movingRight,denBK);

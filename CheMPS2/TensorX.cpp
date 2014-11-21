@@ -170,7 +170,7 @@ void CheMPS2::TensorX::addTermQLRight(const int ikappa, TensorT * denT, TensorL 
          case 0:
             NLup = sectorN1[ikappa]-1;
             TwoSLup = sectorTwoS1[ikappa]-1;
-            ILup = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            ILup = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             NLdown = sectorN1[ikappa];
             TwoSLdown = sectorTwoS1[ikappa];
             ILdown = sectorI1[ikappa];
@@ -178,7 +178,7 @@ void CheMPS2::TensorX::addTermQLRight(const int ikappa, TensorT * denT, TensorL 
          case 1:
             NLup = sectorN1[ikappa]-1;
             TwoSLup = sectorTwoS1[ikappa]+1;
-            ILup = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            ILup = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             NLdown = sectorN1[ikappa];
             TwoSLdown = sectorTwoS1[ikappa];
             ILdown = sectorI1[ikappa];
@@ -189,7 +189,7 @@ void CheMPS2::TensorX::addTermQLRight(const int ikappa, TensorT * denT, TensorL 
             ILup = sectorI1[ikappa];
             NLdown = sectorN1[ikappa]-1;
             TwoSLdown = sectorTwoS1[ikappa]-1;
-            ILdown = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            ILdown = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
          case 3:
             NLup = sectorN1[ikappa]-2;
@@ -197,7 +197,7 @@ void CheMPS2::TensorX::addTermQLRight(const int ikappa, TensorT * denT, TensorL 
             ILup = sectorI1[ikappa];
             NLdown = sectorN1[ikappa]-1;
             TwoSLdown = sectorTwoS1[ikappa]+1;
-            ILdown = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+            ILdown = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
             break;
       }
       int dimLup   = denBK->gCurrentDim(index-1, NLup,   TwoSLup,   ILup);
@@ -276,7 +276,7 @@ void CheMPS2::TensorX::addTermQLLeft(const int ikappa, TensorT * denT, TensorL *
             IRup = sectorI1[ikappa];
             NRdown = sectorN1[ikappa]+1;
             TwoSRdown = sectorTwoS1[ikappa]-1;
-            IRdown = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IRdown = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
          case 1:
             NRup = sectorN1[ikappa];
@@ -284,12 +284,12 @@ void CheMPS2::TensorX::addTermQLLeft(const int ikappa, TensorT * denT, TensorL *
             IRup = sectorI1[ikappa];
             NRdown = sectorN1[ikappa]+1;
             TwoSRdown = sectorTwoS1[ikappa]+1;
-            IRdown = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IRdown = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             break;
          case 2:
             NRup = sectorN1[ikappa]+1;
             TwoSRup = sectorTwoS1[ikappa]-1;
-            IRup = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IRup = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             NRdown = sectorN1[ikappa]+2;
             TwoSRdown = sectorTwoS1[ikappa];
             IRdown = sectorI1[ikappa];
@@ -297,7 +297,7 @@ void CheMPS2::TensorX::addTermQLLeft(const int ikappa, TensorT * denT, TensorL *
          case 3:
             NRup = sectorN1[ikappa]+1;
             TwoSRup = sectorTwoS1[ikappa]+1;
-            IRup = denBK->directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
+            IRup = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index) );
             NRdown = sectorN1[ikappa]+2;
             TwoSRdown = sectorTwoS1[ikappa];
             IRdown = sectorI1[ikappa];
@@ -451,12 +451,12 @@ void CheMPS2::TensorX::addTermCRight(const int ikappa, TensorT * denT, TensorC *
          case 0:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]-1;
-            IL = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
             break;
          case 1:
             NL = sectorN1[ikappa]-1;
             TwoSL = sectorTwoS1[ikappa]+1;
-            IL = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
+            IL = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
             break;
          case 2:
             NL = sectorN1[ikappa]-2;
@@ -494,12 +494,12 @@ void CheMPS2::TensorX::addTermCLeft(const int ikappa, TensorT * denT, TensorC * 
          case 0:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]-1;
-            IR = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index) );
             break;
          case 1:
             NR = sectorN1[ikappa]+1;
             TwoSR = sectorTwoS1[ikappa]+1;
-            IR = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index) );
+            IR = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index) );
             break;
          case 2:
             NR = sectorN1[ikappa]+2;
@@ -532,7 +532,7 @@ void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorD *
 
    int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    
-   const int IL = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
+   const int IL = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index-1) );
    const int NL = sectorN1[ikappa]-1;
    
    for (int geval=0; geval<4; geval++){
@@ -586,7 +586,7 @@ void CheMPS2::TensorX::addTermDLeft(const int ikappa, TensorT * denT, TensorD * 
    int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    
    const int NR = sectorN1[ikappa]+1;
-   const int IR = denBK->directProd( sectorI1[ikappa], denBK->gIrrep(index) );
+   const int IR = Irreps::directProd( sectorI1[ikappa], denBK->gIrrep(index) );
    
    for (int geval=0; geval<4; geval++){
       int TwoSRup, TwoSRdown;

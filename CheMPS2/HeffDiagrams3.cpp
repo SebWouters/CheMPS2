@@ -37,7 +37,7 @@ void CheMPS2::Heff::addDiagram3Aand3D(const int ikappa, double * memS, double * 
    int IR = denS->gIR(ikappa);
    
    int theindex = denS->gIndex();
-   int ILdown = denBK->directProd(IL,denBK->gIrrep(theindex));
+   int ILdown = Irreps::directProd(IL,denBK->gIrrep(theindex));
    int TwoS2 = (N2==1)?1:0;
    
    int dimR = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
@@ -170,7 +170,7 @@ void CheMPS2::Heff::addDiagram3Band3I(const int ikappa, double * memS, double * 
    int IR = denS->gIR(ikappa);
    
    int theindex = denS->gIndex();
-   int ILdown = denBK->directProd(IL,denBK->gIrrep(theindex+1));
+   int ILdown = Irreps::directProd(IL,denBK->gIrrep(theindex+1));
    int TwoS1 = (N1==1)?1:0;
    
    int dimR = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
@@ -316,8 +316,8 @@ void CheMPS2::Heff::addDiagram3C(const int ikappa, double * memS, double * memHe
             const double factor = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);
       
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
-               int ILdown = denBK->directProd(IL,denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR,denBK->gIrrep(l_index));
+               int ILdown = Irreps::directProd(IL,denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR,denBK->gIrrep(l_index));
                int memSkappa = denS->gKappa(NL+1, TwoSLdown, ILdown, N1, N2, TwoJ, NR+1, TwoSRdown, IRdown);
                if (memSkappa!=-1){
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR+1, TwoSRdown, IRdown);
@@ -351,8 +351,8 @@ void CheMPS2::Heff::addDiagram3C(const int ikappa, double * memS, double * memHe
             const double factor = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);
       
             for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
-               int ILdown = denBK->directProd(IL,denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR,denBK->gIrrep(l_index));
+               int ILdown = Irreps::directProd(IL,denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR,denBK->gIrrep(l_index));
                int memSkappa = denS->gKappa(NL-1, TwoSLdown, ILdown, N1, N2, TwoJ, NR-1, TwoSRdown, IRdown);
                if (memSkappa!=-1){
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);
@@ -469,7 +469,7 @@ void CheMPS2::Heff::addDiagram3Kand3F(const int ikappa, double * memS, double * 
    int IR = denS->gIR(ikappa);
    
    int theindex = denS->gIndex();
-   int IRdown = denBK->directProd(IR,denBK->gIrrep(theindex));
+   int IRdown = Irreps::directProd(IR,denBK->gIrrep(theindex));
    int TwoS2 = (N2==1)?1:0;
    
    int dimL   = denBK->gCurrentDim(theindex,  NL,TwoSL,IL);
@@ -602,7 +602,7 @@ void CheMPS2::Heff::addDiagram3Land3G(const int ikappa, double * memS, double * 
    int IR = denS->gIR(ikappa);
    
    int theindex = denS->gIndex();
-   int IRdown = denBK->directProd(IR,denBK->gIrrep(theindex+1));
+   int IRdown = Irreps::directProd(IR,denBK->gIrrep(theindex+1));
    int TwoS1 = (N1==1)?1:0;
    
    int dimL   = denBK->gCurrentDim(theindex,  NL,TwoSL,IL);
@@ -748,8 +748,8 @@ void CheMPS2::Heff::addDiagram3J(const int ikappa, double * memS, double * memHe
             const double factor = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);
       
             for (int l_index=0; l_index<theindex; l_index++){
-               int ILdown = denBK->directProd(IL,denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR,denBK->gIrrep(l_index));
+               int ILdown = Irreps::directProd(IL,denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR,denBK->gIrrep(l_index));
                int memSkappa = denS->gKappa(NL+1, TwoSLdown, ILdown, N1, N2, TwoJ, NR+1, TwoSRdown, IRdown);
                if (memSkappa!=-1){
             
@@ -784,8 +784,8 @@ void CheMPS2::Heff::addDiagram3J(const int ikappa, double * memS, double * memHe
             const double factor = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSRdown,TwoSLdown,1);
       
             for (int l_index=0; l_index<theindex; l_index++){
-               int ILdown = denBK->directProd(IL,denBK->gIrrep(l_index));
-               int IRdown = denBK->directProd(IR,denBK->gIrrep(l_index));
+               int ILdown = Irreps::directProd(IL,denBK->gIrrep(l_index));
+               int IRdown = Irreps::directProd(IR,denBK->gIrrep(l_index));
                int memSkappa = denS->gKappa(NL-1, TwoSLdown, ILdown, N1, N2, TwoJ, NR-1, TwoSRdown, IRdown);
                if (memSkappa!=-1){
                   int dimRdown = denBK->gCurrentDim(theindex+2, NR-1, TwoSRdown, IRdown);

@@ -33,7 +33,7 @@ void CheMPS2::TensorM::construct(TensorT * denT){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
 
-      const int IDR = denBK->directProd(Idiff,sectorI1[ikappa]);
+      const int IDR = Irreps::directProd(Idiff,sectorI1[ikappa]);
       int dimUR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimDR = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sectorTwoSD[ikappa], IDR             );
       int dimL = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1, sectorTwoSD[ikappa], IDR);

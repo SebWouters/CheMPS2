@@ -407,9 +407,9 @@ double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index
          value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ] * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) );
          
          // Case2: (alpha,beta)==(act,act)
-         const int productIrrep = SymmInfo.directProd(irrep1,irrep3);
+         const int productIrrep = Irreps::directProd(irrep1,irrep3);
          for (int irrep_alpha=0; irrep_alpha<numberOfIrreps; irrep_alpha++){
-            int irrep_beta = SymmInfo.directProd(productIrrep,irrep_alpha);
+            int irrep_beta = Irreps::directProd(productIrrep,irrep_alpha);
             for (int alpha_index=iHandler->getOrigNDMRGstart(irrep_alpha); alpha_index<iHandler->getOrigNVIRTstart(irrep_alpha); alpha_index++){
                const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep_alpha) + alpha_index - iHandler->getOrigNDMRGstart(irrep_alpha);
                const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep_alpha);
@@ -485,9 +485,9 @@ double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
       //All the summation indices are active
       const int relIndex2 = index2 - iHandler->getOrigNOCCstart(irrep2);
       for (int irrep_r=0; irrep_r<numberOfIrreps; irrep_r++){
-         const int productIrrep = SymmInfo.directProd(irrep1,irrep_r);
+         const int productIrrep = Irreps::directProd(irrep1,irrep_r);
          for (int irrep_s=0; irrep_s<numberOfIrreps; irrep_s++){
-            int irrep_t = SymmInfo.directProd(productIrrep,irrep_s);
+            int irrep_t = Irreps::directProd(productIrrep,irrep_s);
             for (int r_index=iHandler->getOrigNDMRGstart(irrep_r); r_index<iHandler->getOrigNVIRTstart(irrep_r); r_index++){
                const int DMRGindexR = iHandler->getDMRGcumulative(irrep_r) + r_index - iHandler->getOrigNDMRGstart(irrep_r);
                const int relR = r_index - iHandler->getOrigNOCCstart(irrep_r);
