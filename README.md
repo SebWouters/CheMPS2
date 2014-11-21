@@ -263,8 +263,9 @@ higher than the plugin. In that folder, run:
 DMRG-SCF calculations with PySCF
 --------------------------------
 
-[PySCF](https://github.com/sunqm/pyscf) now also has an interface to perform
-DMRG-SCF calculations using CheMPS2.
+[PySCF](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
+in which all layers are written or interfaced in python. The package can
+perform DMRG-SCF and DMRG-CI calculations using CheMPS2.
    
 
 List of files in the CheMPS2 library
