@@ -36,7 +36,7 @@ using std::endl;
 void CheMPS2::DMRG::calc2DMandCorrelations(){
 
    //First get the whole MPS into left-canonical form
-   int index = Prob->gL()-2;
+   int index = L-2;
    Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
    denS->Join(MPS[index],MPS[index+1]);
    Heff Solver(denBK, Prob);
@@ -64,8 +64,8 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    cout << "**************************************" << endl;
    updateMovingRightSafe(index);
    
-   TensorDiag * Norm = new TensorDiag(Prob->gL(), denBK);
-   MPS[Prob->gL()-1]->QR(Norm);
+   TensorDiag * Norm = new TensorDiag(L, denBK);
+   MPS[L-1]->QR(Norm);
    delete Norm;
    
    //Allocate space for the 2DM
@@ -77,7 +77,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    the2DMallocated = true;
    
    //Then calculate step by step the 2DM
-   for (int siteindex=Prob->gL()-1; siteindex>=0; siteindex--){
+   for (int siteindex=L-1; siteindex>=0; siteindex--){
       the2DM->FillSite(MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors);
       if (siteindex>0){
          TensorDiag * Left = new TensorDiag(siteindex, denBK);
@@ -106,14 +106,14 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    
    //Then calculate step by step the mutual information.
    //Define the following tensor arrays thereto. The native DMRG ones are at the edge and are hence small.
-   TensorGYZ ** Gtensors = new TensorGYZ * [Prob->gL()-1];
-   TensorGYZ ** Ytensors = new TensorGYZ * [Prob->gL()-1];
-   TensorGYZ ** Ztensors = new TensorGYZ * [Prob->gL()-1];
-   TensorK   ** Ktensors = new TensorK   * [Prob->gL()-1];
-   TensorM   ** Mtensors = new TensorM   * [Prob->gL()-1];
+   TensorGYZ ** Gtensors = new TensorGYZ * [L-1];
+   TensorGYZ ** Ytensors = new TensorGYZ * [L-1];
+   TensorGYZ ** Ztensors = new TensorGYZ * [L-1];
+   TensorK   ** Ktensors = new TensorK   * [L-1];
+   TensorM   ** Mtensors = new TensorM   * [L-1];
    
    //Do the actual work
-   for (int siteindex=1; siteindex<Prob->gL(); siteindex++){
+   for (int siteindex=1; siteindex<L; siteindex++){
    
       //Switch MPS gauge
       TensorDiag * Right = new TensorDiag(siteindex, denBK);
@@ -171,7 +171,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    }
    
    //Clean-up
-   for (int previousindex=0; previousindex<Prob->gL()-1; previousindex++){
+   for (int previousindex=0; previousindex<L-1; previousindex++){
       delete Gtensors[previousindex];
       delete Ytensors[previousindex];
       delete Ztensors[previousindex];
@@ -186,8 +186,8 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    delete [] Mtensors;
    
    cout << "   Single-orbital entropies (Hamiltonian index order is used!) = [ ";
-   for (int index=0; index < Prob->gL()-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
-   cout << theCorr->SingleOrbitalEntropy_HAM(Prob->gL()-1) << " ]." << endl;
+   for (int index=0; index < L-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
+   cout << theCorr->SingleOrbitalEntropy_HAM(L-1) << " ]." << endl;
    
    for (int power=0; power<=2; power++){
       cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
@@ -205,7 +205,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[H
    int nTot = 0;
    int twoStot = 0;
    int iTot = 0;
-   for (int cnt=0; cnt<Prob->gL(); cnt++){
+   for (int cnt=0; cnt<L; cnt++){
       int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(cnt) : cnt;
       nTot += coeff[HamIndex];
       twoStot += (coeff[HamIndex]==1)?1:0;
@@ -226,7 +226,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[H
    
    //Construct two matrices
    int Dmax = 1;
-   for (int cnt=1; cnt<Prob->gL(); cnt++){
+   for (int cnt=1; cnt<L; cnt++){
       int DmaxBound = denBK->gMaxDimAtBound(cnt);
       if (DmaxBound>Dmax){ Dmax = DmaxBound; }
    }
@@ -245,7 +245,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[H
    double beta = 0.0;
    char notrans = 'N';
    
-   for (int cnt=0; cnt<Prob->gL(); cnt++){
+   for (int cnt=0; cnt<L; cnt++){
 
       //Right symmetry sector
       int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(cnt) : cnt;
@@ -341,7 +341,7 @@ void CheMPS2::DMRG::calcVeffTilde(double * result, Sobject * currentS, int state
          
          //Do (workmem * OR)_{block} --> result + jumpCurrentS
          int jumpCurrentS = currentS->gKappa2index(ikappa);
-         if (index==Prob->gL()-2){
+         if (index==L-2){
          
             int dimBlock = dimLdown * dimRdown;
             int inc = 1;
@@ -371,7 +371,7 @@ void CheMPS2::DMRG::calcOverlapsWithLowerStates(){
    for (int state=0; state<nStates-1; state++){
  
       //Don't do updatemovingRightSafe here, as with storeRenormOp some left boundary operators are stored and removed from mem.
-      const int cnt = Prob->gL()-2;
+      const int cnt = L-2;
       if (isAllocated[cnt]==2){
          deleteTensors(cnt, false);
          isAllocated[cnt]=0;
@@ -382,8 +382,8 @@ void CheMPS2::DMRG::calcOverlapsWithLowerStates(){
       }
       updateMovingRight(cnt);
  
-      TensorO * Otemp = new TensorO(Prob->gL(), true, Exc_BKs[state], denBK, Prob);
-      Otemp->update(Exc_MPSs[state][Prob->gL()-1], MPS[Prob->gL()-1], Exc_Overlaps[state][Prob->gL()-2]);
+      TensorO * Otemp = new TensorO(L, true, Exc_BKs[state], denBK, Prob);
+      Otemp->update(Exc_MPSs[state][L-1], MPS[L-1], Exc_Overlaps[state][L-2]);
       double overlap = Otemp->gStorage()[0];
       delete Otemp;
       

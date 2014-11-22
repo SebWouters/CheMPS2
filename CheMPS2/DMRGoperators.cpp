@@ -71,13 +71,13 @@ void CheMPS2::DMRG::updateMovingRightSafe(const int cnt){
             isAllocated[cnt-1]=0;
          }
       }
-      if (cnt+1<Prob->gL()-1){
+      if (cnt+1<L-1){
          if (isAllocated[cnt+1]==2){
             deleteTensors(cnt+1, false);
             isAllocated[cnt+1]=0;
          }
       }
-      if (cnt+2<Prob->gL()-1){
+      if (cnt+2<L-1){
          if (isAllocated[cnt+2]==1){
             deleteTensors(cnt+2, true);
             isAllocated[cnt+2]=0;
@@ -105,7 +105,7 @@ void CheMPS2::DMRG::updateMovingLeftSafe(const int cnt){
    updateMovingLeft(cnt);
    
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){
-      if (cnt+1<Prob->gL()-1){
+      if (cnt+1<L-1){
          if (isAllocated[cnt+1]==2){
             storeOperators(cnt+1, false);
             deleteTensors(cnt+1, false);
@@ -146,7 +146,7 @@ void CheMPS2::DMRG::updateMovingLeftSafe2DM(const int cnt){
    updateMovingLeft(cnt);
    
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){
-      if (cnt+1<Prob->gL()-1){
+      if (cnt+1<L-1){
          if (isAllocated[cnt+1]==2){
             deleteTensors(cnt+1, false);
             isAllocated[cnt+1]=0;
@@ -169,7 +169,7 @@ void CheMPS2::DMRG::updateMovingLeftSafe2DM(const int cnt){
 
 void CheMPS2::DMRG::deleteAllBoundaryOperators(){
 
-   for (int cnt=0; cnt<Prob->gL()-1; cnt++){
+   for (int cnt=0; cnt<L-1; cnt++){
       if (isAllocated[cnt]==1){ deleteTensors(cnt, true); }
       if (isAllocated[cnt]==2){ deleteTensors(cnt, false); }
       isAllocated[cnt] = 0;
@@ -234,7 +234,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
       }
       
       //Complementary two-operator tensors
-      const int k2 = Prob->gL()-1-index;
+      const int k2 = L-1-index;
       const int upperbound2 = k2*(k2+1)/2;
       #pragma omp for schedule(static) nowait
       for (int glob=0; glob<upperbound2; glob++){
@@ -283,7 +283,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
       
       //Qtensors
       #pragma omp for schedule(static) nowait
-      for (int cnt2=0; cnt2<Prob->gL()-1-index ; cnt2++){
+      for (int cnt2=0; cnt2<L-1-index ; cnt2++){
          if (index==0){
             Qtensors[index][cnt2]->ClearStorage();
             Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
@@ -334,7 +334,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
 
       //Ltensors
       #pragma omp for schedule(static) nowait
-      for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){
+      for (int cnt2=0; cnt2<L-1-index; cnt2++){
          if (cnt2==0){
             Ltensors[index][cnt2]->makenew(MPS[index+1]);
          } else {
@@ -343,7 +343,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
       }
       
       //Two-operator tensors
-      const int k1 = Prob->gL()-1-index;
+      const int k1 = L-1-index;
       const int upperbound1 = k1*(k1+1)/2;
       //After this parallel region, WAIT because F0,F1,S0,S1[index][cnt2][cnt3==0] is required for the complementary operators
       #pragma omp for schedule(static)
@@ -377,7 +377,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
       for (int glob=0; glob<upperbound2; glob++){
          const int cnt2 = trianglefunction(k2,glob);
          const int cnt3 = glob - (k2-1-cnt2)*(k2-cnt2)/2;
-         if (index==Prob->gL()-2){
+         if (index==L-2){
             Atensors[index][cnt2][cnt3]->ClearStorage();
             if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
             Ctensors[index][cnt2][cnt3]->ClearStorage();
@@ -388,7 +388,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
             Ctensors[index][cnt2][cnt3]->update(Ctensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
             Dtensors[index][cnt2][cnt3]->update(Dtensors[index+1][cnt2][cnt3+1],MPS[index+1],workmem);
          }
-         for (int num=0; num<Prob->gL()-index-1; num++){
+         for (int num=0; num<L-index-1; num++){
             if ( Atensors[index][cnt2][cnt3]->gIdiff() == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
                  
                double alpha = Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
@@ -421,7 +421,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
       //Qtensors
       #pragma omp for schedule(static) nowait
       for (int cnt2=0; cnt2<index+1 ; cnt2++){
-         if (index==Prob->gL()-2){
+         if (index==L-2){
             Qtensors[index][cnt2]->ClearStorage();
             Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
          } else {
@@ -440,7 +440,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
    }
    
    //Xtensors
-   if (index==Prob->gL()-2){
+   if (index==L-2){
       Xtensors[index]->update(MPS[index+1]);
    } else {
       Xtensors[index]->update(MPS[index+1], Ltensors[index+1], Xtensors[index+1], Qtensors[index+1][0], Atensors[index+1][0][0], Ctensors[index+1][0][0], Dtensors[index+1][0][0]);
@@ -449,7 +449,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
    //Otensors
    if (Exc_activated){
       for (int state=0; state<nStates-1; state++){
-         if (index==Prob->gL()-2){
+         if (index==L-2){
             Exc_Overlaps[state][index]->update(Exc_MPSs[state][index+1],MPS[index+1]);
          } else {
             Exc_Overlaps[state][index]->update(Exc_MPSs[state][index+1],MPS[index+1],Exc_Overlaps[state][index+1]);
@@ -490,16 +490,16 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
       //Complementary two-operator tensors
       //To right: Atens[cnt][cnt2][cnt3] = operators on sites cnt+1+cnt3 and cnt+1+cnt2+cnt3; at boundary cnt+1
-      Atensors[index] = new TensorA ** [Prob->gL()-1-index];
-      Btensors[index] = new TensorB ** [Prob->gL()-1-index];
-      Ctensors[index] = new TensorC ** [Prob->gL()-1-index];
-      Dtensors[index] = new TensorD ** [Prob->gL()-1-index];
-      for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){
-         Atensors[index][cnt2] = new TensorA * [Prob->gL()-1-index-cnt2];
-         if (cnt2>0){ Btensors[index][cnt2] = new TensorB * [Prob->gL()-1-index-cnt2]; }
-         Ctensors[index][cnt2] = new TensorC * [Prob->gL()-1-index-cnt2];
-         Dtensors[index][cnt2] = new TensorD * [Prob->gL()-1-index-cnt2];
-         for (int cnt3=0; cnt3<Prob->gL()-1-index-cnt2; cnt3++){
+      Atensors[index] = new TensorA ** [L-1-index];
+      Btensors[index] = new TensorB ** [L-1-index];
+      Ctensors[index] = new TensorC ** [L-1-index];
+      Dtensors[index] = new TensorD ** [L-1-index];
+      for (int cnt2=0; cnt2<L-1-index; cnt2++){
+         Atensors[index][cnt2] = new TensorA * [L-1-index-cnt2];
+         if (cnt2>0){ Btensors[index][cnt2] = new TensorB * [L-1-index-cnt2]; }
+         Ctensors[index][cnt2] = new TensorC * [L-1-index-cnt2];
+         Dtensors[index][cnt2] = new TensorD * [L-1-index-cnt2];
+         for (int cnt3=0; cnt3<L-1-index-cnt2; cnt3++){
             const int Idiff = Irreps::directProd(denBK->gIrrep(index+1+cnt2+cnt3),denBK->gIrrep(index+1+cnt3));
             Atensors[index][cnt2][cnt3] = new TensorA(index+1,Idiff,movingRight,denBK);
             if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorB(index+1,Idiff,movingRight,denBK); }
@@ -510,8 +510,8 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
       //Qtensors
       //To right: Qtens[cnt][cnt2] = operator on site cnt+1+cnt2; at boundary cnt+1
-      Qtensors[index] = new TensorQ * [Prob->gL()-1-index];
-      for (int cnt2=0; cnt2<Prob->gL()-1-index ; cnt2++){
+      Qtensors[index] = new TensorQ * [L-1-index];
+      for (int cnt2=0; cnt2<L-1-index ; cnt2++){
          Qtensors[index][cnt2] = new TensorQ(index+1,denBK->gIrrep(index+1+cnt2),movingRight,denBK,Prob,index+1+cnt2);
       }
    
@@ -529,21 +529,21 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
       //Ltensors
       //To left: Ltens[cnt][cnt2] = operator on site cnt+1+cnt2; at boundary cnt+1
-      Ltensors[index] = new TensorL * [Prob->gL()-1-index];
-      for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){ Ltensors[index][cnt2] = new TensorL(index+1,denBK->gIrrep(index+1+cnt2),movingRight,denBK); }
+      Ltensors[index] = new TensorL * [L-1-index];
+      for (int cnt2=0; cnt2<L-1-index; cnt2++){ Ltensors[index][cnt2] = new TensorL(index+1,denBK->gIrrep(index+1+cnt2),movingRight,denBK); }
    
       //Two-operator tensors
       //To left: F0tens[cnt][cnt2][cnt3] = operators on sites cnt+1+cnt3 and cnt+1+cnt3+cnt2; at boundary cnt+1
-      F0tensors[index] = new TensorF0 ** [Prob->gL()-1-index];
-      F1tensors[index] = new TensorF1 ** [Prob->gL()-1-index];
-      S0tensors[index] = new TensorS0 ** [Prob->gL()-1-index];
-      S1tensors[index] = new TensorS1 ** [Prob->gL()-1-index];
-      for (int cnt2=0; cnt2<Prob->gL()-1-index; cnt2++){
-         F0tensors[index][cnt2] = new TensorF0 * [Prob->gL()-1-index-cnt2];
-         F1tensors[index][cnt2] = new TensorF1 * [Prob->gL()-1-index-cnt2];
-         S0tensors[index][cnt2] = new TensorS0 * [Prob->gL()-1-index-cnt2];
-         if (cnt2>0){ S1tensors[index][cnt2] = new TensorS1 * [Prob->gL()-1-index-cnt2]; }
-         for (int cnt3=0; cnt3<Prob->gL()-1-index-cnt2; cnt3++){
+      F0tensors[index] = new TensorF0 ** [L-1-index];
+      F1tensors[index] = new TensorF1 ** [L-1-index];
+      S0tensors[index] = new TensorS0 ** [L-1-index];
+      S1tensors[index] = new TensorS1 ** [L-1-index];
+      for (int cnt2=0; cnt2<L-1-index; cnt2++){
+         F0tensors[index][cnt2] = new TensorF0 * [L-1-index-cnt2];
+         F1tensors[index][cnt2] = new TensorF1 * [L-1-index-cnt2];
+         S0tensors[index][cnt2] = new TensorS0 * [L-1-index-cnt2];
+         if (cnt2>0){ S1tensors[index][cnt2] = new TensorS1 * [L-1-index-cnt2]; }
+         for (int cnt3=0; cnt3<L-1-index-cnt2; cnt3++){
             const int Iprod = Irreps::directProd(denBK->gIrrep(index+1+cnt3),denBK->gIrrep(index+1+cnt2+cnt3));
             F0tensors[index][cnt2][cnt3] = new TensorF0(index+1,Iprod,movingRight,denBK);
             F1tensors[index][cnt2][cnt3] = new TensorF1(index+1,Iprod,movingRight,denBK);
@@ -614,11 +614,11 @@ void CheMPS2::DMRG::MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, 
 
 void CheMPS2::DMRG::storeOperators(const int index, const bool movingRight){
 
-   const int Nbound = movingRight ? index+1 : Prob->gL()-1-index;
-   const int Cbound = movingRight ? Prob->gL()-1-index : index+1;
+   const int Nbound = movingRight ? index+1 : L-1-index;
+   const int Cbound = movingRight ? L-1-index : index+1;
 
    std::stringstream thefilename;
-   thefilename << CheMPS2::TMPpath << "CheMPS2_Operators_" << thePID << "_index_" << index << ".h5";
+   thefilename << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
    
    //The hdf5 file
    hid_t file_id = H5Fcreate(thefilename.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -724,11 +724,11 @@ void CheMPS2::DMRG::MY_HDF5_READ(const hid_t file_id, const std::string sPath, T
 
 void CheMPS2::DMRG::loadOperators(const int index, const bool movingRight){
 
-   const int Nbound = movingRight ? index+1 : Prob->gL()-1-index;
-   const int Cbound = movingRight ? Prob->gL()-1-index : index+1;
+   const int Nbound = movingRight ? index+1 : L-1-index;
+   const int Cbound = movingRight ? L-1-index : index+1;
 
    std::stringstream thefilename;
-   thefilename << CheMPS2::TMPpath << "CheMPS2_Operators_" << thePID << "_index_" << index << ".h5";
+   thefilename << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
    
    //The hdf5 file
    hid_t file_id = H5Fopen(thefilename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -816,8 +816,8 @@ void CheMPS2::DMRG::loadOperators(const int index, const bool movingRight){
 
 void CheMPS2::DMRG::deleteTensors(const int index, const bool movingRightOfTensors){
 
-   const int upperBoundNormal = (( movingRightOfTensors)?(index+1):(Prob->gL()-1-index));
-   const int upperBoundComple = ((!movingRightOfTensors)?(index+1):(Prob->gL()-1-index));
+   const int upperBoundNormal = (( movingRightOfTensors)?(index+1):(L-1-index));
+   const int upperBoundComple = ((!movingRightOfTensors)?(index+1):(L-1-index));
    
    //Ltensors
    for (int cnt2=0; cnt2<upperBoundNormal; cnt2++){ delete Ltensors[index][cnt2]; }
@@ -876,7 +876,7 @@ void CheMPS2::DMRG::deleteTensors(const int index, const bool movingRightOfTenso
 void CheMPS2::DMRG::deleteStoredOperators(){
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::TMPpath << "CheMPS2_Operators_" << thePID << "*.h5";
+   temp << "rm " << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "*.h5";
    int info = system(temp.str().c_str());
    cout << "Info on DMRG::operators rm call to system: " << info << endl;
 

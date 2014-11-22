@@ -30,6 +30,7 @@
 #include "DMRG.h"
 
 using std::cout;
+using std::cerr;
 using std::endl;
 
 CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
@@ -38,24 +39,25 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
    
    assert( ProbIn->checkConsistency() );
    Prob = ProbIn;
+   L = Prob->gL();
    OptScheme = OptSchemeIn;
    thePID = getpid();
    nStates = 1;
 
-   Ltensors = new TensorL ** [Prob->gL()-1];
-   F0tensors = new TensorF0 *** [Prob->gL()-1];
-   F1tensors = new TensorF1 *** [Prob->gL()-1];
-   S0tensors = new TensorS0 *** [Prob->gL()-1];
-   S1tensors = new TensorS1 *** [Prob->gL()-1];
-   Atensors = new TensorA *** [Prob->gL()-1];
-   Btensors = new TensorB *** [Prob->gL()-1];
-   Ctensors = new TensorC *** [Prob->gL()-1];
-   Dtensors = new TensorD *** [Prob->gL()-1];
-   Qtensors = new TensorQ ** [Prob->gL()-1];
-   Xtensors = new TensorX * [Prob->gL()-1];
-   isAllocated = new int[Prob->gL()-1]; //0 not allocated, 1 allocated with movingRight true, 2 allocated with movingRight false
+   Ltensors = new TensorL ** [L-1];
+   F0tensors = new TensorF0 *** [L-1];
+   F1tensors = new TensorF1 *** [L-1];
+   S0tensors = new TensorS0 *** [L-1];
+   S1tensors = new TensorS1 *** [L-1];
+   Atensors = new TensorA *** [L-1];
+   Btensors = new TensorB *** [L-1];
+   Ctensors = new TensorC *** [L-1];
+   Dtensors = new TensorD *** [L-1];
+   Qtensors = new TensorQ ** [L-1];
+   Xtensors = new TensorX * [L-1];
+   isAllocated = new int[L-1]; //0 not allocated, 1 allocated with movingRight true, 2 allocated with movingRight false
    
-   for (int cnt=0; cnt<Prob->gL()-1; cnt++){ isAllocated[cnt] = 0; }
+   for (int cnt=0; cnt<L-1; cnt++){ isAllocated[cnt] = 0; }
    
    the2DMallocated = false;
    the2DM = NULL;
@@ -71,7 +73,7 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
 void CheMPS2::DMRG::setupBookkeeperAndMPS(){
 
    std::stringstream sstream;
-   sstream << "CheMPS2_MPS" << nStates-1 << ".h5";
+   sstream << CheMPS2::DMRG_MPS_storage_prefix << nStates-1 << ".h5";
    MPSstoragename.assign( sstream.str() );
    
    denBK = new SyBookkeeper(Prob, OptScheme->getD(0));
@@ -83,8 +85,8 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
    
    if (loadedMPS){ loadDIM(MPSstoragename,denBK); }
    
-   MPS = new TensorT * [Prob->gL()];
-   for (int cnt=0; cnt<Prob->gL(); cnt++){ MPS[cnt] = new TensorT(cnt,denBK->gIrrep(cnt),denBK); }
+   MPS = new TensorT * [L];
+   for (int cnt=0; cnt<L; cnt++){ MPS[cnt] = new TensorT(cnt,denBK->gIrrep(cnt),denBK); }
    
    //Left normalize them all and calculate all diagrams up to the end
    if (loadedMPS){
@@ -92,7 +94,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
       loadMPS(MPSstoragename, MPS, &isConverged);
       cout << "Loaded MPS " << MPSstoragename << " converged y/n? : " << isConverged << endl;
    } else {
-      for (int cnt=0; cnt<Prob->gL(); cnt++){
+      for (int cnt=0; cnt<L; cnt++){
          TensorDiag * Dstor = new TensorDiag(cnt+1,denBK);
          MPS[cnt]->random();
          MPS[cnt]->QR(Dstor);
@@ -121,14 +123,14 @@ CheMPS2::DMRG::~DMRG(){
    delete [] Xtensors;
    delete [] isAllocated;
    
-   for (int cnt=0; cnt<Prob->gL(); cnt++){ delete MPS[cnt]; }
+   for (int cnt = 0; cnt < L; cnt++){ delete MPS[cnt]; }
    delete [] MPS;
    
    if (Exc_activated){
       delete [] Exc_Eshifts;
-      for (int cnt=0; cnt<nStates-1; cnt++){
-         for (int cnt2=0; cnt2<Prob->gL(); cnt2++){ delete Exc_MPSs[cnt][cnt2]; }
-         delete [] Exc_MPSs[cnt];
+      for (int state = 0; state < nStates-1; state++){
+         for (int orb = 0; orb < L; orb++){ delete Exc_MPSs[ state ][ orb ]; }
+         delete [] Exc_MPSs[ state ];
       }
       delete [] Exc_MPSs;
       for (int cnt=0; cnt<nStates-1; cnt++){ delete Exc_BKs[cnt]; }
@@ -144,7 +146,7 @@ CheMPS2::DMRG::~DMRG(){
 
 void CheMPS2::DMRG::PreSolve(){
    
-   for (int cnt=0; cnt<Prob->gL()-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }
+   for (int cnt=0; cnt<L-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }
    
    TotalMinEnergy = 1e8;
    MaxDiscWeightLastSweep = 0.0;
@@ -213,7 +215,7 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction){
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
 
-   for (int index = Prob->gL()-2; index>0; index--){
+   for (int index = L-2; index>0; index--){
       //Construct S
       Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
       denS->Join(MPS[index],MPS[index+1]);
@@ -264,7 +266,7 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction){
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
 
-   for (int index = 0; index<Prob->gL()-2; index++){
+   for (int index = 0; index<L-2; index++){
       //Construct S
       Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
       denS->Join(MPS[index],MPS[index+1]);
@@ -323,7 +325,7 @@ void CheMPS2::DMRG::newExcitation(const double EshiftIn){
 
    if (!Exc_activated){
    
-      cout << "DMRG::activateExcitations has not been called yet!" << endl;
+      cerr << "DMRG::newExcitation : DMRG::activateExcitations has not been called yet!" << endl;
       return;
       
    }
@@ -333,8 +335,16 @@ void CheMPS2::DMRG::newExcitation(const double EshiftIn){
       Exc_Eshifts[nStates-1] = EshiftIn;
       Exc_MPSs[nStates-1] = MPS;
       Exc_BKs[nStates-1] = denBK;
-      Exc_Overlaps[nStates-1] = new TensorO * [Prob->gL()-1];
+      Exc_Overlaps[nStates-1] = new TensorO * [L-1];
       
+      if (the2DMallocated){
+         delete the2DM;
+         the2DMallocated = false;
+      }
+      if (theCorrAllocated){
+         delete theCorr;
+         theCorrAllocated = false;
+      }
       deleteAllBoundaryOperators();
       
       nStates++;
@@ -344,7 +354,7 @@ void CheMPS2::DMRG::newExcitation(const double EshiftIn){
    
    } else {
    
-      cout << "Max. number of excitations has been reached!" << endl;
+      cerr << "DMRG::newExcitation : Maximum number of excitations has been reached!" << endl;
       
    }
 

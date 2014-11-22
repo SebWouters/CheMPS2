@@ -83,10 +83,10 @@ namespace CheMPS2{
              \return the desired FCI coefficient */
          double getSpecificCoefficient(int * coeff);
          
-         //! Call "rm CheMPS2_MPS*.h5"
+         //! Call "rm " + CheMPS2::DMRG_MPS_storage_prefix + "*.h5"
          void deleteStoredMPS();
          
-         //! Call "rm + localTmpPath + CheMPS2_ + thePID + *.h5"
+         //! Call "rm " + CheMPS2::TMPpath + "/" + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + "*.h5";
          void deleteStoredOperators();
          
          //! Activate the necessary storage and machinery to handle excitations
@@ -119,6 +119,9 @@ namespace CheMPS2{
       
          //Pointer to the Problem --> constructed and destructed outside of this class
          Problem * Prob;
+         
+         //The number of orbitals: copied here so that the DMRG destructor doesn't depend on whether Prob still exists
+         int L;
          
          //Minimum energy encountered during all performed micro-iterations (as opposed to the 2DM/edge energy)
          double TotalMinEnergy;

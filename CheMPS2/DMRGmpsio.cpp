@@ -142,7 +142,7 @@ void CheMPS2::DMRG::loadMPS(const std::string name, TensorT ** MPSlocation, bool
       H5Gclose(group_id);
       
       //The MPS
-      for (int site=0; site<Prob->gL(); site++){
+      for (int site=0; site<L; site++){
          
          std::stringstream sstream;
          sstream << "/MPS_" << site;
@@ -163,7 +163,9 @@ void CheMPS2::DMRG::loadMPS(const std::string name, TensorT ** MPSlocation, bool
 
 void CheMPS2::DMRG::deleteStoredMPS(){
 
-   int info = system("rm CheMPS2_MPS*.h5");
+   std::stringstream thestream;
+   thestream << "rm " << CheMPS2::DMRG_MPS_storage_prefix << "*.h5";
+   int info = system(thestream.str().c_str());
    std::cout << "Info on DMRG::MPS rm call to system: " << info << std::endl;
 
 }

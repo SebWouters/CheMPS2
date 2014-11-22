@@ -54,13 +54,16 @@ int main(void){
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob,OptScheme);
    double Energy0 = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
    
    //Calculate the first two excited states
    theDMRG->activateExcitations(10);
    theDMRG->newExcitation(20.0);
    double Energy1 = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
    theDMRG->newExcitation(20.0);
    double Energy2 = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
    
    //Clean up
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }

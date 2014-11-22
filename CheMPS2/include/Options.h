@@ -44,10 +44,12 @@ namespace CheMPS2{
    const bool   DMRGSCF_storeDIIS             = true;
    const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
 
-   const string TMPpath                       = "/tmp/";
+   const string TMPpath                       = "/tmp";
    const bool   DMRG_printDiscardedWeight     = false;
    const bool   DMRG_storeRenormOptrOnDisk    = true;
    const bool   DMRG_storeMpsOnDisk           = false;
+   const string DMRG_MPS_storage_prefix       = "CheMPS2_MPS";
+   const string DMRG_OPERATOR_storage_prefix  = "CheMPS2_Operators_";
    
    const bool   HAMILTONIAN_debugPrint        = false;
    const string HAMILTONIAN_TmatStorageName   = "CheMPS2_Ham_Tmat.h5";
