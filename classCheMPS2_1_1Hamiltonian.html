@@ -118,9 +118,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4ae3520da1ff8515a313c4357592a3d1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1">Hamiltonian</a> (const int Norbitals, const int nGroup, const int *OrbIrreps)</td></tr>
 <tr class="memdesc:a4ae3520da1ff8515a313c4357592a3d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a4ae3520da1ff8515a313c4357592a3d1">More...</a><br/></td></tr>
 <tr class="separator:a4ae3520da1ff8515a313c4357592a3d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d20a22b56d996fbd4c9628d4a671a6d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Hamiltonian.html#a6d20a22b56d996fbd4c9628d4a671a6d">Hamiltonian</a> (const string filename)</td></tr>
-<tr class="memdesc:a6d20a22b56d996fbd4c9628d4a671a6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load an output file created by mointegrals/mointegrals.cc; which can be used as a plugin in psi4 beta3.  <a href="#a6d20a22b56d996fbd4c9628d4a671a6d">More...</a><br/></td></tr>
-<tr class="separator:a6d20a22b56d996fbd4c9628d4a671a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa16007e407c4ceb4c77c4ba9e9c6c316"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Hamiltonian.html#aa16007e407c4ceb4c77c4ba9e9c6c316">Hamiltonian</a> (const string filename=&quot;LOADH5&quot;)</td></tr>
+<tr class="memdesc:aa16007e407c4ceb4c77c4ba9e9c6c316"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor which loads a <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> from disk.  <a href="#aa16007e407c4ceb4c77c4ba9e9c6c316">More...</a><br/></td></tr>
+<tr class="separator:aa16007e407c4ceb4c77c4ba9e9c6c316"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27623ac9db80f85c07761ac3ce554a51"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a27623ac9db80f85c07761ac3ce554a51"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51">~Hamiltonian</a> ()</td></tr>
 <tr class="memdesc:a27623ac9db80f85c07761ac3ce554a51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -246,7 +246,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 
 </div>
 </div>
-<a class="anchor" id="a6d20a22b56d996fbd4c9628d4a671a6d"></a>
+<a class="anchor" id="aa16007e407c4ceb4c77c4ba9e9c6c316"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -254,21 +254,21 @@ where the latin letters denote site-indices and the greek letters spin projectio
           <td class="memname">CheMPS2::Hamiltonian::Hamiltonian </td>
           <td>(</td>
           <td class="paramtype">const string&#160;</td>
-          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td class="paramname"><em>filename</em> = <code>&quot;LOADH5&quot;</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Load an output file created by mointegrals/mointegrals.cc; which can be used as a plugin in psi4 beta3. </p>
+<p>Constructor which loads a <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> from disk. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">filename</td><td>Filename of the psi4 mointegral output file </td></tr>
+    <tr><td class="paramname">filename</td><td>If the filename is "LOADH5" then the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> in HDF5 format is loaded; else a Psi4 text dump in "filename" will be loaded. The text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> with the other constructor, (2) filling it with <a class="el" href="classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5" title="Set the constant energy. ">setEconst()</a>, <a class="el" href="classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32" title="Set a Tmat element. ">setTmat()</a> and <a class="el" href="classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. ">setVmat()</a>, and (3) calling <a class="el" href="classCheMPS2_1_1Hamiltonian.html#a7d1e514143996895015413c50770990d" title="Save the Hamiltonian. ">save()</a>. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00224">224</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00062">62</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 </div>
 </div>
@@ -327,7 +327,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00106">106</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00116">116</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -369,7 +369,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <p>Get the constant energy. </p>
 <dl class="section return"><dt>Returns</dt><dd>The constant part of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> (nuclear repulsion &amp; condensed orbitals) </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00080">80</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00090">90</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -400,7 +400,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <p>Get the number of orbitals. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of orbitals </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00072">72</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00082">82</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -431,7 +431,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <p>Get the group number. </p>
 <dl class="section return"><dt>Returns</dt><dd>The group number </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00074">74</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00084">84</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -469,7 +469,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The irrep of orbital nOrb </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00076">76</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00086">86</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -518,7 +518,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$T_{index1,index2}$" src="form_17.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00089">89</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00099">99</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -581,7 +581,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$V_{index1,index2,index3,index4}$" src="form_18.png"/> </dd></dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00113">113</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00123">123</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -629,7 +629,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00078">78</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00088">88</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 </div>
 </div>
@@ -673,7 +673,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00082">82</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00092">92</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 </div>
 </div>
@@ -731,7 +731,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00099">99</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00109">109</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
 <p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -767,7 +767,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a></li>
-    <li class="footer">Generated on Thu Nov 20 2014 22:50:50 for CheMPS2 by
+    <li class="footer">Generated on Fri Nov 21 2014 21:57:11 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

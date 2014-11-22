@@ -1,7 +1,7 @@
 var classCheMPS2_1_1Hamiltonian =
 [
     [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1", null ],
-    [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a6d20a22b56d996fbd4c9628d4a671a6d", null ],
+    [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#aa16007e407c4ceb4c77c4ba9e9c6c316", null ],
     [ "~Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51", null ],
     [ "addToVmat", "classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82", null ],
     [ "debugcheck", "classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343", null ],
