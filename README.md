@@ -628,11 +628,11 @@ half-filling).
 calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal
 STO-3G basis set. The ground and two lowest excited states are determined.
 
-[```tests/test6.cpp.in```](tests/test6.cpp.in) contains a DMRG-SCF ground state
-calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set.
-The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and
-B3u orbitals are chosen as active space. A significant speedup is obtained with
-DIIS.
+[```tests/test6.cpp.in```](tests/test6.cpp.in) contains a state-averaged
+DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h
+symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen,
+and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A
+significant speedup is obtained with DIIS.
 
 [```tests/test7.cpp.in```](tests/test7.cpp.in) reads in
 [```tests/matrixelements/O2_CCPVDZ.dat```](tests/matrixelements/O2_CCPVDZ.dat),
