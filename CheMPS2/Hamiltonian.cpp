@@ -54,9 +54,19 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
       irrep2num_orb[orb2irrep[cnt]]++;
    }
    
-   Tmat = new CheMPS2::TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
-   Vmat = new CheMPS2::FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
+   Tmat = new TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
+   Vmat = new FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
 
+}
+
+CheMPS2::Hamiltonian::Hamiltonian(const string filename){
+
+   if ( filename.compare("LOADH5") == 0 ){
+      CreateAndFillFromH5();
+   } else {
+      CreateAndFillFromPsi4dump( filename );
+   }
+   
 }
 
 CheMPS2::Hamiltonian::~Hamiltonian(){
@@ -183,9 +193,9 @@ void CheMPS2::Hamiltonian::read(){
       hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
        
          //The chain length
-         hid_t dataset_id = H5Dopen(group_id, "L", H5P_DEFAULT);
+         hid_t dataset_id1 = H5Dopen(group_id, "L", H5P_DEFAULT);
          int Lagain;
-         H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &Lagain);
+         H5Dread(dataset_id1, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &Lagain);
          assert( L==Lagain );
          
          //The group number
@@ -207,7 +217,7 @@ void CheMPS2::Hamiltonian::read(){
          hid_t dataset_id4 = H5Dopen(group_id, "Econst", H5P_DEFAULT);
          H5Dread(dataset_id4, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &Econst);
     
-         H5Dclose(dataset_id);
+         H5Dclose(dataset_id1);
          H5Dclose(dataset_id2);
          H5Dclose(dataset_id3);
          H5Dclose(dataset_id4);
@@ -220,8 +230,55 @@ void CheMPS2::Hamiltonian::read(){
 
 }
 
+void CheMPS2::Hamiltonian::CreateAndFillFromH5(){
+
+   //The hdf5 file
+   hid_t file_id = H5Fopen(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+      
+      //The data
+      hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
+       
+         //The number of orbitals: Set L directly!
+         hid_t dataset_id1 = H5Dopen(group_id, "L", H5P_DEFAULT);
+         H5Dread(dataset_id1, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &L);
+         
+         //The group number: SymmInfo.setGroup()
+         hid_t dataset_id2 = H5Dopen(group_id, "nGroup", H5P_DEFAULT);
+         int nGroup_LOADH5;
+         H5Dread(dataset_id2, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &nGroup_LOADH5);
+         SymmInfo.setGroup( nGroup_LOADH5 );
+         
+         //The irrep of each orbital: Create and fill orb2irrep directly!
+         hid_t dataset_id3 = H5Dopen(group_id, "orb2irrep", H5P_DEFAULT);
+         orb2irrep = new int[ L ];
+         H5Dread(dataset_id3, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, orb2irrep);
+    
+         H5Dclose(dataset_id1);
+         H5Dclose(dataset_id2);
+         H5Dclose(dataset_id3);
+
+      H5Gclose(group_id);
+      
+   H5Fclose(file_id);
+   
+   orb2indexSy = new int[ L ];
+   int nIrreps = SymmInfo.getNumberOfIrreps();
+   irrep2num_orb = new int[ nIrreps ];
+   for (int irrep = 0; irrep < nIrreps; irrep++){ irrep2num_orb[ irrep ] = 0; }
+   for (int orb = 0; orb < L; orb++){
+      orb2indexSy[ orb ] = irrep2num_orb[ orb2irrep[ orb ] ];
+      irrep2num_orb[ orb2irrep[ orb ] ]++;
+   }
+   
+   Tmat = new TwoIndex(  SymmInfo.getGroupNumber(), irrep2num_orb );
+   Vmat = new FourIndex( SymmInfo.getGroupNumber(), irrep2num_orb );
+
+   read();
+
+}
+
 //Works for the file mointegrals/mointegrals.cc_PRINT which can be used as a plugin in psi4 beta5
-CheMPS2::Hamiltonian::Hamiltonian(const string filename){
+void CheMPS2::Hamiltonian::CreateAndFillFromPsi4dump(const string filename){
 
    string line, part;
    int pos;

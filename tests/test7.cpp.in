@@ -37,29 +37,34 @@ int main(void){
    //The Hamiltonian
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);
    Ham->save();
-   int L = Ham->getL();
-   int GroupNumber = Ham->getNGroup();
-   int * OrbitalIrreps = new int[L];
-   for (int cnt=0; cnt<L; cnt++){
-      OrbitalIrreps[cnt] = Ham->getOrbitalIrrep(cnt);
-   }
+   const int L = Ham->getL();
+   const int GroupNumber = Ham->getNGroup();
+   int * OrbitalIrreps = new int[ L ];
+   for (int orb = 0; orb < L; orb++){ OrbitalIrreps[orb] = Ham->getOrbitalIrrep(orb); }
    
-   //The loaded Hamiltonian
+   //Use the other initializer
    CheMPS2::Hamiltonian * HamLoaded = new CheMPS2::Hamiltonian(L, GroupNumber, OrbitalIrreps);
+   delete [] OrbitalIrreps;
    HamLoaded->read();
    
    //Test whether it's the same thing
    double RMS = 0.0;
+   double RMSabs = 0.0;
    double temp = 0.0;
-   
+   temp = Ham->getEconst();
+   RMSabs += temp * temp;
    temp = Ham->getEconst() - HamLoaded->getEconst();
    RMS += temp * temp;
    for (int i1=0; i1<L; i1++){
       for (int i2=0; i2<L; i2++){
+         temp = Ham->getTmat(i1,i2);
+         RMSabs += temp * temp;
          temp = Ham->getTmat(i1,i2) - HamLoaded->getTmat(i1,i2);
          RMS += temp * temp;
          for (int i3=0; i3<L; i3++){
             for (int i4=0; i4<L; i4++){
+               temp = Ham->getVmat(i1,i2,i3,i4);
+               RMSabs += temp * temp;
                temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded->getVmat(i1,i2,i3,i4);
                RMS += temp * temp;
             }
@@ -67,13 +72,35 @@ int main(void){
       }
    }
    RMS = sqrt(RMS);
-   
+   cout << "The 2-norm of all Hamiltonian matrix elements is " << RMSabs << endl;
    cout << "The RMS difference between Ham and HamLoaded is " << RMS << endl;
+   delete HamLoaded;
+   
+   //To load an HDF5 dump and immediately fill the Hamiltonian
+   CheMPS2::Hamiltonian * HamLoaded2 = new CheMPS2::Hamiltonian();
+   
+   //Test whether it's the same thing
+   double RMS2 = 0.0;
+   temp = Ham->getEconst() - HamLoaded2->getEconst();
+   RMS2 += temp * temp;
+   for (int i1=0; i1<L; i1++){
+      for (int i2=0; i2<L; i2++){
+         temp = Ham->getTmat(i1,i2) - HamLoaded2->getTmat(i1,i2);
+         RMS2 += temp * temp;
+         for (int i3=0; i3<L; i3++){
+            for (int i4=0; i4<L; i4++){
+               temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded2->getVmat(i1,i2,i3,i4);
+               RMS2 += temp * temp;
+            }
+         }
+      }
+   }
+   RMS2 = sqrt(RMS2);
+   cout << "The RMS difference between Ham and HamLoaded2 is " << RMS2 << endl;
    
    //Clean up
-   delete [] OrbitalIrreps;
    delete Ham;
-   delete HamLoaded;
+   delete HamLoaded2;
    stringstream temp1;
    temp1 << "rm " << CheMPS2::HAMILTONIAN_TmatStorageName;
    int info = system(temp1.str().c_str());
@@ -85,7 +112,7 @@ int main(void){
    info = system(temp3.str().c_str());
    
    //Check succes
-   bool success = (RMS < 1e-10) ? true : false;
+   bool success = ((RMS < 1e-10) && (RMS2 < 1e-10)) ? true : false;
    cout << "================> Did test 7 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
