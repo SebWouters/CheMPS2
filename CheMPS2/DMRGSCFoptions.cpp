@@ -31,6 +31,7 @@ CheMPS2::DMRGSCFoptions::DMRGSCFoptions(){
    GradientThreshold  = CheMPS2::DMRGSCF_gradientNormThreshold;
    StoreUnitary       = CheMPS2::DMRGSCF_storeUnitary;
    UnitaryStorageName = CheMPS2::DMRGSCF_unitaryStorageName;
+   StateAveraging     = CheMPS2::DMRGSCF_stateAveraged;
    
    WhichActiveSpace   = CheMPS2::DMRGSCF_whichActiveSpace;
    DumpCorrelations   = CheMPS2::DMRGSCF_dumpCorrelations;
@@ -49,6 +50,7 @@ int    CheMPS2::DMRGSCFoptions::getMaxIterations() const{      return MaxIterati
 double CheMPS2::DMRGSCFoptions::getGradientThreshold() const{  return GradientThreshold;  }
 bool   CheMPS2::DMRGSCFoptions::getStoreUnitary() const{       return StoreUnitary;       }
 string CheMPS2::DMRGSCFoptions::getUnitaryStorageName() const{ return UnitaryStorageName; }
+bool   CheMPS2::DMRGSCFoptions::getStateAveraging() const{     return StateAveraging;     }
 int    CheMPS2::DMRGSCFoptions::getWhichActiveSpace() const{   return WhichActiveSpace;   }
 bool   CheMPS2::DMRGSCFoptions::getDumpCorrelations() const{   return DumpCorrelations;   }
 bool   CheMPS2::DMRGSCFoptions::getStartLocRandom() const{     return StartLocRandom;     }
@@ -62,6 +64,7 @@ void CheMPS2::DMRGSCFoptions::setMaxIterations(const int MaxIterations_in){     
 void CheMPS2::DMRGSCFoptions::setGradientThreshold(const double GradientThreshold_in){   GradientThreshold  = GradientThreshold_in;  }
 void CheMPS2::DMRGSCFoptions::setStoreUnitary(const bool StoreUnitary_in){               StoreUnitary       = StoreUnitary_in;       }
 void CheMPS2::DMRGSCFoptions::setUnitaryStorageName(const string UnitaryStorageName_in){ UnitaryStorageName = UnitaryStorageName_in; }
+void CheMPS2::DMRGSCFoptions::setStateAveraging(const bool StateAveraging_in){           StateAveraging     = StateAveraging_in;     }
 void CheMPS2::DMRGSCFoptions::setWhichActiveSpace(const int WhichActiveSpace_in){        WhichActiveSpace   = WhichActiveSpace_in;   }
 void CheMPS2::DMRGSCFoptions::setDumpCorrelations(const bool DumpCorrelations_in){       DumpCorrelations   = DumpCorrelations_in;   }
 void CheMPS2::DMRGSCFoptions::setStartLocRandom(const bool StartLocRandom_in){           StartLocRandom     = StartLocRandom_in;     }

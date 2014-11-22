@@ -33,6 +33,7 @@ namespace CheMPS2{
    const string DMRGSCF_unitaryStorageName    = "CheMPS2_CASSCF.h5";
    const int    DMRGSCF_maxlinsizeCutoff      = 100;
    const bool   DMRGSCF_debugPrint            = false;
+   const bool   DMRGSCF_stateAveraged         = true;
    
    const int    DMRGSCF_whichActiveSpace      = 0;
    const bool   DMRGSCF_dumpCorrelations      = false;
@@ -53,7 +54,7 @@ namespace CheMPS2{
    
    const bool   HAMILTONIAN_debugPrint        = false;
    const string HAMILTONIAN_TmatStorageName   = "CheMPS2_Ham_Tmat.h5";
-   const string HAMILTONIAN_VmatStorageName   = "CheMPS2_Ham_Vmat.h5"; 
+   const string HAMILTONIAN_VmatStorageName   = "CheMPS2_Ham_Vmat.h5";
    const string HAMILTONIAN_ParentStorageName = "CheMPS2_Ham_parent.h5";
    
    const string TWODM_2DM_A_storagename       = "CheMPS2_2DM-A.h5";

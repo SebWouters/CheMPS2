@@ -41,11 +41,12 @@ namespace CheMPS2{
     (7)  GradientThreshold (double) : Stop the DMRGSCF iterations when the gradient for orbital rotation has a 2-norm smaller than this value \n
     (8)  StoreUnitary (bool) : Whether or not to store the Orbital Rotation checkpoint file \n
     (9)  UnitaryStorageName (string) : The filename to store the Orbital Rotation checkpoint \n
+    (10) StateAveraging (bool) : Whether to do state-averaged or state-specific DMRGSCF \n
     
     DMRG active space options: \n
-    (10) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
-    (11) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space \n
-    (12) StartLocRandom (bool) : When localized orbitals are used, it is sometimes beneficial to start the localization procedure from a random unitary. A specific example is the reduction of the d2h point group of graphene nanoribbons to the cs point group, in order to make use of locality in the DMRG calculations. Since molecular orbitals will still belong to the full point group d2h, a random unitary helps in constructing localized orbitals which belong to the cs point group.
+    (11) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
+    (12) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space \n
+    (13) StartLocRandom (bool) : When localized orbitals are used, it is sometimes beneficial to start the localization procedure from a random unitary. A specific example is the reduction of the d2h point group of graphene nanoribbons to the cs point group, in order to make use of locality in the DMRG calculations. Since molecular orbitals will still belong to the full point group d2h, a random unitary helps in constructing localized orbitals which belong to the cs point group.
 */
    class DMRGSCFoptions{
 
@@ -92,6 +93,10 @@ namespace CheMPS2{
          //! Get the Orbital Rotation checkpoint filename
          /** \return The filename for the Orbital Rotation checkpoint */
          string getUnitaryStorageName() const;
+         
+         //! Get whether state-averaging or state-specific DMRGSCF should be performed
+         /** \return Whether state-averaging DMRGSCF should be performed */
+         bool getStateAveraging() const;
          
          //! Get which active space should be considered in the DMRG routine
          /** \return Which active space should be considered in the DMRG routine. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). */
@@ -141,6 +146,10 @@ namespace CheMPS2{
          /** \param UnitaryStorageName_in The filename for the Orbital Rotation checkpoint */
          void setUnitaryStorageName(const string UnitaryStorageName_in);
          
+         //! Set whether state-averaging or state-specific DMRGSCF should be performed
+         /** \param StateAveraging_in Whether state-averaging DMRGSCF should be performed */
+         void setStateAveraging(const bool StateAveraging_in);
+         
          //! Set which active space should be considered in the DMRG routine
          /** \param WhichActiveSpace_in Which active space should be considered in the DMRG routine. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). */
          void setWhichActiveSpace(const int WhichActiveSpace_in);
@@ -166,6 +175,7 @@ namespace CheMPS2{
          double GradientThreshold;
          bool   StoreUnitary;
          string UnitaryStorageName;
+         bool   StateAveraging;
          
          int    WhichActiveSpace;
          bool   DumpCorrelations;

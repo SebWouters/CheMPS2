@@ -77,7 +77,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    
    //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
+   const int nOrbDMRGpower4 = nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG;
+   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRGpower4 ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
    double * mem1 = new double[sizeWorkmem];
    double * mem2 = new double[sizeWorkmem];
    double * mem3 = NULL;
@@ -166,18 +167,29 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       }
       
       //Do the DMRG sweeps, and calculate the 2DM
-      DMRG * theDMRG = new DMRG(Prob,OptScheme);
-      Energy = theDMRG->Solve();
-      if (rootNum>1){
-         theDMRG->activateExcitations(rootNum-1);
-         for (int exc=0; exc<rootNum-1; exc++){
-            theDMRG->newExcitation(fabs(Energy));
-            Energy = theDMRG->Solve();
+      for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
+      DMRG * theDMRG = new DMRG(Prob, OptScheme);
+      for (int state = 0; state < rootNum; state++){
+         if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
+         Energy = theDMRG->Solve();
+         if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+            theDMRG->calc2DMandCorrelations();
+            copy2DMover( theDMRG->get2DM() );
          }
+         if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
-      theDMRG->calc2DMandCorrelations();
-      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); }
-      copy2DMover(theDMRG->get2DM());
+      if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
+         theDMRG->calc2DMandCorrelations();
+         copy2DMover( theDMRG->get2DM() );
+      }
+      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
+      if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
+      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+      delete theDMRG;
+      if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
+         const double averagingfactor = 1.0 / rootNum;
+         for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
+      }
       setDMRG1DM(N);
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
@@ -193,18 +205,11 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatrixACT();
       if (doBlockWise){ theRotator.fillVmatRotatedBlockWise(VmatRotated, unitary, mem1, mem2, mem3, maxBlockSize, true); }
-      else{             theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
+      else {            theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
       buildFmat();
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
       gradNorm = augmentedHessianNR(gradient, &updateNorm);
-      
-      //Print the coefficients to discern the 1Ag and 3B1u states in the carbon dimer
-      /*PrintCoeff_C2(theDMRG);*/
-      
-      if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-      delete theDMRG;
    
    }
    

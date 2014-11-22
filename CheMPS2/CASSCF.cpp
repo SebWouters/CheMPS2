@@ -131,7 +131,8 @@ void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM){
       for (int i2=0; i2<nOrbDMRG; i2++){
          for (int i3=0; i3<nOrbDMRG; i3++){
             for (int i4=0; i4<nOrbDMRG; i4++){
-               DMRG2DM[i1 + nOrbDMRG * ( i2 + nOrbDMRG * (i3 + nOrbDMRG * i4 ) ) ] = theDMRG2DM->getTwoDMA_HAM(i1, i2, i3, i4);
+               // The assignment has been changed to an addition for state-averaged calculations!
+               DMRG2DM[i1 + nOrbDMRG * ( i2 + nOrbDMRG * (i3 + nOrbDMRG * i4 ) ) ] += theDMRG2DM->getTwoDMA_HAM(i1, i2, i3, i4);
             }
          }
       }

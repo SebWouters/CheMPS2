@@ -71,10 +71,11 @@ int main(void){
    OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
 
    //Run CASSCF
-   int rootNum = 1; //Ground state only
+   int rootNum = 2; //Do the first excited state
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
    theDMRGSCFoptions->setDoDIIS(true);
    theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
+   theDMRGSCFoptions->setStateAveraging(true);
    double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
@@ -84,7 +85,7 @@ int main(void){
    delete theDMRGSCFoptions;
    
    //Check succes
-   bool success = (fabs(Energy + 149.690485081255) < 1e-10) ? true : false;
+   bool success = (fabs(Energy + 149.6802657522) < 1e-10) ? true : false;
    cout << "================> Did test 6 succeed : ";
    if (success){ cout << "yes" << endl; }
    else { cout << "no" << endl; }
