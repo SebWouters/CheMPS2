@@ -61,7 +61,7 @@ OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
 OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
 
 # Setting the DMRGSCFoptions and run DMRGSCF
-rootNum = 2 # Ground state only
+rootNum = 2 # Do the first excited state
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
 theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
