@@ -18,6 +18,7 @@
 #
 
 import numpy as np
+import math as m
 import sys
 sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
@@ -32,12 +33,12 @@ Initializer.Init()
 Ham = ReadinHamiltonianPsi4.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4_N10_S0_c2v_I0.dat')
 
 # Define the symmetry sector
-TwoS = 0     # Two times the targeted spin
-N = 10       # The number of electrons
+TwoS  = 0    # Two times the targeted spin
+Nelec = 10   # The number of electrons
 Irrep = 0    # The targeted irrep
 
 # Setting up the Problem
-Prob = PyCheMPS2.PyProblem(Ham, TwoS, N, Irrep)
+Prob = PyCheMPS2.PyProblem(Ham, TwoS, Nelec, Irrep)
 
 # Setting up the ConvergenceScheme
 # setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
@@ -47,14 +48,35 @@ OptScheme.setInstruction(1, 1000, 1e-10, 10, 0.0)
 
 # Do DMRG calculation
 theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
-Energy = theDMRG.Solve()
+EnergyDMRG = theDMRG.Solve()
 theDMRG.calc2DMandCorrelations()
+
+# Do FCI calculation
+Nel_up   = ( Nelec + TwoS ) / 2
+Nel_down = ( Nelec - TwoS ) / 2
+maxMemWorkMB = 10.0
+FCIverbose = 1
+theFCI = PyCheMPS2.PyFCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose)
+GSvector = np.zeros([ theFCI.getVecLength() ], dtype=ctypes.c_double)
+GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
+EnergyFCI = theFCI.GSDavidson(GSvector)
+theFCI.CalcSpinSquared(GSvector)
+TwoRDM = np.zeros([ Ham.getL()**4 ], dtype=ctypes.c_double)
+theFCI.Fill2RDM(GSvector, TwoRDM)
+RMSerror2DM = 0.0
+for orb1 in range(0, Ham.getL()):
+    for orb2 in range(0, Ham.getL()):
+        for orb3 in range(0, Ham.getL()):
+            for orb4 in range(0, Ham.getL()):
+                temp = TwoRDM[orb1 + Ham.getL()*(orb2 + Ham.getL()*(orb3 + Ham.getL()*orb4))] - theDMRG.get2DMA(orb1,orb2,orb3,orb4)
+                RMSerror2DM += temp*temp
+RMSerror2DM = m.sqrt(RMSerror2DM)
+print "Frobenius norm of the difference of the DMRG and FCI 2-RDMs =", RMSerror2DM
 
 # Clean-up
 # theDMRG.deleteStoredMPS()
 theDMRG.deleteStoredOperators()
-
-# The order of deallocation matters!
+del theFCI
 del theDMRG
 del OptScheme
 del Prob
@@ -62,7 +84,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 39.8068131148456) < 1e-10):
+if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-10) and (RMSerror2DM < 1e-6)):
     print "================> Did test 3 succeed : yes"
 else:
     print "================> Did test 3 succeed : no"

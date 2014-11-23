@@ -18,12 +18,12 @@
 #
 
 import numpy as np
+import math as m
 import sys
 sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianPsi4
 import ctypes
-import math
 import os
 
 # Set the seed of the random number generator and cout.precision
@@ -48,19 +48,27 @@ HamLoad = PyCheMPS2.PyHamiltonian(L, groupNum, orbirreps)
 HamLoad.read()
 
 # Compare both
+RMSabs = 0.0
+temp = Ham.getEconst()
+RMSabs += temp * temp
 RMS = 0.0
-temp = 0.0
 temp = Ham.getEconst() - HamLoad.getEconst()
 RMS += temp * temp
 for i1 in range(0,L):
     for i2 in range(0,L):
+        temp = Ham.getTmat(i1,i2)
+        RMSabs += temp * temp
         temp = Ham.getTmat(i1,i2) - HamLoad.getTmat(i1,i2)
         RMS += temp * temp
         for i3 in range(0,L):
             for i4 in range(0,L):
+                temp = Ham.getVmat(i1,i2,i3,i4)
+                RMSabs += temp * temp
                 temp = Ham.getVmat(i1,i2,i3,i4) - HamLoad.getVmat(i1,i2,i3,i4)
                 RMS += temp * temp
-RMS = math.sqrt(RMS)
+RMS = m.sqrt(RMS)
+RMSabs = m.sqrt(RMSabs)
+print "The 2-norm of all Hamiltonian matrix elements is", RMSabs
 print "The RMS difference between Ham and HamLoad is", RMS
 
 # Clean-up
@@ -72,7 +80,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(RMS) < 1e-10):
+if (RMS < 1e-10):
     print "================> Did test 7 succeed : yes"
 else:
     print "================> Did test 7 succeed : no"

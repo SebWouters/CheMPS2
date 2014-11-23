@@ -72,6 +72,7 @@ int main(void){
       }
    }
    RMS = sqrt(RMS);
+   RMSabs = sqrt(RMSabs);
    cout << "The 2-norm of all Hamiltonian matrix elements is " << RMSabs << endl;
    cout << "The RMS difference between Ham and HamLoaded is " << RMS << endl;
    delete HamLoaded;

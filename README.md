@@ -668,8 +668,8 @@ contains the matrix elements for test6 and test7.
 [```tests/matrixelements/N2_CCPVDZ.dat```](tests/matrixelements/N2_CCPVDZ.dat)
 contains the matrix elements for test8 and test9.
 
-[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is a Python implementation
-of a part of [```tests/test1.cpp.in```](tests/test1.cpp.in)
+[```PyCheMPS2/test1.py.in```](PyCheMPS2/test1.py.in) is the Python version of
+[```tests/test1.cpp.in```](tests/test1.cpp.in)
 
 [```PyCheMPS2/test2.py.in```](PyCheMPS2/test2.py.in) is the Python version of
 [```tests/test2.cpp.in```](tests/test2.cpp.in)

@@ -29,6 +29,7 @@ cdef extern from "DMRGSCFoptions.h" namespace "CheMPS2":
         bint getStoreUnitary()
         int getWhichActiveSpace()
         bint getDumpCorrelations()
+        bint getStateAveraging()
         void setDoDIIS(const bint)
         void setDIISGradientBranch(const double)
         void setNumDIISVecs(const int)
@@ -38,4 +39,5 @@ cdef extern from "DMRGSCFoptions.h" namespace "CheMPS2":
         void setStoreUnitary(const bint)
         void setWhichActiveSpace(const int)
         void setDumpCorrelations(const bint)
+        void setStateAveraging(const bint)
 

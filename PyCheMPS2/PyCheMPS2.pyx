@@ -31,6 +31,7 @@ cimport TwoRDM
 cimport DMRGsolver
 cimport DMRGSCFopt
 cimport DMRGSCF
+cimport FullCI
 
 cdef class PyInitialize:
     cdef Init.Initialize * thisptr
@@ -189,6 +190,8 @@ cdef class PyDMRGSCFoptions:
         return self.thisptr.getWhichActiveSpace()
     def getDumpCorrelations(self):
         return self.thisptr.getDumpCorrelations()
+    def getStateAveraging(self):
+        return self.thisptr.getStateAveraging()
     def setDoDIIS(self, bint val):
         self.thisptr.setDoDIIS(val)
     def setDIISGradientBranch(self, double val):
@@ -207,6 +210,8 @@ cdef class PyDMRGSCFoptions:
         self.thisptr.setWhichActiveSpace(val)
     def setDumpCorrelations(self, bint val):
         self.thisptr.setDumpCorrelations(val)
+    def setStateAveraging(self, bint val):
+        self.thisptr.setStateAveraging(val)
         
 cdef class PyCASSCF:
     cdef DMRGSCF.CASSCF * thisptr
@@ -221,7 +226,7 @@ cdef class PyCASSCF:
     def __dealloc__(self):
         del self.thisptr
     def setupStart(self, Nocc not None, NDMRG not None, Nvirt not None):
-        assert Nocc.flags['C_CONTIGUOUS']
+        assert  Nocc.flags['C_CONTIGUOUS']
         assert NDMRG.flags['C_CONTIGUOUS']
         assert Nvirt.flags['C_CONTIGUOUS']
         cdef np.ndarray[int, ndim=1, mode="c"] arrNocc
@@ -238,4 +243,69 @@ cdef class PyCASSCF:
     def deleteStoredDIIS(self):
         self.thisptr.deleteStoredDIIS()
         
-
+cdef class PyFCI:
+    cdef FullCI.FCI * thisptr
+    def __cinit__(self, PyHamiltonian theHam, unsigned int Nel_up, unsigned int Nel_down, int TargetIrrep, double maxMemWorkMB=100.0, int FCIverbose=1):
+        self.thisptr = new FullCI.FCI(theHam.thisptr, Nel_up, Nel_down, TargetIrrep, maxMemWorkMB, FCIverbose)
+    def __dealloc__(self):
+        del self.thisptr
+    def getVecLength(self):
+        return self.thisptr.getVecLength(0)
+    def LowestEnergyDeterminant(self):
+        return self.thisptr.LowestEnergyDeterminant()
+    def GSDavidson(self, inoutput not None):
+        assert inoutput.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrinoutput
+        arrinoutput = np.ascontiguousarray(inoutput, dtype=ctypes.c_double)
+        Energy = self.thisptr.GSDavidson(&arrinoutput[0])
+        return Energy
+    def CalcSpinSquared(self, GSvector not None):
+        assert GSvector.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
+        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
+        SpinSquared = self.thisptr.CalcSpinSquared(&arrGSvector[0])
+        return SpinSquared
+    def Fill2RDM(self, GSvector not None, TwoRDM not None):
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert   TwoRDM.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
+        cdef np.ndarray[double, ndim=1, mode="c"] arrTwoRDM
+        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
+        arrTwoRDM   = np.ascontiguousarray(TwoRDM,   dtype=ctypes.c_double)
+        EnergyByContraction = self.thisptr.Fill2RDM(&arrGSvector[0], &arrTwoRDM[0])
+        return EnergyByContraction
+    def FillRandom(self, unsigned long long vecLength, vector not None):
+        assert vector.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrvector
+        arrvector = np.ascontiguousarray(vector, dtype=ctypes.c_double) 
+        self.thisptr.FillRandom(vecLength, &arrvector[0])
+    def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, GSvector not None, PyHamiltonian Hami):
+        RePart = np.zeros([1], dtype=ctypes.c_double)
+        ImPart = np.zeros([1], dtype=ctypes.c_double)
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert   RePart.flags['C_CONTIGUOUS']
+        assert   ImPart.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
+        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
+        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
+        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
+        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
+        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
+        self.thisptr.RetardedGF(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0])
+        return (RePart[0], ImPart[0])
+    def DensityResponseGF(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, GSvector not None):
+        RePart = np.zeros([1], dtype=ctypes.c_double)
+        ImPart = np.zeros([1], dtype=ctypes.c_double)
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert   RePart.flags['C_CONTIGUOUS']
+        assert   ImPart.flags['C_CONTIGUOUS']
+        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
+        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
+        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
+        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
+        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
+        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
+        self.thisptr.DensityResponseGF(omega, eta, orb_alpha, orb_beta, GSenergy, &arrGSvector[0], &arrRePart[0], &arrImPart[0])
+        return (RePart[0], ImPart[0])
+        
+        

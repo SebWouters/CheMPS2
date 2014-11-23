@@ -61,10 +61,11 @@ OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
 OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
 
 # Setting the DMRGSCFoptions and run DMRGSCF
-rootNum = 1 # Ground state only
+rootNum = 2 # Ground state only
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
 theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
+theDMRGSCFoptions.setStateAveraging(True)
 Energy = theDMRGSCF.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
 
 # Clean-up
@@ -81,7 +82,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 149.690485081255) < 1e-10):
+if (np.fabs(Energy + 149.6802657522) < 1e-10):
     print "================> Did test 6 succeed : yes"
 else:
     print "================> Did test 6 succeed : no"
