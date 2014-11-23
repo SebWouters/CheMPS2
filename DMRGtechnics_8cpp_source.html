@@ -142,7 +142,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79">   36</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79">CheMPS2::DMRG::calc2DMandCorrelations</a>(){</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   <span class="comment">//First get the whole MPS into left-canonical form</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;   <span class="keywordtype">int</span> index = Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-2;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;   <span class="keywordtype">int</span> index = L-2;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * denS = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a>(index,denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">gIrrep</a>(index),denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">gIrrep</a>(index+1),denBK);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;   denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;   <a class="code" href="classCheMPS2_1_1Heff.html">Heff</a> Solver(denBK, Prob);</div>
@@ -170,8 +170,8 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;**************************************&quot;</span> &lt;&lt; endl;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;   updateMovingRightSafe(index);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;   </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a> * Norm = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a>(Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>(), denBK);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;   MPS[Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1]-&gt;<a class="code" href="classCheMPS2_1_1TensorT.html#af21d5300f20c3baf88edf9ec3d3bd943">QR</a>(Norm);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a> * Norm = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a>(L, denBK);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;   MPS[L-1]-&gt;<a class="code" href="classCheMPS2_1_1TensorT.html#af21d5300f20c3baf88edf9ec3d3bd943">QR</a>(Norm);</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;   <span class="keyword">delete</span> Norm;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;   </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;   <span class="comment">//Allocate space for the 2DM</span></div>
@@ -183,7 +183,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;   the2DMallocated = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;   </div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;   <span class="comment">//Then calculate step by step the 2DM</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> siteindex=Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1; siteindex&gt;=0; siteindex--){</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> siteindex=L-1; siteindex&gt;=0; siteindex--){</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      the2DM-&gt;<a class="code" href="classCheMPS2_1_1TwoDM.html#a5c5bf12b31aa9cb4b0b31bd53dad1ed3">FillSite</a>(MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      <span class="keywordflow">if</span> (siteindex&gt;0){</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a> * Left = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a>(siteindex, denBK);</div>
@@ -212,14 +212,14 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;   </div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;   <span class="comment">//Then calculate step by step the mutual information.</span></div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;   <span class="comment">//Define the following tensor arrays thereto. The native DMRG ones are at the edge and are hence small.</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Gtensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1];</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Ytensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1];</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Ztensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1];</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorK.html">TensorK</a>   ** Ktensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorK.html">TensorK</a>   * [Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1];</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorM.html">TensorM</a>   ** Mtensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorM.html">TensorM</a>   * [Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1];</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Gtensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [L-1];</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Ytensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [L-1];</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> ** Ztensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorGYZ.html">TensorGYZ</a> * [L-1];</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorK.html">TensorK</a>   ** Ktensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorK.html">TensorK</a>   * [L-1];</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;   <a class="code" href="classCheMPS2_1_1TensorM.html">TensorM</a>   ** Mtensors = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorM.html">TensorM</a>   * [L-1];</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;   </div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;   <span class="comment">//Do the actual work</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> siteindex=1; siteindex&lt;Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>(); siteindex++){</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> siteindex=1; siteindex&lt;L; siteindex++){</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;   </div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;      <span class="comment">//Switch MPS gauge</span></div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a> * Right = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorDiag.html">TensorDiag</a>(siteindex, denBK);</div>
@@ -277,7 +277,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;   }</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;   </div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;   <span class="comment">//Clean-up</span></div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> previousindex=0; previousindex&lt;Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1; previousindex++){</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> previousindex=0; previousindex&lt;L-1; previousindex++){</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;      <span class="keyword">delete</span> Gtensors[previousindex];</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      <span class="keyword">delete</span> Ytensors[previousindex];</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      <span class="keyword">delete</span> Ztensors[previousindex];</div>
@@ -292,8 +292,8 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;   <span class="keyword">delete</span> [] Mtensors;</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;   </div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;   Single-orbital entropies (Hamiltonian index order is used!) = [ &quot;</span>;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index=0; index &lt; Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1; index++){ cout &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e">SingleOrbitalEntropy_HAM</a>(index) &lt;&lt; <span class="stringliteral">&quot; , &quot;</span>; }</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;   cout &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e">SingleOrbitalEntropy_HAM</a>(Prob-&gt;<a class="code" href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">gL</a>()-1) &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index=0; index &lt; L-1; index++){ cout &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e">SingleOrbitalEntropy_HAM</a>(index) &lt;&lt; <span class="stringliteral">&quot; , &quot;</span>; }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;   cout &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e">SingleOrbitalEntropy_HAM</a>(L-1) &lt;&lt; <span class="stringliteral">&quot; ].&quot;</span> &lt;&lt; endl;</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;   </div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> power=0; power&lt;=2; power++){</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   Idistance(&quot;</span> &lt;&lt; power &lt;&lt; <span class="stringliteral">&quot;) = &quot;</span> &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">MutualInformationDistance</a>((<span class="keywordtype">double</span>)power) &lt;&lt; endl;</div>
@@ -311,7 +311,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;   <span class="keywordtype">int</span> nTot = 0;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   <span class="keywordtype">int</span> twoStot = 0;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;   <span class="keywordtype">int</span> iTot = 0;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;Prob-&gt;gL(); cnt++){</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      nTot += coeff[HamIndex];</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      twoStot += (coeff[HamIndex]==1)?1:0;</div>
@@ -332,7 +332,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;   </div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;   <span class="comment">//Construct two matrices</span></div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;   <span class="keywordtype">int</span> Dmax = 1;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;Prob-&gt;gL(); cnt++){</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;L; cnt++){</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordtype">int</span> DmaxBound = denBK-&gt;gMaxDimAtBound(cnt);</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <span class="keywordflow">if</span> (DmaxBound&gt;Dmax){ Dmax = DmaxBound; }</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;   }</div>
@@ -351,7 +351,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;   <span class="keywordtype">double</span> beta = 0.0;</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;   <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;   </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;Prob-&gt;gL(); cnt++){</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <span class="comment">//Right symmetry sector</span></div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
@@ -447,7 +447,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;         </div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;         <span class="comment">//Do (workmem * OR)_{block} --&gt; result + jumpCurrentS</span></div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;         <span class="keywordtype">int</span> jumpCurrentS = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(ikappa);</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         <span class="keywordflow">if</span> (index==Prob-&gt;gL()-2){</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         <span class="keywordflow">if</span> (index==L-2){</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;         </div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;            <span class="keywordtype">int</span> dimBlock = dimLdown * dimRdown;</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            <span class="keywordtype">int</span> inc = 1;</div>
@@ -477,7 +477,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> state=0; state&lt;nStates-1; state++){</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      <span class="comment">//Don&#39;t do updatemovingRightSafe here, as with storeRenormOp some left boundary operators are stored and removed from mem.</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> cnt = Prob-&gt;gL()-2;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> cnt = L-2;</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==2){</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;         deleteTensors(cnt, <span class="keyword">false</span>);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;         isAllocated[cnt]=0;</div>
@@ -488,8 +488,8 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      }</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      updateMovingRight(cnt);</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      TensorO * Otemp = <span class="keyword">new</span> TensorO(Prob-&gt;gL(), <span class="keyword">true</span>, Exc_BKs[state], denBK, Prob);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      Otemp-&gt;update(Exc_MPSs[state][Prob-&gt;gL()-1], MPS[Prob-&gt;gL()-1], Exc_Overlaps[state][Prob-&gt;gL()-2]);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      TensorO * Otemp = <span class="keyword">new</span> TensorO(L, <span class="keyword">true</span>, Exc_BKs[state], denBK, Prob);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      Otemp-&gt;update(Exc_MPSs[state][L-1], MPS[L-1], Exc_Overlaps[state][L-2]);</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="keywordtype">double</span> overlap = Otemp-&gt;gStorage()[0];</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keyword">delete</span> Otemp;</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      </div>
@@ -549,7 +549,6 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a3e4a935011b95ad18b28b88ac56990fc"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">CheMPS2::Correlations::MutualInformationDistance</a></div><div class="ttdeci">double MutualInformationDistance(const double power) const </div><div class="ttdoc">Return Idistance(power) (see return for definition) </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00206">Correlations.cpp:206</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a687a29eab89ef3763af8c630b48e3bf6"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">CheMPS2::Sobject::Join</a></div><div class="ttdeci">void Join(TensorT *Tleft, TensorT *Tright)</div><div class="ttdoc">Join two sites to form a composite S-object. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00195">Sobject.cpp:195</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Problem_html_a3e7be26cd15d22f4e0a65a34616cbcdd"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">CheMPS2::Problem::gL</a></div><div class="ttdeci">int gL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00085">Problem.cpp:85</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1ConvergenceScheme_html_ab8c98d5388c415c42115084c5817e1dc"><div class="ttname"><a href="classCheMPS2_1_1ConvergenceScheme.html#ab8c98d5388c415c42115084c5817e1dc">CheMPS2::ConvergenceScheme::getNInstructions</a></div><div class="ttdeci">int getNInstructions()</div><div class="ttdoc">Get the number of instructions. </div><div class="ttdef"><b>Definition:</b> <a href="ConvergenceScheme_8cpp_source.html#l00046">ConvergenceScheme.cpp:46</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a2b8ca2eaecfc448c0f0591462c8edede"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede">CheMPS2::Sobject::gNL</a></div><div class="ttdeci">int gNL(const int ikappa) const </div><div class="ttdoc">Get the left particle number symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00185">Sobject.cpp:185</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_aa08c71dab6543ef820d13528fc354bcd"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">CheMPS2::DMRG::get2DM</a></div><div class="ttdeci">TwoDM * get2DM()</div><div class="ttdoc">Get the pointer to the 2DM. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00198">DMRGtechnics.cpp:198</a></div></div>
@@ -576,7 +575,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGtechnics.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 21 2014 21:57:10 for CheMPS2 by
+    <li class="footer">Generated on Sun Nov 23 2014 01:55:05 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

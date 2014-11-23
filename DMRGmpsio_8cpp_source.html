@@ -248,7 +248,7 @@ $(document).ready(function(){initNavTree('DMRGmpsio_8cpp_source.html','');});
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      H5Gclose(group_id);</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      </div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="comment">//The MPS</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> site=0; site&lt;Prob-&gt;gL(); site++){</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> site=0; site&lt;L; site++){</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;         </div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;         std::stringstream sstream;</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;         sstream &lt;&lt; <span class="stringliteral">&quot;/MPS_&quot;</span> &lt;&lt; site;</div>
@@ -269,20 +269,22 @@ $(document).ready(function(){initNavTree('DMRGmpsio_8cpp_source.html','');});
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
 <div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c">  164</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c">CheMPS2::DMRG::deleteStoredMPS</a>(){</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;   <span class="keywordtype">int</span> info = system(<span class="stringliteral">&quot;rm CheMPS2_MPS*.h5&quot;</span>);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;   std::cout &lt;&lt; <span class="stringliteral">&quot;Info on DMRG::MPS rm call to system: &quot;</span> &lt;&lt; info &lt;&lt; std::endl;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;}</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;   std::stringstream thestream;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;   thestream &lt;&lt; <span class="stringliteral">&quot;rm &quot;</span> &lt;&lt; CheMPS2::DMRG_MPS_storage_prefix &lt;&lt; <span class="stringliteral">&quot;*.h5&quot;</span>;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;   <span class="keywordtype">int</span> info = system(thestream.str().c_str());</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;   std::cout &lt;&lt; <span class="stringliteral">&quot;Info on DMRG::MPS rm call to system: &quot;</span> &lt;&lt; info &lt;&lt; std::endl;</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;</div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_a0f4e487c40f522846288fe1b3d55e66c"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c">CheMPS2::DMRG::deleteStoredMPS</a></div><div class="ttdeci">void deleteStoredMPS()</div><div class="ttdoc">Call &quot;rm CheMPS2_MPS*.h5&quot;. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGmpsio_8cpp_source.html#l00164">DMRGmpsio.cpp:164</a></div></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;}</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_a0f4e487c40f522846288fe1b3d55e66c"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c">CheMPS2::DMRG::deleteStoredMPS</a></div><div class="ttdeci">void deleteStoredMPS()</div><div class="ttdoc">Call &quot;rm &quot; + CheMPS2::DMRG_MPS_storage_prefix + &quot;*.h5&quot;. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGmpsio_8cpp_source.html#l00164">DMRGmpsio.cpp:164</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGmpsio.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 21 2014 21:57:10 for CheMPS2 by
+    <li class="footer">Generated on Sun Nov 23 2014 01:55:05 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

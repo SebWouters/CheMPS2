@@ -16,6 +16,7 @@ var searchData=
   ['setmaxiterations',['setMaxIterations',['../classCheMPS2_1_1DMRGSCFoptions.html#a1f659a5a28e4511b42e4392d4a0c6af1',1,'CheMPS2::DMRGSCFoptions']]],
   ['setnumdiisvecs',['setNumDIISVecs',['../classCheMPS2_1_1DMRGSCFoptions.html#a4c87f8a2df0db9687e868c961e8d6ebf',1,'CheMPS2::DMRGSCFoptions']]],
   ['setstartlocrandom',['setStartLocRandom',['../classCheMPS2_1_1DMRGSCFoptions.html#ab1482f548cb2dd885d19a14d578691de',1,'CheMPS2::DMRGSCFoptions']]],
+  ['setstateaveraging',['setStateAveraging',['../classCheMPS2_1_1DMRGSCFoptions.html#ad2c42bcb89f55bafa0558d276ba562b7',1,'CheMPS2::DMRGSCFoptions']]],
   ['setstorediis',['setStoreDIIS',['../classCheMPS2_1_1DMRGSCFoptions.html#a4af4d25231bb8d18a836c57e1863ad32',1,'CheMPS2::DMRGSCFoptions']]],
   ['setstoreunitary',['setStoreUnitary',['../classCheMPS2_1_1DMRGSCFoptions.html#a6062c3bdb369f528e5420fb10ae7f5b4',1,'CheMPS2::DMRGSCFoptions']]],
   ['settmat',['setTmat',['../classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32',1,'CheMPS2::Hamiltonian']]],

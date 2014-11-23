@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682":[0,0,0,10,27],
+"classCheMPS2_1_1FCI.html#a748644c42be72710e38631e169b642cc":[0,0,0,10,30],
 "classCheMPS2_1_1FCI.html#a79c9426a1f2d8a4b918adad9ffa89894":[0,0,0,10,24],
 "classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87":[0,0,0,10,0],
 "classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f":[0,0,0,10,17],
@@ -247,7 +249,5 @@ var NAVTREEINDEX1 =
 "classCheMPS2_1_1TensorQ.html#ab61a16cadc17ff60870be54d27216f9f":[0,0,0,34,1],
 "classCheMPS2_1_1TensorQ.html#acf51806ae9d447da34bcd0fb1d4ec814":[0,0,0,34,2],
 "classCheMPS2_1_1TensorS0.html":[0,0,0,35],
-"classCheMPS2_1_1TensorS0.html#a09b9ad3cb125b902abbb3a658e3a60b7":[0,0,0,35,2],
-"classCheMPS2_1_1TensorS0.html#a862df3a3f5650891950e20ee80729cda":[0,0,0,35,0],
-"classCheMPS2_1_1TensorS0.html#ace3bc035b03bcbf1b0a8f94b96977465":[0,0,0,35,1]
+"classCheMPS2_1_1TensorS0.html#a09b9ad3cb125b902abbb3a658e3a60b7":[0,0,0,35,2]
 };

@@ -344,7 +344,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="tests/test3.cpp.in">```tests/test3.cpp.in```</a> contains a ground state DMRG calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</p>
 <p><a href="tests/test4.cpp.in">```tests/test4.cpp.in```</a> contains a ground state DMRG calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open boundary conditions, containing 9 fermions (just below half-filling).</p>
 <p><a href="tests/test5.cpp.in">```tests/test5.cpp.in```</a> contains an excited state DMRG calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The ground and two lowest excited states are determined.</p>
-<p><a href="tests/test6.cpp.in">```tests/test6.cpp.in```</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A significant speedup is obtained with DIIS.</p>
+<p><a href="tests/test6.cpp.in">```tests/test6.cpp.in```</a> contains a state-averaged DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A significant speedup is obtained with DIIS.</p>
 <p><a href="tests/test7.cpp.in">```tests/test7.cpp.in```</a> reads in <a href="tests/matrixelements/O2_CCPVDZ.dat">```tests/matrixelements/O2_CCPVDZ.dat```</a>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
 <p><a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
 <p><a href="tests/test9.cpp.in">```tests/test9.cpp.in```</a> is a copy of <a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a>, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
@@ -353,7 +353,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="tests/matrixelements/N2_N14_S0_d2h_I0.dat">```tests/matrixelements/N2_N14_S0_d2h_I0.dat```</a> contains the matrix elements for test1 and test5.</p>
 <p><a href="tests/matrixelements/O2_CCPVDZ.dat">```tests/matrixelements/O2_CCPVDZ.dat```</a> contains the matrix elements for test6 and test7.</p>
 <p><a href="tests/matrixelements/N2_CCPVDZ.dat">```tests/matrixelements/N2_CCPVDZ.dat```</a> contains the matrix elements for test8 and test9.</p>
-<p><a href="PyCheMPS2/test1.py.in">```PyCheMPS2/test1.py.in```</a> is a Python implementation of a part of <a href="tests/test1.cpp.in">```tests/test1.cpp.in```</a></p>
+<p><a href="PyCheMPS2/test1.py.in">```PyCheMPS2/test1.py.in```</a> is the Python version of <a href="tests/test1.cpp.in">```tests/test1.cpp.in```</a></p>
 <p><a href="PyCheMPS2/test2.py.in">```PyCheMPS2/test2.py.in```</a> is the Python version of <a href="tests/test2.cpp.in">```tests/test2.cpp.in```</a></p>
 <p><a href="PyCheMPS2/test3.py.in">```PyCheMPS2/test3.py.in```</a> is the Python version of <a href="tests/test3.cpp.in">```tests/test3.cpp.in```</a></p>
 <p><a href="PyCheMPS2/test4.py.in">```PyCheMPS2/test4.py.in```</a> is the Python version of <a href="tests/test4.cpp.in">```tests/test4.cpp.in```</a></p>
@@ -368,7 +368,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 21 2014 21:57:20 for CheMPS2 by
+    <li class="footer">Generated on Sun Nov 23 2014 01:55:16 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
