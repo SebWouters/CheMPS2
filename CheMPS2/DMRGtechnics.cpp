@@ -192,6 +192,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    for (int power=0; power<=2; power++){
       cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
    }
+   cout << "**************************************" << endl;
 
 }
 
