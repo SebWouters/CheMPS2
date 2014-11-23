@@ -46,15 +46,9 @@ int main(void){
    
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
-   int D = 100;
-   double Econv = 1e-10;
-   int maxSweeps = 3;
-   double noisePrefactor = 0.1;
-   OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
-   D = 3000;
-   maxSweeps = 10;
-   noisePrefactor = 0.0;
-   OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
+   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0,  100, 1e-10,  3, 0.1);
+   OptScheme->setInstruction(1, 3000, 1e-10, 10, 0.0);
    
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
@@ -66,6 +60,7 @@ int main(void){
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
+   delete Prob;
    
    //Calculate FCI reference energy
    const int Nel_up   = ( N + TwoS ) / 2;
@@ -82,7 +77,6 @@ int main(void){
    
    //Clean up FCI
    delete theFCI;
-   delete Prob;
    delete Ham;
    
    //Check succes

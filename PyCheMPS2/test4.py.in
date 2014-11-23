@@ -84,7 +84,7 @@ maxMemWorkMB = 10.0
 FCIverbose = 1
 theFCI = PyCheMPS2.PyFCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose)
 GSvector = np.zeros([ theFCI.getVecLength() ], dtype=ctypes.c_double)
-GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
+theFCI.FillRandom( theFCI.getVecLength() , GSvector )
 EnergyFCI = theFCI.GSDavidson(GSvector)
 
 # Clean-up

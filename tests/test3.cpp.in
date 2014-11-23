@@ -46,15 +46,9 @@ int main(void){
    
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
-   int D = 30;
-   double Econv = 1e-10;
-   int maxSweeps = 3;
-   double noisePrefactor = 0.1;
-   OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
-   D = 1000;
-   maxSweeps = 10;
-   noisePrefactor = 0.0;
-   OptScheme->setInstruction(1,D,Econv,maxSweeps,noisePrefactor);
+   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0,   30, 1e-10,  3, 0.1);
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0);
    
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
@@ -97,8 +91,8 @@ int main(void){
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
-   delete theFCI;
    delete Prob;
+   delete theFCI;
    delete Ham;
 
    //Check success
