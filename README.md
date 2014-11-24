@@ -80,7 +80,7 @@ CMake generates makefiles based on the user's specifications:
     > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
     -DCMAKE_INSTALL_PREFIX=option4
     
-Option1 is the c++ compiler; typically ```g++``` or ```icpc``` on Linux.
+Option1 is the C++ compiler; typically ```g++``` or ```icpc``` on Linux.
 Option2 can be ```ON``` or ```OFF``` and is used to switch on the
 intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on the possibility
@@ -132,7 +132,7 @@ To test CheMPS2, start in ```./build```, and run:
     > ./test8
     > ./test9
 
-These c++ tests should end with a line stating whether or not they succeeded.
+These C++ tests should end with a line stating whether or not they succeeded.
 They only require a very limited amount of memory (order 10-120 MB).
 
 
@@ -166,11 +166,21 @@ To test PyCheMPS2, start in ```./build```, and run:
     > python test7.py
     > python test8.py
     > python test9.py
+    
+If you compiled the C++ library with ```-DMKL=ON```, you might get the error
 
-These tests do exactly the same thing as the c++ tests above, and illustrate
-the usage of the python interface to CheMPS2. The tests should end with a
-line stating whether or not they succeeded. They only require a very limited
-amount of memory (order 10-120 MB).
+    > Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
+    
+This issue of using Intel's MKL inside python is known and reported. To get
+the python tests to run, you can set the variable ```LD_PRELOAD``` in order to
+preload ```libmkl_rt.so```. On my system, this is done with
+
+    > export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
+
+The python tests do exactly the same thing as the C++ tests above, and
+illustrate the usage of the python interface to CheMPS2. The tests should
+end with a line stating whether or not they succeeded. They only require
+a very limited amount of memory (order 10-120 MB).
 
 
 ### 5. Doxygen documentation
