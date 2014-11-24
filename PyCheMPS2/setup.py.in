@@ -27,7 +27,7 @@ from distutils.command.install_data import install_data
 from Cython.Distutils import build_ext
 
 incCheMPS2path = '${CMAKE_INSTALL_PREFIX}/${CheMPS2_INC_RELPATH}'
-libCheMPS2path = '${CMAKE_INSTALL_PREFIX}/${CheMPS2_LIB_RELPATH}'
+libCheMPS2path = '${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}'
 
 def get_depends(dirname):
     result = glob('%s/*.h' % dirname)
