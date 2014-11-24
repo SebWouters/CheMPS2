@@ -298,229 +298,230 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> power=0; power&lt;=2; power++){</div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   Idistance(&quot;</span> &lt;&lt; power &lt;&lt; <span class="stringliteral">&quot;) = &quot;</span> &lt;&lt; theCorr-&gt;<a class="code" href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">MutualInformationDistance</a>((<span class="keywordtype">double</span>)power) &lt;&lt; endl;</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;   }</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;}</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
-<div class="line"><a name="l00198"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">  198</a></span>&#160;<a class="code" href="classCheMPS2_1_1TwoDM.html">CheMPS2::TwoDM</a> * <a class="code" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">CheMPS2::DMRG::get2DM</a>(){ <span class="keywordflow">return</span> the2DM; }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
-<div class="line"><a name="l00200"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">  200</a></span>&#160;<a class="code" href="classCheMPS2_1_1Correlations.html">CheMPS2::Correlations</a> * <a class="code" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">CheMPS2::DMRG::getCorrelations</a>(){ <span class="keywordflow">return</span> theCorr; }</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">  202</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">CheMPS2::DMRG::getSpecificCoefficient</a>(<span class="keywordtype">int</span> * coeff){ <span class="comment">//DMRGcoeff = coeff[Hamindex = Prob-&gt;gf2(DMRGindex)]</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;   <span class="comment">//Check if it&#39;s possible</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;   <span class="keywordtype">int</span> nTot = 0;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   <span class="keywordtype">int</span> twoStot = 0;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;   <span class="keywordtype">int</span> iTot = 0;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      nTot += coeff[HamIndex];</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      twoStot += (coeff[HamIndex]==1)?1:0;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      <span class="keywordflow">if</span> (coeff[HamIndex]==1){ iTot = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(iTot,denBK-&gt;gIrrep(cnt)); }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;   }</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;   <span class="keywordflow">if</span> ( Prob-&gt;gN() != nTot ){</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Ndesired = &quot;</span> &lt;&lt; Prob-&gt;gN() &lt;&lt; <span class="stringliteral">&quot; and nTot in int * coeff = &quot;</span> &lt;&lt; nTot &lt;&lt; endl;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;   }</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;   <span class="keywordflow">if</span> ( Prob-&gt;gTwoS() != twoStot ){</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;2Sdesired = &quot;</span> &lt;&lt; Prob-&gt;gTwoS() &lt;&lt; <span class="stringliteral">&quot; and number of unpaired electrons in int * coeff = &quot;</span> &lt;&lt; twoStot &lt;&lt; endl;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;   }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;   <span class="keywordflow">if</span> (Prob-&gt;gIrrep() != iTot ){</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Idesired = &quot;</span> &lt;&lt; Prob-&gt;gIrrep() &lt;&lt; <span class="stringliteral">&quot; and global irrep of the unpaired electrons in int * coeff = &quot;</span> &lt;&lt; iTot &lt;&lt; endl;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;   }</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;   </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;   <span class="comment">//Construct two matrices</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;   <span class="keywordtype">int</span> Dmax = 1;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;L; cnt++){</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;      <span class="keywordtype">int</span> DmaxBound = denBK-&gt;gMaxDimAtBound(cnt);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <span class="keywordflow">if</span> (DmaxBound&gt;Dmax){ Dmax = DmaxBound; }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;   }</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;   <span class="keywordtype">double</span> * matA = <span class="keyword">new</span> <span class="keywordtype">double</span>[Dmax*Dmax];</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;   <span class="keywordtype">double</span> * matB = <span class="keyword">new</span> <span class="keywordtype">double</span>[Dmax*Dmax];</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;   </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;   <span class="comment">//Multiply and find coefficient</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;   matA[0] = 1.0;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;   <span class="keywordtype">int</span> dimFirst = 1;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;   <span class="keywordtype">int</span> NL = 0;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;   <span class="keywordtype">int</span> TwoSL = 0;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;   <span class="keywordtype">int</span> IL = 0;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;   <span class="keywordtype">int</span> dimL = 1;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;   </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;   <span class="keywordtype">double</span> alpha = 1.0;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;   <span class="keywordtype">double</span> beta = 0.0;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;   <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;   </div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;      <span class="comment">//Right symmetry sector</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordtype">int</span> NR = NL + coeff[HamIndex];</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      <span class="keywordtype">int</span> TwoSR, IR;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <span class="keywordflow">if</span> (coeff[HamIndex]==1){</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;         TwoSR = TwoSL + 1;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;         IR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(cnt));</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;         TwoSR = TwoSL;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;         IR = IL;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;      }</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(cnt+1,NR,TwoSR,IR);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      </div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      <span class="comment">//Multiply</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      <span class="keywordtype">double</span> * Tblock = MPS[cnt]-&gt;gStorage(NL,TwoSL,IL,NR,TwoSR,IR);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      dgemm_(&amp;notrans,&amp;notrans,&amp;dimFirst,&amp;dimR,&amp;dimL,&amp;alpha,matA,&amp;dimFirst,Tblock,&amp;dimL,&amp;beta,matB,&amp;dimFirst);</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      Tblock = matA;</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      matA = matB;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      matB = Tblock;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      </div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="comment">//Right becomes left</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      dimL = dimR;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      NL = NR;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      TwoSL = TwoSR;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      IL = IR;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;   }</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;   </div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;   <span class="keywordtype">double</span> desCoeff = matA[0];</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;   </div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;   <span class="keyword">delete</span> [] matA;</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;   <span class="keyword">delete</span> [] matB;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;   </div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;   <span class="keywordflow">return</span> desCoeff;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcVeffTilde(<span class="keywordtype">double</span> * result, <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * currentS, <span class="keywordtype">int</span> state_number){</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;   <span class="keywordtype">int</span> dimTot = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>());</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;dimTot; cnt++){ result[cnt] = 0.0; }</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   <span class="keywordtype">int</span> index = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a973aa40f2b0e659a55b4c63e768afdf2">gIndex</a>();</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> dimL = std::max(denBK-&gt;gMaxDimAtBound(index),   Exc_BKs[state_number]-&gt;gMaxDimAtBound(index)   );</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> dimR = std::max(denBK-&gt;gMaxDimAtBound(index+2), Exc_BKs[state_number]-&gt;gMaxDimAtBound(index+2) );</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;   <span class="keywordtype">double</span> * workmem = <span class="keyword">new</span> <span class="keywordtype">double</span>[dimL * dimR];</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;   </div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;   <span class="comment">//Construct Sup</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;   Sobject * Sup = <span class="keyword">new</span> Sobject(index,Exc_BKs[state_number]-&gt;gIrrep(index),Exc_BKs[state_number]-&gt;gIrrep(index+1),Exc_BKs[state_number]);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;   Sup-&gt;Join(Exc_MPSs[state_number][index],Exc_MPSs[state_number][index+1]);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;   </div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;   <span class="comment">//Construct VeffTilde</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> prefactor = sqrt(Exc_Eshifts[state_number]) / (Prob-&gt;gTwoS() + 1.0);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ikappa=0; ikappa&lt;currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>(); ikappa++){</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <span class="keywordtype">int</span> NL    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede">gNL</a>(ikappa);</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="keywordtype">int</span> TwoSL = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ae33e692d6e5f89d446f62515a85f725f">gTwoSL</a>(ikappa);</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordtype">int</span> IL    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a77be4052f1655e2f8fecee8f231bc209">gIL</a>(ikappa);</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">int</span> N1    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ae27c30606eb0f3f1eb9a32c559b7b209">gN1</a>(ikappa);</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordtype">int</span> N2    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a62923e0b950298fe42017dcdeadcfb03">gN2</a>(ikappa);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="keywordtype">int</span> TwoJ  = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2bf86bc7861704b1f2ddb655312da82b">gTwoJ</a>(ikappa);</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      <span class="keywordtype">int</span> NR    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562">gNR</a>(ikappa);</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordtype">int</span> TwoSR = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ac3d208dc1bc37fdbcf48aaa9e4cc6ed7">gTwoSR</a>(ikappa);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      <span class="keywordtype">int</span> IR    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813">gIR</a>(ikappa);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="comment">//Check if block also exists for other MPS</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="keywordtype">int</span> kappaSup = Sup-&gt;gKappa(NL, TwoSL, IL, N1, N2, TwoJ, NR, TwoSR, IR);</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <span class="keywordflow">if</span> (kappaSup!=-1){</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      </div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;         <span class="keywordtype">int</span> dimLdown =                 denBK-&gt;gCurrentDim(index,  NL,TwoSL,IL);</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;         <span class="keywordtype">int</span> dimLup   = Exc_BKs[state_number]-&gt;gCurrentDim(index,  NL,TwoSL,IL);</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;         <span class="keywordtype">int</span> dimRdown =                 denBK-&gt;gCurrentDim(index+2,NR,TwoSR,IR);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;         <span class="keywordtype">int</span> dimRup   = Exc_BKs[state_number]-&gt;gCurrentDim(index+2,NR,TwoSR,IR);</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;         </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;         <span class="comment">//Do sqrt( (TwoJR+1) * Eshift ) / (TwoStarget+1) times (OL * Sup)_{block} --&gt; workmem</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;         <span class="keywordtype">double</span> * SupPart = Sup-&gt;gStorage() + Sup-&gt;gKappa2index(kappaSup);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;         <span class="keywordtype">double</span> alpha = prefactor * sqrt(TwoSR+1.0);</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;         <span class="keywordflow">if</span> (index==0){</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;            <span class="keywordtype">int</span> dimBlock = dimLup * dimRup;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;            <span class="keywordtype">int</span> inc = 1;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;            dcopy_(&amp;dimBlock,SupPart,&amp;inc,workmem,&amp;inc);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;            dscal_(&amp;dimBlock,&amp;alpha,workmem,&amp;inc);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            </div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;         } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;            </div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;            <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;            <span class="keywordtype">double</span> beta = 0.0;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;            <span class="keywordtype">double</span> * Opart = Exc_Overlaps[state_number][index-1]-&gt;gStorage(NL,TwoSL,IL,NL,TwoSL,IL);</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            dgemm_(&amp;notrans,&amp;notrans,&amp;dimLdown,&amp;dimRup,&amp;dimLup,&amp;alpha,Opart,&amp;dimLdown,SupPart,&amp;dimLup,&amp;beta,workmem,&amp;dimLdown);</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            </div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;         }</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;         </div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;         <span class="comment">//Do (workmem * OR)_{block} --&gt; result + jumpCurrentS</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;         <span class="keywordtype">int</span> jumpCurrentS = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(ikappa);</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         <span class="keywordflow">if</span> (index==L-2){</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;         </div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;            <span class="keywordtype">int</span> dimBlock = dimLdown * dimRdown;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            <span class="keywordtype">int</span> inc = 1;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;            dcopy_(&amp;dimBlock, workmem, &amp;inc, result + jumpCurrentS, &amp;inc);</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;         </div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;         } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;         </div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;            alpha = 1.0;</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;            <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//set</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;            <span class="keywordtype">double</span> * Opart = Exc_Overlaps[state_number][index+1]-&gt;gStorage(NR,TwoSR,IR,NR,TwoSR,IR);</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;            dgemm_(&amp;notrans,&amp;trans,&amp;dimLdown,&amp;dimRdown,&amp;dimRup,&amp;alpha,workmem,&amp;dimLdown,Opart,&amp;dimRdown,&amp;beta,result+jumpCurrentS,&amp;dimLdown);</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;         </div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;         }</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      }</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;   }</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;   </div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;   <span class="comment">//Deallocate everything</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;   <span class="keyword">delete</span> Sup;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;   <span class="keyword">delete</span> [] workmem;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;}</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcOverlapsWithLowerStates(){</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> state=0; state&lt;nStates-1; state++){</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      <span class="comment">//Don&#39;t do updatemovingRightSafe here, as with storeRenormOp some left boundary operators are stored and removed from mem.</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> cnt = L-2;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==2){</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;         deleteTensors(cnt, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;         isAllocated[cnt]=0;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      }</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==0){</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;         allocateTensors(cnt, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;         isAllocated[cnt]=1;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      }</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      updateMovingRight(cnt);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160; </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      TensorO * Otemp = <span class="keyword">new</span> TensorO(L, <span class="keyword">true</span>, Exc_BKs[state], denBK, Prob);</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      Otemp-&gt;update(Exc_MPSs[state][L-1], MPS[L-1], Exc_Overlaps[state][L-2]);</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="keywordtype">double</span> overlap = Otemp-&gt;gStorage()[0];</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keyword">delete</span> Otemp;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;The overlap between the current state and state &quot;</span> &lt;&lt; state &lt;&lt; <span class="stringliteral">&quot; is : &quot;</span> &lt;&lt; overlap &lt;&lt; endl;</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==1){</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;         deleteTensors(cnt, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;         isAllocated[cnt]=0;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      }</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;   </div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;   }</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;}</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcOverlapsWithLowerStatesDuringSweeps_debug(<span class="keywordtype">double</span> ** VeffTilde, Sobject * denS){</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;   denS-&gt;prog2symm();</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;   <span class="keywordtype">int</span> dim = denS-&gt;gKappa2index(denS-&gt;gNKappa());</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> state=0; state&lt;nStates-1; state++){</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;      </div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      <span class="keywordtype">int</span> inc = 1;</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;      <span class="keywordtype">double</span> overlap = ddot_(&amp;dim,denS-&gt;gStorage(),&amp;inc,VeffTilde[state],&amp;inc) / sqrt(Exc_Eshifts[state]);</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   Debugger: The overlap (based on VeffTilde) between the current state and state &quot;</span> &lt;&lt; state &lt;&lt; <span class="stringliteral">&quot; is : &quot;</span> &lt;&lt; overlap &lt;&lt; endl;</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;   </div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;   }</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;   </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;   denS-&gt;symm2prog();</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;}</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;**************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;}</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">  199</a></span>&#160;<a class="code" href="classCheMPS2_1_1TwoDM.html">CheMPS2::TwoDM</a> * <a class="code" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">CheMPS2::DMRG::get2DM</a>(){ <span class="keywordflow">return</span> the2DM; }</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
+<div class="line"><a name="l00201"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">  201</a></span>&#160;<a class="code" href="classCheMPS2_1_1Correlations.html">CheMPS2::Correlations</a> * <a class="code" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">CheMPS2::DMRG::getCorrelations</a>(){ <span class="keywordflow">return</span> theCorr; }</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">  203</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">CheMPS2::DMRG::getSpecificCoefficient</a>(<span class="keywordtype">int</span> * coeff){ <span class="comment">//DMRGcoeff = coeff[Hamindex = Prob-&gt;gf2(DMRGindex)]</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;   <span class="comment">//Check if it&#39;s possible</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   <span class="keywordtype">int</span> nTot = 0;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;   <span class="keywordtype">int</span> twoStot = 0;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   <span class="keywordtype">int</span> iTot = 0;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      nTot += coeff[HamIndex];</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;      twoStot += (coeff[HamIndex]==1)?1:0;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keywordflow">if</span> (coeff[HamIndex]==1){ iTot = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(iTot,denBK-&gt;gIrrep(cnt)); }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;   }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;   <span class="keywordflow">if</span> ( Prob-&gt;gN() != nTot ){</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Ndesired = &quot;</span> &lt;&lt; Prob-&gt;gN() &lt;&lt; <span class="stringliteral">&quot; and nTot in int * coeff = &quot;</span> &lt;&lt; nTot &lt;&lt; endl;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;   }</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;   <span class="keywordflow">if</span> ( Prob-&gt;gTwoS() != twoStot ){</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;2Sdesired = &quot;</span> &lt;&lt; Prob-&gt;gTwoS() &lt;&lt; <span class="stringliteral">&quot; and number of unpaired electrons in int * coeff = &quot;</span> &lt;&lt; twoStot &lt;&lt; endl;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;   }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;   <span class="keywordflow">if</span> (Prob-&gt;gIrrep() != iTot ){</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;Idesired = &quot;</span> &lt;&lt; Prob-&gt;gIrrep() &lt;&lt; <span class="stringliteral">&quot; and global irrep of the unpaired electrons in int * coeff = &quot;</span> &lt;&lt; iTot &lt;&lt; endl;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;      <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;   }</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;   </div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;   <span class="comment">//Construct two matrices</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;   <span class="keywordtype">int</span> Dmax = 1;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=1; cnt&lt;L; cnt++){</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;      <span class="keywordtype">int</span> DmaxBound = denBK-&gt;gMaxDimAtBound(cnt);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;      <span class="keywordflow">if</span> (DmaxBound&gt;Dmax){ Dmax = DmaxBound; }</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;   }</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;   <span class="keywordtype">double</span> * matA = <span class="keyword">new</span> <span class="keywordtype">double</span>[Dmax*Dmax];</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;   <span class="keywordtype">double</span> * matB = <span class="keyword">new</span> <span class="keywordtype">double</span>[Dmax*Dmax];</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;   </div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;   <span class="comment">//Multiply and find coefficient</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;   matA[0] = 1.0;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;   <span class="keywordtype">int</span> dimFirst = 1;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;   <span class="keywordtype">int</span> NL = 0;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;   <span class="keywordtype">int</span> TwoSL = 0;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;   <span class="keywordtype">int</span> IL = 0;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;   <span class="keywordtype">int</span> dimL = 1;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;   </div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;   <span class="keywordtype">double</span> alpha = 1.0;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;   <span class="keywordtype">double</span> beta = 0.0;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;   <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;   </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;      <span class="comment">//Right symmetry sector</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordtype">int</span> HamIndex = (Prob-&gt;gReorderD2h()) ? Prob-&gt;gf2(cnt) : cnt;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;      <span class="keywordtype">int</span> NR = NL + coeff[HamIndex];</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;      <span class="keywordtype">int</span> TwoSR, IR;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;      <span class="keywordflow">if</span> (coeff[HamIndex]==1){</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;         TwoSR = TwoSL + 1;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;         IR = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>(IL,denBK-&gt;gIrrep(cnt));</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;         TwoSR = TwoSL;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;         IR = IL;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;      }</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;      <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(cnt+1,NR,TwoSR,IR);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;      </div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;      <span class="comment">//Multiply</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;      <span class="keywordtype">double</span> * Tblock = MPS[cnt]-&gt;gStorage(NL,TwoSL,IL,NR,TwoSR,IR);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;      dgemm_(&amp;notrans,&amp;notrans,&amp;dimFirst,&amp;dimR,&amp;dimL,&amp;alpha,matA,&amp;dimFirst,Tblock,&amp;dimL,&amp;beta,matB,&amp;dimFirst);</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      Tblock = matA;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      matA = matB;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      matB = Tblock;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      </div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      <span class="comment">//Right becomes left</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      dimL = dimR;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;      NL = NR;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;      TwoSL = TwoSR;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;      IL = IR;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;   }</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;   </div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;   <span class="keywordtype">double</span> desCoeff = matA[0];</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;   </div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;   <span class="keyword">delete</span> [] matA;</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;   <span class="keyword">delete</span> [] matB;</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;   </div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;   <span class="keywordflow">return</span> desCoeff;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;}</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcVeffTilde(<span class="keywordtype">double</span> * result, <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * currentS, <span class="keywordtype">int</span> state_number){</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   <span class="keywordtype">int</span> dimTot = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>());</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;dimTot; cnt++){ result[cnt] = 0.0; }</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   <span class="keywordtype">int</span> index = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a973aa40f2b0e659a55b4c63e768afdf2">gIndex</a>();</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;   </div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> dimL = std::max(denBK-&gt;gMaxDimAtBound(index),   Exc_BKs[state_number]-&gt;gMaxDimAtBound(index)   );</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> dimR = std::max(denBK-&gt;gMaxDimAtBound(index+2), Exc_BKs[state_number]-&gt;gMaxDimAtBound(index+2) );</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;   <span class="keywordtype">double</span> * workmem = <span class="keyword">new</span> <span class="keywordtype">double</span>[dimL * dimR];</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;   </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;   <span class="comment">//Construct Sup</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;   Sobject * Sup = <span class="keyword">new</span> Sobject(index,Exc_BKs[state_number]-&gt;gIrrep(index),Exc_BKs[state_number]-&gt;gIrrep(index+1),Exc_BKs[state_number]);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;   Sup-&gt;Join(Exc_MPSs[state_number][index],Exc_MPSs[state_number][index+1]);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;   </div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;   <span class="comment">//Construct VeffTilde</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> prefactor = sqrt(Exc_Eshifts[state_number]) / (Prob-&gt;gTwoS() + 1.0);</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> ikappa=0; ikappa&lt;currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>(); ikappa++){</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="keywordtype">int</span> NL    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede">gNL</a>(ikappa);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordtype">int</span> TwoSL = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ae33e692d6e5f89d446f62515a85f725f">gTwoSL</a>(ikappa);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">int</span> IL    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a77be4052f1655e2f8fecee8f231bc209">gIL</a>(ikappa);</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordtype">int</span> N1    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ae27c30606eb0f3f1eb9a32c559b7b209">gN1</a>(ikappa);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="keywordtype">int</span> N2    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a62923e0b950298fe42017dcdeadcfb03">gN2</a>(ikappa);</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      <span class="keywordtype">int</span> TwoJ  = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a2bf86bc7861704b1f2ddb655312da82b">gTwoJ</a>(ikappa);</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordtype">int</span> NR    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562">gNR</a>(ikappa);</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      <span class="keywordtype">int</span> TwoSR = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#ac3d208dc1bc37fdbcf48aaa9e4cc6ed7">gTwoSR</a>(ikappa);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      <span class="keywordtype">int</span> IR    = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813">gIR</a>(ikappa);</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      <span class="comment">//Check if block also exists for other MPS</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <span class="keywordtype">int</span> kappaSup = Sup-&gt;gKappa(NL, TwoSL, IL, N1, N2, TwoJ, NR, TwoSR, IR);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      <span class="keywordflow">if</span> (kappaSup!=-1){</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      </div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;         <span class="keywordtype">int</span> dimLdown =                 denBK-&gt;gCurrentDim(index,  NL,TwoSL,IL);</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;         <span class="keywordtype">int</span> dimLup   = Exc_BKs[state_number]-&gt;gCurrentDim(index,  NL,TwoSL,IL);</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;         <span class="keywordtype">int</span> dimRdown =                 denBK-&gt;gCurrentDim(index+2,NR,TwoSR,IR);</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;         <span class="keywordtype">int</span> dimRup   = Exc_BKs[state_number]-&gt;gCurrentDim(index+2,NR,TwoSR,IR);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;         </div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;         <span class="comment">//Do sqrt( (TwoJR+1) * Eshift ) / (TwoStarget+1) times (OL * Sup)_{block} --&gt; workmem</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;         <span class="keywordtype">double</span> * SupPart = Sup-&gt;gStorage() + Sup-&gt;gKappa2index(kappaSup);</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;         <span class="keywordtype">double</span> alpha = prefactor * sqrt(TwoSR+1.0);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;         <span class="keywordflow">if</span> (index==0){</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;            <span class="keywordtype">int</span> dimBlock = dimLup * dimRup;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;            <span class="keywordtype">int</span> inc = 1;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;            dcopy_(&amp;dimBlock,SupPart,&amp;inc,workmem,&amp;inc);</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;            dscal_(&amp;dimBlock,&amp;alpha,workmem,&amp;inc);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;            </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;         } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;            </div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;            <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;            <span class="keywordtype">double</span> beta = 0.0;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;            <span class="keywordtype">double</span> * Opart = Exc_Overlaps[state_number][index-1]-&gt;gStorage(NL,TwoSL,IL,NL,TwoSL,IL);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;            dgemm_(&amp;notrans,&amp;notrans,&amp;dimLdown,&amp;dimRup,&amp;dimLup,&amp;alpha,Opart,&amp;dimLdown,SupPart,&amp;dimLup,&amp;beta,workmem,&amp;dimLdown);</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;            </div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;         }</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;         </div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;         <span class="comment">//Do (workmem * OR)_{block} --&gt; result + jumpCurrentS</span></div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;         <span class="keywordtype">int</span> jumpCurrentS = currentS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>(ikappa);</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;         <span class="keywordflow">if</span> (index==L-2){</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;         </div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;            <span class="keywordtype">int</span> dimBlock = dimLdown * dimRdown;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;            <span class="keywordtype">int</span> inc = 1;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            dcopy_(&amp;dimBlock, workmem, &amp;inc, result + jumpCurrentS, &amp;inc);</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;         </div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;         } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;         </div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;            <span class="keywordtype">char</span> notrans = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;            alpha = 1.0;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;            <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//set</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;            <span class="keywordtype">double</span> * Opart = Exc_Overlaps[state_number][index+1]-&gt;gStorage(NR,TwoSR,IR,NR,TwoSR,IR);</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;            dgemm_(&amp;notrans,&amp;trans,&amp;dimLdown,&amp;dimRdown,&amp;dimRup,&amp;alpha,workmem,&amp;dimLdown,Opart,&amp;dimRdown,&amp;beta,result+jumpCurrentS,&amp;dimLdown);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;         </div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;         }</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      }</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;   }</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;   </div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;   <span class="comment">//Deallocate everything</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;   <span class="keyword">delete</span> Sup;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;   <span class="keyword">delete</span> [] workmem;</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;}</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcOverlapsWithLowerStates(){</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> state=0; state&lt;nStates-1; state++){</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160; </div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      <span class="comment">//Don&#39;t do updatemovingRightSafe here, as with storeRenormOp some left boundary operators are stored and removed from mem.</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> cnt = L-2;</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==2){</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;         deleteTensors(cnt, <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;         isAllocated[cnt]=0;</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      }</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==0){</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;         allocateTensors(cnt, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;         isAllocated[cnt]=1;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      }</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      updateMovingRight(cnt);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      TensorO * Otemp = <span class="keyword">new</span> TensorO(L, <span class="keyword">true</span>, Exc_BKs[state], denBK, Prob);</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      Otemp-&gt;update(Exc_MPSs[state][L-1], MPS[L-1], Exc_Overlaps[state][L-2]);</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordtype">double</span> overlap = Otemp-&gt;gStorage()[0];</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      <span class="keyword">delete</span> Otemp;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      </div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;The overlap between the current state and state &quot;</span> &lt;&lt; state &lt;&lt; <span class="stringliteral">&quot; is : &quot;</span> &lt;&lt; overlap &lt;&lt; endl;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      <span class="keywordflow">if</span> (isAllocated[cnt]==1){</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;         deleteTensors(cnt, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;         isAllocated[cnt]=0;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      }</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;   </div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;   }</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;}</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::calcOverlapsWithLowerStatesDuringSweeps_debug(<span class="keywordtype">double</span> ** VeffTilde, Sobject * denS){</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;   denS-&gt;prog2symm();</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;   <span class="keywordtype">int</span> dim = denS-&gt;gKappa2index(denS-&gt;gNKappa());</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> state=0; state&lt;nStates-1; state++){</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;      </div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;      <span class="keywordtype">int</span> inc = 1;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;      <span class="keywordtype">double</span> overlap = ddot_(&amp;dim,denS-&gt;gStorage(),&amp;inc,VeffTilde[state],&amp;inc) / sqrt(Exc_Eshifts[state]);</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   Debugger: The overlap (based on VeffTilde) between the current state and state &quot;</span> &lt;&lt; state &lt;&lt; <span class="stringliteral">&quot; is : &quot;</span> &lt;&lt; overlap &lt;&lt; endl;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;   </div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;   }</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;   </div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;   denS-&gt;symm2prog();</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;}</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_ae33e692d6e5f89d446f62515a85f725f"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#ae33e692d6e5f89d446f62515a85f725f">CheMPS2::Sobject::gTwoSL</a></div><div class="ttdeci">int gTwoSL(const int ikappa) const </div><div class="ttdoc">Get the left spin symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00186">Sobject.cpp:186</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_a5c5bf12b31aa9cb4b0b31bd53dad1ed3"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#a5c5bf12b31aa9cb4b0b31bd53dad1ed3">CheMPS2::TwoDM::FillSite</a></div><div class="ttdeci">void FillSite(TensorT *denT, TensorL ***Ltens, TensorF0 ****F0tens, TensorF1 ****F1tens, TensorS0 ****S0tens, TensorS1 ****S1tens)</div><div class="ttdoc">Fill the 2DM terms with as second site index denT-&gt;gIndex() </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00191">TwoDM.cpp:191</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1ConvergenceScheme_html_abb766295f71d3c1e3b9edc875504b317"><div class="ttname"><a href="classCheMPS2_1_1ConvergenceScheme.html#abb766295f71d3c1e3b9edc875504b317">CheMPS2::ConvergenceScheme::getD</a></div><div class="ttdeci">int getD(const int instruction)</div><div class="ttdoc">Get the number of renormalized states for a particular instruction. </div><div class="ttdef"><b>Definition:</b> <a href="ConvergenceScheme_8cpp_source.html#l00064">ConvergenceScheme.cpp:64</a></div></div>
@@ -544,14 +545,14 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a77be4052f1655e2f8fecee8f231bc209"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a77be4052f1655e2f8fecee8f231bc209">CheMPS2::Sobject::gIL</a></div><div class="ttdeci">int gIL(const int ikappa) const </div><div class="ttdoc">Get the left irrep symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00187">Sobject.cpp:187</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html_afea87f0a1be6ed05fb668528f2f8bf30"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#afea87f0a1be6ed05fb668528f2f8bf30">CheMPS2::TensorT::LQ</a></div><div class="ttdeci">void LQ(TensorDiag *Lstorage)</div><div class="ttdoc">Right-normalization. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00260">TensorT.cpp:260</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorGYZ_html_a8470ec48e82ff7d002a1b248afc98787"><div class="ttname"><a href="classCheMPS2_1_1TensorGYZ.html#a8470ec48e82ff7d002a1b248afc98787">CheMPS2::TensorGYZ::construct</a></div><div class="ttdeci">void construct(TensorT *denT)</div><div class="ttdoc">Construct a new TensorGYZ. </div><div class="ttdef"><b>Definition:</b> <a href="TensorGYZ_8cpp_source.html#l00033">TensorGYZ.cpp:33</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_aadcaff5f067d6625ac69237cee0ee92e"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">CheMPS2::DMRG::getSpecificCoefficient</a></div><div class="ttdeci">double getSpecificCoefficient(int *coeff)</div><div class="ttdoc">Get a specific FCI coefficient. coeff contains the occupation numbers of the L orbitals. It is assumed that the number of unpaired electrons equals twice the total targeted spin. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00202">DMRGtechnics.cpp:202</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_aadcaff5f067d6625ac69237cee0ee92e"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aadcaff5f067d6625ac69237cee0ee92e">CheMPS2::DMRG::getSpecificCoefficient</a></div><div class="ttdeci">double getSpecificCoefficient(int *coeff)</div><div class="ttdoc">Get a specific FCI coefficient. coeff contains the occupation numbers of the L orbitals. It is assumed that the number of unpaired electrons equals twice the total targeted spin. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00203">DMRGtechnics.cpp:203</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Heff_html"><div class="ttname"><a href="classCheMPS2_1_1Heff.html">CheMPS2::Heff</a></div><div class="ttdef"><b>Definition:</b> <a href="Heff_8h_source.html#l00045">Heff.h:45</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Correlations_html_a3e4a935011b95ad18b28b88ac56990fc"><div class="ttname"><a href="classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc">CheMPS2::Correlations::MutualInformationDistance</a></div><div class="ttdeci">double MutualInformationDistance(const double power) const </div><div class="ttdoc">Return Idistance(power) (see return for definition) </div><div class="ttdef"><b>Definition:</b> <a href="Correlations_8cpp_source.html#l00206">Correlations.cpp:206</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a687a29eab89ef3763af8c630b48e3bf6"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">CheMPS2::Sobject::Join</a></div><div class="ttdeci">void Join(TensorT *Tleft, TensorT *Tright)</div><div class="ttdoc">Join two sites to form a composite S-object. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00195">Sobject.cpp:195</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00117">Irreps.h:117</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1ConvergenceScheme_html_ab8c98d5388c415c42115084c5817e1dc"><div class="ttname"><a href="classCheMPS2_1_1ConvergenceScheme.html#ab8c98d5388c415c42115084c5817e1dc">CheMPS2::ConvergenceScheme::getNInstructions</a></div><div class="ttdeci">int getNInstructions()</div><div class="ttdoc">Get the number of instructions. </div><div class="ttdef"><b>Definition:</b> <a href="ConvergenceScheme_8cpp_source.html#l00046">ConvergenceScheme.cpp:46</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a2b8ca2eaecfc448c0f0591462c8edede"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede">CheMPS2::Sobject::gNL</a></div><div class="ttdeci">int gNL(const int ikappa) const </div><div class="ttdoc">Get the left particle number symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00185">Sobject.cpp:185</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_aa08c71dab6543ef820d13528fc354bcd"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">CheMPS2::DMRG::get2DM</a></div><div class="ttdeci">TwoDM * get2DM()</div><div class="ttdoc">Get the pointer to the 2DM. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00198">DMRGtechnics.cpp:198</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_aa08c71dab6543ef820d13528fc354bcd"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd">CheMPS2::DMRG::get2DM</a></div><div class="ttdeci">TwoDM * get2DM()</div><div class="ttdoc">Get the pointer to the 2DM. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00199">DMRGtechnics.cpp:199</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a1a9a06b257e018439ded8c1bf9c88813"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813">CheMPS2::Sobject::gIR</a></div><div class="ttdeci">int gIR(const int ikappa) const </div><div class="ttdoc">Get the right irrep symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00193">Sobject.cpp:193</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_ac3d208dc1bc37fdbcf48aaa9e4cc6ed7"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#ac3d208dc1bc37fdbcf48aaa9e4cc6ed7">CheMPS2::Sobject::gTwoSR</a></div><div class="ttdeci">int gTwoSR(const int ikappa) const </div><div class="ttdoc">Get the right spin symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00192">Sobject.cpp:192</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a973aa40f2b0e659a55b4c63e768afdf2"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a973aa40f2b0e659a55b4c63e768afdf2">CheMPS2::Sobject::gIndex</a></div><div class="ttdeci">int gIndex() const </div><div class="ttdoc">Get the location index. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00183">Sobject.cpp:183</a></div></div>
@@ -559,7 +560,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_aea1ffffbf2e12b56d602e5b692dd3a79"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79">CheMPS2::DMRG::calc2DMandCorrelations</a></div><div class="ttdeci">void calc2DMandCorrelations()</div><div class="ttdoc">Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!! ...</div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00036">DMRGtechnics.cpp:36</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html">CheMPS2::TwoDM</a></div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8h_source.html#l00044">TwoDM.h:44</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a6dc776c7b9c79a2fb5a5e6e81d190562"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562">CheMPS2::Sobject::gNR</a></div><div class="ttdeci">int gNR(const int ikappa) const </div><div class="ttdoc">Get the right particle number symmetry of block ikappa. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00191">Sobject.cpp:191</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_aeb26c265e89b5fcf41d3a18589040264"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">CheMPS2::DMRG::getCorrelations</a></div><div class="ttdeci">Correlations * getCorrelations()</div><div class="ttdoc">Get the pointer to the Correlations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00200">DMRGtechnics.cpp:200</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_aeb26c265e89b5fcf41d3a18589040264"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264">CheMPS2::DMRG::getCorrelations</a></div><div class="ttdeci">Correlations * getCorrelations()</div><div class="ttdoc">Get the pointer to the Correlations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGtechnics_8cpp_source.html#l00201">DMRGtechnics.cpp:201</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorK_html"><div class="ttname"><a href="classCheMPS2_1_1TensorK.html">CheMPS2::TensorK</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorK_8h_source.html#l00034">TensorK.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDM_html_a1e1714c5e2d9cd7bf756ea9263f4711d"><div class="ttname"><a href="classCheMPS2_1_1TwoDM.html#a1e1714c5e2d9cd7bf756ea9263f4711d">CheMPS2::TwoDM::calcEnergy</a></div><div class="ttdeci">double calcEnergy()</div><div class="ttdoc">Calculate the energy based on the 2DM-A. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDM_8cpp_source.html#l00151">TwoDM.cpp:151</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a6c6f133286114da1666965c8048e47a1"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1">CheMPS2::Problem::gEconst</a></div><div class="ttdeci">double gEconst() const </div><div class="ttdoc">Get the constant part of the Hamiltonian. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00101">Problem.cpp:101</a></div></div>
@@ -575,7 +576,7 @@ $(document).ready(function(){initNavTree('DMRGtechnics_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGtechnics.cpp</b></li>
-    <li class="footer">Generated on Sun Nov 23 2014 01:55:05 for CheMPS2 by
+    <li class="footer">Generated on Mon Nov 24 2014 00:20:10 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
