@@ -61,8 +61,9 @@ namespace CheMPS2{
          Hamiltonian(const int Norbitals, const int nGroup, const int * OrbIrreps);
          
          //! Constructor which loads a Hamiltonian from disk
-         /** \param filename If the filename is "LOADH5" then the Hamiltonian in HDF5 format is loaded; else a Psi4 text dump in "filename" will be loaded. The text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with the other constructor, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save(). */
-         Hamiltonian(const string filename="LOADH5");
+         /** \param filename If the filename is "LOADH5" then the Hamiltonian in HDF5 format is loaded; else a Psi4 text dump in "filename" will be loaded. The text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with the other constructor, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save(). 
+          *  \param h5file set to true of the file where filename points to is a HDF5 file */
+         Hamiltonian(const string filename="LOADH5", bool h5file=false);
          
          //! Destructor
          virtual ~Hamiltonian();
@@ -160,7 +161,7 @@ namespace CheMPS2{
          double Econst;
          
          //If filename=="LOADH5" in Hamiltonian::Hamiltonian then the HDF5 Hamiltonian is loaded
-         void CreateAndFillFromH5();
+         void CreateAndFillFromH5(const string filename);
          
          //If filename!="LOADH5" in Hamiltonian::Hamiltonian then a Psi4 dump in the file with name "filename" is loaded
          void CreateAndFillFromPsi4dump(const string filename);
