@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classCheMPS2_1_1TensorS0.html#a09b9ad3cb125b902abbb3a658e3a60b7":[0,0,0,35,2],
 "classCheMPS2_1_1TensorS0.html#a862df3a3f5650891950e20ee80729cda":[0,0,0,35,0],
 "classCheMPS2_1_1TensorS0.html#ace3bc035b03bcbf1b0a8f94b96977465":[0,0,0,35,1],
 "classCheMPS2_1_1TensorS0.html#ad4e092203dac9cedc8e5d6ecc7e60dce":[0,0,0,35,3],
@@ -108,8 +109,8 @@ var NAVTREEINDEX2 =
 "functions_d.html":[0,3,0,3],
 "functions_e.html":[0,3,0,4],
 "functions_f.html":[0,3,0,5],
-"functions_func.html":[0,3,1,0],
 "functions_func.html":[0,3,1],
+"functions_func.html":[0,3,1,0],
 "functions_func_b.html":[0,3,1,1],
 "functions_func_c.html":[0,3,1,2],
 "functions_func_d.html":[0,3,1,3],
