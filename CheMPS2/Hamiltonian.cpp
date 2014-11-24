@@ -59,14 +59,14 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
 
 }
 
-CheMPS2::Hamiltonian::Hamiltonian(const string filename){
+CheMPS2::Hamiltonian::Hamiltonian(const string filename, bool h5file){
 
-   if ( filename.compare("LOADH5") == 0 ){
-      CreateAndFillFromH5();
-   } else {
+   if ( filename.compare("LOADH5") == 0 )
+      CreateAndFillFromH5(CheMPS2::HAMILTONIAN_ParentStorageName);
+   else if (h5file)
+      CreateAndFillFromH5(filename);
+   else 
       CreateAndFillFromPsi4dump( filename );
-   }
-   
 }
 
 CheMPS2::Hamiltonian::~Hamiltonian(){
@@ -230,10 +230,10 @@ void CheMPS2::Hamiltonian::read(){
 
 }
 
-void CheMPS2::Hamiltonian::CreateAndFillFromH5(){
+void CheMPS2::Hamiltonian::CreateAndFillFromH5(const string filename){
 
    //The hdf5 file
-   hid_t file_id = H5Fopen(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
       
       //The data
       hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
