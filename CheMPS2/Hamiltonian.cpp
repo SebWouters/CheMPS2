@@ -59,12 +59,18 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
 
 }
 
-CheMPS2::Hamiltonian::Hamiltonian(const string filename){
+CheMPS2::Hamiltonian::Hamiltonian(const string file_psi4text){
 
-   if ( filename.compare("LOADH5") == 0 ){
-      CreateAndFillFromH5();
+   CreateAndFillFromPsi4dump( file_psi4text );
+   
+}
+
+CheMPS2::Hamiltonian::Hamiltonian(const bool fileh5, const string main_file, const string file_tmat, const string file_vmat){
+
+   if (fileh5){
+      CreateAndFillFromH5( main_file, file_tmat, file_vmat );
    } else {
-      CreateAndFillFromPsi4dump( filename );
+      CreateAndFillFromPsi4dump( main_file );
    }
    
 }
@@ -130,13 +136,13 @@ double CheMPS2::Hamiltonian::getVmat(const int index1, const int index2, const i
    
 }
 
-void CheMPS2::Hamiltonian::save() const{
+void CheMPS2::Hamiltonian::save(const string file_parent, const string file_tmat, const string file_vmat) const{
 
-   Tmat->save(CheMPS2::HAMILTONIAN_TmatStorageName);
-   Vmat->save(CheMPS2::HAMILTONIAN_VmatStorageName);
+   Tmat->save(file_tmat);
+   Vmat->save(file_vmat);
 
    //The hdf5 file
-   hid_t file_id = H5Fcreate(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+   hid_t file_id = H5Fcreate(file_parent.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
       
       //The data
       hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -181,13 +187,13 @@ void CheMPS2::Hamiltonian::save() const{
 
 }
 
-void CheMPS2::Hamiltonian::read(){
+void CheMPS2::Hamiltonian::read(const string file_parent, const string file_tmat, const string file_vmat){
 
-   Tmat->read(CheMPS2::HAMILTONIAN_TmatStorageName);
-   Vmat->read(CheMPS2::HAMILTONIAN_VmatStorageName);
+   Tmat->read(file_tmat);
+   Vmat->read(file_vmat);
 
    //The hdf5 file
-   hid_t file_id = H5Fopen(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(file_parent.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
       
       //The data
       hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
@@ -230,10 +236,10 @@ void CheMPS2::Hamiltonian::read(){
 
 }
 
-void CheMPS2::Hamiltonian::CreateAndFillFromH5(){
+void CheMPS2::Hamiltonian::CreateAndFillFromH5(const string file_parent, const string file_tmat, const string file_vmat){
 
    //The hdf5 file
-   hid_t file_id = H5Fopen(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+   hid_t file_id = H5Fopen(file_parent.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
       
       //The data
       hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
@@ -273,7 +279,7 @@ void CheMPS2::Hamiltonian::CreateAndFillFromH5(){
    Tmat = new TwoIndex(  SymmInfo.getGroupNumber(), irrep2num_orb );
    Vmat = new FourIndex( SymmInfo.getGroupNumber(), irrep2num_orb );
 
-   read();
+   read(file_parent, file_tmat, file_vmat);
 
 }
 

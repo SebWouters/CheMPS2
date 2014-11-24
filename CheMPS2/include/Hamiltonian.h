@@ -60,9 +60,16 @@ namespace CheMPS2{
              \param OrbIrreps Pointer to array containing the orbital irreps */
          Hamiltonian(const int Norbitals, const int nGroup, const int * OrbIrreps);
          
-         //! Constructor which loads a Hamiltonian from disk
-         /** \param filename If the filename is "LOADH5" then the Hamiltonian in HDF5 format is loaded; else a Psi4 text dump in "filename" will be loaded. The text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with the other constructor, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save(). */
-         Hamiltonian(const string filename="LOADH5");
+         //! Constructor which loads a Psi4 text dump of the Hamiltonian from disk. A Psi4 text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT.
+         /** \param file_psi4text The filename of the Psi4 text dump of the Hamiltonian */
+         Hamiltonian(const string file_psi4text);
+         
+         //! Constructor which loads a Hamiltonian from disk which was previously saved as a Psi4 text dump or in HDF5 format. A Psi4 text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with one of the other constructors, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save().
+         /** \param fileh5 If true, attempt to load a Hamiltonian in HDF5 format. All three filenames should be set then! If false, attempt to load a Hamiltonian which was previously saved as a Psi4 text dump. Only the first filename should be set then!
+             \param main_file If fileh5, the HDF5 Hamiltonian parent filename. If not fileh5, the filename of the Psi4 text dump of the Hamiltonian.
+             \param file_tmat The HDF5 Hamiltonian Tmat filename
+             \param file_vmat The HDF5 Hamiltonian Vmat filename */
+         Hamiltonian(const bool fileh5, const string main_file=HAMILTONIAN_ParentStorageName, const string file_tmat=HAMILTONIAN_TmatStorageName, const string file_vmat=HAMILTONIAN_VmatStorageName);
          
          //! Destructor
          virtual ~Hamiltonian();
@@ -125,10 +132,16 @@ namespace CheMPS2{
          double getVmat(const int index1, const int index2, const int index3, const int index4) const;
          
          //! Save the Hamiltonian
-         void save() const;
+         /** \param file_parent The HDF5 Hamiltonian parent filename
+             \param file_tmat The HDF5 Hamiltonian Tmat filename
+             \param file_vmat The HDF5 Hamiltonian Vmat filename */
+         void save(const string file_parent=HAMILTONIAN_ParentStorageName, const string file_tmat=HAMILTONIAN_TmatStorageName, const string file_vmat=HAMILTONIAN_VmatStorageName) const;
          
          //! Load the Hamiltonian
-         void read();
+         /** \param file_parent The HDF5 Hamiltonian parent filename
+             \param file_tmat The HDF5 Hamiltonian Tmat filename
+             \param file_vmat The HDF5 Hamiltonian Vmat filename */
+         void read(const string file_parent=HAMILTONIAN_ParentStorageName, const string file_tmat=HAMILTONIAN_TmatStorageName, const string file_vmat=HAMILTONIAN_VmatStorageName);
          
          //! Debug check certain elements and sums
          void debugcheck() const;
@@ -160,7 +173,7 @@ namespace CheMPS2{
          double Econst;
          
          //If filename=="LOADH5" in Hamiltonian::Hamiltonian then the HDF5 Hamiltonian is loaded
-         void CreateAndFillFromH5();
+         void CreateAndFillFromH5(const string file_parent, const string file_tmat, const string file_vmat);
          
          //If filename!="LOADH5" in Hamiltonian::Hamiltonian then a Psi4 dump in the file with name "filename" is loaded
          void CreateAndFillFromPsi4dump(const string filename);

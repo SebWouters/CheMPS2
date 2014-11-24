@@ -78,7 +78,8 @@ int main(void){
    delete HamLoaded;
    
    //To load an HDF5 dump and immediately fill the Hamiltonian
-   CheMPS2::Hamiltonian * HamLoaded2 = new CheMPS2::Hamiltonian();
+   const bool fileh5 = true;
+   CheMPS2::Hamiltonian * HamLoaded2 = new CheMPS2::Hamiltonian( fileh5 );
    
    //Test whether it's the same thing
    double RMS2 = 0.0;
