@@ -140,14 +140,16 @@ They only require a very limited amount of memory (order 10-120 MB).
 
 PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The
 installation above generated the file ```./build/setup.py```, in which
-the CheMPS2 library and include paths have been assigned. This section
-assumes that CheMPS2 has been installed as described above! Start in
-```./build```, and run:
+the library and include paths have been set to the ones in the build
+directory. Start in ```./build```, and run:
 
     > python setup.py build_ext -i
-    
-If you have pulled a newer version of CheMPS2, please remember to
-(re)install the c++ library first, before building PyCheMPS2 with Cython!
+
+Compilation of PyCheMPS2 occurs by linking to the C++ library in the
+build directory. However, when you want to run the tests in the next section,
+you should first install the C++ library! If you have pulled a newer version
+of CheMPS2, please remember to (re)install the C++ library first, before using
+PyCheMPS2!
 
 
 ### 4. Testing PyCheMPS2
