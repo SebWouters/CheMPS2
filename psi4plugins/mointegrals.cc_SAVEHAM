@@ -10,18 +10,25 @@
 #include <libciomr/libciomr.h>
 #include <liboptions/liboptions.h>
 #include <libchkpt/chkpt.h>
+#include <hdf5.h>
 
 #include <stdlib.h>
 #include <iostream>
 
 #include "CheMPS2/Irreps.h"
 #include "CheMPS2/Hamiltonian.h"
-#include "CheMPS2/Problem.h"
+#include "CheMPS2/Options.h"
 
 using namespace std;
 
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
+
+// macro to help check return status of HDF5 functions
+#define HDF5_STATUS_CHECK(status) { \
+    if(status < 0) \
+    fprintf(outfile, "%s:%d: Error with HDF5. status code=%d\n", __FILE__, __LINE__, status); \
+} 
 
 INIT_PLUGIN
 
@@ -77,6 +84,13 @@ mointegrals(Options &options)
     int *orbspi   = Process::environment.wavefunction()->nmopi();
     int *docc     = Process::environment.wavefunction()->doccpi();
     int *socc     = Process::environment.wavefunction()->soccpi();
+
+    shared_ptr<Molecule> molecule = Process::environment.molecule();
+    int nelectrons = 0;
+    for(int i=0;i<molecule->natom();i++)
+        nelectrons += molecule->true_atomic_number(i);
+
+    nelectrons -= molecule->molecular_charge();
     
     int nTriMo = nmo * (nmo + 1) / 2;
     double *temp = new double[nTriMo];
@@ -220,6 +234,26 @@ mointegrals(Options &options)
 
     delete Ham;
     delete [] temp;
+
+    hid_t file_id = H5Fopen(CheMPS2::HAMILTONIAN_ParentStorageName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+    HDF5_STATUS_CHECK(file_id);
+
+    hid_t group_id = H5Gopen(file_id, ""/Data"", H5P_DEFAULT);
+    HDF5_STATUS_CHECK(group_id);
+
+    hid_t dataspace_id = H5Screate(H5S_SCALAR);
+    hid_t dataset_id = H5Dcreate(group_id, "nelectrons", H5T_STD_I32LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    hid_t status = H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &nelectrons);
+    HDF5_STATUS_CHECK(status);
+
+    status = H5Dclose(dataset_id);
+    HDF5_STATUS_CHECK(status);
+
+    status = H5Gclose(group_id);
+    HDF5_STATUS_CHECK(status);
+
+    status = H5Fclose(file_id);
+    HDF5_STATUS_CHECK(status);
 
     return Success;
 }
