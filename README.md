@@ -63,7 +63,11 @@ Build
 
 ### 1. Build CheMPS2 with CMake
 
-CheMPS2 can be built with CMake. The files
+CheMPS2 requires BLAS, LAPACK, the
+[GNU Scientific Library (GSL)](http://www.gnu.org/software/gsl/), and the
+[Hierarchical Data Format Release 5 (HDF5)](http://www.hdfgroup.org/HDF5/).
+The [Open Multi-Processing (OpenMP)](http://openmp.org/wp/) API is used
+for shared-memory parallelization. CheMPS2 can be built with CMake. The files
 
     ./CMakeLists.txt
     ./CheMPS2/CMakeLists.txt
