@@ -82,10 +82,12 @@ int main(void){
    //Check succes
    bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) ? true : false;
    cout << "================> Did test 2 succeed : ";
-   if (success){ cout << "yes" << endl; }
-   else { cout << "no" << endl; }
-
-   return 0;
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
 
 }
 

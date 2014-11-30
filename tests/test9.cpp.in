@@ -87,10 +87,12 @@ int main(void){
    //Check succes
    bool success = (fabs(Energy + 109.15104350802) < 1e-10) ? true : false;
    cout << "================> Did test 9 succeed : ";
-   if (success){ cout << "yes" << endl; }
-   else { cout << "no" << endl; }
-
-   return 0;
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
 
 }
 

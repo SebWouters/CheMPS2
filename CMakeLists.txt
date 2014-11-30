@@ -57,6 +57,7 @@ find_package (HDF5   REQUIRED)
 find_package (LAPACK REQUIRED)
 find_package (GSL    REQUIRED)
 
+enable_testing ()
 add_subdirectory (CheMPS2)
 add_subdirectory (tests)
 add_subdirectory (PyCheMPS2)

@@ -116,10 +116,12 @@ int main(void){
    //Check succes
    bool success = ((RMS < 1e-10) && (RMS2 < 1e-10)) ? true : false;
    cout << "================> Did test 7 succeed : ";
-   if (success){ cout << "yes" << endl; }
-   else { cout << "no" << endl; }
-
-   return 0;
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
 
 }
 

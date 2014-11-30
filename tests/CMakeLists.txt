@@ -10,5 +10,6 @@ foreach (ITEM ${TESTLIST})
     configure_file (${CMAKE_SOURCE_DIR}/tests/${ITEM}.cpp.in ${CMAKE_BINARY_DIR}/tests/tests/${ITEM}.cpp)
     add_executable (${ITEM} ${CMAKE_BINARY_DIR}/tests/tests/${ITEM}.cpp)
     target_link_libraries (${ITEM} CheMPS2)
+    add_test(${ITEM} ${ITEM})
 endforeach (ITEM)
 

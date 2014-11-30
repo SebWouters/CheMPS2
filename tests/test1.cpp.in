@@ -96,16 +96,19 @@ int main(void){
    for (int cnt=0; cnt<nSectors; cnt++){
       success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-10 );
    }
-   cout << "================> Did test 1 succeed : ";
-   if (success){ cout << "yes" << endl; }
-   else { cout << "no" << endl; }
    
    delete [] EFCI;
    delete [] EDMRG;
    delete [] TwoS;
    delete [] Irreps;
-
-   return 0;
+   
+   cout << "================> Did test 1 succeed : ";
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
 
 }
 

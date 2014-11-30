@@ -80,10 +80,12 @@ int main(void){
    
    bool success = (OK1 && OK2 && OK3);
    cout << "================> Did test 5 succeed : ";
-   if (success){ cout << "yes" << endl; }
-   else { cout << "no" << endl; }
-
-   return 0;
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
 
 }
 
