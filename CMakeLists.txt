@@ -5,7 +5,7 @@ set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio q
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
 set (CheMPS2_URL          "https://github.com/SebWouters/CheMPS2")
 set (CheMPS2_LICENSE      "GNU General Public License, version 2")
-set (CheMPS2_INC_RELPATH  "include/CheMPS2")
+set (CheMPS2_INC_RELPATH  "include/chemps2")
 set (CheMPS2_LIB_SOVERSION 1)
 
 

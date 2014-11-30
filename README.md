@@ -61,13 +61,13 @@ To acknowledge CheMPS2, please cite
 Build
 -----
 
-### 1. Build CheMPS2 with CMake
+### 1. Build libchemps2 with CMake
 
-CheMPS2 requires BLAS, LAPACK, the
+libchemps2 requires BLAS, LAPACK, the
 [GNU Scientific Library (GSL)](http://www.gnu.org/software/gsl/), and the
 [Hierarchical Data Format Release 5 (HDF5)](http://www.hdfgroup.org/HDF5/).
 The [Open Multi-Processing (OpenMP)](http://openmp.org/wp/) API is used
-for shared-memory parallelization. CheMPS2 can be built with CMake. The files
+for shared-memory parallelization. libchemps2 can be built with CMake. The files
 
     ./CMakeLists.txt
     ./CheMPS2/CMakeLists.txt
@@ -90,9 +90,9 @@ intel math kernel library.
 Option3 can be ```ON``` or ```OFF``` and is used to switch on the possibility
 to compile the doxygen documentation.
 Option4 is the prefix of the installation directory; typically
-```/usr``` or ```/usr/local``` on Linux. On my computer, the CheMPS2 library
+```/usr``` or ```/usr/local``` on Linux. On my computer, libchemps2
 is then installed in ```prefix/lib/x86_64-linux-gnu/``` and the headers
-in ```prefix/include/CheMPS2```.
+in ```prefix/include/chemps2```.
 If one or more of the required libraries are not found, please use the
 command
 
@@ -121,9 +121,9 @@ For non-standard installation directories, please remember to append
 the library path to ```LD_LIBRARY_PATH``` in your .bashrc.
 
 
-### 2. Testing CheMPS2
+### 2. Testing libchemps2
 
-To test CheMPS2, start in ```./build```, and run:
+To test libchemps2, start in ```./build```, and run:
 
     > make test
 
@@ -132,7 +132,7 @@ The tests only require a very limited amount of memory (order 10-120 MB).
 
 ### 3. Build PyCheMPS2 with Cython
 
-PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The
+PyCheMPS2, a python inferface to libchemps2, can be built with Cython. The
 installation above generated the file ```./build/setup.py```, in which
 the library and include paths have been set to the ones in the build
 directory. Start in ```./build```, and run:
@@ -172,7 +172,7 @@ preload ```libmkl_rt.so```. On my system, this is done with
     > export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
 
 The python tests do exactly the same thing as the C++ tests above, and
-illustrate the usage of the python interface to CheMPS2. The tests should
+illustrate the usage of the python interface to libchemps2. The tests should
 end with a line stating whether or not they succeeded. They only require
 a very limited amount of memory (order 10-120 MB).
 
@@ -205,7 +205,7 @@ one of the references in CITATIONS.
 Matrix elements from Psi4
 -------------------------
 
-CheMPS2 has a Hamiltonian object which is able to read in matrix elements
+libchemps2 has a Hamiltonian object which is able to read in matrix elements
 from a plugin to [Psi4, Ab initio quantum chemistry](http://www.psicode.org),
 which works on version psi4.0b5 and higher.
 
@@ -225,14 +225,14 @@ Now, replace the file ```mointegrals.cc``` with either:
    permutation symmetry) in binary form with HDF5. See the Doxygen manual for
    more information on CheMPS2::Hamiltonian.
 
-For case 2, CheMPS2 should be installed as described above, and the
+For case 2, libchemps2 should be installed as described above, and the
 ```Makefile``` should be adjusted. Change the line
 
     ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin```
     
 to
 
-    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lCheMPS2```.
+    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lchemps2```.
 
 To compile the plugin, run:
 
@@ -251,7 +251,7 @@ feature, build Psi4 with the plugin option, and then run:
 Now, replace the file ```dmrgci.cc``` with 
 [```psi4plugins/dmrgci.cc```](psi4plugins/dmrgci.cc). For the compilation of
 this plugin, the same instructions as above should be followed (i.e. linking to
-libCheMPS2).
+libchemps2).
 
 Example input files to use the plugin are provided in
 
@@ -271,11 +271,11 @@ DMRG-SCF calculations with PySCF
 
 [PySCF](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
 in which all layers are written or interfaced in python. The package can
-perform DMRG-SCF and DMRG-CI calculations using CheMPS2.
+perform DMRG-SCF and DMRG-CI calculations using PyCheMPS2.
    
 
-List of files in the CheMPS2 library
-------------------------------------
+List of files in libchemps2
+---------------------------
 
 [```CheMPS2/CASSCF.cpp```](CheMPS2/CASSCF.cpp) contains the constructor and
 destructor of the CASSCF class, as well as the functions which allow to
@@ -701,6 +701,6 @@ contains the matrix elements for test8 and test9.
 [```PyCheMPS2/test9.py.in```](PyCheMPS2/test9.py.in) is the Python version of
 [```tests/test9.cpp.in```](tests/test9.cpp.in)
 
-These test files illustrate how to use the CheMPS2 library. The tests only
+These test files illustrate how to use libchemps2. The tests only
 require a very limited amount of memory (order 10-120 MB).
 
