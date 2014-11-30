@@ -134,8 +134,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 </pre></li>
 </ol>
 <h2>Build </h2>
-<h3>1. Build CheMPS2 with CMake</h3>
-<p>CheMPS2 can be built with CMake. The files </p>
+<h3>1. Build libchemps2 with CMake</h3>
+<p>libchemps2 requires BLAS, LAPACK, the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library (GSL)</a>, and the <a href="http://www.hdfgroup.org/HDF5/">Hierarchical Data Format Release 5 (HDF5)</a>. The <a href="http://openmp.org/wp/">Open Multi-Processing (OpenMP)</a> API is used for shared-memory parallelization. libchemps2 can be built with CMake. The files </p>
 <pre class="fragment">./CMakeLists.txt
 ./CheMPS2/CMakeLists.txt
 ./tests/CMakeLists.txt
@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </pre><p>CMake generates makefiles based on the user's specifications: </p>
 <pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 -DCMAKE_INSTALL_PREFIX=option4
-</pre><p>Option1 is the c++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation. Option4 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, the CheMPS2 library is then installed in <code>prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>prefix/include/CheMPS2</code>. If one or more of the required libraries are not found, please use the command </p>
+</pre><p>Option1 is the C++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation. Option4 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>prefix/include/chemps2</code>. If one or more of the required libraries are not found, please use the command </p>
 <pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 -DCMAKE_INSTALL_PREFIX=option4
@@ -159,21 +159,12 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 </pre><p>To install, run: </p>
 <pre class="fragment">&gt; make install
 </pre><p>For non-standard installation directories, please remember to append the library path to <code>LD_LIBRARY_PATH</code> in your .bashrc.</p>
-<h3>2. Testing CheMPS2</h3>
-<p>To test CheMPS2, start in <code>./build</code>, and run: </p>
-<pre class="fragment">&gt; cd tests/
-&gt; ./test1
-&gt; ./test2
-&gt; ./test3
-&gt; ./test4
-&gt; ./test5
-&gt; ./test6
-&gt; ./test7
-&gt; ./test8
-&gt; ./test9
-</pre><p>These c++ tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
+<h3>2. Testing libchemps2</h3>
+<p>To test libchemps2, start in <code>./build</code>, and run: </p>
+<pre class="fragment">&gt; make test
+</pre><p>The tests only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>3. Build PyCheMPS2 with Cython</h3>
-<p>PyCheMPS2, a python inferface to CheMPS2, can be built with Cython. The installation above generated the file <code>./build/setup.py</code>, in which the library and include paths have been set to the ones in the build directory. Start in <code>./build</code>, and run: </p>
+<p>PyCheMPS2, a python inferface to libchemps2, can be built with Cython. The installation above generated the file <code>./build/setup.py</code>, in which the library and include paths have been set to the ones in the build directory. Start in <code>./build</code>, and run: </p>
 <pre class="fragment">&gt; python setup.py build_ext -i
 </pre><p>Compilation of PyCheMPS2 occurs by linking to the C++ library in the build directory. However, when you want to run the tests in the next section, you should first install the C++ library! If you have pulled a newer version of CheMPS2, please remember to (re)install the C++ library first, before using PyCheMPS2!</p>
 <h3>4. Testing PyCheMPS2</h3>
@@ -188,7 +179,11 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 &gt; python test7.py
 &gt; python test8.py
 &gt; python test9.py
-</pre><p>These tests do exactly the same thing as the c++ tests above, and illustrate the usage of the python interface to CheMPS2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
+</pre><p>If you compiled the C++ library with <code>-DMKL=ON</code>, you might get the error </p>
+<pre class="fragment">&gt; Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
+</pre><p>This issue of using Intel's MKL inside python is known and reported. To get the python tests to run, you can set the variable <code>LD_PRELOAD</code> in order to preload <code>libmkl_rt.so</code>. On my system, this is done with </p>
+<pre class="fragment">&gt; export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
+</pre><p>The python tests do exactly the same thing as the C++ tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>5. Doxygen documentation</h3>
 <p>To build and view the Doxygen manual, the documentation flag should have been on: <code>-DBUILD_DOCUMENTATION=ON</code>. Start in <code>./build</code> and run: </p>
 <pre class="fragment">&gt; make doc
@@ -201,7 +196,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p>Doxygen output can be generated, see the section "Build" in <a class="el" href="README_8md_source.html">README.md</a>, or the <a href="http://sebwouters.github.io/CheMPS2/index.html">Doxygen html output</a>.</p>
 <p>For a more concise overview of the concepts and ideas used in CheMPS2, please read the code release paper <a href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry</a>, one of the references in CITATIONS.</p>
 <h2>Matrix elements from Psi4 </h2>
-<p>CheMPS2 has a Hamiltonian object which is able to read in matrix elements from a plugin to <a href="http://www.psicode.org">Psi4, Ab initio quantum chemistry</a>, which works on version psi4.0b5 and higher.</p>
+<p>libchemps2 has a Hamiltonian object which is able to read in matrix elements from a plugin to <a href="http://www.psicode.org">Psi4, Ab initio quantum chemistry</a>, which works on version psi4.0b5 and higher.</p>
 <p>To make use of this feature, build Psi4 with the plugin option, and then run: </p>
 <pre class="fragment">&gt; psi4 --new-plugin mointegrals
 &gt; cd mointegrals
@@ -210,17 +205,17 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <li><a href="psi4plugins/mointegrals.cc_PRINT">```psi4plugins/mointegrals.cc_PRINT```</a> to print the matrix elements as text. Examples of output generated with this plugin can be found in <a href="tests/matrixelements">```tests/matrixelements```</a></li>
 <li><a href="psi4plugins/mointegrals.cc_SAVEHAM">```psi4plugins/mointegrals.cc_SAVEHAM```</a> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5. See the Doxygen manual for more information on <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a>.</li>
 </ol>
-<p>For case 2, CheMPS2 should be installed as described above, and the <code>Makefile</code> should be adjusted. Change the line </p>
+<p>For case 2, libchemps2 should be installed as described above, and the <code>Makefile</code> should be adjusted. Change the line </p>
 <pre class="fragment">```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin```
 </pre><p>to </p>
-<pre class="fragment">```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lCheMPS2```.
+<pre class="fragment">```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lchemps2```.
 </pre><p>To compile the plugin, run: </p>
 <pre class="fragment">&gt; make
 </pre><h2>DMRG-CI calculations with Psi4 </h2>
 <p>DMRG-CI calculations can also be performed with Psi4. To make use of this feature, build Psi4 with the plugin option, and then run: </p>
 <pre class="fragment">&gt; psi4 --new-plugin dmrgci
 &gt; cd dmrgci
-</pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="psi4plugins/dmrgci.cc">```psi4plugins/dmrgci.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (i.e. linking to libCheMPS2).</p>
+</pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="psi4plugins/dmrgci.cc">```psi4plugins/dmrgci.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (i.e. linking to libchemps2).</p>
 <p>Example input files to use the plugin are provided in</p>
 <ol type="1">
 <li><a href="psi4plugins/N2.dat">```psi4plugins/N2.dat```</a></li>
@@ -230,8 +225,8 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <pre class="fragment">&gt; psi4 N2.dat
 &gt; psi4 H2O.dat
 </pre><h2>DMRG-SCF calculations with PySCF </h2>
-<p><a href="https://github.com/sunqm/pyscf">PySCF</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. The package can perform DMRG-SCF and DMRG-CI calculations using CheMPS2.</p>
-<h2>List of files in the CheMPS2 library </h2>
+<p><a href="https://github.com/sunqm/pyscf">PySCF</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. The package can perform DMRG-SCF and DMRG-CI calculations using PyCheMPS2.</p>
+<h2>List of files in libchemps2 </h2>
 <p><a href="CheMPS2/CASSCF.cpp">```CheMPS2/CASSCF.cpp```</a> contains the constructor and destructor of the CASSCF class, as well as the functions which allow to update, get or set its variables.</p>
 <p><a href="CheMPS2/CASSCFdebug.cpp">```CheMPS2/CASSCFdebug.cpp```</a> contains two functions: one for calculating the ROHF energy; and one for fetching FCI coefficients to determine the point group symmetry of certain electronic states of the carbon dimer.</p>
 <p><a href="CheMPS2/CASSCFnewtonraphson.cpp">```CheMPS2/CASSCFnewtonraphson.cpp```</a> contains all DMRG-SCF functions which are specific to the augmented Hessian Newton-Raphson update scheme, including the functions to calculate the gradient and Hessian.</p>
@@ -362,13 +357,13 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="PyCheMPS2/test7.py.in">```PyCheMPS2/test7.py.in```</a> is the Python version of <a href="tests/test7.cpp.in">```tests/test7.cpp.in```</a></p>
 <p><a href="PyCheMPS2/test8.py.in">```PyCheMPS2/test8.py.in```</a> is the Python version of <a href="tests/test8.cpp.in">```tests/test8.cpp.in```</a></p>
 <p><a href="PyCheMPS2/test9.py.in">```PyCheMPS2/test9.py.in```</a> is the Python version of <a href="tests/test9.cpp.in">```tests/test9.cpp.in```</a></p>
-<p>These test files illustrate how to use the CheMPS2 library. The tests only require a very limited amount of memory (order 10-120 MB). </p>
+<p>These test files illustrate how to use libchemps2. The tests only require a very limited amount of memory (order 10-120 MB). </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Nov 24 2014 10:05:27 for CheMPS2 by
+    <li class="footer">Generated on Sat Nov 29 2014 20:29:19 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
