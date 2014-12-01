@@ -14,12 +14,12 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "CheMPS2/Irreps.h"
-#include "CheMPS2/Hamiltonian.h"
-#include "CheMPS2/Problem.h"
-#include "CheMPS2/ConvergenceScheme.h"
-#include "CheMPS2/DMRG.h"
-#include "CheMPS2/Initialize.h"
+#include "chemps2/Irreps.h"
+#include "chemps2/Hamiltonian.h"
+#include "chemps2/Problem.h"
+#include "chemps2/ConvergenceScheme.h"
+#include "chemps2/DMRG.h"
+#include "chemps2/Initialize.h"
 
 using namespace std;
 
