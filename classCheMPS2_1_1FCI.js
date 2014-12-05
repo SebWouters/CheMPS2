@@ -11,6 +11,8 @@ var classCheMPS2_1_1FCI =
     [ "CGOperator", "classCheMPS2_1_1FCI.html#af8496a386028b2eb6ef686817372857c", null ],
     [ "CGSolveSystem", "classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805", null ],
     [ "DensityResponseGF", "classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0", null ],
+    [ "DensityResponseGF_backward", "classCheMPS2_1_1FCI.html#afb36bc580397ad80a7da07988920baf9", null ],
+    [ "DensityResponseGF_forward", "classCheMPS2_1_1FCI.html#acd6a6c72250cd29aa4d98b869aa5d31d", null ],
     [ "DiagHam", "classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144", null ],
     [ "DiagHamSquared", "classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e", null ],
     [ "Fill2RDM", "classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4", null ],
@@ -31,5 +33,7 @@ var classCheMPS2_1_1FCI =
     [ "GSDavidson", "classCheMPS2_1_1FCI.html#a0335191db1dec9127bcad548fa6f1da3", null ],
     [ "HamTimesVec", "classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee", null ],
     [ "LowestEnergyDeterminant", "classCheMPS2_1_1FCI.html#a748644c42be72710e38631e169b642cc", null ],
-    [ "RetardedGF", "classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc", null ]
+    [ "RetardedGF", "classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc", null ],
+    [ "RetardedGF_addition", "classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc", null ],
+    [ "RetardedGF_removal", "classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0", null ]
 ];
