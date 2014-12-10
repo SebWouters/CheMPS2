@@ -147,14 +147,62 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> class. </p>
 <dl class="section author"><dt>Author</dt><dd>Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>June 18, 2013</dd></dl>
-<p>The <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> class provides an implementation of DMRGSCF [Zgid et al., J. Chem. Phys. 128, 144116 (2008)] with as <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> solver the spin-adapted <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> code CheMPS2. For the <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> update, the following implementations are included:<br/>
+<h1><a class="anchor" id="intro"></a>
+Introduction</h1>
+<p>In methods which use a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> solver, this solver can be replaced by <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a>. <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> allows for an efficient extraction of the 2-RDM [CAS1, CAS2]. The 2-RDM of the active space is required in the complete active space self-consistent field (<a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a>) method to compute the gradient and the Hessian with respect to orbital rotations [CAS3]. It is therefore natural to introduce a <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> variant with <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> as active space solver, called DMRG-SCF [CAS2, CAS4, CAS5], which allows to treat static correlation in large active spaces. In CheMPS2, we have implemented the augmented Hessian Newton-Raphson DMRG-SCF method, with exact Hessian [CAS5, CAS6]. It can be called with the function <a class="el" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method. ">CheMPS2::CASSCF::doCASSCFnewtonraphson</a>.</p>
+<h1><a class="anchor" id="origalgo"></a>
+Augmented Hessian Newton-Raphson DMRG-SCF</h1>
+<p>Orbital rotations are represented by orthogonal matrices <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/>. Since orbitals are defined up to a phase factor, one can always choose the orbital gauges so that <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> is special orthogonal: <img class="formulaInl" alt="$\det(\mathbf{U})=+1$" src="form_1.png"/>. <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> can be parametrized by a real-valued skew-symmetric matrix <img class="formulaInl" alt="$\mathbf{X} = -\mathbf{X}^T$" src="form_2.png"/>, see <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">CheMPS2::DMRGSCFunitary</a>. The <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> energy is a function of <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> and hence of <img class="formulaInl" alt="$\mathbf{X}$" src="form_3.png"/>. Up to second order, the energy is given by </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ E(\vec{x}) = E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x}, \]" src="form_4.png"/>
 </p>
-<ul>
-<li>the quadratically convergent Newton-Raphson approach [Siegbahn et al., J. Chem. Phys. 74, 2384 (1981)]</li>
-<li>the augmented Hessian Newton-Raphson approach [Lengsfield, J. Chem. Phys. 73, 382 (1980)]; which is ORCA's prefered choice </li>
-</ul>
+<p> where <img class="formulaInl" alt="$\vec{x}$" src="form_5.png"/> contains the independent variables of <img class="formulaInl" alt="$\mathbf{X}$" src="form_3.png"/>. The variables <img class="formulaInl" alt="$\vec{x}$" src="form_5.png"/> parametrize an additional orbital rotation <img class="formulaInl" alt="$\mathbf{U}_{add} = \exp(\mathbf{X}(\vec{x}))$" src="form_6.png"/> with respect to the current orbitals <img class="formulaInl" alt="$\mathbf{U}(n)$" src="form_7.png"/>. The vector <img class="formulaInl" alt="$\vec{g}$" src="form_8.png"/> is the gradient, and the matrix <img class="formulaInl" alt="$\mathbf{H}$" src="form_9.png"/> the Hessian, for orbital rotations [CAS3]. The minimum of <img class="formulaInl" alt="$E(\vec{x})$" src="form_10.png"/> is found at <img class="formulaInl" alt="$\vec{x} = - \mathbf{H}^{-1} \vec{g}$" src="form_11.png"/>. The additional orbital rotation <img class="formulaInl" alt="$\mathbf{U}_{add}$" src="form_12.png"/> then allows to update the current orbitals <img class="formulaInl" alt="$\mathbf{U}(n)$" src="form_7.png"/> to the new orbitals </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n). \]" src="form_13.png"/>
+</p>
+<p> This updating scheme is called the Newton-Raphson method [CAS3]. If the Hessian is positive definite, these updates are stable. For saddle points in the energy landscape, the Hessian has negative eigenvalues, and these updates can be unstable. It is therefore better to use the augmented Hessian Newton-Raphson method [CAS7]: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \left[ \begin{array}{cc} \mathbf{H} &amp; \vec{g} \\ \vec{g}^T &amp; 0 \end{array} \right] \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right] = \alpha \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right]. \]" src="form_14.png"/>
+</p>
+<p> The eigenvector with smallest algebraic eigenvalue determines a stable update <img class="formulaInl" alt="$\vec{x}$" src="form_5.png"/>, as is well explained in Ref. [CAS7].</p>
+<h1><a class="anchor" id="diis"></a>
+Direct inversion of the iterative subspace (DIIS)</h1>
+<p>When the update norm <img class="formulaInl" alt="$\|\vec{x}\|_2$" src="form_15.png"/> is small enough, the convergence can be accelerated by the direct inversion of the iterative subspace (<a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a>) [CAS5, CAS8, CAS9, CAS10]. For a given set of orbitals <img class="formulaInl" alt="$\mathbf{U}(n)$" src="form_7.png"/>, the update <img class="formulaInl" alt="$\vec{x}(n)$" src="form_16.png"/> is calculated with the augmented Hessian Newton-Rapshon method. This update defines the next set of orbitals: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n). \]" src="form_13.png"/>
+</p>
+<p> In <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a>, the error vector <img class="formulaInl" alt="$\vec{x}(n)$" src="form_16.png"/> and the state vector <img class="formulaInl" alt="$\mathbf{Y}(n+1) = \log(\mathbf{U}(n+1))$" src="form_17.png"/> are added to a list. The error </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ e = \left\| \sum\limits_{i = 1}^{\kappa} c_i \vec{x}(n - \kappa + i) \right\|_2 \]" src="form_18.png"/>
+</p>
+<p> is minimized under the constraint <img class="formulaInl" alt="$\sum_{i} c_i = 1$" src="form_19.png"/>. <img class="formulaInl" alt="$\kappa$" src="form_20.png"/> is the size of the list memory, i.e. the number of retained vectors. The minimization of the error <img class="formulaInl" alt="$e$" src="form_21.png"/> can be performed with Lagrangian calculus: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \left[ \begin{array}{cc} \mathbf{B} &amp; \vec{1} \\ \vec{1}^T &amp; 0 \end{array} \right] \left[ \begin{array}{c} \vec{c} \\ \lambda \end{array} \right] = \left[ \begin{array}{c} \vec{0} \\ 1 \end{array} \right], \]" src="form_22.png"/>
+</p>
+<p> where <img class="formulaInl" alt="$2\lambda$" src="form_23.png"/> is the Lagrangian multiplier and </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \left[\mathbf{B}\right]_{ij} = \vec{x}^T(n - \kappa + i) \vec{x}(n - \kappa + j) = \left[\mathbf{B}\right]_{ji}. \]" src="form_24.png"/>
+</p>
+<p> The new state vector is then defined as </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i). \]" src="form_25.png"/>
+</p>
+<p> In the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> list, <img class="formulaInl" alt="$\mathbf{Y}(n+1)$" src="form_26.png"/> is overwritten with <img class="formulaInl" alt="$\mathbf{Y}_{new}$" src="form_27.png"/>, and the current orbitals are set to <img class="formulaInl" alt="$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})$" src="form_28.png"/>. The new state vector <img class="formulaInl" alt="$\mathbf{Y}_{new}$" src="form_27.png"/> is calculated by the function <a class="el" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors...">CheMPS2::DIIS::calculateParam</a>.</p>
+<h1><a class="anchor" id="biblio"></a>
+References</h1>
+<p>[CAS1] D. Zgid and M. Nooijen, Journal of Chemical Physics 128, 144115 (2008). <a href="http://dx.doi.org/10.1063/1.2883980">http://dx.doi.org/10.1063/1.2883980</a> <br/>
+[CAS2] D. Ghosh, J. Hachmann, T. Yanai and G.K.-L. Chan, Journal of Chemical Physics 128, 144117 (2008). <a href="http://dx.doi.org/10.1063/1.2883976">http://dx.doi.org/10.1063/1.2883976</a> <br/>
+[CAS3] P.E.M. Siegbahn, J. Almlof, A. Heiberg and B.O. Roos, Journal of Chemical Physics 74, 2384-2396 (1981). <a href="http://dx.doi.org/10.1063/1.441359">http://dx.doi.org/10.1063/1.441359</a> <br/>
+[CAS4] D. Zgid and M. Nooijen, Journal of Chemical Physics 128, 144116 (2008). <a href="http://dx.doi.org/10.1063/1.2883981">http://dx.doi.org/10.1063/1.2883981</a> <br/>
+[CAS5] T. Yanai, Y. Kurashige, D. Ghosh and G.K.-L. Chan, International Journal of Quantum Chemistry 109, 2178-2190 (2009). <a href="http://dx.doi.org/10.1002/qua.22099">http://dx.doi.org/10.1002/qua.22099</a> <br/>
+[CAS6] S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, Computer Physics Communications 185, 1501-1514 (2014). <a href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">http://dx.doi.org/10.1016/j.cpc.2014.01.019</a> <br/>
+[CAS7] A. Banerjee, N. Adams, J. Simons and R. Shepard, Journal of Physical Chemistry 89, 52-57 (1985). <a href="http://dx.doi.org/10.1021/j100247a015">http://dx.doi.org/10.1021/j100247a015</a> <br/>
+[CAS8] P. Pulay, Chemical Physics Letters 73, 393-398 (1980). <a href="http://dx.doi.org/10.1016/0009-2614(80)80396-4">http://dx.doi.org/10.1016/0009-2614(80)80396-4</a> <br/>
+[CAS9] C.D. Sherrill, Programming <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a>, <a href="http://vergil.chemistry.gatech.edu/notes/diis/node3.html">http://vergil.chemistry.gatech.edu/notes/diis/node3.html</a> (2000). <br/>
+[CAS10] T. Rohwedder and R. Schneider, Journal of Mathematical Chemistry 49, 1889-1914 (2011). <a href="http://dx.doi.org/10.1007/s10910-011-9863-y">http://dx.doi.org/10.1007/s10910-011-9863-y</a> <br/>
+</p>
 
-<p>Definition at line <a class="el" href="CASSCF_8h_source.html#l00044">44</a> of file <a class="el" href="CASSCF_8h_source.html">CASSCF.h</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8h_source.html#l00097">97</a> of file <a class="el" href="CASSCF_8h_source.html">CASSCF.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aee2071ba5914ed3a6e7120e6d1656144"></a>
 <div class="memitem">
@@ -402,7 +450,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a></li>
-    <li class="footer">Generated on Thu Dec 4 2014 22:42:01 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 10 2014 00:52:21 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

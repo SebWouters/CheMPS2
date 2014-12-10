@@ -131,80 +131,80 @@ $(document).ready(function(){initNavTree('DMRGSCFunitary_8h_source.html','');});
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;DIIS.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">namespace </span>CheMPS2{</div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRGSCFunitary.html">   34</a></span>&#160;   <span class="keyword">class </span><a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a>{</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;      </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36">DMRGSCFunitary</a>(<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandlerIn);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;         </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;         <span class="keyword">virtual</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#aceba497a828617733e83f00fc2766163">~DMRGSCFunitary</a>();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;         </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4">getNumVariablesX</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;         </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#ae302e88ca4b9f938e8bb3fc0f3b39409">getFirstIndex</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> linearindex) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;         </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c">getSecondIndex</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> linearindex) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;         </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;         <span class="keywordtype">double</span> * <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b">getBlock</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;         </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630">updateUnitary</a>(<span class="keywordtype">double</span> * workmem1, <span class="keywordtype">double</span> * workmem2, <span class="keywordtype">double</span> * vector, <span class="keyword">const</span> <span class="keywordtype">bool</span> multiply, <span class="keyword">const</span> <span class="keywordtype">bool</span> compact);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;         </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b">rotateActiveSpaceVectors</a>(<span class="keywordtype">double</span> * eigenvecs, <span class="keywordtype">double</span> * work);</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRGSCFunitary.html">   69</a></span>&#160;   <span class="keyword">class </span><a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a>{</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36">DMRGSCFunitary</a>(<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandlerIn);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;         </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a">CheckDeviationFromUnitary</a>(<span class="keywordtype">double</span> * work) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;         </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100">getLog</a>(<span class="keywordtype">double</span> * vector, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;         </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22">BCH</a>(<span class="keywordtype">double</span> * Xprev, <span class="keywordtype">double</span> * step, <span class="keywordtype">double</span> * Xnew, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;         </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799">makeSureAllBlocksDetOne</a>(<span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2);</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06">saveU</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a867a52da2ca19a581d9c8476fab61246">loadU</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;         </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb">deleteStoredUnitary</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;         </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;         <span class="comment">//Externally created and destroyed index handler</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;         </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;         <span class="comment">//Number of variables in the x-matrix</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;         <span class="keywordtype">int</span> x_linearlength;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;         </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;         <span class="comment">//Helper arrays to jump from linear x-matrix index to orbital indices and back</span></div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;         <span class="keywordtype">int</span> * x_firstindex;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;         <span class="keywordtype">int</span> * x_secondindex;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;         </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;         <span class="comment">//The unitary matrix (e^x * previous unitary): unitary[irrep][row + size_irrep * col]</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;         <span class="keywordtype">double</span> ** unitary;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;         </div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;         <span class="comment">// Find the linear index corresponding to p and q</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment"></span>         <span class="keywordtype">int</span> getLinearIndex(<span class="keyword">const</span> <span class="keywordtype">int</span> p_index, <span class="keyword">const</span> <span class="keywordtype">int</span> q_index) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;         </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;         <span class="comment">// Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;         <span class="keywordtype">void</span> buildSkewSymmX(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep, <span class="keywordtype">double</span> * result, <span class="keywordtype">double</span> * Xelem, <span class="keyword">const</span> <span class="keywordtype">bool</span> compact) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;         </div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;   };</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;         <span class="keyword">virtual</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#aceba497a828617733e83f00fc2766163">~DMRGSCFunitary</a>();</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4">getNumVariablesX</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#ae302e88ca4b9f938e8bb3fc0f3b39409">getFirstIndex</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> linearindex) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;         </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c">getSecondIndex</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> linearindex) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;         </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;         <span class="keywordtype">double</span> * <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b">getBlock</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630">updateUnitary</a>(<span class="keywordtype">double</span> * workmem1, <span class="keywordtype">double</span> * workmem2, <span class="keywordtype">double</span> * vector, <span class="keyword">const</span> <span class="keywordtype">bool</span> multiply, <span class="keyword">const</span> <span class="keywordtype">bool</span> compact);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         </div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b">rotateActiveSpaceVectors</a>(<span class="keywordtype">double</span> * eigenvecs, <span class="keywordtype">double</span> * work);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;         </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a">CheckDeviationFromUnitary</a>(<span class="keywordtype">double</span> * work) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;         </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100">getLog</a>(<span class="keywordtype">double</span> * vector, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;         </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22">BCH</a>(<span class="keywordtype">double</span> * Xprev, <span class="keywordtype">double</span> * step, <span class="keywordtype">double</span> * Xnew, <span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;         </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799">makeSureAllBlocksDetOne</a>(<span class="keywordtype">double</span> * temp1, <span class="keywordtype">double</span> * temp2);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;         </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06">saveU</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;         </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a867a52da2ca19a581d9c8476fab61246">loadU</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;         </div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb">deleteStoredUnitary</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> filename=DMRGSCF_unitaryStorageName) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;         </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;      <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;         <span class="comment">//Externally created and destroyed index handler</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;         </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;         <span class="comment">//Number of variables in the x-matrix</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;         <span class="keywordtype">int</span> x_linearlength;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;         </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;         <span class="comment">//Helper arrays to jump from linear x-matrix index to orbital indices and back</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;         <span class="keywordtype">int</span> * x_firstindex;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;         <span class="keywordtype">int</span> * x_secondindex;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;         </div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;         <span class="comment">//The unitary matrix (e^x * previous unitary): unitary[irrep][row + size_irrep * col]</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;         <span class="keywordtype">double</span> ** unitary;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;         </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;         <span class="comment">// Find the linear index corresponding to p and q</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment"></span>         <span class="keywordtype">int</span> getLinearIndex(<span class="keyword">const</span> <span class="keywordtype">int</span> p_index, <span class="keyword">const</span> <span class="keywordtype">int</span> q_index) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;         </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;         <span class="comment">// Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;         <span class="keywordtype">void</span> buildSkewSymmX(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep, <span class="keywordtype">double</span> * result, <span class="keywordtype">double</span> * Xelem, <span class="keyword">const</span> <span class="keywordtype">bool</span> compact) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;         </div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;   };</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFindices_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFindices.html">CheMPS2::DMRGSCFindices</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFindices_8h_source.html#l00032">DMRGSCFindices.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_a11ad63632a4a368db38a383366847c06"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06">CheMPS2::DMRGSCFunitary::saveU</a></div><div class="ttdeci">void saveU(const string filename=DMRGSCF_unitaryStorageName) const </div><div class="ttdoc">Save the unitary to disk. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00660">DMRGSCFunitary.cpp:660</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_a2fb26346f9c7a15af27b459f7d5b0d3b"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b">CheMPS2::DMRGSCFunitary::rotateActiveSpaceVectors</a></div><div class="ttdeci">void rotateActiveSpaceVectors(double *eigenvecs, double *work)</div><div class="ttdoc">Rotate the unitary matrix. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00279">DMRGSCFunitary.cpp:279</a></div></div>
@@ -220,7 +220,7 @@ $(document).ready(function(){initNavTree('DMRGSCFunitary_8h_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_a0b7e14e83dd48b97dcd791509bddc630"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630">CheMPS2::DMRGSCFunitary::updateUnitary</a></div><div class="ttdeci">void updateUnitary(double *workmem1, double *workmem2, double *vector, const bool multiply, const bool compact)</div><div class="ttdoc">Update the unitary transformation. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00188">DMRGSCFunitary.cpp:188</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_ad4dd547f78eb8b9a3548c51e86177f22"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#ad4dd547f78eb8b9a3548c51e86177f22">CheMPS2::DMRGSCFunitary::BCH</a></div><div class="ttdeci">void BCH(double *Xprev, double *step, double *Xnew, double *temp1, double *temp2) const </div><div class="ttdoc">Obtain the logarithm of the current unitary matrix based on the BCH formula. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00467">DMRGSCFunitary.cpp:467</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_a7ca4dead16809cd2a896c1a05b92fc0b"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b">CheMPS2::DMRGSCFunitary::getBlock</a></div><div class="ttdeci">double * getBlock(const int irrep)</div><div class="ttdoc">Get the unitary rotation for block irrep. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00123">DMRGSCFunitary.cpp:123</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html">CheMPS2::DMRGSCFunitary</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8h_source.html#l00034">DMRGSCFunitary.h:34</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html">CheMPS2::DMRGSCFunitary</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8h_source.html#l00069">DMRGSCFunitary.h:69</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFunitary_html_a17f232492ed870c91cca434a6fc2300c"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c">CheMPS2::DMRGSCFunitary::getSecondIndex</a></div><div class="ttdeci">int getSecondIndex(const int linearindex) const </div><div class="ttdoc">Get the second Hamiltonian index corresponding to linearindex. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFunitary_8cpp_source.html#l00121">DMRGSCFunitary.cpp:121</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -228,7 +228,7 @@ $(document).ready(function(){initNavTree('DMRGSCFunitary_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><b>DMRGSCFunitary.h</b></li>
-    <li class="footer">Generated on Thu Dec 4 2014 22:42:01 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 10 2014 00:52:20 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

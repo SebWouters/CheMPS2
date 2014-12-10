@@ -1996,7 +1996,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l01890"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2"> 1890</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2">CheMPS2::FCI::CGCoreSolver</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> alpha, <span class="keyword">const</span> <span class="keywordtype">double</span> beta, <span class="keyword">const</span> <span class="keywordtype">double</span> eta, <span class="keywordtype">double</span> * precon, <span class="keywordtype">double</span> * Sol, <span class="keywordtype">double</span> * RESID, <span class="keywordtype">double</span> * PVEC, <span class="keywordtype">double</span> * OxPVEC, <span class="keywordtype">double</span> * temp, <span class="keywordtype">double</span> * temp2)<span class="keyword"> const</span>{</div>
 <div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;</div>
 <div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> vecLength = getVecLength( 0 );</div>
-<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CGRESIDUALTHRESHOLD = 10.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CGRESIDUALTHRESHOLD = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );</div>
 <div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;   <span class="keywordflow">if</span> ( FCIverbose&gt;1 ){ cout &lt;&lt; <span class="stringliteral">&quot;FCI::CGCoreSolver : The residual norm for convergence = &quot;</span> &lt;&lt; CGRESIDUALTHRESHOLD &lt;&lt; endl; }</div>
 <div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;</div>
 <div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;   <span class="comment">/*</span></div>
@@ -2363,7 +2363,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>FCI.cpp</b></li>
-    <li class="footer">Generated on Thu Dec 4 2014 22:42:01 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 10 2014 00:52:20 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

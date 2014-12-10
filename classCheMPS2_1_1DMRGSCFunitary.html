@@ -166,9 +166,42 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> class. </p>
 <dl class="section author"><dt>Author</dt><dd>Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>July 11, 2014</dd></dl>
-<p>The <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> class is a storage and manipulation class for the DMRGSCF unitary matrix. This matrix is blockdiagonal in the irreducible representations, and is formed by stepwise multiplying in new unitary rotations due to the Newton-Raphson algorithm. </p>
+<p>The <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> class is a storage and manipulation class for the DMRGSCF orthogonal orbital rotation matrix. This matrix is blockdiagonal in the irreducible representations, and is formed by stepwise multiplying in new unitary rotations due to the augmented Hessian Newton-Raphson algorithm, see <a class="el" href="classCheMPS2_1_1CASSCF.html">CheMPS2::CASSCF</a>.</p>
+<h1><a class="anchor" id="buildexp"></a>
+Exponential of a skew-symmetric matrix</h1>
+<p>The exponential of a real-valued skew-symmetric matrix <img class="formulaInl" alt="$\mathbf{X} = -\mathbf{X}^T$" src="form_2.png"/> is an orthogonal matrix <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/>: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{U}^T \mathbf{U} = \exp(\mathbf{X}^T) \exp(\mathbf{X}) = \exp(- \mathbf{X}) \exp(\mathbf{X}) = \mathbf{I}. \]" src="form_61.png"/>
+</p>
+<p> A real-valued skew-symmetric matrix <img class="formulaInl" alt="$\mathbf{X}$" src="form_3.png"/> has purely imaginary eigenvalues, which come in complex conjugate pairs <img class="formulaInl" alt="$(i \lambda, -i\lambda)$" src="form_62.png"/>. For matrices of odd dimension, there should hence always be one eigenvalue <img class="formulaInl" alt="$0$" src="form_63.png"/>. <img class="formulaInl" alt="$\mathbf{B} = \mathbf{X} \mathbf{X}$" src="form_64.png"/> is then a symmetric matrix with nonpositive real-valued eigenvalues <img class="formulaInl" alt="$-\lambda^2$" src="form_65.png"/>. Nonzero eigenvalues of <img class="formulaInl" alt="$\mathbf{B}$" src="form_66.png"/> occur twice. The eigenvectors <img class="formulaInl" alt="$\mathbf{V}$" src="form_67.png"/> of <img class="formulaInl" alt="$\mathbf{B} = \mathbf{V} diag(-\lambda^2) \mathbf{V}^T$" src="form_68.png"/> allow to make <img class="formulaInl" alt="$\mathbf{X}$" src="form_3.png"/> block-diagonal. <img class="formulaInl" alt="$\mathbf{C} = \mathbf{V}^T \mathbf{X} \mathbf{V}$" src="form_69.png"/> is skew-symmetric. Moreover, <img class="formulaInl" alt="$\mathbf{C}\mathbf{C} = \mathbf{V}^T \mathbf{B} \mathbf{V}$" src="form_70.png"/> is diagonal: <img class="formulaInl" alt="$\mathbf{C}\mathbf{C} = diag(-\lambda^2)$" src="form_71.png"/>. <img class="formulaInl" alt="$\mathbf{C}$" src="form_72.png"/> is hence block-diagonal with <img class="formulaInl" alt="$1 \times 1$" src="form_73.png"/> blocks <img class="formulaInl" alt="$\left[0\right]$" src="form_74.png"/> and <img class="formulaInl" alt="$2 \times 2$" src="form_75.png"/> blocks </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \left[ \begin{array}{cc} 0 &amp; \lambda \\ -\lambda &amp; 0 \end{array} \right]. \]" src="form_76.png"/>
+</p>
+<p> The exponential of the <img class="formulaInl" alt="$1 \times 1$" src="form_73.png"/> block <img class="formulaInl" alt="$\left[0\right]$" src="form_74.png"/> is <img class="formulaInl" alt="$\left[1\right]$" src="form_77.png"/>, and the exponential of the <img class="formulaInl" alt="$2 \times 2$" src="form_75.png"/> block is </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \exp \left[ \begin{array}{cc} 0 &amp; \lambda \\ -\lambda &amp; 0 \end{array} \right] = \left[ \begin{array}{cc} \cos(\lambda) &amp; \sin(\lambda) \\ -\sin(\lambda) &amp; \cos(\lambda) \end{array} \right]. \]" src="form_78.png"/>
+</p>
+<p> The matrix <img class="formulaInl" alt="$\exp(\mathbf{C})$" src="form_79.png"/> can hence be easily calculated blockwise. The exponential of <img class="formulaInl" alt="$\mathbf{X}$" src="form_3.png"/> is then obtained as <img class="formulaInl" alt="$\exp(\mathbf{X}) = \mathbf{V} \exp(\mathbf{C}) \mathbf{V}^T$" src="form_80.png"/>. It is calculated by the function <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. ">CheMPS2::DMRGSCFunitary::updateUnitary</a>.</p>
+<h1><a class="anchor" id="buildlog"></a>
+Logarithm of a special orthogonal matrix</h1>
+<p>The reverse problem of finding a (nonunique) real-valued logarithm of a special orthogonal matrix <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> can be performed similarly. Since <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> is orthogonal (and hence norm-preserving), its eigenvalues all have norm 1: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{U} = \mathbf{V}_{U} diag(e^{i \theta}) \mathbf{V}_{U}^{\dagger} = \mathbf{V}_{U}^* diag(e^{-i \theta}) \mathbf{V}_{U}^{T}, \]" src="form_81.png"/>
+</p>
+ <p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \mathbf{U}^T = \mathbf{V}_{U}^* diag(e^{i \theta}) \mathbf{V}_{U}^{T} = \mathbf{V}_{U} diag(e^{-i \theta}) \mathbf{V}_{U}^{\dagger}. \]" src="form_82.png"/>
+</p>
+<p> For the second equalities, complex conjugation of the real-valued matrices <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> and <img class="formulaInl" alt="$\mathbf{U}^T$" src="form_83.png"/> is used. The eigenvalues of <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> hence come in complex conjugate pairs <img class="formulaInl" alt="$(e^{i \theta}, e^{-i \theta})$" src="form_84.png"/>. Consider the symmetric matrix <img class="formulaInl" alt="$ \mathbf{S} = \mathbf{U} + \mathbf{U}^T = \mathbf{V}_{U} diag(2\cos(\theta) ) \mathbf{V}_{U}^{\dagger} $" src="form_85.png"/>. If <img class="formulaInl" alt="$\cos(\theta) \neq \pm 1$" src="form_86.png"/>, the eigenvalue <img class="formulaInl" alt="$2\cos(\theta)$" src="form_87.png"/> occurs twice. For matrices of odd dimension <img class="formulaInl" alt="$\cos(\theta)=+1$" src="form_88.png"/> always occurs an odd number of times. Construct the symmetric matrix <img class="formulaInl" alt="$\mathbf{S}$" src="form_89.png"/> and diagonalize it (real-valued) as <img class="formulaInl" alt="$\mathbf{S} = \mathbf{V}_{S} diag(2\cos(\theta)) \mathbf{V}_{S}^T$" src="form_90.png"/>. The matrix <img class="formulaInl" alt="$\mathbf{D} = \mathbf{V}_{S}^T \mathbf{U} \mathbf{V}_{S}$" src="form_91.png"/> is also a special orthogonal matrix with <img class="formulaInl" alt="$1 \times 1$" src="form_73.png"/> blocks <img class="formulaInl" alt="$\left[ \pm 1 \right]$" src="form_92.png"/> and <img class="formulaInl" alt="$2 \times 2$" src="form_75.png"/> blocks </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \left[ \begin{array}{cc} \cos(\theta) &amp; \sin(\theta) \\ -\sin(\theta) &amp; \cos(\theta) \end{array} \right]. \]" src="form_93.png"/>
+</p>
+<p> Because we consider special orthogonal matrices, the <img class="formulaInl" alt="$1 \times 1$" src="form_73.png"/> blocks <img class="formulaInl" alt="$\left[ -1 \right]$" src="form_94.png"/> always occur an even number of times, and they can hence be considered as a special case of the <img class="formulaInl" alt="$2 \times 2$" src="form_75.png"/> blocks. If we choose the branchcut for the logarithm on the negative real axis, the logarithm of the <img class="formulaInl" alt="$1 \times 1$" src="form_73.png"/> block <img class="formulaInl" alt="$\left[ 1 \right]$" src="form_95.png"/> is <img class="formulaInl" alt="$\left[ 0 \right]$" src="form_96.png"/> and the logarithm of the <img class="formulaInl" alt="$2\times 2$" src="form_97.png"/> block is </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ \log \left[ \begin{array}{cc} \cos(\theta) &amp; \sin(\theta) \\ -\sin(\theta) &amp; \cos(\theta) \end{array} \right] = \left[ \begin{array}{cc} 0 &amp; \theta \\ -\theta &amp; 0 \end{array} \right], \]" src="form_98.png"/>
+</p>
+<p> with <img class="formulaInl" alt="$\theta \in \left[ -\pi, \pi \right]$" src="form_99.png"/>. The matrix <img class="formulaInl" alt="$\log(\mathbf{D})$" src="form_100.png"/> can hence be easily calculated blockwise. The logarithm of <img class="formulaInl" alt="$\mathbf{U}$" src="form_0.png"/> is then obtained as <img class="formulaInl" alt="$\log(\mathbf{U}) = \mathbf{V}_{S} \log(\mathbf{D}) \mathbf{V}_{S}^T$" src="form_101.png"/>. It is calculated by the function <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. ">CheMPS2::DMRGSCFunitary::getLog</a>. </p>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8h_source.html#l00034">34</a> of file <a class="el" href="DMRGSCFunitary_8h_source.html">DMRGSCFunitary.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8h_source.html#l00069">69</a> of file <a class="el" href="DMRGSCFunitary_8h_source.html">DMRGSCFunitary.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="abb04513af627a6fa3173810faee29a36"></a>
 <div class="memitem">
@@ -778,7 +811,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a></li>
-    <li class="footer">Generated on Thu Dec 4 2014 22:42:02 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 10 2014 00:52:21 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
