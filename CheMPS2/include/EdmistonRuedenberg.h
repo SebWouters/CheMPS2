@@ -45,7 +45,7 @@ namespace CheMPS2{
     \f]
     in order to obtain localized orthonormal orbitals [LOC4]. When the spatial extent of an orbital is small, its self-repulsion will indeed be high. CheMPS2 obtains localized orbitals (per irrep) with an augmented Hessian Newton-Raphson maximization of \f$I\f$, which can be called with the function CheMPS2::EdmistonRuedenberg::Optimize.
     
-    The orbitals which maximize the cost function \f$ I = \sum\limits_i v_{ii;ii} \f$ can be parametrized with an orthogonal matrix \f$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))\f$ (see CheMPS2::DMRGSCFunitary):
+    The orbitals which maximize the cost function \f$ I = \sum\limits_i v_{ii;ii} \f$ can be parametrized with an orthogonal matrix \f$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))\f$ (see CheMPS2::CASSCF):
     \f[
     I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}.
     \f]

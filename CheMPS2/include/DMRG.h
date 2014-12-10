@@ -50,7 +50,20 @@ namespace CheMPS2{
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date July 31, 2013
     
-    The DMRG class solves the Problem with its given parameters. A fully SU(2) symmetric MPS wavefunction is variationally optimized in a two-site sweep algorithm. When the solution has been reached, the converged energy and spin contracted 2DMs can be accessed.*/
+    The DMRG class solves the Problem with its given parameters. A fully SU(2) symmetric MPS wavefunction is variationally optimized in a two-site sweep algorithm. When the solution has been reached, the converged energy and spin contracted 2DMs can be accessed. For more information, please take a look at
+    
+    S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, \n
+    CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry, \n
+    Computer Physics Communications 185, 1501-1514 (2014) \n
+    http://dx.doi.org/10.1016/j.cpc.2014.01.019 \n
+    http://arxiv.org/abs/1312.2415
+    
+    S. Wouters and D. Van Neck, \n
+    The density matrix renormalization group for ab initio quantum chemistry, \n
+    European Physical Journal D 68, 272 (2014) \n
+    http://dx.doi.org/10.1140/epjd/e2014-50500-1 \n
+    http://arxiv.org/abs/1407.2040
+    */
    class DMRG{
 
       public:
