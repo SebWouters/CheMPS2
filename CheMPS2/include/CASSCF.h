@@ -79,7 +79,7 @@ namespace CheMPS2{
     \f[
     \mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i).
     \f]
-    In the DIIS list, \f$\mathbf{Y}(n+1)\f$ is overwritten with \f$\mathbf{Y}_{new}\f$, and the current orbitals are set to \f$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})\f$. The new state vector \f$\mathbf{Y}_{new}\f$ is calculated by the function CheMPS2::DIIS::calculateParam.
+    The new state vector \f$\mathbf{Y}_{new}\f$ is calculated by the function CheMPS2::DIIS::calculateParam. The current orbitals are then set to \f$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})\f$.
     
     \section biblio References
 
