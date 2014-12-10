@@ -1890,7 +1890,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const double eta, double * precon, double * Sol, double * RESID, double * PVEC, double * OxPVEC, double * temp, double * temp2) const{
 
    const unsigned long long vecLength = getVecLength( 0 );
-   const double CGRESIDUALTHRESHOLD = 10.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
+   const double CGRESIDUALTHRESHOLD = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
    if ( FCIverbose>1 ){ cout << "FCI::CGCoreSolver : The residual norm for convergence = " << CGRESIDUALTHRESHOLD << endl; }
 
    /*

@@ -29,7 +29,77 @@ namespace CheMPS2{
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date August 14, 2014
     
-    The EdmistonRuedenberg class localizes the orbitals of the active space based on the maximalization of \f$ O = \sum_i V_{ii;ii} \f$.
+    \section introEdRued Introduction
+    
+    DMRG is not invariant with respect to orbital choice and ordering [LOC1]. An MPS introduces an artificial correlation length. Highly correlated orbitals should be placed close to each other for optimal DMRG performance. The correlation between localized orbitals in extended molecules decreases with increasing spatial separation. The exchange matrix directly reflects orbital overlap and separation. Minimizing its bandwidth yields a good ordering for extended molecules [LOC2, LOC3].
+    
+    \section locEdRued Localization
+    
+    Physics notation is assumed for the two-body matrix elements (the electron repulsion integrals with eightfold permutation symmetry):
+    \f[
+    v_{ij;kl} = \left( i(\vec{r}_1) j(\vec{r}_2) \left| \frac{1}{\mid \vec{r}_1 - \vec{r}_2 \mid} \right| k(\vec{r}_1) l(\vec{r}_2) \right).
+    \f]
+    Edmiston and Ruedenberg proposed to maximize the cost function
+    \f[
+    I = \sum\limits_i v_{ii;ii}
+    \f]
+    in order to obtain localized orthonormal orbitals [LOC4]. When the spatial extent of an orbital is small, its self-repulsion will indeed be high. CheMPS2 obtains localized orbitals (per irrep) with an augmented Hessian Newton-Raphson maximization of \f$I\f$, which can be called with the function CheMPS2::EdmistonRuedenberg::Optimize.
+    
+    The orbitals which maximize the cost function \f$ I = \sum\limits_i v_{ii;ii} \f$ can be parametrized with an orthogonal matrix \f$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))\f$ (see CheMPS2::DMRGSCFunitary):
+    \f[
+    I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}.
+    \f]
+    The following derivatives from Ref. [LOC5] are useful:
+    \f[
+    \left[ \frac{\partial \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq}} \right]_0 = \delta_{p \alpha} \delta_{q \beta} - \delta_{q \alpha} \delta_{p \beta},
+    \f]
+    \f{eqnarray*}{
+    2 \left[ \frac{\partial^2 \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{qr} (\delta_{p \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{p \beta} ) \\ & - & \delta_{pr} (\delta_{q \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{q \beta} ) \\ & - & \delta_{qs} (\delta_{p \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{p \beta} ) \\ & + & \delta_{ps} (\delta_{q \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{q \beta} ),
+    \f}
+    in which \f$x_{pq}\f$ is the element in \f$\vec{x}\f$ which corresponds to \f$\left[ \mathbf{X} \right]_{pq}\f$. Keeping the eightfold permutation symmetry of \f$v_{ij;kl}\f$ in mind, the gradient of \f$I\f$ with respect to orbital rotations is
+    \f[
+    \left[ \frac{\partial I}{\partial x_{pq}} \right]_0 = 4 (v_{pp;pq} - v_{qq;qp}),
+    \f]
+    and the Hessian
+    \f{eqnarray*}{
+    \left[ \frac{\partial^2 I}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{pr} (8v_{pp;qs} + 4v_{pq;ps} - 2v_{qq;qs} - 2v_{ss;sq}) \\ & + & \delta_{qs} (8v_{qq;pr} + 4v_{qp;qr} - 2v_{pp;pr} - 2v_{rr;rp}) \\ & - & \delta_{ps} (8v_{pp;qr} + 4v_{pq;pr} - 2v_{qq;qr} - 2v_{rr;rq})\\ & - & \delta_{qr} (8v_{qq;ps} + 4v_{qp;qs} - 2v_{pp;ps} - 2v_{ss;sp}).
+    \f}
+    
+    \section fiedlerEdRued Minimizing the bandwidth of the exchange matrix
+
+    Once localized orbitals are obtained, they can be ordered so that the bandwidth of the exchange matrix \f$\mathbf{K}\f$ is minimal. This matrix has only nonnegative entries [LOC6]:
+    \f[
+    \left[ \mathbf{K} \right]_{ij} = v_{ij;ji} \geq 0.
+    \f]
+    A fast approximate bandwidth minimization is obtained by the so-called Fiedler vector [LOC7, LOC8, LOC9, LOC10]. Consider the minimization of the cost function
+    \f[
+    F(\vec{z}) ~ = ~ \frac{1}{2} \sum\limits_{k \neq l} \left[ \mathbf{K} \right]_{kl} (z_k - z_l)^2 ~ \geq 0,
+    \f]
+    where the (continuous) variable \f$z_k\f$ denotes the optimal position of orbital \f$k\f$. In order to fix translational invariance and normalization of the solution, the constraints \f$\sum_i z_i = 0\f$ and \f$\vec{z}^T \vec{z} = 1\f$ are imposed. The cost function can be rewritten as
+    \f[
+    F(\vec{z}) ~ = ~ \vec{z}^T \mathbf{L} \vec{z} ~ \geq 0,
+    \f]
+    with the symmetric and positive semidefinite Laplacian \f$\mathbf{L}\f$:
+    \f[
+    \left[ \mathbf{L} \right]_{k \neq l} = - \left[ \mathbf{K} \right]_{kl},
+    \f]
+    \f[
+    \left[ \mathbf{L} \right]_{k k} = \sum\limits_{m \neq k} \left[ \mathbf{K} \right]_{km}.
+    \f]
+    The constant vector \f$\vec{1}\f$ is an eigenvector of \f$\mathbf{L}\f$ with eigenvalue 0, which is discarded due to the translational invariance constraint. When the exchange matrix \f$\mathbf{K}\f$ is not block-diagonal, all other eigenvalues are positive. The eigenvector with smallest nonzero eigenvalue is the Fiedler vector, the solution to the constrained minimization of \f$F(\vec{z})\f$ [LOC7, LOC8, LOC9, LOC10]. When the indices of the orbitals are permuted so that they are ordered according to the continuous variables in the Fiedler vector, a fast approximate bandwidth minimization of the exchange matrix \f$\mathbf{K}\f$ is performed. CheMPS2 orders the localized orbitals according to the Fiedler vector of the exchange matrix, which is performed in the function CheMPS2::EdmistonRuedenberg::FiedlerExchange.
+
+    \section biblioEdRued References
+    
+    [LOC1]  S. Wouters and D. Van Neck, European Physical Journal D 68, 272 (2014). http://dx.doi.org/10.1140/epjd/e2014-50500-1 \n
+    [LOC2]  W. Mizukami, Y. Kurashige and T. Yanai, Journal of Chemical Theory and Computation 9, 401-407 (2013). http://dx.doi.org/10.1021/ct3008974 \n
+    [LOC3]  N. Nakatani and G.K.-L. Chan, Journal of Chemical Physics 138, 134113 (2013). http://dx.doi.org/10.1063/1.4798639 \n
+    [LOC4]  C. Edmiston and K. Ruedenberg, Reviews of Modern Physics 35, 457-464 (1963). http://dx.doi.org/10.1103/RevModPhys.35.457 \n
+    [LOC5]  P.E.M. Siegbahn, J. Almlof, A. Heiberg and B.O. Roos, Journal of Chemical Physics 74, 2384-2396 (1981). http://dx.doi.org/10.1063/1.441359 \n
+    [LOC6]  A. Auerbach, Interacting Electrons and Quantum Magnetism, Springer, Heidelberg, 1994. \n
+    [LOC7]  M. Fiedler, Czechoslovak Mathematical Journal 23, 298-305 (1973). http://dml.cz/dmlcz/101168 \n
+    [LOC8]  M. Fiedler, Czechoslovak Mathematical Journal 25, 619-633 (1975). http://dml.cz/dmlcz/101357 \n
+    [LOC9]  G. Barcza, O. Legeza, K. H. Marti, M. Reiher, Physical Review A 83, 012508 (2011). http://dx.doi.org/10.1103/PhysRevA.83.012508 \n
+    [LOC10] M.W. Berry, Fiedler ordering, http://web.eecs.utk.edu/~mberry/order/node9.html (1996).
 */
    class EdmistonRuedenberg{
 

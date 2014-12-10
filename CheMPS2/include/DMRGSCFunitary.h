@@ -29,7 +29,42 @@ namespace CheMPS2{
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date July 11, 2014
     
-    The DMRGSCFunitary class is a storage and manipulation class for the DMRGSCF unitary matrix. This matrix is blockdiagonal in the irreducible representations, and is formed by stepwise multiplying in new unitary rotations due to the Newton-Raphson algorithm.
+    The DMRGSCFunitary class is a storage and manipulation class for the DMRGSCF orthogonal orbital rotation matrix. This matrix is blockdiagonal in the irreducible representations, and is formed by stepwise multiplying in new unitary rotations due to the augmented Hessian Newton-Raphson algorithm, see CheMPS2::CASSCF.
+    
+    \section buildexp Exponential of a skew-symmetric matrix
+    
+    The exponential of a real-valued skew-symmetric matrix \f$\mathbf{X} = -\mathbf{X}^T\f$ is an orthogonal matrix \f$\mathbf{U}\f$:
+    \f[
+    \mathbf{U}^T \mathbf{U} = \exp(\mathbf{X}^T) \exp(\mathbf{X}) =  \exp(- \mathbf{X}) \exp(\mathbf{X}) = \mathbf{I}.
+    \f]
+    A real-valued skew-symmetric matrix \f$\mathbf{X}\f$ has purely imaginary eigenvalues, which come in complex conjugate pairs \f$(i \lambda, -i\lambda)\f$. For matrices of odd dimension, there should hence always be one eigenvalue \f$0\f$. \f$\mathbf{B} = \mathbf{X} \mathbf{X}\f$ is then a symmetric matrix with nonpositive real-valued eigenvalues \f$-\lambda^2\f$. Nonzero eigenvalues of \f$\mathbf{B}\f$ occur twice. The eigenvectors \f$\mathbf{V}\f$ of \f$\mathbf{B} = \mathbf{V} diag(-\lambda^2) \mathbf{V}^T\f$ allow to make \f$\mathbf{X}\f$ block-diagonal. \f$\mathbf{C} = \mathbf{V}^T \mathbf{X} \mathbf{V}\f$ is skew-symmetric. Moreover, \f$\mathbf{C}\mathbf{C} = \mathbf{V}^T \mathbf{B} \mathbf{V}\f$ is diagonal: \f$\mathbf{C}\mathbf{C} = diag(-\lambda^2)\f$. \f$\mathbf{C}\f$ is hence block-diagonal with \f$1 \times 1\f$ blocks \f$\left[0\right]\f$ and \f$2 \times 2\f$ blocks
+    \f[
+    \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right].
+    \f]
+    The exponential of the \f$1 \times 1\f$ block \f$\left[0\right]\f$ is \f$\left[1\right]\f$, and the exponential of the \f$2 \times 2\f$ block is
+    \f[
+    \exp \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right] = \left[ \begin{array}{cc} \cos(\lambda) & \sin(\lambda) \\ -\sin(\lambda) & \cos(\lambda) \end{array} \right].
+    \f]
+    The matrix \f$\exp(\mathbf{C})\f$ can hence be easily calculated blockwise. The exponential of \f$\mathbf{X}\f$ is then obtained as \f$\exp(\mathbf{X}) = \mathbf{V} \exp(\mathbf{C}) \mathbf{V}^T\f$. It is calculated by the function CheMPS2::DMRGSCFunitary::updateUnitary.
+    
+    \section buildlog Logarithm of a special orthogonal matrix
+
+    The reverse problem of finding a (nonunique) real-valued logarithm of a special orthogonal matrix \f$\mathbf{U}\f$ can be performed similarly. Since \f$\mathbf{U}\f$ is orthogonal (and hence norm-preserving), its eigenvalues all have norm 1:
+    \f[
+    \mathbf{U} = \mathbf{V}_{U} diag(e^{i \theta}) \mathbf{V}_{U}^{\dagger} = \mathbf{V}_{U}^* diag(e^{-i \theta}) \mathbf{V}_{U}^{T},
+    \f]
+    \f[
+    \mathbf{U}^T = \mathbf{V}_{U}^* diag(e^{i \theta}) \mathbf{V}_{U}^{T} = \mathbf{V}_{U} diag(e^{-i \theta}) \mathbf{V}_{U}^{\dagger}.
+    \f]
+    For the second equalities, complex conjugation of the real-valued matrices \f$\mathbf{U}\f$ and \f$\mathbf{U}^T\f$ is used. The eigenvalues of \f$\mathbf{U}\f$ hence come in complex conjugate pairs \f$(e^{i \theta}, e^{-i \theta})\f$. Consider the symmetric matrix \f$ \mathbf{S} = \mathbf{U} + \mathbf{U}^T = \mathbf{V}_{U} diag(2\cos(\theta) ) \mathbf{V}_{U}^{\dagger} \f$. If \f$\cos(\theta) \neq \pm 1\f$, the eigenvalue \f$2\cos(\theta)\f$ occurs twice. For matrices of odd dimension \f$\cos(\theta)=+1\f$ always occurs an odd number of times. Construct the symmetric matrix \f$\mathbf{S}\f$ and diagonalize it (real-valued) as \f$\mathbf{S} = \mathbf{V}_{S} diag(2\cos(\theta)) \mathbf{V}_{S}^T\f$. The matrix \f$\mathbf{D} = \mathbf{V}_{S}^T \mathbf{U} \mathbf{V}_{S}\f$ is also a special orthogonal matrix with \f$1 \times 1\f$ blocks \f$\left[ \pm 1 \right]\f$ and \f$2 \times 2\f$ blocks
+    \f[
+    \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right].
+    \f]
+    Because we consider special orthogonal matrices, the \f$1 \times 1\f$ blocks \f$\left[ -1 \right]\f$ always occur an even number of times, and they can hence be considered as a special case of the \f$2 \times 2\f$ blocks. If we choose the branchcut for the logarithm on the negative real axis, the logarithm of the \f$1 \times 1\f$ block \f$\left[ 1 \right]\f$ is \f$\left[ 0 \right]\f$ and the logarithm of the \f$2\times 2\f$ block is 
+    \f[
+    \log \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right] = \left[ \begin{array}{cc} 0 & \theta \\ -\theta & 0 \end{array} \right],
+    \f]
+    with \f$\theta \in \left[ -\pi, \pi \right]\f$. The matrix \f$\log(\mathbf{D})\f$ can hence be easily calculated blockwise. The logarithm of \f$\mathbf{U}\f$ is then obtained as \f$\log(\mathbf{U}) = \mathbf{V}_{S} \log(\mathbf{D}) \mathbf{V}_{S}^T\f$. It is calculated by the function CheMPS2::DMRGSCFunitary::getLog.
 */
    class DMRGSCFunitary{
 
