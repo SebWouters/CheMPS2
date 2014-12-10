@@ -187,7 +187,7 @@ Direct inversion of the iterative subspace (DIIS)</h1>
 <p class="formulaDsp">
 <img class="formulaDsp" alt="\[ \mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i). \]" src="form_25.png"/>
 </p>
-<p> In the <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> list, <img class="formulaInl" alt="$\mathbf{Y}(n+1)$" src="form_26.png"/> is overwritten with <img class="formulaInl" alt="$\mathbf{Y}_{new}$" src="form_27.png"/>, and the current orbitals are set to <img class="formulaInl" alt="$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})$" src="form_28.png"/>. The new state vector <img class="formulaInl" alt="$\mathbf{Y}_{new}$" src="form_27.png"/> is calculated by the function <a class="el" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors...">CheMPS2::DIIS::calculateParam</a>.</p>
+<p> The new state vector <img class="formulaInl" alt="$\mathbf{Y}_{new}$" src="form_26.png"/> is calculated by the function <a class="el" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors...">CheMPS2::DIIS::calculateParam</a>. The current orbitals are then set to <img class="formulaInl" alt="$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})$" src="form_27.png"/>.</p>
 <h1><a class="anchor" id="biblio"></a>
 References</h1>
 <p>[CAS1] D. Zgid and M. Nooijen, Journal of Chemical Physics 128, 144115 (2008). <a href="http://dx.doi.org/10.1063/1.2883980">http://dx.doi.org/10.1063/1.2883980</a> <br/>
@@ -450,7 +450,7 @@ References</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a></li>
-    <li class="footer">Generated on Wed Dec 10 2014 00:52:21 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 10 2014 09:28:48 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
