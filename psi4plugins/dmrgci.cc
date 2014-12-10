@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 
 #include "chemps2/Irreps.h"
 #include "chemps2/Hamiltonian.h"
@@ -372,12 +373,15 @@ dmrgci(Options &options)
     fprintf(outfile, "\n");
     
     CheMPS2::Initialize::Init();
-    
-    // Redirect cout and cerr
-    /*std::stringstream discard;
-    std::streambuf * new_buffer  = discard.rdbuf();
-    std::streambuf * cout_buffer = cout.rdbuf(new_buffer);
-    std::streambuf * cerr_buffer = cerr.rdbuf(new_buffer);*/
+
+    std::ofstream psi4outfile;
+    std::streambuf * cout_buffer;
+    if ( outfile_name != "stdout" ){
+        fclose(outfile);
+        outfile = NULL;
+        psi4outfile.open( outfile_name.c_str() , ios::app ); // append
+        cout_buffer = cout.rdbuf( psi4outfile.rdbuf() );
+    }
 
     // The convergence scheme
     CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( ndmrg_states );
@@ -394,8 +398,6 @@ dmrgci(Options &options)
        theDMRG->getCorrelations()->Print();
     }
     
-    fprintf(outfile, "The DMRG-CI energy = %3.10f", EnergyDMRG);
-    
     //Clean up
     if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
     if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
@@ -404,9 +406,18 @@ dmrgci(Options &options)
     delete Prob;
     delete Ham;
     
-    // Restore the original buffers
-    /*cout.rdbuf(cout_buffer);
-    cerr.rdbuf(cerr_buffer);*/
+    if ( outfile_name != "stdout" ){
+        cout.rdbuf(cout_buffer);
+        psi4outfile.close();
+        outfile = fopen(outfile_name.c_str(), "a");
+        if (outfile == NULL){
+            throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
+        }
+    }
+
+    fprintf(outfile, "The DMRG-CI energy = %3.10f", EnergyDMRG);
+    Process::environment.globals["CURRENT ENERGY"]    = EnergyDMRG;
+    Process::environment.globals["DMRG TOTAL ENERGY"] = EnergyDMRG;
     
     return Success;
 }
