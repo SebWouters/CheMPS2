@@ -1825,6 +1825,10 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    double * temp2  = new double[ vecLength ];
    double * precon = new double[ vecLength ];
    CGDiagPrecond( alpha , beta , eta , precon , temp );
+   
+   assert( RealSol != NULL );
+   assert( ImagSol != NULL );
+   assert( fabs( eta ) > 0.0 );
 
    /* 
          ( alpha + beta H + I eta ) Solution = RHS
@@ -1834,45 +1838,32 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
       
          precon * [ ( alpha + beta H )^2 + eta^2 ] * precon * SolutionTilde = precon * ( alpha + beta H - I eta ) * RHS
          Solution = precon * SolutionTilde
+         
+      Clue: Solve for ImagSol first. RealSol is then simply
+      
+         RealSol = - ( alpha + beta H ) / eta * ImagSol
    */
    
-   if ( RealSol != NULL ){
+   /**** Solve for ImagSol ****/
+   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = - eta * precon[ cnt ] * RHS[ cnt ]; } // RESID = - eta * precon * RHS
+   if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the imaginary part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
+   //FCIdcopy( vecLength , RESID , ImagSol ); // Initial guess for the imaginary part
+   FillRandom( vecLength, ImagSol );
+   CGCoreSolver( alpha , beta , eta , precon , ImagSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
+   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ ImagSol[ cnt ] = precon[ cnt ] * ImagSol[ cnt ]; }
    
-      CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID ); // RESID = ( alpha + beta * H ) * RHS
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = precon[ cnt ] * RESID[ cnt ]; } // RESID = precon * ( alpha + beta * H ) * RHS
-      if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the real part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-      //FCIdcopy( vecLength , RESID , RealSol ); // Initial guess for the real part
-      FillRandom( vecLength, RealSol );
-      CGCoreSolver( alpha , beta , eta , precon , RealSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RealSol[ cnt ] = precon[ cnt ] * RealSol[ cnt ]; }
-   
-   }
-   
-   if ( ImagSol != NULL ){
-   
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = - eta * precon[ cnt ] * RHS[ cnt ]; } // RESID = - eta * precon * RHS
-      if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the imaginary part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-      //FCIdcopy( vecLength , RESID , ImagSol ); // Initial guess for the imaginary part
-      FillRandom( vecLength, ImagSol );
-      CGCoreSolver( alpha , beta , eta , precon , ImagSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ ImagSol[ cnt ] = precon[ cnt ] * ImagSol[ cnt ]; }
-      
-   }
+   /**** Solve for RealSol ****/
+   CGAlphaPlusBetaHAM( -alpha/eta, -beta/eta, ImagSol, RealSol );
    
    if (( checkError ) && ( FCIverbose > 0 )){
       for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ precon[ cnt ] = 1.0; }
-      double RMSerror = 0.0;
-      if ( RealSol != NULL ){
-         CGOperator( alpha , beta , eta , precon , RealSol , temp , temp2 , OxPVEC );
-         CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID );
-         FCIdaxpy( vecLength , -1.0 , RESID , OxPVEC );
-         RMSerror += FCIddot( vecLength , OxPVEC , OxPVEC );
-      }
-      if ( ImagSol != NULL ){
-         CGOperator( alpha , beta , eta , precon , ImagSol , temp , temp2 , OxPVEC );
-         FCIdaxpy( vecLength , eta , RHS , OxPVEC );
-         RMSerror += FCIddot( vecLength , OxPVEC , OxPVEC );
-      }
+      CGOperator( alpha , beta , eta , precon , RealSol , temp , temp2 , OxPVEC );
+      CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID );
+      FCIdaxpy( vecLength , -1.0 , RESID , OxPVEC );
+      double RMSerror = FCIddot( vecLength , OxPVEC , OxPVEC );
+      CGOperator( alpha , beta , eta , precon , ImagSol , temp , temp2 , OxPVEC );
+      FCIdaxpy( vecLength , eta , RHS , OxPVEC );
+      RMSerror += FCIddot( vecLength , OxPVEC , OxPVEC );
       RMSerror = sqrt( RMSerror );
       cout << "FCI::CGSolveSystem : RMS error when checking the solution (without preconditioner) = " << RMSerror << endl;
    }
@@ -1985,23 +1976,24 @@ void CheMPS2::FCI::CGDiagPrecond(const double alpha, const double beta, const do
 
 void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF) const{
 
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
+
    // G( omega, alpha, beta, eta ) = < 0 | a_{alpha,spin}  [ omega - Ham + E_0 + I*eta ]^{-1} a^+_{beta,spin} | 0 > (addition amplitude)
    //                              + < 0 | a^+_{beta,spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha,spin}  | 0 > (removal  amplitude)
 
    double Realpart, Imagpart;
-   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, (RePartGF == NULL) ? NULL : &Realpart, (ImPartGF == NULL) ? NULL : &Imagpart, NULL, NULL);
-   if ( RePartGF != NULL ){ RePartGF[0] = Realpart; } // Set
-   if ( ImPartGF != NULL ){ ImPartGF[0] = Imagpart; }
+   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL);
+   RePartGF[0] = Realpart; // Set
+   ImPartGF[0] = Imagpart; // Set
    
-   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, (RePartGF == NULL) ? NULL : &Realpart, (ImPartGF == NULL) ? NULL : &Imagpart, NULL, NULL);
-   if ( RePartGF != NULL ){ RePartGF[0] += Realpart; } // Add
-   if ( ImPartGF != NULL ){ ImPartGF[0] += Imagpart; }
+   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL);
+   RePartGF[0] += Realpart; // Add
+   ImPartGF[0] += Imagpart;
    
    if ( FCIverbose>0 ){
-      cout << "FCI::RetardedGF : G( omega = " << omega << " ; eta = " << eta << " ; i = " << orb_alpha << " ; j = " << orb_beta << " ) :" << endl;
-      if ( RePartGF != NULL ){ cout << "                  Re( retarded GF ) = " << RePartGF[0] << endl; }
-      if ( ImPartGF != NULL ){ cout << "                  Im( retarded GF ) = " << ImPartGF[0] << endl;
-                               cout << "     Local density of states (LDOS) = " << - ImPartGF[0] / M_PI << endl; }
+      cout << "FCI::RetardedGF : G( omega = " << omega << " ; eta = " << eta << " ; i = " << orb_alpha << " ; j = " << orb_beta << " ) = " << RePartGF[0] << " + I * " << ImPartGF[0] << endl;
+      cout << "                  Local density of states (LDOS) = " << - ImPartGF[0] / M_PI << endl;
    }
 
 }
@@ -2011,12 +2003,13 @@ void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, con
    // Addition amplitude < 0 | a_{alpha, spin} [ omega - Ham + E_0 + I*eta ]^{-1} a^+_{beta, spin} | 0 >
 
    assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
-   assert( ( RePartGF != NULL ) || ( ImPartGF != NULL ) ); // We should do something
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
    
    const bool isOK = ( isUp ) ? ( getNel_up() < L ) : ( getNel_down() < L ); // The electron can be added
    if (( getOrb2Irrep( orb_alpha ) != getOrb2Irrep( orb_beta ) ) || ( !isOK )){
-      if ( RePartGF != NULL ){ RePartGF[0] = 0.0; }
-      if ( ImPartGF != NULL ){ ImPartGF[0] = 0.0; }
+      RePartGF[0] = 0.0;
+      ImPartGF[0] = 0.0;
       const unsigned int Lpow4 = L*L*L*L;
       if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
       if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
@@ -2036,19 +2029,15 @@ void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, con
       additionFCI.ActWithSecondQuantizedOperator( 'C' , isUp , orb_alpha , addAlphaVector , this , GSvector ); // | addAlphaVector > = a^+_alpha,spin | GSvector >
    }
    
-   double * RealPartSolution = ( RePartGF == NULL ) ? NULL : new double[ addVecLength ];
-   double * ImagPartSolution = ( ImPartGF == NULL ) ? NULL : new double[ addVecLength ];
+   double * RealPartSolution = new double[ addVecLength ];
+   double * ImagPartSolution = new double[ addVecLength ];
    additionFCI.CGSolveSystem( omega + GSenergy , -1.0 , eta , addBetaVector , RealPartSolution , ImagPartSolution );
-   if ( RePartGF != NULL ){
-      if ( TwoRDMreal != NULL ){ additionFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-      RePartGF[0] = FCIddot( addVecLength , addAlphaVector , RealPartSolution );
-      delete [] RealPartSolution;
-   }
-   if ( ImPartGF != NULL ){
-      if ( TwoRDMimag != NULL ){ additionFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-      ImPartGF[0] = FCIddot( addVecLength , addAlphaVector , ImagPartSolution );
-      delete [] ImagPartSolution;
-   }
+   if ( TwoRDMreal != NULL ){ additionFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
+   RePartGF[0] = FCIddot( addVecLength , addAlphaVector , RealPartSolution );
+   delete [] RealPartSolution;
+   if ( TwoRDMimag != NULL ){ additionFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
+   ImPartGF[0] = FCIddot( addVecLength , addAlphaVector , ImagPartSolution );
+   delete [] ImagPartSolution;
 
    if ( orb_alpha != orb_beta ){ delete [] addAlphaVector; }
    delete [] addBetaVector;
@@ -2060,12 +2049,13 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
    // Removal amplitude < 0 | a^+_{beta, spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha, spin} | 0 >
 
    assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
-   assert( ( RePartGF != NULL ) || ( ImPartGF != NULL ) ); // We should do something
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
    
    const bool isOK = ( isUp ) ? ( getNel_up() > 0 ) : ( getNel_down() > 0 ); // The electron can be removed
    if (( getOrb2Irrep( orb_alpha ) != getOrb2Irrep( orb_beta ) ) || ( !isOK )){
-      if ( RePartGF != NULL ){ RePartGF[0] = 0.0; }
-      if ( ImPartGF != NULL ){ ImPartGF[0] = 0.0; }
+      RePartGF[0] = 0.0;
+      ImPartGF[0] = 0.0;
       const unsigned int Lpow4 = L*L*L*L;
       if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
       if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
@@ -2085,20 +2075,16 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
       removalFCI.ActWithSecondQuantizedOperator( 'A' , isUp , orb_beta , removeBetaVector , this , GSvector ); // | removeBetaVector > = a_beta,spin | GSvector >
    }
    
-   double * RealPartSolution = ( RePartGF == NULL ) ? NULL : new double[ removeVecLength ];
-   double * ImagPartSolution = ( ImPartGF == NULL ) ? NULL : new double[ removeVecLength ];
+   double * RealPartSolution = new double[ removeVecLength ];
+   double * ImagPartSolution = new double[ removeVecLength ];
    removalFCI.CGSolveSystem( omega - GSenergy , 1.0 , eta , removeAlphaVector , RealPartSolution , ImagPartSolution );
-   if ( RePartGF != NULL ){
-      if ( TwoRDMreal != NULL ){ removalFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-      RePartGF[0] = FCIddot( removeVecLength , removeBetaVector , RealPartSolution );
-      delete [] RealPartSolution;
-   }
-   if ( ImPartGF != NULL ){
-      if ( TwoRDMimag != NULL ){ removalFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-      ImPartGF[0] = FCIddot( removeVecLength , removeBetaVector , ImagPartSolution );
-      delete [] ImagPartSolution;
-   }
-   
+   if ( TwoRDMreal != NULL ){ removalFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
+   RePartGF[0] = FCIddot( removeVecLength , removeBetaVector , RealPartSolution );
+   delete [] RealPartSolution;
+   if ( TwoRDMimag != NULL ){ removalFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
+   ImPartGF[0] = FCIddot( removeVecLength , removeBetaVector , ImagPartSolution );
+   delete [] ImagPartSolution;
+
    if ( orb_alpha != orb_beta ){ delete [] removeBetaVector; }
    delete [] removeAlphaVector;
 
@@ -2106,23 +2092,24 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
 
 void CheMPS2::FCI::DensityResponseGF(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF) const{
 
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
+
    // X( omega, alpha, beta, eta ) = < 0 | ( n_alpha - <0| n_alpha |0> ) [ omega - Ham + E_0 + I*eta ]^{-1} ( n_beta  - <0| n_beta  |0> ) | 0 > (forward  amplitude)
    //                              - < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 > (backward amplitude)
    
    double Realpart, Imagpart;
-   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, (RePartGF == NULL) ? NULL : &Realpart, (ImPartGF == NULL) ? NULL : &Imagpart, NULL, NULL);
-   if ( RePartGF != NULL ){ RePartGF[0] = Realpart; } // Set
-   if ( ImPartGF != NULL ){ ImPartGF[0] = Imagpart; }
+   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL);
+   RePartGF[0] = Realpart; // Set
+   ImPartGF[0] = Imagpart; // Set
    
-   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, (RePartGF == NULL) ? NULL : &Realpart, (ImPartGF == NULL) ? NULL : &Imagpart, NULL, NULL);
-   if ( RePartGF != NULL ){ RePartGF[0] -= Realpart; } // Subtract !!!
-   if ( ImPartGF != NULL ){ ImPartGF[0] -= Imagpart; }
+   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL);
+   RePartGF[0] -= Realpart; // Subtract !!!
+   ImPartGF[0] -= Imagpart; // Subtract !!!
 
    if ( FCIverbose>0 ){
-      cout << "FCI::DensityResponseGF : X( omega = " << omega << " ; eta = " << eta << " ; i = " << orb_alpha << " ; j = " << orb_beta << " ) :" << endl;
-      if ( RePartGF != NULL ){ cout << "                         Re( density response ) = " << RePartGF[0] << endl; }
-      if ( ImPartGF != NULL ){ cout << "                         Im( density response ) = " << ImPartGF[0] << endl;
-                               cout << "          Local density-density response (LDDR) = " << - ImPartGF[0] / M_PI << endl; }
+      cout << "FCI::DensityResponseGF : X( omega = " << omega << " ; eta = " << eta << " ; i = " << orb_alpha << " ; j = " << orb_beta << " ) = " << RePartGF[0] << " + I * " << ImPartGF[0] << endl;
+      cout << "                         Local density-density response (LDDR) = " << - ImPartGF[0] / M_PI << endl;
    }
 
 }
@@ -2132,7 +2119,8 @@ void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double et
    // Forward amplitude: < 0 | ( n_alpha - <0| n_alpha |0> ) [ omega - Ham + E_0 + I*eta ]^{-1} ( n_beta  - <0| n_beta  |0> ) | 0 >
    
    assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
-   assert( ( RePartGF != NULL ) || ( ImPartGF != NULL ) ); // We should do something
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
    
    const unsigned long long vecLength = getVecLength( 0 );
    double * densityAlphaVector = new double[ vecLength ];
@@ -2146,19 +2134,15 @@ void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double et
       FCIdaxpy( vecLength , -n_beta_0 , GSvector , densityBetaVector );            // densityBetaVector = ( n_beta - <0| n_beta |0> ) |0>
    }
 
-   double * RealPartSolution = ( RePartGF == NULL ) ? NULL : new double[ vecLength ];
-   double * ImagPartSolution = ( ImPartGF == NULL ) ? NULL : new double[ vecLength ];
+   double * RealPartSolution = new double[ vecLength ];
+   double * ImagPartSolution = new double[ vecLength ];
    CGSolveSystem( omega + GSenergy , -1.0 , eta , densityBetaVector , RealPartSolution , ImagPartSolution );
-   if ( RePartGF != NULL ){
-      if ( TwoRDMreal != NULL ){ Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-      RePartGF[0] = FCIddot( vecLength , densityAlphaVector , RealPartSolution );
-      delete [] RealPartSolution;
-   }
-   if ( ImPartGF != NULL ){
-      if ( TwoRDMimag != NULL ){ Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-      ImPartGF[0] = FCIddot( vecLength , densityAlphaVector , ImagPartSolution );
-      delete [] ImagPartSolution;
-   }
+   if ( TwoRDMreal != NULL ){ Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
+   RePartGF[0] = FCIddot( vecLength , densityAlphaVector , RealPartSolution );
+   delete [] RealPartSolution;
+   if ( TwoRDMimag != NULL ){ Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
+   ImPartGF[0] = FCIddot( vecLength , densityAlphaVector , ImagPartSolution );
+   delete [] ImagPartSolution;
 
    if ( orb_alpha != orb_beta ){ delete [] densityBetaVector; }
    delete [] densityAlphaVector;
@@ -2170,7 +2154,8 @@ void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double e
    // Backward amplitude: < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 >
    
    assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
-   assert( ( RePartGF != NULL ) || ( ImPartGF != NULL ) ); // We should do something
+   assert( RePartGF != NULL );
+   assert( ImPartGF != NULL );
    
    const unsigned long long vecLength = getVecLength( 0 );
    double * densityAlphaVector = new double[ vecLength ];
@@ -2184,19 +2169,15 @@ void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double e
       FCIdaxpy( vecLength , -n_beta_0 , GSvector , densityBetaVector );            // densityBetaVector = ( n_beta - <0| n_beta |0> ) |0>
    }
 
-   double * RealPartSolution = ( RePartGF == NULL ) ? NULL : new double[ vecLength ];
-   double * ImagPartSolution = ( ImPartGF == NULL ) ? NULL : new double[ vecLength ];
+   double * RealPartSolution = new double[ vecLength ];
+   double * ImagPartSolution = new double[ vecLength ];
    CGSolveSystem( omega - GSenergy , 1.0 , eta , densityAlphaVector , RealPartSolution , ImagPartSolution );
-   if ( RePartGF != NULL ){
-      if ( TwoRDMreal != NULL ){ Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-      RePartGF[0] = FCIddot( vecLength , densityBetaVector , RealPartSolution );
-      delete [] RealPartSolution;
-   }
-   if ( ImPartGF != NULL ){
-      if ( TwoRDMimag != NULL ){ Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-      ImPartGF[0] = FCIddot( vecLength , densityBetaVector , ImagPartSolution );
-      delete [] ImagPartSolution;
-   }
+   if ( TwoRDMreal != NULL ){ Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
+   RePartGF[0] = FCIddot( vecLength , densityBetaVector , RealPartSolution );
+   delete [] RealPartSolution;
+   if ( TwoRDMimag != NULL ){ Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
+   ImPartGF[0] = FCIddot( vecLength , densityBetaVector , ImagPartSolution );
+   delete [] ImagPartSolution;
    
    if ( orb_alpha != orb_beta ){ delete [] densityBetaVector; }
    delete [] densityAlphaVector;
