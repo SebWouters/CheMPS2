@@ -390,9 +390,7 @@ void CheMPS2::FCI::StartupIrrepCenter(){
    // Check for the lapack routines { dgemm_ , daxpy_ , dscal_ , dcopy_ , ddot_ }
    unsigned long long maxVecLength = 0;
    for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
-      if ( getVecLength( irrep ) > maxVecLength ){
-         maxVecLength = getVecLength( irrep );
-      }
+      if ( getVecLength( irrep ) > maxVecLength ){ maxVecLength = getVecLength( irrep ); }
    }
    const unsigned int max_integer = INT_MAX;
    assert( max_integer >= maxVecLength );
@@ -1930,6 +1928,106 @@ void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const dou
 
 }
 
+void CheMPS2::FCI::BiCGSTABSolveSystem(const double alphaparam, const double betaparam, const double etaparam, double * RHS, double * RealSol, double * ImagSol, const bool checkError) const{
+
+   assert( RealSol != NULL );
+   assert( ImagSol != NULL );
+   assert( fabs( etaparam ) > 0.0 );
+   const unsigned long long vecLength       = getVecLength( 0 );
+   const unsigned long long doubleVecLength = 2 * vecLength;
+   const unsigned int max_integer           = INT_MAX;
+   assert( max_integer >= doubleVecLength ); // Necessary for using the FCI wrappers to BLAS routines
+   
+   const double RESIDUALTHRESHOLD = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * doubleVecLength );
+   if ( FCIverbose>1 ){ cout << "FCI::BiCGSTABSolveSystem : The residual norm for convergence = " << RESIDUALTHRESHOLD << endl; }
+   
+   // Create a few helper arrays
+   double * r0_hat = new double[ doubleVecLength ];
+   double * r_vec  = new double[ doubleVecLength ];
+   double * p_vec  = new double[ doubleVecLength ];
+   double * v_vec  = new double[ doubleVecLength ];
+   double * t_vec  = new double[ doubleVecLength ];
+   double * x_vec  = new double[ doubleVecLength ];
+
+   /* 
+         ( alphaparam + betaparam * H + I * etaparam ) ( RealSol + I * ImagSol ) = RHS + I * 0
+      
+      is solved with the biconjugate gradient STAB method:
+      
+         [ alphaparam + betaparam * H       -etaparam                  ]  [ RealSol ]   =   [ RHS ]
+         [ etaparam                         alphaparam + betaparam * H ]  [ ImagSol ]       [ 0   ]
+         
+      which is written in shorthand form as
+      
+         Operator(BiCGSTAB) * x_vec = [RHS, 0]^T
+      
+   */
+   
+   FillRandom( doubleVecLength, x_vec ); // x_vec contains the initial guess for the solution
+   FCIdcopy( vecLength, RHS, r_vec );
+   ClearVector( vecLength, r_vec + vecLength ); // r_vec contains the right-hand side of the linear system
+   
+   //The actual BiCGSTAB algorithm
+   {
+      BiCGSTABOperator( alphaparam, betaparam, etaparam, x_vec, t_vec ); // t_vec  = A * x0
+      FCIdaxpy( doubleVecLength, -1.0, t_vec, r_vec );    // r_vec  = r0 = b - A * x0
+      FCIdcopy( doubleVecLength, r_vec, r0_hat );         // r0_hat = r0
+      double rho_previous   = 1;                          // rho0   = 1
+      double alpha          = 1;                          // alpha  = 1
+      double omega_previous = 1;                          // omega0 = 1
+      ClearVector( doubleVecLength, v_vec );              // p0 = 0
+      ClearVector( doubleVecLength, p_vec );              // v0 = 0
+      double norm_s = 100 * RESIDUALTHRESHOLD;
+      int iteration = 0;
+      
+      while ( norm_s > RESIDUALTHRESHOLD ){
+      
+         iteration++;
+         const double rho_i = FCIddot( doubleVecLength, r0_hat, r_vec );
+         const double beta  = ( rho_i / rho_previous ) * ( alpha / omega_previous );
+         for ( unsigned int cnt = 0; cnt < doubleVecLength; cnt++ ){ // assert( max_integer >= doubleVecLength ); in the beginning
+            p_vec[ cnt ] = r_vec[ cnt ] + beta * ( p_vec[ cnt ] - omega_previous * v_vec[ cnt ] );
+         }
+         BiCGSTABOperator( alphaparam, betaparam, etaparam, p_vec, v_vec ); // vi = Operator(BiCGSTAB) * pi
+         alpha = rho_i / FCIddot( doubleVecLength, r0_hat, v_vec );
+         FCIdaxpy( doubleVecLength, -alpha, v_vec, r_vec );                 // s (r_vec) = r_{i-1} - alpha v_i
+         norm_s = FCIfrobeniusnorm( doubleVecLength, r_vec );
+         BiCGSTABOperator( alphaparam, betaparam, etaparam, r_vec, t_vec ); // t = Operator(BiCGSTAB) * s
+         const double omega_i = FCIddot( doubleVecLength, t_vec, r_vec ) / FCIddot( doubleVecLength, t_vec, t_vec );
+         for ( unsigned int cnt = 0; cnt < doubleVecLength; cnt++ ){        // assert( max_integer >= doubleVecLength ); in the beginning
+            x_vec[ cnt ] = x_vec[ cnt ] + alpha * p_vec[ cnt ] + omega_i * r_vec[ cnt ];
+         }
+         FCIdaxpy( doubleVecLength, -omega_i, t_vec, r_vec );               // r_i = s (r_vec) - omega_i * t
+         
+         rho_previous   = rho_i;
+         omega_previous = omega_i;
+         if ( FCIverbose > 1 ){ cout << "FCI::BiCGSTABSolveSystem : At step " << iteration << " the residual norm is " << norm_s << endl; }
+      
+      }
+   }
+   
+   FCIdcopy( vecLength, x_vec,             RealSol );
+   FCIdcopy( vecLength, x_vec + vecLength, ImagSol );
+
+   if (( checkError ) && ( FCIverbose > 0 )){
+      FCIdcopy( vecLength, RHS, r_vec );
+      ClearVector( vecLength, r_vec + vecLength );
+      BiCGSTABOperator( alphaparam, betaparam, etaparam, x_vec, t_vec );
+      FCIdaxpy( doubleVecLength, -1.0, r_vec, t_vec ); // t_vec = Operator(BiCGSTAB) * x_vec - r_vec
+      double RMSerror = FCIfrobeniusnorm( doubleVecLength, t_vec );
+      cout << "FCI::BiCGSTABSolveSystem : RMS error when checking the solution = " << RMSerror << endl;
+   }
+   
+   // Clean up
+   delete [] r0_hat;
+   delete [] r_vec;
+   delete [] p_vec;
+   delete [] v_vec;
+   delete [] t_vec;
+   delete [] x_vec;
+
+}
+
 void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const{
 
    HamTimesVec( in , out );
@@ -1953,6 +2051,20 @@ void CheMPS2::FCI::CGOperator(const double alpha, const double beta, const doubl
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
       out[ cnt ] = precon[ cnt ] * out[ cnt ];                 // out   = precon * [ ( alpha + beta * H )^2 + eta*eta ] * precon * in
    }
+
+}
+
+void CheMPS2::FCI::BiCGSTABOperator(const double alpha, const double beta, const double eta, double * in, double * out) const{
+
+   const unsigned long long vecLength = getVecLength( 0 );
+   double * Re_in  = in;
+   double * Im_in  = in + vecLength;
+   double * Re_out = out;
+   double * Im_out = out + vecLength;
+   CGAlphaPlusBetaHAM( alpha, beta, Re_in, Re_out ); // Re(out) = ( alpha + beta * H ) Re(in)
+   CGAlphaPlusBetaHAM( alpha, beta, Im_in, Im_out ); // Im(out) = ( alpha + beta * H ) Im(in)
+   FCIdaxpy( vecLength, -eta, Im_in, Re_out );       // Re(out) = ( alpha + beta * H ) Re(in) - eta Im(in)
+   FCIdaxpy( vecLength,  eta, Re_in, Im_out );       // Im(out) = eta Re(in) + ( alpha + beta * H ) Im(in)
 
 }
 
