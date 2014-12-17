@@ -627,7 +627,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01930">1930</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01933">1933</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -728,7 +728,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01890">1890</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01893">1893</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -794,7 +794,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01956">1956</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01959">1959</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -881,7 +881,7 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01941">1941</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01944">1944</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -946,8 +946,8 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">beta</td><td>The real-valued prefactor of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> in the operator </td></tr>
     <tr><td class="paramname">eta</td><td>The imaginary part of the scalar in the operator </td></tr>
     <tr><td class="paramname">RHS</td><td>The real-valued right-hand side of the equation with length getVecLength(0) </td></tr>
-    <tr><td class="paramname">RealSol</td><td>If not NULL, on exit this array of length getVecLength(0) contains the real part of the solution </td></tr>
-    <tr><td class="paramname">ImagSol</td><td>If not NULL, on exit this array of length getVecLength(0) contains the imaginary part of the solution </td></tr>
+    <tr><td class="paramname">RealSol</td><td>On exit this array of length getVecLength(0) contains the real part of the solution </td></tr>
+    <tr><td class="paramname">ImagSol</td><td>On exit this array of length getVecLength(0) contains the imaginary part of the solution </td></tr>
     <tr><td class="paramname">checkError</td><td>If true, the RMS error without preconditioner will be calculated and printed after convergence </td></tr>
   </table>
   </dd>
@@ -1082,13 +1082,13 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the density response Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the density response Green's function </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the density response Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the density response Green's function </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02107">2107</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02105">2105</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1173,15 +1173,15 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the backward propagating part of the density response Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the backward propagating part of the density response Green's function </td></tr>
-    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL and RePartGF not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
-    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL and ImPartGF not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the backward propagating part of the density response Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the backward propagating part of the density response Green's function </td></tr>
+    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02168">2168</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02164">2164</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1266,15 +1266,15 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">orb_beta</td><td>The second orbital index </td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the forward propagating part of the density response Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the forward propagating part of the density response Green's function </td></tr>
-    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL and RePartGF not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
-    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL and ImPartGF not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the forward propagating part of the density response Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the forward propagating part of the density response Green's function </td></tr>
+    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02130">2130</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02129">2129</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2547,13 +2547,13 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
     <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, which contains the matrix elements </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the retarded Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the retarded Green's function </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01986">1986</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01989">1989</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -2652,15 +2652,15 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
     <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, which contains the matrix elements </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the addition part of the retarded Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the addition part of the retarded Green's function </td></tr>
-    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL and RePartGF not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
-    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL and ImPartGF not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the addition part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the addition part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02009">2009</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02013">2013</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -2770,15 +2770,15 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">GSenergy</td><td>The ground state energy returned by GSDavidson </td></tr>
     <tr><td class="paramname">GSvector</td><td>The ground state vector as calculated by GSDavidson </td></tr>
     <tr><td class="paramname">Ham</td><td>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>, which contains the matrix elements </td></tr>
-    <tr><td class="paramname">RePartGF</td><td>If not NULL, on exit RePartGF[0] contains the real part of the removal part of the retarded Green's function </td></tr>
-    <tr><td class="paramname">ImPartGF</td><td>If not NULL, on exit ImPartGF[0] contains the imaginary part of the removal part of the retarded Green's function </td></tr>
-    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL and RePartGF not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
-    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL and ImPartGF not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">RePartGF</td><td>On exit RePartGF[0] contains the real part of the removal part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the removal part of the retarded Green's function </td></tr>
+    <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02058">2058</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02059">2059</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -2855,7 +2855,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Wed Dec 10 2014 09:28:48 for CheMPS2 by
+    <li class="footer">Generated on Wed Dec 17 2014 00:19:39 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
