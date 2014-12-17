@@ -1853,7 +1853,19 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ ImagSol[ cnt ] = precon[ cnt ] * ImagSol[ cnt ]; }
    
    /**** Solve for RealSol ****/
-   CGAlphaPlusBetaHAM( -alpha/eta, -beta/eta, ImagSol, RealSol );
+   CGAlphaPlusBetaHAM( -alpha/eta, -beta/eta, ImagSol, RealSol ); // Initial guess RealSol can be obtained from ImagSol
+   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
+      if ( fabs( precon[cnt] ) > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){
+         RealSol[cnt] = RealSol[cnt] / precon[cnt];
+      } else {
+         RealSol[cnt] = RealSol[cnt] / CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+      }
+   }
+   CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID ); // RESID = ( alpha + beta * H ) * RHS
+   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = precon[ cnt ] * RESID[ cnt ]; } // RESID = precon * ( alpha + beta * H ) * RHS
+   if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the real part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
+   CGCoreSolver( alpha , beta , eta , precon , RealSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
+   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RealSol[ cnt ] = precon[ cnt ] * RealSol[ cnt ]; }
    
    if (( checkError ) && ( FCIverbose > 0 )){
       for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ precon[ cnt ] = 1.0; }
