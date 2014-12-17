@@ -1845,9 +1845,8 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    /**** Solve for ImagSol ****/
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = - eta * precon[ cnt ] * RHS[ cnt ]; } // RESID = - eta * precon * RHS
    if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the imaginary part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-   //FCIdcopy( vecLength , RESID , ImagSol ); // Initial guess for the imaginary part
-   FillRandom( vecLength, ImagSol );
-   CGCoreSolver( alpha , beta , eta , precon , ImagSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
+   FCIdcopy( vecLength, RESID, ImagSol ); // Well educated initial guess for the imaginary part (guess is exact if operator is diagonal)
+   CGCoreSolver( alpha, beta, eta, precon, ImagSol, RESID, PVEC, OxPVEC, temp, temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ ImagSol[ cnt ] = precon[ cnt ] * ImagSol[ cnt ]; }
    
    /**** Solve for RealSol ****/
@@ -1859,10 +1858,10 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
          RealSol[cnt] = RealSol[cnt] / CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
       }
    }
-   CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID ); // RESID = ( alpha + beta * H ) * RHS
+   CGAlphaPlusBetaHAM( alpha, beta, RHS, RESID ); // RESID = ( alpha + beta * H ) * RHS
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = precon[ cnt ] * RESID[ cnt ]; } // RESID = precon * ( alpha + beta * H ) * RHS
    if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the real part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-   CGCoreSolver( alpha , beta , eta , precon , RealSol , RESID , PVEC , OxPVEC , temp , temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
+   CGCoreSolver( alpha, beta, eta, precon, RealSol, RESID, PVEC, OxPVEC, temp, temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RealSol[ cnt ] = precon[ cnt ] * RealSol[ cnt ]; }
    
    if (( checkError ) && ( FCIverbose > 0 )){
@@ -1967,7 +1966,7 @@ void CheMPS2::FCI::BiCGSTABSolveSystem(const double alphaparam, const double bet
    FCIdcopy( vecLength, RHS, r_vec );
    ClearVector( vecLength, r_vec + vecLength ); // r_vec contains the right-hand side of the linear system
    
-   //The actual BiCGSTAB algorithm
+   //The actual BiCGSTAB algorithm (without preconditioner)
    {
       BiCGSTABOperator( alphaparam, betaparam, etaparam, x_vec, t_vec ); // t_vec  = A * x0
       FCIdaxpy( doubleVecLength, -1.0, t_vec, r_vec );    // r_vec  = r0 = b - A * x0
