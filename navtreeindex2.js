@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"classCheMPS2_1_1TensorQ.html#a29123b1ef23fbbdcf7d29d5c60b11b9f":[0,0,0,34,0],
+"classCheMPS2_1_1TensorQ.html#a4590f2433b7d5d44a8a2c6a847e15e0c":[0,0,0,34,3],
 "classCheMPS2_1_1TensorQ.html#aa8b8725cc9529f5954b7c16398fa7b00":[0,0,0,34,6],
 "classCheMPS2_1_1TensorQ.html#ab61a16cadc17ff60870be54d27216f9f":[0,0,0,34,1],
 "classCheMPS2_1_1TensorQ.html#acf51806ae9d447da34bcd0fb1d4ec814":[0,0,0,34,2],
@@ -106,8 +108,8 @@ var NAVTREEINDEX2 =
 "classCheMPS2_1_1TwoIndex.html#afcc065077cfa14cfecc9a325f39e4649":[0,0,0,44,1],
 "classes.html":[0,1],
 "files.html":[1,0],
-"functions.html":[0,3,0,0],
 "functions.html":[0,3,0],
+"functions.html":[0,3,0,0],
 "functions_b.html":[0,3,0,1],
 "functions_c.html":[0,3,0,2],
 "functions_d.html":[0,3,0,3],

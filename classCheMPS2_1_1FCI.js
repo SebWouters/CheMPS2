@@ -4,6 +4,8 @@ var classCheMPS2_1_1FCI =
     [ "~FCI", "classCheMPS2_1_1FCI.html#adbc5264ad1dd857cdd5ba99e749c761a", null ],
     [ "ActWithNumberOperator", "classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca", null ],
     [ "ActWithSecondQuantizedOperator", "classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb", null ],
+    [ "BiCGSTABOperator", "classCheMPS2_1_1FCI.html#ab4d1b3e33329a93d6e6ffaea0ac5b8b7", null ],
+    [ "BiCGSTABSolveSystem", "classCheMPS2_1_1FCI.html#ab6d3a05b01d2fa79f018413436ee68fa", null ],
     [ "CalcSpinSquared", "classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f", null ],
     [ "CGAlphaPlusBetaHAM", "classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b", null ],
     [ "CGCoreSolver", "classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2", null ],
