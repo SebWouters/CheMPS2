@@ -34,7 +34,7 @@ NoisePrefac = np.array([   0.1,   0.0])
 
 # In the following two lines, the orbitals are specified by their R(O)HF energy ordering
 frozen = np.array([ 0, 1 ])                                  # Keep 1s core orbitals of N2 frozen
-active = np.array([ 2, 4, 10, 13, 7, 8, 3, 9, 16, 17, 5, 6]) # 4 Ag, 1 B2g, 1 B3g, 4 B1u, 4 B2u, 4 B3u in active space
+active = np.array([ 2, 4, 10, 13, 7, 8, 3, 9, 16, 17, 5, 6]) # 4 Ag, 1 B2g, 1 B3g, 4 B1u, 1 B2u, 1 B3u in active space
 
 ##########################################
 #   Do dmrgci calculation with CheMPS2   #
