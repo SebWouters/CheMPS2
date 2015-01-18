@@ -277,15 +277,15 @@ PyCheMPS2: [```chemps2.py```](https://github.com/sunqm/pyscf/blob/dev/future/dmr
 Examples of how to extract MO integrals from pyscf to perform DMRG-CI
 calculations with PyCheMPS2 can be found in
 
-1. [```integrals/pyscf/example.dat```](integrals/pyscf/example.dat)
+1. [```integrals/pyscf/example.py```](integrals/pyscf/example.py)
 
-2. [```integrals/pyscf/example2.dat```](integrals/pyscf/example2.dat)
+2. [```integrals/pyscf/example2.py```](integrals/pyscf/example2.py)
 
-3. [```integrals/pyscf/example3.dat```](integrals/pyscf/example.dat)
+3. [```integrals/pyscf/example3.py```](integrals/pyscf/example.py)
 
-4. [```integrals/pyscf/dmrgci.dat```](integrals/pyscf/dmrgci.dat)
+4. [```integrals/pyscf/dmrgci.py```](integrals/pyscf/dmrgci.py)
 
-5. [```integrals/pyscf/call_chemps2.dat```](integrals/pyscf/call_chemps2.dat)
+5. [```integrals/pyscf/call_chemps2.py```](integrals/pyscf/call_chemps2.py)
 
 Please remember to append the correct pyscf and PyCheMPS2 directories to
 ```sys.path``` at the top of these files.
