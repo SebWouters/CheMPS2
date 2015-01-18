@@ -272,7 +272,7 @@ DMRG-CI and DMRG-SCF calculations with pyscf
 [pyscf](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
 in which all layers are written or interfaced in python. In the future, the
 package will be able to perform DMRG-CI and DMRG-SCF calculations using
-PyCheMPS2: [```chemps2.py```](https://github.com/sunqm/pyscf/future/dmrgscf/chemps2.py).
+PyCheMPS2: [```chemps2.py```](https://github.com/sunqm/pyscf/blob/dev/future/dmrgscf/chemps2.py).
 
 Examples of how to extract MO integrals from pyscf to perform DMRG-CI
 calculations with PyCheMPS2 can be found in
