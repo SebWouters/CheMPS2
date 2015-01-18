@@ -103,7 +103,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <img src="https://raw.githubusercontent.com/sebwouters/CheMPS2/master/CheMPS2/CheMPS2logo.png?raw=true"  alt="CheMPS2 Logo"/>
 </div>
 <h1>CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry </h1>
-<p>Copyright (C) 2013, 2014 Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a></p>
+<p>Copyright (C) 2013-2015 Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a></p>
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
 <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</p>
@@ -202,8 +202,8 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 &gt; cd mointegrals
 </pre><p>Now, replace the file <code>mointegrals.cc</code> with either:</p>
 <ol type="1">
-<li><a href="psi4plugins/mointegrals.cc_PRINT">```psi4plugins/mointegrals.cc_PRINT```</a> to print the matrix elements as text. Examples of output generated with this plugin can be found in <a href="tests/matrixelements">```tests/matrixelements```</a></li>
-<li><a href="psi4plugins/mointegrals.cc_SAVEHAM">```psi4plugins/mointegrals.cc_SAVEHAM```</a> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5. See the Doxygen manual for more information on <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a>.</li>
+<li><a href="integrals/psi4plugins/mointegrals.cc_PRINT">```integrals/psi4plugins/mointegrals.cc_PRINT```</a> to print the matrix elements as text. Examples of output generated with this plugin can be found in <a href="tests/matrixelements">```tests/matrixelements```</a></li>
+<li><a href="integrals/psi4plugins/mointegrals.cc_SAVEHAM">```integrals/psi4plugins/mointegrals.cc_SAVEHAM```</a> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5. See the Doxygen manual for more information on <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a>.</li>
 </ol>
 <p>For case 2, libchemps2 should be installed as described above, and the <code>Makefile</code> should be adjusted. Change the line </p>
 <pre class="fragment">```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin```
@@ -215,17 +215,26 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p>DMRG-CI calculations can also be performed with Psi4. To make use of this feature, build Psi4 with the plugin option, and then run: </p>
 <pre class="fragment">&gt; psi4 --new-plugin dmrgci
 &gt; cd dmrgci
-</pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="psi4plugins/dmrgci.cc">```psi4plugins/dmrgci.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (i.e. linking to libchemps2).</p>
+</pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="integrals/psi4plugins/dmrgci.cc">```integrals/psi4plugins/dmrgci.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (linking to libchemps2).</p>
 <p>Example input files to use the plugin are provided in</p>
 <ol type="1">
-<li><a href="psi4plugins/N2.dat">```psi4plugins/N2.dat```</a></li>
-<li><a href="psi4plugins/H2O.dat">```psi4plugins/H2O.dat```</a></li>
+<li><a href="integrals/psi4plugins/N2.dat">```integrals/psi4plugins/N2.dat```</a></li>
+<li><a href="integrals/psi4plugins/H2O.dat">```integrals/psi4plugins/H2O.dat```</a></li>
 </ol>
 <p>After compilation of the dmrgci plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
 <pre class="fragment">&gt; psi4 N2.dat
 &gt; psi4 H2O.dat
-</pre><h2>DMRG-SCF calculations with PySCF </h2>
-<p><a href="https://github.com/sunqm/pyscf">PySCF</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. The package can perform DMRG-SCF and DMRG-CI calculations using PyCheMPS2.</p>
+</pre><h2>DMRG-CI and DMRG-SCF calculations with pyscf </h2>
+<p><a href="https://github.com/sunqm/pyscf">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a href="https://github.com/sunqm/pyscf/blob/dev/future/dmrgscf/chemps2.py">```chemps2.py```</a>.</p>
+<p>Examples of how to extract MO integrals from pyscf to perform DMRG-CI calculations with PyCheMPS2 can be found in</p>
+<ol type="1">
+<li><a href="integrals/pyscf/example.py">```integrals/pyscf/example.py```</a></li>
+<li><a href="integrals/pyscf/example2.py">```integrals/pyscf/example2.py```</a></li>
+<li><a href="integrals/pyscf/example3.py">```integrals/pyscf/example3.py```</a></li>
+<li><a href="integrals/pyscf/dmrgci.py">```integrals/pyscf/dmrgci.py```</a></li>
+<li><a href="integrals/pyscf/call_chemps2.py">```integrals/pyscf/call_chemps2.py```</a></li>
+</ol>
+<p>Please remember to append the correct pyscf and PyCheMPS2 directories to <code>sys.path</code> at the top of these files.</p>
 <h2>List of files in libchemps2 </h2>
 <p><a href="CheMPS2/CASSCF.cpp">```CheMPS2/CASSCF.cpp```</a> contains the constructor and destructor of the CASSCF class, as well as the functions which allow to update, get or set its variables.</p>
 <p><a href="CheMPS2/CASSCFdebug.cpp">```CheMPS2/CASSCFdebug.cpp```</a> contains two functions: one for calculating the ROHF energy; and one for fetching FCI coefficients to determine the point group symmetry of certain electronic states of the carbon dimer.</p>
@@ -363,7 +372,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Dec 17 2014 23:57:11 for CheMPS2 by
+    <li class="footer">Generated on Sun Jan 18 2015 10:57:35 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
