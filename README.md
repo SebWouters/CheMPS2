@@ -281,7 +281,7 @@ calculations with PyCheMPS2 can be found in
 
 2. [```integrals/pyscf/example2.py```](integrals/pyscf/example2.py)
 
-3. [```integrals/pyscf/example3.py```](integrals/pyscf/example.py)
+3. [```integrals/pyscf/example3.py```](integrals/pyscf/example3.py)
 
 4. [```integrals/pyscf/dmrgci.py```](integrals/pyscf/dmrgci.py)
 
