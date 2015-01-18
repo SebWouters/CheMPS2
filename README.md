@@ -3,7 +3,7 @@
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
 ==============================================================================
 
-Copyright (C) 2013, 2014 Sebastian Wouters <sebastianwouters@gmail.com>
+Copyright (C) 2013-2015 Sebastian Wouters <sebastianwouters@gmail.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -216,11 +216,11 @@ To make use of this feature, build Psi4 with the plugin option, and then run:
 
 Now, replace the file ```mointegrals.cc``` with either:
 
-1. [```psi4plugins/mointegrals.cc_PRINT```](psi4plugins/mointegrals.cc_PRINT)
+1. [```integrals/psi4plugins/mointegrals.cc_PRINT```](integrals/psi4plugins/mointegrals.cc_PRINT)
    to print the matrix elements as text. Examples of output generated with this
    plugin can be found in [```tests/matrixelements```](tests/matrixelements)
 
-2. [```psi4plugins/mointegrals.cc_SAVEHAM```](psi4plugins/mointegrals.cc_SAVEHAM)
+2. [```integrals/psi4plugins/mointegrals.cc_SAVEHAM```](integrals/psi4plugins/mointegrals.cc_SAVEHAM)
    to store all unique matrix elements (remember that there is eightfold
    permutation symmetry) in binary form with HDF5. See the Doxygen manual for
    more information on CheMPS2::Hamiltonian.
@@ -249,15 +249,15 @@ feature, build Psi4 with the plugin option, and then run:
     > cd dmrgci
     
 Now, replace the file ```dmrgci.cc``` with 
-[```psi4plugins/dmrgci.cc```](psi4plugins/dmrgci.cc). For the compilation of
-this plugin, the same instructions as above should be followed (i.e. linking to
-libchemps2).
+[```integrals/psi4plugins/dmrgci.cc```](integrals/psi4plugins/dmrgci.cc).
+For the compilation of this plugin, the same instructions as above should
+be followed (linking to libchemps2).
 
 Example input files to use the plugin are provided in
 
-1. [```psi4plugins/N2.dat```](psi4plugins/N2.dat)
+1. [```integrals/psi4plugins/N2.dat```](integrals/psi4plugins/N2.dat)
 
-2. [```psi4plugins/H2O.dat```](psi4plugins/H2O.dat)
+2. [```integrals/psi4plugins/H2O.dat```](integrals/psi4plugins/H2O.dat)
 
 After compilation of the dmrgci plugin, place these input files one directory
 higher than the plugin. In that folder, run:
@@ -266,13 +266,30 @@ higher than the plugin. In that folder, run:
     > psi4 H2O.dat
    
    
-DMRG-SCF calculations with PySCF
---------------------------------
+DMRG-CI and DMRG-SCF calculations with pyscf
+--------------------------------------------
 
-[PySCF](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
-in which all layers are written or interfaced in python. The package can
-perform DMRG-SCF and DMRG-CI calculations using PyCheMPS2.
-   
+[pyscf](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
+in which all layers are written or interfaced in python. In the future, the
+package will be able to perform DMRG-CI and DMRG-SCF calculations using
+PyCheMPS2: [```chemps2.py```](https://github.com/sunqm/pyscf/future/dmrgscf/chemps2.py).
+
+Examples of how to extract MO integrals from pyscf to perform DMRG-CI
+calculations with PyCheMPS2 can be found in
+
+1. [```integrals/pyscf/example.dat```](integrals/pyscf/example.dat)
+
+2. [```integrals/pyscf/example2.dat```](integrals/pyscf/example2.dat)
+
+3. [```integrals/pyscf/example3.dat```](integrals/pyscf/example.dat)
+
+4. [```integrals/pyscf/dmrgci.dat```](integrals/pyscf/dmrgci.dat)
+
+5. [```integrals/pyscf/call_chemps2.dat```](integrals/pyscf/call_chemps2.dat)
+
+Please remember to append the correct pyscf and PyCheMPS2 directories to
+```sys.path``` at the top of these files.
+
 
 List of files in libchemps2
 ---------------------------
