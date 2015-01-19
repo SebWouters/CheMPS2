@@ -60,22 +60,16 @@ read_options(std::string name, Options &options)
             retained during successive DMRG instructions -*/
         options.add_array("DMRG_STATES");
         
-        /*- Whether or not noise is on during a particular DMRG instruction.
-            If ( dmrg_noise[instruction] ) noise is added. This array should
-            of course contain as many elements as DMRG_STATES -*/
-        options.add_array("DMRG_NOISE");
+        /*- The energy convergence to stop an instruction
+            during successive DMRG instructions -*/
+        options.add_array("DMRG_ECONV");
         
-        /*- The energy convergence for sweeps -*/
-        options.add_double("DMRG_E_CONVERGENCE", 1e-6);
+        /*- The maximum number of sweeps to stop an instruction
+            during successive DMRG instructions -*/
+        options.add_array("DMRG_MAXSWEEPS");
         
-        /*- The noise prefactor during the initial sweeps -*/
-        options.add_double("DMRG_NOISE_FACTOR", 0.03);
-        
-        /*- The number of sweeps when the noise is still on -*/
-        options.add_int("DMRG_MAXITER_NOISE", 5);
-        
-        /*- The number of sweeps when the noise is turned off -*/
-        options.add_int("DMRG_MAXITER_SILENT", 20);
+        /*- The noiseprefactors for successive DMRG instructions -*/
+        options.add_array("DMRG_NOISEPREFACTORS");
         
         /*- Whether or not to print the correlation functions after the DMRG calculation -*/
         options.add_int("DMRG_PRINT_CORR", 1);
@@ -121,12 +115,13 @@ dmrgci(Options &options)
     
     int * dmrg_states               = options.get_int_array("DMRG_STATES");
     const int ndmrg_states          = options["DMRG_STATES"].size();
-    int * dmrg_noise                = options.get_int_array("DMRG_NOISE");
-    const int ndmrg_noise           = options["DMRG_NOISE"].size();
-    const double dmrg_e_convergence = options.get_double("DMRG_E_CONVERGENCE");
-    const double dmrg_noise_factor  = options.get_double("DMRG_NOISE_FACTOR");
-    const int dmrg_maxiter_noise    = options.get_int("DMRG_MAXITER_NOISE");
-    const int dmrg_maxiter_silent   = options.get_int("DMRG_MAXITER_SILENT");
+    double * dmrg_econv             = options.get_double_array("DMRG_ECONV");
+    const int ndmrg_econv           = options["DMRG_ECONV"].size();
+    int * dmrg_maxsweeps            = options.get_int_array("DMRG_MAXSWEEPS");
+    const int ndmrg_maxsweeps       = options["DMRG_MAXSWEEPS"].size();
+    double * dmrg_noiseprefactors   = options.get_double_array("DMRG_NOISEPREFACTORS");
+    const int ndmrg_noiseprefactors = options["DMRG_NOISEPREFACTORS"].size();
+    
     const int dmrg_print_corr       = options.get_int("DMRG_PRINT_CORR");
     
     int * frozen_docc               = options.get_int_array("FROZEN_DOCC");
@@ -164,10 +159,12 @@ dmrgci(Options &options)
     if ( wfn_irrep<0 )                            { throw PSIEXCEPTION("Option WFN_IRREP (integer) may not be smaller than zero!"); }
     if ( wfn_multp<1 )                            { throw PSIEXCEPTION("Option WFN_MULTP (integer) should be larger or equal to one: WFN_MULTP = (2S+1) >= 1 !"); }
     if ( ndmrg_states==0 )                        { throw PSIEXCEPTION("Option DMRG_STATES (integer array) should be set!"); }
-    if ( ndmrg_states!=ndmrg_noise )              { throw PSIEXCEPTION("Options DMRG_NOISE and DMRG_STATES (integer arrays) should contain the same number of elements!"); }
-    if ( dmrg_e_convergence<=0.0 )                { throw PSIEXCEPTION("Option DMRG_E_CONVERGENCE (double/float) should be positive!"); }
-    if ( dmrg_maxiter_noise<=0 )                  { throw PSIEXCEPTION("Option DMRG_MAXITER_NOISE (integer) should be positive!"); }
-    if ( dmrg_maxiter_silent<=0 )                 { throw PSIEXCEPTION("Option DMRG_MAXITER_SILENT (integer) should be positive!"); }
+    if ( ndmrg_econv==0 )                         { throw PSIEXCEPTION("Option DMRG_ECONV (double array) should be set!"); }
+    if ( ndmrg_maxsweeps==0 )                     { throw PSIEXCEPTION("Option DMRG_MAXSWEEPS (integer array) should be set!"); }
+    if ( ndmrg_noiseprefactors==0 )               { throw PSIEXCEPTION("Option DMRG_NOISEPREFACTORS (double array) should be set!"); }
+    if ( ndmrg_states!=ndmrg_econv )              { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_ECONV (double array) should contain the same number of elements!"); }
+    if ( ndmrg_states!=ndmrg_maxsweeps )          { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_MAXSWEEPS (integer array) should contain the same number of elements!"); }
+    if ( ndmrg_states!=ndmrg_noiseprefactors )    { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_NOISEPREFACTORS (double array) should contain the same number of elements!"); }
     if ( options["FROZEN_DOCC"].size() != nirrep ){ throw PSIEXCEPTION("Option FROZEN_DOCC (integer array) should contain as many elements as there are irreps!"); }
     if ( options["ACTIVE"].size()      != nirrep ){ throw PSIEXCEPTION("Option ACTIVE (integer array) should contain as many elements as there are irreps!"); }
     for ( int cnt=0; cnt<ndmrg_states; cnt++ ){
@@ -233,6 +230,7 @@ dmrgci(Options &options)
     //                   (only Abelian symmetry groups with real-valued character tables are allowed...)
     CheMPS2::Problem * Prob = new CheMPS2::Problem( Ham , wfn_multp-1 , nDMRGelectrons , wfn_irrep );
     if ( !(Prob->checkConsistency()) ){ throw PSIEXCEPTION("CheMPS2::Problem : No Hilbert state vector compatible with all symmetry sectors!"); }
+    Prob->SetupReorderD2h(); // Does nothing if group not d2h
     
     /******************************************
      *   Input is parsed and consistent.      *
@@ -367,6 +365,7 @@ dmrgci(Options &options)
     fprintf(outfile, "###                       DMRG-CI                       ###\n");
     fprintf(outfile, "###                                                     ###\n");
     fprintf(outfile, "###            CheMPS2 by Sebastian Wouters             ###\n");
+    fprintf(outfile, "###        https://github.com/SebWouters/CheMPS2        ###\n");
     fprintf(outfile, "###   Comput. Phys. Commun. 185 (6), 1501-1514 (2014)   ###\n");
     fprintf(outfile, "###                                                     ###\n");
     fprintf(outfile, "###########################################################\n");
@@ -386,8 +385,7 @@ dmrgci(Options &options)
     // The convergence scheme
     CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( ndmrg_states );
     for (int cnt=0; cnt<ndmrg_states; cnt++){
-       if ( dmrg_noise[cnt] ){ OptScheme->setInstruction( cnt , dmrg_states[cnt] , dmrg_e_convergence , dmrg_maxiter_noise  , dmrg_noise_factor ); }
-       else                  { OptScheme->setInstruction( cnt , dmrg_states[cnt] , dmrg_e_convergence , dmrg_maxiter_silent , 0.0               ); }
+       OptScheme->setInstruction( cnt, dmrg_states[cnt], dmrg_econv[cnt], dmrg_maxsweeps[cnt], dmrg_noiseprefactors[cnt] );
     }
 
     // Run the DMRGCI calculation
@@ -396,6 +394,31 @@ dmrgci(Options &options)
     if ( dmrg_print_corr ){
        theDMRG->calc2DMandCorrelations();
        theDMRG->getCorrelations()->Print();
+       
+       if (true){ // Example usage of CheMPS2's 2-RDM object
+          CheMPS2::TwoDM * the2RDM = theDMRG->get2DM();
+          double Energy2RDM = Ham->getEconst();
+          for (int orbi=0; orbi<nDMRGorbitals; orbi++){
+             for (int orbj=0; orbj<nDMRGorbitals; orbj++){
+                double OneRDM_ij = 0.0;
+                /* GammaA(i,j,k,l) = sum_s1,s2 < a^+_i,s1  a^+_j,s2  a_l,s2  a_k,s1 >
+                   GammaB(i,j,k,l) = sum_s1,s2 (-1)^{s1-s2} < a^+_i,s1  a^+_j,s2  a_l,s2  a_k,s1 > */
+                for (int orbk=0; orbk<nDMRGorbitals; orbk++){ OneRDM_ij += the2RDM->getTwoDMA_HAM(orbi, orbk, orbj, orbk); }
+                OneRDM_ij = OneRDM_ij / ( nDMRGelectrons - 1 );
+                Energy2RDM += Ham->getTmat(orbi, orbj) * OneRDM_ij;
+                for (int orbk=0; orbk<nDMRGorbitals; orbk++){
+                   for (int orbl=0; orbl<nDMRGorbitals; orbl++){
+                      /* CheMPS2 uses physics notation: on the following line
+                         ERI = int_dr1,dr2 orbi(r_1) orbj(r_2) orbk(r_1) orbl(r_2) / | r_1 - r_2 | */
+                      Energy2RDM += 0.5 * Ham->getVmat(orbi, orbj, orbk, orbl) * the2RDM->getTwoDMA_HAM(orbi, orbj, orbk, orbl);
+                   }
+                }
+             }
+          }
+          cout << "Energy( DMRG-CI )     = " << EnergyDMRG << endl;
+          cout << "Energy( 2-RDM * Ham ) = " << Energy2RDM << endl;
+       }
+       
     }
     
     //Clean up
@@ -415,7 +438,7 @@ dmrgci(Options &options)
         }
     }
 
-    fprintf(outfile, "The DMRG-CI energy = %3.10f", EnergyDMRG);
+    fprintf(outfile, "The DMRG-CI energy = %3.10f \n", EnergyDMRG);
     Process::environment.globals["CURRENT ENERGY"]    = EnergyDMRG;
     Process::environment.globals["DMRG TOTAL ENERGY"] = EnergyDMRG;
     
