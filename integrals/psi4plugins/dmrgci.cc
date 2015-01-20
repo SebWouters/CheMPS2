@@ -94,7 +94,6 @@ dmrgci(Options &options)
     /*
      * This plugin is able to perform a DMRGCI calculation in a molecular orbital active space.
      * TODO: Provide a DMRGCI option to select other single-particle basis states as well (MO, SO, MP2-NO).
-     * TODO: Is it possible to rotate only the relevent parts of the MO space for the DMRG-CI calculation (e.g. no virtuals)?
      */
 
     // Grab the global (default) PSIO object, for file I/O
@@ -103,7 +102,14 @@ dmrgci(Options &options)
     // Now we want the reference (SCF) wavefunction
     boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
     if (!wfn){ throw PSIEXCEPTION("SCF has not been run yet!"); }
-    
+
+    /* TODO: Sparse rotations for DMRG-SCF require to update the wfn coefficients (skew orbital basis)
+    boost::shared_ptr<psi::Matrix> CoeffAlpha = wfn->Ca();
+    boost::shared_ptr<psi::Matrix> CoeffBeta  = wfn->Cb();
+    CoeffAlpha->print();
+    CoeffAlpha->identity();
+    wfn->Ca()->print();*/
+
     /****************************************************************************
      *   Parse input and see if everything is consistent.                       *
      *   Only afterwards rotate the integrals and start with expensive stuff.   *
@@ -217,7 +223,7 @@ dmrgci(Options &options)
     int * orbitalIrreps = new int[ nDMRGorbitals ];
     int counterFillOrbitalIrreps = 0;
     for (int h=0; h<nirrep; h++){
-       for (int cnt=0; cnt<active[h]; cnt++){ //Remember that only the active space is considered!
+       for (int cnt=0; cnt<active[h]; cnt++){ //Only the active space is treated with DMRG-CI!
           orbitalIrreps[counterFillOrbitalIrreps] = h;
           counterFillOrbitalIrreps++;
        }
@@ -238,15 +244,22 @@ dmrgci(Options &options)
      ******************************************/
      
     fprintf(outfile, "Start filling the active space Hamiltonian.\n");
-    
-    // TODO: Only rotate the active space !!!
-    // TODO: Option to work in other orthonormal single particle bases than MO !
-    // For now, we'll just transform for closed shells and generate all integrals.  For more elaborate use of the LibTrans object, check out the plugin_mp2 example.
+
+    // CheMPS2 requires RHF or ROHF orbitals.
+    // Generate only the two-electron integrals for the frozen and active spaces.
+    std::vector<int> frozenActive;
+    std::vector<int> empty;
+    int jump = 0;
+    for (int h=0; h<nirrep; h++){ // Tell the two-electron rotator which integrals we'd like
+       for (int orb=0; orb<frozen_docc[h]+active[h]; orb++){ frozenActive.push_back( jump + orb ); }
+       jump += orbspi[h];
+    }
+    boost::shared_ptr<MOSpace> frozenActive_ptr;
+    frozenActive_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'S', frozenActive, empty ) );
     std::vector<boost::shared_ptr<MOSpace> > spaces;
-    spaces.push_back(MOSpace::all);
+    spaces.push_back( frozenActive_ptr );
     IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted);
-    ints.transform_tei(MOSpace::all, MOSpace::all, MOSpace::all, MOSpace::all);
-    // Use the IntegralTransform object's DPD instance, for convenience
+    ints.transform_tei( frozenActive_ptr, frozenActive_ptr, frozenActive_ptr, frozenActive_ptr );
     dpd_set_default(ints.get_dpd_id());
     
     // Constant part of the energy: due to nuclear repulsion and doubly occupied orbitals
@@ -276,14 +289,15 @@ dmrgci(Options &options)
        }
     }
     delete [] temp;
- 
+
     /*
      * Now, loop over the DPD buffer
      */
     dpdbuf4 K;
     psio->open(PSIF_LIBTRANS_DPD, PSIO_OPEN_OLD);
     // To only process the permutationally unique integrals, change the ID("[A,A]") to ID("[A>=A]+")
-    global_dpd_->buf4_init(&K, PSIF_LIBTRANS_DPD, 0, ID("[A,A]"), ID("[A,A]"), ID("[A>=A]+"), ID("[A>=A]+"), 0, "MO Ints (AA|AA)");
+    //global_dpd_->buf4_init(&K, PSIF_LIBTRANS_DPD, 0, ID("[A,A]"), ID("[A,A]"), ID("[A>=A]+"), ID("[A>=A]+"), 0, "MO Ints (AA|AA)");
+    global_dpd_->buf4_init(&K, PSIF_LIBTRANS_DPD, 0, ID("[S,S]"), ID("[S,S]"), ID("[S>=S]+"), ID("[S>=S]+"), 0, "MO Ints (SS|SS)");
     for(int h = 0; h < nirrep; ++h){
         global_dpd_->buf4_mat_irrep_init(&K, h);
         global_dpd_->buf4_mat_irrep_rd(&K, h);
@@ -359,7 +373,6 @@ dmrgci(Options &options)
     delete [] Tmat;
     
     fprintf(outfile, "Finished filling the active space Hamiltonian.\n");
-   
     fprintf(outfile, "###########################################################\n");
     fprintf(outfile, "###                                                     ###\n");
     fprintf(outfile, "###                       DMRG-CI                       ###\n");
