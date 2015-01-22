@@ -1822,7 +1822,8 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    double * temp   = new double[ vecLength ];
    double * temp2  = new double[ vecLength ];
    double * precon = new double[ vecLength ];
-   CGDiagPrecond( alpha , beta , eta , precon , temp );
+   if ( Nel_up + Nel_down >= 2 ){ CGDiagPrecond( alpha , beta , eta , precon , temp ); }
+   else{ for (unsigned long long cnt = 0; cnt<vecLength; cnt++){ precon[cnt] = 1.0; } }
    
    assert( RealSol != NULL );
    assert( ImagSol != NULL );
