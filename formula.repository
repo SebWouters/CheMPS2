@@ -1,145 +1,164 @@
-\form#0:$\mathbf{U}$
-\form#1:$\det(\mathbf{U})=+1$
-\form#2:$\mathbf{X} = -\mathbf{X}^T$
-\form#3:$\mathbf{X}$
-\form#4:\[ E(\vec{x}) = E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x}, \]
-\form#5:$\vec{x}$
-\form#6:$\mathbf{U}_{add} = \exp(\mathbf{X}(\vec{x}))$
-\form#7:$\mathbf{U}(n)$
-\form#8:$\vec{g}$
-\form#9:$\mathbf{H}$
-\form#10:$E(\vec{x})$
-\form#11:$\vec{x} = - \mathbf{H}^{-1} \vec{g}$
-\form#12:$\mathbf{U}_{add}$
-\form#13:\[ \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n). \]
-\form#14:\[ \left[ \begin{array}{cc} \mathbf{H} & \vec{g} \\ \vec{g}^T & 0 \end{array} \right] \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right] = \alpha \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right]. \]
-\form#15:$\|\vec{x}\|_2$
-\form#16:$\vec{x}(n)$
-\form#17:$\mathbf{Y}(n+1) = \log(\mathbf{U}(n+1))$
-\form#18:\[ e = \left\| \sum\limits_{i = 1}^{\kappa} c_i \vec{x}(n - \kappa + i) \right\|_2 \]
-\form#19:$\sum_{i} c_i = 1$
-\form#20:$\kappa$
-\form#21:$e$
-\form#22:\[ \left[ \begin{array}{cc} \mathbf{B} & \vec{1} \\ \vec{1}^T & 0 \end{array} \right] \left[ \begin{array}{c} \vec{c} \\ \lambda \end{array} \right] = \left[ \begin{array}{c} \vec{0} \\ 1 \end{array} \right], \]
-\form#23:$2\lambda$
-\form#24:\[ \left[\mathbf{B}\right]_{ij} = \vec{x}^T(n - \kappa + i) \vec{x}(n - \kappa + j) = \left[\mathbf{B}\right]_{ji}. \]
-\form#25:\[ \mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i). \]
-\form#26:$\mathbf{Y}_{new}$
-\form#27:$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})$
-\form#28:$A$
-\form#29:$B$
-\form#30:$\ket{\Psi}$
-\form#31:\[ \mathbf{\rho}_A = trace_{B} ~ \ket{\Psi}\bra{\Psi}, \]
-\form#32:$trace_{B}$
-\form#33:$\mathbf{\rho}_A$
-\form#34:$\ket{\Psi} = \ket{\Psi_A}\ket{\Psi_B}$
-\form#35:\[ S_{A \mid B} = -trace_A ~ \mathbf{\rho}_A \log( \mathbf{\rho}_A ) = S_{B \mid A} \geq 0. \]
-\form#36:$S_{A \mid B} = 0$
-\form#37:$S_{A \mid B}$
-\form#38:$i$
-\form#39:$S_1(i)$
-\form#40:$j$
-\form#41:$S_2(ij)$
-\form#42:\[ S_2(ij) \leq S_1(i) + S_1(j), \]
-\form#43:$S_1(i) + S_1(j)$
-\form#44:\[ \left[ \mathbf{I} \right]_{ij} = \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left( 1 - \delta_{ij} \right) = \left[ \mathbf{I} \right]_{ji} \geq 0. \]
-\form#45:$\left[ \mathbf{I} \right]_{ij}$
-\form#46:$\Gamma^A$
-\form#47:$\Gamma^B$
-\form#48:$\Gamma^1$
-\form#49:\begin{eqnarray*} \Gamma^A_{ij;kl} & = & \sum\limits_{\sigma \tau} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\tau}^{\dagger} \hat{a}_{l\tau} \hat{a}_{k\sigma} }, \\ \Gamma^B_{ij;kl} & = & \sum\limits_{\sigma \tau} (-1)^{\sigma-\tau} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\tau}^{\dagger} \hat{a}_{l\tau} \hat{a}_{k\sigma} }, \\ \Gamma^1_{i;j} & = & \sum\limits_{\sigma} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\sigma} }, \end{eqnarray*}
-\form#50:$\sigma$
-\form#51:$\tau$
-\form#52:$\pm\frac{1}{2}$
-\form#53:\[ C_{spin}(i,j) = 4 \left( \braket{\hat{S}_i^z \hat{S}_j^z} - \braket{\hat{S}_i^z} \braket{\hat{S}_j^z} \right) = \Gamma^B_{ij;ij} + \delta_{ij} \Gamma^1_{i;i}, \]
-\form#54:$\braket{\hat{S}_i^z}=0$
-\form#55:\[ C_{spinflip}(i,j) = \braket{\hat{S}_i^+ \hat{S}_j^-} + \braket{\hat{S}_i^- \hat{S}_j^+} = \frac{1}{2} \left( \Gamma^B_{ij;ji} - \Gamma^A_{ij;ji} \right) + \delta_{ij} \Gamma^1_{i;i}, \]
-\form#56:\[ C_{dens}(i,j) = \braket{\hat{n}_i \hat{n}_j} - \braket{\hat{n}_i} \braket{\hat{n}_j} = \Gamma^A_{ij;ij} + \Gamma^1_{i;i} \left( \delta_{ij} - \Gamma^1_{j;j} \right). \]
-\form#57:\[ C_{dirad}(i,j) = \braket{\hat{d}_{i\uparrow} \hat{d}_{j\downarrow}} + \braket{\hat{d}_{i\downarrow} \hat{d}_{j\uparrow}} - \braket{\hat{d}_{i\uparrow}} \braket{\hat{d}_{j\downarrow}} - \braket{\hat{d}_{i\downarrow}} \braket{\hat{d}_{j\uparrow}}, \]
-\form#58:$\hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1 - \hat{n}_{i~-\sigma})$
-\form#59:$ Idistance(power) = sum_{ij} I(i,j) * \mid i-j \mid^{power} $
-\form#60:\[ \mathbf{U}^T \mathbf{U} = \exp(\mathbf{X}^T) \exp(\mathbf{X}) = \exp(- \mathbf{X}) \exp(\mathbf{X}) = \mathbf{I}. \]
-\form#61:$(i \lambda, -i\lambda)$
-\form#62:$0$
-\form#63:$\mathbf{B} = \mathbf{X} \mathbf{X}$
-\form#64:$-\lambda^2$
-\form#65:$\mathbf{B}$
-\form#66:$\mathbf{V}$
-\form#67:$\mathbf{B} = \mathbf{V} diag(-\lambda^2) \mathbf{V}^T$
-\form#68:$\mathbf{C} = \mathbf{V}^T \mathbf{X} \mathbf{V}$
-\form#69:$\mathbf{C}\mathbf{C} = \mathbf{V}^T \mathbf{B} \mathbf{V}$
-\form#70:$\mathbf{C}\mathbf{C} = diag(-\lambda^2)$
-\form#71:$\mathbf{C}$
-\form#72:$1 \times 1$
-\form#73:$\left[0\right]$
-\form#74:$2 \times 2$
-\form#75:\[ \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right]. \]
-\form#76:$\left[1\right]$
-\form#77:\[ \exp \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right] = \left[ \begin{array}{cc} \cos(\lambda) & \sin(\lambda) \\ -\sin(\lambda) & \cos(\lambda) \end{array} \right]. \]
-\form#78:$\exp(\mathbf{C})$
-\form#79:$\exp(\mathbf{X}) = \mathbf{V} \exp(\mathbf{C}) \mathbf{V}^T$
-\form#80:\[ \mathbf{U} = \mathbf{V}_{U} diag(e^{i \theta}) \mathbf{V}_{U}^{\dagger} = \mathbf{V}_{U}^* diag(e^{-i \theta}) \mathbf{V}_{U}^{T}, \]
-\form#81:\[ \mathbf{U}^T = \mathbf{V}_{U}^* diag(e^{i \theta}) \mathbf{V}_{U}^{T} = \mathbf{V}_{U} diag(e^{-i \theta}) \mathbf{V}_{U}^{\dagger}. \]
-\form#82:$\mathbf{U}^T$
-\form#83:$(e^{i \theta}, e^{-i \theta})$
-\form#84:$ \mathbf{S} = \mathbf{U} + \mathbf{U}^T = \mathbf{V}_{U} diag(2\cos(\theta) ) \mathbf{V}_{U}^{\dagger} $
-\form#85:$\cos(\theta) \neq \pm 1$
-\form#86:$2\cos(\theta)$
-\form#87:$\cos(\theta)=+1$
-\form#88:$\mathbf{S}$
-\form#89:$\mathbf{S} = \mathbf{V}_{S} diag(2\cos(\theta)) \mathbf{V}_{S}^T$
-\form#90:$\mathbf{D} = \mathbf{V}_{S}^T \mathbf{U} \mathbf{V}_{S}$
-\form#91:$\left[ \pm 1 \right]$
-\form#92:\[ \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right]. \]
-\form#93:$\left[ -1 \right]$
-\form#94:$\left[ 1 \right]$
-\form#95:$\left[ 0 \right]$
-\form#96:$2\times 2$
-\form#97:\[ \log \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right] = \left[ \begin{array}{cc} 0 & \theta \\ -\theta & 0 \end{array} \right], \]
-\form#98:$\theta \in \left[ -\pi, \pi \right]$
-\form#99:$\log(\mathbf{D})$
-\form#100:$\log(\mathbf{U}) = \mathbf{V}_{S} \log(\mathbf{D}) \mathbf{V}_{S}^T$
-\form#101:\[ v_{ij;kl} = \left( i(\vec{r}_1) j(\vec{r}_2) \left| \frac{1}{\mid \vec{r}_1 - \vec{r}_2 \mid} \right| k(\vec{r}_1) l(\vec{r}_2) \right). \]
-\form#102:\[ I = \sum\limits_i v_{ii;ii} \]
-\form#103:$I$
-\form#104:$ I = \sum\limits_i v_{ii;ii} $
-\form#105:$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))$
-\form#106:\[ I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}. \]
-\form#107:\[ \left[ \frac{\partial \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq}} \right]_0 = \delta_{p \alpha} \delta_{q \beta} - \delta_{q \alpha} \delta_{p \beta}, \]
-\form#108:\begin{eqnarray*} 2 \left[ \frac{\partial^2 \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{qr} (\delta_{p \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{p \beta} ) \\ & - & \delta_{pr} (\delta_{q \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{q \beta} ) \\ & - & \delta_{qs} (\delta_{p \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{p \beta} ) \\ & + & \delta_{ps} (\delta_{q \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{q \beta} ), \end{eqnarray*}
-\form#109:$x_{pq}$
-\form#110:$\left[ \mathbf{X} \right]_{pq}$
-\form#111:$v_{ij;kl}$
-\form#112:\[ \left[ \frac{\partial I}{\partial x_{pq}} \right]_0 = 4 (v_{pp;pq} - v_{qq;qp}), \]
-\form#113:\begin{eqnarray*} \left[ \frac{\partial^2 I}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{pr} (8v_{pp;qs} + 4v_{pq;ps} - 2v_{qq;qs} - 2v_{ss;sq}) \\ & + & \delta_{qs} (8v_{qq;pr} + 4v_{qp;qr} - 2v_{pp;pr} - 2v_{rr;rp}) \\ & - & \delta_{ps} (8v_{pp;qr} + 4v_{pq;pr} - 2v_{qq;qr} - 2v_{rr;rq})\\ & - & \delta_{qr} (8v_{qq;ps} + 4v_{qp;qs} - 2v_{pp;ps} - 2v_{ss;sp}). \end{eqnarray*}
-\form#114:$\mathbf{K}$
-\form#115:\[ \left[ \mathbf{K} \right]_{ij} = v_{ij;ji} \geq 0. \]
-\form#116:\[ F(\vec{z}) ~ = ~ \frac{1}{2} \sum\limits_{k \neq l} \left[ \mathbf{K} \right]_{kl} (z_k - z_l)^2 ~ \geq 0, \]
-\form#117:$z_k$
-\form#118:$k$
-\form#119:$\sum_i z_i = 0$
-\form#120:$\vec{z}^T \vec{z} = 1$
-\form#121:\[ F(\vec{z}) ~ = ~ \vec{z}^T \mathbf{L} \vec{z} ~ \geq 0, \]
-\form#122:$\mathbf{L}$
-\form#123:\[ \left[ \mathbf{L} \right]_{k \neq l} = - \left[ \mathbf{K} \right]_{kl}, \]
-\form#124:\[ \left[ \mathbf{L} \right]_{k k} = \sum\limits_{m \neq k} \left[ \mathbf{K} \right]_{km}. \]
-\form#125:$\vec{1}$
-\form#126:$F(\vec{z})$
-\form#127:$\frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
-\form#128:$ V_{ijkl} = ( ij \mid V \mid kl ) $
-\form#129:$_{a,b}$
-\form#130:$I_a$
-\form#131:$I_b$
-\form#132:$_{a,b,c,d}$
-\form#133:$I_a \otimes I_b$
-\form#134:$I_c \otimes I_d$
-\form#135:$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
-\form#136:$T_{index1,index2}$
-\form#137:$V_{index1,index2,index3,index4}$
-\form#138:$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$
-\form#139:$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) $
-\form#140:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
-\form#141:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
-\form#142:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
-\form#143:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
-\form#144:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
+\form#0:\begin{eqnarray*} \hat{E}_{pq} & = & \sum\limits_{\sigma} \hat{a}^{\dagger}_{p \sigma} \hat{a}_{q \sigma} \\ \left[ \hat{E}_{pq} , \hat{E}_{rs} \right] & = & \delta_{qr} \hat{E}_{ps} - \delta_{ps} \hat{E}_{rq} \\ \hat{E}^{-}_{pq} & = & \hat{E}_{pq} - \hat{E}_{qp} \\ \hat{T} & = & \sum\limits_{p<q} x_{pq} \hat{E}^{-}_{pq} \\ E(\vec{x}) & = & \braket{0 | e^{\hat{T}} \hat{H} e^{-\hat{T}} | 0 } \\ \left. \frac{\partial E(\vec{x})}{\partial x_{ij}} \right|_{0} & = & \braket{ 0 | \left[ \hat{E}_{ij}^{-}, \hat{H} \right] | 0 } \\ \left. \frac{\partial^2 E(\vec{x})}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & \frac{1}{2} \braket{ 0 | \left[ \hat{E}_{ij}^{-}, \left[ \hat{E}_{kl}^{-}, \hat{H} \right] \right] | 0 } + \frac{1}{2} \braket{ 0 | \left[ \hat{E}_{kl}^{-}, \left[ \hat{E}_{ij}^{-}, \hat{H} \right] \right] | 0 } \end{eqnarray*}
+\form#1:$x_{pq}$
+\form#2:$I_p=I_q$
+\form#3:$h_{ij}$
+\form#4:$(ij | kl)$
+\form#5:\begin{eqnarray*} \Gamma^{2A}_{ijkl} & = & \sum\limits_{\sigma \tau} \braket{ 0 | \hat{a}^{\dagger}_{i \sigma} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} | 0} \\ \Gamma^1_{ij} & = & \sum\limits_{\sigma} \braket{ 0 | \hat{a}^{\dagger}_{i \sigma} \hat{a}_{j \sigma} | 0} \\ \left. \frac{\partial E(\vec{x})}{\partial x_{ij}} \right|_{0} & = & 2 \left( F_{ij} - F_{ji} \right) \\ F_{pq} & = & \sum\limits_{r} \Gamma_{pr}^{1} h_{qr} + \sum\limits_{rst} \Gamma^{2A}_{psrt} (qr | st) \\ \left. \frac{\partial^2 E(\vec{x})}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & w_{ijkl} - w_{jikl} - w_{ijlk} + w_{jilk} \\ w_{pqrs} & = & \delta_{qr} \left( F_{ps} + F_{sp} \right) + \tilde{w}_{pqrs} \\ \tilde{w}_{pqrs} & = & 2 \Gamma^1_{pr} h_{qs} + 2 \sum\limits_{\alpha \beta} \left( \Gamma^{2A}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A}_{r \alpha \beta p} + \Gamma^{2A}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right) \end{eqnarray*}
+\form#6:$F_{pq}$
+\form#7:$prst$
+\form#8:$q$
+\form#9:$I_p = I_q$
+\form#10:$\tilde{w}_{pqrs}$
+\form#11:$pr\alpha\beta$
+\form#12:$qs$
+\form#13:$I_r = I_s$
+\form#14:\begin{eqnarray*} \Gamma^1_{ij} & = & 2 \delta_{ij}^{occ} + \Gamma^{1,act}_{ij} \\ \Gamma^{2A}_{ijkl} & = & \Gamma^{2A,act}_{ijkl} + 2 \delta_{ik}^{occ} \Gamma^{1,act}_{jl} - \delta_{il}^{occ} \Gamma^{1,act}_{jk} \\ & + & 2 \delta_{jl}^{occ} \Gamma^{1,act}_{ik} - \delta_{jk}^{occ} \Gamma^{1,act}_{il} + 4 \delta_{ik}^{occ} \delta_{jl}^{occ} - 2 \delta_{il}^{occ} \delta_{jk}^{occ} \end{eqnarray*}
+\form#15:\begin{eqnarray*} Q^{occ}_{ij} & = & \sum\limits_{s \in occ} \left[ 2 (ij | ss) - (is | js ) \right] \\ Q^{act}_{ij} & = & \sum\limits_{st \in act} \frac{1}{2} \Gamma^{1,act}_{st} \left[ 2 (ij | st) - (is | jt ) \right] \end{eqnarray*}
+\form#16:\begin{eqnarray*} \tilde{E}_{const} & = & E_{const} + \sum\limits_{s \in occ} \left( 2 h_{ss} + Q_{ss}^{occ} \right) \\ \tilde{h}_{ij} & = & h_{ij} + Q_{ij}^{occ} \end{eqnarray*}
+\form#17:\begin{eqnarray*} p \in occ & : & F_{pq} = 2 \left( h_{qp} + Q^{occ}_{qp} + Q^{act}_{qp} \right) \\ p \in act & : & F_{pq} = \sum\limits_{r \in act} \Gamma^{1,act}_{pr} \left[ h_{qr} + Q^{occ}_{qr} \right] + \sum\limits_{rst \in act} \Gamma^{2A,act}_{psrt} (qr | st) \end{eqnarray*}
+\form#18:\begin{eqnarray*} (p,r) & \in & (occ,occ) : \tilde{w}_{pqrs} \\ & = & 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} + 3 (qp | sp) - (qs | pp) \right] \\ & + & 4 ( 1 - \delta_{pr}^{occ} ) \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\ (p,r) & \in & (act,act) : \tilde{w}_{pqrs} \\ & = & 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\ & + & 2 \sum\limits_{\alpha\beta \in act} \left[ \left( \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right) \right] \\ (p,r) & \in & (act,occ) : \tilde{w}_{pqrs} \\ & = & 2 \sum\limits_{\alpha \in act} \Gamma^{1,act}_{\alpha p} \left[ 4 (q \alpha | s r) - (qs | \alpha r) - (qr | s \alpha) \right] \\ (p,r) & \in & (occ,act) : \tilde{w}_{pqrs} \\ & = & 2 \sum\limits_{\beta \in act} \Gamma^{1,act}_{r \beta} \left[ 4 (q p | s \beta) - (qs | p \beta) - (q \beta | sp) \right] \end{eqnarray*}
+\form#19:$\vec{x}$
+\form#20:\[ E(\vec{x}) = \braket{0 | e^{\hat{T}(\vec{x})} \hat{H} e^{-\hat{T}(\vec{x})} | 0 } \approx E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x}. \]
+\form#21:$\vec{g}$
+\form#22:$\mathbf{H}$
+\form#23:$E(\vec{x})$
+\form#24:$\vec{x} = - \mathbf{H}^{-1} \vec{g}$
+\form#25:$\mathbf{U}_{add} = \exp(\mathbf{X}(\vec{x}))$
+\form#26:$\mathbf{X}(\vec{x}) = -\mathbf{X}^T(\vec{x})$
+\form#27:$\mathbf{U}_{add}$
+\form#28:$\mathbf{U}(n)$
+\form#29:\[ \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n). \]
+\form#30:\[ \left[ \begin{array}{cc} \mathbf{H} & \vec{g} \\ \vec{g}^T & 0 \end{array} \right] \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right] = \alpha \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right]. \]
+\form#31:$\mathbf{U}$
+\form#32:$\det(\mathbf{U})=+1$
+\form#33:$\|\vec{x}\|_2$
+\form#34:$\vec{x}(n)$
+\form#35:$\mathbf{Y}(n+1) = \log(\mathbf{U}(n+1))$
+\form#36:\[ e = \left\| \sum\limits_{i = 1}^{\kappa} c_i \vec{x}(n - \kappa + i) \right\|_2 \]
+\form#37:$\sum_{i} c_i = 1$
+\form#38:$\kappa$
+\form#39:$e$
+\form#40:\[ \left[ \begin{array}{cc} \mathbf{B} & \vec{1} \\ \vec{1}^T & 0 \end{array} \right] \left[ \begin{array}{c} \vec{c} \\ \lambda \end{array} \right] = \left[ \begin{array}{c} \vec{0} \\ 1 \end{array} \right], \]
+\form#41:$2\lambda$
+\form#42:\[ \left[\mathbf{B}\right]_{ij} = \vec{x}^T(n - \kappa + i) \vec{x}(n - \kappa + j) = \left[\mathbf{B}\right]_{ji}. \]
+\form#43:\[ \mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i). \]
+\form#44:$\mathbf{Y}_{new}$
+\form#45:$\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})$
+\form#46:$A$
+\form#47:$B$
+\form#48:$\ket{\Psi}$
+\form#49:\[ \mathbf{\rho}_A = trace_{B} ~ \ket{\Psi}\bra{\Psi}, \]
+\form#50:$trace_{B}$
+\form#51:$\mathbf{\rho}_A$
+\form#52:$\ket{\Psi} = \ket{\Psi_A}\ket{\Psi_B}$
+\form#53:\[ S_{A \mid B} = -trace_A ~ \mathbf{\rho}_A \log( \mathbf{\rho}_A ) = S_{B \mid A} \geq 0. \]
+\form#54:$S_{A \mid B} = 0$
+\form#55:$S_{A \mid B}$
+\form#56:$i$
+\form#57:$S_1(i)$
+\form#58:$j$
+\form#59:$S_2(ij)$
+\form#60:\[ S_2(ij) \leq S_1(i) + S_1(j), \]
+\form#61:$S_1(i) + S_1(j)$
+\form#62:\[ \left[ \mathbf{I} \right]_{ij} = \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left( 1 - \delta_{ij} \right) = \left[ \mathbf{I} \right]_{ji} \geq 0. \]
+\form#63:$\left[ \mathbf{I} \right]_{ij}$
+\form#64:$\Gamma^A$
+\form#65:$\Gamma^B$
+\form#66:$\Gamma^1$
+\form#67:\begin{eqnarray*} \Gamma^A_{ij;kl} & = & \sum\limits_{\sigma \tau} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\tau}^{\dagger} \hat{a}_{l\tau} \hat{a}_{k\sigma} }, \\ \Gamma^B_{ij;kl} & = & \sum\limits_{\sigma \tau} (-1)^{\sigma-\tau} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\tau}^{\dagger} \hat{a}_{l\tau} \hat{a}_{k\sigma} }, \\ \Gamma^1_{i;j} & = & \sum\limits_{\sigma} \braket{ \hat{a}_{i\sigma}^{\dagger} \hat{a}_{j\sigma} }, \end{eqnarray*}
+\form#68:$\sigma$
+\form#69:$\tau$
+\form#70:$\pm\frac{1}{2}$
+\form#71:\[ C_{spin}(i,j) = 4 \left( \braket{\hat{S}_i^z \hat{S}_j^z} - \braket{\hat{S}_i^z} \braket{\hat{S}_j^z} \right) = \Gamma^B_{ij;ij} + \delta_{ij} \Gamma^1_{i;i}, \]
+\form#72:$\braket{\hat{S}_i^z}=0$
+\form#73:\[ C_{spinflip}(i,j) = \braket{\hat{S}_i^+ \hat{S}_j^-} + \braket{\hat{S}_i^- \hat{S}_j^+} = \frac{1}{2} \left( \Gamma^B_{ij;ji} - \Gamma^A_{ij;ji} \right) + \delta_{ij} \Gamma^1_{i;i}, \]
+\form#74:\[ C_{dens}(i,j) = \braket{\hat{n}_i \hat{n}_j} - \braket{\hat{n}_i} \braket{\hat{n}_j} = \Gamma^A_{ij;ij} + \Gamma^1_{i;i} \left( \delta_{ij} - \Gamma^1_{j;j} \right). \]
+\form#75:\[ C_{dirad}(i,j) = \braket{\hat{d}_{i\uparrow} \hat{d}_{j\downarrow}} + \braket{\hat{d}_{i\downarrow} \hat{d}_{j\uparrow}} - \braket{\hat{d}_{i\uparrow}} \braket{\hat{d}_{j\downarrow}} - \braket{\hat{d}_{i\downarrow}} \braket{\hat{d}_{j\uparrow}}, \]
+\form#76:$\hat{d}_{i\sigma} = \hat{n}_{i\sigma} (1 - \hat{n}_{i~-\sigma})$
+\form#77:$ Idistance(power) = sum_{ij} I(i,j) * \mid i-j \mid^{power} $
+\form#78:$\mathbf{X} = -\mathbf{X}^T$
+\form#79:\[ \mathbf{U}^T \mathbf{U} = \exp(\mathbf{X}^T) \exp(\mathbf{X}) = \exp(- \mathbf{X}) \exp(\mathbf{X}) = \mathbf{I}. \]
+\form#80:$\mathbf{X}$
+\form#81:$(i \lambda, -i\lambda)$
+\form#82:$0$
+\form#83:$\mathbf{B} = \mathbf{X} \mathbf{X}$
+\form#84:$-\lambda^2$
+\form#85:$\mathbf{B}$
+\form#86:$\mathbf{V}$
+\form#87:$\mathbf{B} = \mathbf{V} diag(-\lambda^2) \mathbf{V}^T$
+\form#88:$\mathbf{C} = \mathbf{V}^T \mathbf{X} \mathbf{V}$
+\form#89:$\mathbf{C}\mathbf{C} = \mathbf{V}^T \mathbf{B} \mathbf{V}$
+\form#90:$\mathbf{C}\mathbf{C} = diag(-\lambda^2)$
+\form#91:$\mathbf{C}$
+\form#92:$1 \times 1$
+\form#93:$\left[0\right]$
+\form#94:$2 \times 2$
+\form#95:\[ \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right]. \]
+\form#96:$\left[1\right]$
+\form#97:\[ \exp \left[ \begin{array}{cc} 0 & \lambda \\ -\lambda & 0 \end{array} \right] = \left[ \begin{array}{cc} \cos(\lambda) & \sin(\lambda) \\ -\sin(\lambda) & \cos(\lambda) \end{array} \right]. \]
+\form#98:$\exp(\mathbf{C})$
+\form#99:$\exp(\mathbf{X}) = \mathbf{V} \exp(\mathbf{C}) \mathbf{V}^T$
+\form#100:\[ \mathbf{U} = \mathbf{V}_{U} diag(e^{i \theta}) \mathbf{V}_{U}^{\dagger} = \mathbf{V}_{U}^* diag(e^{-i \theta}) \mathbf{V}_{U}^{T}, \]
+\form#101:\[ \mathbf{U}^T = \mathbf{V}_{U}^* diag(e^{i \theta}) \mathbf{V}_{U}^{T} = \mathbf{V}_{U} diag(e^{-i \theta}) \mathbf{V}_{U}^{\dagger}. \]
+\form#102:$\mathbf{U}^T$
+\form#103:$(e^{i \theta}, e^{-i \theta})$
+\form#104:$ \mathbf{S} = \mathbf{U} + \mathbf{U}^T = \mathbf{V}_{U} diag(2\cos(\theta) ) \mathbf{V}_{U}^{\dagger} $
+\form#105:$\cos(\theta) \neq \pm 1$
+\form#106:$2\cos(\theta)$
+\form#107:$\cos(\theta)=+1$
+\form#108:$\mathbf{S}$
+\form#109:$\mathbf{S} = \mathbf{V}_{S} diag(2\cos(\theta)) \mathbf{V}_{S}^T$
+\form#110:$\mathbf{D} = \mathbf{V}_{S}^T \mathbf{U} \mathbf{V}_{S}$
+\form#111:$\left[ \pm 1 \right]$
+\form#112:\[ \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right]. \]
+\form#113:$\left[ -1 \right]$
+\form#114:$\left[ 1 \right]$
+\form#115:$\left[ 0 \right]$
+\form#116:$2\times 2$
+\form#117:\[ \log \left[ \begin{array}{cc} \cos(\theta) & \sin(\theta) \\ -\sin(\theta) & \cos(\theta) \end{array} \right] = \left[ \begin{array}{cc} 0 & \theta \\ -\theta & 0 \end{array} \right], \]
+\form#118:$\theta \in \left[ -\pi, \pi \right]$
+\form#119:$\log(\mathbf{D})$
+\form#120:$\log(\mathbf{U}) = \mathbf{V}_{S} \log(\mathbf{D}) \mathbf{V}_{S}^T$
+\form#121:\[ v_{ij;kl} = \left( i(\vec{r}_1) j(\vec{r}_2) \left| \frac{1}{\mid \vec{r}_1 - \vec{r}_2 \mid} \right| k(\vec{r}_1) l(\vec{r}_2) \right). \]
+\form#122:\[ I = \sum\limits_i v_{ii;ii} \]
+\form#123:$I$
+\form#124:$ I = \sum\limits_i v_{ii;ii} $
+\form#125:$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))$
+\form#126:\[ I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}. \]
+\form#127:\[ \left[ \frac{\partial \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq}} \right]_0 = \delta_{p \alpha} \delta_{q \beta} - \delta_{q \alpha} \delta_{p \beta}, \]
+\form#128:\begin{eqnarray*} 2 \left[ \frac{\partial^2 \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{qr} (\delta_{p \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{p \beta} ) \\ & - & \delta_{pr} (\delta_{q \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{q \beta} ) \\ & - & \delta_{qs} (\delta_{p \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{p \beta} ) \\ & + & \delta_{ps} (\delta_{q \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{q \beta} ), \end{eqnarray*}
+\form#129:$\left[ \mathbf{X} \right]_{pq}$
+\form#130:$v_{ij;kl}$
+\form#131:\[ \left[ \frac{\partial I}{\partial x_{pq}} \right]_0 = 4 (v_{pp;pq} - v_{qq;qp}), \]
+\form#132:\begin{eqnarray*} \left[ \frac{\partial^2 I}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & \delta_{pr} (8v_{pp;qs} + 4v_{pq;ps} - 2v_{qq;qs} - 2v_{ss;sq}) \\ & + & \delta_{qs} (8v_{qq;pr} + 4v_{qp;qr} - 2v_{pp;pr} - 2v_{rr;rp}) \\ & - & \delta_{ps} (8v_{pp;qr} + 4v_{pq;pr} - 2v_{qq;qr} - 2v_{rr;rq})\\ & - & \delta_{qr} (8v_{qq;ps} + 4v_{qp;qs} - 2v_{pp;ps} - 2v_{ss;sp}). \end{eqnarray*}
+\form#133:$\mathbf{K}$
+\form#134:\[ \left[ \mathbf{K} \right]_{ij} = v_{ij;ji} \geq 0. \]
+\form#135:\[ F(\vec{z}) ~ = ~ \frac{1}{2} \sum\limits_{k \neq l} \left[ \mathbf{K} \right]_{kl} (z_k - z_l)^2 ~ \geq 0, \]
+\form#136:$z_k$
+\form#137:$k$
+\form#138:$\sum_i z_i = 0$
+\form#139:$\vec{z}^T \vec{z} = 1$
+\form#140:\[ F(\vec{z}) ~ = ~ \vec{z}^T \mathbf{L} \vec{z} ~ \geq 0, \]
+\form#141:$\mathbf{L}$
+\form#142:\[ \left[ \mathbf{L} \right]_{k \neq l} = - \left[ \mathbf{K} \right]_{kl}, \]
+\form#143:\[ \left[ \mathbf{L} \right]_{k k} = \sum\limits_{m \neq k} \left[ \mathbf{K} \right]_{km}. \]
+\form#144:$\vec{1}$
+\form#145:$F(\vec{z})$
+\form#146:$\frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
+\form#147:$ V_{ijkl} = ( ij \mid V \mid kl ) $
+\form#148:$_{a,b}$
+\form#149:$I_a$
+\form#150:$I_b$
+\form#151:$_{a,b,c,d}$
+\form#152:$I_a \otimes I_b$
+\form#153:$I_c \otimes I_d$
+\form#154:$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $
+\form#155:$T_{index1,index2}$
+\form#156:$V_{index1,index2,index3,index4}$
+\form#157:$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$
+\form#158:$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) $
+\form#159:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
+\form#160:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
+\form#161:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
+\form#162:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
+\form#163:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $

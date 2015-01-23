@@ -143,54 +143,54 @@ Introduction</h1>
 Localization</h1>
 <p>Physics notation is assumed for the two-body matrix elements (the electron repulsion integrals with eightfold permutation symmetry): </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ v_{ij;kl} = \left( i(\vec{r}_1) j(\vec{r}_2) \left| \frac{1}{\mid \vec{r}_1 - \vec{r}_2 \mid} \right| k(\vec{r}_1) l(\vec{r}_2) \right). \]" src="form_101.png"/>
+<img class="formulaDsp" alt="\[ v_{ij;kl} = \left( i(\vec{r}_1) j(\vec{r}_2) \left| \frac{1}{\mid \vec{r}_1 - \vec{r}_2 \mid} \right| k(\vec{r}_1) l(\vec{r}_2) \right). \]" src="form_121.png"/>
 </p>
 <p> Edmiston and Ruedenberg proposed to maximize the cost function </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ I = \sum\limits_i v_{ii;ii} \]" src="form_102.png"/>
+<img class="formulaDsp" alt="\[ I = \sum\limits_i v_{ii;ii} \]" src="form_122.png"/>
 </p>
-<p> in order to obtain localized orthonormal orbitals [LOC4]. When the spatial extent of an orbital is small, its self-repulsion will indeed be high. CheMPS2 obtains localized orbitals (per irrep) with an augmented Hessian Newton-Raphson maximization of <img class="formulaInl" alt="$I$" src="form_103.png"/>, which can be called with the function <a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston-Ruedenberg cost function. ">CheMPS2::EdmistonRuedenberg::Optimize</a>.</p>
-<p>The orbitals which maximize the cost function <img class="formulaInl" alt="$ I = \sum\limits_i v_{ii;ii} $" src="form_104.png"/> can be parametrized with an orthogonal matrix <img class="formulaInl" alt="$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))$" src="form_105.png"/> (see <a class="el" href="classCheMPS2_1_1CASSCF.html">CheMPS2::CASSCF</a>): </p>
+<p> in order to obtain localized orthonormal orbitals [LOC4]. When the spatial extent of an orbital is small, its self-repulsion will indeed be high. CheMPS2 obtains localized orbitals (per irrep) with an augmented Hessian Newton-Raphson maximization of <img class="formulaInl" alt="$I$" src="form_123.png"/>, which can be called with the function <a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston-Ruedenberg cost function. ">CheMPS2::EdmistonRuedenberg::Optimize</a>.</p>
+<p>The orbitals which maximize the cost function <img class="formulaInl" alt="$ I = \sum\limits_i v_{ii;ii} $" src="form_124.png"/> can be parametrized with an orthogonal matrix <img class="formulaInl" alt="$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))$" src="form_125.png"/> (see <a class="el" href="classCheMPS2_1_1CASSCF.html">CheMPS2::CASSCF</a>): </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}. \]" src="form_106.png"/>
+<img class="formulaDsp" alt="\[ I(\mathbf{U}) = \sum\limits_{ijklm} \left[ \mathbf{U} \right]_{ij} \left[ \mathbf{U} \right]_{ik} \left[ \mathbf{U} \right]_{il} \left[ \mathbf{U} \right]_{im} v_{jk;lm}. \]" src="form_126.png"/>
 </p>
 <p> The following derivatives from Ref. [LOC5] are useful: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \left[ \frac{\partial \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq}} \right]_0 = \delta_{p \alpha} \delta_{q \beta} - \delta_{q \alpha} \delta_{p \beta}, \]" src="form_107.png"/>
+<img class="formulaDsp" alt="\[ \left[ \frac{\partial \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq}} \right]_0 = \delta_{p \alpha} \delta_{q \beta} - \delta_{q \alpha} \delta_{p \beta}, \]" src="form_127.png"/>
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} 2 \left[ \frac{\partial^2 \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq} \partial x_{rs}} \right]_0 &amp; = &amp; \delta_{qr} (\delta_{p \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{p \beta} ) \\ &amp; - &amp; \delta_{pr} (\delta_{q \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{q \beta} ) \\ &amp; - &amp; \delta_{qs} (\delta_{p \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{p \beta} ) \\ &amp; + &amp; \delta_{ps} (\delta_{q \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{q \beta} ), \end{eqnarray*}" src="form_108.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} 2 \left[ \frac{\partial^2 \left[ \mathbf{U} \right]_{\alpha \beta}}{\partial x_{pq} \partial x_{rs}} \right]_0 &amp; = &amp; \delta_{qr} (\delta_{p \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{p \beta} ) \\ &amp; - &amp; \delta_{pr} (\delta_{q \alpha} \delta_{s \beta} + \delta_{s \alpha} \delta_{q \beta} ) \\ &amp; - &amp; \delta_{qs} (\delta_{p \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{p \beta} ) \\ &amp; + &amp; \delta_{ps} (\delta_{q \alpha} \delta_{r \beta} + \delta_{r \alpha} \delta_{q \beta} ), \end{eqnarray*}" src="form_128.png"/>
 </p>
-<p> in which <img class="formulaInl" alt="$x_{pq}$" src="form_109.png"/> is the element in <img class="formulaInl" alt="$\vec{x}$" src="form_5.png"/> which corresponds to <img class="formulaInl" alt="$\left[ \mathbf{X} \right]_{pq}$" src="form_110.png"/>. Keeping the eightfold permutation symmetry of <img class="formulaInl" alt="$v_{ij;kl}$" src="form_111.png"/> in mind, the gradient of <img class="formulaInl" alt="$I$" src="form_103.png"/> with respect to orbital rotations is </p>
+<p> in which <img class="formulaInl" alt="$x_{pq}$" src="form_1.png"/> is the element in <img class="formulaInl" alt="$\vec{x}$" src="form_19.png"/> which corresponds to <img class="formulaInl" alt="$\left[ \mathbf{X} \right]_{pq}$" src="form_129.png"/>. Keeping the eightfold permutation symmetry of <img class="formulaInl" alt="$v_{ij;kl}$" src="form_130.png"/> in mind, the gradient of <img class="formulaInl" alt="$I$" src="form_123.png"/> with respect to orbital rotations is </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \left[ \frac{\partial I}{\partial x_{pq}} \right]_0 = 4 (v_{pp;pq} - v_{qq;qp}), \]" src="form_112.png"/>
+<img class="formulaDsp" alt="\[ \left[ \frac{\partial I}{\partial x_{pq}} \right]_0 = 4 (v_{pp;pq} - v_{qq;qp}), \]" src="form_131.png"/>
 </p>
 <p> and the Hessian </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} \left[ \frac{\partial^2 I}{\partial x_{pq} \partial x_{rs}} \right]_0 &amp; = &amp; \delta_{pr} (8v_{pp;qs} + 4v_{pq;ps} - 2v_{qq;qs} - 2v_{ss;sq}) \\ &amp; + &amp; \delta_{qs} (8v_{qq;pr} + 4v_{qp;qr} - 2v_{pp;pr} - 2v_{rr;rp}) \\ &amp; - &amp; \delta_{ps} (8v_{pp;qr} + 4v_{pq;pr} - 2v_{qq;qr} - 2v_{rr;rq})\\ &amp; - &amp; \delta_{qr} (8v_{qq;ps} + 4v_{qp;qs} - 2v_{pp;ps} - 2v_{ss;sp}). \end{eqnarray*}" src="form_113.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} \left[ \frac{\partial^2 I}{\partial x_{pq} \partial x_{rs}} \right]_0 &amp; = &amp; \delta_{pr} (8v_{pp;qs} + 4v_{pq;ps} - 2v_{qq;qs} - 2v_{ss;sq}) \\ &amp; + &amp; \delta_{qs} (8v_{qq;pr} + 4v_{qp;qr} - 2v_{pp;pr} - 2v_{rr;rp}) \\ &amp; - &amp; \delta_{ps} (8v_{pp;qr} + 4v_{pq;pr} - 2v_{qq;qr} - 2v_{rr;rq})\\ &amp; - &amp; \delta_{qr} (8v_{qq;ps} + 4v_{qp;qs} - 2v_{pp;ps} - 2v_{ss;sp}). \end{eqnarray*}" src="form_132.png"/>
 </p>
 <h1><a class="anchor" id="fiedlerEdRued"></a>
 Minimizing the bandwidth of the exchange matrix</h1>
-<p>Once localized orbitals are obtained, they can be ordered so that the bandwidth of the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_114.png"/> is minimal. This matrix has only nonnegative entries [LOC6]: </p>
+<p>Once localized orbitals are obtained, they can be ordered so that the bandwidth of the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_133.png"/> is minimal. This matrix has only nonnegative entries [LOC6]: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \left[ \mathbf{K} \right]_{ij} = v_{ij;ji} \geq 0. \]" src="form_115.png"/>
+<img class="formulaDsp" alt="\[ \left[ \mathbf{K} \right]_{ij} = v_{ij;ji} \geq 0. \]" src="form_134.png"/>
 </p>
 <p> A fast approximate bandwidth minimization is obtained by the so-called Fiedler vector [LOC7, LOC8, LOC9, LOC10]. Consider the minimization of the cost function </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ F(\vec{z}) ~ = ~ \frac{1}{2} \sum\limits_{k \neq l} \left[ \mathbf{K} \right]_{kl} (z_k - z_l)^2 ~ \geq 0, \]" src="form_116.png"/>
+<img class="formulaDsp" alt="\[ F(\vec{z}) ~ = ~ \frac{1}{2} \sum\limits_{k \neq l} \left[ \mathbf{K} \right]_{kl} (z_k - z_l)^2 ~ \geq 0, \]" src="form_135.png"/>
 </p>
-<p> where the (continuous) variable <img class="formulaInl" alt="$z_k$" src="form_117.png"/> denotes the optimal position of orbital <img class="formulaInl" alt="$k$" src="form_118.png"/>. In order to fix translational invariance and normalization of the solution, the constraints <img class="formulaInl" alt="$\sum_i z_i = 0$" src="form_119.png"/> and <img class="formulaInl" alt="$\vec{z}^T \vec{z} = 1$" src="form_120.png"/> are imposed. The cost function can be rewritten as </p>
+<p> where the (continuous) variable <img class="formulaInl" alt="$z_k$" src="form_136.png"/> denotes the optimal position of orbital <img class="formulaInl" alt="$k$" src="form_137.png"/>. In order to fix translational invariance and normalization of the solution, the constraints <img class="formulaInl" alt="$\sum_i z_i = 0$" src="form_138.png"/> and <img class="formulaInl" alt="$\vec{z}^T \vec{z} = 1$" src="form_139.png"/> are imposed. The cost function can be rewritten as </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ F(\vec{z}) ~ = ~ \vec{z}^T \mathbf{L} \vec{z} ~ \geq 0, \]" src="form_121.png"/>
+<img class="formulaDsp" alt="\[ F(\vec{z}) ~ = ~ \vec{z}^T \mathbf{L} \vec{z} ~ \geq 0, \]" src="form_140.png"/>
 </p>
-<p> with the symmetric and positive semidefinite Laplacian <img class="formulaInl" alt="$\mathbf{L}$" src="form_122.png"/>: </p>
+<p> with the symmetric and positive semidefinite Laplacian <img class="formulaInl" alt="$\mathbf{L}$" src="form_141.png"/>: </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \left[ \mathbf{L} \right]_{k \neq l} = - \left[ \mathbf{K} \right]_{kl}, \]" src="form_123.png"/>
+<img class="formulaDsp" alt="\[ \left[ \mathbf{L} \right]_{k \neq l} = - \left[ \mathbf{K} \right]_{kl}, \]" src="form_142.png"/>
 </p>
  <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \left[ \mathbf{L} \right]_{k k} = \sum\limits_{m \neq k} \left[ \mathbf{K} \right]_{km}. \]" src="form_124.png"/>
+<img class="formulaDsp" alt="\[ \left[ \mathbf{L} \right]_{k k} = \sum\limits_{m \neq k} \left[ \mathbf{K} \right]_{km}. \]" src="form_143.png"/>
 </p>
-<p> The constant vector <img class="formulaInl" alt="$\vec{1}$" src="form_125.png"/> is an eigenvector of <img class="formulaInl" alt="$\mathbf{L}$" src="form_122.png"/> with eigenvalue 0, which is discarded due to the translational invariance constraint. When the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_114.png"/> is not block-diagonal, all other eigenvalues are positive. The eigenvector with smallest nonzero eigenvalue is the Fiedler vector, the solution to the constrained minimization of <img class="formulaInl" alt="$F(\vec{z})$" src="form_126.png"/> [LOC7, LOC8, LOC9, LOC10]. When the indices of the orbitals are permuted so that they are ordered according to the continuous variables in the Fiedler vector, a fast approximate bandwidth minimization of the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_114.png"/> is performed. CheMPS2 orders the localized orbitals according to the Fiedler vector of the exchange matrix, which is performed in the function <a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i...">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a>.</p>
+<p> The constant vector <img class="formulaInl" alt="$\vec{1}$" src="form_144.png"/> is an eigenvector of <img class="formulaInl" alt="$\mathbf{L}$" src="form_141.png"/> with eigenvalue 0, which is discarded due to the translational invariance constraint. When the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_133.png"/> is not block-diagonal, all other eigenvalues are positive. The eigenvector with smallest nonzero eigenvalue is the Fiedler vector, the solution to the constrained minimization of <img class="formulaInl" alt="$F(\vec{z})$" src="form_145.png"/> [LOC7, LOC8, LOC9, LOC10]. When the indices of the orbitals are permuted so that they are ordered according to the continuous variables in the Fiedler vector, a fast approximate bandwidth minimization of the exchange matrix <img class="formulaInl" alt="$\mathbf{K}$" src="form_133.png"/> is performed. CheMPS2 orders the localized orbitals according to the Fiedler vector of the exchange matrix, which is performed in the function <a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i...">CheMPS2::EdmistonRuedenberg::FiedlerExchange</a>.</p>
 <h1><a class="anchor" id="biblioEdRued"></a>
 References</h1>
 <p>[LOC1] S. Wouters and D. Van Neck, European Physical Journal D 68, 272 (2014). <a href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">http://dx.doi.org/10.1140/epjd/e2014-50500-1</a> <br/>
@@ -443,7 +443,7 @@ References</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html">EdmistonRuedenberg</a></li>
-    <li class="footer">Generated on Sun Jan 18 2015 10:56:56 for CheMPS2 by
+    <li class="footer">Generated on Thu Jan 22 2015 23:01:14 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
