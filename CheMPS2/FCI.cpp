@@ -579,32 +579,40 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
             
             {
                // E^{alpha}_{creator <= annihilator}
-               const int entry_up     = creator + L * ( annihilator + L * count_new_up );
-               const int sign_up      = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
-               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
-               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
-               myResult += sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               const int entry_up = creator + L * ( annihilator + L * count_new_up );
+               const int sign_up  = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
+               if ( sign_up != 0 ){ // Required for one-electron calculations
+                  const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+                  const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+                  myResult = sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               }
                
                // E^{beta}_{creator <= annihilator}
-               const int entry_down   = creator + L * ( annihilator + L * count_new_down );
-               const int sign_down    = lookup_sign_beta[ irrep_new_down ][ entry_down ];
-               const int cnt_old_down = lookup_cnt_beta [ irrep_new_down ][ entry_down ];
-               myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+               const int entry_down = creator + L * ( annihilator + L * count_new_down );
+               const int sign_down  = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+               if ( sign_down != 0 ){ // Required for one-electron calculations
+                  const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
+                  myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+               }
             }
             
             if ( annihilator > creator ){
                // E^{alpha}_{annihilator > creator}
-               const int entry_up     = annihilator + L * ( creator + L * count_new_up );
-               const int sign_up      = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
-               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
-               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
-               myResult += sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               const int entry_up = annihilator + L * ( creator + L * count_new_up );
+               const int sign_up  = lookup_sign_alpha [ irrep_new_up ][ entry_up ];
+               if ( sign_up != 0 ){ // Required for one-electron calculations
+                  const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+                  const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+                  myResult += sign_up * input[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+               }
                
                // E^{beta}_{annihilator > creator}
-               const int entry_down   = annihilator + L * ( creator + L * count_new_down );
-               const int sign_down    = lookup_sign_beta[ irrep_new_down ][ entry_down ];
-               const int cnt_old_down = lookup_cnt_beta [ irrep_new_down ][ entry_down ];
-               myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+               const int entry_down = annihilator + L * ( creator + L * count_new_down );
+               const int sign_down  = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+               if ( sign_down != 0 ){ // Required for one-electron calculations
+                  const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
+                  myResult += sign_down * input[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+               }
             }
             
             HXVworkbig1[ loopvariable ] = myResult;
@@ -659,10 +667,10 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
             for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
                const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
                const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-               const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                const int entry_up                = orbj + L * ( orbi + L * count_old_up );
                const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ entry_up ];
                if ( sign_up != 0 ){ // Required for thread safety
+                  const unsigned int count_old_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                   const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
                   const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
                   const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
@@ -673,12 +681,12 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
             #pragma omp parallel for schedule(static) // The given E_{i<=j}^{beta} connects exactly one veccounter with one location_new
             for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
                const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-               const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
                const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                const int entry_down              = orbj + L * ( orbi + L * count_old_down );
                const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
                const int sign_down               = lookup_sign_beta[ irrep_old_down ][ entry_down ];
                if ( sign_down != 0 ){ // Required for thread safety
+                  const unsigned int count_old_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
                   const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
                   const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
                   output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
@@ -691,10 +699,10 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
                for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
                   const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
                   const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-                  const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                   const int entry_up                = orbi + L * ( orbj + L * count_old_up );
                   const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ entry_up ];
                   if ( sign_up != 0 ){ // Required for thread safety
+                     const unsigned int count_old_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                      const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
                      const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
                      const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
@@ -705,12 +713,12 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
                #pragma omp parallel for schedule(static) // The given E_{j>i}^{beta} connects exactly one veccounter with one location_new
                for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
                   const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-                  const unsigned int count_old_up   = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
                   const unsigned int count_old_down = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                   const int entry_down              = orbi + L * ( orbj + L * count_old_down );
                   const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
                   const int sign_down               = lookup_sign_beta[ irrep_old_down ][ entry_down ];
                   if ( sign_down != 0 ){ // Required for thread safety
+                     const unsigned int count_old_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
                      const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
                      const unsigned long long location_new = irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
                      output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
@@ -727,6 +735,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
 double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
 
    ClearVector( L*L*L*L , TwoRDM );
+   assert( Nel_up + Nel_down >= 2 );
 
    // Based HamTimesVec: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+j,tau a_l,tau a_l,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
    
@@ -762,19 +771,25 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
             const int irrep_new_down              = getIrrepProduct( irrep_new_up , localTargetIrrep );
             const unsigned int count_new_up       = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) % numPerIrrep_up[ irrep_new_up ];
             const unsigned int count_new_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_new_up ] ) / numPerIrrep_up[ irrep_new_up ];
+            
+            double myResult = 0.0;
 
             // E^{alpha}_{creator <= annihilator}
             const int entry_up = creator + L * ( annihilator + L * count_new_up );
             const int sign_up  = lookup_sign_alpha[ irrep_new_up ][ entry_up ];
-            const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
-            const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
-            double myResult = sign_up * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+            if ( sign_up != 0 ){ // Required for one-electron calculations
+               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
+               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
+               myResult = sign_up * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
+            }
             
             // E^{beta}_{creator <= annihilator}
             const int entry_down = creator + L * ( annihilator + L * count_new_down );
-            const int sign_down = lookup_sign_beta[ irrep_new_down ][ entry_down ];
-            const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
-            myResult += sign_down * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+            const int sign_down  = lookup_sign_beta[ irrep_new_down ][ entry_down ];
+            if ( sign_down != 0 ){ // Required for one-electron calculations
+               const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
+               myResult += sign_down * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
+            }
             
             HXVworkbig1[ loopvariable ] = myResult;
             
@@ -837,17 +852,21 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
                const unsigned int count_old_down     = ( veccounter - irrep_center_jumps[ irrep_center ][ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
                
                // E^{alpha}_{i<=k}
-               const int entry_up     = orb_k + L * ( orb_i + L * count_old_up );
-               const int sign_up      = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
-               const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
-               const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
-               myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+               const int entry_up = orb_k + L * ( orb_i + L * count_old_up );
+               const int sign_up  = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
+               if ( sign_up != 0 ){
+                  const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+                  const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+                  myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+               }
                
                // E^{beta}_{i<=k}
-               const int entry_down   = orb_k + L * ( orb_i + L * count_old_down );
-               const int sign_down    = lookup_sign_beta[ irrep_old_down ][ entry_down ];
-               const int cnt_new_down = lookup_cnt_beta [ irrep_old_down ][ entry_down ];
-               myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+               const int entry_down = orb_k + L * ( orb_i + L * count_old_down );
+               const int sign_down  = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+               if ( sign_down != 0 ){
+                  const int cnt_new_down = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
+                  myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+               }
             }
             
             TwoRDM[ orb_i + L * ( orb_j + L * ( orb_k + L * orb_l ) ) ] += myResult; // i<=k and j<=l
@@ -867,16 +886,20 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
                   
                   // E^{alpha}_{k>i}
                   const int entry_up = orb_i + L * ( orb_k + L * count_old_up );
-                  const int sign_up      = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
-                  const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
-                  const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
-                  myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+                  const int sign_up  = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
+                  if ( sign_up != 0 ){
+                     const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
+                     const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
+                     myResult += sign_up * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
+                  }
                   
                   // E^{beta}_{k>i}
-                  const int entry_down   = orb_i + L * ( orb_k + L * count_old_down );
-                  const int sign_down    = lookup_sign_beta[ irrep_old_down ][ entry_down ];
-                  const int cnt_new_down = lookup_cnt_beta [ irrep_old_down ][ entry_down ];
-                  myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+                  const int entry_down = orb_i + L * ( orb_k + L * count_old_down );
+                  const int sign_down  = lookup_sign_beta[ irrep_old_down ][ entry_down ];
+                  if ( sign_down != 0 ){
+                     const int cnt_new_down = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
+                     myResult += sign_down * HXVworkbig1[ location_old ] * vector[ irrep_center_jumps[ 0 ][ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
+                  }
                }
             
                TwoRDM[ orb_k + L * ( orb_j + L * ( orb_i + L * orb_l ) ) ] += myResult; // "i>k" and j<=l
@@ -950,20 +973,26 @@ double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
             // - ( a_i,up^+ a_j,up )( a_j,down^+ a_i,down )
             const int entry_down_ji = orbj + L * ( orbi + L * count_down );
             const int sign_down_ji  = lookup_sign_beta [ irrep_down ][ entry_down_ji ];
-            const int cnt_down_ji   = lookup_cnt_beta  [ irrep_down ][ entry_down_ji ];
             const int entry_up_ij   = orbi + L * ( orbj + L * count_up );
             const int sign_up_ij    = lookup_sign_alpha[ irrep_up ][ entry_up_ij ];
-            const int cnt_up_ij     = lookup_cnt_alpha [ irrep_up ][ entry_up_ij ];
-            result -= sign_down_ji * sign_up_ij * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ij + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ji ] * vector[ counter ];
+            const int sign_product1 = sign_up_ij * sign_down_ji;
+            if ( sign_product1 != 0 ){
+               const int cnt_down_ji = lookup_cnt_beta[ irrep_down ][ entry_down_ji ];
+               const int cnt_up_ij   = lookup_cnt_alpha[ irrep_up ][ entry_up_ij ];
+               result -= sign_product1 * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ij + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ji ] * vector[ counter ];
+            }
 
             // - ( a_j,up^+ a_i,up )( a_i,down^+ a_j,down )
             const int entry_down_ij = orbi + L * ( orbj + L * count_down );
             const int sign_down_ij  = lookup_sign_beta[ irrep_down ][ entry_down_ij ];
-            const int cnt_down_ij   = lookup_cnt_beta [ irrep_down ][ entry_down_ij ];
             const int entry_up_ji   = orbj + L * ( orbi + L * count_up );
             const int sign_up_ji    = lookup_sign_alpha[ irrep_up ][ entry_up_ji ];
-            const int cnt_up_ji     = lookup_cnt_alpha [ irrep_up ][ entry_up_ji ];
-            result -= sign_down_ij * sign_up_ji * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ji + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ij ] * vector[ counter ];
+            const int sign_product2 = sign_up_ji * sign_down_ij;
+            if ( sign_product2 != 0 ){
+               const int cnt_down_ij = lookup_cnt_beta[ irrep_down ][ entry_down_ij ];
+               const int cnt_up_ji   = lookup_cnt_alpha[ irrep_up ][ entry_up_ji ];
+               result -= sign_product2 * vector[ irrep_center_jumps[ 0 ][ irrep_up_bis ] + cnt_up_ji + numPerIrrep_up[ irrep_up_bis ] * cnt_down_ij ] * vector[ counter ];
+            }
          
          }
       }
@@ -1061,8 +1090,75 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
             bits_down_bra[ cnt ] = bits_down_ket[ cnt ];
          }
          
+         // If only 1 electron: Acting with a^+_i,up a_k,up
+         if (( Nel_up == 1 ) && ( Nel_down == 0 )){
+            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
+            
+            //Loop i to remove from the vector
+            for (unsigned int orbi = 0; orbi < L; orbi++){
+               if ( bits_up_bra[ orbi ] ){
+                  bits_up_bra[ orbi ] = 0;
+
+                  //Loop k to add again to the vector
+                  for (unsigned int orbk = 0; orbk < L; orbk++){
+                     if (( orb2irrep[ orbi ] == orb2irrep[ orbk ] ) && ( !(bits_up_bra[ orbk ]) )){
+                        bits_up_bra[ orbk ] = 1;
+
+                        //find the corresponding string and counter
+                        const unsigned int string_in_up = bits2str(L, bits_up_bra);
+                        const unsigned long long incounter = incounter_offset + str2cnt_up[ irrep_out_up ][ string_in_up ];
+                        
+                        if ( workspace[ incounter ] ){
+                           workspace[ incounter ] = false;
+                           const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
+                           myResult += factor * factor;
+                        }
+
+                        bits_up_bra[ orbk ] = 0;
+                     }
+                  }
+                  bits_up_bra[ orbi ] = 1;
+               }
+            }
+         
+         }
+         
+         // If only 1 electron: Acting with a^+_i,down a_k,down
+         if (( Nel_up == 0 ) && ( Nel_down == 1 )){
+            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + outcount_up;
+            
+            //Loop i to remove from the vector
+            for (unsigned int orbi = 0; orbi < L; orbi++){
+               if ( bits_down_bra[ orbi ] ){
+                  bits_down_bra[ orbi ] = 0;
+                        
+                  //Loop k to add again to the vector
+                  for (unsigned int orbk = 0; orbk < L; orbk++){
+                     if (( orb2irrep[ orbi ] == orb2irrep[ orbk ] ) && ( !(bits_down_bra[ orbk ]) )){
+                        bits_down_bra[ orbk ] = 1;
+                                                      
+                        //find the corresponding string and counter
+                        const unsigned int string_in_down = bits2str(L, bits_down_bra);
+                        const unsigned long long incounter = incounter_offset + numPerIrrep_up[ irrep_out_up ] * str2cnt_down[ irrep_out_down ][ string_in_down ];
+                        
+                        if ( workspace[ incounter ] ){
+                           workspace[ incounter ] = false;
+                           const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
+                           myResult += factor * factor;
+                        }
+                        
+                        bits_down_bra[ orbk ] = 0;
+                     }
+                  }
+
+                  bits_down_bra[ orbi ] = 1;
+               }
+            }
+            
+         }
+         
          // Case 1: Acting with a^+_i,up a^+_j,up a_l,up a_k,up
-         {
+         if ( Nel_up >= 2 ){
             const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
             
             //Loop i<j to remove from the vector
@@ -1108,7 +1204,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
          }
          
          // Case 2: Acting with a^+_i,down a^+_j,down a_l,down a_k,down
-         {
+         if ( Nel_down >=2 ){
             const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + outcount_up;
             
             //Loop i<j to remove from the vector
@@ -1153,8 +1249,8 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
             
          }
          
-         // Case 1: Acting with a^+_i,up a_k,up a^+_j,down a_l,down
-         {
+         // Case 3: Acting with a^+_i,up a_k,up a^+_j,down a_l,down
+         if (( Nel_up >= 1 ) && ( Nel_down >= 1 )){
          
             //Loop orbi to REMOVE an UP electron from the vector
             for (unsigned int orbi = 0; orbi < L; orbi++){
@@ -1822,8 +1918,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    double * temp   = new double[ vecLength ];
    double * temp2  = new double[ vecLength ];
    double * precon = new double[ vecLength ];
-   if ( Nel_up + Nel_down >= 2 ){ CGDiagPrecond( alpha , beta , eta , precon , temp ); }
-   else{ for (unsigned long long cnt = 0; cnt<vecLength; cnt++){ precon[cnt] = 1.0; } }
+   CGDiagPrecond( alpha , beta , eta , precon , temp );
    
    assert( RealSol != NULL );
    assert( ImagSol != NULL );
@@ -1928,106 +2023,6 @@ void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const dou
 
 }
 
-void CheMPS2::FCI::BiCGSTABSolveSystem(const double alphaparam, const double betaparam, const double etaparam, double * RHS, double * RealSol, double * ImagSol, const bool checkError) const{
-
-   assert( RealSol != NULL );
-   assert( ImagSol != NULL );
-   assert( fabs( etaparam ) > 0.0 );
-   const unsigned long long vecLength       = getVecLength( 0 );
-   const unsigned long long doubleVecLength = 2 * vecLength;
-   const unsigned int max_integer           = INT_MAX;
-   assert( max_integer >= doubleVecLength ); // Necessary for using the FCI wrappers to BLAS routines
-   
-   const double RESIDUALTHRESHOLD = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * doubleVecLength );
-   if ( FCIverbose>1 ){ cout << "FCI::BiCGSTABSolveSystem : The residual norm for convergence = " << RESIDUALTHRESHOLD << endl; }
-   
-   // Create a few helper arrays
-   double * r0_hat = new double[ doubleVecLength ];
-   double * r_vec  = new double[ doubleVecLength ];
-   double * p_vec  = new double[ doubleVecLength ];
-   double * v_vec  = new double[ doubleVecLength ];
-   double * t_vec  = new double[ doubleVecLength ];
-   double * x_vec  = new double[ doubleVecLength ];
-
-   /* 
-         ( alphaparam + betaparam * H + I * etaparam ) ( RealSol + I * ImagSol ) = RHS + I * 0
-      
-      is solved with the biconjugate gradient STAB method:
-      
-         [ alphaparam + betaparam * H       -etaparam                  ]  [ RealSol ]   =   [ RHS ]
-         [ etaparam                         alphaparam + betaparam * H ]  [ ImagSol ]       [ 0   ]
-         
-      which is written in shorthand form as
-      
-         Operator(BiCGSTAB) * x_vec = [RHS, 0]^T
-      
-   */
-   
-   FillRandom( doubleVecLength, x_vec ); // x_vec contains the initial guess for the solution
-   FCIdcopy( vecLength, RHS, r_vec );
-   ClearVector( vecLength, r_vec + vecLength ); // r_vec contains the right-hand side of the linear system
-   
-   //The actual BiCGSTAB algorithm (without preconditioner)
-   {
-      BiCGSTABOperator( alphaparam, betaparam, etaparam, x_vec, t_vec ); // t_vec  = A * x0
-      FCIdaxpy( doubleVecLength, -1.0, t_vec, r_vec );    // r_vec  = r0 = b - A * x0
-      FCIdcopy( doubleVecLength, r_vec, r0_hat );         // r0_hat = r0
-      double rho_previous   = 1;                          // rho0   = 1
-      double alpha          = 1;                          // alpha  = 1
-      double omega_previous = 1;                          // omega0 = 1
-      ClearVector( doubleVecLength, v_vec );              // p0 = 0
-      ClearVector( doubleVecLength, p_vec );              // v0 = 0
-      double norm_s = 100 * RESIDUALTHRESHOLD;
-      int iteration = 0;
-      
-      while ( norm_s > RESIDUALTHRESHOLD ){
-      
-         iteration++;
-         const double rho_i = FCIddot( doubleVecLength, r0_hat, r_vec );
-         const double beta  = ( rho_i / rho_previous ) * ( alpha / omega_previous );
-         for ( unsigned int cnt = 0; cnt < doubleVecLength; cnt++ ){ // assert( max_integer >= doubleVecLength ); in the beginning
-            p_vec[ cnt ] = r_vec[ cnt ] + beta * ( p_vec[ cnt ] - omega_previous * v_vec[ cnt ] );
-         }
-         BiCGSTABOperator( alphaparam, betaparam, etaparam, p_vec, v_vec ); // vi = Operator(BiCGSTAB) * pi
-         alpha = rho_i / FCIddot( doubleVecLength, r0_hat, v_vec );
-         FCIdaxpy( doubleVecLength, -alpha, v_vec, r_vec );                 // s (r_vec) = r_{i-1} - alpha v_i
-         norm_s = FCIfrobeniusnorm( doubleVecLength, r_vec );
-         BiCGSTABOperator( alphaparam, betaparam, etaparam, r_vec, t_vec ); // t = Operator(BiCGSTAB) * s
-         const double omega_i = FCIddot( doubleVecLength, t_vec, r_vec ) / FCIddot( doubleVecLength, t_vec, t_vec );
-         for ( unsigned int cnt = 0; cnt < doubleVecLength; cnt++ ){        // assert( max_integer >= doubleVecLength ); in the beginning
-            x_vec[ cnt ] = x_vec[ cnt ] + alpha * p_vec[ cnt ] + omega_i * r_vec[ cnt ];
-         }
-         FCIdaxpy( doubleVecLength, -omega_i, t_vec, r_vec );               // r_i = s (r_vec) - omega_i * t
-         
-         rho_previous   = rho_i;
-         omega_previous = omega_i;
-         if ( FCIverbose > 1 ){ cout << "FCI::BiCGSTABSolveSystem : At step " << iteration << " the residual norm is " << norm_s << endl; }
-      
-      }
-   }
-   
-   FCIdcopy( vecLength, x_vec,             RealSol );
-   FCIdcopy( vecLength, x_vec + vecLength, ImagSol );
-
-   if (( checkError ) && ( FCIverbose > 0 )){
-      FCIdcopy( vecLength, RHS, r_vec );
-      ClearVector( vecLength, r_vec + vecLength );
-      BiCGSTABOperator( alphaparam, betaparam, etaparam, x_vec, t_vec );
-      FCIdaxpy( doubleVecLength, -1.0, r_vec, t_vec ); // t_vec = Operator(BiCGSTAB) * x_vec - r_vec
-      double RMSerror = FCIfrobeniusnorm( doubleVecLength, t_vec );
-      cout << "FCI::BiCGSTABSolveSystem : RMS error when checking the solution = " << RMSerror << endl;
-   }
-   
-   // Clean up
-   delete [] r0_hat;
-   delete [] r_vec;
-   delete [] p_vec;
-   delete [] v_vec;
-   delete [] t_vec;
-   delete [] x_vec;
-
-}
-
 void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const{
 
    HamTimesVec( in , out );
@@ -2051,20 +2046,6 @@ void CheMPS2::FCI::CGOperator(const double alpha, const double beta, const doubl
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
       out[ cnt ] = precon[ cnt ] * out[ cnt ];                 // out   = precon * [ ( alpha + beta * H )^2 + eta*eta ] * precon * in
    }
-
-}
-
-void CheMPS2::FCI::BiCGSTABOperator(const double alpha, const double beta, const double eta, double * in, double * out) const{
-
-   const unsigned long long vecLength = getVecLength( 0 );
-   double * Re_in  = in;
-   double * Im_in  = in + vecLength;
-   double * Re_out = out;
-   double * Im_out = out + vecLength;
-   CGAlphaPlusBetaHAM( alpha, beta, Re_in, Re_out ); // Re(out) = ( alpha + beta * H ) Re(in)
-   CGAlphaPlusBetaHAM( alpha, beta, Im_in, Im_out ); // Im(out) = ( alpha + beta * H ) Im(in)
-   FCIdaxpy( vecLength, -eta, Im_in, Re_out );       // Re(out) = ( alpha + beta * H ) Re(in) - eta Im(in)
-   FCIdaxpy( vecLength,  eta, Re_in, Im_out );       // Im(out) = eta Re(in) + ( alpha + beta * H ) Im(in)
 
 }
 

@@ -370,14 +370,6 @@ namespace CheMPS2{
              \param temp2 Workspace of size getVecLength(0) */
          void CGOperator(const double alpha, const double beta, const double eta, double * precon, double * in, double * temp, double * temp2, double * out) const;
          
-         //! Calculate out = Operator(BiCGSTAB) * in, where Operator(BiCGSTAB) is [[ alpha + beta * H, -eta ][ eta, alpha + beta * H ]] (Econstant is taken into account!!)
-         /** \param alpha The parameter alpha of the operator
-             \param beta The parameter beta of the operator
-             \param eta The parameter eta of the operator
-             \param in On entry the vector of size 2*getVecLength(0) on which the operator should be applied; unchanged on exit
-             \param out Array of size 2*getVecLength(0), which contains on exit Operator(BiCGSTAB) * in */
-         void BiCGSTABOperator(const double alpha, const double beta, const double eta, double * in, double * out) const;
-         
          //! Calculate (without approximation) precon = (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)
          /** \param alpha The parameter alpha of the operator
              \param beta The parameter beta of the operator
@@ -385,16 +377,6 @@ namespace CheMPS2{
              \param precon Array of size getVecLength(0), which contains on exit (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 }
              \param workspace Workspace of size getVecLength(0) */
          void CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const;
-         
-         //! Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with BiCGSTAB, i.e. stabilized biconjugate gradient
-         /** \param alpha The real part of the scalar in the operator
-             \param beta The real-valued prefactor of the Hamiltonian in the operator
-             \param eta The imaginary part of the scalar in the operator
-             \param RHS The real-valued right-hand side of the equation with length getVecLength(0)
-             \param RealSol On exit this array of length getVecLength(0) contains the real part of the solution
-             \param ImagSol On exit this array of length getVecLength(0) contains the imaginary part of the solution
-             \param checkError If true, the RMS error will be calculated and printed after convergence */
-         void BiCGSTABSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError=true) const;
       
       private:
       
