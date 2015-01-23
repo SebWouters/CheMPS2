@@ -93,9 +93,8 @@ namespace CheMPS2{
       (p,r) & \in & (occ,occ) : \tilde{w}_{pqrs} \\
                           & = & 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} + 3 (qp | sp) - (qs | pp) \right] \\
                           & + & 4 ( 1 - \delta_{pr}^{occ} ) \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\
-      (p,r) & \in & (act,act) : \tilde{w}_{pqrs} \\
-                          & = & 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\
-                          & + & 2 \sum\limits_{\alpha\beta \in act} \left[ \left( \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right) \right] \\
+      (p,r) & \in & (act,act) : \tilde{w}_{pqrs} = 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\
+                          & + & 2 \sum\limits_{\alpha\beta \in act} \left[ \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right] \\
       (p,r) & \in & (act,occ) : \tilde{w}_{pqrs} \\
                           & = & 2 \sum\limits_{\alpha \in act} \Gamma^{1,act}_{\alpha p} \left[ 4 (q \alpha | s r) - (qs | \alpha r) - (qr | s \alpha) \right] \\
       (p,r) & \in & (occ,act) : \tilde{w}_{pqrs} \\
