@@ -43,23 +43,23 @@ namespace CheMPS2{
     
     \section equations_2step_dmrgscf Orbital gradient and Hessian
 
-    The calculation of the orbital gradient and orbital-orbital Hessian for DMRG-SCF is based on [CAS3]. The basic idea is to express the energy with the unitary group generators:
+    The calculation of the orbital gradient and Hessian for DMRG-SCF is based on [CAS3]. The basic idea is to express the energy with the unitary group generators:
     \f{eqnarray*}{
       \hat{E}_{pq} & = & \sum\limits_{\sigma} \hat{a}^{\dagger}_{p \sigma} \hat{a}_{q \sigma} \\
       \left[ \hat{E}_{pq} , \hat{E}_{rs} \right] & = & \delta_{qr} \hat{E}_{ps} - \delta_{ps} \hat{E}_{rq} \\
       \hat{E}^{-}_{pq} & = & \hat{E}_{pq} - \hat{E}_{qp} \\
       \hat{T} & = & \sum\limits_{p<q} x_{pq} \hat{E}^{-}_{pq} \\
-      E(x) & = & \braket{0 | e^{\hat{T}} \hat{H} e^{-\hat{T}} | 0 } \\
-      \left. \frac{\partial E(x)}{\partial x_{ij}} \right|_{0} & = & \braket{ 0 | \left[ \hat{E}_{ij}^{-}, \hat{H} \right] | 0 } \\
-      \left. \frac{\partial^2 E(x)}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & \frac{1}{2} \braket{ 0 |  \left[ \hat{E}_{ij}^{-}, \left[ \hat{E}_{kl}^{-}, \hat{H} \right] \right] | 0 } + \frac{1}{2} \braket{ 0 |  \left[ \hat{E}_{kl}^{-}, \left[ \hat{E}_{ij}^{-}, \hat{H} \right] \right] | 0 }
+      E(\vec{x}) & = & \braket{0 | e^{\hat{T}} \hat{H} e^{-\hat{T}} | 0 } \\
+      \left. \frac{\partial E(\vec{x})}{\partial x_{ij}} \right|_{0} & = & \braket{ 0 | \left[ \hat{E}_{ij}^{-}, \hat{H} \right] | 0 } \\
+      \left. \frac{\partial^2 E(\vec{x})}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & \frac{1}{2} \braket{ 0 |  \left[ \hat{E}_{ij}^{-}, \left[ \hat{E}_{kl}^{-}, \hat{H} \right] \right] | 0 } + \frac{1}{2} \braket{ 0 |  \left[ \hat{E}_{kl}^{-}, \left[ \hat{E}_{ij}^{-}, \hat{H} \right] \right] | 0 }
     \f}
     The variables \f$x_{pq}\f$ only connect orbitals with the same irrep (\f$I_p=I_q\f$). Assuming that DMRG is exact, \f$x_{pq}\f$ in addition only connects orbitals when they belong to different occupation blocks: occupied, active, virtual. With some algebra, the derivatives can be rewritten. Real-valued symmetric one-electron integrals \f$h_{ij}\f$ and real-valued eightfold permutation symmetric two-electron integrals \f$(ij | kl)\f$ are assumed (chemical notation for the latter).
     \f{eqnarray*}{
       \Gamma^{2A}_{ijkl} & = & \sum\limits_{\sigma \tau} \braket{ 0 | \hat{a}^{\dagger}_{i \sigma} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} | 0} \\
       \Gamma^1_{ij} & = & \sum\limits_{\sigma} \braket{ 0 | \hat{a}^{\dagger}_{i \sigma} \hat{a}_{j \sigma} | 0} \\
-      \left. \frac{\partial E(x)}{\partial x_{ij}} \right|_{0} & = & 2 \left( F_{ij} - F_{ji} \right) \\
+      \left. \frac{\partial E(\vec{x})}{\partial x_{ij}} \right|_{0} & = & 2 \left( F_{ij} - F_{ji} \right) \\
       F_{pq} & = & \sum\limits_{r} \Gamma_{pr}^{1} h_{qr} + \sum\limits_{rst} \Gamma^{2A}_{psrt} (qr | st) \\
-      \left. \frac{\partial^2 E(x)}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & w_{ijkl} - w_{jikl} - w_{ijlk} + w_{jilk} \\
+      \left. \frac{\partial^2 E(\vec{x})}{\partial x_{ij} \partial x_{kl}} \right|_{0} & = & w_{ijkl} - w_{jikl} - w_{ijlk} + w_{jilk} \\
       w_{pqrs} & = & \delta_{qr} \left( F_{ps} + F_{sp} \right) + \tilde{w}_{pqrs} \\
       \tilde{w}_{pqrs} & = & 2 \Gamma^1_{pr} h_{qs} + 2 \sum\limits_{\alpha \beta} \left( \Gamma^{2A}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A}_{r \alpha \beta p} + \Gamma^{2A}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right)
     \f}
@@ -73,7 +73,7 @@ namespace CheMPS2{
       \Gamma^{2A}_{ijkl} & = & \Gamma^{2A,act}_{ijkl} + 2 \delta_{ik}^{occ} \Gamma^{1,act}_{jl} - \delta_{il}^{occ} \Gamma^{1,act}_{jk} \\
       & + & 2 \delta_{jl}^{occ} \Gamma^{1,act}_{ik} - \delta_{jk}^{occ} \Gamma^{1,act}_{il} + 4 \delta_{ik}^{occ} \delta_{jl}^{occ} - 2 \delta_{il}^{occ} \delta_{jk}^{occ}
     \f}
-    Define the following symmetric Coulomb and exchange matrices:
+    Define the following symmetric charge (Coulomb + exchange) matrices:
     \f{eqnarray*}{
       Q^{occ}_{ij} & = & \sum\limits_{s \in occ} \left[ 2 (ij | ss) - (is | js ) \right] \\
       Q^{act}_{ij} & = & \sum\limits_{st \in act} \frac{1}{2} \Gamma^{1,act}_{st} \left[ 2 (ij | st) - (is | jt ) \right] 
@@ -83,12 +83,12 @@ namespace CheMPS2{
       \tilde{E}_{const} & = & E_{const} + \sum\limits_{s \in occ} \left( 2 h_{ss} + Q_{ss}^{occ} \right) \\
       \tilde{h}_{ij} & = & h_{ij} + Q_{ij}^{occ} 
     \f}
-    The calculation of \f$F_{pq}\f$ simplifies significantly:
+    The calculation of \f$F_{pq}\f$ boils down to:
     \f{eqnarray*}{
       p \in occ & : & F_{pq} = 2 \left( h_{qp} + Q^{occ}_{qp} + Q^{act}_{qp} \right) \\
       p \in act & : & F_{pq} = \sum\limits_{r \in act} \Gamma^{1,act}_{pr} \left[ h_{qr} + Q^{occ}_{qr} \right] +  \sum\limits_{rst \in act} \Gamma^{2A,act}_{psrt} (qr | st)
     \f}
-    And the calculation of \f$\tilde{w}_{pqrs}\f$ as well (remember that \f$I_p = I_q\f$ and \f$I_r = I_s\f$):
+    And the calculation of \f$\tilde{w}_{pqrs}\f$ (remember that \f$I_p = I_q\f$ and \f$I_r = I_s\f$):
     \f{eqnarray*}{
       (p,r) & \in & (occ,occ) : \tilde{w}_{pqrs} \\
                           & = & 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} + 3 (qp | sp) - (qs | pp) \right] \\
@@ -103,12 +103,12 @@ namespace CheMPS2{
     \f}
 
     \section origalgo Augmented Hessian Newton-Raphson DMRG-SCF
-
-    Orbital rotations are represented by orthogonal matrices \f$\mathbf{U}\f$. Since orbitals are defined up to a phase factor, one can always choose the orbital gauges so that \f$\mathbf{U}\f$ is special orthogonal: \f$\det(\mathbf{U})=+1\f$. \f$\mathbf{U}\f$ can be parametrized by a real-valued skew-symmetric matrix \f$\mathbf{X} = -\mathbf{X}^T\f$, see CheMPS2::DMRGSCFunitary. The CASSCF energy is a function of \f$\mathbf{U}\f$ and hence of \f$\mathbf{X}\f$. Up to second order, the energy is given by 
+    
+    The CASSCF energy is a function of \f$\vec{x}\f$. Up to second order, the energy is given by 
     \f[
-    E(\vec{x}) = E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x},
+    E(\vec{x}) = \braket{0 | e^{\hat{T}(\vec{x})} \hat{H} e^{-\hat{T}(\vec{x})} | 0 } \approx E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x}.
     \f]
-    where \f$\vec{x}\f$ contains the independent variables of \f$\mathbf{X}\f$. The variables \f$\vec{x}\f$ parametrize an additional orbital rotation \f$\mathbf{U}_{add} = \exp(\mathbf{X}(\vec{x}))\f$ with respect to the current orbitals \f$\mathbf{U}(n)\f$. The vector \f$\vec{g}\f$ is the gradient, and the matrix \f$\mathbf{H}\f$ the Hessian, for orbital rotations [CAS3]. The minimum of \f$E(\vec{x})\f$ is found at \f$\vec{x} = - \mathbf{H}^{-1} \vec{g}\f$. The additional orbital rotation \f$\mathbf{U}_{add}\f$ then allows to update the current orbitals \f$\mathbf{U}(n)\f$ to the new orbitals
+    The vector \f$\vec{g}\f$ is the gradient and the matrix \f$\mathbf{H}\f$ the Hessian for orbital rotations [CAS3]. They have been described in the previous section. The minimum of \f$E(\vec{x})\f$ is found at \f$\vec{x} = - \mathbf{H}^{-1} \vec{g}\f$. The variables \f$\vec{x}\f$ parametrize an additional orbital rotation \f$\mathbf{U}_{add} = \exp(\mathbf{X}(\vec{x}))\f$, with \f$\mathbf{X}(\vec{x}) = -\mathbf{X}^T(\vec{x})\f$ a real-valued skew-symmetric matrix. The additional orbital rotation \f$\mathbf{U}_{add}\f$ transforms the current orbitals \f$\mathbf{U}(n)\f$ to the new orbitals
     \f[
     \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n).
     \f]
@@ -117,10 +117,12 @@ namespace CheMPS2{
     \left[ \begin{array}{cc} \mathbf{H} & \vec{g} \\ \vec{g}^T & 0 \end{array} \right] \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right] = \alpha \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right].
     \f]
     The eigenvector with smallest algebraic eigenvalue determines a stable update \f$\vec{x}\f$, as is well explained in Ref. [CAS7].
+    
+    As a final remark in this section, I would like to say that orbitals have gauge freedom. One can always multiply them with a phase factor. It is therefore possible to choose the orbital gauges so that all \f$\mathbf{U}\f$ are always special orthogonal: \f$\det(\mathbf{U})=+1\f$.
 
     \section diis Direct inversion of the iterative subspace (DIIS)
 
-    When the update norm \f$\|\vec{x}\|_2\f$ is small enough, the convergence can be accelerated by the direct inversion of the iterative subspace (DIIS) [CAS5, CAS8, CAS9, CAS10]. For a given set of orbitals \f$\mathbf{U}(n)\f$, the update \f$\vec{x}(n)\f$ is calculated with the augmented Hessian Newton-Rapshon method. This update defines the next set of orbitals:
+    When the update norm \f$\|\vec{x}\|_2\f$ is small enough, the convergence can be accelerated by the direct inversion of the iterative subspace (DIIS) [CAS5, CAS8, CAS9, CAS10]. For a given set of orbitals \f$\mathbf{U}(n)\f$, the update \f$\vec{x}(n)\f$ is calculated with the augmented Hessian Newton-Raphson method. This update defines the next set of orbitals:
     \f[
     \mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{X}(\vec{x}(n))) \mathbf{U}(n).
     \f]
