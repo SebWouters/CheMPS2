@@ -17,15 +17,7 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h>
-#include <assert.h>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include "DMRGSCFmatrix.h"
-
-using namespace std;
 
 CheMPS2::DMRGSCFmatrix::DMRGSCFmatrix(DMRGSCFindices * iHandler_in){
 

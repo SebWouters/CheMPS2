@@ -17,15 +17,7 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include <stdlib.h>
-#include <assert.h>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include "DMRGSCFwtilde.h"
-
-using namespace std;
 
 CheMPS2::DMRGSCFwtilde::DMRGSCFwtilde(DMRGSCFindices * iHandler_in){
 
