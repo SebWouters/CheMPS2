@@ -31,6 +31,8 @@
 #include "DMRGSCFunitary.h"
 #include "DIIS.h"
 #include "DMRGSCFoptions.h"
+#include "DMRGSCFwtilde.h"
+#include "DMRGSCFmatrix.h"
 
 namespace CheMPS2{
 /** CASSCF class.
@@ -91,8 +93,8 @@ namespace CheMPS2{
     And the calculation of \f$\tilde{w}_{pqrs}\f$ (remember that \f$I_p = I_q\f$ and \f$I_r = I_s\f$):
     \f{eqnarray*}{
       (p,r) & \in & (occ,occ) : \tilde{w}_{pqrs} \\
-                          & = & 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} + 3 (qp | sp) - (qs | pp) \right] \\
-                          & + & 4 ( 1 - \delta_{pr}^{occ} ) \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\
+                          & = & 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} \right] \\
+                          & + & 4 \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\
       (p,r) & \in & (act,act) : \tilde{w}_{pqrs} = 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\
                           & + & 2 \sum\limits_{\alpha\beta \in act} \left[ \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right] \\
       (p,r) & \in & (act,occ) : \tilde{w}_{pqrs} \\
@@ -280,27 +282,26 @@ namespace CheMPS2{
          double augmentedHessianNR(double * gradient, double * updateNorm);
          
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
-         double FmatHelper(const int index1, const int index2) const;
-         double Fmat(const int index1, const int index2) const;
-         double ** Fmatrix;
          void buildFmat();
+         DMRGSCFmatrix * theFmatrix;
          
          //The Coulomb and exchange interaction with the occupied and active electrons respectively
-         double ** QmatrixOCC;
-         double ** QmatrixACT;
-         double ** QmatrixWORK;
-         double ** OneBodyMatrixElements;
-         void buildQmatrixOCC();
-         void buildQmatrixACT();
-         void buildOneBodyMatrixElements();
-         void rotateOldToNew(double ** matrix);
-         void constructCoulombAndExchangeMatrixInOrigIndices(double ** densityMatrix, double ** result);
-         double QmatOCC(const int index1, const int index2) const;
-         double QmatACT(const int index1, const int index2) const;
-         double TmatRotated(const int index1, const int index2) const;
+         DMRGSCFmatrix * theQmatOCC;
+         DMRGSCFmatrix * theQmatACT;
+         DMRGSCFmatrix * theQmatWORK;
+         DMRGSCFmatrix * theTmatrix;
+         void rotateOldToNew(DMRGSCFmatrix * myMatrix);
+         void buildTmatrix();
+         void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix);
+         void buildQmatOCC();
+         void buildQmatACT();
          
-         //Wmat function as defined by Eq.(21b) in the Siegbahn paper.
-         double Wmat(const int index1, const int index2, const int index3, const int index4) const;
+         //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
+         DMRGSCFwtilde * wmattilde;
+         void buildWtilde();
+         
+         //The Wmat function as defined by Eq. (21b) in the Siegbahn paper
+         double Wmat(const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS) const;
          
          //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
          void PrintCoeff_C2(DMRG * theDMRG);

@@ -54,6 +54,7 @@ namespace CheMPS2{
              \param l The fourth index (within the symmetry block)
              \param val The value to which the element of the matrix should be set */
          void set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val);
+         
          //! Add a double to an element
          /** \param irrep_i The irrep number of the first orbital (see Irreps.h)
              \param irrep_j The irrep number of the second orbital
