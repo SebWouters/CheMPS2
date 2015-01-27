@@ -180,7 +180,7 @@ Orbital gradient and Hessian</h1>
 </p>
 <p> And the calculation of <img class="formulaInl" alt="$\tilde{w}_{pqrs}$" src="form_10.png"/> (remember that <img class="formulaInl" alt="$I_p = I_q$" src="form_9.png"/> and <img class="formulaInl" alt="$I_r = I_s$" src="form_13.png"/>): </p>
 <p class="formulaDsp">
-<img class="formulaDsp" alt="\begin{eqnarray*} (p,r) &amp; \in &amp; (occ,occ) : \tilde{w}_{pqrs} \\ &amp; = &amp; 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} + 3 (qp | sp) - (qs | pp) \right] \\ &amp; + &amp; 4 ( 1 - \delta_{pr}^{occ} ) \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\ (p,r) &amp; \in &amp; (act,act) : \tilde{w}_{pqrs} = 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\ &amp; + &amp; 2 \sum\limits_{\alpha\beta \in act} \left[ \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right] \\ (p,r) &amp; \in &amp; (act,occ) : \tilde{w}_{pqrs} \\ &amp; = &amp; 2 \sum\limits_{\alpha \in act} \Gamma^{1,act}_{\alpha p} \left[ 4 (q \alpha | s r) - (qs | \alpha r) - (qr | s \alpha) \right] \\ (p,r) &amp; \in &amp; (occ,act) : \tilde{w}_{pqrs} \\ &amp; = &amp; 2 \sum\limits_{\beta \in act} \Gamma^{1,act}_{r \beta} \left[ 4 (q p | s \beta) - (qs | p \beta) - (q \beta | sp) \right] \end{eqnarray*}" src="form_18.png"/>
+<img class="formulaDsp" alt="\begin{eqnarray*} (p,r) &amp; \in &amp; (occ,occ) : \tilde{w}_{pqrs} \\ &amp; = &amp; 4 \delta_{pr}^{occ} \left[ h_{qs} + Q^{occ}_{qs} + Q^{act}_{qs} \right] \\ &amp; + &amp; 4 \left[ 4 (qp | sr) - ( qs | pr ) - ( qr | sp ) \right] \\ (p,r) &amp; \in &amp; (act,act) : \tilde{w}_{pqrs} = 2 \Gamma^{1,act}_{rp} \left[ h_{qs} + Q^{occ}_{qs} \right] \\ &amp; + &amp; 2 \sum\limits_{\alpha\beta \in act} \left[ \Gamma^{2A,act}_{r \alpha p \beta} (qs | \alpha \beta ) + \left( \Gamma^{2A,act}_{r \alpha \beta p} + \Gamma^{2A,act}_{r p \beta \alpha} \right) (q \alpha | s \beta ) \right] \\ (p,r) &amp; \in &amp; (act,occ) : \tilde{w}_{pqrs} \\ &amp; = &amp; 2 \sum\limits_{\alpha \in act} \Gamma^{1,act}_{\alpha p} \left[ 4 (q \alpha | s r) - (qs | \alpha r) - (qr | s \alpha) \right] \\ (p,r) &amp; \in &amp; (occ,act) : \tilde{w}_{pqrs} \\ &amp; = &amp; 2 \sum\limits_{\beta \in act} \Gamma^{1,act}_{r \beta} \left[ 4 (q p | s \beta) - (qs | p \beta) - (q \beta | sp) \right] \end{eqnarray*}" src="form_18.png"/>
 </p>
 <h1><a class="anchor" id="origalgo"></a>
 Augmented Hessian Newton-Raphson DMRG-SCF</h1>
@@ -235,7 +235,7 @@ References</h1>
 [CAS10] T. Rohwedder and R. Schneider, Journal of Mathematical Chemistry 49, 1889-1914 (2011). <a href="http://dx.doi.org/10.1007/s10910-011-9863-y">http://dx.doi.org/10.1007/s10910-011-9863-y</a> <br/>
 </p>
 
-<p>Definition at line <a class="el" href="CASSCF_8h_source.html#l00159">159</a> of file <a class="el" href="CASSCF_8h_source.html">CASSCF.h</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8h_source.html#l00161">161</a> of file <a class="el" href="CASSCF_8h_source.html">CASSCF.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aee2071ba5914ed3a6e7120e6d1656144"></a>
 <div class="memitem">
@@ -392,7 +392,7 @@ References</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The converged DMRGSCF energy </dd></dl>
 
-<p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00038">38</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00039">39</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -423,7 +423,7 @@ References</h1>
 <p>Get the number of irreps. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of irreps </dd></dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00126">126</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00121">121</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +467,7 @@ References</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00533">533</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
+<p>Definition at line <a class="el" href="CASSCF_8cpp_source.html#l00491">491</a> of file <a class="el" href="CASSCF_8cpp_source.html">CASSCF.cpp</a>.</p>
 
 </div>
 </div>
@@ -483,7 +483,7 @@ References</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a></li>
-    <li class="footer">Generated on Sat Jan 24 2015 11:06:03 for CheMPS2 by
+    <li class="footer">Generated on Tue Jan 27 2015 00:27:43 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
