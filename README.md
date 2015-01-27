@@ -332,6 +332,9 @@ from disk, and updating.
 [```CheMPS2/DMRGSCFindices.cpp```](CheMPS2/DMRGSCFindices.cpp) contains the
 index conversions for the DMRG-SCF algorithm.
 
+[```CheMPS2/DMRGSCFmatrix.cpp```](CheMPS2/DMRGSCFmatrix.cpp) is a container
+class for orbital matrices which are blockdiagonal in the irreps.
+
 [```CheMPS2/DMRGSCFoptions.cpp```](CheMPS2/DMRGSCFoptions.cpp) is a container
 class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson
 routine.
@@ -343,6 +346,9 @@ parametrization required for the DMRG-SCF algorithm.
 [```CheMPS2/DMRGSCFVmatRotations.cpp```](CheMPS2/DMRGSCFVmatRotations.cpp)
 performs the two-body matrix element rotations for the DMRGSCF and
 Edmiston-Ruedenberg classes.
+
+[```CheMPS2/DMRGSCFwtilde.cpp```](CheMPS2/DMRGSCFwtilde.cpp) is a container
+class to store a tensor which is required to compute the DMRG-SCF Hessian.
 
 [```CheMPS2/DMRGtechnics.cpp```](CheMPS2/DMRGtechnics.cpp) contains the
 functions related to the 2-RDM and the excited-state calculations.
@@ -515,6 +521,9 @@ Correlations class.
 [```CheMPS2/include/DMRGSCFindices.h```](CheMPS2/include/DMRGSCFindices.h) contains the definitions of the
 DMRGSCFindices class.
 
+[```CheMPS2/include/DMRGSCFmatrix.h```](CheMPS2/include/DMRGSCFmatrix.h) contains the definitions of the
+DMRGSCFmatrix class.
+
 [```CheMPS2/include/DMRGSCFoptions.h```](CheMPS2/include/DMRGSCFoptions.h) contains the definitions of the
 DMRGSCFoptions container class.
 
@@ -523,6 +532,9 @@ DMRGSCFunitary class.
 
 [```CheMPS2/include/DMRGSCFVmatRotations.h```](CheMPS2/include/DMRGSCFVmatRotations.h) contains the definitions of the
 DMRGSCFVmatRotations class.
+
+[```CheMPS2/include/DMRGSCFwtilde.h```](CheMPS2/include/DMRGSCFwtilde.h) contains the definitions of the
+DMRGSCFwtilde class.
 
 [```CheMPS2/include/EdmistonRuedenberg.h```](CheMPS2/include/EdmistonRuedenberg.h) contains the definitions of the
 EdmistonRuedenberg class.
