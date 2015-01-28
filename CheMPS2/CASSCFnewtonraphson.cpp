@@ -205,8 +205,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      if (doBlockWise){ theRotator.fillVmatRotatedBlockWise(VmatRotated, unitary, mem1, mem2, mem3, maxBlockSize, true); }
-      else {            theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
+      if (doBlockWise){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, maxBlockSize); }
+      else {            theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
       buildFmat();
       buildWtilde();
 
@@ -419,9 +419,9 @@ void CheMPS2::CASSCF::buildWtilde(){
             for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
                for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
                   subblock[ relindexQ + NumORBpq * relindexS ] +=  
-                      4 * ( 4 * VmatRotated->get(irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relindexR)
-                              - VmatRotated->get(irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relindexR)
-                              - VmatRotated->get(irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relindexP) );
+                      4 * ( 4 * theRotatedTEI->FourIndexAPI(irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relindexR)
+                              - theRotatedTEI->FourIndexAPI(irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relindexR)
+                              - theRotatedTEI->FourIndexAPI(irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relindexP) );
                }
             }
          } // End combined P and R occupied
@@ -459,8 +459,8 @@ void CheMPS2::CASSCF::buildWtilde(){
                      for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
                         for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
                            subblock[ relindexQ + NumORBpq * relindexS ] += 
-                              2 * ( TwoDMvalue1  * VmatRotated->get( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
-                                  + TwoDMvalue23 * VmatRotated->get( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                              2 * ( TwoDMvalue1  * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
                         }
                      }
                   }
@@ -486,9 +486,9 @@ void CheMPS2::CASSCF::buildWtilde(){
                for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
                   for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
                      subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
-                         ( 4 * VmatRotated->get( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
-                             - VmatRotated->get( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
-                             - VmatRotated->get( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relalpha) );
+                         ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relalpha) );
                   }
                }
             }
@@ -512,9 +512,9 @@ void CheMPS2::CASSCF::buildWtilde(){
                for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
                   for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
                      subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
-                         ( 4 * VmatRotated->get( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
-                             - VmatRotated->get( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
-                             - VmatRotated->get( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relbeta, relindexP) );
+                         ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relbeta, relindexP) );
                   }
                }
             }
@@ -569,7 +569,7 @@ void CheMPS2::CASSCF::buildFmat(){
                         const int DMRGindex_t = t - iHandler->getNOCC( irrep_t ) + iHandler->getDMRGcumulative( irrep_t );
                         const double TwoDMvalue = DMRG2DM[ DMRGindex_p + nOrbDMRG * ( DMRGindex_r + nOrbDMRG * ( DMRGindex_s + nOrbDMRG * DMRGindex_t ) ) ];
                         for (int q = 0; q < NumORB; q++){
-                           theFmatrix->getBlock(irrep_pq)[ p + NumORB * q ] += TwoDMvalue * VmatRotated->get(irrep_pq, irrep_r, irrep_s, irrep_t, q, r, s, t);
+                           theFmatrix->getBlock(irrep_pq)[ p + NumORB * q ] += TwoDMvalue * theRotatedTEI->FourIndexAPI(irrep_pq, irrep_r, irrep_s, irrep_t, q, r, s, t);
                         }
                      }
                   }

@@ -332,6 +332,9 @@ from disk, and updating.
 [```CheMPS2/DMRGSCFindices.cpp```](CheMPS2/DMRGSCFindices.cpp) contains the
 index conversions for the DMRG-SCF algorithm.
 
+[```CheMPS2/DMRGSCFintegrals.cpp```](CheMPS2/DMRGSCFintegrals.cpp) is a container
+class for two-body matrix elements with at most two virtual indices.
+
 [```CheMPS2/DMRGSCFmatrix.cpp```](CheMPS2/DMRGSCFmatrix.cpp) is a container
 class for orbital matrices which are blockdiagonal in the irreps.
 
@@ -520,6 +523,9 @@ Correlations class.
 
 [```CheMPS2/include/DMRGSCFindices.h```](CheMPS2/include/DMRGSCFindices.h) contains the definitions of the
 DMRGSCFindices class.
+
+[```CheMPS2/include/DMRGSCFintegrals.h```](CheMPS2/include/DMRGSCFintegrals.h) contains the definitions of the
+DMRGSCFintegrals class.
 
 [```CheMPS2/include/DMRGSCFmatrix.h```](CheMPS2/include/DMRGSCFmatrix.h) contains the definitions of the
 DMRGSCFmatrix class.

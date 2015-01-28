@@ -34,70 +34,41 @@ using std::endl;
 CheMPS2::CASSCF::CASSCF(const string filename){
 
    HamOrig = new Hamiltonian(filename);
+   shouldHamOrigBeDeleted = true;
    
    L = HamOrig->getL();
-   
    SymmInfo.setGroup(HamOrig->getNGroup());
-   
    numberOfIrreps = SymmInfo.getNumberOfIrreps();
-
+   
    allocateAndFillOCC(filename);
-   
    setupStartCalled = false;
-   
+
 }
 
 CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
 
-   L = HamIn->getL();
-   int SyGroup = HamIn->getNGroup();
-   int * OrbIrreps = new int[L];
-   for (int cnt=0; cnt<L; cnt++){ OrbIrreps[cnt] = HamIn->getOrbitalIrrep(cnt); }
-
-   HamOrig = new Hamiltonian(L, SyGroup, OrbIrreps);
+   HamOrig = HamIn;
+   shouldHamOrigBeDeleted = false;
    
-   delete [] OrbIrreps;
-   
-   SymmInfo.setGroup(SyGroup);
-   
-   HamOrig->setEconst(HamIn->getEconst());
-   for (int cnt=0; cnt<L; cnt++){
-      int I1 = HamIn->getOrbitalIrrep(cnt);
-      for (int cnt2=cnt; cnt2<L; cnt2++){
-         int I2 = HamIn->getOrbitalIrrep(cnt2);
-         if (I1==I2){
-            HamOrig->setTmat(cnt,cnt2,HamIn->getTmat(cnt,cnt2));
-         }
-         for (int cnt3=cnt; cnt3<L; cnt3++){
-            int I3 = HamIn->getOrbitalIrrep(cnt3);
-            for (int cnt4=cnt2; cnt4<L; cnt4++){
-               int I4 = HamIn->getOrbitalIrrep(cnt4);
-               if (Irreps::directProd(I1,I2) == Irreps::directProd(I3,I4)){
-                  HamOrig->setVmat(cnt,cnt2,cnt3,cnt4,HamIn->getVmat(cnt,cnt2,cnt3,cnt4));
-               }
-            }
-         }
-      }
-   }
-   
+   L = HamOrig->getL();
+   SymmInfo.setGroup(HamOrig->getNGroup());
    numberOfIrreps = SymmInfo.getNumberOfIrreps();
-
+   
    allocateAndFillOCC(DOCCin, SOCCin);
-   
    setupStartCalled = false;
-   
+
 }
 
 CheMPS2::CASSCF::~CASSCF(){
 
-   delete HamOrig;
+   if (shouldHamOrigBeDeleted){ delete HamOrig; }
    
    delete [] DOCC;
    delete [] SOCC;
    
    if (setupStartCalled){
    
-      delete VmatRotated;
+      delete theRotatedTEI;
 
       delete [] DMRG1DM;
       delete [] DMRG2DM;
@@ -495,10 +466,7 @@ void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
    iHandler = new DMRGSCFindices(L, SymmInfo.getGroupNumber(), NoccIn, NDMRGIn, NvirtIn);
    unitary  = new DMRGSCFunitary(iHandler);
    theDIIS = NULL;
-   int * orbPerIrrep = new int[numberOfIrreps];
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){ orbPerIrrep[irrep] = iHandler->getNORB(irrep); }
-   VmatRotated = new FourIndex(SymmInfo.getGroupNumber(), orbPerIrrep);
-   delete [] orbPerIrrep;
+   theRotatedTEI = new DMRGSCFintegrals( iHandler );
    
    //Allocate space for the DMRG 1DM and 2DM
    nOrbDMRG = iHandler->getDMRGcumulative(numberOfIrreps);

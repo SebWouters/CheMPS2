@@ -33,6 +33,7 @@
 #include "DMRGSCFoptions.h"
 #include "DMRGSCFwtilde.h"
 #include "DMRGSCFmatrix.h"
+#include "DMRGSCFintegrals.h"
 
 namespace CheMPS2{
 /** CASSCF class.
@@ -214,9 +215,10 @@ namespace CheMPS2{
       
          //The original Hamiltonian
          Hamiltonian * HamOrig;
+         bool shouldHamOrigBeDeleted;
          
-         //The rotated 2-body matrix elements
-         FourIndex * VmatRotated;
+         //The rotated 2-body matrix elements with at most two virtual indices
+         DMRGSCFintegrals * theRotatedTEI;
          
          //Irreps controller
          Irreps SymmInfo;
