@@ -1,3 +1,6 @@
 <map id="CheMPS2::DMRGSCFwtilde::DMRGSCFwtilde" name="CheMPS2::DMRGSCFwtilde::DMRGSCFwtilde">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="246,5,445,46"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="246,5,445,46"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="246,70,445,111"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec" title="Get the number of active orbitals for an irrep. " alt="" coords="246,135,445,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="246,201,445,242"/>
 </map>

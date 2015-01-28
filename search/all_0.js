@@ -4,6 +4,8 @@ var searchData=
   ['actwithnumberoperator',['ActWithNumberOperator',['../classCheMPS2_1_1FCI.html#ac7b47739c602e3351baca282bdc715ca',1,'CheMPS2::FCI']]],
   ['actwithsecondquantizedoperator',['ActWithSecondQuantizedOperator',['../classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb',1,'CheMPS2::FCI']]],
   ['add',['add',['../classCheMPS2_1_1FourIndex.html#a48e9e1b0939679da974e35c26281ba87',1,'CheMPS2::FourIndex']]],
+  ['add_5fcoulomb',['add_coulomb',['../classCheMPS2_1_1DMRGSCFintegrals.html#ab3a4b266923e8188ac73d49aa2acb90a',1,'CheMPS2::DMRGSCFintegrals']]],
+  ['add_5fexchange',['add_exchange',['../classCheMPS2_1_1DMRGSCFintegrals.html#a57d2abf30dfa50a715d7fffcb3987674',1,'CheMPS2::DMRGSCFintegrals']]],
   ['addaterm',['AddATerm',['../classCheMPS2_1_1TensorA.html#aa007e07e253c3dc8ceaf5b9592cd7371',1,'CheMPS2::TensorA::AddATerm()'],['../classCheMPS2_1_1TensorB.html#a5d55f80f8053d96b413542db4a3d9b9a',1,'CheMPS2::TensorB::AddATerm()'],['../classCheMPS2_1_1TensorC.html#a1482dc7ffa3a50ee3e550b764424ce03',1,'CheMPS2::TensorC::AddATerm()'],['../classCheMPS2_1_1TensorD.html#a62fdb77e0a88f0ae6a21078b433b01db',1,'CheMPS2::TensorD::AddATerm()']]],
   ['addatermtranspose',['AddATermTranspose',['../classCheMPS2_1_1TensorC.html#a59ecea30bb4eb5c3ff634999931bcb5c',1,'CheMPS2::TensorC::AddATermTranspose()'],['../classCheMPS2_1_1TensorD.html#a18e3f1730c2f05d7334ca0331c279088',1,'CheMPS2::TensorD::AddATermTranspose()']]],
   ['addnoise',['addNoise',['../classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c',1,'CheMPS2::Sobject']]],

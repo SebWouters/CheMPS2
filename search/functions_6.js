@@ -5,6 +5,8 @@ var searchData=
   ['geconst',['gEconst',['../classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1',1,'CheMPS2::Problem']]],
   ['get',['get',['../classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9',1,'CheMPS2::DMRGSCFmatrix::get()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a39a6ec517f0bbd6129dce43473bfbc89',1,'CheMPS2::DMRGSCFwtilde::get()'],['../classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1',1,'CheMPS2::FourIndex::get()'],['../classCheMPS2_1_1TwoDMstorage.html#ac5846d6d56d4eff21fa84dcc3b343cd6',1,'CheMPS2::TwoDMstorage::get()'],['../classCheMPS2_1_1TwoIndex.html#a49c7065a18ca6b82e7a63a56cdf2687c',1,'CheMPS2::TwoIndex::get()']]],
   ['get2dm',['get2DM',['../classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd',1,'CheMPS2::DMRG']]],
+  ['get_5fcoulomb',['get_coulomb',['../classCheMPS2_1_1DMRGSCFintegrals.html#a2c40911e39bd643684180ff400b2a9f4',1,'CheMPS2::DMRGSCFintegrals']]],
+  ['get_5fexchange',['get_exchange',['../classCheMPS2_1_1DMRGSCFintegrals.html#ad3549d8b199d76fdc1edab70e132dcb0',1,'CheMPS2::DMRGSCFintegrals']]],
   ['getbitsofcounter',['getBitsOfCounter',['../classCheMPS2_1_1FCI.html#a258401fbd7000fd62455914746c4c246',1,'CheMPS2::FCI']]],
   ['getblock',['getBlock',['../classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5',1,'CheMPS2::DMRGSCFmatrix::getBlock()'],['../classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b',1,'CheMPS2::DMRGSCFunitary::getBlock()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a1315dead44fb4c153c1e93758f048378',1,'CheMPS2::DMRGSCFwtilde::getBlock()']]],
   ['getcdens_5fdmrg',['getCdens_DMRG',['../classCheMPS2_1_1Correlations.html#aeb62579405983674c4d129890bc32de0',1,'CheMPS2::Correlations']]],

@@ -4,6 +4,8 @@ var searchData=
   ['savediis',['saveDIIS',['../classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37',1,'CheMPS2::DIIS']]],
   ['saveu',['saveU',['../classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06',1,'CheMPS2::DMRGSCFunitary']]],
   ['set',['set',['../classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24',1,'CheMPS2::DMRGSCFmatrix::set()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a80468137491080bec2c3cf6c3fd68da0',1,'CheMPS2::DMRGSCFwtilde::set()'],['../classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f',1,'CheMPS2::FourIndex::set()'],['../classCheMPS2_1_1TwoDMstorage.html#a2eb0495511d151e372b77edb3f9d5d36',1,'CheMPS2::TwoDMstorage::set()'],['../classCheMPS2_1_1TwoIndex.html#a4385881853e910bb1ce7d5ea911b75c4',1,'CheMPS2::TwoIndex::set()']]],
+  ['set_5fcoulomb',['set_coulomb',['../classCheMPS2_1_1DMRGSCFintegrals.html#ac9c1b2d0d67b2beb246ce3c59b193177',1,'CheMPS2::DMRGSCFintegrals']]],
+  ['set_5fexchange',['set_exchange',['../classCheMPS2_1_1DMRGSCFintegrals.html#af910b76a44cdbde6cdffc1750705fdb9',1,'CheMPS2::DMRGSCFintegrals']]],
   ['setdiisgradientbranch',['setDIISGradientBranch',['../classCheMPS2_1_1DMRGSCFoptions.html#af4e0750d68513bf84350128edbbd5775',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdiisstoragename',['setDIISStorageName',['../classCheMPS2_1_1DMRGSCFoptions.html#aabfdc28366e49402ebbaf977d154ebe7',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdim',['SetDim',['../classCheMPS2_1_1SyBookkeeper.html#ab496351a4cbc31f88be340d987d11406',1,'CheMPS2::SyBookkeeper']]],

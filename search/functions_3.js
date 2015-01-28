@@ -14,6 +14,7 @@ var searchData=
   ['directprod',['directProd',['../classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047',1,'CheMPS2::Irreps']]],
   ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71',1,'CheMPS2::DMRG']]],
   ['dmrgscfindices',['DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3',1,'CheMPS2::DMRGSCFindices']]],
+  ['dmrgscfintegrals',['DMRGSCFintegrals',['../classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426',1,'CheMPS2::DMRGSCFintegrals']]],
   ['dmrgscfmatrix',['DMRGSCFmatrix',['../classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39',1,'CheMPS2::DMRGSCFmatrix']]],
   ['dmrgscfoptions',['DMRGSCFoptions',['../classCheMPS2_1_1DMRGSCFoptions.html#add6896a9f3cf6b7f13d009a9abc6d7ef',1,'CheMPS2::DMRGSCFoptions']]],
   ['dmrgscfunitary',['DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36',1,'CheMPS2::DMRGSCFunitary']]],

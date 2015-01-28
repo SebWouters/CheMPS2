@@ -1,5 +1,6 @@
 <map id="CheMPS2::DMRGSCFindices::getNOCC" name="CheMPS2::DMRGSCFindices::getNOCC">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,5,565,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="311,57,508,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="313,122,505,163"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="306,57,513,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="311,122,508,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="313,187,505,229"/>
 </map>

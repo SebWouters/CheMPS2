@@ -7,6 +7,7 @@ var annotated =
       [ "DIIS", "classCheMPS2_1_1DIIS.html", "classCheMPS2_1_1DIIS" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],
       [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html", "classCheMPS2_1_1DMRGSCFindices" ],
+      [ "DMRGSCFintegrals", "classCheMPS2_1_1DMRGSCFintegrals.html", "classCheMPS2_1_1DMRGSCFintegrals" ],
       [ "DMRGSCFmatrix", "classCheMPS2_1_1DMRGSCFmatrix.html", "classCheMPS2_1_1DMRGSCFmatrix" ],
       [ "DMRGSCFoptions", "classCheMPS2_1_1DMRGSCFoptions.html", "classCheMPS2_1_1DMRGSCFoptions" ],
       [ "DMRGSCFunitary", "classCheMPS2_1_1DMRGSCFunitary.html", "classCheMPS2_1_1DMRGSCFunitary" ],

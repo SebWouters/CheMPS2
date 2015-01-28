@@ -16,6 +16,8 @@ var files =
     [ "DMRGoperators.cpp", "DMRGoperators_8cpp_source.html", null ],
     [ "DMRGSCFindices.cpp", "DMRGSCFindices_8cpp_source.html", null ],
     [ "DMRGSCFindices.h", "DMRGSCFindices_8h_source.html", null ],
+    [ "DMRGSCFintegrals.cpp", "DMRGSCFintegrals_8cpp_source.html", null ],
+    [ "DMRGSCFintegrals.h", "DMRGSCFintegrals_8h_source.html", null ],
     [ "DMRGSCFmatrix.cpp", "DMRGSCFmatrix_8cpp_source.html", null ],
     [ "DMRGSCFmatrix.h", "DMRGSCFmatrix_8h_source.html", null ],
     [ "DMRGSCFoptions.cpp", "DMRGSCFoptions_8cpp_source.html", null ],

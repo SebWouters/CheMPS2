@@ -1,5 +1,5 @@
 <map id="CheMPS2::DMRGSCFVmatRotations::fillVmatRotated" name="CheMPS2::DMRGSCFVmatRotations::fillVmatRotated">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="563,30,874,57"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="299,23,514,64"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="299,88,514,130"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="299,5,514,46"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="299,70,514,111"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="563,45,874,72"/>
 </map>

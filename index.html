@@ -246,9 +246,12 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/DMRGmpsio.cpp">```CheMPS2/DMRGmpsio.cpp```</a> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
 <p><a href="CheMPS2/DMRGoperators.cpp">```CheMPS2/DMRGoperators.cpp```</a> contains all functions related to the DMRG renormalized operators: saving to disk, loading from disk, and updating.</p>
 <p><a href="CheMPS2/DMRGSCFindices.cpp">```CheMPS2/DMRGSCFindices.cpp```</a> contains the index conversions for the DMRG-SCF algorithm.</p>
+<p><a href="CheMPS2/DMRGSCFintegrals.cpp">```CheMPS2/DMRGSCFintegrals.cpp```</a> is a container class for two-body matrix elements with at most two virtual indices.</p>
+<p><a href="CheMPS2/DMRGSCFmatrix.cpp">```CheMPS2/DMRGSCFmatrix.cpp```</a> is a container class for orbital matrices which are blockdiagonal in the irreps.</p>
 <p><a href="CheMPS2/DMRGSCFoptions.cpp">```CheMPS2/DMRGSCFoptions.cpp```</a> is a container class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson routine.</p>
 <p><a href="CheMPS2/DMRGSCFunitary.cpp">```CheMPS2/DMRGSCFunitary.cpp```</a> contains the storage and handling of the unitary matrix and its nonredundant skew-symmetric parametrization required for the DMRG-SCF algorithm.</p>
 <p><a href="CheMPS2/DMRGSCFVmatRotations.cpp">```CheMPS2/DMRGSCFVmatRotations.cpp```</a> performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.</p>
+<p><a href="CheMPS2/DMRGSCFwtilde.cpp">```CheMPS2/DMRGSCFwtilde.cpp```</a> is a container class to store a tensor which is required to compute the DMRG-SCF Hessian.</p>
 <p><a href="CheMPS2/DMRGtechnics.cpp">```CheMPS2/DMRGtechnics.cpp```</a> contains the functions related to the 2-RDM and the excited-state calculations.</p>
 <p><a href="CheMPS2/EdmistonRuedenberg.cpp">```CheMPS2/EdmistonRuedenberg.cpp```</a> contains an orbital localization function based on the Edmiston-Ruedenberg cost function and an augmented Hessian Newton-Raphson optimizer.</p>
 <p><a href="CheMPS2/FCI.cpp">```CheMPS2/FCI.cpp```</a> contains a full configuration interaction solver based on Davidson's algorithm. It also contains the functionality to calculate Green's functions.</p>
@@ -298,9 +301,12 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/include/DIIS.h">```CheMPS2/include/DIIS.h```</a> contains the definitions of the DIIS class.</p>
 <p><a href="CheMPS2/include/DMRG.h">```CheMPS2/include/DMRG.h```</a> contains the definitions of the DMRG class.</p>
 <p><a href="CheMPS2/include/DMRGSCFindices.h">```CheMPS2/include/DMRGSCFindices.h```</a> contains the definitions of the DMRGSCFindices class.</p>
+<p><a href="CheMPS2/include/DMRGSCFintegrals.h">```CheMPS2/include/DMRGSCFintegrals.h```</a> contains the definitions of the DMRGSCFintegrals class.</p>
+<p><a href="CheMPS2/include/DMRGSCFmatrix.h">```CheMPS2/include/DMRGSCFmatrix.h```</a> contains the definitions of the DMRGSCFmatrix class.</p>
 <p><a href="CheMPS2/include/DMRGSCFoptions.h">```CheMPS2/include/DMRGSCFoptions.h```</a> contains the definitions of the DMRGSCFoptions container class.</p>
 <p><a href="CheMPS2/include/DMRGSCFunitary.h">```CheMPS2/include/DMRGSCFunitary.h```</a> contains the definitions of the DMRGSCFunitary class.</p>
 <p><a href="CheMPS2/include/DMRGSCFVmatRotations.h">```CheMPS2/include/DMRGSCFVmatRotations.h```</a> contains the definitions of the DMRGSCFVmatRotations class.</p>
+<p><a href="CheMPS2/include/DMRGSCFwtilde.h">```CheMPS2/include/DMRGSCFwtilde.h```</a> contains the definitions of the DMRGSCFwtilde class.</p>
 <p><a href="CheMPS2/include/EdmistonRuedenberg.h">```CheMPS2/include/EdmistonRuedenberg.h```</a> contains the definitions of the EdmistonRuedenberg class.</p>
 <p><a href="CheMPS2/include/FCI.h">```CheMPS2/include/FCI.h```</a> contains the definitions of the FCI class.</p>
 <p><a href="CheMPS2/include/FourIndex.h">```CheMPS2/include/FourIndex.h```</a> contains the definitions of the FourIndex class.</p>
@@ -372,7 +378,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Tue Jan 27 2015 00:29:03 for CheMPS2 by
+    <li class="footer">Generated on Wed Jan 28 2015 00:14:59 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
