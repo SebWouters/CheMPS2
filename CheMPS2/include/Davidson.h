@@ -49,7 +49,7 @@ namespace CheMPS2{
          
          //! The iterator to converge the ground state vector
          /** \param whichpointers Array of double* of length 2 to return pointers to vectors to the caller
-             \return Instruction character. 'A' means copy the initial guess to whichpointers[0] and the diagonal of the symmetric matrix to whichpointers[1]. 'B' means calculate whichpointers[1] as the result of multiplying the symmetric matrix with whichpointers[0]. 'C' means that the converges solution can be copied back from whichpointers[0] and the energy from whichpointers[1][0]. 'D' means that an error has occurred, so please assert( returnvar != 'D' ). */
+             \return Instruction character. 'A' means copy the initial guess to whichpointers[0] and the diagonal of the symmetric matrix to whichpointers[1]. 'B' means calculate whichpointers[1] as the result of multiplying the symmetric matrix with whichpointers[0]. 'C' means that the converged solution can be copied back from whichpointers[0], and the ground-state energy from whichpointers[1][0]. 'D' means that an error has occurred. */
          char FetchInstruction(double ** whichpointers);
          
          //! Get the number of matrix vector multiplications which have been performed
