@@ -45,7 +45,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
    double * theDIISparameterVector = NULL;
    int theDIISvectorParamSize = 0;
-   double Energy;
+   double Energy = 1e8;
    
    //The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());

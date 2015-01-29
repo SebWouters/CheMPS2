@@ -316,6 +316,9 @@ for the subsequent DMRG sweeps.
 functionality to calculate the spin, density, and spin-flip correlation
 functions as well as the two-orbital mutual information.
 
+[```CheMPS2/Davidson.cpp```](CheMPS2/Davidson.cpp) is an implementation of
+Davidson's algorithm.
+
 [```CheMPS2/DIIS.cpp```](CheMPS2/DIIS.cpp) contains a DIIS convergence
 speed-up for DMRG-SCF.
 
@@ -516,6 +519,9 @@ ConvergenceScheme class.
 
 [```CheMPS2/include/Correlations.h```](CheMPS2/include/Correlations.h) contains the definitions of the
 Correlations class.
+
+[```CheMPS2/include/Davidson.h```](CheMPS2/include/Davidson.h) contains the definitions of the
+Davidson class.
 
 [```CheMPS2/include/DIIS.h```](CheMPS2/include/DIIS.h) contains the definitions of the DIIS class.
 

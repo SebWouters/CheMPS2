@@ -28,6 +28,7 @@ using std::endl;
 #include "FCI.h"
 #include "Irreps.h"
 #include "Lapack.h"
+#include "Davidson.h"
 
 CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigned int theNel_down, const int TargetIrrep_in, const double maxMemWorkMB_in, const int FCIverbose_in){
 
@@ -1541,251 +1542,30 @@ void CheMPS2::FCI::FillRandom(const unsigned long long vecLength, double * vec){
 
 double CheMPS2::FCI::GSDavidson(double * inoutput, const int DAVIDSON_NUM_VEC) const{
 
-   const int DAVIDSON_NUM_VEC_KEEP      = CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP;
-   const double DAVIDSON_RTOL_BASE      = CheMPS2::HEFF_DAVIDSON_RTOL_BASE;
-   const double DAVIDSON_PRECOND_CUTOFF = CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+   const int veclength = getVecLength( 0 ); // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
+   const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * veclength );
    
-   assert( DAVIDSON_NUM_VEC > DAVIDSON_NUM_VEC_KEEP );
-
-   const unsigned long long length_vec = getVecLength( 0 );
-   int num_vec = 0;
-   double ** vecs  = new double*[DAVIDSON_NUM_VEC];
-   double ** Hvecs = new double*[DAVIDSON_NUM_VEC];
-   int num_allocated = 0;
+   Davidson deBoskabouter( veclength, DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing for FCI
+   double ** whichpointers = new double*[2];
    
-   double * mxM = new double[DAVIDSON_NUM_VEC * DAVIDSON_NUM_VEC];
-   double * mxM_eigs = new double[DAVIDSON_NUM_VEC];
-   double * mxM_vecs = new double[DAVIDSON_NUM_VEC * DAVIDSON_NUM_VEC];
-   int mxM_lwork = 3*DAVIDSON_NUM_VEC-1;
-   double * mxM_work = new double[mxM_lwork];
+   char instruction = deBoskabouter.FetchInstruction( whichpointers );
+   assert( instruction == 'A' );
+   if ( inoutput != NULL ){ FCIdcopy( veclength, inoutput, whichpointers[0] ); }
+   else { FillRandom( veclength, whichpointers[0] ); }
+   DiagHam( whichpointers[1] );
    
-   double rtol = DAVIDSON_RTOL_BASE * sqrt( 1.0 * length_vec );
-   double rnorm = 10*rtol;
-   
-   double * t_vec = new double[length_vec];
-   double * u_vec = new double[length_vec];
-   double * work_vec = new double[length_vec];
-   int inc1 = 1;
-   
-   double Norm = 0.0;
-   if ( inoutput != NULL ){
-      Norm = FCIfrobeniusnorm(length_vec, inoutput);
-      if ( Norm != 0.0 ){ FCIdcopy(length_vec, inoutput, t_vec); }
-   }
-   if (( Norm == 0.0 ) || ( inoutput == NULL )){
-      FillRandom(length_vec, t_vec);
+   instruction = deBoskabouter.FetchInstruction( whichpointers );
+   while ( instruction == 'B' ){
+      HamTimesVec( whichpointers[0], whichpointers[1] );
+      instruction = deBoskabouter.FetchInstruction( whichpointers );
    }
    
-   double * Diag = new double[length_vec];
-   DiagHam(Diag);
-   
-   double * Reortho_Lowdin = NULL;
-   double * Reortho_Overlap_eigs = NULL;
-   double * Reortho_Overlap = NULL;
-   double * Reortho_Eigenvecs = NULL;
-   bool Reortho_Allocated = false;
-   
-   int nIterations = 0;
-   
-   while (rnorm > rtol){
-
-      //1. Orthogonalize the new t_vec w.r.t. the old basis
-      for (int cnt=0; cnt<num_vec; cnt++){
-         const double minus_overlap = - FCIddot(length_vec, t_vec, vecs[cnt]);
-         FCIdaxpy(length_vec, minus_overlap, vecs[cnt], t_vec);
-      }
-   
-      //2. Normalize the t_vec
-      double alpha = 1.0/FCIfrobeniusnorm(length_vec, t_vec);
-      FCIdscal(length_vec, alpha, t_vec);
-      
-      //3. t_vec becomes part of vecs
-      if (num_vec<num_allocated){
-         double * temp = vecs[num_vec];
-         vecs[num_vec] = t_vec;
-         t_vec = temp;
-      } else {
-         vecs[num_allocated] = t_vec;
-         Hvecs[num_allocated] = new double[length_vec];
-         t_vec = new double[length_vec];
-         num_allocated++;
-      }
-      HamTimesVec(vecs[num_vec], Hvecs[num_vec]);
-      nIterations++;
-      
-      //4. mxM contains the Hamiltonian in the basis "vecs"
-      for (int cnt=0; cnt<num_vec; cnt++){
-         mxM[cnt + DAVIDSON_NUM_VEC * num_vec] = FCIddot(length_vec, vecs[num_vec], Hvecs[cnt]);
-         mxM[num_vec + DAVIDSON_NUM_VEC * cnt] = mxM[cnt + DAVIDSON_NUM_VEC * num_vec];
-      }
-      mxM[num_vec + DAVIDSON_NUM_VEC * num_vec] = FCIddot(length_vec, vecs[num_vec], Hvecs[num_vec]);
-      
-      //5. When t_vec was added to vecs, the number of vecs was actually increased by one. For convenience (doing 4.), only now the number is incremented.
-      num_vec++;
-      
-      //6. Calculate the eigenvalues and vectors of mxM
-      char jobz = 'V';
-      char uplo = 'U';
-      int info;
-      for (int cnt1=0; cnt1<num_vec; cnt1++){
-         for (int cnt2=0; cnt2<num_vec; cnt2++){
-            mxM_vecs[cnt1 + DAVIDSON_NUM_VEC * cnt2] = mxM[cnt1 + DAVIDSON_NUM_VEC * cnt2];
-         }
-      }
-      int lda = DAVIDSON_NUM_VEC;
-      dsyev_(&jobz,&uplo,&num_vec,mxM_vecs,&lda,mxM_eigs,mxM_work,&mxM_lwork,&info); //ascending order of eigs
-      if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Current lowest eigenvalue = " << mxM_eigs[0] + getEconst() << endl; }
-      
-      //7. Calculate u and r. r is stored in t_vec, u in u_vec.
-      ClearVector(length_vec, t_vec);
-      ClearVector(length_vec, u_vec);
-      for (int cnt=0; cnt<num_vec; cnt++){
-         double alpha = mxM_vecs[cnt]; //eigenvector with lowest eigenvalue, hence mxM_vecs[cnt + DAVIDSON_NUM_VEC * 0]
-         FCIdaxpy(length_vec, alpha, Hvecs[cnt], t_vec);
-         FCIdaxpy(length_vec, alpha,  vecs[cnt], u_vec);
-      }
-      alpha = -mxM_eigs[0];
-      FCIdaxpy(length_vec, alpha, u_vec, t_vec);
-      
-      //8. Calculate the norm of r
-      rnorm = FCIfrobeniusnorm(length_vec, t_vec);
-      
-      //9. In case convergence is not yet reached: prepare for the following iteration
-      if (rnorm > rtol){
-      
-         //9a. Calculate the new t_vec based on the residual of the lowest eigenvalue, to add to the vecs.
-         for (unsigned long long cnt=0; cnt<length_vec; cnt++){
-            if (fabs(Diag[cnt] - mxM_eigs[0])> DAVIDSON_PRECOND_CUTOFF ){
-               work_vec[cnt] = u_vec[cnt]/(Diag[cnt] - mxM_eigs[0]); // work_vec = K^(-1) u_vec
-            } else {
-               work_vec[cnt] = u_vec[cnt]/ DAVIDSON_PRECOND_CUTOFF;
-            }
-         }
-         alpha = - FCIddot(length_vec, work_vec, t_vec) / FCIddot(length_vec, work_vec, u_vec); // alpha = - (u^T K^(-1) r) / (u^T K^(-1) u)
-         FCIdaxpy(length_vec, alpha, u_vec, t_vec); // t_vec = r - (u^T K^(-1) r) / (u^T K^(-1) u) u
-         for (unsigned long long cnt=0; cnt<length_vec; cnt++){
-            if (fabs(Diag[cnt] - mxM_eigs[0])> DAVIDSON_PRECOND_CUTOFF ){
-               t_vec[cnt] = - t_vec[cnt]/(Diag[cnt] - mxM_eigs[0]); //t_vec = - K^(-1) (r - (u^T K^(-1) r) / (u^T K^(-1) u) u)
-            } else {
-               t_vec[cnt] = - t_vec[cnt]/ DAVIDSON_PRECOND_CUTOFF ;
-            }
-         }
-         
-         // 9b. When the maximum number of vectors is reached: construct the one with lowest eigenvalue & restart
-         if (num_vec == DAVIDSON_NUM_VEC){
-         
-            if (DAVIDSON_NUM_VEC_KEEP<=1){
-            
-               alpha = 1.0/FCIfrobeniusnorm(length_vec, u_vec);
-               FCIdscal(length_vec, alpha, u_vec);
-               FCIdcopy(length_vec, u_vec, vecs[0]);
-               HamTimesVec(vecs[0], Hvecs[0]);
-               nIterations++;
-               mxM[0] = FCIddot(length_vec, vecs[0], Hvecs[0]);
-            
-               num_vec = 1;
-            
-            } else {
-            
-               //Construct the lowest DAVIDSON_NUM_VEC_KEEP eigenvectors
-               if (!Reortho_Allocated) Reortho_Eigenvecs = new double[length_vec * DAVIDSON_NUM_VEC_KEEP];
-               FCIdcopy(length_vec, u_vec, Reortho_Eigenvecs);
-               for (int cnt=1; cnt<DAVIDSON_NUM_VEC_KEEP; cnt++){
-                  for (unsigned long long irow=0; irow<length_vec; irow++){
-                     Reortho_Eigenvecs[irow + length_vec * cnt] = 0.0;
-                     for (int ivec=0; ivec<DAVIDSON_NUM_VEC; ivec++){
-                        Reortho_Eigenvecs[irow + length_vec * cnt] += vecs[ivec][irow] * mxM_vecs[ivec + DAVIDSON_NUM_VEC * cnt];
-                     }
-                  }
-               }
-               
-               //Reorthonormalize them
-               //Reortho: Calculate the overlap matrix
-               if (!Reortho_Allocated) Reortho_Overlap = new double[DAVIDSON_NUM_VEC_KEEP * DAVIDSON_NUM_VEC_KEEP];
-               for (int row=0; row<DAVIDSON_NUM_VEC_KEEP; row++){
-                  for (int col=row; col<DAVIDSON_NUM_VEC_KEEP; col++){
-                     Reortho_Overlap[row + DAVIDSON_NUM_VEC_KEEP * col] = FCIddot(length_vec, Reortho_Eigenvecs + row * length_vec, Reortho_Eigenvecs + col * length_vec);
-                     Reortho_Overlap[col + DAVIDSON_NUM_VEC_KEEP * row] = Reortho_Overlap[row + DAVIDSON_NUM_VEC_KEEP * col];
-                  }
-               }
-               
-               //Reortho: Calculate the Lowdin tfo
-               int DVDS_KEEP = DAVIDSON_NUM_VEC_KEEP;
-               if (!Reortho_Allocated) Reortho_Overlap_eigs = new double[DVDS_KEEP];
-               dsyev_(&jobz,&uplo,&DVDS_KEEP,Reortho_Overlap,&DVDS_KEEP,Reortho_Overlap_eigs,mxM_work,&mxM_lwork,&info); //ascending order of eigs
-               for (int icnt=0; icnt<DVDS_KEEP; icnt++){
-                  Reortho_Overlap_eigs[icnt] = pow(Reortho_Overlap_eigs[icnt],-0.25);
-                  dscal_(&DVDS_KEEP, Reortho_Overlap_eigs+icnt, Reortho_Overlap+DVDS_KEEP*icnt, &inc1);
-               }
-               if (!Reortho_Allocated) Reortho_Lowdin = new double[DVDS_KEEP*DVDS_KEEP];
-               char trans = 'T';
-               char notr = 'N';
-               double one = 1.0;
-               double zero = 0.0; //set
-               dgemm_(&notr,&trans,&DVDS_KEEP,&DVDS_KEEP,&DVDS_KEEP,&one,Reortho_Overlap,&DVDS_KEEP,Reortho_Overlap,&DVDS_KEEP,&zero,Reortho_Lowdin,&DVDS_KEEP);
-               
-               //Reortho: Put the Lowdin tfo eigenvecs in vecs
-               for (int ivec=0; ivec<DAVIDSON_NUM_VEC_KEEP; ivec++){
-                  ClearVector(length_vec, vecs[ivec]);
-                  for (int ivec2=0; ivec2<DAVIDSON_NUM_VEC_KEEP; ivec2++){
-                     FCIdaxpy(length_vec, Reortho_Lowdin[ ivec2 + DAVIDSON_NUM_VEC_KEEP * ivec ], Reortho_Eigenvecs + length_vec * ivec2, vecs[ivec]);
-                  }
-               }
-               
-               if (!Reortho_Allocated) Reortho_Allocated = true;
-               
-               //Construct the H*vecs
-               for (int cnt=0; cnt<DAVIDSON_NUM_VEC_KEEP; cnt++){
-                  HamTimesVec(vecs[cnt], Hvecs[cnt]);
-                  nIterations++;
-               }
-               
-               //Build MxM
-               for (int ivec=0; ivec<DAVIDSON_NUM_VEC_KEEP; ivec++){
-                  for (int ivec2=ivec; ivec2<DAVIDSON_NUM_VEC_KEEP; ivec2++){
-                     mxM[ivec + DAVIDSON_NUM_VEC * ivec2] = FCIddot(length_vec, vecs[ivec], Hvecs[ivec2]);
-                     mxM[ivec2 + DAVIDSON_NUM_VEC * ivec] = mxM[ivec + DAVIDSON_NUM_VEC * ivec2];
-                  }
-               }
-               
-               //Set num_vec
-               num_vec = DAVIDSON_NUM_VEC_KEEP;
-            
-            }
-
-         }
-      }
-      
-   }
-   
-   const double FCIenergy = mxM_eigs[0] + getEconst();
-   if ( inoutput != NULL ){ FCIdcopy(length_vec, u_vec, inoutput); }
-   
-   if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Number of matrix-vector products which were required = " << nIterations << endl; }
+   assert( instruction == 'C' );
+   if ( inoutput != NULL ){ FCIdcopy( veclength, whichpointers[0], inoutput ); }
+   const double FCIenergy = whichpointers[1][0] + getEconst();
+   if ( FCIverbose > 1 ){ cout << "FCI::GSDavidson : Required number of matrix-vector multiplications = " << deBoskabouter.GetNumMultiplications() << endl; }
    if ( FCIverbose > 0 ){ cout << "FCI::GSDavidson : Converged ground state energy = " << FCIenergy << endl; }
-   
-   for (int cnt=0; cnt<num_allocated; cnt++){
-      delete [] vecs[cnt];
-      delete [] Hvecs[cnt];
-   }
-   delete [] vecs;
-   delete [] Hvecs;
-   delete [] t_vec;
-   delete [] u_vec;
-   delete [] work_vec;
-   delete [] mxM;
-   delete [] mxM_eigs;
-   delete [] mxM_vecs;
-   delete [] mxM_work;
-   delete [] Diag;
-   
-   if (Reortho_Allocated){
-      delete [] Reortho_Eigenvecs;
-      delete [] Reortho_Overlap;
-      delete [] Reortho_Overlap_eigs;
-      delete [] Reortho_Lowdin;
-   }
-   
+   delete [] whichpointers;
    return FCIenergy;
 
 }
