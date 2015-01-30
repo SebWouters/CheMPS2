@@ -368,13 +368,14 @@ void CheMPS2::CASSCF::buildWtilde(){
       const int NumOCCpq  = iHandler->getNOCC(  irrep_pq );
       const int NumDMRGpq = iHandler->getNDMRG( irrep_pq );
       const int NumORBpq  = iHandler->getNORB(  irrep_pq );
+      const int NumCOREpq = NumOCCpq + NumDMRGpq;
       
-      //If irrep_pq == irrep_rs and P == R occupied
+      //If irrep_pq == irrep_rs and P == R occupied --> QS only active or virtual
       #pragma omp parallel for schedule(static)
       for (int relindexP = 0; relindexP < NumOCCpq; relindexP++){
          double * subblock = wmattilde->getBlock( irrep_pq, irrep_pq, relindexP, relindexP);
-         for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-            for (int relindexS = 0; relindexS < NumORBpq; relindexS++){
+         for (int relindexS = NumOCCpq; relindexS < NumORBpq; relindexS++){
+            for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
                subblock[ relindexQ + NumORBpq * relindexS ] += 4 * ( theTmatrix->get(irrep_pq, relindexQ, relindexS)
                                                                    + theQmatOCC->get(irrep_pq, relindexQ, relindexS)
                                                                    + theQmatACT->get(irrep_pq, relindexQ, relindexS) );
@@ -382,7 +383,7 @@ void CheMPS2::CASSCF::buildWtilde(){
          }
       }
       
-      //If irrep_pq == irrep_rs and P,R active
+      //If irrep_pq == irrep_rs and P,R active --> QS only occupied or virtual
       #pragma omp parallel for schedule(static)
       for (int combined = 0; combined < NumDMRGpq*NumDMRGpq; combined++){
          
@@ -393,8 +394,22 @@ void CheMPS2::CASSCF::buildWtilde(){
          const int DMRGindexR = relindexR - NumOCCpq + iHandler->getDMRGcumulative( irrep_pq );
          const double OneDMvalue = DMRG1DM[ DMRGindexP + nOrbDMRG * DMRGindexR ];
          
-         for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-            for (int relindexS = 0; relindexS < NumORBpq; relindexS++){
+         for (int relindexS = 0; relindexS < NumOCCpq; relindexS++){
+            for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( theTmatrix->get(irrep_pq, relindexQ, relindexS)
+                                                                                + theQmatOCC->get(irrep_pq, relindexQ, relindexS) );
+            }
+            for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( theTmatrix->get(irrep_pq, relindexQ, relindexS)
+                                                                                + theQmatOCC->get(irrep_pq, relindexQ, relindexS) );
+            }
+         }
+         for (int relindexS = NumCOREpq; relindexS < NumORBpq; relindexS++){
+            for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( theTmatrix->get(irrep_pq, relindexQ, relindexS)
+                                                                                + theQmatOCC->get(irrep_pq, relindexQ, relindexS) );
+            }
+            for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
                subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( theTmatrix->get(irrep_pq, relindexQ, relindexS)
                                                                                 + theQmatOCC->get(irrep_pq, relindexQ, relindexS) );
             }
@@ -406,9 +421,10 @@ void CheMPS2::CASSCF::buildWtilde(){
          const int NumOCCrs  = iHandler->getNOCC(  irrep_rs );
          const int NumDMRGrs = iHandler->getNDMRG( irrep_rs );
          const int NumORBrs  = iHandler->getNORB(  irrep_rs );
+         const int NumCORErs = NumOCCrs + NumDMRGrs;
          const int productirrep = Irreps::directProd( irrep_pq, irrep_rs );
       
-         // P and R occupied
+         // P and R occupied --> QS only active or virtual
          #pragma omp parallel for schedule(static)
          for (int combined = 0; combined < NumOCCpq*NumOCCrs; combined++){
          
@@ -416,8 +432,8 @@ void CheMPS2::CASSCF::buildWtilde(){
             const int relindexR = combined / NumOCCpq;
             double * subblock   = wmattilde->getBlock( irrep_pq, irrep_rs, relindexP, relindexR);
             
-            for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-               for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
+            for (int relindexS = NumOCCrs; relindexS < NumORBrs; relindexS++){
+               for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
                   subblock[ relindexQ + NumORBpq * relindexS ] +=  
                       4 * ( 4 * theRotatedTEI->FourIndexAPI(irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relindexR)
                               - theRotatedTEI->FourIndexAPI(irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relindexR)
@@ -426,7 +442,7 @@ void CheMPS2::CASSCF::buildWtilde(){
             }
          } // End combined P and R occupied
          
-         // P and R active
+         // P and R active --> QS only occupied or virtual
          #pragma omp parallel for schedule(static)
          for (int combined = 0; combined < NumDMRGpq*NumDMRGrs; combined++){
          
@@ -456,9 +472,26 @@ void CheMPS2::CASSCF::buildWtilde(){
                      const double TwoDMvalue23 = DMRG2DM[ DMRGindexR + nOrbDMRG * ( DMRGalpha + nOrbDMRG * ( DMRGbeta + nOrbDMRG * DMRGindexP ) ) ]
                                                + DMRG2DM[ DMRGindexR + nOrbDMRG * ( DMRGindexP + nOrbDMRG * ( DMRGbeta + nOrbDMRG * DMRGalpha ) ) ];
                      
-                     for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-                        for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
-                           subblock[ relindexQ + NumORBpq * relindexS ] += 
+                     for (int relindexS = 0; relindexS < NumOCCrs; relindexS++){
+                        for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                        for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                     }
+                     for (int relindexS = NumCORErs; relindexS < NumORBrs; relindexS++){
+                        for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                        for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
                               2 * ( TwoDMvalue1  * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
                                   + TwoDMvalue23 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
                         }
@@ -468,7 +501,7 @@ void CheMPS2::CASSCF::buildWtilde(){
             }
          } // End combined P and R active
          
-         // P active and R occupied
+         // P active and R occupied  -->  Q occupied or virtual  //  S active or virtual
          #pragma omp parallel for schedule(static)
          for (int combined = 0; combined < NumDMRGpq*NumOCCrs; combined++){
             
@@ -483,8 +516,14 @@ void CheMPS2::CASSCF::buildWtilde(){
                const int relalpha      = iHandler->getNOCC( irrep_pq ) + alpha;
                const double OneDMvalue = DMRG1DM[ DMRGalpha + nOrbDMRG * DMRGindexP ];
                
-               for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-                  for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
+               for (int relindexS = NumOCCrs; relindexS < NumORBrs; relindexS++){
+                  for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relalpha) );
+                  }
+                  for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
                      subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
                          ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
                              - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
@@ -494,7 +533,7 @@ void CheMPS2::CASSCF::buildWtilde(){
             }
          } // End combined P active and R occupied
          
-         // P occupied and R active
+         // P occupied and R active  -->  Q active or virtual  //  S occupied or virtual
          #pragma omp parallel for schedule(static)
          for (int combined = 0; combined < NumOCCpq*NumDMRGrs; combined++){
             
@@ -509,8 +548,14 @@ void CheMPS2::CASSCF::buildWtilde(){
                const int relbeta       = iHandler->getNOCC( irrep_rs ) + beta;
                const double OneDMvalue = DMRG1DM[ DMRGindexR + nOrbDMRG * DMRGbeta ];
                
-               for (int relindexQ = 0; relindexQ < NumORBpq; relindexQ++){
-                  for (int relindexS = 0; relindexS < NumORBrs; relindexS++){
+               for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
+                  for (int relindexS = 0; relindexS < NumOCCrs; relindexS++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
+                             - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relbeta, relindexP) );
+                  }
+                  for (int relindexS = NumCORErs; relindexS < NumORBrs; relindexS++){
                      subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
                          ( 4 * theRotatedTEI->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
                              - theRotatedTEI->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
