@@ -36,8 +36,6 @@ CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigne
    FCIverbose   = FCIverbose_in;
    maxMemWorkMB = maxMemWorkMB_in;
    L = Ham->getL();
-   assert( theNel_up    >= 0 );
-   assert( theNel_down  >= 0 );
    assert( theNel_up    <= L );
    assert( theNel_down  <= L );
    assert( maxMemWorkMB >  0.0 );
@@ -1578,8 +1576,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput, const int DAVIDSON_NUM_VEC) c
 
 void CheMPS2::FCI::ActWithNumberOperator(const unsigned int orbIndex, double * resultVector, double * sourceVector) const{
 
-   assert( orbIndex>=0 );
-   assert( orbIndex<L  );
+   assert( orbIndex<L );
 
    int * bits_up    = new int[ L ];
    int * bits_down  = new int[ L ];
@@ -1598,7 +1595,6 @@ void CheMPS2::FCI::ActWithNumberOperator(const unsigned int orbIndex, double * r
 void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, const bool isUp, const unsigned int orbIndex, double * thisVector, const FCI * otherFCI, double * otherVector) const{
 
    assert( ( whichOperator=='C' ) || ( whichOperator=='A' ) ); //Operator should be a (C) Creator, or (A) Annihilator
-   assert( orbIndex>=0 );
    assert( orbIndex<L  );
    assert( L==otherFCI->getL() );
 
@@ -1887,7 +1883,7 @@ void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, con
 
    // Addition amplitude < 0 | a_{alpha, spin} [ omega - Ham + E_0 + I*eta ]^{-1} a^+_{beta, spin} | 0 >
 
-   assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
+   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
@@ -1933,7 +1929,7 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
 
    // Removal amplitude < 0 | a^+_{beta, spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha, spin} | 0 >
 
-   assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
+   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
@@ -2003,7 +1999,7 @@ void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double et
 
    // Forward amplitude: < 0 | ( n_alpha - <0| n_alpha |0> ) [ omega - Ham + E_0 + I*eta ]^{-1} ( n_beta  - <0| n_beta  |0> ) | 0 >
    
-   assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
+   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
@@ -2038,7 +2034,7 @@ void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double e
 
    // Backward amplitude: < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 >
    
-   assert( ( orb_alpha>=0  ) && ( orb_beta>=0 ) && ( orb_alpha<L ) & ( orb_beta<L ) ); // Orbital indices within bound
+   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
