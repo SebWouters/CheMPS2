@@ -151,7 +151,7 @@ $(document).ready(function(){initNavTree('CASSCFnewtonraphson_8cpp_source.html',
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;unitary-&gt;<a class="code" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4">getNumVariablesX</a>(); cnt++){ gradient[cnt] = 0.0; }</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;   <span class="keywordtype">double</span> * theDIISparameterVector = NULL;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;   <span class="keywordtype">int</span> theDIISvectorParamSize = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;   <span class="keywordtype">double</span> Energy;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;   <span class="keywordtype">double</span> Energy = 1e8;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;   </div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;   <span class="comment">//The CheMPS2::Problem for the inner DMRG calculation</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;   <a class="code" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> * HamDMRG = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a>(nOrbDMRG, SymmInfo.<a class="code" href="classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0">getGroupNumber</a>(), iHandler-&gt;<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d">getIrrepOfEachDMRGorbital</a>());</div>
@@ -747,7 +747,7 @@ $(document).ready(function(){initNavTree('CASSCFnewtonraphson_8cpp_source.html',
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CASSCFnewtonraphson.cpp</b></li>
-    <li class="footer">Generated on Wed Jan 28 2015 00:14:15 for CheMPS2 by
+    <li class="footer">Generated on Thu Jan 29 2015 21:46:33 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

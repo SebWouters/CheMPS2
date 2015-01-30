@@ -58,6 +58,7 @@ var searchData=
   ['getnumberofirreps',['getNumberOfIrreps',['../classCheMPS2_1_1CASSCF.html#afba8add72828a26c426f47a790511bf1',1,'CheMPS2::CASSCF::getNumberOfIrreps()'],['../classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d',1,'CheMPS2::Irreps::getNumberOfIrreps()']]],
   ['getnumdiisvecs',['getNumDIISVecs',['../classCheMPS2_1_1DMRGSCFoptions.html#a57ed7e22a351ad6fc1621ff95106040a',1,'CheMPS2::DMRGSCFoptions']]],
   ['getnumirreps',['getNumIrreps',['../classCheMPS2_1_1FCI.html#ad921697e69e7ebc3f554ebe4613b30d6',1,'CheMPS2::FCI']]],
+  ['getnummultiplications',['GetNumMultiplications',['../classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797',1,'CheMPS2::Davidson']]],
   ['getnumvariablesx',['getNumVariablesX',['../classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4',1,'CheMPS2::DMRGSCFunitary']]],
   ['getnumvarserror',['getNumVarsError',['../classCheMPS2_1_1DIIS.html#a81381386f2ebf71857d382747ed597ae',1,'CheMPS2::DIIS']]],
   ['getnumvarsparam',['getNumVarsParam',['../classCheMPS2_1_1DIIS.html#a53ed9c34c62a372b5ab48dbb01b50150',1,'CheMPS2::DIIS']]],

@@ -241,6 +241,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/CASSCFnewtonraphson.cpp">```CheMPS2/CASSCFnewtonraphson.cpp```</a> contains all DMRG-SCF functions which are specific to the augmented Hessian Newton-Raphson update scheme, including the functions to calculate the gradient and Hessian.</p>
 <p><a href="CheMPS2/ConvergenceScheme.cpp">```CheMPS2/ConvergenceScheme.cpp```</a> contains all functions of the ConvergenceScheme class, which contains the instructions for the subsequent DMRG sweeps.</p>
 <p><a href="CheMPS2/Correlations.cpp">```CheMPS2/Correlations.cpp```</a> contains all the functionality to calculate the spin, density, and spin-flip correlation functions as well as the two-orbital mutual information.</p>
+<p><a href="CheMPS2/Davidson.cpp">```CheMPS2/Davidson.cpp```</a> is an implementation of Davidson's algorithm.</p>
 <p><a href="CheMPS2/DIIS.cpp">```CheMPS2/DIIS.cpp```</a> contains a DIIS convergence speed-up for DMRG-SCF.</p>
 <p><a href="CheMPS2/DMRG.cpp">```CheMPS2/DMRG.cpp```</a> contains the constructor and destructor of the DMRG class, as well as the top-level sweep functions.</p>
 <p><a href="CheMPS2/DMRGmpsio.cpp">```CheMPS2/DMRGmpsio.cpp```</a> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
@@ -298,6 +299,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p><a href="CheMPS2/include/CASSCF.h">```CheMPS2/include/CASSCF.h```</a> contains the definitions of the CASSCF class.</p>
 <p><a href="CheMPS2/include/ConvergenceScheme.h">```CheMPS2/include/ConvergenceScheme.h```</a> contains the definitions of the ConvergenceScheme class.</p>
 <p><a href="CheMPS2/include/Correlations.h">```CheMPS2/include/Correlations.h```</a> contains the definitions of the Correlations class.</p>
+<p><a href="CheMPS2/include/Davidson.h">```CheMPS2/include/Davidson.h```</a> contains the definitions of the Davidson class.</p>
 <p><a href="CheMPS2/include/DIIS.h">```CheMPS2/include/DIIS.h```</a> contains the definitions of the DIIS class.</p>
 <p><a href="CheMPS2/include/DMRG.h">```CheMPS2/include/DMRG.h```</a> contains the definitions of the DMRG class.</p>
 <p><a href="CheMPS2/include/DMRGSCFindices.h">```CheMPS2/include/DMRGSCFindices.h```</a> contains the definitions of the DMRGSCFindices class.</p>
@@ -378,7 +380,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Jan 28 2015 00:14:59 for CheMPS2 by
+    <li class="footer">Generated on Thu Jan 29 2015 21:47:19 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

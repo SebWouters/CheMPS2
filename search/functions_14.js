@@ -3,6 +3,7 @@ var searchData=
   ['_7ecasscf',['~CASSCF',['../classCheMPS2_1_1CASSCF.html#a20937fd3dbc5c5f3fa2e7ffd4f751900',1,'CheMPS2::CASSCF']]],
   ['_7econvergencescheme',['~ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#af2ca92fc4ac3bbe78ae0ee252c58fab1',1,'CheMPS2::ConvergenceScheme']]],
   ['_7ecorrelations',['~Correlations',['../classCheMPS2_1_1Correlations.html#a46134b49330a269ff102d5d0ca3291e7',1,'CheMPS2::Correlations']]],
+  ['_7edavidson',['~Davidson',['../classCheMPS2_1_1Davidson.html#a9e03fe514d6149d5be69775179ac5c8a',1,'CheMPS2::Davidson']]],
   ['_7ediis',['~DIIS',['../classCheMPS2_1_1DIIS.html#a4fdba33bfbbf693f0565a9a4f8e1e0e1',1,'CheMPS2::DIIS']]],
   ['_7edmrg',['~DMRG',['../classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5',1,'CheMPS2::DMRG']]],
   ['_7edmrgscfindices',['~DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#a1dc37bccdc88d7d8f28ab151937f891d',1,'CheMPS2::DMRGSCFindices']]],

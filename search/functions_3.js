@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['davidson',['Davidson',['../classCheMPS2_1_1Davidson.html#abef20668c9bca9634116c525f9ab0627',1,'CheMPS2::Davidson']]],
   ['debugcheck',['debugcheck',['../classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343',1,'CheMPS2::Hamiltonian']]],
   ['deletestoreddiis',['deleteStoredDIIS',['../classCheMPS2_1_1CASSCF.html#abd8799e175329933a246dfee97e5dfb7',1,'CheMPS2::CASSCF::deleteStoredDIIS()'],['../classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba',1,'CheMPS2::DIIS::deleteStoredDIIS()']]],
   ['deletestoredmps',['deleteStoredMPS',['../classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c',1,'CheMPS2::DMRG']]],
