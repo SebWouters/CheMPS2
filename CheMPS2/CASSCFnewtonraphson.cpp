@@ -29,6 +29,7 @@
 #include "Lapack.h"
 #include "DMRGSCFVmatRotations.h"
 #include "EdmistonRuedenberg.h"
+#include "Davidson.h"
 
 using std::string;
 using std::ifstream;
@@ -240,47 +241,64 @@ double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNor
    
    //Calculate the gradient
    int x_linearlength = unitary->getNumVariablesX();
-   double gradNorm = calcGradient(gradient);
+   const double gradNorm = calcGradient(gradient);
    
    //Calculate the Hessian
-   int aug_linlength = x_linearlength+1;
-   int size = aug_linlength * aug_linlength;
+   int dim = x_linearlength + 1;
+   int size = dim * dim;
    double * hessian = new double[size];
-   calcHessian(hessian, aug_linlength);
+   calcHessian(hessian, dim);
    
    //Augment the gradient into the Hessian matrix
    for (int cnt=0; cnt<x_linearlength; cnt++){
-      hessian[cnt + x_linearlength*aug_linlength] = gradient[cnt];
-      hessian[x_linearlength + aug_linlength*cnt] = gradient[cnt];
+      hessian[cnt + x_linearlength*dim] = gradient[cnt];
+      hessian[x_linearlength + dim*cnt] = gradient[cnt];
    }
-   hessian[x_linearlength + aug_linlength*x_linearlength] = 0.0;
-   
-   //Find its lowest eigenvalue and vector
-   double * work = new double[size];
-   double * eigen = new double[aug_linlength];
-   char jobz = 'V';
-   char uplo = 'U';
-   int info;
-   dsyev_(&jobz,&uplo,&aug_linlength,hessian,&aug_linlength,eigen,work,&size,&info);
-   
-   if (CheMPS2::DMRGSCF_debugPrint){
-      cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << eigen[0] << endl;
-      cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
+   hessian[x_linearlength + dim*x_linearlength] = 0.0;
+
+   //Find the lowest eigenvalue and corresponding eigenvector of the augmented hessian
+   {
+      const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * dim );
+      Davidson deBoskabouter(dim, CheMPS2::HEFF_DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false); // No debug printing
+      double ** whichpointers = new double*[2];
+
+      char instruction = deBoskabouter.FetchInstruction( whichpointers );
+      assert( instruction == 'A' );
+      for (int cnt = 0; cnt < dim; cnt++){ whichpointers[1][cnt] = hessian[cnt*(1+dim)]; } // Preconditioner = diagonal elements of the augmented Hessian
+      for (int cnt = 0; cnt < x_linearlength; cnt++){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
+         const double denom = ( whichpointers[1][cnt] > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+         whichpointers[0][cnt] = - gradient[cnt] / denom;
+      }
+      whichpointers[0][x_linearlength] = 1.0;
+
+      instruction = deBoskabouter.FetchInstruction( whichpointers );
+      while ( instruction == 'B' ){
+         char notrans = 'N';
+         int one = 1;
+         double alpha = 1.0;
+         double beta = 0.0;
+         dgemm_(&notrans, &notrans, &dim, &one, &dim, &alpha, hessian, &dim, whichpointers[0], &dim, &beta, whichpointers[1], &dim);
+         instruction = deBoskabouter.FetchInstruction( whichpointers );
+      }
+
+      assert( instruction == 'C' );
+      double scalar = 1.0 / whichpointers[0][x_linearlength];
+      cout << "DMRGSCF::augmentedHessianNR : Augmented Hessian update found with " << deBoskabouter.GetNumMultiplications() << " Davidson iterations." << endl;
+      if (CheMPS2::DMRGSCF_debugPrint){
+         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[1][0] << endl;
+         cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << scalar << endl;
+      }
+      for (int cnt = 0; cnt < x_linearlength; cnt++){ gradient[cnt] = scalar * whichpointers[0][cnt]; } // Update is stored in gradient
+      delete [] whichpointers;
    }
-   double scalar = 1.0/hessian[x_linearlength];
-   int inc = 1;
-   dscal_(&x_linearlength,&scalar,hessian,&inc);
    
-   //Copy the update to the gradient vector --> needed for updates of the unitary and DIIS
-   dcopy_(&x_linearlength,hessian,&inc,gradient,&inc);
+   //Calculate the update norm
    updateNorm[0] = 0.0;
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ updateNorm[0] += gradient[cnt] * gradient[cnt]; }
    updateNorm[0] = sqrt(updateNorm[0]);
    cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
    
    delete [] hessian;
-   delete [] eigen;
-   delete [] work;
    
    return gradNorm;
 
