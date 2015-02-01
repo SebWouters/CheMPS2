@@ -131,6 +131,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a17f232492ed870c91cca434a6fc2300c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c">getSecondIndex</a> (const int linearindex) const </td></tr>
 <tr class="memdesc:a17f232492ed870c91cca434a6fc2300c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the second <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> index corresponding to linearindex.  <a href="#a17f232492ed870c91cca434a6fc2300c">More...</a><br/></td></tr>
 <tr class="separator:a17f232492ed870c91cca434a6fc2300c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17b95341e5a322650deee68408c317ea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a17b95341e5a322650deee68408c317ea">getJumper</a> (const int irrep, const int geval) const </td></tr>
+<tr class="memdesc:a17b95341e5a322650deee68408c317ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the start index for a certain block in the x-matrix.  <a href="#a17b95341e5a322650deee68408c317ea">More...</a><br/></td></tr>
+<tr class="separator:a17b95341e5a322650deee68408c317ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ca4dead16809cd2a896c1a05b92fc0b"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b">getBlock</a> (const int irrep)</td></tr>
 <tr class="memdesc:a7ca4dead16809cd2a896c1a05b92fc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unitary rotation for block irrep.  <a href="#a7ca4dead16809cd2a896c1a05b92fc0b">More...</a><br/></td></tr>
 <tr class="separator:a7ca4dead16809cd2a896c1a05b92fc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -295,7 +298,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00467">467</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00519">519</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -332,7 +335,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00323">323</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00375">375</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +361,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00707">707</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00759">759</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -396,7 +399,7 @@ Logarithm of a special orthogonal matrix</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the desired unitary block </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00123">123</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00186">186</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -434,7 +437,45 @@ Logarithm of a special orthogonal matrix</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The first <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> index corresponding to linearindex </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00119">119</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00182">182</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a17b95341e5a322650deee68408c317ea"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int CheMPS2::DMRGSCFunitary::getJumper </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>irrep</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>geval</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the start index for a certain block in the x-matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">irrep</td><td>The irrep of the block </td></tr>
+    <tr><td class="paramname">geval</td><td>If geval==0, the first and second indices are <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> and OCC indices. If geval==1, the first and second indices are VIRT and <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> indices. If geval==2, the first and second indices are VIRT and OCC indices. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The start index of the requested block in the x-matrix </dd></dl>
+
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00121">121</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 </div>
 </div>
@@ -478,7 +519,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00350">350</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00402">402</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -520,7 +561,7 @@ Logarithm of a special orthogonal matrix</h1>
 <p>Get the number of variables in the x-parametrization of the unitary update. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of unique variables in the x-matrix </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00107">107</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00119">119</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -558,7 +599,7 @@ Logarithm of a special orthogonal matrix</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The second <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> index corresponding to linearindex </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00121">121</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00184">184</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 </div>
 </div>
@@ -584,7 +625,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00685">685</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00737">737</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -632,7 +673,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00597">597</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00649">649</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -680,7 +721,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00279">279</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00331">331</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -717,7 +758,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00660">660</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00712">712</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -786,7 +827,7 @@ Logarithm of a special orthogonal matrix</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00188">188</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGSCFunitary_8cpp_source.html#l00240">240</a> of file <a class="el" href="DMRGSCFunitary_8cpp_source.html">DMRGSCFunitary.cpp</a>.</p>
 
 <p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-11-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -811,7 +852,7 @@ Logarithm of a special orthogonal matrix</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a></li>
-    <li class="footer">Generated on Thu Jan 29 2015 21:46:34 for CheMPS2 by
+    <li class="footer">Generated on Sun Feb 1 2015 17:33:25 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

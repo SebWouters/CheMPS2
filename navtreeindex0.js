@@ -249,5 +249,5 @@ var NAVTREEINDEX0 =
 "classCheMPS2_1_1DMRGSCFoptions.html#ae4f2901cf992d1a4100367f002af786c":[0,0,0,9,3],
 "classCheMPS2_1_1DMRGSCFoptions.html#af4e0750d68513bf84350128edbbd5775":[0,0,0,9,15],
 "classCheMPS2_1_1DMRGSCFunitary.html":[0,0,0,10],
-"classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630":[0,0,0,10,14]
+"classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630":[0,0,0,10,15]
 };

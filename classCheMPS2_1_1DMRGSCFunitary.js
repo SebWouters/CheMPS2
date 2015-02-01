@@ -7,6 +7,7 @@ var classCheMPS2_1_1DMRGSCFunitary =
     [ "deleteStoredUnitary", "classCheMPS2_1_1DMRGSCFunitary.html#a5f102451d366a3a856db499799c0c5eb", null ],
     [ "getBlock", "classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b", null ],
     [ "getFirstIndex", "classCheMPS2_1_1DMRGSCFunitary.html#ae302e88ca4b9f938e8bb3fc0f3b39409", null ],
+    [ "getJumper", "classCheMPS2_1_1DMRGSCFunitary.html#a17b95341e5a322650deee68408c317ea", null ],
     [ "getLog", "classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100", null ],
     [ "getNumVariablesX", "classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4", null ],
     [ "getSecondIndex", "classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c", null ],
