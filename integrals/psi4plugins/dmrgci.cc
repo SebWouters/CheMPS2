@@ -7,9 +7,12 @@
 #include <libtrans/integraltransform.h>
 #include <libmints/wavefunction.h>
 #include <libmints/mints.h>
+#include <libmints/typedefs.h>
+//Header above this comment contains typedef boost::shared_ptr<psi::Matrix> SharedMatrix;
 #include <libciomr/libciomr.h>
 #include <liboptions/liboptions.h>
 #include <libchkpt/chkpt.h>
+#include <libfock/jk.h>
 
 #include <stdlib.h>
 #include <iostream>
@@ -84,6 +87,39 @@ read_options(std::string name, Options &options)
     }
 
     return true;
+}
+
+
+void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK){
+
+    SharedMatrix SO_RDM;     SO_RDM = SharedMatrix( new Matrix( MO_RDM ) );
+    SharedMatrix Identity; Identity = SharedMatrix( new Matrix( MO_RDM ) );
+    SharedMatrix SO_JK;       SO_JK = SharedMatrix( new Matrix( MO_RDM ) );
+    
+    MO_JK->gemm(false, false, 1.0, Cmat, MO_RDM, 0.0);
+    SO_RDM->gemm(false, true, 1.0, MO_JK, Cmat, 0.0);
+    
+    std::vector<SharedMatrix> & CL = myJK->C_left();
+    CL.clear();
+    CL.push_back( SO_RDM );
+    
+    std::vector<SharedMatrix> & CR = myJK->C_right();
+    CR.clear();
+    Identity->identity();
+    CR.push_back( Identity );
+    
+    myJK->set_do_J(true);
+    myJK->set_do_K(true);
+    myJK->set_do_wK(false);
+    myJK->compute();
+
+    SO_JK->copy( myJK->K()[0] );
+    SO_JK->scale( -0.5 );
+    SO_JK->add( myJK->J()[0] );
+    
+    Identity->gemm(true, false, 1.0, Cmat, SO_JK, 0.0);
+    MO_JK->gemm(false, false, 1.0, Identity, Cmat, 0.0);
+
 }
 
 
@@ -244,22 +280,35 @@ dmrgci(Options &options)
      ******************************************/
      
     fprintf(outfile, "Start filling the active space Hamiltonian.\n");
+    
+    SharedMatrix MO_RDM; MO_RDM = SharedMatrix( new Matrix("MO frozen RDM", nirrep, orbspi, orbspi) );
+    SharedMatrix MO_JK;   MO_JK = SharedMatrix( new Matrix("MO frozen JK",  nirrep, orbspi, orbspi) );
+    MO_RDM->zero();
+    for (int irrep = 0; irrep < nirrep; irrep++){
+        for (int orb = 0; orb < frozen_docc[irrep]; orb++){
+            MO_RDM->set(irrep, orb, orb, 2.0);
+        }
+    }
+    boost::shared_ptr<JK> myJK; myJK = boost::shared_ptr<JK>( new DiskJK( wfn->basisset() ) );
+    myJK->set_cutoff( 0.0 );
+    myJK->initialize();
+    buildJK( MO_RDM, MO_JK, wfn->Ca(), myJK );
 
     // CheMPS2 requires RHF or ROHF orbitals.
-    // Generate only the two-electron integrals for the frozen and active spaces.
-    std::vector<int> frozenActive;
+    // Generate only the two-electron integrals for the active space.
+    std::vector<int> onlyActive;
     std::vector<int> empty;
     int jump = 0;
     for (int h=0; h<nirrep; h++){ // Tell the two-electron rotator which integrals we'd like
-       for (int orb=0; orb<frozen_docc[h]+active[h]; orb++){ frozenActive.push_back( jump + orb ); }
+       for (int orb=frozen_docc[h]; orb<frozen_docc[h]+active[h]; orb++){ onlyActive.push_back( jump + orb ); }
        jump += orbspi[h];
     }
-    boost::shared_ptr<MOSpace> frozenActive_ptr;
-    frozenActive_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'S', frozenActive, empty ) );
+    boost::shared_ptr<MOSpace> onlyActive_ptr;
+    onlyActive_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'S', onlyActive, empty ) );
     std::vector<boost::shared_ptr<MOSpace> > spaces;
-    spaces.push_back( frozenActive_ptr );
+    spaces.push_back( onlyActive_ptr );
     IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted);
-    ints.transform_tei( frozenActive_ptr, frozenActive_ptr, frozenActive_ptr, frozenActive_ptr );
+    ints.transform_tei( onlyActive_ptr, onlyActive_ptr, onlyActive_ptr, onlyActive_ptr );
     dpd_set_default(ints.get_dpd_id());
     
     // Constant part of the energy: due to nuclear repulsion and doubly occupied orbitals
@@ -278,12 +327,13 @@ dmrgci(Options &options)
     for (int h=0; h<nirrep; h++){
        // A part contributes to the constant part of the energy
        for (int froz=0; froz<frozen_docc[h]; froz++){
-          Econstant += 2 * moOei[h][froz][froz];
+          Econstant += 2 * moOei[h][froz][froz] + MO_JK->get(h, froz, froz);
        }
        // And a part can just be directly copied
        for (int row=0; row<active[h]; row++){
           for (int col=row; col<active[h]; col++){
-             Tmat[h][row + active[h]*col] = moOei[h][frozen_docc[h]+row][frozen_docc[h]+col];
+             Tmat[h][row + active[h]*col] = moOei[h][frozen_docc[h]+row][frozen_docc[h]+col]
+                                          + MO_JK->get(h, frozen_docc[h]+row, frozen_docc[h]+col);
              Tmat[h][col + active[h]*row] = Tmat[h][row + active[h]*col];
           }
        }
@@ -304,53 +354,11 @@ dmrgci(Options &options)
         for(int pq = 0; pq < K.params->rowtot[h]; ++pq){
             const int p = K.params->roworb[h][pq][0];
             const int q = K.params->roworb[h][pq][1];
-            const int psym = K.params->psym[p];
-            const int qsym = K.params->qsym[q];
-            const int prel = p - K.params->poff[psym];
-            const int qrel = q - K.params->qoff[qsym];
-            const int p_active = prel - frozen_docc[psym];
-            const int q_active = qrel - frozen_docc[qsym];
-            int p_glob = p_active; for (int prev_irr=0; prev_irr<psym; prev_irr++){ p_glob += active[prev_irr]; }
-            int q_glob = q_active; for (int prev_irr=0; prev_irr<qsym; prev_irr++){ q_glob += active[prev_irr]; }
-            const bool p_DMRG_AS = ((p_active>=0) && (p_active < active[psym]));
-            const bool q_DMRG_AS = ((q_active>=0) && (q_active < active[qsym]));
+            /*const int psym = K.params->psym[p]; const int prel = p - K.params->poff[psym]; and idem for qrs */
             for(int rs = 0; rs < K.params->coltot[h]; ++rs){
                 const int r = K.params->colorb[h][rs][0];
                 const int s = K.params->colorb[h][rs][1];
-                const int rsym = K.params->rsym[r];
-                const int ssym = K.params->ssym[s];
-                const int rrel = r - K.params->roff[rsym];
-                const int srel = s - K.params->soff[ssym];
-                const int r_active = rrel - frozen_docc[rsym];
-                const int s_active = srel - frozen_docc[ssym];
-                const bool r_DMRG_AS = ((r_active>=0) && (r_active < active[rsym]));
-                const bool s_DMRG_AS = ((s_active>=0) && (s_active < active[ssym]));
-
-                // From the plugin to dump all integrals : Ham->setVmat(p,r,q,s,K.matrix[h][pq][rs]);
-                
-                if (( p_active<0 ) && ( p==q )){ // Orbital p is frozen and equals q : Coulomb
-                
-                   // Orbitals r and s are frozen as well : Econstant
-                   if (( r_active<0 ) && (r==s)){ Econstant += 2*K.matrix[h][pq][rs]; }
-                   
-                   // Since p==q, this automatically should imply ssym==rsym; Orbitals r and s are active
-                   if (( r_DMRG_AS ) && ( s_DMRG_AS )){ Tmat[ rsym ][ r_active + active[rsym] * s_active ] += 2*K.matrix[h][pq][rs]; }
-                }
-                
-                if (( p_active<0 ) && ( p==s )){ // Orbital p is frozen and equals s : Exchange
-                
-                   // Orbitals r and q are frozen as well : Econstant
-                   if (( r_active<0 ) && ( r==q )){ Econstant -= K.matrix[h][pq][rs]; }
-                   
-                   // Since p==s, this automatically should imply qsym==rsym; Orbitals r and q are active
-                   if (( r_DMRG_AS ) && ( q_DMRG_AS )){ Tmat[ rsym ][ r_active + active[rsym] * q_active ] -= K.matrix[h][pq][rs]; }
-                }
-                
-                if (( p_DMRG_AS ) && ( q_DMRG_AS ) && ( r_DMRG_AS ) && ( s_DMRG_AS )){ //Everything is active
-                   int r_glob = r_active; for (int prev_irr=0; prev_irr<rsym; prev_irr++){ r_glob += active[prev_irr]; }
-                   int s_glob = s_active; for (int prev_irr=0; prev_irr<ssym; prev_irr++){ s_glob += active[prev_irr]; }
-                   Ham->setVmat( p_glob , r_glob , q_glob , s_glob , K.matrix[h][pq][rs] );
-                }
+                Ham->setVmat( p, r, q, s, K.matrix[h][pq][rs] );
             }
         }
         global_dpd_->buf4_mat_irrep_close(&K, h);
