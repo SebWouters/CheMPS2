@@ -6,9 +6,9 @@ import numpy as np
 
 def fetchJK_mo( mf , DM_mo , Cmat ):
 
-   DM_ao = np.dot( np.dot( Cmat , DM_mo ) , Cmat.T )
-   JK_ao = scf.hf.get_veff( mol=mf.mol , dm=DM_ao , dm_last=0, vhf_last=0, hermi=1 )
-   JK_mo = np.dot( np.dot( Cmat.T , JK_ao ) , Cmat )
+   DM_ao = np.dot( np.dot( Cmat, DM_mo ), Cmat.T )
+   JK_ao = scf.hf.get_veff( mf.mol, DM_ao, 0, 0, 1 ) #Last 3 numbers: dm_last, vhf_last, hermi
+   JK_mo = np.dot( np.dot( Cmat.T, JK_ao ), Cmat )
    return JK_mo
 
 def dmrgci( mf , TwoS , Nelec , Irrep , DSU2 , Econv , MaxSweeps , NoisePrefac , frozen , active ):
