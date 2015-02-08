@@ -202,6 +202,38 @@ namespace CheMPS2{
          //! CASSCF DIIS vectors remove call
          void deleteStoredDIIS(const string filename=CheMPS2::DMRGSCF_DIISstorageName){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(filename); }}
          
+         //! Build the F-matrix (Eq. (11) in the Siegbahn paper [CAS3])
+         /** \param localFmat Matrix where the result should be stored
+             \param localTmat Matrix which contains the one-electron integrals
+             \param localJKocc Matrix which contains the Coulomb and exchange interaction due to the frozen core orbitals
+             \param localJKact Matrix which contains the Coulomb and exchange interaction due to the active space
+             \param localIdx Orbital index bookkeeper for the CASSCF calculations
+             \param theInts The rotated two-electron integrals (at most 2 virtual indices)
+             \param local2DM The DMRG 2-RDM
+             \param local1DM The DMRG 1-RDM */
+         static void buildFmat(DMRGSCFmatrix * localFmat, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM);
+         
+         //! Build the Wtilde-matrix (Eq. (20b) in the Siegbahn paper [CAS3])
+         /** \param localwtilde Where the result should be stored
+             \param localTmat Matrix which contains the one-electron integrals
+             \param localJKocc Matrix which contains the Coulomb and exchange interaction due to the frozen core orbitals
+             \param localJKact Matrix which contains the Coulomb and exchange interaction due to the active space
+             \param localIdx Orbital index bookkeeper for the CASSCF calculations
+             \param theInts The rotated two-electron integrals (at most 2 virtual indices)
+             \param local2DM The DMRG 2-RDM
+             \param local1DM The DMRG 1-RDM */
+         static void buildWtilde(DMRGSCFwtilde * localwtilde, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM);
+         
+         //! Calculate the augmented Hessian Newton-Raphson update for the orthogonal orbital rotation matrix
+         /** \param localFmat Matrix which contains the Fock operator (Eq. (11) in the Siegbahn paper [CAS3])
+             \param localwtilde Object which contains the second order derivative of the energy with respect to the unitary (Eq. (20b) in the Siegbahn paper [CAS3])
+             \param localIdx Orbital index bookkeeper for the CASSCF calculations
+             \param localUmat The unitary matrix for CASSCF calculations (in this function it is used to fetch the orbital ordering convention of the skew-symmetric parametrization)
+             \param theupdate Where the augmented Hessian Newton-Raphson update will be stored
+             \param updateNorm Pointer to one double to store the update norm
+             \param gradNorm Pointer to one double to store the gradient norm */
+         static void augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm);
+         
       private:
       
          //Index convention handler
@@ -275,16 +307,12 @@ namespace CheMPS2{
          void fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const;
          
          //Calculate the gradient, return function is the gradient 2-norm
-         double calcGradient(double * gradient);
+         static double calcGradient(const DMRGSCFmatrix * localFmat, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * gradient);
          
          //Calculate the hessian
-         void calcHessian(double * hessian, const int rowjump);
-         
-         //Do Augmented Hessian form of NR. On return, gradient contains the RESCALED gradient.
-         double augmentedHessianNR(double * gradient, double * updateNorm);
+         static void calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump);
          
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
-         void buildFmat();
          DMRGSCFmatrix * theFmatrix;
          
          //The Coulomb and exchange interaction with the occupied and active electrons respectively
@@ -300,10 +328,9 @@ namespace CheMPS2{
          
          //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;
-         void buildWtilde();
          
          //The Wmat function as defined by Eq. (21b) in the Siegbahn paper
-         double Wmat(const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS) const;
+         static double Wmat(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS);
          
          //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
          void PrintCoeff_C2(DMRG * theDMRG);

@@ -96,6 +96,11 @@ namespace CheMPS2{
          /** \return pointer to irrepOfEachDMRGorbital */
          int * getIrrepOfEachDMRGorbital();
          
+         //! Get the irrep corresponding to a global orbital index
+         /** \param index The global orbital index
+             \return The irrep of the corresponding orbital */
+         int getOrbitalIrrep(const int index) const;
+         
          //! Print my contents
          void Print() const;
 
@@ -134,6 +139,9 @@ namespace CheMPS2{
          
          //Irrep of each DMRG orbital (to construct HamDMRG)
          int * irrepOfEachDMRGorbital;
+         
+         //Irrep of each global orbital
+         int * irrepOfEachOrbital;
          
    };
 }
