@@ -10,6 +10,7 @@ var classCheMPS2_1_1DMRGSCFindices =
     [ "getNOCC", "classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892", null ],
     [ "getNORB", "classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2", null ],
     [ "getNVIRT", "classCheMPS2_1_1DMRGSCFindices.html#afdbe42f60924d9fb705cce44426d72d0", null ],
+    [ "getOrbitalIrrep", "classCheMPS2_1_1DMRGSCFindices.html#a2b1f2ae0964f9c0ecd653acfe88f5bd4", null ],
     [ "getOrigNDMRGstart", "classCheMPS2_1_1DMRGSCFindices.html#a2da1c6944764244f4393bc22cc055a13", null ],
     [ "getOrigNOCCstart", "classCheMPS2_1_1DMRGSCFindices.html#a1a24f5ffe9537c50cf1a23211e3a7a5f", null ],
     [ "getOrigNVIRTstart", "classCheMPS2_1_1DMRGSCFindices.html#a440634b63107d8a02132ee4bcb7ef0b4", null ],

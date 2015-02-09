@@ -14,5 +14,6 @@ var searchData=
   ['addtermsimple',['AddTermSimple',['../classCheMPS2_1_1TensorQ.html#a2713d322bf2d702d276cac8619196b0f',1,'CheMPS2::TensorQ']]],
   ['addtermsl',['AddTermsL',['../classCheMPS2_1_1TensorQ.html#a1aabed806e81453ed29f84626985bc65',1,'CheMPS2::TensorQ']]],
   ['addtovmat',['addToVmat',['../classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82',1,'CheMPS2::Hamiltonian']]],
-  ['appendnew',['appendNew',['../classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432',1,'CheMPS2::DIIS']]]
+  ['appendnew',['appendNew',['../classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432',1,'CheMPS2::DIIS']]],
+  ['augmentedhessiannr',['augmentedHessianNR',['../classCheMPS2_1_1CASSCF.html#abf34a3243a38979439e7aa2d9e60c4dd',1,'CheMPS2::CASSCF']]]
 ];

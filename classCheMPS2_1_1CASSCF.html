@@ -105,6 +105,7 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1CASSCF.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classCheMPS2_1_1CASSCF-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">CheMPS2::CASSCF Class Reference</div>  </div>
@@ -142,6 +143,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#abd8799e175329933a246dfee97e5dfb7">deleteStoredDIIS</a> (const string filename=CheMPS2::DMRGSCF_DIISstorageName)</td></tr>
 <tr class="memdesc:abd8799e175329933a246dfee97e5dfb7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> <a class="el" href="classCheMPS2_1_1DIIS.html">DIIS</a> vectors remove call. <br/></td></tr>
 <tr class="separator:abd8799e175329933a246dfee97e5dfb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a0210ff118bab44593aef7c6ec9f31a56"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56">buildFmat</a> (<a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localFmat, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localTmat, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localJKocc, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localJKact, const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *localIdx, const <a class="el" href="classCheMPS2_1_1DMRGSCFintegrals.html">DMRGSCFintegrals</a> *theInts, double *local2DM, double *local1DM)</td></tr>
+<tr class="memdesc:a0210ff118bab44593aef7c6ec9f31a56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the F-matrix (Eq. (11) in the Siegbahn paper [CAS3])  <a href="#a0210ff118bab44593aef7c6ec9f31a56">More...</a><br/></td></tr>
+<tr class="separator:a0210ff118bab44593aef7c6ec9f31a56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21471f166b873029b5e51dda4a6907c4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4">buildWtilde</a> (<a class="el" href="classCheMPS2_1_1DMRGSCFwtilde.html">DMRGSCFwtilde</a> *localwtilde, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localTmat, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localJKocc, const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localJKact, const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *localIdx, const <a class="el" href="classCheMPS2_1_1DMRGSCFintegrals.html">DMRGSCFintegrals</a> *theInts, double *local2DM, double *local1DM)</td></tr>
+<tr class="memdesc:a21471f166b873029b5e51dda4a6907c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the Wtilde-matrix (Eq. (20b) in the Siegbahn paper [CAS3])  <a href="#a21471f166b873029b5e51dda4a6907c4">More...</a><br/></td></tr>
+<tr class="separator:a21471f166b873029b5e51dda4a6907c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf34a3243a38979439e7aa2d9e60c4dd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1CASSCF.html#abf34a3243a38979439e7aa2d9e60c4dd">augmentedHessianNR</a> (const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *localFmat, const <a class="el" href="classCheMPS2_1_1DMRGSCFwtilde.html">DMRGSCFwtilde</a> *localwtilde, const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *localIdx, const <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> *localUmat, double *theupdate, double *updateNorm, double *gradNorm)</td></tr>
+<tr class="memdesc:abf34a3243a38979439e7aa2d9e60c4dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the augmented Hessian Newton-Raphson update for the orthogonal orbital rotation matrix.  <a href="#abf34a3243a38979439e7aa2d9e60c4dd">More...</a><br/></td></tr>
+<tr class="separator:abf34a3243a38979439e7aa2d9e60c4dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> class. </p>
@@ -330,6 +343,326 @@ References</h1>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="abf34a3243a38979439e7aa2d9e60c4dd"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::CASSCF::augmentedHessianNR </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localFmat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFwtilde.html">DMRGSCFwtilde</a> *&#160;</td>
+          <td class="paramname"><em>localwtilde</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *&#160;</td>
+          <td class="paramname"><em>localIdx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> *&#160;</td>
+          <td class="paramname"><em>localUmat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>theupdate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>updateNorm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>gradNorm</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the augmented Hessian Newton-Raphson update for the orthogonal orbital rotation matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">localFmat</td><td>Matrix which contains the Fock operator (Eq. (11) in the Siegbahn paper [CAS3]) </td></tr>
+    <tr><td class="paramname">localwtilde</td><td>Object which contains the second order derivative of the energy with respect to the unitary (Eq. (20b) in the Siegbahn paper [CAS3]) </td></tr>
+    <tr><td class="paramname">localIdx</td><td>Orbital index bookkeeper for the <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> calculations </td></tr>
+    <tr><td class="paramname">localUmat</td><td>The unitary matrix for <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> calculations (in this function it is used to fetch the orbital ordering convention of the skew-symmetric parametrization) </td></tr>
+    <tr><td class="paramname">theupdate</td><td>Where the augmented Hessian Newton-Raphson update will be stored </td></tr>
+    <tr><td class="paramname">updateNorm</td><td>Pointer to one double to store the update norm </td></tr>
+    <tr><td class="paramname">gradNorm</td><td>Pointer to one double to store the gradient norm </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00233">233</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
+
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_cgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_cgraph" id="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="272,5,469,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="294,70,447,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="293,135,448,177"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_icgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_icgraph" id="classCheMPS2_1_1CASSCF_abf34a3243a38979439e7aa2d9e60c4dd_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="273,12,583,39"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a0210ff118bab44593aef7c6ec9f31a56"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::CASSCF::buildFmat </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localFmat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localTmat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localJKocc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localJKact</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *&#160;</td>
+          <td class="paramname"><em>localIdx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFintegrals.html">DMRGSCFintegrals</a> *&#160;</td>
+          <td class="paramname"><em>theInts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>local2DM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>local1DM</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build the F-matrix (Eq. (11) in the Siegbahn paper [CAS3]) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">localFmat</td><td>Matrix where the result should be stored </td></tr>
+    <tr><td class="paramname">localTmat</td><td>Matrix which contains the one-electron integrals </td></tr>
+    <tr><td class="paramname">localJKocc</td><td>Matrix which contains the Coulomb and exchange interaction due to the frozen core orbitals </td></tr>
+    <tr><td class="paramname">localJKact</td><td>Matrix which contains the Coulomb and exchange interaction due to the active space </td></tr>
+    <tr><td class="paramname">localIdx</td><td>Orbital index bookkeeper for the <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> calculations </td></tr>
+    <tr><td class="paramname">theInts</td><td>The rotated two-electron integrals (at most 2 virtual indices) </td></tr>
+    <tr><td class="paramname">local2DM</td><td>The <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> 2-RDM </td></tr>
+    <tr><td class="paramname">local1DM</td><td>The <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> 1-RDM </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00591">591</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
+
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_cgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_cgraph" id="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFmatrix.html#a0729b05fef0cb96eaf26e7c8d6017931" title="Clear the matrix. " alt="" coords="277,5,472,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="275,70,474,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018" title="Get the cumulative number of active orbitals for an irrep. " alt="" coords="275,135,474,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="275,201,474,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="275,266,474,307"/><area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec" title="Get the number of active orbitals for an irrep. " alt="" coords="275,331,474,373"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24" title="Set an element. " alt="" coords="265,397,485,424"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9" title="Get an element. " alt="" coords="265,448,485,475"/><area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="277,499,472,541"/><area shape="rect" id="node11" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="534,595,725,621"/><area shape="rect" id="node12" href="classCheMPS2_1_1DMRGSCFintegrals.html#ad462dfa92d77f1f02371f12e91cac429" title="Get a two&#45;body matrix element with at most 2 virtual indices, using the FourIndex API..." alt="" coords="271,617,478,658"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_icgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_icgraph" id="classCheMPS2_1_1CASSCF_a0210ff118bab44593aef7c6ec9f31a56_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="265,5,575,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a21471f166b873029b5e51dda4a6907c4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::CASSCF::buildWtilde </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classCheMPS2_1_1DMRGSCFwtilde.html">DMRGSCFwtilde</a> *&#160;</td>
+          <td class="paramname"><em>localwtilde</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localTmat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localJKocc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFmatrix.html">DMRGSCFmatrix</a> *&#160;</td>
+          <td class="paramname"><em>localJKact</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> *&#160;</td>
+          <td class="paramname"><em>localIdx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classCheMPS2_1_1DMRGSCFintegrals.html">DMRGSCFintegrals</a> *&#160;</td>
+          <td class="paramname"><em>theInts</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>local2DM</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>local1DM</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build the Wtilde-matrix (Eq. (20b) in the Siegbahn paper [CAS3]) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">localwtilde</td><td>Where the result should be stored </td></tr>
+    <tr><td class="paramname">localTmat</td><td>Matrix which contains the one-electron integrals </td></tr>
+    <tr><td class="paramname">localJKocc</td><td>Matrix which contains the Coulomb and exchange interaction due to the frozen core orbitals </td></tr>
+    <tr><td class="paramname">localJKact</td><td>Matrix which contains the Coulomb and exchange interaction due to the active space </td></tr>
+    <tr><td class="paramname">localIdx</td><td>Orbital index bookkeeper for the <a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a> calculations </td></tr>
+    <tr><td class="paramname">theInts</td><td>The rotated two-electron integrals (at most 2 virtual indices) </td></tr>
+    <tr><td class="paramname">local2DM</td><td>The <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> 2-RDM </td></tr>
+    <tr><td class="paramname">local1DM</td><td>The <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> 1-RDM </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00379">379</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
+
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_cgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_cgraph" id="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFwtilde.html#a939e077b9fcc8ffafd9a168056991795" title="Clear. " alt="" coords="287,5,479,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="283,70,482,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018" title="Get the cumulative number of active orbitals for an irrep. " alt="" coords="283,135,482,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="283,201,482,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec" title="Get the number of active orbitals for an irrep. " alt="" coords="283,266,482,307"/><area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="283,331,482,373"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFwtilde.html#a1315dead44fb4c153c1e93758f048378" title="Get the (pr) subblock of w_tilde_pqrs, which is stored as w_tilde[ I_pq ][ I_rs ][ p + ( Nocc[I_pq] +..." alt="" coords="287,397,479,438"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9" title="Get an element. " alt="" coords="273,463,493,489"/><area shape="rect" id="node10" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="542,543,733,569"/><area shape="rect" id="node11" href="classCheMPS2_1_1DMRGSCFintegrals.html#ad462dfa92d77f1f02371f12e91cac429" title="Get a two&#45;body matrix element with at most 2 virtual indices, using the FourIndex API..." alt="" coords="279,565,486,606"/></map>
+</div>
+</p>
+
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_icgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_icgraph" id="classCheMPS2_1_1CASSCF_a21471f166b873029b5e51dda4a6907c4_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="273,5,583,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="a2ab912e50eb821fed2089e88692ec0b1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -394,14 +727,14 @@ References</h1>
 
 <p>Definition at line <a class="el" href="CASSCFnewtonraphson_8cpp_source.html#l00040">40</a> of file <a class="el" href="CASSCFnewtonraphson_8cpp_source.html">CASSCFnewtonraphson.cpp</a>.</p>
 
-<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-2-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1CASSCF_a2ab912e50eb821fed2089e88692ec0b1_cgraph.png" border="0" usemap="#classCheMPS2_1_1CASSCF_a2ab912e50eb821fed2089e88692ec0b1_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1CASSCF_a2ab912e50eb821fed2089e88692ec0b1_cgraph" id="classCheMPS2_1_1CASSCF_a2ab912e50eb821fed2089e88692ec0b1_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="392,5,589,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="399,70,583,111"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d" title="Get an array with the irreps of each DMRG orbital. " alt="" coords="391,135,590,177"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="391,201,590,242"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="365,267,616,293"/><area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="391,318,590,359"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFoptions.html#a9f81d7a089fc4a239638d95d93c24099" title="Get which active space should be considered in the DMRG routine. " alt="" coords="391,383,591,425"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFoptions.html#acea3d3f5a5abf8a4bdd509fc13a1a275" title="Get whether the Orbital Rotation checkpoint should be stored to disk. " alt="" coords="391,449,591,490"/><area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFoptions.html#a45fb0323c73651fb83f6856af5145e83" title="Get the Orbital Rotation checkpoint filename. " alt="" coords="391,514,591,555"/><area shape="rect" id="node11" href="classCheMPS2_1_1DMRGSCFunitary.html#a867a52da2ca19a581d9c8476fab61246" title="Load the unitary from disk. " alt="" coords="392,579,589,621"/><area shape="rect" id="node12" href="classCheMPS2_1_1DMRGSCFoptions.html#a208fba2b1dbb95bec171867d39917fc8" title="Get whether DIIS should be performed. " alt="" coords="391,645,591,686"/><area shape="rect" id="node13" href="classCheMPS2_1_1DMRGSCFoptions.html#a59cdddf8451651c980aa49957c2897b5" title="Get whether the DIIS checkpoint should be stored to disk. " alt="" coords="391,710,591,751"/><area shape="rect" id="node14" href="classCheMPS2_1_1DMRGSCFoptions.html#ae4f2901cf992d1a4100367f002af786c" title="Get the DIIS checkpoint filename. " alt="" coords="391,775,591,817"/><area shape="rect" id="node15" href="classCheMPS2_1_1DMRGSCFoptions.html#a57ed7e22a351ad6fc1621ff95106040a" title="Get the number of DIIS update vectors which should be kept. " alt="" coords="391,841,591,882"/><area shape="rect" id="node16" href="classCheMPS2_1_1DIIS.html#a9a18331523e2455812e808f83072f3d8" title="Load the DIIS object from disk. " alt="" coords="403,907,579,933"/><area shape="rect" id="node17" href="classCheMPS2_1_1DMRGSCFoptions.html#a55ce3e1a48b8d977e53db9874c8fd7c6" title="Get the threshold for DMRGSCF convergence. " alt="" coords="391,958,591,999"/><area shape="rect" id="node18" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="688,1017,885,1058"/><area shape="rect" id="node19" href="classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799" title="Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary ..." alt="" coords="392,1505,589,1546"/><area shape="rect" id="node20" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="392,1075,589,1117"/><area shape="rect" id="node22" href="classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432" title="Append a new error and parameter vector. " alt="" coords="393,1571,588,1597"/><area shape="rect" id="node23" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors..." alt="" coords="402,1622,579,1663"/><area shape="rect" id="node24" href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06" title="Save the unitary to disk. " alt="" coords="392,1687,589,1729"/><area shape="rect" id="node25" href="classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37" title="Save the DIIS object to disk. " alt="" coords="401,1753,581,1780"/><area shape="rect" id="node26" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="368,1374,613,1415"/><area shape="rect" id="node30" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="368,1439,613,1481"/><area shape="rect" id="node31" href="classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="383,1206,598,1247"/><area shape="rect" id="node33" href="classCheMPS2_1_1DMRGSCFoptions.html#a874f361f6567bebf376a4d35095b4a98" title="Get whether the localization procedure should start from a random unitary. " alt="" coords="391,1805,591,1846"/><area shape="rect" id="node34" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="383,1141,598,1182"/><area shape="rect" id="node35" href="classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02" title="Get the pointer to the unitary to use in DMRGSCF. " alt="" coords="383,1870,598,1911"/><area shape="rect" id="node36" href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b" title="Rotate the unitary matrix. " alt="" coords="392,1935,589,1977"/><area shape="rect" id="node37" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation. " alt="" coords="380,2001,601,2028"/><area shape="rect" id="node38" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="405,2052,577,2079"/><area shape="rect" id="node39" href="classCheMPS2_1_1DMRGSCFoptions.html#a82add836b4de5c8ef97dda33553f2c64" title="Get whether state&#45;averaging or state&#45;specific DMRGSCF should be performed. " alt="" coords="391,2103,591,2145"/><area shape="rect" id="node40" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!! ..." alt="" coords="385,2169,597,2210"/><area shape="rect" id="node42" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd" title="Get the pointer to the 2DM. " alt="" coords="398,2235,583,2261"/><area shape="rect" id="node43" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations. " alt="" coords="365,2285,616,2312"/><area shape="rect" id="node44" href="classCheMPS2_1_1DMRGSCFoptions.html#acb3c7d12b054befbe92d704d6746f4be" title="Get whether the correlations and two&#45;orbital mutual information should be printed. " alt="" coords="391,2337,591,2378"/><area shape="rect" id="node45" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264" title="Get the pointer to the Correlations. " alt="" coords="377,2403,604,2429"/><area shape="rect" id="node46" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6" title="Print the correlation functions and two&#45;orbital mutual information. " alt="" coords="411,2454,571,2495"/><area shape="rect" id="node47" href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm &quot; + CheMPS2::DMRG_MPS_storage_prefix + &quot;*.h5&quot;. " alt="" coords="370,2520,611,2547"/><area shape="rect" id="node48" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm &quot; + CheMPS2::TMPpath + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*..." alt="" coords="385,2571,597,2613"/><area shape="rect" id="node49" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#ae8773f07770b03db7c70dc51fc78958e" title="Fill the rotated two&#45;body matrix elements with max. two virtual indices, based on HamOrig and unitary..." alt="" coords="664,1199,909,1241"/><area shape="rect" id="node50" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a86092727e466bea078911da301567093" title="Fill the rotated two&#45;body matrix elements with max. two virtual indices, based on HamOrig and unitary..." alt="" coords="664,1367,909,1409"/><area shape="rect" id="node21" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="957,1229,1155,1270"/><area shape="rect" id="node27" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="961,1433,1151,1460"/><area shape="rect" id="node28" href="classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="707,1550,866,1591"/><area shape="rect" id="node29" href="classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82" title="Add to Vmat element. " alt="" coords="707,1485,866,1526"/><area shape="rect" id="node32" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="664,1134,909,1175"/><area shape="rect" id="node41" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a" title="Get an orbital irrep. " alt="" coords="699,2169,874,2210"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="665,38,863,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="399,133,583,174"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d" title="Get an array with the irreps of each DMRG orbital. " alt="" coords="391,198,590,239"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="665,217,863,258"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="365,845,616,872"/><area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="665,334,863,375"/><area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFoptions.html#a9f81d7a089fc4a239638d95d93c24099" title="Get which active space should be considered in the DMRG routine. " alt="" coords="391,897,591,938"/><area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFoptions.html#acea3d3f5a5abf8a4bdd509fc13a1a275" title="Get whether the Orbital Rotation checkpoint should be stored to disk. " alt="" coords="391,962,591,1003"/><area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFoptions.html#a45fb0323c73651fb83f6856af5145e83" title="Get the Orbital Rotation checkpoint filename. " alt="" coords="391,1027,591,1069"/><area shape="rect" id="node11" href="classCheMPS2_1_1DMRGSCFunitary.html#a867a52da2ca19a581d9c8476fab61246" title="Load the unitary from disk. " alt="" coords="392,1093,589,1134"/><area shape="rect" id="node12" href="classCheMPS2_1_1DMRGSCFoptions.html#a208fba2b1dbb95bec171867d39917fc8" title="Get whether DIIS should be performed. " alt="" coords="391,1158,591,1199"/><area shape="rect" id="node13" href="classCheMPS2_1_1DMRGSCFoptions.html#a59cdddf8451651c980aa49957c2897b5" title="Get whether the DIIS checkpoint should be stored to disk. " alt="" coords="391,1223,591,1265"/><area shape="rect" id="node14" href="classCheMPS2_1_1DMRGSCFoptions.html#ae4f2901cf992d1a4100367f002af786c" title="Get the DIIS checkpoint filename. " alt="" coords="391,1289,591,1330"/><area shape="rect" id="node15" href="classCheMPS2_1_1DMRGSCFoptions.html#a57ed7e22a351ad6fc1621ff95106040a" title="Get the number of DIIS update vectors which should be kept. " alt="" coords="391,1354,591,1395"/><area shape="rect" id="node16" href="classCheMPS2_1_1DIIS.html#a9a18331523e2455812e808f83072f3d8" title="Load the DIIS object from disk. " alt="" coords="403,1420,579,1447"/><area shape="rect" id="node17" href="classCheMPS2_1_1DMRGSCFoptions.html#a55ce3e1a48b8d977e53db9874c8fd7c6" title="Get the threshold for DMRGSCF convergence. " alt="" coords="391,1471,591,1513"/><area shape="rect" id="node18" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="665,787,863,829"/><area shape="rect" id="node19" href="classCheMPS2_1_1DMRGSCFunitary.html#a661342a71c1ee032e9c2bf0efaa8e799" title="Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary ..." alt="" coords="392,1537,589,1578"/><area shape="rect" id="node20" href="classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="392,729,589,770"/><area shape="rect" id="node22" href="classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432" title="Append a new error and parameter vector. " alt="" coords="393,1603,588,1629"/><area shape="rect" id="node23" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3" title="Calculate the new parameter vector, based on the just appended error and parameter vectors..." alt="" coords="402,1654,579,1695"/><area shape="rect" id="node24" href="classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06" title="Save the unitary to disk. " alt="" coords="392,1719,589,1761"/><area shape="rect" id="node25" href="classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37" title="Save the DIIS object to disk. " alt="" coords="401,1785,581,1812"/><area shape="rect" id="node26" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="368,467,613,509"/><area shape="rect" id="node29" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="368,533,613,574"/><area shape="rect" id="node30" href="classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="383,1837,598,1878"/><area shape="rect" id="node31" href="classCheMPS2_1_1DMRGSCFoptions.html#a874f361f6567bebf376a4d35095b4a98" title="Get whether the localization procedure should start from a random unitary. " alt="" coords="391,1902,591,1943"/><area shape="rect" id="node32" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="383,1967,598,2009"/><area shape="rect" id="node33" href="classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02" title="Get the pointer to the unitary to use in DMRGSCF. " alt="" coords="383,2033,598,2074"/><area shape="rect" id="node34" href="classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b" title="Rotate the unitary matrix. " alt="" coords="392,2098,589,2139"/><area shape="rect" id="node35" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation. " alt="" coords="380,2164,601,2191"/><area shape="rect" id="node36" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="405,2215,577,2241"/><area shape="rect" id="node37" href="classCheMPS2_1_1DMRGSCFoptions.html#a82add836b4de5c8ef97dda33553f2c64" title="Get whether state&#45;averaging or state&#45;specific DMRGSCF should be performed. " alt="" coords="391,2266,591,2307"/><area shape="rect" id="node38" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!! ..." alt="" coords="385,2331,597,2373"/><area shape="rect" id="node39" href="classCheMPS2_1_1DMRG.html#aa08c71dab6543ef820d13528fc354bcd" title="Get the pointer to the 2DM. " alt="" coords="398,2397,583,2424"/><area shape="rect" id="node40" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations. " alt="" coords="365,2448,616,2475"/><area shape="rect" id="node41" href="classCheMPS2_1_1DMRGSCFoptions.html#acb3c7d12b054befbe92d704d6746f4be" title="Get whether the correlations and two&#45;orbital mutual information should be printed. " alt="" coords="391,2499,591,2541"/><area shape="rect" id="node42" href="classCheMPS2_1_1DMRG.html#aeb26c265e89b5fcf41d3a18589040264" title="Get the pointer to the Correlations. " alt="" coords="377,2565,604,2592"/><area shape="rect" id="node43" href="classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6" title="Print the correlation functions and two&#45;orbital mutual information. " alt="" coords="411,2617,571,2658"/><area shape="rect" id="node44" href="classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm &quot; + CheMPS2::DMRG_MPS_storage_prefix + &quot;*.h5&quot;. " alt="" coords="370,2683,611,2709"/><area shape="rect" id="node45" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm &quot; + CheMPS2::TMPpath + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*..." alt="" coords="385,2734,597,2775"/><area shape="rect" id="node46" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#ae8773f07770b03db7c70dc51fc78958e" title="Fill the rotated two&#45;body matrix elements with max. two virtual indices, based on HamOrig and unitary..." alt="" coords="368,598,613,639"/><area shape="rect" id="node47" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a86092727e466bea078911da301567093" title="Fill the rotated two&#45;body matrix elements with max. two virtual indices, based on HamOrig and unitary..." alt="" coords="368,663,613,705"/><area shape="rect" id="node48" href="classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="385,315,596,341"/><area shape="rect" id="node49" href="classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="382,365,599,392"/><area shape="rect" id="node50" href="classCheMPS2_1_1CASSCF.html#abf34a3243a38979439e7aa2d9e60c4dd" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="382,67,599,109"/><area shape="rect" id="node21" href="classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="665,619,863,661"/><area shape="rect" id="node27" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="913,509,1103,536"/><area shape="rect" id="node28" href="classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="685,502,843,543"/></map>
 </div>
 </p>
 
@@ -483,7 +816,7 @@ References</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1CASSCF.html">CASSCF</a></li>
-    <li class="footer">Generated on Sun Feb 1 2015 17:33:25 for CheMPS2 by
+    <li class="footer">Generated on Mon Feb 9 2015 00:55:27 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

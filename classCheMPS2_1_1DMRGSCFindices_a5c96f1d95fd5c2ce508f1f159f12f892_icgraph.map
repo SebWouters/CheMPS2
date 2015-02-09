@@ -1,6 +1,8 @@
 <map id="CheMPS2::DMRGSCFindices::getNOCC" name="CheMPS2::DMRGSCFindices::getNOCC">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="254,5,565,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="306,57,513,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="311,122,508,163"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="313,187,505,229"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="521,38,831,65"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="254,38,471,65"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="257,89,468,115"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="259,140,466,181"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="264,205,461,247"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="267,271,459,312"/>
 </map>

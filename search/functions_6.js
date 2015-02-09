@@ -66,7 +66,7 @@ var searchData=
   ['getnumvecs',['getNumVecs',['../classCheMPS2_1_1DIIS.html#ab8ace1d47532d7382d6c4e63a899b51c',1,'CheMPS2::DIIS']]],
   ['getnvirt',['getNVIRT',['../classCheMPS2_1_1DMRGSCFindices.html#afdbe42f60924d9fb705cce44426d72d0',1,'CheMPS2::DMRGSCFindices']]],
   ['getorb2irrep',['getOrb2Irrep',['../classCheMPS2_1_1FCI.html#a79c9426a1f2d8a4b918adad9ffa89894',1,'CheMPS2::FCI']]],
-  ['getorbitalirrep',['getOrbitalIrrep',['../classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd',1,'CheMPS2::Hamiltonian']]],
+  ['getorbitalirrep',['getOrbitalIrrep',['../classCheMPS2_1_1DMRGSCFindices.html#a2b1f2ae0964f9c0ecd653acfe88f5bd4',1,'CheMPS2::DMRGSCFindices::getOrbitalIrrep()'],['../classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd',1,'CheMPS2::Hamiltonian::getOrbitalIrrep()']]],
   ['getorigndmrgstart',['getOrigNDMRGstart',['../classCheMPS2_1_1DMRGSCFindices.html#a2da1c6944764244f4393bc22cc055a13',1,'CheMPS2::DMRGSCFindices']]],
   ['getorignoccstart',['getOrigNOCCstart',['../classCheMPS2_1_1DMRGSCFindices.html#a1a24f5ffe9537c50cf1a23211e3a7a5f',1,'CheMPS2::DMRGSCFindices']]],
   ['getorignvirtstart',['getOrigNVIRTstart',['../classCheMPS2_1_1DMRGSCFindices.html#a440634b63107d8a02132ee4bcb7ef0b4',1,'CheMPS2::DMRGSCFindices']]],

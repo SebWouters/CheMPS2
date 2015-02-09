@@ -1,6 +1,9 @@
 <map id="CheMPS2::DMRGSCFindices::getNirreps" name="CheMPS2::DMRGSCFindices::getNirreps">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="254,5,461,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39" title="Constructor. " alt="" coords="260,70,455,111"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="259,135,456,177"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="261,201,453,242"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="254,5,471,32"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="257,56,468,83"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="259,107,466,149"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39" title="Constructor. " alt="" coords="265,173,460,214"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="264,238,461,279"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="267,303,459,345"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="521,31,831,57"/>
 </map>
