@@ -457,7 +457,7 @@ void fillRotatedTEI_exchange(CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2:
                 const int ssym = K.params->ssym[s];
                 const int rrel = r - K.params->roff[rsym];
                 const int srel = s - K.params->soff[ssym] + iHandler->getNVIRT(ssym);
-                theRotatedTEI->set_coulomb( psym, rsym, qsym, ssym, prel, rrel, qrel, srel, K.matrix[h][pq][rs] );
+                theRotatedTEI->set_exchange( psym, rsym, qsym, ssym, prel, rrel, qrel, srel, K.matrix[h][pq][rs] );
             }
         }
         global_dpd_->buf4_mat_irrep_close(&K, h);
