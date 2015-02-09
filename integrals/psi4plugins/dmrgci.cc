@@ -90,14 +90,45 @@ read_options(std::string name, Options &options)
 }
 
 
-void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK){
+int chemps2_groupnumber(const string SymmLabel){
 
-    SharedMatrix SO_RDM;     SO_RDM = SharedMatrix( new Matrix( MO_RDM ) );
-    SharedMatrix Identity; Identity = SharedMatrix( new Matrix( MO_RDM ) );
-    SharedMatrix SO_JK;       SO_JK = SharedMatrix( new Matrix( MO_RDM ) );
+    int SyGroup = 0;
+    bool stopFindGN = false;
+    const int magic_number_max_groups_chemps2 = 8;
+    do {
+        if ( SymmLabel.compare(CheMPS2::Irreps::getGroupName(SyGroup)) == 0 ){ stopFindGN = true; }
+        else { SyGroup++; }
+    } while (( !stopFindGN ) && ( SyGroup < magic_number_max_groups_chemps2 ));
+
+    fprintf(outfile, "Psi4 symmetry group was found to be <"); fprintf(outfile, SymmLabel.c_str()); fprintf(outfile, ">.\n");
+    if ( SyGroup >= magic_number_max_groups_chemps2 ){
+       fprintf(outfile, "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:\n");
+       for (int cnt=0; cnt<magic_number_max_groups_chemps2; cnt++){
+           fprintf(outfile, "   <"); fprintf(outfile, (CheMPS2::Irreps::getGroupName(cnt)).c_str()); fprintf(outfile, ">\n");
+       }
+       throw PSIEXCEPTION("CheMPS2 did not recognize the symmetry group name!");
+    }
+    return SyGroup;
+
+}
+
+
+void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK, boost::shared_ptr<Wavefunction> wfn){
+
+    const int nso    = wfn->nso();
+    int * nsopi      = wfn->nsopi();
+    const int nmo    = wfn->nmo();
+    int * nmopi      = wfn->nmopi();
+    const int nirrep = wfn->nirrep();
+
+    // nso can be different from nmo
+    SharedMatrix SO_RDM;     SO_RDM = SharedMatrix( new Matrix( "SO RDM",   nirrep, nsopi, nsopi ) );
+    SharedMatrix Identity; Identity = SharedMatrix( new Matrix( "Identity", nirrep, nsopi, nsopi ) );
+    SharedMatrix SO_JK;       SO_JK = SharedMatrix( new Matrix( "SO JK",    nirrep, nsopi, nsopi ) );
+    SharedMatrix work;         work = SharedMatrix( new Matrix( "work",     nirrep, nsopi, nmopi ) );
     
-    MO_JK->gemm(false, false, 1.0, Cmat, MO_RDM, 0.0);
-    SO_RDM->gemm(false, true, 1.0, MO_JK, Cmat, 0.0);
+    work->gemm(false, false, 1.0, Cmat, MO_RDM, 0.0);
+    SO_RDM->gemm(false, true, 1.0, work, Cmat, 0.0);
     
     std::vector<SharedMatrix> & CL = myJK->C_left();
     CL.clear();
@@ -117,8 +148,8 @@ void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::
     SO_JK->scale( -0.5 );
     SO_JK->add( myJK->J()[0] );
     
-    Identity->gemm(true, false, 1.0, Cmat, SO_JK, 0.0);
-    MO_JK->gemm(false, false, 1.0, Identity, Cmat, 0.0);
+    work->gemm(false, false, 1.0, SO_JK, Cmat, 0.0);
+    MO_JK->gemm(true, false, 1.0, Cmat, work,  0.0);
 
 }
 
@@ -170,32 +201,12 @@ dmrgci(Options &options)
     int * active                    = options.get_int_array("ACTIVE");
     
     // Fetching basic irrep information
-    std::string SymmLabel = Process::environment.molecule()->sym_label();
+    const int SyGroup = chemps2_groupnumber(Process::environment.molecule()->sym_label());
     int nmo       = wfn->nmo();
     int nirrep    = wfn->nirrep();
     int * orbspi  = wfn->nmopi();
     int * docc    = wfn->doccpi();
     int * socc    = wfn->soccpi();
-    
-    // See if CheMPS2 finds the symmetry group
-    int SyGroup = 0;
-    {
-        bool stopFindGN = false;
-        const int magic_number_max_groups_chemps2 = 8;
-        do {
-            if ( SymmLabel.compare(CheMPS2::Irreps::getGroupName(SyGroup)) == 0 ){ stopFindGN = true; }
-            else { SyGroup++; }
-        } while (( !stopFindGN ) && ( SyGroup < magic_number_max_groups_chemps2 ));
-
-        fprintf(outfile, "Psi4 symmetry group was found to be <"); fprintf(outfile, SymmLabel.c_str()); fprintf(outfile, ">.\n");
-        if ( SyGroup >= magic_number_max_groups_chemps2 ){
-           fprintf(outfile, "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:\n");
-           for (int cnt=0; cnt<magic_number_max_groups_chemps2; cnt++){
-               fprintf(outfile, "   <"); fprintf(outfile, (CheMPS2::Irreps::getGroupName(cnt)).c_str()); fprintf(outfile, ">\n");
-           }
-           throw PSIEXCEPTION("CheMPS2 did not recognize the symmetry group name!");
-        }
-    }
 
     // See if the other stuff has been well initialized
     if ( wfn_irrep<0 )                            { throw PSIEXCEPTION("Option WFN_IRREP (integer) may not be smaller than zero!"); }
@@ -292,7 +303,7 @@ dmrgci(Options &options)
     boost::shared_ptr<JK> myJK; myJK = boost::shared_ptr<JK>( new DiskJK( wfn->basisset() ) );
     myJK->set_cutoff( 0.0 );
     myJK->initialize();
-    buildJK( MO_RDM, MO_JK, wfn->Ca(), myJK );
+    buildJK( MO_RDM, MO_JK, wfn->Ca(), myJK, wfn );
 
     // CheMPS2 requires RHF or ROHF orbitals.
     // Generate only the two-electron integrals for the active space.
