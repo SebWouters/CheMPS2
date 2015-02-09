@@ -91,14 +91,14 @@ CheMPS2::CASSCF::~CASSCF(){
 
 int CheMPS2::CASSCF::getNumberOfIrreps(){ return numberOfIrreps; }
 
-void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM){
+void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM){
 
-   for (int i1=0; i1<nOrbDMRG; i1++){
-      for (int i2=0; i2<nOrbDMRG; i2++){
-         for (int i3=0; i3<nOrbDMRG; i3++){
-            for (int i4=0; i4<nOrbDMRG; i4++){
+   for (int i1=0; i1<totOrbDMRG; i1++){
+      for (int i2=0; i2<totOrbDMRG; i2++){
+         for (int i3=0; i3<totOrbDMRG; i3++){
+            for (int i4=0; i4<totOrbDMRG; i4++){
                // The assignment has been changed to an addition for state-averaged calculations!
-               DMRG2DM[i1 + nOrbDMRG * ( i2 + nOrbDMRG * (i3 + nOrbDMRG * i4 ) ) ] += theDMRG2DM->getTwoDMA_HAM(i1, i2, i3, i4);
+               localDMRG2DM[i1 + totOrbDMRG * ( i2 + totOrbDMRG * (i3 + totOrbDMRG * i4 ) ) ] += theDMRG2DM->getTwoDMA_HAM(i1, i2, i3, i4);
             }
          }
       }
@@ -106,37 +106,39 @@ void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM){
 
 }
 
-void CheMPS2::CASSCF::setDMRG1DM(const int N){
+void CheMPS2::CASSCF::setDMRG1DM(const int nDMRGelectrons, const int totOrbDMRG, double * localDMRG1DM, double * localDMRG2DM){
 
-   const double prefactor = 1.0/(N-1.0);
+   const double prefactor = 1.0/(nDMRGelectrons-1.0);
 
-   for (int cnt1=0; cnt1<nOrbDMRG; cnt1++){
-      for (int cnt2=cnt1; cnt2<nOrbDMRG; cnt2++){
-         DMRG1DM[cnt1 + nOrbDMRG*cnt2] = 0.0;
-         for (int cnt3=0; cnt3<nOrbDMRG; cnt3++){ DMRG1DM[cnt1 + nOrbDMRG*cnt2] += DMRG2DM[cnt1 + nOrbDMRG * (cnt3 + nOrbDMRG * (cnt2 + nOrbDMRG * cnt3 ) ) ]; }
-         DMRG1DM[cnt1 + nOrbDMRG*cnt2] *= prefactor;
-         DMRG1DM[cnt2 + nOrbDMRG*cnt1] = DMRG1DM[cnt1 + nOrbDMRG*cnt2];
+   for (int cnt1=0; cnt1<totOrbDMRG; cnt1++){
+      for (int cnt2=cnt1; cnt2<totOrbDMRG; cnt2++){
+         localDMRG1DM[cnt1 + totOrbDMRG*cnt2] = 0.0;
+         for (int cnt3=0; cnt3<totOrbDMRG; cnt3++){ localDMRG1DM[cnt1 + totOrbDMRG*cnt2] += localDMRG2DM[cnt1 + totOrbDMRG * (cnt3 + totOrbDMRG * (cnt2 + totOrbDMRG * cnt3 ) ) ]; }
+         localDMRG1DM[cnt1 + totOrbDMRG*cnt2] *= prefactor;
+         localDMRG1DM[cnt2 + totOrbDMRG*cnt1] = localDMRG1DM[cnt1 + totOrbDMRG*cnt2];
       }
    }
 
 }
 
-void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, double * eigenvecs){
+void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs){
 
-   const int size = nOrbDMRG * nOrbDMRG;
+   const int numIrreps = localIdx->getNirreps();
+   const int totOrbDMRG = localIdx->getDMRGcumulative( numIrreps );
+   const int size = totOrbDMRG * totOrbDMRG;
    for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = 0.0; }
    int passed = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for (int irrep=0; irrep<numIrreps; irrep++){
 
-      const int NDMRG = iHandler->getNDMRG(irrep);
+      const int NDMRG = localIdx->getNDMRG(irrep);
       if (NDMRG>0){
 
          double * blockUnit = unitary->getBlock(irrep);
-         double * blockEigs = eigenvecs + passed * ( 1 + nOrbDMRG );
+         double * blockEigs = eigenvecs + passed * ( 1 + totOrbDMRG );
 
          for (int row=0; row<NDMRG; row++){
             for (int col=0; col<NDMRG; col++){
-               blockEigs[row + nOrbDMRG * col] = blockUnit[col + NDMRG * row]; //Eigs = Unit^T
+               blockEigs[row + totOrbDMRG * col] = blockUnit[col + NDMRG * row]; //Eigs = Unit^T
             }
          }
 
@@ -148,37 +150,39 @@ void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * un
 
 }
 
-void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
+void CheMPS2::CASSCF::calcNOON(DMRGSCFindices * localIdx, double * eigenvecs, double * workmem, double * localDMRG1DM){
 
-   int size = nOrbDMRG * nOrbDMRG;
+   const int numIrreps = localIdx->getNirreps();
+   int totOrbDMRG = localIdx->getDMRGcumulative( numIrreps );
+   int size = totOrbDMRG * totOrbDMRG;
    double * eigenval = workmem + size;
 
-   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = DMRG1DM[cnt]; }
+   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = localDMRG1DM[cnt]; }
 
    char jobz = 'V';
    char uplo = 'U';
    int info;
    int passed = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for (int irrep=0; irrep<numIrreps; irrep++){
 
-      int NDMRG = iHandler->getNDMRG(irrep);
+      int NDMRG = localIdx->getNDMRG(irrep);
       if (NDMRG > 0){
 
          //Calculate the eigenvectors and values per block
-         dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+nOrbDMRG) ,&nOrbDMRG, eigenval + passed, workmem, &size, &info);
+         dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+totOrbDMRG), &totOrbDMRG, eigenval + passed, workmem, &size, &info);
 
          //Print the NOON
-         if (irrep==0){ cout << "DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
-         else {         cout << "                    DMRG 1DM eigenvalues [NOON] of irrep " << SymmInfo.getIrrepName(irrep) << " = [ "; }
+         if (irrep==0){ cout << "DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
+         else {         cout << "                    DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
          for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
          cout << eigenval[passed + 0] << " ]." << endl;
 
          //Sort the eigenvecs
          for (int col=0; col<NDMRG/2; col++){
             for (int row=0; row<NDMRG; row++){
-               double temp = eigenvecs[passed + row + nOrbDMRG * (passed + NDMRG - 1 - col)];
-               eigenvecs[passed + row + nOrbDMRG * (passed + NDMRG - 1 - col)] = eigenvecs[passed + row + nOrbDMRG * (passed + col)];
-               eigenvecs[passed + row + nOrbDMRG * (passed + col)] = temp;
+               double temp = eigenvecs[passed + row + totOrbDMRG * (passed + NDMRG - 1 - col)];
+               eigenvecs[passed + row + totOrbDMRG * (passed + NDMRG - 1 - col)] = eigenvecs[passed + row + totOrbDMRG * (passed + col)];
+               eigenvecs[passed + row + totOrbDMRG * (passed + col)] = temp;
             }
          }
 
@@ -191,32 +195,32 @@ void CheMPS2::CASSCF::calcNOON(double * eigenvecs, double * workmem){
 
 }
 
-void CheMPS2::CASSCF::rotate2DMand1DM(const int N, double * eigenvecs, double * work){
+void CheMPS2::CASSCF::rotate2DMand1DM(const int nDMRGelectrons, int totOrbDMRG, double * eigenvecs, double * work, double * localDMRG1DM, double * localDMRG2DM){
 
    char notr = 'N';
    char tran = 'T';
    double alpha = 1.0;
    double beta = 0.0;
 
-   int power1 = nOrbDMRG;
-   int power2 = nOrbDMRG*nOrbDMRG;
-   int power3 = nOrbDMRG*nOrbDMRG*nOrbDMRG;
+   int power1 = totOrbDMRG;
+   int power2 = totOrbDMRG*totOrbDMRG;
+   int power3 = totOrbDMRG*totOrbDMRG*totOrbDMRG;
 
    //2DM: Gamma_{ijkl} --> Gamma_{ajkl}
-   dgemm_(&tran,&notr,&power1,&power3,&power1,&alpha,eigenvecs,&power1,DMRG2DM,&power1,&beta,work,&power1);
+   dgemm_(&tran,&notr,&power1,&power3,&power1,&alpha,eigenvecs,&power1,localDMRG2DM,&power1,&beta,work,&power1);
    //2DM: Gamma_{ajkl} --> Gamma_{ajkd}
-   dgemm_(&notr,&notr,&power3,&power1,&power1,&alpha,work,&power3,eigenvecs,&power1,&beta,DMRG2DM,&power3);
+   dgemm_(&notr,&notr,&power3,&power1,&power1,&alpha,work,&power3,eigenvecs,&power1,&beta,localDMRG2DM,&power3);
    //2DM: Gamma_{ajkd} --> Gamma_{ajcd}
-   for (int cnt=0; cnt<nOrbDMRG; cnt++){
-      dgemm_(&notr,&notr,&power2,&power1,&power1,&alpha,DMRG2DM + cnt*power3,&power2,eigenvecs,&power1,&beta,work + cnt*power3,&power2);
+   for (int cnt=0; cnt<totOrbDMRG; cnt++){
+      dgemm_(&notr,&notr,&power2,&power1,&power1,&alpha,localDMRG2DM + cnt*power3,&power2,eigenvecs,&power1,&beta,work + cnt*power3,&power2);
    }
    //2DM: Gamma_{ajcd} --> Gamma_{abcd}
    for (int cnt=0; cnt<power2; cnt++){
-      dgemm_(&notr,&notr,&power1,&power1,&power1,&alpha,work + cnt*power2,&power1,eigenvecs,&power1,&beta,DMRG2DM + cnt*power2,&power1);
+      dgemm_(&notr,&notr,&power1,&power1,&power1,&alpha,work + cnt*power2,&power1,eigenvecs,&power1,&beta,localDMRG2DM + cnt*power2,&power1);
    }
 
    //Update 1DM
-   setDMRG1DM(N);
+   setDMRG1DM(nDMRGelectrons, totOrbDMRG, localDMRG1DM, localDMRG2DM);
 
 }
 

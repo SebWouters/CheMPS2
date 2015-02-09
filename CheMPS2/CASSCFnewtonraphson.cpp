@@ -158,7 +158,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
          theLocalizer->Optimize(mem1, mem2, theDMRGSCFoptions->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
-         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), mem1);
+         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);
          buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
          buildTmatrix();
@@ -176,13 +176,13 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          Energy = theDMRG->Solve();
          if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
             theDMRG->calc2DMandCorrelations();
-            copy2DMover( theDMRG->get2DM() );
+            copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
          if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
       if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
          theDMRG->calc2DMandCorrelations();
-         copy2DMover( theDMRG->get2DM() );
+         copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
       }
       if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
@@ -192,12 +192,12 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          const double averagingfactor = 1.0 / rootNum;
          for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
       }
-      setDMRG1DM(N);
+      setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
-      calcNOON(mem1, mem2);
+      calcNOON(iHandler, mem1, mem2, DMRG1DM);
       if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         rotate2DMand1DM(N, mem1, mem2);
+         rotate2DMand1DM(N, nOrbDMRG, mem1, mem2, DMRG1DM, DMRG2DM);
          unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildTmatrix();

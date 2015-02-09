@@ -234,6 +234,41 @@ namespace CheMPS2{
              \param gradNorm Pointer to one double to store the gradient norm */
          static void augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm);
          
+         //! Copy over the DMRG 2-RDM
+         /** \param theDMRG2DM The 2-RDM from the DMRG object
+             \param totOrbDMRG The total number of DMRG orbitals
+             \param localDMRG2DM The CASSCF 2-RDM */
+         static void copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM);
+         
+         //! Construct the 1-RDM from the 2-RDM
+         /** \param nDMRGelectrons The number of DMRG active space electrons
+             \param totOrbDMRG The total number of DMRG orbitals
+             \param localDMRG1DM The CASSCF 1-RDM
+             \param localDMRG2DM The CASSCF 2-RDM */
+         static void setDMRG1DM(const int nDMRGelectrons, const int totOrbDMRG, double * localDMRG1DM, double * localDMRG2DM);
+         
+         //! Calculate the natural orbitals and their occupation numbers
+         /** \param localIdx Object which handles the index conventions for CASSCF
+             \param eigenvecs Where to store the natural orbitals
+             \param workmem Work memory
+             \param localDMRG1DM The CASSCF 1-RDM */
+         static void calcNOON(CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs, double * workmem, double * localDMRG1DM);
+         
+         //! Rotate the CASSCF 1-RDM and 2-RDM to a new basis (to calculate the gradient and Hessian)
+         /** \param nDMRGelectrons The number of DMRG active space electrons
+             \param totOrbDMRG The total number of DMRG orbitals
+             \param eigenvecs Where the eigenvectors are stored
+             \param work Work memory
+             \param localDMRG1DM The CASSCF 1-RDM
+             \param localDMRG2DM The CASSCF 2-RDM */
+         static void rotate2DMand1DM(const int nDMRGelectrons, int totOrbDMRG, double * eigenvecs, double * work, double * localDMRG1DM, double * localDMRG2DM);
+         
+         //! From an Edmiston-Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs
+         /** \param unitary The Edmiston-Ruedenberg active space rotation
+             \param localIdx Object which handles the index conventions for CASSCF
+             \param eigenvecs Where the eigenvectors are stored */
+         static void fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs);
+         
       private:
       
          //Index convention handler
@@ -272,27 +307,12 @@ namespace CheMPS2{
          
          //Number of DMRG orbitals
          int nOrbDMRG;
-
-         //Copy theDMRG2DM over to CASSCF::DMRG2DM
-         void copy2DMover(TwoDM * theDMRG2DM);
-
-         //Update the unitary, 2DM and 1DM with the given NO basis
-         void rotate2DMand1DM(const int N, double * eigenvecs, double * work); 
          
          //Space for the DMRG 1DM
          double * DMRG1DM;
 
          //Space for the DMRG 2DM
          double * DMRG2DM;
-         
-         //Set the DMRG 1DM
-         void setDMRG1DM(const int N);
-
-         //The NO in terms of the active space orbitals are stored in the nOrbDMRG*nOrbDMRG array eigenvecs
-         void calcNOON(double * eigenvecs, double * workmem);
-         
-         //Copy the localized orbitals over from unitary to the nOrbDMRG*nOrbDMRG array eigenvecs
-         void fillLocalizedOrbitalRotations(DMRGSCFunitary * unitary, double * eigenvecs);
          
          //Helper function to fetch DOCC and SOCC from filename
          void allocateAndFillOCC(const string filename);
