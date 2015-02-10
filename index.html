@@ -211,8 +211,8 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <pre class="fragment">```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lchemps2```.
 </pre><p>To compile the plugin, run: </p>
 <pre class="fragment">&gt; make
-</pre><h2>DMRG-CI calculations with Psi4 </h2>
-<p>DMRG-CI calculations can also be performed with Psi4. To make use of this feature, build Psi4 with the plugin option, and then run: </p>
+</pre><h2>DMRG-CI and DMRG-SCF calculations with Psi4 </h2>
+<p>DMRG-CI and DMRG-SCF calculations can also be performed with Psi4. To perform DMRG-CI calculations, build Psi4 with the plugin option, and then run: </p>
 <pre class="fragment">&gt; psi4 --new-plugin dmrgci
 &gt; cd dmrgci
 </pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="integrals/psi4plugins/dmrgci.cc">```integrals/psi4plugins/dmrgci.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (linking to libchemps2).</p>
@@ -224,6 +224,20 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <p>After compilation of the dmrgci plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
 <pre class="fragment">&gt; psi4 N2.dat
 &gt; psi4 H2O.dat
+</pre><p>To perform DMRG-SCF calculations, build Psi4 with the plugin option, and then run: </p>
+<pre class="fragment">&gt; psi4 --new-plugin dmrgscf
+&gt; cd dmrgscf
+</pre><p>Now, replace the file <code>dmrgscf.cc</code> with <a href="integrals/psi4plugins/dmrgscf.cc">```integrals/psi4plugins/dmrgscf.cc```</a>. For the compilation of this plugin, the same instructions as above should be followed (linking to libchemps2).</p>
+<p>Example input files to use the plugin are provided in</p>
+<ol type="1">
+<li><a href="integrals/psi4plugins/test6.dat">```integrals/psi4plugins/test6.dat```</a></li>
+<li><a href="integrals/psi4plugins/test8.dat">```integrals/psi4plugins/test8.dat```</a></li>
+<li><a href="integrals/psi4plugins/test9.dat">```integrals/psi4plugins/test9.dat```</a></li>
+</ol>
+<p>These DMRG-SCF tests are the exact analogs of the corresponding C++ and python tests (with the same number). After compilation of the dmrgscf plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
+<pre class="fragment">&gt; psi4 test6.dat
+&gt; psi4 test8.dat
+&gt; psi4 test9.dat
 </pre><h2>DMRG-CI and DMRG-SCF calculations with pyscf </h2>
 <p><a href="https://github.com/sunqm/pyscf">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a href="https://github.com/sunqm/pyscf/blob/dev/future/dmrgscf/chemps2.py">```chemps2.py```</a>.</p>
 <p>Examples of how to extract MO integrals from pyscf to perform DMRG-CI calculations with PyCheMPS2 can be found in</p>
@@ -380,7 +394,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Feb 9 2015 22:16:02 for CheMPS2 by
+    <li class="footer">Generated on Mon Feb 9 2015 23:44:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
