@@ -124,7 +124,7 @@ read_options(std::string name, Options &options)
 }
 
 
-int chemps2_groupnumber(const string SymmLabel){
+int chemps2_groupnumber( const string SymmLabel ){
 
     int SyGroup = 0;
     bool stopFindGN = false;
@@ -136,11 +136,11 @@ int chemps2_groupnumber(const string SymmLabel){
 
     fprintf(outfile, "Psi4 symmetry group was found to be <"); fprintf(outfile, SymmLabel.c_str()); fprintf(outfile, ">.\n");
     if ( SyGroup >= magic_number_max_groups_chemps2 ){
-       fprintf(outfile, "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:\n");
-       for (int cnt=0; cnt<magic_number_max_groups_chemps2; cnt++){
-           fprintf(outfile, "   <"); fprintf(outfile, (CheMPS2::Irreps::getGroupName(cnt)).c_str()); fprintf(outfile, ">\n");
-       }
-       throw PSIEXCEPTION("CheMPS2 did not recognize the symmetry group name!");
+        fprintf(outfile, "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:\n");
+        for (int cnt=0; cnt<magic_number_max_groups_chemps2; cnt++){
+            fprintf(outfile, "   <"); fprintf(outfile, (CheMPS2::Irreps::getGroupName(cnt)).c_str()); fprintf(outfile, ">\n");
+        }
+        throw PSIEXCEPTION("CheMPS2 did not recognize the symmetry group name!");
     }
     return SyGroup;
 
@@ -188,7 +188,7 @@ void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::
 }
 
 
-void copyPSIMXtoCHEMPS2MX(SharedMatrix source, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFmatrix * target){
+void copyPSIMXtoCHEMPS2MX( SharedMatrix source, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFmatrix * target ){
 
     for (int irrep = 0; irrep < iHandler->getNirreps(); irrep++){
         for (int orb1 = 0; orb1 < iHandler->getNORB(irrep); orb1++){
@@ -200,7 +200,7 @@ void copyPSIMXtoCHEMPS2MX(SharedMatrix source, CheMPS2::DMRGSCFindices * iHandle
     
 }
 
-void copyCHEMPS2MXtoPSIMX(CheMPS2::DMRGSCFmatrix * source, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target){
+void copyCHEMPS2MXtoPSIMX( CheMPS2::DMRGSCFmatrix * source, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target ){
 
     for (int irrep = 0; irrep < iHandler->getNirreps(); irrep++){
         for (int orb1 = 0; orb1 < iHandler->getNORB(irrep); orb1++){
@@ -258,43 +258,43 @@ void buildHamDMRG( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<
     
     // Econstant and one-electron integrals
     {
-       const int nmo    = wfn->nmo();
-       const int nTriMo = nmo * (nmo + 1) / 2;
-       const int nso    = wfn->nso();
-       const int nTriSo = nso * (nso + 1) / 2;
-       int * mopi       = wfn->nmopi();
-       int * sopi       = wfn->nsopi();
-       double * work1   = new double[ nTriSo ];
-       double * work2   = new double[ nTriSo ];
-       IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_T, work1, nTriSo, 0, 0, outfile);
-       IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_V, work2, nTriSo, 0, 0, outfile);
-       for (int n = 0; n < nTriSo; n++){ work1[n] += work2[n]; }
-       delete [] work2;
-       
-       Matrix soOei("SO OEI", nirrep, sopi, sopi);
-       Matrix  half(  "Half", nirrep, mopi, sopi);
-       Matrix moOei("MO OEI", nirrep, mopi, mopi);
+        const int nmo    = wfn->nmo();
+        const int nTriMo = nmo * (nmo + 1) / 2;
+        const int nso    = wfn->nso();
+        const int nTriSo = nso * (nso + 1) / 2;
+        int * mopi       = wfn->nmopi();
+        int * sopi       = wfn->nsopi();
+        double * work1   = new double[ nTriSo ];
+        double * work2   = new double[ nTriSo ];
+        IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_T, work1, nTriSo, 0, 0, outfile);
+        IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_V, work2, nTriSo, 0, 0, outfile);
+        for (int n = 0; n < nTriSo; n++){ work1[n] += work2[n]; }
+        delete [] work2;
 
-       soOei.set( work1 );
-       half.gemm(true, false, 1.0, wfn->Ca(), soOei, 0.0);
-       moOei.gemm(false, false, 1.0, half, wfn->Ca(), 0.0);
-       
-       double Econstant = Process::environment.molecule()->nuclear_repulsion_energy();
-       for (int h = 0; h < iHandler->getNirreps(); h++){
-           const int NOCC = iHandler->getNOCC(h);
-           for (int froz = 0; froz < NOCC; froz++){
-               Econstant += 2 * moOei[h][froz][froz] + theQmatOCC->get(h, froz, froz);
-           }
-           const int shift = iHandler->getDMRGcumulative(h);
-           for (int orb1 = 0; orb1 < iHandler->getNDMRG(h); orb1++){
-               for (int orb2 = orb1; orb2 < iHandler->getNDMRG(h); orb2++){
-                   HamDMRG->setTmat( shift+orb1, shift+orb2, moOei[h][NOCC+orb1][NOCC+orb2]
-                                                 + theQmatOCC->get(h, NOCC+orb1, NOCC+orb2) );
-               }
-           }
-       }
-       delete [] work1;
-       HamDMRG->setEconst( Econstant );
+        Matrix soOei("SO OEI", nirrep, sopi, sopi);
+        Matrix  half(  "Half", nirrep, mopi, sopi);
+        Matrix moOei("MO OEI", nirrep, mopi, mopi);
+
+        soOei.set( work1 );
+        half.gemm(true, false, 1.0, wfn->Ca(), soOei, 0.0);
+        moOei.gemm(false, false, 1.0, half, wfn->Ca(), 0.0);
+
+        double Econstant = Process::environment.molecule()->nuclear_repulsion_energy();
+        for (int h = 0; h < iHandler->getNirreps(); h++){
+            const int NOCC = iHandler->getNOCC(h);
+            for (int froz = 0; froz < NOCC; froz++){
+                Econstant += 2 * moOei[h][froz][froz] + theQmatOCC->get(h, froz, froz);
+            }
+            const int shift = iHandler->getDMRGcumulative(h);
+            for (int orb1 = 0; orb1 < iHandler->getNDMRG(h); orb1++){
+                for (int orb2 = orb1; orb2 < iHandler->getNDMRG(h); orb2++){
+                    HamDMRG->setTmat( shift+orb1, shift+orb2, moOei[h][NOCC+orb1][NOCC+orb2]
+                                                  + theQmatOCC->get(h, NOCC+orb1, NOCC+orb2) );
+                }
+            }
+        }
+        delete [] work1;
+        HamDMRG->setEconst( Econstant );
     }
     
     // Two-electron integrals
@@ -331,34 +331,32 @@ void fillRotatedTEI_coulomb( boost::shared_ptr<IntegralTransform> ints, boost::s
     
     //One-electron integrals
     {
-       const int nmo    = wfn->nmo();
-       const int nTriMo = nmo * (nmo + 1) / 2;
-       const int nso    = wfn->nso();
-       const int nTriSo = nso * (nso + 1) / 2;
-       int * mopi       = wfn->nmopi();
-       int * sopi       = wfn->nsopi();
-       double * work1   = new double[ nTriSo ];
-       double * work2   = new double[ nTriSo ];
-       IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_T, work1, nTriSo, 0, 0, outfile);
-       IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_V, work2, nTriSo, 0, 0, outfile);
-       for (int n = 0; n < nTriSo; n++){ work1[n] += work2[n]; }
-       delete [] work2;
-       
-       SharedMatrix soOei; soOei = SharedMatrix( new Matrix("SO OEI", nirrep, sopi, sopi) );
-       SharedMatrix half;   half = SharedMatrix( new Matrix(  "Half", nirrep, mopi, sopi) );
-       SharedMatrix moOei; moOei = SharedMatrix( new Matrix("MO OEI", nirrep, mopi, mopi) );
+        const int nmo    = wfn->nmo();
+        const int nTriMo = nmo * (nmo + 1) / 2;
+        const int nso    = wfn->nso();
+        const int nTriSo = nso * (nso + 1) / 2;
+        int * mopi       = wfn->nmopi();
+        int * sopi       = wfn->nsopi();
+        double * work1   = new double[ nTriSo ];
+        double * work2   = new double[ nTriSo ];
+        IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_T, work1, nTriSo, 0, 0, outfile);
+        IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_V, work2, nTriSo, 0, 0, outfile);
+        for (int n = 0; n < nTriSo; n++){ work1[n] += work2[n]; }
+        delete [] work2;
 
-       soOei->set( work1 );
-       half->gemm(true, false, 1.0, wfn->Ca(), soOei, 0.0);
-       moOei->gemm(false, false, 1.0, half, wfn->Ca(), 0.0);
-       delete [] work1;
-       
-       copyPSIMXtoCHEMPS2MX( moOei, iHandler, theTmatrix );
+        SharedMatrix soOei; soOei = SharedMatrix( new Matrix("SO OEI", nirrep, sopi, sopi) );
+        SharedMatrix half;   half = SharedMatrix( new Matrix(  "Half", nirrep, mopi, sopi) );
+        SharedMatrix moOei; moOei = SharedMatrix( new Matrix("MO OEI", nirrep, mopi, mopi) );
+
+        soOei->set( work1 );
+        half->gemm(true, false, 1.0, wfn->Ca(), soOei, 0.0);
+        moOei->gemm(false, false, 1.0, half, wfn->Ca(), 0.0);
+        delete [] work1;
+
+        copyPSIMXtoCHEMPS2MX( moOei, iHandler, theTmatrix );
     }
 
-    /*
-     * Now, loop over the DPD buffer
-     */
+    // Two-electron integrals
     dpdbuf4 K;
     psio->open(PSIF_LIBTRANS_DPD, PSIO_OPEN_OLD);
     // To only process the permutationally unique integrals, change the ID("[A,A]") to ID("[A>=A]+")
@@ -393,15 +391,13 @@ void fillRotatedTEI_coulomb( boost::shared_ptr<IntegralTransform> ints, boost::s
 }
 
 
-void fillRotatedTEI_exchange( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<MOSpace> OAorbs_ptr, boost::shared_ptr<MOSpace> Vorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, boost::shared_ptr<PSIO> psio){
+void fillRotatedTEI_exchange( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<MOSpace> OAorbs_ptr, boost::shared_ptr<MOSpace> Vorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, boost::shared_ptr<PSIO> psio ){
 
     ints->update_orbitals();
     ints->transform_tei( Vorbs_ptr, OAorbs_ptr, Vorbs_ptr, OAorbs_ptr );
     dpd_set_default(ints->get_dpd_id());
 
-    /*
-     * Now, loop over the DPD buffer
-     */
+    // Two-electron integrals
     dpdbuf4 K;
     psio->open(PSIF_LIBTRANS_DPD, PSIO_OPEN_OLD);
     // To only process the permutationally unique integrals, change the ID("[A,A]") to ID("[A>=A]+")
@@ -436,7 +432,7 @@ void fillRotatedTEI_exchange( boost::shared_ptr<IntegralTransform> ints, boost::
 }
 
 
-void copyUNITARYtoPSIMX(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target){
+void copyUNITARYtoPSIMX( CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target ){
 
     for (int irrep = 0; irrep < iHandler->getNirreps(); irrep++){
         for (int orb1 = 0; orb1 < iHandler->getNORB(irrep); orb1++){
@@ -449,7 +445,7 @@ void copyUNITARYtoPSIMX(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindic
 }
 
 
-void update_WFNco(CheMPS2::DMRGSCFmatrix * Coeff_orig, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, boost::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2){
+void update_WFNco( CheMPS2::DMRGSCFmatrix * Coeff_orig, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, boost::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2 ){
 
     copyCHEMPS2MXtoPSIMX( Coeff_orig, iHandler, work1 );
     copyUNITARYtoPSIMX( unitary, iHandler, work2 );
@@ -785,9 +781,7 @@ dmrgscf(Options &options)
                 cout.rdbuf(cout_buffer);
                 psi4outfile.close();
                 outfile = fopen(outfile_name.c_str(), "a");
-                if (outfile == NULL){
-                    throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
-                }
+                if (outfile == NULL){ throw PSIEXCEPTION("PSI4: Unable to reopen output file."); }
             }
             
         }
@@ -820,9 +814,7 @@ dmrgscf(Options &options)
                 cout.rdbuf(cout_buffer);
                 psi4outfile.close();
                 outfile = fopen(outfile_name.c_str(), "a");
-                if (outfile == NULL){
-                    throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
-                }
+                if (outfile == NULL){ throw PSIEXCEPTION("PSI4: Unable to reopen output file."); }
             }
             
             update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
@@ -873,9 +865,7 @@ dmrgscf(Options &options)
                 cout.rdbuf(cout_buffer);
                 psi4outfile.close();
                 outfile = fopen(outfile_name.c_str(), "a");
-                if (outfile == NULL){
-                    throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
-                }
+                if (outfile == NULL){ throw PSIEXCEPTION("PSI4: Unable to reopen output file."); }
             }
         }
         
@@ -912,9 +902,7 @@ dmrgscf(Options &options)
                 cout.rdbuf(cout_buffer);
                 psi4outfile.close();
                 outfile = fopen(outfile_name.c_str(), "a");
-                if (outfile == NULL){
-                    throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
-                }
+                if (outfile == NULL){ throw PSIEXCEPTION("PSI4: Unable to reopen output file."); }
             }
         }
     }
@@ -924,6 +912,7 @@ dmrgscf(Options &options)
     delete [] theupdate;
     if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
     if (theLocalizer!=NULL){ delete theLocalizer; }
+    if (theDIIS!=NULL){ delete theDIIS; }
     delete Coeff_orig;
     
     delete wmattilde;

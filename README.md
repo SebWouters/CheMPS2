@@ -239,11 +239,12 @@ To compile the plugin, run:
     > make
 
 
-DMRG-CI calculations with Psi4
-------------------------------
+DMRG-CI and DMRG-SCF calculations with Psi4
+-------------------------------------------
 
-DMRG-CI calculations can also be performed with Psi4. To make use of this
-feature, build Psi4 with the plugin option, and then run:
+DMRG-CI and DMRG-SCF calculations can also be performed with Psi4. To
+perform DMRG-CI calculations, build Psi4 with the plugin option, and then
+run:
 
     > psi4 --new-plugin dmrgci
     > cd dmrgci
@@ -264,8 +265,35 @@ higher than the plugin. In that folder, run:
 
     > psi4 N2.dat
     > psi4 H2O.dat
-   
-   
+
+To perform DMRG-SCF calculations, build Psi4 with the plugin option,
+and then run:
+
+    > psi4 --new-plugin dmrgscf
+    > cd dmrgscf
+    
+Now, replace the file ```dmrgscf.cc``` with 
+[```integrals/psi4plugins/dmrgscf.cc```](integrals/psi4plugins/dmrgscf.cc).
+For the compilation of this plugin, the same instructions as above should
+be followed (linking to libchemps2).
+
+Example input files to use the plugin are provided in
+
+1. [```integrals/psi4plugins/test6.dat```](integrals/psi4plugins/test6.dat)
+
+2. [```integrals/psi4plugins/test8.dat```](integrals/psi4plugins/test8.dat)
+
+3. [```integrals/psi4plugins/test9.dat```](integrals/psi4plugins/test9.dat)
+
+These DMRG-SCF tests are the exact analogs of the corresponding C++ and python
+tests (with the same number). After compilation of the dmrgscf plugin, place
+these input files one directory higher than the plugin. In that folder, run:
+
+    > psi4 test6.dat
+    > psi4 test8.dat
+    > psi4 test9.dat
+
+
 DMRG-CI and DMRG-SCF calculations with pyscf
 --------------------------------------------
 
