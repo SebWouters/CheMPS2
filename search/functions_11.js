@@ -9,6 +9,7 @@ var searchData=
   ['setdiisgradientbranch',['setDIISGradientBranch',['../classCheMPS2_1_1DMRGSCFoptions.html#af4e0750d68513bf84350128edbbd5775',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdiisstoragename',['setDIISStorageName',['../classCheMPS2_1_1DMRGSCFoptions.html#aabfdc28366e49402ebbaf977d154ebe7',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdim',['SetDim',['../classCheMPS2_1_1SyBookkeeper.html#ab496351a4cbc31f88be340d987d11406',1,'CheMPS2::SyBookkeeper']]],
+  ['setdmrg1dm',['setDMRG1DM',['../classCheMPS2_1_1CASSCF.html#a56b332538d87b477c036385b0b7c371e',1,'CheMPS2::CASSCF']]],
   ['setdodiis',['setDoDIIS',['../classCheMPS2_1_1DMRGSCFoptions.html#ad5836e6a2d9230a394bd919fffd4bfa6',1,'CheMPS2::DMRGSCFoptions']]],
   ['setdumpcorrelations',['setDumpCorrelations',['../classCheMPS2_1_1DMRGSCFoptions.html#a601016c288f96a89628cc4137c18062c',1,'CheMPS2::DMRGSCFoptions']]],
   ['seteconst',['setEconst',['../classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5',1,'CheMPS2::Hamiltonian']]],

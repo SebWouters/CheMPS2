@@ -1,8 +1,10 @@
 <map id="CheMPS2::DMRGSCFindices::getNDMRG" name="CheMPS2::DMRGSCFindices::getNDMRG">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="254,5,471,32"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="257,56,468,83"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="259,107,466,149"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="264,173,461,214"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="267,238,459,279"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="521,31,831,57"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a258f11f16c7790c6943589633203c7e3" title="From an Edmiston&#45;Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs..." alt="" coords="253,5,475,46"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#acbda4df2bea2dc0e5667d92eae2e8013" title="Calculate the natural orbitals and their occupation numbers. " alt="" coords="255,71,473,97"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="255,121,473,148"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="259,172,469,199"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="261,223,467,265"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="265,289,463,330"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="268,354,460,395"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="523,96,834,123"/>
 </map>
