@@ -161,8 +161,9 @@ namespace CheMPS2{
              \param RePartGF On exit RePartGF[0] contains the real part of the addition part of the retarded Green's function
              \param ImPartGF On exit ImPartGF[0] contains the imaginary part of the addition part of the retarded Green's function
              \param TwoRDMreal If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector > }
-             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector > } */
-         void RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const;
+             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector > }
+             \param TwoRDMadd If not NULL, on exit the 2-RDM of a^+_{beta, spin(isUp)} | GSvector > */
+         void RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMadd) const;
          
          //! Calculate the removal part of the retarded Green's function: <GSvector| a^+_{beta, spin(isUp)} [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} |GSvector>
          /** \param omega The frequency value
@@ -176,8 +177,9 @@ namespace CheMPS2{
              \param RePartGF On exit RePartGF[0] contains the real part of the removal part of the retarded Green's function
              \param ImPartGF On exit ImPartGF[0] contains the imaginary part of the removal part of the retarded Green's function
              \param TwoRDMreal If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector > }
-             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector > } */
-         void RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const;
+             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector > }
+             \param TwoRDMrem If not NULL, on exit the 2-RDM of a_{alpha, spin(isUp)} | GSvector > */
+         void RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMrem) const;
          
          //! Calculate the density response Green's function (= forward - backward propagating part)
          /** \param omega The frequency value
@@ -200,8 +202,9 @@ namespace CheMPS2{
              \param RePartGF On exit RePartGF[0] contains the real part of the forward propagating part of the density response Green's function
              \param ImPartGF On exit ImPartGF[0] contains the imaginary part of the forward propagating part of the density response Green's function
              \param TwoRDMreal If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - <GSvector| n_beta |GSvector> ) |GSvector> }
-             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - <GSvector| n_beta |GSvector> ) |GSvector> } */
-         void DensityResponseGF_forward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const;
+             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - <GSvector| n_beta |GSvector> ) |GSvector> }
+             \param TwoRDMdens If not NULL, on exit the 2-RDM of ( n_beta - <GSvector| n_beta |GSvector> ) |GSvector> */
+         void DensityResponseGF_forward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMdens) const;
          
          //! Calculate the backward propagating part of the density response Green's function: <GSvector| ( n_beta - <GSvector| n_beta |GSvector> ) [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - <GSvector| n_alpha |GSvector> ) |GSvector>
          /** \param omega The frequency value
@@ -213,8 +216,9 @@ namespace CheMPS2{
              \param RePartGF On exit RePartGF[0] contains the real part of the backward propagating part of the density response Green's function
              \param ImPartGF On exit ImPartGF[0] contains the imaginary part of the backward propagating part of the density response Green's function
              \param TwoRDMreal If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - <GSvector| n_alpha |GSvector> ) |GSvector> }
-             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - <GSvector| n_alpha |GSvector> ) |GSvector> } */
-         void DensityResponseGF_backward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const;
+             \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - <GSvector| n_alpha |GSvector> ) |GSvector> }
+             \param TwoRDMdens If not NULL, on exit the 2-RDM of ( n_alpha - <GSvector| n_alpha |GSvector> ) |GSvector> */
+         void DensityResponseGF_backward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMdens) const;
          
          //! Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with conjugate gradient
          /** \param alpha The real part of the scalar in the operator

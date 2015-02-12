@@ -1864,11 +1864,11 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
    //                              + < 0 | a^+_{beta,spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha,spin}  | 0 > (removal  amplitude)
 
    double Realpart, Imagpart;
-   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL);
+   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL, NULL);
    RePartGF[0] = Realpart; // Set
    ImPartGF[0] = Imagpart; // Set
    
-   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL);
+   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL, NULL);
    RePartGF[0] += Realpart; // Add
    ImPartGF[0] += Imagpart;
    
@@ -1879,7 +1879,7 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
 
 }
 
-void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const{
+void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMadd) const{
 
    // Addition amplitude < 0 | a_{alpha, spin} [ omega - Ham + E_0 + I*eta ]^{-1} a^+_{beta, spin} | 0 >
 
@@ -1894,6 +1894,7 @@ void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, con
       const unsigned int Lpow4 = L*L*L*L;
       if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
       if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
+      if ( TwoRDMadd  != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMadd[  cnt ] = 0.0; } }
       return;
    }
 
@@ -1920,12 +1921,13 @@ void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, con
    ImPartGF[0] = FCIddot( addVecLength , addAlphaVector , ImagPartSolution );
    delete [] ImagPartSolution;
 
+   if ( TwoRDMadd != NULL ){ additionFCI.Fill2RDM( addBetaVector , TwoRDMadd ); } // Sets the TwoRDMadd
    if ( orb_alpha != orb_beta ){ delete [] addAlphaVector; }
    delete [] addBetaVector;
 
 }
 
-void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const{
+void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMrem) const{
 
    // Removal amplitude < 0 | a^+_{beta, spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha, spin} | 0 >
 
@@ -1940,6 +1942,7 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
       const unsigned int Lpow4 = L*L*L*L;
       if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
       if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
+      if ( TwoRDMrem  != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMrem[  cnt ] = 0.0; } }
       return;
    }
    
@@ -1966,6 +1969,7 @@ void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, cons
    ImPartGF[0] = FCIddot( removeVecLength , removeBetaVector , ImagPartSolution );
    delete [] ImagPartSolution;
 
+   if ( TwoRDMrem != NULL ){ removalFCI.Fill2RDM( removeAlphaVector , TwoRDMrem ); } // Sets the TwoRDMrem
    if ( orb_alpha != orb_beta ){ delete [] removeBetaVector; }
    delete [] removeAlphaVector;
 
@@ -1980,11 +1984,11 @@ void CheMPS2::FCI::DensityResponseGF(const double omega, const double eta, const
    //                              - < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 > (backward amplitude)
    
    double Realpart, Imagpart;
-   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL);
+   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL, NULL);
    RePartGF[0] = Realpart; // Set
    ImPartGF[0] = Imagpart; // Set
    
-   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL);
+   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL, NULL);
    RePartGF[0] -= Realpart; // Subtract !!!
    ImPartGF[0] -= Imagpart; // Subtract !!!
 
@@ -1995,7 +1999,7 @@ void CheMPS2::FCI::DensityResponseGF(const double omega, const double eta, const
 
 }
 
-void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const{
+void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMdens) const{
 
    // Forward amplitude: < 0 | ( n_alpha - <0| n_alpha |0> ) [ omega - Ham + E_0 + I*eta ]^{-1} ( n_beta  - <0| n_beta  |0> ) | 0 >
    
@@ -2025,12 +2029,13 @@ void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double et
    ImPartGF[0] = FCIddot( vecLength , densityAlphaVector , ImagPartSolution );
    delete [] ImagPartSolution;
 
+   if ( TwoRDMdens != NULL ){ Fill2RDM( densityBetaVector , TwoRDMdens ); } // Sets the TwoRDMdens
    if ( orb_alpha != orb_beta ){ delete [] densityBetaVector; }
    delete [] densityAlphaVector;
 
 }
 
-void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag) const{
+void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double * GSvector, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMdens) const{
 
    // Backward amplitude: < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 >
    
@@ -2059,7 +2064,8 @@ void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double e
    if ( TwoRDMimag != NULL ){ Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
    ImPartGF[0] = FCIddot( vecLength , densityBetaVector , ImagPartSolution );
    delete [] ImagPartSolution;
-   
+
+   if ( TwoRDMdens != NULL ){ Fill2RDM( densityAlphaVector , TwoRDMdens ); } // Sets the TwoRDMdens
    if ( orb_alpha != orb_beta ){ delete [] densityBetaVector; }
    delete [] densityAlphaVector;
 
