@@ -234,12 +234,12 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <li><a href="integrals/psi4plugins/test8.dat">```integrals/psi4plugins/test8.dat```</a></li>
 <li><a href="integrals/psi4plugins/test9.dat">```integrals/psi4plugins/test9.dat```</a></li>
 </ol>
-<p>These DMRG-SCF tests are the exact analogs of the corresponding C++ and python tests (with the same number). After compilation of the dmrgscf plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
+<p>These DMRG-SCF tests are the analogs of the corresponding C++ and python tests (with the same number). After compilation of the dmrgscf plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
 <pre class="fragment">&gt; psi4 test6.dat
 &gt; psi4 test8.dat
 &gt; psi4 test9.dat
 </pre><h2>DMRG-CI and DMRG-SCF calculations with pyscf </h2>
-<p><a href="https://github.com/sunqm/pyscf">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a href="https://github.com/sunqm/pyscf/blob/dev/future/dmrgscf/chemps2.py">```chemps2.py```</a>.</p>
+<p><a href="https://github.com/sunqm/pyscf">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a href="https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py">```chemps2.py```</a>.</p>
 <p>Examples of how to extract MO integrals from pyscf to perform DMRG-CI calculations with PyCheMPS2 can be found in</p>
 <ol type="1">
 <li><a href="integrals/pyscf/example.py">```integrals/pyscf/example.py```</a></li>
@@ -394,7 +394,7 @@ cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Feb 9 2015 23:44:28 for CheMPS2 by
+    <li class="footer">Generated on Fri Feb 13 2015 01:04:34 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

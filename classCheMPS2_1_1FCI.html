@@ -170,21 +170,21 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc">RetardedGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF) const </td></tr>
 <tr class="memdesc:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the retarded Green's function (= addition + removal amplitude)  <a href="#aaa00a4720e4796700dc9ebd83aa71cfc">More...</a><br/></td></tr>
 <tr class="separator:aaa00a4720e4796700dc9ebd83aa71cfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac91f240864980f4bd3c65d4222b928bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc">RetardedGF_addition</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag) const </td></tr>
-<tr class="memdesc:ac91f240864980f4bd3c65d4222b928bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the addition part of the retarded Green's function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} |GSvector&gt;  <a href="#ac91f240864980f4bd3c65d4222b928bc">More...</a><br/></td></tr>
-<tr class="separator:ac91f240864980f4bd3c65d4222b928bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa78419aaf589c4e4e4dceb39265b9bf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0">RetardedGF_removal</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag) const </td></tr>
-<tr class="memdesc:aa78419aaf589c4e4e4dceb39265b9bf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the removal part of the retarded Green's function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} |GSvector&gt;  <a href="#aa78419aaf589c4e4e4dceb39265b9bf0">More...</a><br/></td></tr>
-<tr class="separator:aa78419aaf589c4e4e4dceb39265b9bf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d25ab318099a9ba0a76d29e655f071c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c">RetardedGF_addition</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag, double *TwoRDMadd) const </td></tr>
+<tr class="memdesc:a9d25ab318099a9ba0a76d29e655f071c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the addition part of the retarded Green's function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} |GSvector&gt;  <a href="#a9d25ab318099a9ba0a76d29e655f071c">More...</a><br/></td></tr>
+<tr class="separator:a9d25ab318099a9ba0a76d29e655f071c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7744c9cf79d9b696efa65471e4f439a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a">RetardedGF_removal</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double *GSvector, <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> *Ham, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag, double *TwoRDMrem) const </td></tr>
+<tr class="memdesc:ac7744c9cf79d9b696efa65471e4f439a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the removal part of the retarded Green's function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} |GSvector&gt;  <a href="#ac7744c9cf79d9b696efa65471e4f439a">More...</a><br/></td></tr>
+<tr class="separator:ac7744c9cf79d9b696efa65471e4f439a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0">DensityResponseGF</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF) const </td></tr>
 <tr class="memdesc:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the density response Green's function (= forward - backward propagating part)  <a href="#a132bbdf8fb4063a5199c7cbbbdccc0e0">More...</a><br/></td></tr>
 <tr class="separator:a132bbdf8fb4063a5199c7cbbbdccc0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd6a6c72250cd29aa4d98b869aa5d31d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#acd6a6c72250cd29aa4d98b869aa5d31d">DensityResponseGF_forward</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag) const </td></tr>
-<tr class="memdesc:acd6a6c72250cd29aa4d98b869aa5d31d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the forward propagating part of the density response Green's function: &lt;GSvector| ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt;  <a href="#acd6a6c72250cd29aa4d98b869aa5d31d">More...</a><br/></td></tr>
-<tr class="separator:acd6a6c72250cd29aa4d98b869aa5d31d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb36bc580397ad80a7da07988920baf9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#afb36bc580397ad80a7da07988920baf9">DensityResponseGF_backward</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag) const </td></tr>
-<tr class="memdesc:afb36bc580397ad80a7da07988920baf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the backward propagating part of the density response Green's function: &lt;GSvector| ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt;  <a href="#afb36bc580397ad80a7da07988920baf9">More...</a><br/></td></tr>
-<tr class="separator:afb36bc580397ad80a7da07988920baf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d61e4c603c53a3f98f4f47064f35f33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a1d61e4c603c53a3f98f4f47064f35f33">DensityResponseGF_forward</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag, double *TwoRDMdens) const </td></tr>
+<tr class="memdesc:a1d61e4c603c53a3f98f4f47064f35f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the forward propagating part of the density response Green's function: &lt;GSvector| ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt;  <a href="#a1d61e4c603c53a3f98f4f47064f35f33">More...</a><br/></td></tr>
+<tr class="separator:a1d61e4c603c53a3f98f4f47064f35f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa127b9f43ef9064a5d0d04f109cfad86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#aa127b9f43ef9064a5d0d04f109cfad86">DensityResponseGF_backward</a> (const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const double GSenergy, double *GSvector, double *RePartGF, double *ImPartGF, double *TwoRDMreal, double *TwoRDMimag, double *TwoRDMdens) const </td></tr>
+<tr class="memdesc:aa127b9f43ef9064a5d0d04f109cfad86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the backward propagating part of the density response Green's function: &lt;GSvector| ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt;  <a href="#aa127b9f43ef9064a5d0d04f109cfad86">More...</a><br/></td></tr>
+<tr class="separator:aa127b9f43ef9064a5d0d04f109cfad86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
 <tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
 <tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -493,7 +493,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph" id="classCheMPS2_1_1FCI_ac33683cb6adf2063e7fe0fc908c3febb_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="265,5,455,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="265,70,455,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="265,5,455,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="265,70,455,111"/></map>
 </div>
 </p>
 
@@ -962,7 +962,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph" id="classCheMPS2_1_1FCI_ab41b5c8e777fcdfeb700c7763f64f805_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="273,5,463,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="273,70,463,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="273,5,463,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="273,70,463,111"/></map>
 </div>
 </p>
 
@@ -1088,11 +1088,11 @@ Static Protected Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01974">1974</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01978">1978</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="afb36bc580397ad80a7da07988920baf9"></a>
+<a class="anchor" id="aa127b9f43ef9064a5d0d04f109cfad86"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1154,7 +1154,13 @@ Static Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>TwoRDMimag</em>&#160;</td>
+          <td class="paramname"><em>TwoRDMimag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>TwoRDMdens</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1177,15 +1183,16 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the backward propagating part of the density response Green's function </td></tr>
     <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
     <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMdens</td><td>If not NULL, on exit the 2-RDM of ( n_alpha - &lt;GSvector| n_alpha |GSvector&gt; ) |GSvector&gt; </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02033">2033</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02038">2038</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="acd6a6c72250cd29aa4d98b869aa5d31d"></a>
+<a class="anchor" id="a1d61e4c603c53a3f98f4f47064f35f33"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1247,7 +1254,13 @@ Static Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>TwoRDMimag</em>&#160;</td>
+          <td class="paramname"><em>TwoRDMimag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>TwoRDMdens</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1270,11 +1283,12 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the forward propagating part of the density response Green's function </td></tr>
     <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
     <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMdens</td><td>If not NULL, on exit the 2-RDM of ( n_beta - &lt;GSvector| n_beta |GSvector&gt; ) |GSvector&gt; </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01998">1998</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l02002">2002</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 </div>
 </div>
@@ -1651,7 +1665,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_a36e81090d6d9c12eb8e86f65ce1e66b4_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a36e81090d6d9c12eb8e86f65ce1e66b4_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_a36e81090d6d9c12eb8e86f65ce1e66b4_icgraph" id="classCheMPS2_1_1FCI_a36e81090d6d9c12eb8e86f65ce1e66b4_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="230,5,421,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="230,70,421,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="230,5,421,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="230,70,421,111"/></map>
 </div>
 </p>
 
@@ -1907,7 +1921,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph" id="classCheMPS2_1_1FCI_a87f310673fe8b183cb4a5bf3d3051f9f_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="243,38,453,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="502,5,693,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="502,70,693,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="243,38,453,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="502,5,693,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="502,70,693,111"/></map>
 </div>
 </p>
 
@@ -2038,7 +2052,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph" id="classCheMPS2_1_1FCI_aebb431f39d1a3fa0be120bdf90d2d152_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="200,38,411,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="459,5,650,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="459,70,650,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="200,38,411,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="459,5,650,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="459,70,650,111"/></map>
 </div>
 </p>
 
@@ -2263,7 +2277,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph" id="classCheMPS2_1_1FCI_ae876dae50220954a3ed8fd72813e28db_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="256,38,467,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="515,5,706,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="515,70,706,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="256,38,467,79"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="515,5,706,46"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="515,70,706,111"/></map>
 </div>
 </p>
 
@@ -2355,7 +2369,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph" id="classCheMPS2_1_1FCI_a6e153d335d6500f4758212e203f7d682_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#ac91f240864980f4bd3c65d4222b928bc" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="254,5,445,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#aa78419aaf589c4e4e4dceb39265b9bf0" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="254,70,445,111"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="254,5,445,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="254,70,445,111"/></map>
 </div>
 </p>
 
@@ -2568,7 +2582,7 @@ Static Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac91f240864980f4bd3c65d4222b928bc"></a>
+<a class="anchor" id="a9d25ab318099a9ba0a76d29e655f071c"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -2642,7 +2656,13 @@ Static Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>TwoRDMimag</em>&#160;</td>
+          <td class="paramname"><em>TwoRDMimag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>TwoRDMadd</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2667,6 +2687,7 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the addition part of the retarded Green's function </td></tr>
     <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
     <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega - Ham + GSenergy + I*eta ]^{-1} a^+_{beta, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMadd</td><td>If not NULL, on exit the 2-RDM of a^+_{beta, spin(isUp)} | GSvector &gt; </td></tr>
   </table>
   </dd>
 </dl>
@@ -2678,15 +2699,15 @@ Static Protected Member Functions</h2></td></tr>
 <div id="dynsection-10-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-10-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_ac91f240864980f4bd3c65d4222b928bc_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac91f240864980f4bd3c65d4222b928bc_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_ac91f240864980f4bd3c65d4222b928bc_cgraph" id="classCheMPS2_1_1FCI_ac91f240864980f4bd3c65d4222b928bc_cgraph">
+<div class="center"><img src="classCheMPS2_1_1FCI_a9d25ab318099a9ba0a76d29e655f071c_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_a9d25ab318099a9ba0a76d29e655f071c_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_a9d25ab318099a9ba0a76d29e655f071c_cgraph" id="classCheMPS2_1_1FCI_a9d25ab318099a9ba0a76d29e655f071c_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="255,5,455,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="249,57,460,98"/><area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with c..." alt="" coords="245,123,464,149"/><area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="267,173,442,200"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="541,13,686,40"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="513,64,714,91"/><area shape="rect" id="node6" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="519,115,708,141"/></map>
 </div>
 </p>
 
 </div>
 </div>
-<a class="anchor" id="aa78419aaf589c4e4e4dceb39265b9bf0"></a>
+<a class="anchor" id="ac7744c9cf79d9b696efa65471e4f439a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -2760,7 +2781,13 @@ Static Protected Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>TwoRDMimag</em>&#160;</td>
+          <td class="paramname"><em>TwoRDMimag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>TwoRDMrem</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -2785,19 +2812,20 @@ Static Protected Member Functions</h2></td></tr>
     <tr><td class="paramname">ImPartGF</td><td>On exit ImPartGF[0] contains the imaginary part of the removal part of the retarded Green's function </td></tr>
     <tr><td class="paramname">TwoRDMreal</td><td>If not NULL, on exit the 2-RDM of Re{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
     <tr><td class="paramname">TwoRDMimag</td><td>If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector &gt; } </td></tr>
+    <tr><td class="paramname">TwoRDMrem</td><td>If not NULL, on exit the 2-RDM of a_{alpha, spin(isUp)} | GSvector &gt; </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01928">1928</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
+<p>Definition at line <a class="el" href="FCI_8cpp_source.html#l01930">1930</a> of file <a class="el" href="FCI_8cpp_source.html">FCI.cpp</a>.</p>
 
 <p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-11-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
 <div id="dynsection-11-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-11-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1FCI_aa78419aaf589c4e4e4dceb39265b9bf0_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_aa78419aaf589c4e4e4dceb39265b9bf0_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1FCI_aa78419aaf589c4e4e4dceb39265b9bf0_cgraph" id="classCheMPS2_1_1FCI_aa78419aaf589c4e4e4dceb39265b9bf0_cgraph">
+<div class="center"><img src="classCheMPS2_1_1FCI_ac7744c9cf79d9b696efa65471e4f439a_cgraph.png" border="0" usemap="#classCheMPS2_1_1FCI_ac7744c9cf79d9b696efa65471e4f439a_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1FCI_ac7744c9cf79d9b696efa65471e4f439a_cgraph" id="classCheMPS2_1_1FCI_ac7744c9cf79d9b696efa65471e4f439a_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="255,5,455,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="249,57,460,98"/><area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805" title="Calculate the solution of the equation ( alpha + beta * Hamiltonian + I * eta ) Solution = RHS with c..." alt="" coords="245,123,464,149"/><area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="267,173,442,200"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#aebb431f39d1a3fa0be120bdf90d2d152" title="Getter for the number of orbitals. " alt="" coords="541,13,686,40"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db" title="Get the target irrep. " alt="" coords="513,64,714,91"/><area shape="rect" id="node6" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f" title="Function which returns a FCI coefficient. " alt="" coords="519,115,708,141"/></map>
 </div>
 </p>
@@ -2866,7 +2894,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Mon Feb 9 2015 23:43:42 for CheMPS2 by
+    <li class="footer">Generated on Fri Feb 13 2015 01:03:47 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
