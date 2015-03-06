@@ -100,6 +100,28 @@ namespace CheMPS2{
     [LOC8]  M. Fiedler, Czechoslovak Mathematical Journal 25, 619-633 (1975). http://dml.cz/dmlcz/101357 \n
     [LOC9]  G. Barcza, O. Legeza, K. H. Marti, M. Reiher, Physical Review A 83, 012508 (2011). http://dx.doi.org/10.1103/PhysRevA.83.012508 \n
     [LOC10] M.W. Berry, Fiedler ordering, http://web.eecs.utk.edu/~mberry/order/node9.html (1996).
+    
+    \section boysLocal Boys localization
+    
+    In the Boys localization method, the cost function
+    \f[
+      J = \frac{1}{2} \sum\limits_{ij} \left( \braket{ \phi_i \mid \vec{r} \mid \phi_i } - \braket{ \phi_j \mid \vec{r} \mid \phi_j } \right)^2 = \frac{1}{2} \sum\limits_{ij} \left( \vec{r}_{ii} - \vec{r}_{jj} \right)^2
+    \f]
+    is maximized. With an orthogonal orbital rotation \f$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))\f$, the cost function becomes
+    \f[
+      J(\mathbf{U}) = \frac{1}{2} \sum\limits_{i,j} \left( \left[ \mathbf{U} \right]_{i\alpha} \left[ \mathbf{U} \right]_{i\beta} \vec{r}_{\alpha\beta} - \left[ \mathbf{U} \right]_{j\alpha} \left[ \mathbf{U} \right]_{j\beta} \vec{r}_{\alpha\beta} \right)^2.
+    \f]
+    The gradient and hessian of J with respect to orbital rotations are given by:
+    \f{eqnarray*}{
+      \left[ \frac{\partial J}{\partial x_{pq}} \right]_0 & = & 2 N_{orb} \left[ \left( \vec{r}_{pq} + \vec{r}_{qp} \right).\left( \vec{r}_{pp} - \vec{r}_{qq} \right) \right] \\
+      \left[ \frac{\partial^2 J}{\partial x_{pq} \partial x_{rs}} \right]_0 & = & 2 N_{orb} \left( \delta_{pr} + \delta_{qs} - \delta_{qr} - \delta_{ps} \right) \left[ \left( \vec{r}_{pq} + \vec{r}_{qp} \right).\left( \vec{r}_{rs} + \vec{r}_{sr} \right) \right] \\
+      & + & N_{orb} \delta_{pr} \left[ \left( \vec{r}_{qs} + \vec{r}_{sq} \right).\left( 2 \vec{r}_{pp} - \vec{r}_{qq} - \vec{r}_{ss} \right) \right] \\
+      & + & N_{orb} \delta_{qs} \left[ \left( \vec{r}_{pr} + \vec{r}_{rp} \right).\left( 2 \vec{r}_{qq} - \vec{r}_{pp} - \vec{r}_{rr} \right) \right] \\
+      & - & N_{orb} \delta_{qr} \left[ \left( \vec{r}_{ps} + \vec{r}_{sp} \right).\left( 2 \vec{r}_{qq} - \vec{r}_{pp} - \vec{r}_{ss} \right) \right] \\
+      & - & N_{orb} \delta_{ps} \left[ \left( \vec{r}_{qr} + \vec{r}_{rq} \right).\left( 2 \vec{r}_{pp} - \vec{r}_{qq} - \vec{r}_{rr} \right) \right].
+    \f}
+    (Written down here for future reference.)
+    
 */
    class EdmistonRuedenberg{
 
