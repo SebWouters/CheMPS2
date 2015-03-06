@@ -202,9 +202,24 @@ References</h1>
 [LOC7] M. Fiedler, Czechoslovak Mathematical Journal 23, 298-305 (1973). <a href="http://dml.cz/dmlcz/101168">http://dml.cz/dmlcz/101168</a> <br/>
 [LOC8] M. Fiedler, Czechoslovak Mathematical Journal 25, 619-633 (1975). <a href="http://dml.cz/dmlcz/101357">http://dml.cz/dmlcz/101357</a> <br/>
 [LOC9] G. Barcza, O. Legeza, K. H. Marti, M. Reiher, Physical Review A 83, 012508 (2011). <a href="http://dx.doi.org/10.1103/PhysRevA.83.012508">http://dx.doi.org/10.1103/PhysRevA.83.012508</a> <br/>
-[LOC10] M.W. Berry, Fiedler ordering, <a href="http://web.eecs.utk.edu/~mberry/order/node9.html">http://web.eecs.utk.edu/~mberry/order/node9.html</a> (1996). </p>
+[LOC10] M.W. Berry, Fiedler ordering, <a href="http://web.eecs.utk.edu/~mberry/order/node9.html">http://web.eecs.utk.edu/~mberry/order/node9.html</a> (1996).</p>
+<h1><a class="anchor" id="boysLocal"></a>
+Boys localization</h1>
+<p>In the Boys localization method, the cost function </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ J = \frac{1}{2} \sum\limits_{ij} \left( \braket{ \phi_i \mid \vec{r} \mid \phi_i } - \braket{ \phi_j \mid \vec{r} \mid \phi_j } \right)^2 = \frac{1}{2} \sum\limits_{ij} \left( \vec{r}_{ii} - \vec{r}_{jj} \right)^2 \]" src="form_156.png"/>
+</p>
+<p> is maximized. With an orthogonal orbital rotation <img class="formulaInl" alt="$\mathbf{U} = \exp(\mathbf{X}(\vec{x}))$" src="form_135.png"/>, the cost function becomes </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\[ J(\mathbf{U}) = \frac{1}{2} \sum\limits_{i,j} \left( \left[ \mathbf{U} \right]_{i\alpha} \left[ \mathbf{U} \right]_{i\beta} \vec{r}_{\alpha\beta} - \left[ \mathbf{U} \right]_{j\alpha} \left[ \mathbf{U} \right]_{j\beta} \vec{r}_{\alpha\beta} \right)^2. \]" src="form_157.png"/>
+</p>
+<p> The gradient and hessian of J with respect to orbital rotations are given by: </p>
+<p class="formulaDsp">
+<img class="formulaDsp" alt="\begin{eqnarray*} \left[ \frac{\partial J}{\partial x_{pq}} \right]_0 &amp; = &amp; 2 N_{orb} \left[ \left( \vec{r}_{pq} + \vec{r}_{qp} \right).\left( \vec{r}_{pp} - \vec{r}_{qq} \right) \right] \\ \left[ \frac{\partial^2 J}{\partial x_{pq} \partial x_{rs}} \right]_0 &amp; = &amp; 2 N_{orb} \left( \delta_{pr} + \delta_{qs} - \delta_{qr} - \delta_{ps} \right) \left[ \left( \vec{r}_{pq} + \vec{r}_{qp} \right).\left( \vec{r}_{rs} + \vec{r}_{sr} \right) \right] \\ &amp; + &amp; N_{orb} \delta_{pr} \left[ \left( \vec{r}_{qs} + \vec{r}_{sq} \right).\left( 2 \vec{r}_{pp} - \vec{r}_{qq} - \vec{r}_{ss} \right) \right] \\ &amp; + &amp; N_{orb} \delta_{qs} \left[ \left( \vec{r}_{pr} + \vec{r}_{rp} \right).\left( 2 \vec{r}_{qq} - \vec{r}_{pp} - \vec{r}_{rr} \right) \right] \\ &amp; - &amp; N_{orb} \delta_{qr} \left[ \left( \vec{r}_{ps} + \vec{r}_{sp} \right).\left( 2 \vec{r}_{qq} - \vec{r}_{pp} - \vec{r}_{ss} \right) \right] \\ &amp; - &amp; N_{orb} \delta_{ps} \left[ \left( \vec{r}_{qr} + \vec{r}_{rq} \right).\left( 2 \vec{r}_{pp} - \vec{r}_{qq} - \vec{r}_{rr} \right) \right]. \end{eqnarray*}" src="form_158.png"/>
+</p>
+<p> (Written down here for future reference.) </p>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8h_source.html#l00104">104</a> of file <a class="el" href="EdmistonRuedenberg_8h_source.html">EdmistonRuedenberg.h</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8h_source.html#l00126">126</a> of file <a class="el" href="EdmistonRuedenberg_8h_source.html">EdmistonRuedenberg.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ae2fd288381bda86ab5c07e1d793aa3fd"></a>
 <div class="memitem">
@@ -443,7 +458,7 @@ References</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html">EdmistonRuedenberg</a></li>
-    <li class="footer">Generated on Fri Feb 13 2015 01:03:47 for CheMPS2 by
+    <li class="footer">Generated on Thu Mar 5 2015 23:13:09 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

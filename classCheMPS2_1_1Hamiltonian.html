@@ -183,11 +183,11 @@ Specific Hamiltonian information</h1>
 <li>groupNumber (in SymmInfo): the number of the Abelian point group symmetry with real-valued character table (see <a class="el" href="Irreps_8h_source.html">Irreps.h</a>)</li>
 <li>orb2irrep: array with the irrep number for each orbital</li>
 <li>Econst: nuclear repulsion energy; or any constant part of the energy not contained in the 1- or 2-particle matrix elements</li>
-<li>Tmat: 1-particle matrix elements; Tmat <img class="formulaInl" alt="$_{a,b}$" src="form_158.png"/> = 0 if <img class="formulaInl" alt="$I_a$" src="form_159.png"/> is different from <img class="formulaInl" alt="$I_b$" src="form_160.png"/></li>
-<li>Vmat: 2-particle matrix elements; Vmat <img class="formulaInl" alt="$_{a,b,c,d}$" src="form_161.png"/> = 0 if <img class="formulaInl" alt="$I_a \otimes I_b$" src="form_162.png"/> is not equal to <img class="formulaInl" alt="$I_c \otimes I_d$" src="form_163.png"/>; the matrix elements are not antisymmetrized and are stored with the convention that both (a &amp; c) and (b &amp; d) have the same spatial variable for the nuclear repulsion integral (physics notation).</li>
+<li>Tmat: 1-particle matrix elements; Tmat <img class="formulaInl" alt="$_{a,b}$" src="form_161.png"/> = 0 if <img class="formulaInl" alt="$I_a$" src="form_162.png"/> is different from <img class="formulaInl" alt="$I_b$" src="form_163.png"/></li>
+<li>Vmat: 2-particle matrix elements; Vmat <img class="formulaInl" alt="$_{a,b,c,d}$" src="form_164.png"/> = 0 if <img class="formulaInl" alt="$I_a \otimes I_b$" src="form_165.png"/> is not equal to <img class="formulaInl" alt="$I_c \otimes I_d$" src="form_166.png"/>; the matrix elements are not antisymmetrized and are stored with the convention that both (a &amp; c) and (b &amp; d) have the same spatial variable for the nuclear repulsion integral (physics notation).</li>
 </ul>
 <p>The targeted spin, particle number and point group symmetry are not defined here. For convenience, the second quantized formulation of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> is given here: <br/>
- <img class="formulaInl" alt="$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $" src="form_164.png"/><br/>
+ <img class="formulaInl" alt="$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $" src="form_167.png"/><br/>
 where the latin letters denote site-indices and the greek letters spin projections. This <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> preserves spin, spin projection, particle number, and Abelian point group symmetry (if its character table is real at least). </p>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8h_source.html#l00053">53</a> of file <a class="el" href="Hamiltonian_8h_source.html">Hamiltonian.h</a>.</p>
@@ -568,7 +568,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$T_{index1,index2}$" src="form_165.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$T_{index1,index2}$" src="form_168.png"/> </dd></dl>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00105">105</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
@@ -631,7 +631,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$V_{index1,index2,index3,index4}$" src="form_166.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$V_{index1,index2,index3,index4}$" src="form_169.png"/> </dd></dl>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00129">129</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
@@ -907,7 +907,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a></li>
-    <li class="footer">Generated on Fri Feb 13 2015 01:03:47 for CheMPS2 by
+    <li class="footer">Generated on Thu Mar 5 2015 23:13:09 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
