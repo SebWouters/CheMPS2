@@ -1864,11 +1864,11 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
    //                              + < 0 | a^+_{beta,spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha,spin}  | 0 > (removal  amplitude)
 
    double Realpart, Imagpart;
-   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL, NULL);
+   RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart);
    RePartGF[0] = Realpart; // Set
    ImPartGF[0] = Imagpart; // Set
    
-   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart, NULL, NULL, NULL);
+   RetardedGF_removal( omega, eta, orb_alpha, orb_beta, isUp, GSenergy, GSvector, Ham, &Realpart, &Imagpart);
    RePartGF[0] += Realpart; // Add
    ImPartGF[0] += Imagpart;
    
@@ -1984,11 +1984,11 @@ void CheMPS2::FCI::DensityResponseGF(const double omega, const double eta, const
    //                              - < 0 | ( n_beta  - <0| n_beta  |0> ) [ omega + Ham - E_0 + I*eta ]^{-1} ( n_alpha - <0| n_alpha |0> ) | 0 > (backward amplitude)
    
    double Realpart, Imagpart;
-   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL, NULL);
+   DensityResponseGF_forward( omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart);
    RePartGF[0] = Realpart; // Set
    ImPartGF[0] = Imagpart; // Set
    
-   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart, NULL, NULL, NULL);
+   DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, GSvector, &Realpart, &Imagpart);
    RePartGF[0] -= Realpart; // Subtract !!!
    ImPartGF[0] -= Imagpart; // Subtract !!!
 
