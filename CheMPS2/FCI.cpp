@@ -1879,99 +1879,186 @@ void CheMPS2::FCI::RetardedGF(const double omega, const double eta, const unsign
 
 }
 
+void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, const double eta, int * orbsLeft, const unsigned int numLeft, int * orbsRight, const unsigned int numRight, const bool isUp, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartsGF, double * ImPartsGF, double ** TwoRDMreal, double ** TwoRDMimag, double ** TwoRDMadd) const{
+
+   /*
+                                                                         1
+       GF[i + numLeft * j] = < 0 | a_{orbsLeft[i], spin} -------------------------------- a^+_{orbsRight[j], spin} | 0 >
+                                                          [ alpha + beta * Ham + I*eta ]
+   */
+
+   // Check whether some stuff is OK
+   assert( numLeft  > 0 );
+   assert( numRight > 0 );
+   for ( unsigned int cnt = 0; cnt < numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] < L ) && (  orbsLeft[ cnt ] >= 0 ) ); }
+   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){ assert( ( orbsRight[ cnt ] < L ) && ( orbsRight[ cnt ] >= 0 ) ); }
+   assert( RePartsGF != NULL );
+   assert( ImPartsGF != NULL );
+   for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
+       RePartsGF[ counter ] = 0.0;
+       ImPartsGF[ counter ] = 0.0;
+   }
+   const unsigned int Lpow4 = L*L*L*L;
+   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){
+      if ( TwoRDMreal != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){ TwoRDMreal[ cnt ][ elem ] = 0.0; } }
+      if ( TwoRDMimag != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){ TwoRDMimag[ cnt ][ elem ] = 0.0; } }
+      if ( TwoRDMadd  != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){  TwoRDMadd[ cnt ][ elem ] = 0.0; } }
+   }
+   
+   const bool isOK = ( isUp ) ? ( getNel_up() < L ) : ( getNel_down() < L ); // The electron can be added
+   for ( unsigned int cnt_right = 0; cnt_right < numRight; cnt_right++ ){
+   
+      const int orbitalRight = orbsRight[ cnt_right ];
+      bool matchingIrrep = false;
+      for ( int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+         if ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = true; }
+      }
+      
+      if ( isOK && matchingIrrep ){
+      
+         const unsigned int addNelUP   = getNel_up()   + ((isUp) ? 1 : 0);
+         const unsigned int addNelDOWN = getNel_down() + ((isUp) ? 0 : 1);
+         const int addIrrep = getIrrepProduct( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
+         
+         CheMPS2::FCI additionFCI( Ham, addNelUP, addNelDOWN, addIrrep, maxMemWorkMB, FCIverbose );
+         const unsigned long long addVecLength = additionFCI.getVecLength( 0 );
+         double * addVector = new double[ addVecLength ];
+         additionFCI.ActWithSecondQuantizedOperator( 'C', isUp, orbitalRight, addVector, this, GSvector ); // | addVector > = a^+_right,spin | GSvector >
+         
+         double * RealPartSolution = new double[ addVecLength ];
+         double * ImagPartSolution = new double[ addVecLength ];
+         additionFCI.CGSolveSystem( alpha, beta, eta, addVector, RealPartSolution, ImagPartSolution );
+         
+         if ( TwoRDMreal != NULL ){ additionFCI.Fill2RDM( RealPartSolution, TwoRDMreal[ cnt_right ] ); }
+         if ( TwoRDMimag != NULL ){ additionFCI.Fill2RDM( ImagPartSolution, TwoRDMimag[ cnt_right ] ); }
+         if ( TwoRDMadd  != NULL ){ additionFCI.Fill2RDM( addVector,         TwoRDMadd[ cnt_right ] ); }
+         
+         for ( unsigned int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+            const int orbitalLeft = orbsLeft[ cnt_left ];
+            if ( getOrb2Irrep( orbitalLeft ) == getOrb2Irrep( orbitalRight ) ){
+               additionFCI.ActWithSecondQuantizedOperator( 'C', isUp, orbitalLeft, addVector, this, GSvector ); // | addVector > = a^+_left,spin | GSvector >
+               RePartsGF[ cnt_left + numLeft * cnt_right ] = FCIddot( addVecLength, addVector, RealPartSolution );
+               ImPartsGF[ cnt_left + numLeft * cnt_right ] = FCIddot( addVecLength, addVector, ImagPartSolution );
+            }
+         }
+         
+         delete [] RealPartSolution;
+         delete [] ImagPartSolution;
+         delete [] addVector;
+       
+      }
+   }
+
+}
+
 void CheMPS2::FCI::RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMadd) const{
 
    // Addition amplitude < 0 | a_{alpha, spin} [ omega - Ham + E_0 + I*eta ]^{-1} a^+_{beta, spin} | 0 >
-
-   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
-   assert( RePartGF != NULL );
-   assert( ImPartGF != NULL );
    
-   const bool isOK = ( isUp ) ? ( getNel_up() < L ) : ( getNel_down() < L ); // The electron can be added
-   if (( getOrb2Irrep( orb_alpha ) != getOrb2Irrep( orb_beta ) ) || ( !isOK )){
-      RePartGF[0] = 0.0;
-      ImPartGF[0] = 0.0;
-      const unsigned int Lpow4 = L*L*L*L;
-      if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
-      if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
-      if ( TwoRDMadd  != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMadd[  cnt ] = 0.0; } }
-      return;
+   double ** TwoRDMreal_wrap = NULL; if ( TwoRDMreal != NULL ){ TwoRDMreal_wrap = new double*[1]; TwoRDMreal_wrap[0] = TwoRDMreal; }
+   double ** TwoRDMimag_wrap = NULL; if ( TwoRDMimag != NULL ){ TwoRDMimag_wrap = new double*[1]; TwoRDMimag_wrap[0] = TwoRDMimag; }
+   double **  TwoRDMadd_wrap = NULL; if (  TwoRDMadd != NULL ){  TwoRDMadd_wrap = new double*[1];  TwoRDMadd_wrap[0] = TwoRDMadd;  }
+   
+   int orb_left  = orb_alpha;
+   int orb_right = orb_beta;
+   
+   GFmatrix_addition( omega + GSenergy, -1.0, eta, &orb_left, 1, &orb_right, 1, isUp, GSvector, Ham, RePartGF, ImPartGF, TwoRDMreal_wrap, TwoRDMimag_wrap, TwoRDMadd_wrap );
+   
+   if ( TwoRDMreal != NULL ){ delete [] TwoRDMreal_wrap; }
+   if ( TwoRDMimag != NULL ){ delete [] TwoRDMimag_wrap; }
+   if (  TwoRDMadd != NULL ){ delete [] TwoRDMadd_wrap;  }
+
+}
+
+void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const double eta, int * orbsLeft, const unsigned int numLeft, int * orbsRight, const unsigned int numRight, const bool isUp, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartsGF, double * ImPartsGF, double ** TwoRDMreal, double ** TwoRDMimag, double ** TwoRDMrem) const{
+
+   /*
+                                                                           1
+       GF[i + numLeft * j] = < 0 | a^+_{orbsLeft[i], spin} -------------------------------- a_{orbsRight[j], spin} | 0 >
+                                                            [ alpha + beta * Ham + I*eta ]
+   */
+   
+   // Check whether some stuff is OK
+   assert( numLeft  > 0 );
+   assert( numRight > 0 );
+   for ( unsigned int cnt = 0; cnt < numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] < L ) && (  orbsLeft[ cnt ] >= 0 ) ); }
+   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){ assert( ( orbsRight[ cnt ] < L ) && ( orbsRight[ cnt ] >= 0 ) ); }
+   assert( RePartsGF != NULL );
+   assert( ImPartsGF != NULL );
+   for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
+       RePartsGF[ counter ] = 0.0;
+       ImPartsGF[ counter ] = 0.0;
    }
-
-   const unsigned int addNelUP   = getNel_up()   + ((isUp) ? 1 : 0);
-   const unsigned int addNelDOWN = getNel_down() + ((isUp) ? 0 : 1);
-   const int addIrrep = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_beta ) );
-
-   CheMPS2::FCI additionFCI( Ham , addNelUP , addNelDOWN , addIrrep , maxMemWorkMB , FCIverbose );
-   const unsigned long long addVecLength = additionFCI.getVecLength( 0 );
-   double * addBetaVector  = new double[ addVecLength ];
-   double * addAlphaVector = ( orb_alpha == orb_beta ) ? addBetaVector : new double[ addVecLength ];
-   additionFCI.ActWithSecondQuantizedOperator( 'C' , isUp , orb_beta , addBetaVector , this , GSvector ); // | addBetaVector > = a^+_beta,spin | GSvector >
-   if ( orb_alpha != orb_beta ){
-      additionFCI.ActWithSecondQuantizedOperator( 'C' , isUp , orb_alpha , addAlphaVector , this , GSvector ); // | addAlphaVector > = a^+_alpha,spin | GSvector >
+   const unsigned int Lpow4 = L*L*L*L;
+   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){
+      if ( TwoRDMreal != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){ TwoRDMreal[ cnt ][ elem ] = 0.0; } }
+      if ( TwoRDMimag != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){ TwoRDMimag[ cnt ][ elem ] = 0.0; } }
+      if ( TwoRDMrem  != NULL ){ for ( unsigned int elem = 0; elem < Lpow4; elem++ ){  TwoRDMrem[ cnt ][ elem ] = 0.0; } }
    }
    
-   double * RealPartSolution = new double[ addVecLength ];
-   double * ImagPartSolution = new double[ addVecLength ];
-   additionFCI.CGSolveSystem( omega + GSenergy , -1.0 , eta , addBetaVector , RealPartSolution , ImagPartSolution );
-   if ( TwoRDMreal != NULL ){ additionFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-   RePartGF[0] = FCIddot( addVecLength , addAlphaVector , RealPartSolution );
-   delete [] RealPartSolution;
-   if ( TwoRDMimag != NULL ){ additionFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-   ImPartGF[0] = FCIddot( addVecLength , addAlphaVector , ImagPartSolution );
-   delete [] ImagPartSolution;
-
-   if ( TwoRDMadd != NULL ){ additionFCI.Fill2RDM( addBetaVector , TwoRDMadd ); } // Sets the TwoRDMadd
-   if ( orb_alpha != orb_beta ){ delete [] addAlphaVector; }
-   delete [] addBetaVector;
+   const bool isOK = ( isUp ) ? ( getNel_up() > 0 ) : ( getNel_down() > 0 ); // The electron can be removed
+   for ( unsigned int cnt_right = 0; cnt_right < numRight; cnt_right++ ){
+   
+      const int orbitalRight = orbsRight[ cnt_right ];
+      bool matchingIrrep = false;
+      for ( int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+         if ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = true; }
+      }
+      
+      if ( isOK && matchingIrrep ){
+      
+         const unsigned int removeNelUP   = getNel_up()   - ((isUp) ? 1 : 0);
+         const unsigned int removeNelDOWN = getNel_down() - ((isUp) ? 0 : 1);
+         const int removeIrrep = getIrrepProduct( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
+         
+         CheMPS2::FCI removalFCI( Ham, removeNelUP, removeNelDOWN, removeIrrep, maxMemWorkMB, FCIverbose );
+         const unsigned long long removeVecLength = removalFCI.getVecLength( 0 );
+         double * removeVector = new double[ removeVecLength ];
+         removalFCI.ActWithSecondQuantizedOperator( 'A', isUp, orbitalRight, removeVector, this, GSvector ); // | removeVector > = a_right,spin | GSvector >
+         
+         double * RealPartSolution = new double[ removeVecLength ];
+         double * ImagPartSolution = new double[ removeVecLength ];
+         removalFCI.CGSolveSystem( alpha, beta, eta, removeVector, RealPartSolution, ImagPartSolution );
+         
+         if ( TwoRDMreal != NULL ){ removalFCI.Fill2RDM( RealPartSolution, TwoRDMreal[ cnt_right ] ); }
+         if ( TwoRDMimag != NULL ){ removalFCI.Fill2RDM( ImagPartSolution, TwoRDMimag[ cnt_right ] ); }
+         if ( TwoRDMrem  != NULL ){ removalFCI.Fill2RDM( removeVector,      TwoRDMrem[ cnt_right ] ); }
+         
+         for ( unsigned int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+            const int orbitalLeft = orbsLeft[ cnt_left ];
+            if ( getOrb2Irrep( orbitalLeft ) == getOrb2Irrep( orbitalRight ) ){
+               removalFCI.ActWithSecondQuantizedOperator( 'A', isUp, orbitalLeft, removeVector, this, GSvector ); // | removeVector > = a_left,spin | GSvector >
+               RePartsGF[ cnt_left + numLeft * cnt_right ] = FCIddot( removeVecLength, removeVector, RealPartSolution );
+               ImPartsGF[ cnt_left + numLeft * cnt_right ] = FCIddot( removeVecLength, removeVector, ImagPartSolution );
+            }
+         }
+         
+         delete [] RealPartSolution;
+         delete [] ImagPartSolution;
+         delete [] removeVector;
+       
+      }
+   }
 
 }
 
 void CheMPS2::FCI::RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal, double * TwoRDMimag, double * TwoRDMrem) const{
 
    // Removal amplitude < 0 | a^+_{beta, spin} [ omega + Ham - E_0 + I*eta ]^{-1} a_{alpha, spin} | 0 >
-
-   assert( ( orb_alpha<L ) && ( orb_beta<L ) ); // Orbital indices within bound
-   assert( RePartGF != NULL );
-   assert( ImPartGF != NULL );
    
-   const bool isOK = ( isUp ) ? ( getNel_up() > 0 ) : ( getNel_down() > 0 ); // The electron can be removed
-   if (( getOrb2Irrep( orb_alpha ) != getOrb2Irrep( orb_beta ) ) || ( !isOK )){
-      RePartGF[0] = 0.0;
-      ImPartGF[0] = 0.0;
-      const unsigned int Lpow4 = L*L*L*L;
-      if ( TwoRDMreal != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMreal[ cnt ] = 0.0; } }
-      if ( TwoRDMimag != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMimag[ cnt ] = 0.0; } }
-      if ( TwoRDMrem  != NULL ){ for ( unsigned int cnt = 0; cnt < Lpow4; cnt++ ){ TwoRDMrem[  cnt ] = 0.0; } }
-      return;
-   }
+   double ** TwoRDMreal_wrap = NULL; if ( TwoRDMreal != NULL ){ TwoRDMreal_wrap = new double*[1]; TwoRDMreal_wrap[0] = TwoRDMreal; }
+   double ** TwoRDMimag_wrap = NULL; if ( TwoRDMimag != NULL ){ TwoRDMimag_wrap = new double*[1]; TwoRDMimag_wrap[0] = TwoRDMimag; }
+   double **  TwoRDMrem_wrap = NULL; if (  TwoRDMrem != NULL ){  TwoRDMrem_wrap = new double*[1];  TwoRDMrem_wrap[0] = TwoRDMrem;  }
    
-   const unsigned int removeNelUP   = getNel_up()   - ((isUp) ? 1 : 0);
-   const unsigned int removeNelDOWN = getNel_down() - ((isUp) ? 0 : 1);
-   const int removeIrrep  = getIrrepProduct( getTargetIrrep() , getOrb2Irrep( orb_alpha ) );
+   int orb_left  = orb_beta;
+   int orb_right = orb_alpha;
    
-   CheMPS2::FCI removalFCI( Ham , removeNelUP , removeNelDOWN , removeIrrep , maxMemWorkMB , FCIverbose );
-   const unsigned long long removeVecLength = removalFCI.getVecLength( 0 );
-   double * removeAlphaVector = new double[ removeVecLength ];
-   double * removeBetaVector  = ( orb_alpha == orb_beta ) ? removeAlphaVector : new double[ removeVecLength ];
-   removalFCI.ActWithSecondQuantizedOperator( 'A' , isUp , orb_alpha , removeAlphaVector , this , GSvector ); // | removeAlphaVector > = a_alpha,spin | GSvector >
-   if ( orb_alpha != orb_beta ){
-      removalFCI.ActWithSecondQuantizedOperator( 'A' , isUp , orb_beta , removeBetaVector , this , GSvector ); // | removeBetaVector > = a_beta,spin | GSvector >
-   }
+   // orb_alpha = orb_right in this case !!
+   GFmatrix_removal( omega - GSenergy, 1.0, eta, &orb_left, 1, &orb_right, 1, isUp, GSvector, Ham, RePartGF, ImPartGF, TwoRDMreal_wrap, TwoRDMimag_wrap, TwoRDMrem_wrap );
    
-   double * RealPartSolution = new double[ removeVecLength ];
-   double * ImagPartSolution = new double[ removeVecLength ];
-   removalFCI.CGSolveSystem( omega - GSenergy , 1.0 , eta , removeAlphaVector , RealPartSolution , ImagPartSolution );
-   if ( TwoRDMreal != NULL ){ removalFCI.Fill2RDM( RealPartSolution , TwoRDMreal ); } // Sets the TwoRDMreal
-   RePartGF[0] = FCIddot( removeVecLength , removeBetaVector , RealPartSolution );
-   delete [] RealPartSolution;
-   if ( TwoRDMimag != NULL ){ removalFCI.Fill2RDM( ImagPartSolution , TwoRDMimag ); } // Sets the TwoRDMimag
-   ImPartGF[0] = FCIddot( removeVecLength , removeBetaVector , ImagPartSolution );
-   delete [] ImagPartSolution;
-
-   if ( TwoRDMrem != NULL ){ removalFCI.Fill2RDM( removeAlphaVector , TwoRDMrem ); } // Sets the TwoRDMrem
-   if ( orb_alpha != orb_beta ){ delete [] removeBetaVector; }
-   delete [] removeAlphaVector;
+   if ( TwoRDMreal != NULL ){ delete [] TwoRDMreal_wrap; }
+   if ( TwoRDMimag != NULL ){ delete [] TwoRDMimag_wrap; }
+   if (  TwoRDMrem != NULL ){ delete [] TwoRDMrem_wrap;  }
 
 }
 

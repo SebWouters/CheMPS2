@@ -165,6 +165,24 @@ namespace CheMPS2{
              \param TwoRDMadd If not NULL, on exit the 2-RDM of a^+_{beta, spin(isUp)} | GSvector > */
          void RetardedGF_addition(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal=NULL, double * TwoRDMimag=NULL, double * TwoRDMadd=NULL) const;
          
+         //! Calculate the addition Green's function: GF[i+numLeft*j] = <GSvector| a_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{-1} a^+_{orbsRight[j], spin} |GSvector>
+         /** \param alpha Constant parameter in the resolvent
+             \param beta Prefector of the Hamiltonian in the resolvent
+             \param eta The regularization parameter
+             \param orbsLeft The left orbital indices
+             \param numLeft The number of left orbital indices
+             \param orbsRight The right orbital indices
+             \param numRight The number of right orbital indices
+             \param isUp If true, the spin projection value of the second quantized operators is up, otherwise it will be down
+             \param GSvector The ground state vector as calculated by GSDavidson
+             \param Ham The Hamiltonian, which contains the matrix elements
+             \param RePartsGF On exit RePartsGF[i+numLeft*j] contains the real part of the addition Green's function
+             \param ImPartsGF On exit ImPartsGF[i+numLeft*j] contains the imaginary part of the addition Green's function
+             \param TwoRDMreal If not NULL, TwoRDMreal[j] contains on exit the 2-RDM of Re{ [ alpha + beta * Ham + I*eta ]^{-1} a^+_{orbsRight[j], spin} | GSvector > }
+             \param TwoRDMimag If not NULL, TwoRDMimag[j] contains on exit the 2-RDM of Im{ [ alpha + beta * Ham + I*eta ]^{-1} a^+_{orbsRight[j], spin} | GSvector > }
+             \param TwoRDMadd If not NULL, TwoRDMadd[j] contains on exit the 2-RDM of a^+_{orbsRight[j], spin} | GSvector > */
+         void GFmatrix_addition(const double alpha, const double beta, const double eta, int * orbsLeft, const unsigned int numLeft, int * orbsRight, const unsigned int numRight, const bool isUp, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartsGF, double * ImPartsGF, double ** TwoRDMreal=NULL, double ** TwoRDMimag=NULL, double ** TwoRDMadd=NULL) const;
+         
          //! Calculate the removal part of the retarded Green's function: <GSvector| a^+_{beta, spin(isUp)} [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} |GSvector>
          /** \param omega The frequency value
              \param eta The regularization parameter
@@ -180,6 +198,24 @@ namespace CheMPS2{
              \param TwoRDMimag If not NULL, on exit the 2-RDM of Im{ [ omega + Ham - GSenergy + I*eta ]^{-1} a_{alpha, spin(isUp)} | GSvector > }
              \param TwoRDMrem If not NULL, on exit the 2-RDM of a_{alpha, spin(isUp)} | GSvector > */
          void RetardedGF_removal(const double omega, const double eta, const unsigned int orb_alpha, const unsigned int orb_beta, const bool isUp, const double GSenergy, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartGF, double * ImPartGF, double * TwoRDMreal=NULL, double * TwoRDMimag=NULL, double * TwoRDMrem=NULL) const;
+         
+         //! Calculate the removal Green's function: GF[i+numLeft*j] = <GSvector| a^+_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{-1} a_{orbsRight[j], spin} |GSvector>
+         /** \param alpha Constant parameter in the resolvent
+             \param beta Prefector of the Hamiltonian in the resolvent
+             \param eta The regularization parameter
+             \param orbsLeft The left orbital indices
+             \param numLeft The number of left orbital indices
+             \param orbsRight The right orbital indices
+             \param numRight The number of right orbital indices
+             \param isUp If true, the spin projection value of the second quantized operators is up, otherwise it will be down
+             \param GSvector The ground state vector as calculated by GSDavidson
+             \param Ham The Hamiltonian, which contains the matrix elements
+             \param RePartsGF On exit RePartsGF[i+numLeft*j] contains the real part of the removal Green's function GF[i+numLeft*j]
+             \param ImPartsGF On exit ImPartsGF[i+numLeft*j] contains the imaginary part of the removal Green's function GF[i+numLeft*j]
+             \param TwoRDMreal If not NULL, TwoRDMreal[j] contains on exit the 2-RDM of Re{ [ alpha + beta * Ham + I*eta ]^{-1} a_{orbsRight[j], spin} | GSvector > }
+             \param TwoRDMimag If not NULL, TwoRDMimag[j] contains on exit the 2-RDM of Im{ [ alpha + beta * Ham + I*eta ]^{-1} a_{orbsRight[j], spin} | GSvector > }
+             \param TwoRDMrem If not NULL, TwoRDMrem[j] contains on exit the 2-RDM of a_{orbsRight[j], spin} | GSvector > */
+         void GFmatrix_removal(const double alpha, const double beta, const double eta, int * orbsLeft, const unsigned int numLeft, int * orbsRight, const unsigned int numRight, const bool isUp, double * GSvector, CheMPS2::Hamiltonian * Ham, double * RePartsGF, double * ImPartsGF, double ** TwoRDMreal=NULL, double ** TwoRDMimag=NULL, double ** TwoRDMrem=NULL) const;
          
          //! Calculate the density response Green's function (= forward - backward propagating part)
          /** \param omega The frequency value

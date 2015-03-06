@@ -33,11 +33,9 @@ cdef extern from "FCI.h" namespace "CheMPS2":
         void RetardedGF(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *)
         void RetardedGF_addition(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
         void RetardedGF_removal(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
-        void RetardedGF_addition(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *)
-        void RetardedGF_removal(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *)
+        void GFmatrix_addition(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bint, double *, Ham.Hamiltonian *, double *, double *)
+        void GFmatrix_removal(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bint, double *, Ham.Hamiltonian *, double *, double *)
         void DensityResponseGF(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *)
         void DensityResponseGF_forward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *, double *, double *, double *)
         void DensityResponseGF_backward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *, double *, double *, double *)
-        void DensityResponseGF_forward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *)
-        void DensityResponseGF_backward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *)
 
