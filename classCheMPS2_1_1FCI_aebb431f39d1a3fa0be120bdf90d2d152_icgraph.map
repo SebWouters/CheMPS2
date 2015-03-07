@@ -1,5 +1,5 @@
 <map id="CheMPS2::FCI::getL" name="CheMPS2::FCI::getL">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#ac33683cb6adf2063e7fe0fc908c3febb" title="Set thisVector to a creator/annihilator acting on otherVector. " alt="" coords="200,38,411,79"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="459,5,650,46"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a" title="Calculate the removal part of the retarded Green&#39;s function: &lt;GSvector| a^+_{beta, spin(isUp)} [ omega + Ham &#45; GSenergy + I*eta ]^{&#45;1} a_{alpha, spin(isUp)} |GSvector&gt; " alt="" coords="459,70,650,111"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#a490f73f0901972ed913a47119b5e0f23" title="Calculate the addition Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a^+_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="459,5,634,46"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#ad940e823b2f18ce3d85ff2f3a0e94889" title="Calculate the removal Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a^+_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="459,70,634,111"/>
 </map>

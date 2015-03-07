@@ -11,8 +11,8 @@ var classCheMPS2_1_1FCI =
     [ "CGOperator", "classCheMPS2_1_1FCI.html#af8496a386028b2eb6ef686817372857c", null ],
     [ "CGSolveSystem", "classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805", null ],
     [ "DensityResponseGF", "classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0", null ],
-    [ "DensityResponseGF_backward", "classCheMPS2_1_1FCI.html#aa127b9f43ef9064a5d0d04f109cfad86", null ],
-    [ "DensityResponseGF_forward", "classCheMPS2_1_1FCI.html#a1d61e4c603c53a3f98f4f47064f35f33", null ],
+    [ "DensityResponseGF_backward", "classCheMPS2_1_1FCI.html#aee7af7bfd2815c30db028025d573a684", null ],
+    [ "DensityResponseGF_forward", "classCheMPS2_1_1FCI.html#ac8ae42bbe769daf5254064e65adc076f", null ],
     [ "DiagHam", "classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144", null ],
     [ "DiagHamSquared", "classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e", null ],
     [ "Fill2RDM", "classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4", null ],
@@ -30,10 +30,12 @@ var classCheMPS2_1_1FCI =
     [ "getTargetIrrep", "classCheMPS2_1_1FCI.html#ae876dae50220954a3ed8fd72813e28db", null ],
     [ "getUpIrrepOfCounter", "classCheMPS2_1_1FCI.html#adb9b96226cf824b8e9abe3c7924f48c0", null ],
     [ "getVecLength", "classCheMPS2_1_1FCI.html#a6e153d335d6500f4758212e203f7d682", null ],
+    [ "GFmatrix_addition", "classCheMPS2_1_1FCI.html#a490f73f0901972ed913a47119b5e0f23", null ],
+    [ "GFmatrix_removal", "classCheMPS2_1_1FCI.html#ad940e823b2f18ce3d85ff2f3a0e94889", null ],
     [ "GSDavidson", "classCheMPS2_1_1FCI.html#a0335191db1dec9127bcad548fa6f1da3", null ],
     [ "HamTimesVec", "classCheMPS2_1_1FCI.html#a96e5332d478b2d00133372ba425b14ee", null ],
     [ "LowestEnergyDeterminant", "classCheMPS2_1_1FCI.html#a748644c42be72710e38631e169b642cc", null ],
     [ "RetardedGF", "classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc", null ],
-    [ "RetardedGF_addition", "classCheMPS2_1_1FCI.html#a9d25ab318099a9ba0a76d29e655f071c", null ],
-    [ "RetardedGF_removal", "classCheMPS2_1_1FCI.html#ac7744c9cf79d9b696efa65471e4f439a", null ]
+    [ "RetardedGF_addition", "classCheMPS2_1_1FCI.html#ae8035a4a03bc0232f6a38a90f1477a60", null ],
+    [ "RetardedGF_removal", "classCheMPS2_1_1FCI.html#aabbf6b2efcbcafcac2a584c08f2be1a6", null ]
 ];
