@@ -206,8 +206,11 @@ Matrix elements from Psi4
 -------------------------
 
 libchemps2 has a Hamiltonian object which is able to read in matrix elements
-from a plugin to [Psi4, Ab initio quantum chemistry](http://www.psicode.org),
-which works on version psi4.0b5 and higher.
+from a plugin to [Psi4, Ab initio quantum chemistry](http://www.psicode.org).
+The new version of this plugin has been tested on commit
+14c78eabdca86f8e094576890518d93d300d2500 (February 27, 2015)
+on [https://github.com/psi4/psi4public](https://github.com/psi4/psi4public),
+and should work on later versions as well.
 
 To make use of this feature, build Psi4 with the plugin option, and then run:
 
@@ -228,11 +231,11 @@ Now, replace the file ```mointegrals.cc``` with either:
 For case 2, libchemps2 should be installed as described above, and the
 ```Makefile``` should be adjusted. Change the line
 
-    ```PSIPLUGIN = -L$(OBJDIR)/lib -lplugin```
+    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
 
 to
 
-    ```PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2```.
+    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
 
 To compile the plugin, run:
 
