@@ -228,11 +228,11 @@ Now, replace the file ```mointegrals.cc``` with either:
 For case 2, libchemps2 should be installed as described above, and the
 ```Makefile``` should be adjusted. Change the line
 
-    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin```
-    
+    ```PSIPLUGIN = -L$(OBJDIR)/lib -lplugin```
+
 to
 
-    ```PSILIBS = -L$(top_objdir)/lib -lPSI_plugin -lchemps2```.
+    ```PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2```.
 
 To compile the plugin, run:
 
