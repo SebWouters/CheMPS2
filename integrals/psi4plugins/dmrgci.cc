@@ -100,11 +100,11 @@ int chemps2_groupnumber(const string SymmLabel){
         else { SyGroup++; }
     } while (( !stopFindGN ) && ( SyGroup < magic_number_max_groups_chemps2 ));
 
-    fprintf(outfile, "Psi4 symmetry group was found to be <"); fprintf(outfile, SymmLabel.c_str()); fprintf(outfile, ">.\n");
+    (*outfile) << "Psi4 symmetry group was found to be <" << SymmLabel.c_str() << ">." << endl;
     if ( SyGroup >= magic_number_max_groups_chemps2 ){
-       fprintf(outfile, "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:\n");
+       (*outfile) << "CheMPS2 did not recognize this symmetry group name. CheMPS2 only knows:" << endl;
        for (int cnt=0; cnt<magic_number_max_groups_chemps2; cnt++){
-           fprintf(outfile, "   <"); fprintf(outfile, (CheMPS2::Irreps::getGroupName(cnt)).c_str()); fprintf(outfile, ">\n");
+           (*outfile) << "   <" << (CheMPS2::Irreps::getGroupName(cnt)).c_str() << ">" << endl;
        }
        throw PSIEXCEPTION("CheMPS2 did not recognize the symmetry group name!");
     }
@@ -170,13 +170,6 @@ dmrgci(Options &options)
     boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
     if (!wfn){ throw PSIEXCEPTION("SCF has not been run yet!"); }
 
-    /* TODO: Sparse rotations for DMRG-SCF require to update the wfn coefficients (skew orbital basis)
-    boost::shared_ptr<psi::Matrix> CoeffAlpha = wfn->Ca();
-    boost::shared_ptr<psi::Matrix> CoeffBeta  = wfn->Cb();
-    CoeffAlpha->print();
-    CoeffAlpha->identity();
-    wfn->Ca()->print();*/
-
     /****************************************************************************
      *   Parse input and see if everything is consistent.                       *
      *   Only afterwards rotate the integrals and start with expensive stuff.   *
@@ -235,20 +228,20 @@ dmrgci(Options &options)
     }
   
     // Print basic active space information
-    fprintf(outfile, "wfn_irrep   = %1d \n",wfn_irrep);
-    fprintf(outfile, "wfn_multp   = %1d \n",wfn_multp);
-    fprintf(outfile, "numOrbitals = [ %1d ", orbspi[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", orbspi[cnt]     ); } fprintf(outfile, "]\n");
-    fprintf(outfile, "R(O)HF DOCC = [ %1d ", docc[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", docc[cnt]       ); } fprintf(outfile, "]\n");
-    fprintf(outfile, "R(O)HF SOCC = [ %1d ", socc[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", socc[cnt]       ); } fprintf(outfile, "]\n");
-    fprintf(outfile, "frozen_docc = [ %1d ", frozen_docc[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", frozen_docc[cnt]); } fprintf(outfile, "]\n");
-    fprintf(outfile, "active      = [ %1d ", active[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", active[cnt]     ); } fprintf(outfile, "]\n");
-    fprintf(outfile, "virtual     = [ %1d ", nvirtual[0]);
-    for (int cnt=1; cnt<nirrep; cnt++){ fprintf(outfile, ", %1d ", nvirtual[cnt]   ); } fprintf(outfile, "]\n");
+    (*outfile) << "wfn_irrep   = " << wfn_irrep << endl;
+    (*outfile) << "wfn_multp   = " << wfn_multp << endl;
+    (*outfile) << "numOrbitals = [ " << orbspi[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << orbspi[cnt];      } (*outfile) << " ]" << endl;
+    (*outfile) << "R(O)HF DOCC = [ " << docc[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << docc[cnt];        } (*outfile) << " ]" << endl;
+    (*outfile) << "R(O)HF SOCC = [ " << socc[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << socc[cnt];        } (*outfile) << " ]" << endl;
+    (*outfile) << "frozen_docc = [ " << frozen_docc[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << frozen_docc[cnt]; } (*outfile) << " ]" << endl;
+    (*outfile) << "active      = [ " << active[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << active[cnt];      } (*outfile) << " ]" << endl;
+    (*outfile) << "virtual     = [ " << nvirtual[0];
+    for (int cnt=1; cnt<nirrep; cnt++){ (*outfile) << " , " << nvirtual[cnt];    } (*outfile) << " ]" << endl;
     delete [] nvirtual;
     
     // Now that users can actually see what they did wrong with frozen_docc and active, throw exception
@@ -257,12 +250,12 @@ dmrgci(Options &options)
     // Total number of electrons
     int nElectrons = 0;
     for (int cnt=0; cnt<nirrep; cnt++){ nElectrons += 2 * docc[cnt] + socc[cnt]; }
-    fprintf(outfile, "nElectrons  = %1d \n", nElectrons);
+    (*outfile) << "nElectrons  = " << nElectrons << endl;
     
     // Number of electrons in the active space
     int nDMRGelectrons = nElectrons;
     for (int cnt=0; cnt<nirrep; cnt++){ nDMRGelectrons -= 2 * frozen_docc[cnt]; }
-    fprintf(outfile, "nEl. active = %1d \n", nDMRGelectrons);
+    (*outfile) << "nEl. active = " << nDMRGelectrons << endl;
 
     // Create the CheMPS2 Hamiltonian
     int nDMRGorbitals = 0;
@@ -290,7 +283,7 @@ dmrgci(Options &options)
      *   Rotate the integrals and fill Ham.   *
      ******************************************/
      
-    fprintf(outfile, "Start filling the active space Hamiltonian.\n");
+    (*outfile) << "Start filling the active space Hamiltonian." << endl;
     
     SharedMatrix MO_RDM; MO_RDM = SharedMatrix( new Matrix("MO frozen RDM", nirrep, orbspi, orbspi) );
     SharedMatrix MO_JK;   MO_JK = SharedMatrix( new Matrix("MO frozen JK",  nirrep, orbspi, orbspi) );
@@ -333,7 +326,7 @@ dmrgci(Options &options)
     int nTriMo = nmo * (nmo + 1) / 2;
     double * temp = new double[nTriMo];
     Matrix moOei("MO OEI", nirrep, orbspi, orbspi);
-    IWL::read_one(psio.get(), PSIF_OEI, PSIF_MO_OEI, temp, nTriMo, 0, 0, outfile);
+    IWL::read_one(psio.get(), PSIF_OEI, PSIF_MO_OEI, temp, nTriMo, 0, 0, "outfile");
     moOei.set(temp);
     for (int h=0; h<nirrep; h++){
        // A part contributes to the constant part of the energy
@@ -391,28 +384,26 @@ dmrgci(Options &options)
     for (int h=0; h<nirrep; h++){ delete [] Tmat[h]; }
     delete [] Tmat;
     
-    fprintf(outfile, "Finished filling the active space Hamiltonian.\n");
-    fprintf(outfile, "###########################################################\n");
-    fprintf(outfile, "###                                                     ###\n");
-    fprintf(outfile, "###                       DMRG-CI                       ###\n");
-    fprintf(outfile, "###                                                     ###\n");
-    fprintf(outfile, "###            CheMPS2 by Sebastian Wouters             ###\n");
-    fprintf(outfile, "###        https://github.com/SebWouters/CheMPS2        ###\n");
-    fprintf(outfile, "###   Comput. Phys. Commun. 185 (6), 1501-1514 (2014)   ###\n");
-    fprintf(outfile, "###                                                     ###\n");
-    fprintf(outfile, "###########################################################\n");
-    fprintf(outfile, "\n");
+    (*outfile) << "Finished filling the active space Hamiltonian." << endl;
+    (*outfile) << "###########################################################" << endl;
+    (*outfile) << "###                                                     ###" << endl;
+    (*outfile) << "###                       DMRG-CI                       ###" << endl;
+    (*outfile) << "###                                                     ###" << endl;
+    (*outfile) << "###            CheMPS2 by Sebastian Wouters             ###" << endl;
+    (*outfile) << "###        https://github.com/SebWouters/CheMPS2        ###" << endl;
+    (*outfile) << "###   Comput. Phys. Commun. 185 (6), 1501-1514 (2014)   ###" << endl;
+    (*outfile) << "###                                                     ###" << endl;
+    (*outfile) << "###########################################################" << endl;
+    (*outfile) << endl;
     
     CheMPS2::Initialize::Init();
 
-    std::ofstream psi4outfile;
+    std::ofstream capturing;
     std::streambuf * cout_buffer;
-    if ( outfile_name != "stdout" ){
-        fclose(outfile);
-        outfile = NULL;
-        psi4outfile.open( outfile_name.c_str() , ios::app ); // append
-        cout_buffer = cout.rdbuf( psi4outfile.rdbuf() );
-    }
+    string chemps2filename = outfile_name + ".chemps2";
+    (*outfile) << "CheMPS2 output is temporarily written to the file " << chemps2filename << " and will be copied here." << endl;
+    capturing.open( chemps2filename.c_str() , ios::trunc ); // truncate
+    cout_buffer = cout.rdbuf( capturing.rdbuf() );
 
     // The convergence scheme
     CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( ndmrg_states );
@@ -461,16 +452,18 @@ dmrgci(Options &options)
     delete Prob;
     delete Ham;
     
-    if ( outfile_name != "stdout" ){
-        cout.rdbuf(cout_buffer);
-        psi4outfile.close();
-        outfile = fopen(outfile_name.c_str(), "a");
-        if (outfile == NULL){
-            throw PSIEXCEPTION("PSI4: Unable to reopen output file.");
-        }
+    cout.rdbuf(cout_buffer);
+    capturing.close();
+    std::ifstream copying;
+    copying.open( chemps2filename , ios::in ); // read only
+    if (copying.is_open()){
+        string line;
+        while( getline( copying, line ) ){ (*outfile) << line << endl; }
+        copying.close();
     }
+    system(("rm " + chemps2filename).c_str());
 
-    fprintf(outfile, "The DMRG-CI energy = %3.10f \n", EnergyDMRG);
+    outfile->Printf("The DMRG-CI energy = %3.10f \n", EnergyDMRG);
     Process::environment.globals["CURRENT ENERGY"]    = EnergyDMRG;
     Process::environment.globals["DMRG TOTAL ENERGY"] = EnergyDMRG;
     
