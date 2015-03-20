@@ -1,5 +1,5 @@
 <map id="CheMPS2::TensorDiag::updateLeft" name="CheMPS2::TensorDiag::updateLeft">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="211,5,402,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="211,5,402,32"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="211,56,402,83"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1TensorDiag.html#a7fb7bbec47e601be89ffba3ad3736ca7" title="Get the pointer to the storage. " alt="" coords="228,107,385,149"/>
 </map>

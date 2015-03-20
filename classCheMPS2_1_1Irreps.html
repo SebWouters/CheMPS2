@@ -161,7 +161,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a136f15adb9e7f5bcf10af028bb1cec6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the group corresponding to nGroup.  <a href="#a136f15adb9e7f5bcf10af028bb1cec6d">More...</a><br/></td></tr>
 <tr class="separator:a136f15adb9e7f5bcf10af028bb1cec6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">directProd</a> (const int Irrep1, const int Irrep2)</td></tr>
-<tr class="memdesc:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4's conventions.  <a href="#a1d86c7a8b3c3a7b9215c0e298f0ae047">More...</a><br/></td></tr>
+<tr class="memdesc:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4's conventions.  <a href="#a1d86c7a8b3c3a7b9215c0e298f0ae047">More...</a><br/></td></tr>
 <tr class="separator:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd70b3b21e33a3f8163db04a768ef848"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd70b3b21e33a3f8163db04a768ef848"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848">printAll</a> ()</td></tr>
@@ -172,7 +172,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1Irreps.html">Irreps</a> class. </p>
 <dl class="section author"><dt>Author</dt><dd>Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a> </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>February 7, 2013</dd></dl>
-<p>Class containing the irrep conventions and multiplication tables. The program requires Abelian point groups with real character tables, with hence <img class="formulaInl" alt="$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$" src="form_170.png"/>.</p>
+<p>This class contains the symmetry group and irrep conventions. The program requires Abelian point groups with real character tables, with hence <img class="formulaInl" alt="$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$" src="form_170.png"/>.</p>
 <h1><a class="anchor" id="irreps_conv"></a>
 Irrep conventions</h1>
 <p>The same conventions as in Psi4 (beta5) are used. For convenience, they are listed below:<br/>
@@ -189,8 +189,9 @@ Irrep conventions</h1>
 <tr><td> 6: c2h              </td><td> Ag </td><td> Bg  </td><td> Au  </td><td> Bu  </td><td>    </td><td>     </td><td>     </td><td>     </td></tr>
 <tr><td> 7: d2h              </td><td> Ag </td><td> B1g </td><td> B2g </td><td> B3g </td><td> Au </td><td> B1u </td><td> B2u </td><td> B3u </td></tr>
 </table>
- 
-<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00068">68</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
+ Note that these conventions allow to use the XOR operation for irrep multiplication. </p>
+
+<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00069">69</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a8d33ef5ebd5cf824cf62f3383b455a07"></a>
 <div class="memitem">
@@ -251,7 +252,7 @@ Irrep conventions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4's conventions. </p>
+<p>Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4's conventions. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Irrep1</td><td>The number of the first irrep </td></tr>
@@ -261,7 +262,7 @@ Irrep conventions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The direct product of I1 and I2 </dd></dl>
 
-<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00117">117</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
+<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00118">118</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -488,7 +489,7 @@ Irrep conventions</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Irreps.html">Irreps</a></li>
-    <li class="footer">Generated on Fri Mar 6 2015 21:25:21 for CheMPS2 by
+    <li class="footer">Generated on Thu Mar 19 2015 23:50:39 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

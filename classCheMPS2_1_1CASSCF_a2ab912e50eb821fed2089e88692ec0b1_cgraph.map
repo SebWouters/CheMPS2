@@ -51,7 +51,7 @@
 <area shape="rect" id="node104" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="382,2559,599,2585"/>
 <area shape="rect" id="node107" href="$classCheMPS2_1_1CASSCF.html#abf34a3243a38979439e7aa2d9e60c4dd" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="382,2337,599,2378"/>
 <area shape="rect" id="node21" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="981,321,1179,362"/>
-<area shape="rect" id="node27" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="985,1764,1175,1791"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="985,1764,1175,1791"/>
 <area shape="rect" id="node28" href="$classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="713,614,871,655"/>
 <area shape="rect" id="node29" href="$classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82" title="Add to Vmat element. " alt="" coords="713,497,871,538"/>
 <area shape="rect" id="node32" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="669,262,915,303"/>

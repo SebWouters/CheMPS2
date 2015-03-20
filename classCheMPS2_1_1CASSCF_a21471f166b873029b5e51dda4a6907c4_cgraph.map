@@ -7,6 +7,6 @@
 <area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="283,331,482,373"/>
 <area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a1315dead44fb4c153c1e93758f048378" title="Get the (pr) subblock of w_tilde_pqrs, which is stored as w_tilde[ I_pq ][ I_rs ][ p + ( Nocc[I_pq] +..." alt="" coords="287,397,479,438"/>
 <area shape="rect" id="node9" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9" title="Get an element. " alt="" coords="273,463,493,489"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="542,543,733,569"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="542,543,733,569"/>
 <area shape="rect" id="node11" href="$classCheMPS2_1_1DMRGSCFintegrals.html#ad462dfa92d77f1f02371f12e91cac429" title="Get a two&#45;body matrix element with at most 2 virtual indices, using the FourIndex API..." alt="" coords="279,565,486,606"/>
 </map>

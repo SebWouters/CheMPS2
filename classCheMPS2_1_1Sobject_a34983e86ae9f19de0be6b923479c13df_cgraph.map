@@ -1,5 +1,5 @@
 <map id="CheMPS2::Sobject::Split" name="CheMPS2::Sobject::Split">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="226,5,417,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="226,5,417,32"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="231,56,412,83"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="222,107,421,133"/>
 </map>

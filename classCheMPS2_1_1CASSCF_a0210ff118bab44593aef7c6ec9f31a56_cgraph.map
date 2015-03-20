@@ -8,6 +8,6 @@
 <area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24" title="Set an element. " alt="" coords="265,397,485,424"/>
 <area shape="rect" id="node9" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9" title="Get an element. " alt="" coords="265,448,485,475"/>
 <area shape="rect" id="node10" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="277,499,472,541"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4&#39;s convent..." alt="" coords="534,595,725,621"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="534,595,725,621"/>
 <area shape="rect" id="node12" href="$classCheMPS2_1_1DMRGSCFintegrals.html#ad462dfa92d77f1f02371f12e91cac429" title="Get a two&#45;body matrix element with at most 2 virtual indices, using the FourIndex API..." alt="" coords="271,617,478,658"/>
 </map>
