@@ -37,16 +37,21 @@ Hessian for orbital rotations or nuclear displacements. In addition,
 several correlation functions can be obtained to investigate the
 electronic structure in the active space.
 
+Next to a spin-adapted implementation of DMRG, the library also
+contains a determinant-based FCI implementation, which allows to
+calculate both Hamiltonian eigenstates and Green's functions.
+
 To gain a better understanding of how to perform DMRG calculations for
 large active spaces, you are encouraged to read the
 [two papers](#how-to-acknowledge-chemps2) listed below.
 
 Incorporation of the library into other codes is very simple due a
-minimal API. Direct usage of the library is illustrated in the
-[c++](#2-testing-libchemps2) and [python](#4-testing-pychemps2) tests,
-which can be easily adapted to your needs. The interfaces to psi4 in
-[c++](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) and to pyscf in
-[python](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
+minimal API, as well as a python interface. Direct usage of the
+library is illustrated in the [c++](#2-testing-libchemps2) and
+[python](#4-testing-pychemps2) tests, which can be easily adapted
+to your needs. The interfaces to
+[psi4 (in c++)](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) and to
+[pyscf (in python)](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
 described below.
 
 In the future the parallelization of CheMPS2 for shared memory
