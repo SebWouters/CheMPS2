@@ -220,7 +220,7 @@ a very limited amount of memory (order 10-120 MB).
 
 ### 5. Doxygen documentation
 
-To build and view the Doxygen manual, the documentation flag should have
+To build and view the doxygen manual, the documentation flag should have
 been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
 
     > make doc
