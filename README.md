@@ -229,7 +229,7 @@ been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
 User manual
 -----------
 
-Doxygen output can be generated, see the section "Build" in README.md, or
+Doxygen output can be generated: see the [build section](#build) or
 the [doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
 
 For an overview of the concepts and ideas used in CheMPS2, please read the
