@@ -44,15 +44,15 @@ large active spaces, you are encouraged to read the
 Incorporation of the library into other codes is very simple due a
 minimal API. Direct usage of the library is illustrated in the
 [c++](#2-testing-libchemps2) and [python](#4-testing-pychemps2) tests,
-which can be easily adapted to your needs. Example interfaces in
-[c++](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) to psi4 and in
-[python](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) to pyscf are
-discussed below.
+which can be easily adapted to your needs. The interfaces to psi4 in
+[c++](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) and to pyscf in
+[python](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
+described below.
 
 In the future the parallelization of CheMPS2 for shared memory
 architectures will be extended to a hybrid scheme with both shared
-(OpenMP) and distributed (MPI) memory parallelization, and the
-calculation of the 2-RDM of the active space will be extended to
+(OpenMP) and distributed (MPI) memory parallelization. In addition,
+the calculation of the 2-RDM of the active space will be extended to
 the 3-RDM.
 
 
