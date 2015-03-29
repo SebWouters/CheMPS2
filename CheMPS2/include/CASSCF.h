@@ -164,7 +164,7 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param filename The file containing the Psi output to start the DMRGSCF calculations. */
+         /** \param filename The file containing the Psi4 Hamiltonian text dump (mointegrals.so_PRINT) output to start the DMRGSCF calculations. */
          CASSCF(const string filename);
          
          //! Constructor

@@ -106,6 +106,11 @@ namespace CheMPS2{
          /** \return The number of irreps for the currently activated group (-1 means not activated) */
          int getNumberOfIrreps() const;
          
+         //! Get the number of irreps for a certain group number
+         /** \param nGroup The group number for which the number of irreps will be returned
+             \return The number of irreps of that group (-1 means wrong group number) */
+         static int getNumberOfIrreps(const int nGroup);
+         
          //! Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is always the trivial irrep.
          /** \param irrepNumber The irrep number
              \return The irrep name (not activated returns "error1"; wrong number returns "error2") */
@@ -133,7 +138,6 @@ namespace CheMPS2{
          
          //static member functions containing the group names, the number of irreps, and the names of the irreps
          static string getGroupNamePrivate(const int nGroup);
-         static int getNumberOfIrrepsPrivate(const int nGroup);
          static string getIrrepNamePrivate(const int nGroup, const int nIrrep);
 
    };

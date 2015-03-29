@@ -117,6 +117,7 @@ fcidump(Options &options)
         }
     }
     fprintf( capturing, "\n  ISYM=%d,\n /\n", symm_psi2molpro[targetIrrep] );
+    delete [] symm_psi2molpro;
 
     // Now, loop over the DPD buffer, printing the integrals
     dpdbuf4 K;
