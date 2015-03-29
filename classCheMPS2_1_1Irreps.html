@@ -160,6 +160,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a136f15adb9e7f5bcf10af028bb1cec6d"><td class="memItemLeft" align="right" valign="top">static string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#a136f15adb9e7f5bcf10af028bb1cec6d">getGroupName</a> (const int nGroup)</td></tr>
 <tr class="memdesc:a136f15adb9e7f5bcf10af028bb1cec6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the group corresponding to nGroup.  <a href="#a136f15adb9e7f5bcf10af028bb1cec6d">More...</a><br/></td></tr>
 <tr class="separator:a136f15adb9e7f5bcf10af028bb1cec6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6c67c3f38d078a3692dca32614644db"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#ae6c67c3f38d078a3692dca32614644db">getNumberOfIrreps</a> (const int nGroup)</td></tr>
+<tr class="memdesc:ae6c67c3f38d078a3692dca32614644db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of irreps for a certain group number.  <a href="#ae6c67c3f38d078a3692dca32614644db">More...</a><br/></td></tr>
+<tr class="separator:ae6c67c3f38d078a3692dca32614644db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">directProd</a> (const int Irrep1, const int Irrep2)</td></tr>
 <tr class="memdesc:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4's conventions.  <a href="#a1d86c7a8b3c3a7b9215c0e298f0ae047">More...</a><br/></td></tr>
 <tr class="separator:a1d86c7a8b3c3a7b9215c0e298f0ae047"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,7 +265,7 @@ Irrep conventions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The direct product of I1 and I2 </dd></dl>
 
-<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00118">118</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
+<p>Definition at line <a class="el" href="Irreps_8h_source.html#l00123">123</a> of file <a class="el" href="Irreps_8h_source.html">Irreps.h</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -386,7 +389,7 @@ Irrep conventions</h1>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The irrep name (not activated returns "error1"; wrong number returns "error2") </dd></dl>
 
-<p>Definition at line <a class="el" href="Irreps_8cpp_source.html#l00109">109</a> of file <a class="el" href="Irreps_8cpp_source.html">Irreps.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Irreps_8cpp_source.html#l00110">110</a> of file <a class="el" href="Irreps_8cpp_source.html">Irreps.cpp</a>.</p>
 
 </div>
 </div>
@@ -441,6 +444,41 @@ Irrep conventions</h1>
 
 </div>
 </div>
+<a class="anchor" id="ae6c67c3f38d078a3692dca32614644db"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int CheMPS2::Irreps::getNumberOfIrreps </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>nGroup</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the number of irreps for a certain group number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nGroup</td><td>The group number for which the number of irreps will be returned </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of irreps of that group (-1 means wrong group number) </dd></dl>
+
+<p>Definition at line <a class="el" href="Irreps_8cpp_source.html#l00100">100</a> of file <a class="el" href="Irreps_8cpp_source.html">Irreps.cpp</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="aca6fdd79557f9189153258daad5fbe8c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -489,7 +527,7 @@ Irrep conventions</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Irreps.html">Irreps</a></li>
-    <li class="footer">Generated on Thu Mar 19 2015 23:50:39 for CheMPS2 by
+    <li class="footer">Generated on Sun Mar 29 2015 00:21:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

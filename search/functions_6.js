@@ -56,7 +56,7 @@ var searchData=
   ['getnocc',['getNOCC',['../classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892',1,'CheMPS2::DMRGSCFindices']]],
   ['getnoiseprefactor',['getNoisePrefactor',['../classCheMPS2_1_1ConvergenceScheme.html#a06c60aeec22896b5018541ebcae2aeb8',1,'CheMPS2::ConvergenceScheme']]],
   ['getnorb',['getNORB',['../classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2',1,'CheMPS2::DMRGSCFindices']]],
-  ['getnumberofirreps',['getNumberOfIrreps',['../classCheMPS2_1_1CASSCF.html#afba8add72828a26c426f47a790511bf1',1,'CheMPS2::CASSCF::getNumberOfIrreps()'],['../classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d',1,'CheMPS2::Irreps::getNumberOfIrreps()']]],
+  ['getnumberofirreps',['getNumberOfIrreps',['../classCheMPS2_1_1CASSCF.html#afba8add72828a26c426f47a790511bf1',1,'CheMPS2::CASSCF::getNumberOfIrreps()'],['../classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d',1,'CheMPS2::Irreps::getNumberOfIrreps() const '],['../classCheMPS2_1_1Irreps.html#ae6c67c3f38d078a3692dca32614644db',1,'CheMPS2::Irreps::getNumberOfIrreps(const int nGroup)']]],
   ['getnumdiisvecs',['getNumDIISVecs',['../classCheMPS2_1_1DMRGSCFoptions.html#a57ed7e22a351ad6fc1621ff95106040a',1,'CheMPS2::DMRGSCFoptions']]],
   ['getnumirreps',['getNumIrreps',['../classCheMPS2_1_1FCI.html#ad921697e69e7ebc3f554ebe4613b30d6',1,'CheMPS2::FCI']]],
   ['getnummultiplications',['GetNumMultiplications',['../classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797',1,'CheMPS2::Davidson']]],
