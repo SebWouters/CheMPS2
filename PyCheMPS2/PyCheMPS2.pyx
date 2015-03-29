@@ -20,7 +20,6 @@
 import numpy as np
 cimport numpy as np
 np.import_array()
-import ctypes
 
 cimport Init
 cimport ConvScheme
@@ -61,12 +60,10 @@ cdef class PyConvergenceScheme:
 
 cdef class PyHamiltonian:
     cdef Ham.Hamiltonian * thisptr
-    def __cinit__(self, int Norbitals, int nGroup, OrbIrreps not None):
+    def __cinit__(self, int Norbitals, int nGroup, np.ndarray[int, ndim=1, mode="c"] OrbIrreps not None):
         assert OrbIrreps.flags['C_CONTIGUOUS']
         assert OrbIrreps.shape[0] == Norbitals
-        cdef np.ndarray[int, ndim=1, mode="c"] arr
-        arr = np.ascontiguousarray(OrbIrreps, dtype=ctypes.c_int)
-        self.thisptr = new Ham.Hamiltonian(Norbitals, nGroup, &arr[0])
+        self.thisptr = new Ham.Hamiltonian(Norbitals, nGroup, &OrbIrreps[0])
     def __dealloc__(self):
         del self.thisptr
     def getL(self):
@@ -215,27 +212,17 @@ cdef class PyDMRGSCFoptions:
         
 cdef class PyCASSCF:
     cdef DMRGSCF.CASSCF * thisptr
-    def __cinit__(self, PyHamiltonian theHam, DOCC not None, SOCC not None):
+    def __cinit__(self, PyHamiltonian theHam, np.ndarray[int, ndim=1, mode="c"] DOCC not None, np.ndarray[int, ndim=1, mode="c"] SOCC not None):
         assert DOCC.flags['C_CONTIGUOUS']
         assert SOCC.flags['C_CONTIGUOUS']
-        cdef np.ndarray[int, ndim=1, mode="c"] arrDOCC
-        cdef np.ndarray[int, ndim=1, mode="c"] arrSOCC
-        arrDOCC = np.ascontiguousarray(DOCC, dtype=ctypes.c_int)
-        arrSOCC = np.ascontiguousarray(SOCC, dtype=ctypes.c_int)
-        self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &arrDOCC[0], &arrSOCC[0])
+        self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &DOCC[0], &SOCC[0])
     def __dealloc__(self):
         del self.thisptr
-    def setupStart(self, Nocc not None, NDMRG not None, Nvirt not None):
+    def setupStart(self, np.ndarray[int, ndim=1, mode="c"] Nocc not None, np.ndarray[int, ndim=1, mode="c"] NDMRG not None, np.ndarray[int, ndim=1, mode="c"] Nvirt not None):
         assert  Nocc.flags['C_CONTIGUOUS']
         assert NDMRG.flags['C_CONTIGUOUS']
         assert Nvirt.flags['C_CONTIGUOUS']
-        cdef np.ndarray[int, ndim=1, mode="c"] arrNocc
-        cdef np.ndarray[int, ndim=1, mode="c"] arrNDMRG
-        cdef np.ndarray[int, ndim=1, mode="c"] arrNvirt
-        arrNocc  = np.ascontiguousarray(Nocc,  dtype=ctypes.c_int)
-        arrNDMRG = np.ascontiguousarray(NDMRG, dtype=ctypes.c_int)
-        arrNvirt = np.ascontiguousarray(Nvirt, dtype=ctypes.c_int)
-        self.thisptr.setupStart(&arrNocc[0], &arrNDMRG[0], &arrNvirt[0])
+        self.thisptr.setupStart(&Nocc[0], &NDMRG[0], &Nvirt[0])
     def doCASSCFnewtonraphson(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
         return self.thisptr.doCASSCFnewtonraphson(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
     def deleteStoredUnitary(self):
@@ -253,191 +240,101 @@ cdef class PyFCI:
         return self.thisptr.getVecLength(0)
     def LowestEnergyDeterminant(self):
         return self.thisptr.LowestEnergyDeterminant()
-    def GSDavidson(self, inoutput not None):
+    def GSDavidson(self, np.ndarray[double, ndim=1, mode="c"] inoutput not None):
         assert inoutput.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrinoutput
-        arrinoutput = np.ascontiguousarray(inoutput, dtype=ctypes.c_double)
-        Energy = self.thisptr.GSDavidson(&arrinoutput[0])
+        Energy = self.thisptr.GSDavidson(&inoutput[0])
         return Energy
-    def CalcSpinSquared(self, GSvector not None):
+    def CalcSpinSquared(self, np.ndarray[double, ndim=1, mode="c"] GSvector not None):
         assert GSvector.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        SpinSquared = self.thisptr.CalcSpinSquared(&arrGSvector[0])
+        SpinSquared = self.thisptr.CalcSpinSquared(&GSvector[0])
         return SpinSquared
-    def Fill2RDM(self, GSvector not None, TwoRDM not None):
+    def Fill2RDM(self, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] TwoRDM not None):
         assert GSvector.flags['C_CONTIGUOUS']
         assert   TwoRDM.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrTwoRDM
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrTwoRDM   = np.ascontiguousarray(TwoRDM,   dtype=ctypes.c_double)
-        EnergyByContraction = self.thisptr.Fill2RDM(&arrGSvector[0], &arrTwoRDM[0])
+        EnergyByContraction = self.thisptr.Fill2RDM(&GSvector[0], &TwoRDM[0])
         return EnergyByContraction
-    def FillRandom(self, unsigned long long vecLength, vector not None):
+    def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrvector
-        arrvector = np.ascontiguousarray(vector, dtype=ctypes.c_double) 
-        self.thisptr.FillRandom(vecLength, &arrvector[0])
-    def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, GSvector not None, PyHamiltonian Hami):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+        self.thisptr.FillRandom(vecLength, &vector[0])
+    def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        self.thisptr.RetardedGF(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0])
+        self.thisptr.RetardedGF(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0])
         return (RePart[0], ImPart[0])
-    def RetardedGF_addition(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, GSvector not None, PyHamiltonian Hami, Re2RDM not None, Im2RDM not None, Add2RDM not None):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+    def RetardedGF_addition(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Add2RDM not None):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
         assert   Re2RDM.flags['C_CONTIGUOUS']
         assert   Im2RDM.flags['C_CONTIGUOUS']
         assert  Add2RDM.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRe2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrIm2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrAdd2RDM
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        arrRe2RDM   = np.ascontiguousarray(Re2RDM,   dtype=ctypes.c_double)
-        arrIm2RDM   = np.ascontiguousarray(Im2RDM,   dtype=ctypes.c_double)
-        arrAdd2RDM  = np.ascontiguousarray(Add2RDM,  dtype=ctypes.c_double)
-        self.thisptr.RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0], &arrRe2RDM[0], &arrIm2RDM[0], &arrAdd2RDM[0])
+        self.thisptr.RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Add2RDM[0])
         return (RePart[0], ImPart[0])
-    def RetardedGF_removal(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, GSvector not None, PyHamiltonian Hami, Re2RDM not None, Im2RDM not None, Rem2RDM not None):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+    def RetardedGF_removal(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Rem2RDM not None):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
         assert   Re2RDM.flags['C_CONTIGUOUS']
         assert   Im2RDM.flags['C_CONTIGUOUS']
         assert  Rem2RDM.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRe2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrIm2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRem2RDM
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        arrRe2RDM   = np.ascontiguousarray(Re2RDM,   dtype=ctypes.c_double)
-        arrIm2RDM   = np.ascontiguousarray(Im2RDM,   dtype=ctypes.c_double)
-        arrRem2RDM  = np.ascontiguousarray(Rem2RDM,  dtype=ctypes.c_double)
-        self.thisptr.RetardedGF_removal(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0], &arrRe2RDM[0], &arrIm2RDM[0], &arrRem2RDM[0])
+        self.thisptr.RetardedGF_removal(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Rem2RDM[0])
         return (RePart[0], ImPart[0])
-    def GFmatrix_add(self, double alpha, double beta, double eta, orbsLeft not None, orbsRight not None, bint isUp, GSvector not None, PyHamiltonian Hami):
-        RePart = np.zeros([len(orbsLeft)*len(orbsRight)], dtype=ctypes.c_double)
-        ImPart = np.zeros([len(orbsLeft)*len(orbsRight)], dtype=ctypes.c_double)
+    def GFmatrix_add(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bint isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([len(orbsLeft)*len(orbsRight)])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([len(orbsLeft)*len(orbsRight)])
         assert  GSvector.flags['C_CONTIGUOUS']
         assert    RePart.flags['C_CONTIGUOUS']
         assert    ImPart.flags['C_CONTIGUOUS']
         assert  orbsLeft.flags['C_CONTIGUOUS']
         assert orbsRight.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[int, ndim=1, mode="c"] arrOrbsLeft
-        cdef np.ndarray[int, ndim=1, mode="c"] arrOrbsRight
-        arrGSvector  = np.ascontiguousarray(GSvector,  dtype=ctypes.c_double)
-        arrRePart    = np.ascontiguousarray(RePart,    dtype=ctypes.c_double)
-        arrImPart    = np.ascontiguousarray(ImPart,    dtype=ctypes.c_double)
-        arrOrbsLeft  = np.ascontiguousarray(orbsLeft,  dtype=ctypes.c_int)
-        arrOrbsRight = np.ascontiguousarray(orbsRight, dtype=ctypes.c_int)
-        self.thisptr.GFmatrix_addition(alpha, beta, eta, &arrOrbsLeft[0], len(orbsLeft), &arrOrbsRight[0], len(orbsRight), isUp, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0])
+        self.thisptr.GFmatrix_addition(alpha, beta, eta, &orbsLeft[0], len(orbsLeft), &orbsRight[0], len(orbsRight), isUp, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0])
         return ( RePart, ImPart )
-    def GFmatrix_rem(self, double alpha, double beta, double eta, orbsLeft not None, orbsRight not None, bint isUp, GSvector not None, PyHamiltonian Hami):
-        RePart = np.zeros([len(orbsLeft)*len(orbsRight)], dtype=ctypes.c_double)
-        ImPart = np.zeros([len(orbsLeft)*len(orbsRight)], dtype=ctypes.c_double)
+    def GFmatrix_rem(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bint isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([len(orbsLeft)*len(orbsRight)])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([len(orbsLeft)*len(orbsRight)])
         assert  GSvector.flags['C_CONTIGUOUS']
         assert    RePart.flags['C_CONTIGUOUS']
         assert    ImPart.flags['C_CONTIGUOUS']
         assert  orbsLeft.flags['C_CONTIGUOUS']
         assert orbsRight.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[int, ndim=1, mode="c"] arrOrbsLeft
-        cdef np.ndarray[int, ndim=1, mode="c"] arrOrbsRight
-        arrGSvector  = np.ascontiguousarray(GSvector,  dtype=ctypes.c_double)
-        arrRePart    = np.ascontiguousarray(RePart,    dtype=ctypes.c_double)
-        arrImPart    = np.ascontiguousarray(ImPart,    dtype=ctypes.c_double)
-        arrOrbsLeft  = np.ascontiguousarray(orbsLeft,  dtype=ctypes.c_int)
-        arrOrbsRight = np.ascontiguousarray(orbsRight, dtype=ctypes.c_int)
-        self.thisptr.GFmatrix_removal(alpha, beta, eta, &arrOrbsLeft[0], len(orbsLeft), &arrOrbsRight[0], len(orbsRight), isUp, &arrGSvector[0], Hami.thisptr, &arrRePart[0], &arrImPart[0])
+        self.thisptr.GFmatrix_removal(alpha, beta, eta, &orbsLeft[0], len(orbsLeft), &orbsRight[0], len(orbsRight), isUp, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0])
         return ( RePart, ImPart )
-    def DensityResponseGF(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, GSvector not None):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+    def DensityResponseGF(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        self.thisptr.DensityResponseGF(omega, eta, orb_alpha, orb_beta, GSenergy, &arrGSvector[0], &arrRePart[0], &arrImPart[0])
+        self.thisptr.DensityResponseGF(omega, eta, orb_alpha, orb_beta, GSenergy, &GSvector[0], &RePart[0], &ImPart[0])
         return (RePart[0], ImPart[0])
-    def DensityResponseGF_forward(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, GSvector not None, Re2RDM not None, Im2RDM not None, Dens2RDM not None):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+    def DensityResponseGF_forward(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Dens2RDM not None):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
         assert   Re2RDM.flags['C_CONTIGUOUS']
         assert   Im2RDM.flags['C_CONTIGUOUS']
         assert Dens2RDM.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRe2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrIm2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrDens2RDM
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        arrRe2RDM   = np.ascontiguousarray(Re2RDM,   dtype=ctypes.c_double)
-        arrIm2RDM   = np.ascontiguousarray(Im2RDM,   dtype=ctypes.c_double)
-        arrDens2RDM = np.ascontiguousarray(Dens2RDM, dtype=ctypes.c_double)
-        self.thisptr.DensityResponseGF_forward(omega, eta, orb_alpha, orb_beta, GSenergy, &arrGSvector[0], &arrRePart[0], &arrImPart[0], &arrRe2RDM[0], &arrIm2RDM[0], &arrDens2RDM[0])
+        self.thisptr.DensityResponseGF_forward(omega, eta, orb_alpha, orb_beta, GSenergy, &GSvector[0], &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Dens2RDM[0])
         return (RePart[0], ImPart[0])
-    def DensityResponseGF_backward(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, GSvector not None, Re2RDM not None, Im2RDM not None, Dens2RDM not None):
-        RePart = np.zeros([1], dtype=ctypes.c_double)
-        ImPart = np.zeros([1], dtype=ctypes.c_double)
+    def DensityResponseGF_backward(self, double omega, double eta, int orb_alpha, int orb_beta, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Dens2RDM not None):
+        cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
+        cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
         assert   RePart.flags['C_CONTIGUOUS']
         assert   ImPart.flags['C_CONTIGUOUS']
         assert   Re2RDM.flags['C_CONTIGUOUS']
         assert   Im2RDM.flags['C_CONTIGUOUS']
         assert Dens2RDM.flags['C_CONTIGUOUS']
-        cdef np.ndarray[double, ndim=1, mode="c"] arrGSvector
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRePart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrImPart
-        cdef np.ndarray[double, ndim=1, mode="c"] arrRe2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrIm2RDM
-        cdef np.ndarray[double, ndim=1, mode="c"] arrDens2RDM
-        arrGSvector = np.ascontiguousarray(GSvector, dtype=ctypes.c_double)
-        arrRePart   = np.ascontiguousarray(RePart,   dtype=ctypes.c_double)
-        arrImPart   = np.ascontiguousarray(ImPart,   dtype=ctypes.c_double)
-        arrRe2RDM   = np.ascontiguousarray(Re2RDM,   dtype=ctypes.c_double)
-        arrIm2RDM   = np.ascontiguousarray(Im2RDM,   dtype=ctypes.c_double)
-        arrDens2RDM = np.ascontiguousarray(Dens2RDM, dtype=ctypes.c_double)
-        self.thisptr.DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, &arrGSvector[0], &arrRePart[0], &arrImPart[0], &arrRe2RDM[0], &arrIm2RDM[0], &arrDens2RDM[0])
+        self.thisptr.DensityResponseGF_backward(omega, eta, orb_alpha, orb_beta, GSenergy, &GSvector[0], &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Dens2RDM[0])
         return (RePart[0], ImPart[0])
 
 
