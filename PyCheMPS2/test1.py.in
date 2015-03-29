@@ -21,15 +21,15 @@ import numpy as np
 import sys
 sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
-import ReadinHamiltonianPsi4
+import ReadinHamiltonianFCIDUMP
 import ctypes
 
 # Set the seed of the random number generator and cout.precision
 Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
-# Read in the Hamiltonian from the Psi4 plugin
-Ham = ReadinHamiltonianPsi4.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/N2_N14_S0_d2h_I0.dat')
+# Read in the FCIDUMP
+Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.STO3G.FCIDUMP', 'd2h')
 
 # Define the symmetry sector
 Nelec = 14 # The number of electrons
