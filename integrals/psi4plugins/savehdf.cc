@@ -11,17 +11,26 @@
 #include <liboptions/liboptions.h>
 #include <libchkpt/chkpt.h>
 
+#include <stdlib.h>
+#include <iostream>
+
+#include "chemps2/Irreps.h"
+#include "chemps2/Hamiltonian.h"
+#include "chemps2/Problem.h"
+
+using namespace std;
+
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
 
 INIT_PLUGIN
 
-namespace psi{ namespace mointegrals{
+namespace psi{ namespace savehdf{
 
 extern "C" int
 read_options(std::string name, Options &options)
 {
-    if (name == "MOINTEGRALS"|| options.read_globals()) {
+    if (name == "SAVEHDF"|| options.read_globals()) {
         /*- The amount of information printed
             to the output file -*/
         options.add_int("PRINT", 1);
@@ -32,7 +41,7 @@ read_options(std::string name, Options &options)
 
 
 extern "C" PsiReturnType
-mointegrals(Options &options)
+savehdf(Options &options)
 {
     /*
      * This plugin shows a simple way of obtaining MO basis integrals, directly from a DPD buffer.  It is also
@@ -48,7 +57,7 @@ mointegrals(Options &options)
     if(!wfn) throw PSIEXCEPTION("SCF has not been run yet!");
     
     /*MoldenWriter mollie(wfn);
-    mollie.write("moldenwriteroutput.txt");*/ //Please call the MoldenWriter from the psi4 input file from now on.
+    mollie.write("infoForMolden.txt");*/ //Please call the MoldenWriter from the psi4 input file from now on.
     
     // Quickly check that there are no open shell orbitals here...
     int nirrep  = wfn->nirrep();
@@ -75,58 +84,58 @@ mointegrals(Options &options)
     IWL::read_one(psio.get(), PSIF_OEI, PSIF_MO_OEI, temp, nTriMo, 0, 0, "outfile");
     moOei.set(temp);
     
-    moOei.print();
-    
-    outfile->Printf( "****  Molecular Integrals For CheMPS Start Here \n");
-    
-    std::string SymmLabel =  Process::environment.molecule()->sym_label();
-    outfile->Printf( "Symmetry Label = ");
+    int * orbitalIrreps = new int[nmo];
+
+    int SyGroup = 0;
+    bool stopFindGN = false;
+    std::string SymmLabel = Process::environment.molecule()->sym_label();
+    do {
+        if (SymmLabel.compare(CheMPS2::Irreps::getGroupName(SyGroup))==0) stopFindGN = true;
+        else SyGroup += 1;
+    } while ((!stopFindGN) && (SyGroup<42));
+    outfile->Printf( "If anything went wrong: Is ");
     outfile->Printf( SymmLabel.c_str());
-    outfile->Printf( " \n");
-    outfile->Printf( "Nirreps = %1d \n", nirrep);
-    double NuclRepulsion =  Process::environment.molecule()->nuclear_repulsion_energy();
-    outfile->Printf( "Nuclear Repulsion Energy = %16.48f \n", NuclRepulsion);
-    outfile->Printf( "Number Of Molecular Orbitals = %2d \n", nmo);
-    outfile->Printf( "Irreps Of Molecular Orbitals = \n");
+    outfile->Printf( " equal to ");
+    outfile->Printf( (CheMPS2::Irreps::getGroupName(SyGroup)).c_str());
+    outfile->Printf( " ?\n");
+
+    int counterFillOrbitalIrreps = 0;
     for (int h=0; h<nirrep; ++h){
        for (int cnt=0; cnt<moOei.rowspi(h); ++cnt){
-          outfile->Printf( "%1d ",h);
+          orbitalIrreps[counterFillOrbitalIrreps] = h;
+          counterFillOrbitalIrreps++;
        }
     }
-    outfile->Printf( "\n");
-    outfile->Printf( "DOCC = ");
-    for (int h=0; h<nirrep; h++){
-       outfile->Printf( "%2d ",docc[h]);
-    }
-    outfile->Printf( "\n");
-    outfile->Printf( "SOCC = ");
-    for (int h=0; h<nirrep; h++){
-       outfile->Printf( "%2d ",socc[h]);
-    }
-    outfile->Printf( "\n");
+
+    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(nmo,SyGroup,orbitalIrreps);
+    delete [] orbitalIrreps;
     
-    double EnergyHF = 0.0;
-    EnergyHF += NuclRepulsion;
-    
-    outfile->Printf( "****  MO OEI \n");
+    double NuclRepulsion =  Process::environment.molecule()->nuclear_repulsion_energy();
+    Ham->setEconst(NuclRepulsion);
+    double EnergyHF = NuclRepulsion;
     
     int nTot = 0;
     for(int h = 0; h < nirrep; ++h){
-       for(int cnt = 0; cnt < moOei.rowspi(h); ++cnt){
-          for (int cnt2 = 0; cnt2 < moOei.colspi(h); ++cnt2){
-             outfile->Printf( "%1d %1d %16.48f \n",
-                               nTot+cnt, nTot+cnt2, moOei[h][cnt][cnt2]);
+       for (int cnt = 0; cnt < moOei.rowspi(h); cnt++){
+          for (int cnt2 = cnt; cnt2 < moOei.colspi(h); cnt2++){
+             Ham->setTmat(nTot+cnt, nTot+cnt2, moOei[h][cnt][cnt2]);
           }
-          if (cnt <docc[h]) EnergyHF += 2*moOei[h][cnt][cnt];
-          else{
-             if (cnt <socc[h]+docc[h]) EnergyHF += moOei[h][cnt][cnt];
-          }
+          if (cnt <docc[h])                            EnergyHF += 2*moOei[h][cnt][cnt];
+          if ((cnt>=docc[h]) && (cnt<docc[h]+socc[h])) EnergyHF +=   moOei[h][cnt][cnt];
        }
        nTot += moOei.rowspi(h);
     }
-
-    outfile->Printf( "****  MO TEI \n");
-
+    
+    outfile->Printf( "DOCC = [ ");
+    for (int cnt=0; cnt<nirrep; cnt++){
+        outfile->Printf( "%2d  ", docc[cnt]);
+    }
+    outfile->Printf( "] \nSOCC = [ ");
+    for (int cnt=0; cnt<nirrep; cnt++){
+        outfile->Printf( "%2d  ", socc[cnt]);
+    }
+    outfile->Printf( "] \n");
+ 
     /*
      * Now, loop over the DPD buffer, printing the integrals
      */
@@ -154,8 +163,9 @@ mointegrals(Options &options)
                 int srel = s - K.params->soff[ssym];
                 // Print out the absolute orbital numbers, the relative (within irrep)
                 // numbers, the symmetries, and the integral itself
-                outfile->Printf( "%1d %1d %1d %1d %16.48f \n",
-                                 p, q, r, s, K.matrix[h][pq][rs]);
+                /*outfile->Printf( "%1d %1d %1d %1d %16.48f \n",
+                                 p, q, r, s, K.matrix[h][pq][rs]);*/
+                Ham->setVmat(p,r,q,s,K.matrix[h][pq][rs]);
                 if ((p==q) && (r==s)){
                    if ((prel <docc[psym]) && (rrel < docc[rsym])) EnergyHF += 2*K.matrix[h][pq][rs];
                    if ((prel>=docc[psym]) && (prel < socc[psym] + docc[psym]) && (rrel < docc[rsym])) EnergyHF += K.matrix[h][pq][rs];
@@ -175,7 +185,41 @@ mointegrals(Options &options)
     global_dpd_->buf4_close(&K);
     psio->close(PSIF_LIBTRANS_DPD, PSIO_OPEN_OLD);
     outfile->Printf( "****  HF Energy = %16.48f \n", EnergyHF);
-    outfile->Printf( "****  Molecular Integrals For CheMPS End Here \n");
+
+    outfile->Printf( "****  The debug check of Hamiltonian ****\n");
+    outfile->Printf( "Econst = %16.24f \n", Ham->getEconst());
+   
+    double test = 0.0;
+    double test2 = 0.0;
+    for (int i=0; i<Ham->getL(); i++){
+       for (int j=0; j<Ham->getL(); j++){
+          test += Ham->getTmat(i,j);
+          if (i<=j) test2 += Ham->getTmat(i,j);
+       }
+    }
+    outfile->Printf( "1-electron integrals: Sum over all elements  : %16.24f \n", test);
+    outfile->Printf( "1-electron integrals: Sum over Tij with i<=j : %16.24f \n", test2);
+      
+    test = 0.0;
+    test2 = 0.0;
+    for (int i=0; i<Ham->getL(); i++){
+       for (int j=0; j<Ham->getL(); j++){
+          for (int k=0; k<Ham->getL(); k++){
+             for (int l=0; l<Ham->getL(); l++){
+                test += Ham->getVmat(i,j,k,l);
+                if ((i<=j) && (j<=k) && (k<=l)) test2 += Ham->getVmat(i,j,k,l);
+             }
+          }
+       }
+    }
+    outfile->Printf( "2-electron integrals: Sum over all elements          : %16.24f \n", test);
+    outfile->Printf( "2-electron integrals: Sum over Vijkl with i<=j<=k<=l : %16.24f \n", test2);
+ 
+    cout.precision(15);
+    Ham->save();
+
+    delete Ham;
+    delete [] temp;
 
     return Success;
 }
