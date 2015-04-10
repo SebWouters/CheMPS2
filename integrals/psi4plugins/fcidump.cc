@@ -155,6 +155,8 @@ fcidump(Options &options)
        jump += moOei.rowspi(h);
     }
     
+    delete [] temp;
+    
     fprintf( capturing, " % 23.16E %3d %3d %3d %3d", Process::environment.molecule()->nuclear_repulsion_energy(), 0, 0, 0, 0 );
     fclose( capturing );
 
