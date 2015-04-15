@@ -1,6 +1,6 @@
 var classCheMPS2_1_1DMRG =
 [
-    [ "DMRG", "classCheMPS2_1_1DMRG.html#af75174435718b0b533712fbeb6568c71", null ],
+    [ "DMRG", "classCheMPS2_1_1DMRG.html#a873b3e58f248e3c7c1e6deb0c52e2899", null ],
     [ "~DMRG", "classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5", null ],
     [ "activateExcitations", "classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133", null ],
     [ "calc2DMandCorrelations", "classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79", null ],
