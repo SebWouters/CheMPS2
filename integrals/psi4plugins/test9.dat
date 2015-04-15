@@ -21,6 +21,7 @@ set dmrgscf dmrg_econv           [ 1e-10, 1e-10, 1e-10 ]
 set dmrgscf dmrg_maxsweeps       [     5,     5,    10 ]
 set dmrgscf dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
 set dmrgscf dmrg_print_corr      false
+set dmrgscf mps_chkpt            false
 
 set dmrgscf dmrgscf_convergence  1e-6
 set dmrgscf dmrgscf_store_unit   true

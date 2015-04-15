@@ -70,8 +70,9 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param Probin The problem to be solved
-             \param OptSchemeIn The optimization scheme for the DMRG sweeps */
-         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn);
+             \param OptSchemeIn The optimization scheme for the DMRG sweeps
+             \param makechkpt Whether or not to save MPS checkpoints in the working directory */
+         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn, bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk);
          
          //! Destructor
          virtual ~DMRG();
@@ -217,6 +218,7 @@ namespace CheMPS2{
          void saveMPS(const std::string name, TensorT ** MPSlocation, SyBookkeeper * BKlocation, bool isConverged) const;
          void loadDIM(const std::string name, SyBookkeeper * BKlocation);
          void loadMPS(const std::string name, TensorT ** MPSlocation, bool * isConverged);
+         bool makecheckpoints;
          
          //Helper functions for making the boundary operators
          void updateMovingRight(const int index);

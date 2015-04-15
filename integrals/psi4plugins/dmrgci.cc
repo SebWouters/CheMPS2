@@ -75,7 +75,10 @@ read_options(std::string name, Options &options)
         options.add_array("DMRG_NOISEPREFACTORS");
         
         /*- Whether or not to print the correlation functions after the DMRG calculation -*/
-        options.add_int("DMRG_PRINT_CORR", 1);
+        options.add_bool("DMRG_PRINT_CORR", true);
+        
+        /*- Whether or not to create intermediary MPS checkpoints -*/
+        options.add_bool("MPS_CHKPT", false);
 
         /*- Doubly occupied frozen orbitals for DMRGCI, per irrep. Same
             conventions as for other MR methods -*/
@@ -188,7 +191,8 @@ dmrgci(Options &options)
     double * dmrg_noiseprefactors   = options.get_double_array("DMRG_NOISEPREFACTORS");
     const int ndmrg_noiseprefactors = options["DMRG_NOISEPREFACTORS"].size();
     
-    const int dmrg_print_corr       = options.get_int("DMRG_PRINT_CORR");
+    const bool dmrg_print_corr      = options.get_bool("DMRG_PRINT_CORR");
+    const bool mps_chkpt            = options.get_bool("MPS_CHKPT");
     
     int * frozen_docc               = options.get_int_array("FROZEN_DOCC");
     int * active                    = options.get_int_array("ACTIVE");
@@ -412,7 +416,7 @@ dmrgci(Options &options)
     }
 
     // Run the DMRGCI calculation
-    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme, mps_chkpt);
     const double EnergyDMRG = theDMRG->Solve();
     if ( dmrg_print_corr ){
        theDMRG->calc2DMandCorrelations();
@@ -445,7 +449,6 @@ dmrgci(Options &options)
     }
     
     //Clean up
-    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
     if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
     delete theDMRG;
     delete OptScheme;

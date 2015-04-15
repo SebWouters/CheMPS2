@@ -77,6 +77,9 @@ read_options(std::string name, Options &options)
         
         /*- Whether or not to print the correlation functions after the DMRG calculation -*/
         options.add_bool("DMRG_PRINT_CORR", false);
+        
+        /*- Whether or not to create intermediary MPS checkpoints -*/
+        options.add_bool("MPS_CHKPT", false);
 
         /*- Doubly occupied frozen orbitals for DMRGSCF, per irrep. Same
             conventions as for other MR methods -*/
@@ -483,6 +486,7 @@ dmrgscf(Options &options)
     double * dmrg_noiseprefactors     = options.get_double_array("DMRG_NOISEPREFACTORS");
     const int ndmrg_noiseprefactors   = options["DMRG_NOISEPREFACTORS"].size();
     const bool dmrg_print_corr        = options.get_bool("DMRG_PRINT_CORR");
+    const bool mps_chkpt              = options.get_bool("MPS_CHKPT");
     int * frozen_docc                 = options.get_int_array("FROZEN_DOCC");
     int * active                      = options.get_int_array("ACTIVE");
     const double dmrgscf_convergence  = options.get_double("DMRGSCF_CONVERGENCE");
@@ -838,7 +842,7 @@ dmrgscf(Options &options)
             cout_buffer = cout.rdbuf( capturing.rdbuf() );
         
             for (int cnt = 0; cnt < nOrbDMRG_pow4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
-            CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+            CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme, mps_chkpt);
             for (int state = 0; state < dmrgscf_which_root; state++){
                 if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
                 Energy = theDMRG->Solve();
@@ -853,7 +857,6 @@ dmrgscf(Options &options)
                 CheMPS2::CASSCF::copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
             }
             if (theSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); }
-            if ( CheMPS2::DMRG_storeMpsOnDisk ){ theDMRG->deleteStoredMPS(); }
             if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ theDMRG->deleteStoredOperators(); }
             delete theDMRG;
             if ((theSCFoptions->getStateAveraging()) && (dmrgscf_which_root > 1)){

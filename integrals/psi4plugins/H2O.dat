@@ -22,7 +22,8 @@ set dmrgci dmrg_states          [  200,  500, 1000, 1000 ]
 set dmrgci dmrg_econv           [ 1e-8, 1e-8, 1e-8, 1e-8 ]
 set dmrgci dmrg_maxsweeps       [    5,    5,    5,  100 ]
 set dmrgci dmrg_noiseprefactors [ 0.03, 0.03, 0.03,  0.0 ]
-set dmrgci dmrg_print_corr      1
+set dmrgci dmrg_print_corr      false
+set dmrgci mps_chkpt            false
 
 scf()
 

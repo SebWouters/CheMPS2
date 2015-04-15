@@ -1,5 +1,5 @@
 project (CheMPS2)
-set (CheMPS2_VERSION      "1.4")
+set (CheMPS2_VERSION      "1.5")
 set (CheMPS2_AUTHORS      "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
@@ -8,10 +8,11 @@ set (CheMPS2_LICENSE      "GNU General Public License, version 2")
 set (CheMPS2_INC_RELPATH  "include/chemps2")
 set (CheMPS2_LIB_SOVERSION 1)
 
-
 include (GNUInstallDirs)
 
-option (MKL "Compile using the MKL" OFF)
+option (MKL                  "Compile using the MKL"                   OFF)
+option (BUILD_DOCUMENTATION  "Use Doxygen to create a HTML/PDF manual" OFF)
+option (STATIC_ONLY          "Compile only the static library"         OFF)
 
 if (MKL)
     cmake_minimum_required (VERSION 2.8.11)
@@ -19,7 +20,6 @@ else (MKL)
     cmake_minimum_required (VERSION 2.8)
 endif (MKL)
 
-option (BUILD_DOCUMENTATION "Use Doxygen to create a HTML/PDF manual" OFF)
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
 find_package (OpenMP)
