@@ -22,20 +22,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 Information
 -----------
 
-CheMPS2 is a scientific library in the field of ab initio quantum
-chemistry. It contains a spin-adapted implementation of the density
-matrix renormalization group (DMRG) for ab initio quantum chemistry.
-This method allows one to obtain numerical accuracy in active spaces
-beyond the capabilities of full configuration interaction (FCI).
+CheMPS2 is a scientific library in the field of ab initio quantum chemistry.
+It contains a spin-adapted implementation of the density matrix
+renormalization group (DMRG) for ab initio quantum chemistry. This method
+allows to obtain numerical accuracy in active spaces beyond the capabilities
+of full configuration interaction (FCI).
 
-For an input Hamiltonian and targeted symmetry sector, the library
-performs successive DMRG sweeps according to a user-defined convergence
-scheme. As output, the library returns the minimal encountered energy
-as well as the 2-RDM of the active space. The latter allows one to
-calculate various molecular properties, as well as the gradient and
-Hessian for orbital rotations or nuclear displacements. In addition,
-several correlation functions can be obtained to investigate the
-electronic structure in the active space.
+For an input Hamiltonian and targeted symmetry sector, the library performs
+successive DMRG sweeps according to a user-defined convergence scheme. As
+output, the library returns the minimal encountered energy as well as the
+2-RDM of the active space. With the latter, various molecular properties
+can be calculated, as well as the gradient and Hessian for orbital rotations
+or nuclear displacements. In addition, several correlation functions can be
+obtained to investigate the electronic structure in the active space.
 
 Next to a spin-adapted implementation of DMRG, the library also
 contains a determinant-based FCI implementation, which allows to
@@ -54,11 +53,11 @@ to your needs. The interfaces to
 [pyscf (in python)](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
 described below.
 
-In the future the parallelization of CheMPS2 for shared memory
+In the future, the parallelization of CheMPS2 for shared memory
 architectures will be extended to a hybrid scheme with both shared
 (OpenMP) and distributed (MPI) memory parallelization. In addition,
-the calculation of the 2-RDM of the active space will be extended to
-the 3-RDM.
+the calculation of the 2-RDM of the active space will be extended
+to the 3-RDM.
 
 
 How to acknowledge CheMPS2
@@ -99,143 +98,203 @@ To acknowledge CheMPS2, please cite
             doi = {10.1140/epjd/e2014-50500-1}
         }
 
-Build
------
+Installation
+------------
 
-### 1. Build libchemps2 with CMake
+### 1. Dependencies
 
-libchemps2 requires BLAS, LAPACK, the
-[GNU Scientific Library (GSL)](http://www.gnu.org/software/gsl/), and the
-[Hierarchical Data Format Release 5 (HDF5)](http://www.hdfgroup.org/HDF5/).
-The [Open Multi-Processing (OpenMP)](http://openmp.org/wp/) API is used
-for shared-memory parallelization. libchemps2 can be built with CMake. The files
+CheMPS2 can be built with [CMake](http://www.cmake.org/) and depends on
 
-    ./CMakeLists.txt
-    ./CheMPS2/CMakeLists.txt
-    ./tests/CMakeLists.txt
-    ./PyCheMPS2/CMakeLists.txt
+-   BLAS
+-   LAPACK
+-   GSL ([GNU Scientific library](http://www.gnu.org/software/gsl/))
+-   HDF5 ([Hierarchical Data Format Release 5](http://www.hdfgroup.org/HDF5/))
 
-provide a minimal compilation. Start in ```./``` and run:
+It is parallelized for shared memory architectures with the Open
+Multi-Processing ([OpenMP](http://openmp.org/wp/)) API. In the future,
+the parallelization of CheMPS2 for shared memory architectures will be
+extended to a hybrid scheme with both shared (OpenMP) and distributed
+(MPI) memory parallelization.
 
-    > mkdir build
-    > cd build
-    
-CMake generates makefiles based on the user's specifications:
+### 2. Download
 
-    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-    -DCMAKE_INSTALL_PREFIX=option4
-    
-Option1 is the C++ compiler; typically ```g++``` or ```icpc``` on Linux.
-Option2 can be ```ON``` or ```OFF``` and is used to switch on the
-intel math kernel library.
-Option3 can be ```ON``` or ```OFF``` and is used to switch on the possibility
-to compile the doxygen documentation.
-Option4 is the prefix of the installation directory; typically
-```/usr``` or ```/usr/local``` on Linux. On my computer, libchemps2
-is then installed in ```prefix/lib/x86_64-linux-gnu/``` and the headers
-in ```prefix/include/chemps2```.
-If one or more of the required libraries are not found, please use the
-command
+It is advised to clone the CheMPS2 git repository from github. In your
+terminal, run:
 
-    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
-    cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
-    -DCMAKE_INSTALL_PREFIX=option4
-    
-instead, where option5 and option6 are respectively the missing
+```bash
+$ cd /myfolder
+$ git clone 'https://github.com/sebwouters/chemps2'
+$ cd chemps2
+```
+
+That way, future updates and bug fixes can be easily pulled in:
+
+```bash
+$ cd /myfolder/chemps2
+$ git pull
+```
+
+### 3. Build libchemps2
+
+The files
+
+```bash
+/myfolder/chemps2/CMakeLists.txt
+/myfolder/chemps2/CheMPS2/CMakeLists.txt
+/myfolder/chemps2/tests/CMakeLists.txt
+/myfolder/chemps2/PyCheMPS2/CMakeLists.txt
+```
+
+provide a minimal compilation. In your terminal, run:
+
+```bash
+$ cd /myfolder/chemps2
+$ mkdir build
+$ cd build
+```
+
+CMake generates makefiles based on the user’s specifications:
+
+```bash
+$ CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
+```
+
+1.  Option1 is the `c++` compiler; typically `g++`, `icpc`, or `clang++`
+    on Linux.
+2.  Option2 can be `ON` or `OFF` and is used to switch on the intel math
+    kernel library.
+3.  Option3 can be `ON` or `OFF` and is used to switch on the
+    possibility to compile the doxygen documentation.
+4.  Option4 is the prefix of the installation directory; typically
+    `/usr` or `/usr/local` on Linux. On my computer, libchemps2 is then
+    installed in `prefix/lib/x86_64-linux-gnu/` and the headers in
+    `prefix/include/chemps2`.
+5.  Option5 can be `ON` or `OFF` and is used to avoid building the
+    shared library (please use the default here).
+
+If one or more of the required libraries are not found, use the command
+
+```bash
+$ CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
+```
+
+instead, where option6 and option7 are respectively the missing
 colon-separated include and library paths, e.g.
 
-    CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
+```bash
+CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
+```
 
 and
 
-    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/
+```bash
+CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
+```
 
 To compile, run:
 
-    > make
+```bash
+$ make
+```
 
 To install, run:
 
-    > make install
+```bash
+$ make install
+```
 
-For non-standard installation directories, please remember to append
-the library path to ```LD_LIBRARY_PATH``` in your .bashrc.
+For non-standard installation directories, please remember to append the
+library path to `LD_LIBRARY_PATH` in your `.bashrc`.
 
+### 4. Test libchemps2
 
-### 2. Testing libchemps2
+To test libchemps2, run:
 
-To test libchemps2, start in ```./build```, and run:
+```bash
+$ cd /myfolder/chemps2/build
+$ make test
+```
 
-    > make test
+The tests only require a very limited amount of memory (order 10-120
+MB).
 
-The tests only require a very limited amount of memory (order 10-120 MB).
+### 5. Build PyCheMPS2
 
+PyCheMPS2, a python inferface to libchemps2, can be built with
+[Cython](http://cython.org/). The installation above generated the file
+`/myfolder/chemps2/build/setup.py`, in which the library and include
+paths have been set to the ones in the build directory. In your
+terminal, run:
 
-### 3. Build PyCheMPS2 with Cython
+```bash
+$ cd /myfolder/chemps2/build
+$ python setup.py build_ext -i
+```
 
-PyCheMPS2, a python inferface to libchemps2, can be built with Cython. The
-installation above generated the file ```./build/setup.py```, in which
-the library and include paths have been set to the ones in the build
-directory. Start in ```./build```, and run:
+Compilation of PyCheMPS2 occurs by linking to the `c++` library in the
+build directory. However, when you want to run the tests in the next
+section, you should first install the `c++` library! If you have pulled
+a newer version of CheMPS2, please remember to (re)install the `c++`
+library first, before using PyCheMPS2!
 
-    > python setup.py build_ext -i
+### 6. Test PyCheMPS2
 
-Compilation of PyCheMPS2 occurs by linking to the C++ library in the
-build directory. However, when you want to run the tests in the next section,
-you should first install the C++ library! If you have pulled a newer version
-of CheMPS2, please remember to (re)install the C++ library first, before using
-PyCheMPS2!
+To test PyCheMPS2, run:
 
+```bash
+$ cd /myfolder/chemps2/build/PyTests
+$ python test1.py
+$ python test2.py
+$ python test3.py
+$ python test4.py
+$ python test5.py
+$ python test6.py
+$ python test7.py
+$ python test8.py
+$ python test9.py
+```
 
-### 4. Testing PyCheMPS2
+If you compiled the `c++` library with `-DMKL=ON`, you might get the
+error
 
-To test PyCheMPS2, start in ```./build```, and run:
+```bash
+Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
+```
 
-    > cd PyTests/
-    > python test1.py
-    > python test2.py
-    > python test3.py
-    > python test4.py
-    > python test5.py
-    > python test6.py
-    > python test7.py
-    > python test8.py
-    > python test9.py
-    
-If you compiled the C++ library with ```-DMKL=ON```, you might get the error
+This issue of using Intel’s MKL inside python is known and reported. To
+get the python tests to run, you can set the variable `LD_PRELOAD` in
+order to preload libmkl\_rt.so. On my system, this is done with
 
-    > Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
-    
-This issue of using Intel's MKL inside python is known and reported. To get
-the python tests to run, you can set the variable ```LD_PRELOAD``` in order to
-preload ```libmkl_rt.so```. On my system, this is done with
+```bash
+$ export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
+```
 
-    > export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
+The python tests do exactly the same thing as the `c++` tests above, and
+illustrate the usage of the python interface to libchemps2. The tests
+should end with a line stating whether or not they succeeded. They only
+require a very limited amount of memory (order 10-120 MB).
 
-The python tests do exactly the same thing as the C++ tests above, and
-illustrate the usage of the python interface to libchemps2. The tests should
-end with a line stating whether or not they succeeded. They only require
-a very limited amount of memory (order 10-120 MB).
-
-
-### 5. Doxygen documentation
+### 7. Doxygen
 
 To build and view the doxygen manual, the documentation flag should have
-been on: ```-DBUILD_DOCUMENTATION=ON```. Start in ```./build``` and run:
+been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
 
-    > make doc
-    > cd LaTeX-documents
-    > make
-    > evince refman.pdf &
-    > cd ../html
-    > firefox index.html &
+```bash
+$ cd /myfolder/chemps2/build
+$ make doc
+$ cd LaTeX-documents
+$ make
+$ evince refman.pdf &
+$ cd ../html
+$ firefox index.html &
+```
 
 
 User manual
 -----------
 
-Doxygen output can be generated: see the [build section](#build) or
-the [doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
+Doxygen output can be generated: see the [installation section](#installation)
+or the [doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
 
 For an overview of the concepts and ideas used in CheMPS2, please read the
 [code release paper and review](#how-to-acknowledge-chemps2) listed above.
@@ -254,14 +313,18 @@ and should work on later versions as well.
 
 To make use of this feature, build psi4 with the plugin option, and then run:
 
-    > psi4 --new-plugin fcidump
-    > cd fcidump
+```bash
+$ psi4 --new-plugin fcidump
+$ cd fcidump
+```
 
 Now, replace the file ```fcidump.cc``` with 
 [integrals/psi4plugins/fcidump.cc](integrals/psi4plugins/fcidump.cc). To
 compile the plugin, run:
 
-    > make
+```bash
+$ make
+```
 
 Examples of output generated with this
 plugin can be found in [tests/matrixelements](tests/matrixelements).
@@ -277,8 +340,10 @@ The remark on psi4's commit version from the previous section remains.
 
 To make use of this feature, build psi4 with the plugin option, and then run:
 
-    > psi4 --new-plugin savehdf
-    > cd savehdf
+```bash
+$ psi4 --new-plugin savehdf
+$ cd savehdf
+```
 
 Now, replace the file ```savehdf.cc``` with 
 [integrals/psi4plugins/savehdf.cc](integrals/psi4plugins/savehdf.cc)
@@ -288,15 +353,21 @@ permutation symmetry) in binary form with HDF5.
 To compile the plugin, libchemps2 should be installed as described
 above, and the ```Makefile``` should be adjusted. Change the line
 
-    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
+```bash
+PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
+```
 
 to
 
-    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
+```bash
+PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
+```
 
 To compile the plugin, run:
 
-    > make
+```bash
+$ make
+```
 
 
 DMRG-CI and DMRG-SCF calculations with psi4
@@ -308,8 +379,10 @@ The remark on psi4's commit version from the previous section remains. To
 perform DMRG-CI calculations, build psi4 with the plugin option, and then
 run:
 
-    > psi4 --new-plugin dmrgci
-    > cd dmrgci
+```bash
+$ psi4 --new-plugin dmrgci
+$ cd dmrgci
+```
 
 Now, replace the file ```dmrgci.cc``` with 
 [integrals/psi4plugins/dmrgci.cc](integrals/psi4plugins/dmrgci.cc).
@@ -325,14 +398,18 @@ Example input files to use the plugin are provided in
 After compilation of the dmrgci plugin, place these input files one directory
 higher than the plugin. In that folder, run:
 
-    > psi4 N2.dat
-    > psi4 H2O.dat
+```bash
+$ psi4 N2.dat
+$ psi4 H2O.dat
+```
 
 To perform DMRG-SCF calculations, build psi4 with the plugin option,
 and then run:
 
-    > psi4 --new-plugin dmrgscf
-    > cd dmrgscf
+```bash
+$ psi4 --new-plugin dmrgscf
+$ cd dmrgscf
+```
     
 Now, replace the file ```dmrgscf.cc``` with 
 [integrals/psi4plugins/dmrgscf.cc](integrals/psi4plugins/dmrgscf.cc).
@@ -351,10 +428,11 @@ These DMRG-SCF tests are the analogs of the corresponding C++ and python
 tests (with the same number). After compilation of the dmrgscf plugin, place
 these input files one directory higher than the plugin. In that folder, run:
 
-    > psi4 test6.dat
-    > psi4 test8.dat
-    > psi4 test9.dat
-
+```bash
+$ psi4 test6.dat
+$ psi4 test8.dat
+$ psi4 test9.dat
+```
 
 DMRG-CI and DMRG-SCF calculations with pyscf
 --------------------------------------------
@@ -739,8 +817,8 @@ TwoDMstorage class.
 class.
 
 Please note that these files are documented with doxygen comments. The
-[build section](#build) discusses how a manual can be generated from these
-comments.
+[installation section](#installation) discusses how a manual can be
+generated from these comments.
 
 
 List of files to perform test runs
