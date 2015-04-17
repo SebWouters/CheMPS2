@@ -166,7 +166,6 @@ If one or more of the required libraries are not found, use the command
 
     > CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
 
-
 instead, where option6 and option7 are respectively the missing
 colon-separated include and library paths, e.g.
 
@@ -285,7 +284,7 @@ To make use of this feature, build psi4 with the plugin option, and then run:
     > psi4 --new-plugin fcidump
     > cd fcidump
 
-Now, replace the file ```fcidump.cc``` with 
+Now, replace the file `fcidump.cc` with 
 [integrals/psi4plugins/fcidump.cc](integrals/psi4plugins/fcidump.cc). To
 compile the plugin, run:
 
@@ -308,13 +307,13 @@ To make use of this feature, build psi4 with the plugin option, and then run:
     > psi4 --new-plugin savehdf
     > cd savehdf
 
-Now, replace the file ```savehdf.cc``` with 
+Now, replace the file `savehdf.cc` with 
 [integrals/psi4plugins/savehdf.cc](integrals/psi4plugins/savehdf.cc)
 to store all unique matrix elements (remember that there is eightfold
 permutation symmetry) in binary form with HDF5.
 
 To compile the plugin, libchemps2 should be installed as described
-above, and the ```Makefile``` should be adjusted. Change the line
+above, and the `Makefile` should be adjusted. Change the line
 
     PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
 
@@ -339,7 +338,7 @@ run:
     > psi4 --new-plugin dmrgci
     > cd dmrgci
 
-Now, replace the file ```dmrgci.cc``` with 
+Now, replace the file `dmrgci.cc` with 
 [integrals/psi4plugins/dmrgci.cc](integrals/psi4plugins/dmrgci.cc).
 For the compilation of this plugin, the same instructions as above should
 be followed (linking to libchemps2).
@@ -362,7 +361,7 @@ and then run:
     > psi4 --new-plugin dmrgscf
     > cd dmrgscf
     
-Now, replace the file ```dmrgscf.cc``` with 
+Now, replace the file `dmrgscf.cc` with 
 [integrals/psi4plugins/dmrgscf.cc](integrals/psi4plugins/dmrgscf.cc).
 For the compilation of this plugin, the same instructions as above should
 be followed (linking to libchemps2).
@@ -375,7 +374,7 @@ Example input files to use the plugin are provided in
 
 3. [integrals/psi4plugins/test9.dat](integrals/psi4plugins/test9.dat)
 
-These DMRG-SCF tests are the analogs of the corresponding C++ and python
+These DMRG-SCF tests are the analogs of the corresponding `c++` and python
 tests (with the same number). After compilation of the dmrgscf plugin, place
 these input files one directory higher than the plugin. In that folder, run:
 
@@ -405,7 +404,7 @@ calculations with PyCheMPS2 can be found in
 5. [integrals/pyscf/call_chemps2.py](integrals/pyscf/call_chemps2.py)
 
 Please remember to append the correct pyscf and PyCheMPS2 directories to
-```sys.path``` at the top of these files.
+`sys.path` at the top of these files.
 
 
 List of files in libchemps2
