@@ -46,8 +46,8 @@ large active spaces, you are encouraged to read the
 
 Incorporation of the library into other codes is very simple due a
 minimal API, as well as a python interface. Direct usage of the
-library is illustrated in the [c++](#2-testing-libchemps2) and
-[python](#4-testing-pychemps2) tests, which can be easily adapted
+library is illustrated in the [c++](#4-test-libchemps2) and
+[python](#6-test-pychemps2) tests, which can be easily adapted
 to your needs. The interfaces to
 [psi4 (in c++)](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) and to
 [pyscf (in python)](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
