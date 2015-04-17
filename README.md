@@ -121,43 +121,33 @@ extended to a hybrid scheme with both shared (OpenMP) and distributed
 It is advised to clone the CheMPS2 git repository from github. In your
 terminal, run:
 
-```bash
-$ cd /myfolder
-$ git clone 'https://github.com/sebwouters/chemps2'
-$ cd chemps2
-```
+    > cd /myfolder
+    > git clone 'https://github.com/sebwouters/chemps2'
+    > cd chemps2
 
 That way, future updates and bug fixes can be easily pulled in:
 
-```bash
-$ cd /myfolder/chemps2
-$ git pull
-```
+    > cd /myfolder/chemps2
+    > git pull
 
 ### 3. Build libchemps2
 
 The files
 
-```bash
-/myfolder/chemps2/CMakeLists.txt
-/myfolder/chemps2/CheMPS2/CMakeLists.txt
-/myfolder/chemps2/tests/CMakeLists.txt
-/myfolder/chemps2/PyCheMPS2/CMakeLists.txt
-```
+    /myfolder/chemps2/CMakeLists.txt
+    /myfolder/chemps2/CheMPS2/CMakeLists.txt
+    /myfolder/chemps2/tests/CMakeLists.txt
+    /myfolder/chemps2/PyCheMPS2/CMakeLists.txt
 
 provide a minimal compilation. In your terminal, run:
 
-```bash
-$ cd /myfolder/chemps2
-$ mkdir build
-$ cd build
-```
+    > cd /myfolder/chemps2
+    > mkdir build
+    > cd build
 
 CMake generates makefiles based on the user’s specifications:
 
-```bash
-$ CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
-```
+    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
 
 1.  Option1 is the `c++` compiler; typically `g++`, `icpc`, or `clang++`
     on Linux.
@@ -174,34 +164,25 @@ $ CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTA
 
 If one or more of the required libraries are not found, use the command
 
-```bash
-$ CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
-```
+    > CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
+
 
 instead, where option6 and option7 are respectively the missing
 colon-separated include and library paths, e.g.
 
-```bash
-CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
-```
+    CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
 
 and
 
-```bash
-CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
-```
+    CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 
 To compile, run:
 
-```bash
-$ make
-```
+    > make
 
 To install, run:
 
-```bash
-$ make install
-```
+    > make install
 
 For non-standard installation directories, please remember to append the
 library path to `LD_LIBRARY_PATH` in your `.bashrc`.
@@ -210,10 +191,8 @@ library path to `LD_LIBRARY_PATH` in your `.bashrc`.
 
 To test libchemps2, run:
 
-```bash
-$ cd /myfolder/chemps2/build
-$ make test
-```
+    > cd /myfolder/chemps2/build
+    > make test
 
 The tests only require a very limited amount of memory (order 10-120
 MB).
@@ -226,10 +205,8 @@ PyCheMPS2, a python inferface to libchemps2, can be built with
 paths have been set to the ones in the build directory. In your
 terminal, run:
 
-```bash
-$ cd /myfolder/chemps2/build
-$ python setup.py build_ext -i
-```
+    > cd /myfolder/chemps2/build
+    > python setup.py build_ext -i
 
 Compilation of PyCheMPS2 occurs by linking to the `c++` library in the
 build directory. However, when you want to run the tests in the next
@@ -241,33 +218,27 @@ library first, before using PyCheMPS2!
 
 To test PyCheMPS2, run:
 
-```bash
-$ cd /myfolder/chemps2/build/PyTests
-$ python test1.py
-$ python test2.py
-$ python test3.py
-$ python test4.py
-$ python test5.py
-$ python test6.py
-$ python test7.py
-$ python test8.py
-$ python test9.py
-```
+    > cd /myfolder/chemps2/build/PyTests
+    > python test1.py
+    > python test2.py
+    > python test3.py
+    > python test4.py
+    > python test5.py
+    > python test6.py
+    > python test7.py
+    > python test8.py
+    > python test9.py
 
 If you compiled the `c++` library with `-DMKL=ON`, you might get the
 error
 
-```bash
-Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
-```
+    Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 
 This issue of using Intel’s MKL inside python is known and reported. To
 get the python tests to run, you can set the variable `LD_PRELOAD` in
 order to preload libmkl\_rt.so. On my system, this is done with
 
-```bash
-$ export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
-```
+    > export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
 
 The python tests do exactly the same thing as the `c++` tests above, and
 illustrate the usage of the python interface to libchemps2. The tests
@@ -279,15 +250,13 @@ require a very limited amount of memory (order 10-120 MB).
 To build and view the doxygen manual, the documentation flag should have
 been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
 
-```bash
-$ cd /myfolder/chemps2/build
-$ make doc
-$ cd LaTeX-documents
-$ make
-$ evince refman.pdf &
-$ cd ../html
-$ firefox index.html &
-```
+    > cd /myfolder/chemps2/build
+    > make doc
+    > cd LaTeX-documents
+    > make
+    > evince refman.pdf &
+    > cd ../html
+    > firefox index.html &
 
 
 User manual
@@ -313,18 +282,14 @@ and should work on later versions as well.
 
 To make use of this feature, build psi4 with the plugin option, and then run:
 
-```bash
-$ psi4 --new-plugin fcidump
-$ cd fcidump
-```
+    > psi4 --new-plugin fcidump
+    > cd fcidump
 
 Now, replace the file ```fcidump.cc``` with 
 [integrals/psi4plugins/fcidump.cc](integrals/psi4plugins/fcidump.cc). To
 compile the plugin, run:
 
-```bash
-$ make
-```
+    > make
 
 Examples of output generated with this
 plugin can be found in [tests/matrixelements](tests/matrixelements).
@@ -340,10 +305,8 @@ The remark on psi4's commit version from the previous section remains.
 
 To make use of this feature, build psi4 with the plugin option, and then run:
 
-```bash
-$ psi4 --new-plugin savehdf
-$ cd savehdf
-```
+    > psi4 --new-plugin savehdf
+    > cd savehdf
 
 Now, replace the file ```savehdf.cc``` with 
 [integrals/psi4plugins/savehdf.cc](integrals/psi4plugins/savehdf.cc)
@@ -353,21 +316,15 @@ permutation symmetry) in binary form with HDF5.
 To compile the plugin, libchemps2 should be installed as described
 above, and the ```Makefile``` should be adjusted. Change the line
 
-```bash
-PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
-```
+    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
 
 to
 
-```bash
-PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
-```
+    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
 
 To compile the plugin, run:
 
-```bash
-$ make
-```
+    > make
 
 
 DMRG-CI and DMRG-SCF calculations with psi4
@@ -379,10 +336,8 @@ The remark on psi4's commit version from the previous section remains. To
 perform DMRG-CI calculations, build psi4 with the plugin option, and then
 run:
 
-```bash
-$ psi4 --new-plugin dmrgci
-$ cd dmrgci
-```
+    > psi4 --new-plugin dmrgci
+    > cd dmrgci
 
 Now, replace the file ```dmrgci.cc``` with 
 [integrals/psi4plugins/dmrgci.cc](integrals/psi4plugins/dmrgci.cc).
@@ -398,18 +353,14 @@ Example input files to use the plugin are provided in
 After compilation of the dmrgci plugin, place these input files one directory
 higher than the plugin. In that folder, run:
 
-```bash
-$ psi4 N2.dat
-$ psi4 H2O.dat
-```
+    > psi4 N2.dat
+    > psi4 H2O.dat
 
 To perform DMRG-SCF calculations, build psi4 with the plugin option,
 and then run:
 
-```bash
-$ psi4 --new-plugin dmrgscf
-$ cd dmrgscf
-```
+    > psi4 --new-plugin dmrgscf
+    > cd dmrgscf
     
 Now, replace the file ```dmrgscf.cc``` with 
 [integrals/psi4plugins/dmrgscf.cc](integrals/psi4plugins/dmrgscf.cc).
@@ -428,11 +379,9 @@ These DMRG-SCF tests are the analogs of the corresponding C++ and python
 tests (with the same number). After compilation of the dmrgscf plugin, place
 these input files one directory higher than the plugin. In that folder, run:
 
-```bash
-$ psi4 test6.dat
-$ psi4 test8.dat
-$ psi4 test9.dat
-```
+    > psi4 test6.dat
+    > psi4 test8.dat
+    > psi4 test9.dat
 
 DMRG-CI and DMRG-SCF calculations with pyscf
 --------------------------------------------
