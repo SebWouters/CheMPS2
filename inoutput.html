@@ -8,8 +8,8 @@
     
     <title>6. DMRG calculations &mdash; CheMPS2 1.5 documentation</title>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -20,9 +20,9 @@
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
     <link rel="next" title="7. DMRG-SCF" href="dmrgscf.html" />
@@ -208,7 +208,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 </pre></div>
 </div>
 <p>The energy <span class="math">\(E_{D}\)</span> is a linear function of the discarded weight <span class="math">\(w_D^{disc}\)</span>, which allows to extrapolate the DMRG energies <span class="math">\(E_D\)</span> to the FCI energy. An example of such an extrapolation for N2 in the cc-pVDZ basis with nuclear separation 2.118 a.u. is given in the figure below:</p>
-<img alt="_images/ExtrapolationN2reorder.png" src="_images/ExtrapolationN2reorder.png" />
+<img alt="images/ExtrapolationN2reorder.png" src="images/ExtrapolationN2reorder.png" />
 </div>
 <div class="section" id="orbital-choice-and-ordering">
 <span id="chemps2-orbitalchoiceordering"></span><span id="index-2"></span><h2>6.6. Orbital choice and ordering<a class="headerlink" href="#orbital-choice-and-ordering" title="Permalink to this headline">¶</a></h2>
@@ -219,9 +219,9 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 <li>For compact molecules such as dimers, it is best to group orbitals in irrep blocks, and to place bonding and anti-bonding irreps adjacent.</li>
 </ol>
 <p>An example for the all-trans polyene <span class="math">\(C_{14}H_{16}\)</span> is provided in the figure below. Its geometry was optimized at the B3LYP/6-31G** level of theory. The <span class="math">\(\sigma\)</span>-orbitals are kept frozen at the RHF/6-31G level of theory, and the active space consists of 28 RHF/6-31G <span class="math">\(\pi\)</span>-orbitals. In the figure, the convergence rates of DMRG calculations with canonical RHF orbitals and with localized orbitals (Edmiston-Ruedenberg) are compared.</p>
-<img alt="_images/Comparison.png" src="_images/Comparison.png" />
+<img alt="images/Comparison.png" src="images/Comparison.png" />
 <p>An example for N2 in the cc-pVDZ basis with nuclear separation 2.118 a.u. is given in the figure below. The convergence rates of DMRG calculations using the standard irrep ordering in <a class="reference external" href="http://www.psicode.org/">psi4</a> and the ordering where bonding and antibonding irreps are placed adjacent are compared.</p>
-<img alt="_images/ComparisonN2.png" src="_images/ComparisonN2.png" />
+<img alt="images/ComparisonN2.png" src="images/ComparisonN2.png" />
 <p>For homonuclear dimers with d2h symmetry, the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> object allows to reorder the irrep blocks from standard <a class="reference external" href="http://www.psicode.org/">psi4</a> ordering to the ordering shown in the figure with bonding and antibonding irreps adjacent:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span><span class="o">::</span><span class="n">SetupReorderD2h</span><span class="p">()</span>
 </pre></div>
@@ -254,6 +254,9 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
+            </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">6. DMRG calculations</a><ul>
@@ -276,7 +279,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/inoutput.txt"
+      <li><a href="sources/inoutput.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
