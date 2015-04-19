@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Symmetries &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="5. CheMPS2::Hamiltonian" href="matrixelements.html" />
+    <link rel="prev" title="3. DMRG algorithm" href="method.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="method.html" title="3. DMRG algorithm"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="symmetries">
+<span id="index-0"></span><h1>4. Symmetries<a class="headerlink" href="#symmetries" title="Permalink to this headline">¶</a></h1>
+<p>CheMPS2 exploits the <span class="math">\(\mathsf{SU(2)}\)</span> spin symmetry, <span class="math">\(\mathsf{U(1)}\)</span> particle number symmetry, and abelian point group symmetries <span class="math">\(\{ \mathsf{C_1}, \mathsf{C_i}, \mathsf{C_2}, \mathsf{C_s}, \mathsf{D_2}, \mathsf{C_{2v}}, \mathsf{C_{2h}}, \mathsf{D_{2h}}  \}\)</span> of ab initio quantum chemistry Hamiltonians. Thereto the orbital occupation and virtual indices have to be represented by states which transform according to a particular row of one of the irreps of the symmetry group of the Hamiltonian. For example for orbital <span class="math">\(k\)</span>:</p>
+<div class="math">
+\[\begin{split}\left|-\right\rangle &amp; \rightarrow &amp; \left|s = 0;s^z=0;N=0; I=I_0\right\rangle\\
+\left|\uparrow\right\rangle &amp; \rightarrow &amp; \left|s = \frac{1}{2};s^z=\frac{1}{2};N=1; I=I_k\right\rangle\\
+\left|\downarrow\right\rangle &amp; \rightarrow &amp; \left|s = \frac{1}{2};s^z=-\frac{1}{2};N=1; I=I_k\right\rangle\\
+\left|\uparrow\downarrow\right\rangle &amp; \rightarrow &amp; \left|s = 0;s^z=0;N=2; I=I_k \otimes I_k = I_0\right\rangle.\end{split}\]</div>
+<p>Then the MPS tensors factorize into Clebsch-Gordan coefficients and reduced tensors due to the Wigner-Eckart theorem:</p>
+<div class="math">
+\[A[i]^{(ss^zNI)}_{(j_L j_L^z N_L I_L \alpha_L);(j_R j_R^z N_R I_R \alpha_R)} = \left\langle j_L j_L^z s s^z \mid j_R j_R^z \right\rangle \delta_{N_L+N,N_R} \delta_{I_L\otimes I, I_R} T[i]^{(sNI)}_{(j_L N_L I_L \alpha_L);(j_R N_R I_R \alpha_R)}.\]</div>
+<p>This has three important consequences:</p>
+<ol class="arabic simple">
+<li>There is block-sparsity due to the Clebsch-Gordan coefficients. Remember that the Clebsch-Gordan coefficients of abelian groups are Kronecker <span class="math">\(\delta\)</span>&#8216;s. The block-sparsity results in both memory and CPU time savings.</li>
+<li>There is information compression for spin symmetry sectors other than singlets, as the tensor <span class="math">\(\mathbf{T[i]}\)</span> does not contain spin projection indices. The virtual dimension associated with <span class="math">\(\mathbf{T[i]}\)</span> is called the reduced virtual dimension <span class="math">\(D_{\mathsf{SU(2)}}\)</span>. This also results in both memory and CPU time savings.</li>
+<li>Excited states in different symmetry sectors can be obtained by ground-state calculations.</li>
+</ol>
+<p>The operators</p>
+<div class="math">
+\[\begin{split}\hat{b}^{\dagger}_{k\sigma} &amp; = &amp; \hat{a}^{\dagger}_{k\sigma}\\
+\hat{b}_{k\sigma} &amp; = &amp; (-1)^{\frac{1}{2}-\sigma}\hat{a}_{k-\sigma}\end{split}\]</div>
+<p>of orbital <span class="math">\(c\)</span> transform according to row <span class="math">\((s = \frac{1}{2}; s^z=\sigma; N=\pm 1; I_c)\)</span> of irrep <span class="math">\((s = \frac{1}{2}; N=\pm 1; I_c)\)</span>. <span class="math">\(\hat{b}^{\dagger}\)</span> and <span class="math">\(\hat{b}\)</span> are hence both doublet irreducible tensor operators, and the Wigner-Eckart theorem allows to factorize corresponding matrix elements into Clebsch-Gordan coefficients and reduced matrix elements. Together with the Wigner-Eckart theorem for the MPS tensors, this allows to work with reduced quantities only in CheMPS2. Only Wigner 6-j and 9-j symbols are needed, but never Wigner 3-j symbols or Clebsch-Gordan coefficients.</p>
+<p>For more information on the exploitation of symmetry in the DMRG method, please read Ref. <a class="reference internal" href="#symm1" id="id1">[SYMM1]</a>.</p>
+<table class="docutils citation" frame="void" id="symm1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[SYMM1]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters and D. Van Neck, <em>European Physical Journal D</em> <strong>68</strong>, 272 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">10.1140/epjd/e2014-50500-1</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="method.html"
+                        title="previous chapter">3. DMRG algorithm</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="matrixelements.html"
+                        title="next chapter">5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/symmetry.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="method.html" title="3. DMRG algorithm"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

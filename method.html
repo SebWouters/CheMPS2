@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. DMRG algorithm &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="4. Symmetries" href="symmetry.html" />
+    <link rel="prev" title="2. Publications" href="publications.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="symmetry.html" title="4. Symmetries"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="publications.html" title="2. Publications"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dmrg-algorithm">
+<span id="index-0"></span><h1>3. DMRG algorithm<a class="headerlink" href="#dmrg-algorithm" title="Permalink to this headline">¶</a></h1>
+<p>The density matrix renormalization group (DMRG) was first used for ab initio quantum chemistry in 1999 <a class="reference internal" href="#dmrg1" id="id1">[DMRG1]</a>. The method variationally optimizes a low-rank tensor approximation of the full configuration interaction (FCI) solution. Suppose we have <span class="math">\(L\)</span> spatial orbitals. The FCI solution can in general be written as</p>
+<div class="math">
+\[\begin{split}\left|\Psi\right\rangle &amp; = &amp; \sum\limits_{\{ n_{i\sigma} \}} C^{n_{1\uparrow} n_{1\downarrow} n_{2\uparrow} n_{2\downarrow} n_{3\uparrow} ... n_{L\uparrow} n_{L\downarrow} }  \left( \hat{a}^{\dagger}_{1\uparrow} \right)^{n_{1\uparrow}} \left( \hat{a}^{\dagger}_{1\downarrow} \right)^{n_{1\downarrow}} \left( \hat{a}^{\dagger}_{2\uparrow} \right)^{n_{2\uparrow}} ... \left( \hat{a}^{\dagger}_{L\uparrow} \right)^{n_{L\uparrow}} \left( \hat{a}^{\dagger}_{L\downarrow} \right)^{n_{L\downarrow}} \left|-\right\rangle \nonumber \\
+&amp; = &amp; \sum\limits_{\{ n_{i\sigma} \}} C^{n_{1\uparrow} n_{1\downarrow} n_{2\uparrow} n_{2\downarrow} n_{3\uparrow} ... n_{L\uparrow} n_{L\downarrow} } \left| n_{1\uparrow} n_{1\downarrow} n_{2\uparrow} n_{2\downarrow} n_{3\uparrow} ... n_{L\uparrow} n_{L\downarrow} \right\rangle.\end{split}\]</div>
+<p>With successive singular value decompositions, the FCI <span class="math">\(C\)</span>-tensor can be composed into a matrix product state (MPS):</p>
+<div class="math">
+\[\begin{split}C^{ n_{1\uparrow} n_{1\downarrow} n_{2\uparrow} n_{2\downarrow} n_{3\uparrow} ... n_{L\uparrow} n_{L\downarrow} } &amp; = &amp; \sum\limits_{\alpha_1, \alpha_2, ..., \alpha_L} A[1]^{ n_{1\uparrow} n_{1\downarrow} }_{ \alpha_1 } A[2]^{n_{2\uparrow} n_{2\downarrow}}_{ \alpha_1 ; \alpha_2 } A[3]^{n_{3\uparrow} n_{3\downarrow}}_{ \alpha_2 ; \alpha_3 } ... A[L-1]^{n_{L-1\uparrow} n_{L-1\downarrow}}_{ \alpha_{L-2} ; \alpha_{L-1} } A[L]^{n_{L\uparrow} n_{L\downarrow}}_{ \alpha_{L-1} } \nonumber \\
+&amp; = &amp; \mathbf{A}[1]^{ n_{1\uparrow} n_{1\downarrow} } \mathbf{A}[2]^{n_{2\uparrow} n_{2\downarrow}} \mathbf{A}[3]^{n_{3\uparrow} n_{3\downarrow}} ... \mathbf{A}[L-1]^{n_{L-1\uparrow} n_{L-1\downarrow}} \mathbf{A}[L]^{n_{L\uparrow} n_{L\downarrow}},\end{split}\]</div>
+<p>where <span class="math">\(dim(\alpha_i) = min(4^i,4^{L-i})\)</span>. To make the method of polynomial complexity, the rank of the decomposition is truncated to a fixed dimension <span class="math">\(D\)</span>:</p>
+<div class="math">
+\[dim(\alpha_i) = min(4^i,4^{L-i},D).\]</div>
+<p>The integer <span class="math">\(D\)</span> is called the bond, virtual, or auxiliary dimension. The DMRG algorithm consists of consecutive sweeps over the chain of orbitals, during which two neighbouring MPS tensors are variatonally optimized. Thereto they are combined into a two-orbital tensor:</p>
+<div class="math">
+\[\mathbf{B}[i]^{n_{i\uparrow} n_{i\downarrow} n_{i+1\uparrow} n_{i+1\downarrow}} = \mathbf{A}[i]^{n_{i\uparrow} n_{i\downarrow}} \mathbf{A}[i+1]^{n_{i+1\uparrow} n_{i+1\downarrow}}.\]</div>
+<p>The Lagrangian</p>
+<div class="math">
+\[\mathcal{L} = \left\langle \Psi( \mathbf{B}[i] ) \mid \hat{H} \mid \Psi( \mathbf{B}[i] ) \right\rangle - E \left\langle \Psi( \mathbf{B}[i] ) \mid \Psi( \mathbf{B}[i] ) \right\rangle\]</div>
+<p>is varied with respect to <span class="math">\(\mathbf{B}[i]\)</span> to yield an effective Hamiltonian eigenvalue equation. By exploiting the gauge freedom in the MPS, this eigenvalue equation can always be turned into a numerically stable standard eigenvalue equation for each local optimization step:</p>
+<div class="math">
+\[\mathbf{H}^{\text{effective}}[i] \times \mathbf{B}[i] = E \mathbf{B}[i].\]</div>
+<p>Once <span class="math">\(\mathbf{B}[i]\)</span> is found, it is decomposed with a singular value decomposition:</p>
+<div class="math">
+\[B[i]^{n_{i\uparrow} n_{i\downarrow} n_{i+1\uparrow} n_{i+1\downarrow}}_{\alpha;\beta} = M_{(\alpha n_{i\uparrow} n_{i\downarrow});(n_{i+1\uparrow} n_{i+1\downarrow} \beta)} = \sum\limits_{\kappa} U_{(\alpha n_{i\uparrow} n_{i\downarrow});\kappa} \lambda_{\kappa} V^{\dagger}_{\kappa;(n_{i+1\uparrow} n_{i+1\downarrow} \beta)} = \sum\limits_{\kappa} A[i]^{n_{i\uparrow} n_{i\downarrow}}_{\alpha;\kappa} \lambda_{\kappa} A[i+1]^{n_{i+1\uparrow} n_{i+1\downarrow}}_{\kappa;\beta}.\]</div>
+<p>For a normalized wavefunction <span class="math">\(\sum\limits_{\kappa} \lambda_{\kappa}^2 = 1\)</span>. If <span class="math">\(dim(\alpha) = dim(\beta) = D\)</span> then <span class="math">\(dim(\kappa) = 4D\)</span>. In order to keep the virtual dimension fixed to <span class="math">\(D\)</span>, the summation over <span class="math">\(\kappa\)</span> is truncated to the <span class="math">\(D\)</span> largest values <span class="math">\(\lambda_{\kappa}\)</span>. The discarded weight <span class="math">\(w_D[i] = \sum\limits_{\kappa &gt; D} \lambda_{\kappa}^2\)</span> is a measure for the information loss.</p>
+<p>For more information on the DMRG method, please read Ref. <a class="reference internal" href="#dmrg2" id="id2">[DMRG2]</a>.</p>
+<table class="docutils citation" frame="void" id="dmrg1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[DMRG1]</a></td><td>S.R. White and R.L. Martin, <em>Journal of Chemical Physics</em> <strong>110</strong>, 4127 (1999), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.478295">10.1063/1.478295</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrg2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[DMRG2]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters and D. Van Neck, <em>European Physical Journal D</em> <strong>68</strong>, 272 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">10.1140/epjd/e2014-50500-1</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="publications.html"
+                        title="previous chapter">2. Publications</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="symmetry.html"
+                        title="next chapter">4. Symmetries</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/method.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="symmetry.html" title="4. Symmetries"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="publications.html" title="2. Publications"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

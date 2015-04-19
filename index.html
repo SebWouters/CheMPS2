@@ -1,414 +1,169 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.6"/>
-<title>CheMPS2: Main Page</title>
-<link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="dynsections.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript">
-  $(document).ready(initResizable);
-  $(window).load(resizeHeight);
-</script>
-<link href="search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="search/search.js"></script>
-<script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
-</script>
-<link href="doxygen.css" rel="stylesheet" type="text/css" />
-</head>
-<body>
-<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
-<div id="titlearea">
-<table cellspacing="0" cellpadding="0">
- <tbody>
- <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="CheMPS2logo.png"/></td>
-  <td style="padding-left: 0.5em;">
-   <div id="projectname">CheMPS2
-   </div>
-  </td>
- </tr>
- </tbody>
-</table>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CheMPS2 documentation &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="#" />
+    <link rel="next" title="1. Installation" href="sourcecode.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="sourcecode.html" title="1. Installation"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="chemps2-documentation">
+<h1>CheMPS2 documentation<a class="headerlink" href="#chemps2-documentation" title="Permalink to this headline">¶</a></h1>
+<img alt="_images/CheMPS2logo.png" src="_images/CheMPS2logo.png" />
+<p>CheMPS2 is a scientific library in the field of ab initio quantum chemistry. It contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI).</p>
+<p>For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
+<p>In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
+<p>CheMPS2 is distributed under the GNU General Public License version 2, and can be downloaded from <a class="reference external" href="https://github.com/sebwouters/chemps2">https://github.com/sebwouters/chemps2</a>.</p>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sourcecode.html">1. Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#dependencies">1.1. Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#download">1.2. Download</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-libchemps2">1.3. Build libchemps2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-libchemps2">1.4. Test libchemps2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-pychemps2">1.5. Build PyCheMPS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-pychemps2">1.6. Test PyCheMPS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#doxygen">1.7. Doxygen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#sphinx-user-manual">1.8. Sphinx user manual</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="publications.html">2. Publications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="method.html">3. DMRG algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="symmetry.html">4. Symmetries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrixelements.html">5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="matrixelements.html#psi4-fcidump-plugin">5.1. psi4 <code class="docutils literal"><span class="pre">fcidump</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrixelements.html#psi4-savehdf-plugin">5.2. psi4 <code class="docutils literal"><span class="pre">savehdf</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrixelements.html#custom-matrix-elements">5.3. Custom matrix elements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="inoutput.html">6. DMRG calculations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#chemps2-problem">6.1. <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#chemps2-convergencescheme">6.2. <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#chemps2-dmrg">6.3. <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#excited-states">6.4. Excited states</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#extrapolation">6.5. Extrapolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="inoutput.html#orbital-choice-and-ordering">6.6. Orbital choice and ordering</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dmrgscf.html">7. DMRG-SCF</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#augmented-hessian-newton-raphson">7.1. Augmented Hessian Newton-Raphson</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#diis">7.2. DIIS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dmrgscfcalcs.html">8. DMRG-SCF calculations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-dmrgscfoptions">8.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-casscf">8.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces.html">9. Interfaces to psi4 and pyscf</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgci-plugin">9.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgscf-plugin">9.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#id12">9.3. pyscf</a></li>
+</ul>
+</li>
+</ul>
 </div>
-<!-- end header part -->
-<!-- Generated by Doxygen 1.8.6 -->
-<script type="text/javascript">
-var searchBox = new SearchBox("searchBox", "search",false,'Search');
-</script>
-  <div id="navrow1" class="tabs">
-    <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
-      <li>
-        <div id="MSearchBox" class="MSearchBoxInactive">
-        <span class="left">
-          <img id="MSearchSelect" src="search/mag_sel.png"
-               onmouseover="return searchBox.OnSearchSelectShow()"
-               onmouseout="return searchBox.OnSearchSelectHide()"
-               alt=""/>
-          <input type="text" id="MSearchField" value="Search" accesskey="S"
-               onfocus="searchBox.OnSearchFieldFocus(true)" 
-               onblur="searchBox.OnSearchFieldFocus(false)" 
-               onkeyup="searchBox.OnSearchFieldChange(event)"/>
-          </span><span class="right">
-            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
-          </span>
+<p>For more elaborate information on CheMPS2, please consult the <a class="reference internal" href="publications.html#label-publications"><span>publications</span></a> and the <a class="reference external" href="http://sebwouters.github.io/CheMPS2/doxygen/index.html">doxygen html output</a>.</p>
+</div>
+</div>
+
+
+          </div>
         </div>
-      </li>
-    </ul>
-  </div>
-</div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-      <div id="nav-sync" class="sync"></div>
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-$(document).ready(function(){initNavTree('index.html','');});
-</script>
-<div id="doc-content">
-<!-- window showing the filter options -->
-<div id="MSearchSelectWindow"
-     onmouseover="return searchBox.OnSearchSelectShow()"
-     onmouseout="return searchBox.OnSearchSelectHide()"
-     onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
-
-<!-- iframe showing the search results (closed by default) -->
-<div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" frameborder="0" 
-        name="MSearchResults" id="MSearchResults">
-</iframe>
-</div>
-
-<div class="header">
-  <div class="headertitle">
-<div class="title">CheMPS2 Documentation</div>  </div>
-</div><!--header-->
-<div class="contents">
-<div class="textblock"><div class="image">
-<img src="https://raw.githubusercontent.com/sebwouters/CheMPS2/master/CheMPS2/CheMPS2logo.png?raw=true"  alt="CheMPS2 Logo"/>
-</div>
-<h1>CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry </h1>
-<p>Copyright (C) 2013-2015 Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a></p>
-<p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
-<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
-<p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</p>
-<h2>Information </h2>
-<p>CheMPS2 is a scientific library in the field of ab initio quantum chemistry. It contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows one to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI).</p>
-<p>For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. The latter allows one to calculate various molecular properties, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
-<p>Next to a spin-adapted implementation of DMRG, the library also contains a determinant-based FCI implementation, which allows to calculate both Hamiltonian eigenstates and Green's functions.</p>
-<p>To gain a better understanding of how to perform DMRG calculations for large active spaces, you are encouraged to read the <a href="#how-to-acknowledge-chemps2">two papers</a> listed below.</p>
-<p>Incorporation of the library into other codes is very simple due a minimal API, as well as a python interface. Direct usage of the library is illustrated in the <a href="#2-testing-libchemps2">c++</a> and <a href="#4-testing-pychemps2">python</a> tests, which can be easily adapted to your needs. The interfaces to <a href="#dmrg-ci-and-dmrg-scf-calculations-with-psi4">psi4 (in c++)</a> and to <a href="#dmrg-ci-and-dmrg-scf-calculations-with-pyscf">pyscf (in python)</a> are described below.</p>
-<p>In the future the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
-<h2>How to acknowledge CheMPS2 </h2>
-<p>To acknowledge CheMPS2, please cite</p>
-<ol type="1">
-<li>S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry, Computer Physics Communications 185 (6), 1501-1514 (2014), <a href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">doi:10.1016/j.cpc.2014.01.019</a> <pre class="fragment"> @article{CheMPS2cite1,
-     author = {Sebastian Wouters and Ward Poelmans and Paul W. Ayers and Dimitri {Van Neck}},
-     title = {CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry},
-     journal = {Computer Physics Communications},
-     year = {2014},
-     volume = {185},
-     number = {6},
-     pages = {1501-1514},
-     doi = {10.1016/j.cpc.2014.01.019}
- }
-</pre></li>
-<li>S. Wouters and D. Van Neck, The density matrix renormalization group for ab initio quantum chemistry, The European Physical Journal D 68 (9), 272 (2014), <a href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">doi:10.1140/epjd/e2014-50500-1</a> <pre class="fragment"> @article{CheMPS2cite2,
-     author = {Sebastian Wouters and Dimitri {Van Neck}},
-     title = {The density matrix renormalization group for ab initio quantum chemistry},
-     journal = {The European Physical Journal D},
-     year = {2014},
-     volume = {68},
-     number = {9},
-     pages = {272},
-     doi = {10.1140/epjd/e2014-50500-1}
- }
-</pre></li>
-</ol>
-<h2>Build </h2>
-<h3>1. Build libchemps2 with CMake</h3>
-<p>libchemps2 requires BLAS, LAPACK, the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library (GSL)</a>, and the <a href="http://www.hdfgroup.org/HDF5/">Hierarchical Data Format Release 5 (HDF5)</a>. The <a href="http://openmp.org/wp/">Open Multi-Processing (OpenMP)</a> API is used for shared-memory parallelization. libchemps2 can be built with CMake. The files </p>
-<pre class="fragment">./CMakeLists.txt
-./CheMPS2/CMakeLists.txt
-./tests/CMakeLists.txt
-./PyCheMPS2/CMakeLists.txt
-</pre><p>provide a minimal compilation. Start in <code>./</code> and run: </p>
-<pre class="fragment">&gt; mkdir build
-&gt; cd build
-</pre><p>CMake generates makefiles based on the user's specifications: </p>
-<pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
--DCMAKE_INSTALL_PREFIX=option4
-</pre><p>Option1 is the C++ compiler; typically <code>g++</code> or <code>icpc</code> on Linux. Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library. Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation. Option4 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>prefix/include/chemps2</code>. If one or more of the required libraries are not found, please use the command </p>
-<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1
-cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3
--DCMAKE_INSTALL_PREFIX=option4
-</pre><p>instead, where option5 and option6 are respectively the missing colon-separated include and library paths, e.g. </p>
-<pre class="fragment">CMAKE_INCLUDE_PATH=/my_libs/lib1/include/:/my_libs/lib2/include/
-</pre><p>and </p>
-<pre class="fragment">CMAKE_LIBRARY_PATH=/my_libs/lib1/lib/:/my_libs/lib2/lib/
-</pre><p>To compile, run: </p>
-<pre class="fragment">&gt; make
-</pre><p>To install, run: </p>
-<pre class="fragment">&gt; make install
-</pre><p>For non-standard installation directories, please remember to append the library path to <code>LD_LIBRARY_PATH</code> in your .bashrc.</p>
-<h3>2. Testing libchemps2</h3>
-<p>To test libchemps2, start in <code>./build</code>, and run: </p>
-<pre class="fragment">&gt; make test
-</pre><p>The tests only require a very limited amount of memory (order 10-120 MB).</p>
-<h3>3. Build PyCheMPS2 with Cython</h3>
-<p>PyCheMPS2, a python inferface to libchemps2, can be built with Cython. The installation above generated the file <code>./build/setup.py</code>, in which the library and include paths have been set to the ones in the build directory. Start in <code>./build</code>, and run: </p>
-<pre class="fragment">&gt; python setup.py build_ext -i
-</pre><p>Compilation of PyCheMPS2 occurs by linking to the C++ library in the build directory. However, when you want to run the tests in the next section, you should first install the C++ library! If you have pulled a newer version of CheMPS2, please remember to (re)install the C++ library first, before using PyCheMPS2!</p>
-<h3>4. Testing PyCheMPS2</h3>
-<p>To test PyCheMPS2, start in <code>./build</code>, and run: </p>
-<pre class="fragment">&gt; cd PyTests/
-&gt; python test1.py
-&gt; python test2.py
-&gt; python test3.py
-&gt; python test4.py
-&gt; python test5.py
-&gt; python test6.py
-&gt; python test7.py
-&gt; python test8.py
-&gt; python test9.py
-</pre><p>If you compiled the C++ library with <code>-DMKL=ON</code>, you might get the error </p>
-<pre class="fragment">&gt; Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
-</pre><p>This issue of using Intel's MKL inside python is known and reported. To get the python tests to run, you can set the variable <code>LD_PRELOAD</code> in order to preload <code>libmkl_rt.so</code>. On my system, this is done with </p>
-<pre class="fragment">&gt; export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
-</pre><p>The python tests do exactly the same thing as the C++ tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
-<h3>5. Doxygen documentation</h3>
-<p>To build and view the doxygen manual, the documentation flag should have been on: <code>-DBUILD_DOCUMENTATION=ON</code>. Start in <code>./build</code> and run: </p>
-<pre class="fragment">&gt; make doc
-&gt; cd LaTeX-documents
-&gt; make
-&gt; evince refman.pdf &amp;
-&gt; cd ../html
-&gt; firefox index.html &amp;
-</pre><h2>User manual </h2>
-<p>Doxygen output can be generated: see the <a href="#build">build section</a> or the <a href="http://sebwouters.github.io/CheMPS2/index.html">doxygen html output</a>.</p>
-<p>For an overview of the concepts and ideas used in CheMPS2, please read the <a href="#how-to-acknowledge-chemps2">code release paper and review</a> listed above.</p>
-<h2>FCIDUMP files </h2>
-<p>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> object is able to read in FCIDUMP files. Such files can for example be generated by a plugin to <a href="http://www.psicode.org">psi4, ab initio quantum chemistry</a>. The plugin has been tested on commit 14c78eabdca86f8e094576890518d93d300d2500 (February 27, 2015) on <a href="https://github.com/psi4/psi4public">https://github.com/psi4/psi4public</a>, and should work on later versions as well.</p>
-<p>To make use of this feature, build psi4 with the plugin option, and then run: </p>
-<pre class="fragment">&gt; psi4 --new-plugin fcidump
-&gt; cd fcidump
-</pre><p>Now, replace the file <code>fcidump.cc</code> with <a href="integrals/psi4plugins/fcidump.cc">integrals/psi4plugins/fcidump.cc</a>. To compile the plugin, run: </p>
-<pre class="fragment">&gt; make
-</pre><p>Examples of output generated with this plugin can be found in <a href="tests/matrixelements">tests/matrixelements</a>.</p>
-<h2>Matrix elements from psi4 in HDF5 </h2>
-<p>The <a class="el" href="classCheMPS2_1_1Hamiltonian.html">CheMPS2::Hamiltonian</a> object is able to read in HDF5 files generated by a plugin to <a href="http://www.psicode.org">psi4, ab initio quantum chemistry</a>. The remark on psi4's commit version from the previous section remains.</p>
-<p>To make use of this feature, build psi4 with the plugin option, and then run: </p>
-<pre class="fragment">&gt; psi4 --new-plugin savehdf
-&gt; cd savehdf
-</pre><p>Now, replace the file <code>savehdf.cc</code> with <a href="integrals/psi4plugins/savehdf.cc">integrals/psi4plugins/savehdf.cc</a> to store all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5.</p>
-<p>To compile the plugin, libchemps2 should be installed as described above, and the <code>Makefile</code> should be adjusted. Change the line </p>
-<pre class="fragment">PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
-</pre><p>to </p>
-<pre class="fragment">PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
-</pre><p>To compile the plugin, run: </p>
-<pre class="fragment">&gt; make
-</pre><h2>DMRG-CI and DMRG-SCF calculations with psi4 </h2>
-<p>DMRG-CI and DMRG-SCF calculations can also be performed directly with <a href="http://www.psicode.org">psi4, ab initio quantum chemistry</a>. The remark on psi4's commit version from the previous section remains. To perform DMRG-CI calculations, build psi4 with the plugin option, and then run: </p>
-<pre class="fragment">&gt; psi4 --new-plugin dmrgci
-&gt; cd dmrgci
-</pre><p>Now, replace the file <code>dmrgci.cc</code> with <a href="integrals/psi4plugins/dmrgci.cc">integrals/psi4plugins/dmrgci.cc</a>. For the compilation of this plugin, the same instructions as above should be followed (linking to libchemps2).</p>
-<p>Example input files to use the plugin are provided in</p>
-<ol type="1">
-<li><a href="integrals/psi4plugins/N2.dat">integrals/psi4plugins/N2.dat</a></li>
-<li><a href="integrals/psi4plugins/H2O.dat">integrals/psi4plugins/H2O.dat</a></li>
-</ol>
-<p>After compilation of the dmrgci plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
-<pre class="fragment">&gt; psi4 N2.dat
-&gt; psi4 H2O.dat
-</pre><p>To perform DMRG-SCF calculations, build psi4 with the plugin option, and then run: </p>
-<pre class="fragment">&gt; psi4 --new-plugin dmrgscf
-&gt; cd dmrgscf
-</pre><p>Now, replace the file <code>dmrgscf.cc</code> with <a href="integrals/psi4plugins/dmrgscf.cc">integrals/psi4plugins/dmrgscf.cc</a>. For the compilation of this plugin, the same instructions as above should be followed (linking to libchemps2).</p>
-<p>Example input files to use the plugin are provided in</p>
-<ol type="1">
-<li><a href="integrals/psi4plugins/test6.dat">integrals/psi4plugins/test6.dat</a></li>
-<li><a href="integrals/psi4plugins/test8.dat">integrals/psi4plugins/test8.dat</a></li>
-<li><a href="integrals/psi4plugins/test9.dat">integrals/psi4plugins/test9.dat</a></li>
-</ol>
-<p>These DMRG-SCF tests are the analogs of the corresponding C++ and python tests (with the same number). After compilation of the dmrgscf plugin, place these input files one directory higher than the plugin. In that folder, run: </p>
-<pre class="fragment">&gt; psi4 test6.dat
-&gt; psi4 test8.dat
-&gt; psi4 test9.dat
-</pre><h2>DMRG-CI and DMRG-SCF calculations with pyscf </h2>
-<p><a href="https://github.com/sunqm/pyscf">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a href="https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py">chemps2.py</a>.</p>
-<p>Examples of how to extract MO integrals from pyscf to perform DMRG-CI calculations with PyCheMPS2 can be found in</p>
-<ol type="1">
-<li><a href="integrals/pyscf/example.py">integrals/pyscf/example.py</a></li>
-<li><a href="integrals/pyscf/example2.py">integrals/pyscf/example2.py</a></li>
-<li><a href="integrals/pyscf/example3.py">integrals/pyscf/example3.py</a></li>
-<li><a href="integrals/pyscf/dmrgci.py">integrals/pyscf/dmrgci.py</a></li>
-<li><a href="integrals/pyscf/call_chemps2.py">integrals/pyscf/call_chemps2.py</a></li>
-</ol>
-<p>Please remember to append the correct pyscf and PyCheMPS2 directories to <code>sys.path</code> at the top of these files.</p>
-<h2>List of files in libchemps2 </h2>
-<p><a href="CheMPS2/CASSCF.cpp">CheMPS2/CASSCF.cpp</a> contains the constructor and destructor of the CASSCF class, as well as the functions which allow to update, get or set its variables.</p>
-<p><a href="CheMPS2/CASSCFdebug.cpp">CheMPS2/CASSCFdebug.cpp</a> contains two functions: one for calculating the ROHF energy; and one for fetching FCI coefficients to determine the point group symmetry of certain electronic states of the carbon dimer.</p>
-<p><a href="CheMPS2/CASSCFnewtonraphson.cpp">CheMPS2/CASSCFnewtonraphson.cpp</a> contains all DMRG-SCF functions which are specific to the augmented Hessian Newton-Raphson update scheme, including the functions to calculate the gradient and Hessian.</p>
-<p><a href="CheMPS2/ConvergenceScheme.cpp">CheMPS2/ConvergenceScheme.cpp</a> contains all functions of the ConvergenceScheme class, which contains the instructions for the subsequent DMRG sweeps.</p>
-<p><a href="CheMPS2/Correlations.cpp">CheMPS2/Correlations.cpp</a> contains all the functionality to calculate the spin, density, and spin-flip correlation functions as well as the two-orbital mutual information.</p>
-<p><a href="CheMPS2/Davidson.cpp">CheMPS2/Davidson.cpp</a> is an implementation of Davidson's algorithm.</p>
-<p><a href="CheMPS2/DIIS.cpp">CheMPS2/DIIS.cpp</a> contains a DIIS convergence speed-up for DMRG-SCF.</p>
-<p><a href="CheMPS2/DMRG.cpp">CheMPS2/DMRG.cpp</a> contains the constructor and destructor of the DMRG class, as well as the top-level sweep functions.</p>
-<p><a href="CheMPS2/DMRGmpsio.cpp">CheMPS2/DMRGmpsio.cpp</a> contains the store and load functions for the DMRG checkpoint file (the MPS).</p>
-<p><a href="CheMPS2/DMRGoperators.cpp">CheMPS2/DMRGoperators.cpp</a> contains all functions related to the DMRG renormalized operators: saving to disk, loading from disk, and updating.</p>
-<p><a href="CheMPS2/DMRGSCFindices.cpp">CheMPS2/DMRGSCFindices.cpp</a> contains the index conversions for the DMRG-SCF algorithm.</p>
-<p><a href="CheMPS2/DMRGSCFintegrals.cpp">CheMPS2/DMRGSCFintegrals.cpp</a> is a container class for two-body matrix elements with at most two virtual indices.</p>
-<p><a href="CheMPS2/DMRGSCFmatrix.cpp">CheMPS2/DMRGSCFmatrix.cpp</a> is a container class for orbital matrices which are blockdiagonal in the irreps.</p>
-<p><a href="CheMPS2/DMRGSCFoptions.cpp">CheMPS2/DMRGSCFoptions.cpp</a> is a container class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson routine.</p>
-<p><a href="CheMPS2/DMRGSCFunitary.cpp">CheMPS2/DMRGSCFunitary.cpp</a> contains the storage and handling of the unitary matrix and its nonredundant skew-symmetric parametrization required for the DMRG-SCF algorithm.</p>
-<p><a href="CheMPS2/DMRGSCFVmatRotations.cpp">CheMPS2/DMRGSCFVmatRotations.cpp</a> performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.</p>
-<p><a href="CheMPS2/DMRGSCFwtilde.cpp">CheMPS2/DMRGSCFwtilde.cpp</a> is a container class to store a tensor which is required to compute the DMRG-SCF Hessian.</p>
-<p><a href="CheMPS2/DMRGtechnics.cpp">CheMPS2/DMRGtechnics.cpp</a> contains the functions related to the 2-RDM and the excited-state calculations.</p>
-<p><a href="CheMPS2/EdmistonRuedenberg.cpp">CheMPS2/EdmistonRuedenberg.cpp</a> contains an orbital localization function based on the Edmiston-Ruedenberg cost function and an augmented Hessian Newton-Raphson optimizer.</p>
-<p><a href="CheMPS2/FCI.cpp">CheMPS2/FCI.cpp</a> contains a full configuration interaction solver based on Davidson's algorithm. It also contains the functionality to calculate Green's functions.</p>
-<p><a href="CheMPS2/FourIndex.cpp">CheMPS2/FourIndex.cpp</a> contains all functions of the FourIndex container class for the two-body matrix elements.</p>
-<p><a href="CheMPS2/Hamiltonian.cpp">CheMPS2/Hamiltonian.cpp</a> contains all functions of the Hamiltonian class, including functions to get or set specific variables, as well as the save and load functions to store the Hamiltonian on disk.</p>
-<p><a href="CheMPS2/Heff.cpp">CheMPS2/Heff.cpp</a> contains the constructor and destructor of the Heff class, as well as the top-level functions to perform the effective Hamiltonian times guess-vector multiplication and Davidson's algorithm.</p>
-<p><a href="CheMPS2/HeffDiagonal.cpp">CheMPS2/HeffDiagonal.cpp</a> contains the functions to calculate the diagonal elements of the effective Hamiltonian. These are required as preconditioner in Davidson's algorithm.</p>
-<p><a href="CheMPS2/HeffDiagrams1.cpp">CheMPS2/HeffDiagrams1.cpp</a> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
-<p><a href="CheMPS2/HeffDiagrams2.cpp">CheMPS2/HeffDiagrams2.cpp</a> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
-<p><a href="CheMPS2/HeffDiagrams3.cpp">CheMPS2/HeffDiagrams3.cpp</a> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
-<p><a href="CheMPS2/HeffDiagrams4.cpp">CheMPS2/HeffDiagrams4.cpp</a> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
-<p><a href="CheMPS2/HeffDiagrams5.cpp">CheMPS2/HeffDiagrams5.cpp</a> contains a subset of functions to perform the effective Hamiltonian times guess-vector multiplication.</p>
-<p><a href="CheMPS2/Initialize.cpp">CheMPS2/Initialize.cpp</a> allows to set the seed of the random number generator and cout.precision (added for PyCheMPS2).</p>
-<p><a href="CheMPS2/Irreps.cpp">CheMPS2/Irreps.cpp</a> contains the psi4 symmetry conventions.</p>
-<p><a href="CheMPS2/PrintLicense.cpp">CheMPS2/PrintLicense.cpp</a> contains a function which prints the license disclaimer.</p>
-<p><a href="CheMPS2/Problem.cpp">CheMPS2/Problem.cpp</a> contains all Problem class functions. This wrapper class allows to set the desired symmetry sector for the DMRG algorithm.</p>
-<p><a href="CheMPS2/Sobject.cpp">CheMPS2/Sobject.cpp</a> contains all Sobject class functions. This class constructs, stores, and decomposes the reduced two-site object.</p>
-<p><a href="CheMPS2/SyBookkeeper.cpp">CheMPS2/SyBookkeeper.cpp</a> contains all SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual dimensions of all symmetry sectors at all boundaries.</p>
-<p><a href="CheMPS2/TensorA.cpp">CheMPS2/TensorA.cpp</a> contains the TensorA functions. This class stores and handles the complementary reduced spin-0 S0-tensors.</p>
-<p><a href="CheMPS2/TensorB.cpp">CheMPS2/TensorB.cpp</a> contains the TensorB functions. This class stores and handles the complementary reduced spin-1 S1-tensors.</p>
-<p><a href="CheMPS2/TensorC.cpp">CheMPS2/TensorC.cpp</a> contains the TensorC functions. This class stores and handles the complementary reduced spin-0 F0-tensors.</p>
-<p><a href="CheMPS2/TensorD.cpp">CheMPS2/TensorD.cpp</a> contains the TensorD functions. This class stores and handles the complementary reduced spin-1 F1-tensors.</p>
-<p><a href="CheMPS2/TensorDiag.cpp">CheMPS2/TensorDiag.cpp</a> contains the TensorDiag functions. This storage class handles reduced tensors which are diagonal in the symmetry sectors.</p>
-<p><a href="CheMPS2/TensorF0Cbase.cpp">CheMPS2/TensorF0Cbase.cpp</a> contains the common storage and handling functions of the TensorF0 and TensorC classes.</p>
-<p><a href="CheMPS2/TensorF0.cpp">CheMPS2/TensorF0.cpp</a> contains all TensorF0 functions. This class stores and handles the reduced spin-0 part of two sandwiched second quantized operators, of which the particle symmetry sectors are equal.</p>
-<p><a href="CheMPS2/TensorF1.cpp">CheMPS2/TensorF1.cpp</a> contains all TensorF1 functions. This class stores and handles the reduced spin-1 part of two sandwiched second quantized operators, of which the particle symmetry sectors are equal.</p>
-<p><a href="CheMPS2/TensorF1Dbase.cpp">CheMPS2/TensorF1Dbase.cpp</a> contains the common storage and handling functions of the TensorF1 and TensorD classes.</p>
-<p><a href="CheMPS2/TensorGYZ.cpp">CheMPS2/TensorGYZ.cpp</a> contains the contruct and update functions for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual information.</p>
-<p><a href="CheMPS2/TensorK.cpp">CheMPS2/TensorK.cpp</a> contains the contruct and update functions for the K-tensor. It is required for the two-orbital mutual information.</p>
-<p><a href="CheMPS2/TensorL.cpp">CheMPS2/TensorL.cpp</a> contains all TensorL functions. This class stores and handles the reduced spin-1/2 part of a single sandwiched second quantized operator.</p>
-<p><a href="CheMPS2/TensorM.cpp">CheMPS2/TensorM.cpp</a> contains the contruct and update functions for the M-tensor. It is required for the two-orbital mutual information.</p>
-<p><a href="CheMPS2/TensorO.cpp">CheMPS2/TensorO.cpp</a> implements the storage and handling of the partial terms which are required to calculate the overlap between two MPSs.</p>
-<p><a href="CheMPS2/TensorQ.cpp">CheMPS2/TensorQ.cpp</a> contains all TensorQ functions. This class stores and handles the complementary reduced spin-1/2 part of three sandwiched second quantized operators.</p>
-<p><a href="CheMPS2/TensorS0Abase.cpp">CheMPS2/TensorS0Abase.cpp</a> contains the common storage and handling functions of the TensorS0 and TensorA classes.</p>
-<p><a href="CheMPS2/TensorS0.cpp">CheMPS2/TensorS0.cpp</a> contains all TensorS0 functions. This class stores and handles the reduced spin-0 part of two sandwiched second quantized operators, of which the particle symmetry sectors differ by 2.</p>
-<p><a href="CheMPS2/TensorS1Bbase.cpp">CheMPS2/TensorS1Bbase.cpp</a> contains the common storage and handling functions of the TensorS1 and TensorB classes.</p>
-<p><a href="CheMPS2/TensorS1.cpp">CheMPS2/TensorS1.cpp</a> contains all TensorS1 functions. This class stores and handles the reduced spin-1 part of two sandwiched second quantized operators, of which the particle symmetry sectors differ by 2.</p>
-<p><a href="CheMPS2/TensorSwap.cpp">CheMPS2/TensorSwap.cpp</a> contains the common storage and handling functions of the TensorL and TensorQ classes.</p>
-<p><a href="CheMPS2/TensorT.cpp">CheMPS2/TensorT.cpp</a> contains all TensorT functions. This class stores and handles the reduced part of an MPS site-tensor.</p>
-<p><a href="CheMPS2/TensorX.cpp">CheMPS2/TensorX.cpp</a> contains all TensorX functions. This class stores and handles the complementary reduced spin-0 part of four sandwiched second quantized operators, which is of course diagonal in the symmetry sectors.</p>
-<p><a href="CheMPS2/TwoDM.cpp">CheMPS2/TwoDM.cpp</a> contains all functions to calculate the 2-RDM from the DMRG-optimized MPS.</p>
-<p><a href="CheMPS2/TwoDMstorage.cpp">CheMPS2/TwoDMstorage.cpp</a> contains all functions to store the 2-RDM from the DMRG-optimized MPS.</p>
-<p><a href="CheMPS2/TwoIndex.cpp">CheMPS2/TwoIndex.cpp</a> contains all functions of the TwoIndex container class for the one-body matrix elements.</p>
-<p><a href="CheMPS2/include/CASSCF.h">CheMPS2/include/CASSCF.h</a> contains the definitions of the CASSCF class.</p>
-<p><a href="CheMPS2/include/ConvergenceScheme.h">CheMPS2/include/ConvergenceScheme.h</a> contains the definitions of the ConvergenceScheme class.</p>
-<p><a href="CheMPS2/include/Correlations.h">CheMPS2/include/Correlations.h</a> contains the definitions of the Correlations class.</p>
-<p><a href="CheMPS2/include/Davidson.h">CheMPS2/include/Davidson.h</a> contains the definitions of the Davidson class.</p>
-<p><a href="CheMPS2/include/DIIS.h">CheMPS2/include/DIIS.h</a> contains the definitions of the DIIS class.</p>
-<p><a href="CheMPS2/include/DMRG.h">CheMPS2/include/DMRG.h</a> contains the definitions of the DMRG class.</p>
-<p><a href="CheMPS2/include/DMRGSCFindices.h">CheMPS2/include/DMRGSCFindices.h</a> contains the definitions of the DMRGSCFindices class.</p>
-<p><a href="CheMPS2/include/DMRGSCFintegrals.h">CheMPS2/include/DMRGSCFintegrals.h</a> contains the definitions of the DMRGSCFintegrals class.</p>
-<p><a href="CheMPS2/include/DMRGSCFmatrix.h">CheMPS2/include/DMRGSCFmatrix.h</a> contains the definitions of the DMRGSCFmatrix class.</p>
-<p><a href="CheMPS2/include/DMRGSCFoptions.h">CheMPS2/include/DMRGSCFoptions.h</a> contains the definitions of the DMRGSCFoptions container class.</p>
-<p><a href="CheMPS2/include/DMRGSCFunitary.h">CheMPS2/include/DMRGSCFunitary.h</a> contains the definitions of the DMRGSCFunitary class.</p>
-<p><a href="CheMPS2/include/DMRGSCFVmatRotations.h">CheMPS2/include/DMRGSCFVmatRotations.h</a> contains the definitions of the DMRGSCFVmatRotations class.</p>
-<p><a href="CheMPS2/include/DMRGSCFwtilde.h">CheMPS2/include/DMRGSCFwtilde.h</a> contains the definitions of the DMRGSCFwtilde class.</p>
-<p><a href="CheMPS2/include/EdmistonRuedenberg.h">CheMPS2/include/EdmistonRuedenberg.h</a> contains the definitions of the EdmistonRuedenberg class.</p>
-<p><a href="CheMPS2/include/FCI.h">CheMPS2/include/FCI.h</a> contains the definitions of the FCI class.</p>
-<p><a href="CheMPS2/include/FourIndex.h">CheMPS2/include/FourIndex.h</a> contains the definitions of the FourIndex class.</p>
-<p><a href="CheMPS2/include/Gsl.h">CheMPS2/include/Gsl.h</a> contains the definitions of the external GSL routines.</p>
-<p><a href="CheMPS2/include/Hamiltonian.h">CheMPS2/include/Hamiltonian.h</a> contains the definitions of the Hamiltonian class.</p>
-<p><a href="CheMPS2/include/Heff.h">CheMPS2/include/Heff.h</a> contains the definitions of the Heff class.</p>
-<p><a href="CheMPS2/include/Initialize.h">CheMPS2/include/Initialize.h</a> contains the definitions of the Initialize class.</p>
-<p><a href="CheMPS2/include/Irreps.h">CheMPS2/include/Irreps.h</a> contains the definitions of the Irrep class.</p>
-<p><a href="CheMPS2/include/Lapack.h">CheMPS2/include/Lapack.h</a> contains the definitions of the external BLAS and LAPACK routines.</p>
-<p><a href="CheMPS2/include/MyHDF5.h">CheMPS2/include/MyHDF5.h</a> forces the use of the HDF5 1.8 API, e.g. H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.</p>
-<p><a href="CheMPS2/include/Options.h">CheMPS2/include/Options.h</a> contains all the options of the CheMPS2 namespace. Here the checkpoint storage names and folders can be set, as well as parameters related to memory usage and convergence.</p>
-<p><a href="CheMPS2/include/Problem.h">CheMPS2/include/Problem.h</a> contains the definitions of the Problem class.</p>
-<p><a href="CheMPS2/include/Sobject.h">CheMPS2/include/Sobject.h</a> contains the definitions of the Sobject class.</p>
-<p><a href="CheMPS2/include/SyBookkeeper.h">CheMPS2/include/SyBookkeeper.h</a> contains the definitions of the SyBookkeeper class.</p>
-<p><a href="CheMPS2/include/TensorA.h">CheMPS2/include/TensorA.h</a> contains the definitions of the TensorA class.</p>
-<p><a href="CheMPS2/include/TensorB.h">CheMPS2/include/TensorB.h</a> contains the definitions of the TensorB class.</p>
-<p><a href="CheMPS2/include/TensorC.h">CheMPS2/include/TensorC.h</a> contains the definitions of the TensorC class.</p>
-<p><a href="CheMPS2/include/TensorD.h">CheMPS2/include/TensorD.h</a> contains the definitions of the TensorD class.</p>
-<p><a href="CheMPS2/include/TensorDiag.h">CheMPS2/include/TensorDiag.h</a> contains the definitions of the TensorDiag class.</p>
-<p><a href="CheMPS2/include/TensorF0Cbase.h">CheMPS2/include/TensorF0Cbase.h</a> contains the definitions of the TensorF0Cbase class.</p>
-<p><a href="CheMPS2/include/TensorF0.h">CheMPS2/include/TensorF0.h</a> contains the definitions of the TensorF0 class.</p>
-<p><a href="CheMPS2/include/TensorF1Dbase.h">CheMPS2/include/TensorF1Dbase.h</a> contains the definitions of the TensorF1Dbase class.</p>
-<p><a href="CheMPS2/include/TensorF1.h">CheMPS2/include/TensorF1.h</a> contains the definitions of the TensorF1 class.</p>
-<p><a href="CheMPS2/include/TensorGYZ.h">CheMPS2/include/TensorGYZ.h</a> contains the definitions of the TensorGYZ class.</p>
-<p><a href="CheMPS2/include/Tensor.h">CheMPS2/include/Tensor.h</a> contains the definitions of the virtual Tensor class.</p>
-<p><a href="CheMPS2/include/TensorK.h">CheMPS2/include/TensorK.h</a> contains the definitions of the TensorK class.</p>
-<p><a href="CheMPS2/include/TensorL.h">CheMPS2/include/TensorL.h</a> contains the definitions of the TensorL class.</p>
-<p><a href="CheMPS2/include/TensorM.h">CheMPS2/include/TensorM.h</a> contains the definitions of the TensorM class.</p>
-<p><a href="CheMPS2/include/TensorO.h">CheMPS2/include/TensorO.h</a> contains the definitions of the TensorO class.</p>
-<p><a href="CheMPS2/include/TensorQ.h">CheMPS2/include/TensorQ.h</a> contains the definitions of the TensorQ class.</p>
-<p><a href="CheMPS2/include/TensorS0Abase.h">CheMPS2/include/TensorS0Abase.h</a> contains the definitions of the TensorS0Abase class.</p>
-<p><a href="CheMPS2/include/TensorS0.h">CheMPS2/include/TensorS0.h</a> contains the definitions of the TensorS0 class.</p>
-<p><a href="CheMPS2/include/TensorS1Bbase.h">CheMPS2/include/TensorS1Bbase.h</a> contains the definitions of the TensorS1Bbase class.</p>
-<p><a href="CheMPS2/include/TensorS1.h">CheMPS2/include/TensorS1.h</a> contains the definitions of the TensorS1 class.</p>
-<p><a href="CheMPS2/include/TensorSwap.h">CheMPS2/include/TensorSwap.h</a> contains the definitions of the TensorSwap class.</p>
-<p><a href="CheMPS2/include/TensorT.h">CheMPS2/include/TensorT.h</a> contains the definitions of the TensorT class.</p>
-<p><a href="CheMPS2/include/TensorX.h">CheMPS2/include/TensorX.h</a> contains the definitions of the TensorX class.</p>
-<p><a href="CheMPS2/include/TwoDM.h">CheMPS2/include/TwoDM.h</a> contains the definitions of the TwoDM class.</p>
-<p><a href="CheMPS2/include/TwoDMstorage.h">CheMPS2/include/TwoDMstorage.h</a> contains the definitions of the TwoDMstorage class.</p>
-<p><a href="CheMPS2/include/TwoIndex.h">CheMPS2/include/TwoIndex.h</a> contains the definitions of the TwoIndex class.</p>
-<p>Please note that these files are documented with doxygen comments. The <a href="#build">build section</a> discusses how a manual can be generated from these comments.</p>
-<h2>List of files to perform test runs </h2>
-<p><a href="tests/test1.cpp.in">tests/test1.cpp.in</a> contains several DMRG ground state calculations in different symmetry sectors for the N2 molecule (d2h symmetry) in the minimal STO-3G basis set.</p>
-<p><a href="tests/test2.cpp.in">tests/test2.cpp.in</a> contains a ground state DMRG calculation of the ^1A1 state of H2O (c2v symmetry) in the 6-31G basis set.</p>
-<p><a href="tests/test3.cpp.in">tests/test3.cpp.in</a> contains a ground state DMRG calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</p>
-<p><a href="tests/test4.cpp.in">tests/test4.cpp.in</a> contains a ground state DMRG calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry) with 10 sites and open boundary conditions, containing 9 fermions (just below half-filling).</p>
-<p><a href="tests/test5.cpp.in">tests/test5.cpp.in</a> contains an excited state DMRG calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal STO-3G basis set. The ground and two lowest excited states are determined.</p>
-<p><a href="tests/test6.cpp.in">tests/test6.cpp.in</a> contains a state-averaged DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A significant speedup is obtained with DIIS.</p>
-<p><a href="tests/test7.cpp.in">tests/test7.cpp.in</a> reads in <a href="tests/matrixelements/O2.CCPVDZ.FCIDUMP">tests/matrixelements/O2.CCPVDZ.FCIDUMP</a>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
-<p><a href="tests/test8.cpp.in">tests/test8.cpp.in</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
-<p><a href="tests/test9.cpp.in">tests/test9.cpp.in</a> is a copy of <a href="tests/test8.cpp.in">tests/test8.cpp.in</a>, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
-<p><a href="tests/matrixelements/CH4.STO3G.FCIDUMP">tests/matrixelements/CH4.STO3G.FCIDUMP</a> contains the matrix elements for test3.</p>
-<p><a href="tests/matrixelements/H2O.631G.FCIDUMP">tests/matrixelements/H2O.631G.FCIDUMP</a> contains the matrix elements for test2.</p>
-<p><a href="tests/matrixelements/N2.STO3G.FCIDUMP">tests/matrixelements/N2.STO3G.FCIDUMP</a> contains the matrix elements for test1 and test5.</p>
-<p><a href="tests/matrixelements/O2.CCPVDZ.FCIDUMP">tests/matrixelements/O2.CCPVDZ.FCIDUMP</a> contains the matrix elements for test6 and test7.</p>
-<p><a href="tests/matrixelements/N2.CCPVDZ.FCIDUMP">tests/matrixelements/N2.CCPVDZ.FCIDUMP</a> contains the matrix elements for test8 and test9.</p>
-<p><a href="PyCheMPS2/test1.py.in">PyCheMPS2/test1.py.in</a> is the python version of <a href="tests/test1.cpp.in">tests/test1.cpp.in</a></p>
-<p><a href="PyCheMPS2/test2.py.in">PyCheMPS2/test2.py.in</a> is the python version of <a href="tests/test2.cpp.in">tests/test2.cpp.in</a></p>
-<p><a href="PyCheMPS2/test3.py.in">PyCheMPS2/test3.py.in</a> is the python version of <a href="tests/test3.cpp.in">tests/test3.cpp.in</a></p>
-<p><a href="PyCheMPS2/test4.py.in">PyCheMPS2/test4.py.in</a> is the python version of <a href="tests/test4.cpp.in">tests/test4.cpp.in</a></p>
-<p><a href="PyCheMPS2/test5.py.in">PyCheMPS2/test5.py.in</a> is the python version of <a href="tests/test5.cpp.in">tests/test5.cpp.in</a></p>
-<p><a href="PyCheMPS2/test6.py.in">PyCheMPS2/test6.py.in</a> is the python version of <a href="tests/test6.cpp.in">tests/test6.cpp.in</a></p>
-<p><a href="PyCheMPS2/test7.py.in">PyCheMPS2/test7.py.in</a> is the python version of <a href="tests/test7.cpp.in">tests/test7.cpp.in</a></p>
-<p><a href="PyCheMPS2/test8.py.in">PyCheMPS2/test8.py.in</a> is the python version of <a href="tests/test8.cpp.in">tests/test8.cpp.in</a></p>
-<p><a href="PyCheMPS2/test9.py.in">PyCheMPS2/test9.py.in</a> is the python version of <a href="tests/test9.cpp.in">tests/test9.cpp.in</a></p>
-<p>These test files illustrate how to use libchemps2. The tests only require a very limited amount of memory (order 10-120 MB). </p>
-</div></div><!-- contents -->
-</div><!-- doc-content -->
-<!-- start footer part -->
-<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-    <li class="footer">Generated on Wed Apr 15 2015 14:43:35 for CheMPS2 by
-    <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
-  </ul>
+<li><a class="reference internal" href="#">CheMPS2 documentation</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sourcecode.html"
+                        title="next chapter">1. Installation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
-</body>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="sourcecode.html" title="1. Installation"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
 </html>

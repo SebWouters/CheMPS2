@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Installation &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="2. Publications" href="publications.html" />
+    <link rel="prev" title="CheMPS2 documentation" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="publications.html" title="2. Publications"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="CheMPS2 documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><span class="target" id="index-3"></span><span class="target" id="index-4"></span><div class="section" id="installation">
+<span id="index-5"></span><h1>1. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependencies">
+<h2>1.1. Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>CheMPS2 can be built with <a class="reference external" href="http://www.cmake.org/">CMake</a> and depends on</p>
+<ul class="simple">
+<li>BLAS</li>
+<li>LAPACK</li>
+<li>GSL (<a class="reference external" href="http://www.gnu.org/software/gsl/">GNU Scientific library</a>)</li>
+<li>HDF5 (<a class="reference external" href="http://www.hdfgroup.org/HDF5/">Hierarchical Data Format Release 5</a>)</li>
+</ul>
+<p>It is parallelized for shared memory architectures with the Open Multi-Processing (<a class="reference external" href="http://openmp.org/wp/">OpenMP</a>) API. In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization.</p>
+</div>
+<div class="section" id="download">
+<h2>1.2. Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>It is advised to clone the CheMPS2 git repository from github. In your terminal, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder
+<span class="nv">$ </span>git clone <span class="s1">&#39;https://github.com/sebwouters/chemps2&#39;</span>
+<span class="nv">$ </span><span class="nb">cd </span>chemps2
+</pre></div>
+</div>
+<p>That way, future updates and bug fixes can be easily pulled in:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2
+<span class="nv">$ </span>git pull
+</pre></div>
+</div>
+</div>
+<div class="section" id="build-libchemps2">
+<h2>1.3. Build libchemps2<a class="headerlink" href="#build-libchemps2" title="Permalink to this headline">¶</a></h2>
+<p>The files</p>
+<div class="highlight-bash"><div class="highlight"><pre>/myfolder/chemps2/CMakeLists.txt
+/myfolder/chemps2/CheMPS2/CMakeLists.txt
+/myfolder/chemps2/tests/CMakeLists.txt
+/myfolder/chemps2/PyCheMPS2/CMakeLists.txt
+/myfolder/chemps2/sphinx/CMakeLists.txt
+</pre></div>
+</div>
+<p>provide a minimal compilation. In your terminal, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2
+<span class="nv">$ </span>mkdir build
+<span class="nv">$ </span><span class="nb">cd </span>build
+</pre></div>
+</div>
+<p>CMake generates makefiles based on the user&#8217;s specifications:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DBUILD_DOCUMENTATION<span class="o">=</span>option3 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option4 -DSTATIC_ONLY<span class="o">=</span>option5 -DBUILD_SPHINX<span class="o">=</span>option6
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>Option1 is the <code class="docutils literal"><span class="pre">c++</span></code> compiler; typically <code class="docutils literal"><span class="pre">g++</span></code>, <code class="docutils literal"><span class="pre">icpc</span></code>, or <code class="docutils literal"><span class="pre">clang++</span></code> on Linux.</li>
+<li>Option2 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the intel math kernel library.</li>
+<li>Option3 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile the doxygen documentation.</li>
+<li>Option4 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/prefix/lib/x86_64-linux-gnu</span></code> and the headers in <code class="docutils literal"><span class="pre">/prefix/include/chemps2</span></code>.</li>
+<li>Option5 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to avoid building the shared library (please use the default here).</li>
+<li>Option6 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
+</ol>
+<p>If one or more of the required libraries are not found, use the command</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CMAKE_INCLUDE_PATH</span><span class="o">=</span>option7 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>option8 <span class="nv">CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DBUILD_DOCUMENTATION<span class="o">=</span>option3 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option4 -DSTATIC_ONLY<span class="o">=</span>option5 -DBUILD_SPHINX<span class="o">=</span>option6
+</pre></div>
+</div>
+<p>instead, where option7 and option8 are respectively the missing colon-separated include and library paths:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">CMAKE_INCLUDE_PATH</span><span class="o">=</span>/my_libs/lib1/include:/my_libs/lib2/include
+<span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>/my_libs/lib1/lib:/my_libs/lib2/lib
+</pre></div>
+</div>
+<p>To compile, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make
+</pre></div>
+</div>
+<p>To install, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make install
+</pre></div>
+</div>
+<p>For non-standard installation directories, please remember to append the library path to <code class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></code> in your <code class="docutils literal"><span class="pre">.bashrc</span></code>.</p>
+</div>
+<div class="section" id="test-libchemps2">
+<h2>1.4. Test libchemps2<a class="headerlink" href="#test-libchemps2" title="Permalink to this headline">¶</a></h2>
+<p>To test libchemps2, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build
+<span class="nv">$ </span>make <span class="nb">test</span>
+</pre></div>
+</div>
+<p>The tests only require a very limited amount of memory (order 10-120 MB).</p>
+</div>
+<div class="section" id="build-pychemps2">
+<h2>1.5. Build PyCheMPS2<a class="headerlink" href="#build-pychemps2" title="Permalink to this headline">¶</a></h2>
+<p>PyCheMPS2, a python inferface to libchemps2, can be built with <a class="reference external" href="http://cython.org/">Cython</a>. The installation above generated the file <code class="docutils literal"><span class="pre">/myfolder/chemps2/build/setup.py</span></code>, in which the library and include paths have been set to the ones in the build directory. In your terminal, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build
+<span class="nv">$ </span>python setup.py build_ext -i
+</pre></div>
+</div>
+<p>Compilation of PyCheMPS2 occurs by linking to the <code class="docutils literal"><span class="pre">c++</span></code> library in the build directory. However, when you want to run the tests in the next section, you should first install the <code class="docutils literal"><span class="pre">c++</span></code> library! If you have pulled a newer version of CheMPS2, please remember to (re)install the <code class="docutils literal"><span class="pre">c++</span></code> library first, before using PyCheMPS2!</p>
+</div>
+<div class="section" id="test-pychemps2">
+<h2>1.6. Test PyCheMPS2<a class="headerlink" href="#test-pychemps2" title="Permalink to this headline">¶</a></h2>
+<p>To test PyCheMPS2, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build/PyTests
+<span class="nv">$ </span>python test1.py
+<span class="nv">$ </span>python test2.py
+<span class="nv">$ </span>python test3.py
+<span class="nv">$ </span>python test4.py
+<span class="nv">$ </span>python test5.py
+<span class="nv">$ </span>python test6.py
+<span class="nv">$ </span>python test7.py
+<span class="nv">$ </span>python test8.py
+<span class="nv">$ </span>python test9.py
+</pre></div>
+</div>
+<p>If you compiled the <code class="docutils literal"><span class="pre">c++</span></code> library with <code class="docutils literal"><span class="pre">-DMKL=ON</span></code>, you might get the error</p>
+<div class="highlight-bash"><div class="highlight"><pre>Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
+</pre></div>
+</div>
+<p>This issue of using Intel&#8217;s MKL inside python is known and reported. To get the python tests to run, you can set the variable <code class="docutils literal"><span class="pre">LD_PRELOAD</span></code> in order to preload libmkl_rt.so. On my system, this is done with</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">LD_PRELOAD</span><span class="o">=</span>/opt/intel/mkl/lib/intel64/libmkl_rt.so
+</pre></div>
+</div>
+<p>The python tests do exactly the same thing as the <code class="docutils literal"><span class="pre">c++</span></code> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
+</div>
+<div class="section" id="doxygen">
+<h2>1.7. Doxygen<a class="headerlink" href="#doxygen" title="Permalink to this headline">¶</a></h2>
+<p>To build the doxygen manual, the <code class="docutils literal"><span class="pre">BUILD_DOCUMENTATION</span></code> flag should have been on: <code class="docutils literal"><span class="pre">-DBUILD_DOCUMENTATION=ON</span></code>. In your terminal, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build
+<span class="nv">$ </span>make doc
+<span class="nv">$ </span><span class="nb">cd </span>LaTeX-documents
+<span class="nv">$ </span>make
+<span class="nv">$ </span>evince refman.pdf <span class="p">&amp;</span>
+<span class="nv">$ </span><span class="nb">cd</span> ../html
+<span class="nv">$ </span>firefox index.html <span class="p">&amp;</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="http://sebwouters.github.io/CheMPS2/doxygen/index.html">doxygen html output</a> can also be consulted online.</p>
+</div>
+<div class="section" id="sphinx-user-manual">
+<h2>1.8. Sphinx user manual<a class="headerlink" href="#sphinx-user-manual" title="Permalink to this headline">¶</a></h2>
+<p>To build the sphinx user manual, the <code class="docutils literal"><span class="pre">BUILD_SPHINX</span></code> flag should have been on: <code class="docutils literal"><span class="pre">-DBUILD_SPHINX=ON</span></code>. In your terminal, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build
+<span class="nv">$ </span>make sphinx
+<span class="nv">$ </span><span class="nb">cd </span>sphinx/html
+<span class="nv">$ </span>firefox index.html <span class="p">&amp;</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="http://sebwouters.github.io/CheMPS2/index.html">sphinx user manual</a> can also be consulted online.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Installation</a><ul>
+<li><a class="reference internal" href="#dependencies">1.1. Dependencies</a></li>
+<li><a class="reference internal" href="#download">1.2. Download</a></li>
+<li><a class="reference internal" href="#build-libchemps2">1.3. Build libchemps2</a></li>
+<li><a class="reference internal" href="#test-libchemps2">1.4. Test libchemps2</a></li>
+<li><a class="reference internal" href="#build-pychemps2">1.5. Build PyCheMPS2</a></li>
+<li><a class="reference internal" href="#test-pychemps2">1.6. Test PyCheMPS2</a></li>
+<li><a class="reference internal" href="#doxygen">1.7. Doxygen</a></li>
+<li><a class="reference internal" href="#sphinx-user-manual">1.8. Sphinx user manual</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">CheMPS2 documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="publications.html"
+                        title="next chapter">2. Publications</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sourcecode.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="publications.html" title="2. Publications"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="CheMPS2 documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

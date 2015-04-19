@@ -1,0 +1,397 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. CheMPS2::Hamiltonian &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="6. DMRG calculations" href="inoutput.html" />
+    <link rel="prev" title="4. Symmetries" href="symmetry.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="symmetry.html" title="4. Symmetries"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="index-0"></span><span class="target" id="index-1"></span><div class="section" id="chemps2-hamiltonian">
+<span id="index-2"></span><h1>5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code><a class="headerlink" href="#chemps2-hamiltonian" title="Permalink to this headline">¶</a></h1>
+<p>There are several ways to feed matrix elements to CheMPS2. They are explained below in detail. Because CheMPS2 is a spin-adapted code, it can only handle spatial orbitals. It is hence not possible to use different orbitals for <span class="math">\(\uparrow\)</span> and <span class="math">\(\downarrow\)</span> electrons.</p>
+<ol class="arabic simple">
+<li>The <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object is able to read in FCIDUMP files.</li>
+<li>The <code class="docutils literal"><span class="pre">savehdf</span></code> plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a> fills a <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object, and saves the matrix elements to disk in HDF5 format, taking into account their eightfold permutation symmetry.</li>
+<li>Users can also generate matrix elements themselves, and feed them to the <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object.</li>
+</ol>
+<div class="section" id="psi4-fcidump-plugin">
+<h2>5.1. psi4 <code class="docutils literal"><span class="pre">fcidump</span></code> plugin<a class="headerlink" href="#psi4-fcidump-plugin" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object is able to read in FCIDUMP files:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="p">(</span> <span class="k">const</span> <span class="n">string</span> <span class="n">filename</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">psi4groupnumber</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The variable <code class="docutils literal"><span class="pre">filename</span></code> should contain the path to the FCIDUMP file, and the variable <code class="docutils literal"><span class="pre">psi4groupnumber</span></code> should be the group number of the abelian point group with real-valued character table as defined in <a class="reference external" href="http://www.psicode.org/">psi4</a>. The conversion table is provided here:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Group name</td>
+<td>c1</td>
+<td>ci</td>
+<td>c2</td>
+<td>cs</td>
+<td>d2</td>
+<td>c2v</td>
+<td>c2h</td>
+<td>d2h</td>
+</tr>
+<tr class="row-even"><td>Group number</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>FCIDUMP files can for example be generated by a plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a>. The plugin has been tested on commit <code class="docutils literal"><span class="pre">14c78eabdca86f8e094576890518d93d300d2500</span></code> (February 27, 2015) on <a class="reference external" href="https://github.com/psi4/psi4public">https://github.com/psi4/psi4public</a>, and should work on later versions as well.</p>
+<p>To make use of this feature, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option, and then run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
+<span class="nv">$ </span>psi4 --new-plugin fcidump
+<span class="nv">$ </span><span class="nb">cd </span>fcidump
+</pre></div>
+</div>
+<p>Now, replace the file <code class="docutils literal"><span class="pre">fcidump.cc</span></code> with <code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/psi4plugins/fcidump.cc</span></code>. To compile the plugin, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make
+</pre></div>
+</div>
+<p>An example input file to generate a FCIDUMP file:</p>
+<div class="highlight-python"><div class="highlight"><pre>molecule N2 {
+   N       0.0000   0.0000   0.0000
+   N       0.0000   0.0000   2.1180
+units au
+}
+
+plugin_load(&quot;fcidump/fcidump.so&quot;)
+
+set basis cc-pVDZ
+set reference rhf
+set e_convergence 1e-12
+set d_convergence 1e-12
+set ints_tolerance 0.0
+
+set fcidump dumpfilename N2.ccpvdz.fcidump
+
+scf()
+
+plugin(&quot;fcidump.so&quot;)
+</pre></div>
+</div>
+<p>This file (<code class="docutils literal"><span class="pre">N2.fcidump.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins</span></code>. The FCIDUMP file can then be generated with:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
+<span class="nv">$ </span>psi4 N2.fcidump.in N2.fcidump.out
+</pre></div>
+</div>
+<p>Examples of output generated with this plugin can be found in <code class="docutils literal"><span class="pre">/myfolder/chemps2/tests/matrixelements</span></code>.</p>
+</div>
+<div class="section" id="psi4-savehdf-plugin">
+<h2>5.2. psi4 <code class="docutils literal"><span class="pre">savehdf</span></code> plugin<a class="headerlink" href="#psi4-savehdf-plugin" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object is able to read in HDF5 files generated by a plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a>. The plugin has been tested on commit <code class="docutils literal"><span class="pre">14c78eabdca86f8e094576890518d93d300d2500</span></code> (February 27, 2015) on <a class="reference external" href="https://github.com/psi4/psi4public">https://github.com/psi4/psi4public</a>, and should work on later versions as well. It stores all unique matrix elements (remember that there is eightfold permutation symmetry) in binary form with HDF5.</p>
+<p>To make use of this feature, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option, and then run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
+<span class="nv">$ </span>psi4 --new-plugin savehdf
+<span class="nv">$ </span><span class="nb">cd </span>savehdf
+</pre></div>
+</div>
+<p>Now, replace the file <code class="docutils literal"><span class="pre">savehdf.cc</span></code> with <code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/psi4plugins/savehdf.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">PSIPLUGIN</span> <span class="o">=</span> -L<span class="k">$(</span>OBJDIR<span class="k">)</span>/lib -lplugin
+</pre></div>
+</div>
+<p>to</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">PSIPLUGIN</span> <span class="o">=</span> -L<span class="k">$(</span>OBJDIR<span class="k">)</span>/lib -lplugin -lchemps2
+</pre></div>
+</div>
+<p>Remember to add the library and include paths to the Makefile as well, if <code class="docutils literal"><span class="pre">libchemps2</span></code> is not installed in a standard location.
+To compile the plugin, run:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make
+</pre></div>
+</div>
+<p>An example input file to use the <code class="docutils literal"><span class="pre">savehdf</span></code> plugin:</p>
+<div class="highlight-python"><div class="highlight"><pre>molecule N2 {
+   N       0.0000   0.0000   0.0000
+   N       0.0000   0.0000   2.1180
+units au
+}
+
+plugin_load(&quot;savehdf/savehdf.so&quot;)
+
+set basis cc-pVDZ
+set reference rhf
+set e_convergence 1e-12
+set d_convergence 1e-12
+set ints_tolerance 0.0
+
+scf()
+
+plugin(&quot;savehdf.so&quot;)
+</pre></div>
+</div>
+<p>This file (<code class="docutils literal"><span class="pre">N2.savehdf.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins</span></code>. The matrix elements can then be saved to disk in binary form with HDF5 by running:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
+<span class="nv">$ </span>psi4 N2.savehdf.in N2.savehdf.out
+</pre></div>
+</div>
+<p>The plugin generates three files:</p>
+<div class="highlight-bash"><div class="highlight"><pre>/mypsi4plugins/CheMPS2_Ham_parent.h5
+/mypsi4plugins/CheMPS2_Ham_Tmat.h5
+/mypsi4plugins/CheMPS2_Ham_Vmat.h5
+</pre></div>
+</div>
+<p>which allow to create an instance of the <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="p">(</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">fileh5</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span> <span class="n">main_file</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span> <span class="n">file_tmat</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span> <span class="n">file_vmat</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The variable <code class="docutils literal"><span class="pre">fileh5</span></code> should be <code class="docutils literal"><span class="pre">true</span></code>, and the three strings should contain the paths to the three files listed above, in the same respective order.</p>
+</div>
+<div class="section" id="custom-matrix-elements">
+<span id="chemps2-psi4irrepconventions"></span><h2>5.3. Custom matrix elements<a class="headerlink" href="#custom-matrix-elements" title="Permalink to this headline">¶</a></h2>
+<p>It is also possible to create a <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object with your own matrix elements. Please consult the <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> class in the <a class="reference external" href="http://sebwouters.github.io/CheMPS2/doxygen/index.html">doxygen html output</a>, and more specifically the functions:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Norbitals</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">nGroup</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">OrbIrreps</span> <span class="p">)</span>
+<span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">setEconst</span><span class="p">(</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">val</span> <span class="p">)</span>
+<span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">setTmat</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index1</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index2</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">val</span> <span class="p">)</span>
+<span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span><span class="o">::</span><span class="n">setVmat</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index1</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index2</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index3</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">index4</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">val</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>The variable <code class="docutils literal"><span class="pre">Norbitals</span></code> should be the total number of orbitals in the active space. The variable <code class="docutils literal"><span class="pre">nGroup</span></code> should be the group number of the abelian point group with real-valued character table as defined in <a class="reference external" href="http://www.psicode.org/">psi4</a>. The array <code class="docutils literal"><span class="pre">OrbIrreps</span></code> of length <code class="docutils literal"><span class="pre">Norbitals</span></code> contains for each orbital its irreducible representation number as defined in <a class="reference external" href="http://www.psicode.org/">psi4</a>. The conversion table is provided here:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Group / Irreps</th>
+<th class="head">0</th>
+<th class="head">1</th>
+<th class="head">2</th>
+<th class="head">3</th>
+<th class="head">4</th>
+<th class="head">5</th>
+<th class="head">6</th>
+<th class="head">7</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0: c1</td>
+<td>A</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>1: ci</td>
+<td>Ag</td>
+<td>Au</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>2: c2</td>
+<td>A</td>
+<td>B</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>3: cs</td>
+<td>A&#8217;</td>
+<td>A&#8217;&#8216;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>4: d2</td>
+<td>A</td>
+<td>B1</td>
+<td>B2</td>
+<td>B3</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>5: c2v</td>
+<td>A1</td>
+<td>A2</td>
+<td>B1</td>
+<td>B2</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>6: c2h</td>
+<td>Ag</td>
+<td>Bg</td>
+<td>Au</td>
+<td>Bu</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>7: d2h</td>
+<td>Ag</td>
+<td>B1g</td>
+<td>B2g</td>
+<td>B3g</td>
+<td>Au</td>
+<td>B1u</td>
+<td>B2u</td>
+<td>B3u</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Two important remarks:</p>
+<ol class="arabic simple">
+<li>Every matrix element which can be nonzero according to the point group symmetry should be assigned (also if its value is 0.0).</li>
+<li>Physics notation is used for the two-electron integrals in CheMPS2: <span class="math">\(V_{ij;kl} = ( ik \mid jl )\)</span> or <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian::setVmat(</span> <span class="pre">i,</span> <span class="pre">j,</span> <span class="pre">k,</span> <span class="pre">l,</span> <span class="pre">(ik|jl)</span> <span class="pre">)</span></code>.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code></a><ul>
+<li><a class="reference internal" href="#psi4-fcidump-plugin">5.1. psi4 <code class="docutils literal"><span class="pre">fcidump</span></code> plugin</a></li>
+<li><a class="reference internal" href="#psi4-savehdf-plugin">5.2. psi4 <code class="docutils literal"><span class="pre">savehdf</span></code> plugin</a></li>
+<li><a class="reference internal" href="#custom-matrix-elements">5.3. Custom matrix elements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="symmetry.html"
+                        title="previous chapter">4. Symmetries</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="inoutput.html"
+                        title="next chapter">6. DMRG calculations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/matrixelements.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="symmetry.html" title="4. Symmetries"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

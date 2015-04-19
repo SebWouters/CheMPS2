@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. DMRG-SCF &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="8. DMRG-SCF calculations" href="dmrgscfcalcs.html" />
+    <link rel="prev" title="6. DMRG calculations" href="inoutput.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><div class="section" id="dmrg-scf">
+<span id="index-3"></span><h1>7. DMRG-SCF<a class="headerlink" href="#dmrg-scf" title="Permalink to this headline">¶</a></h1>
+<p>In methods which use a FCI solver, this solver can be replaced by DMRG. DMRG allows for an efficient extraction of the 2-RDM. The 2-RDM of the active space is required in the complete active space self-consistent field (CASSCF) method to compute the gradient and the Hessian with respect to orbital rotations <a class="reference internal" href="#dmrgscf1" id="id1">[DMRGSCF1]</a>. It is therefore natural to introduce a CASSCF variant with DMRG as active space solver, called DMRG-SCF <a class="reference internal" href="#dmrgscf2" id="id2">[DMRGSCF2]</a> <a class="reference internal" href="#dmrgscf3" id="id3">[DMRGSCF3]</a> <a class="reference internal" href="#dmrgscf4" id="id4">[DMRGSCF4]</a>, which allows to treat static correlation in large active spaces. In CheMPS2, the augmented Hessian Newton-Raphson DMRG-SCF method is implemented, with exact Hessian <a class="reference internal" href="#dmrgscf5" id="id5">[DMRGSCF5]</a> <a class="reference internal" href="#dmrgscf6" id="id6">[DMRGSCF6]</a>.</p>
+<div class="section" id="augmented-hessian-newton-raphson">
+<h2>7.1. Augmented Hessian Newton-Raphson<a class="headerlink" href="#augmented-hessian-newton-raphson" title="Permalink to this headline">¶</a></h2>
+<p>The basic idea is to express the energy with the unitary group generators up to second order:</p>
+<div class="math">
+\[\begin{split}\hat{E}_{pq} &amp; = &amp; \sum\limits_{\sigma} \hat{a}^{\dagger}_{p \sigma} \hat{a}_{q \sigma} \\
+\left[ \hat{E}_{pq} , \hat{E}_{rs} \right] &amp; = &amp; \delta_{qr} \hat{E}_{ps} - \delta_{ps} \hat{E}_{rq} \\
+\hat{E}^{-}_{pq} &amp; = &amp; \hat{E}_{pq} - \hat{E}_{qp} \\
+\hat{T}(\vec{x}) &amp; = &amp; \sum\limits_{p&lt;q} x_{pq} \hat{E}^{-}_{pq} \\
+E(\vec{x}) &amp; = &amp; \left\langle 0 \mid e^{\hat{T}(\vec{x})} \hat{H} e^{-\hat{T}(\vec{x})} \mid 0 \right\rangle \approx E(0) + \vec{x}^T \vec{g} + \frac{1}{2} \vec{x}^T \mathbf{H} \vec{x}\end{split}\]</div>
+<p>The vector <span class="math">\(\vec{g}\)</span> is the gradient and the matrix <span class="math">\(\mathbf{H}\)</span> the Hessian for orbital rotations. The minimum of <span class="math">\(E(\vec{x})\)</span> is found at <span class="math">\(\vec{x} = - \mathbf{H}^{-1} \vec{g}\)</span>. The variables <span class="math">\(\vec{x}\)</span> parametrize an additional orbital rotation <span class="math">\(\mathbf{U}_{add} = \exp(\mathbf{T}(\vec{x}))\)</span>, with <span class="math">\(\mathbf{T}(\vec{x}) = -\mathbf{T}^T(\vec{x})\)</span> a real-valued skew-symmetric matrix. The additional orbital rotation <span class="math">\(\mathbf{U}_{add}\)</span> transforms the current orbitals <span class="math">\(\mathbf{U}(n)\)</span> to the new orbitals</p>
+<div class="math">
+\[\mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{T}(\vec{x}(n))) \mathbf{U}(n).\]</div>
+<p>This updating scheme is called the Newton-Raphson method. If the Hessian is positive definite, these updates are stable. For saddle points in the energy landscape, the Hessian has negative eigenvalues, and these updates can be unstable. It is therefore better to use the augmented Hessian Newton-Raphson method:</p>
+<div class="math">
+\[\begin{split}\left[ \begin{array}{cc} \mathbf{H} &amp; \vec{g} \\ \vec{g}^T &amp; 0 \end{array} \right] \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right] = \alpha \left[ \begin{array}{c} \vec{x} \\ 1 \end{array} \right].\end{split}\]</div>
+<p>The eigenvector with smallest algebraic eigenvalue determines a stable update <span class="math">\(\vec{x}\)</span>, as is well explained in Ref. <a class="reference internal" href="#dmrgscf7" id="id7">[DMRGSCF7]</a>.</p>
+</div>
+<div class="section" id="diis">
+<h2>7.2. DIIS<a class="headerlink" href="#diis" title="Permalink to this headline">¶</a></h2>
+<p>When the update norm <span class="math">\(\|\vec{x}\|_2\)</span> is small enough, the convergence can be accelerated by the direct inversion of the iterative subspace (DIIS) <a class="reference internal" href="#dmrgscf8" id="id8">[DMRGSCF8]</a> <a class="reference internal" href="#dmrgscf9" id="id9">[DMRGSCF9]</a>. For a given set of orbitals <span class="math">\(\mathbf{U}(n)\)</span>, the update <span class="math">\(\vec{x}(n)\)</span> is calculated with the augmented Hessian Newton-Raphson method. This update defines the next set of orbitals:</p>
+<div class="math">
+\[\mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{T}(\vec{x}(n))) \mathbf{U}(n).\]</div>
+<p>In DIIS, the error vector <span class="math">\(\vec{x}(n)\)</span> and the state vector <span class="math">\(\mathbf{Y}(n+1) = \log(\mathbf{U}(n+1))\)</span> are added to a list. The error</p>
+<div class="math">
+\[e = \left\| \sum\limits_{i = 1}^{\kappa} c_i \vec{x}(n - \kappa + i) \right\|_2\]</div>
+<p>is minimized under the constraint <span class="math">\(\sum_{i} c_i = 1\)</span>. <span class="math">\(\kappa\)</span> is the size of the list memory, i.e. the number of retained vectors. The minimization of the error <span class="math">\(e\)</span> can be performed with Lagrangian calculus:</p>
+<div class="math">
+\[\begin{split}\left[ \begin{array}{cc} \mathbf{B} &amp; \vec{1} \\ \vec{1}^T &amp; 0 \end{array} \right] \left[ \begin{array}{c} \vec{c} \\ \lambda \end{array} \right] = \left[ \begin{array}{c} \vec{0} \\ 1 \end{array} \right],\end{split}\]</div>
+<p>where <span class="math">\(2\lambda\)</span> is the Lagrangian multiplier and</p>
+<div class="math">
+\[\left[\mathbf{B}\right]_{ij} = \vec{x}^T(n - \kappa + i) \vec{x}(n - \kappa + j) = \left[\mathbf{B}\right]_{ji}.\]</div>
+<p>The new state vector is then defined as</p>
+<div class="math">
+\[\mathbf{Y}_{new} = \sum\limits_{i = 1}^{\kappa} c_i \mathbf{Y}(n+1 - \kappa + i).\]</div>
+<p>The current orbitals are then set to <span class="math">\(\mathbf{U}(n+1) = \exp(\mathbf{Y}_{new})\)</span>.</p>
+<table class="docutils citation" frame="void" id="dmrgscf1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[DMRGSCF1]</a></td><td>P.E.M. Siegbahn, J. Almlof, A. Heiberg and B.O. Roos, <em>Journal of Chemical Physics</em> <strong>74</strong>, 2384-2396 (1981), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.441359">10.1063/1.441359</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[DMRGSCF2]</a></td><td><ol class="first last upperalpha simple" start="4">
+<li>Ghosh, J. Hachmann, T. Yanai and G.K.-L. Chan, <em>Journal of Chemical Physics</em> <strong>128</strong>, 144117 (2008), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.2883976">10.1063/1.2883976</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[DMRGSCF3]</a></td><td><ol class="first last upperalpha simple" start="4">
+<li>Zgid and M. Nooijen, <em>Journal of Chemical Physics</em> <strong>128</strong>, 144116 (2008), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.2883981">10.1063/1.2883981</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[DMRGSCF4]</a></td><td><ol class="first last upperalpha simple" start="20">
+<li>Yanai, Y. Kurashige, D. Ghosh and G.K.-L. Chan, <em>International Journal of Quantum Chemistry</em> <strong>109</strong>, 2178-2190 (2009), doi: <a class="reference external" href="http://dx.doi.org/10.1002/qua.22099">10.1002/qua.22099</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[DMRGSCF5]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters, W. Poelmans, P.W. Ayers and D. Van Neck, <em>Computer Physics Communications</em> <strong>185</strong>, 1501-1514 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2014.01.019">10.1016/j.cpc.2014.01.019</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[DMRGSCF6]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters, T. Bogaerts, P. Van Der Voort, V. Van Speybroeck and D. Van Neck, <em>Journal of Chemical Physics</em> <strong>140</strong>, 241103 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.4885815">10.1063/1.4885815</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[DMRGSCF7]</a></td><td><ol class="first last upperalpha simple">
+<li>Banerjee, N. Adams, J. Simons and R. Shepard, <em>Journal of Physical Chemistry</em> <strong>89</strong>, 52-57 (1985), doi: <a class="reference external" href="http://dx.doi.org/10.1021/j100247a015">10.1021/j100247a015</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[DMRGSCF8]</a></td><td><ol class="first last upperalpha simple" start="16">
+<li>Pulay, <em>Chemical Physics Letters</em> <strong>73</strong>, 393-398 (1980), doi: <a class="reference external" href="http://dx.doi.org/10.1016/0009-2614(80)80396-4">10.1016/0009-2614(80)80396-4</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="dmrgscf9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[DMRGSCF9]</a></td><td>C.D. Sherrill, Programming DIIS, <a class="reference external" href="http://vergil.chemistry.gatech.edu/notes/diis/node3.html">http://vergil.chemistry.gatech.edu/notes/diis/node3.html</a> (2000).</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7. DMRG-SCF</a><ul>
+<li><a class="reference internal" href="#augmented-hessian-newton-raphson">7.1. Augmented Hessian Newton-Raphson</a></li>
+<li><a class="reference internal" href="#diis">7.2. DIIS</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="inoutput.html"
+                        title="previous chapter">6. DMRG calculations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dmrgscfcalcs.html"
+                        title="next chapter">8. DMRG-SCF calculations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dmrgscf.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
