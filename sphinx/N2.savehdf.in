@@ -1,0 +1,17 @@
+molecule N2 {
+   N       0.0000   0.0000   0.0000
+   N       0.0000   0.0000   2.1180
+units au
+}
+
+plugin_load("savehdf/savehdf.so")
+
+set basis cc-pVDZ
+set reference rhf
+set e_convergence 1e-12
+set d_convergence 1e-12
+set ints_tolerance 0.0
+
+scf()
+
+plugin("savehdf.so")

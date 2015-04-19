@@ -36,22 +36,17 @@ can be calculated, as well as the gradient and Hessian for orbital rotations
 or nuclear displacements. In addition, several correlation functions can be
 obtained to investigate the electronic structure in the active space.
 
-Next to a spin-adapted implementation of DMRG, the library also
-contains a determinant-based FCI implementation, which allows to
-calculate both Hamiltonian eigenstates and Green's functions.
-
 To gain a better understanding of how to perform DMRG calculations for
 large active spaces, you are encouraged to read the
-[two papers](#how-to-acknowledge-chemps2) listed below.
+[three papers](#how-to-acknowledge-chemps2) listed below.
 
 Incorporation of the library into other codes is very simple due a
 minimal API, as well as a python interface. Direct usage of the
 library is illustrated in the [c++](#4-test-libchemps2) and
 [python](#6-test-pychemps2) tests, which can be easily adapted
-to your needs. The interfaces to
-[psi4 (in c++)](#dmrg-ci-and-dmrg-scf-calculations-with-psi4) and to
-[pyscf (in python)](#dmrg-ci-and-dmrg-scf-calculations-with-pyscf) are
-described below.
+to your needs. The interfaces to [psi4](http://www.psicode.org)
+and [pyscf](https://github.com/sunqm/pyscf) are described in the
+[user manual](http://sebwouters.github.io/CheMPS2/index.html).
 
 In the future, the parallelization of CheMPS2 for shared memory
 architectures will be extended to a hybrid scheme with both shared
@@ -68,7 +63,7 @@ To acknowledge CheMPS2, please cite
 1. S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck,
    CheMPS2: a free open-source spin-adapted implementation of the density
    matrix renormalization group for ab initio quantum chemistry,
-   Computer Physics Communications 185 (6), 1501-1514 (2014),
+   *Computer Physics Communications* **185** (6), 1501-1514 (2014),
    [doi:10.1016/j.cpc.2014.01.019](http://dx.doi.org/10.1016/j.cpc.2014.01.019)
 
         @article{CheMPS2cite1,
@@ -84,19 +79,36 @@ To acknowledge CheMPS2, please cite
 
 2. S. Wouters and D. Van Neck,
    The density matrix renormalization group for ab initio quantum chemistry,
-   The European Physical Journal D 68 (9), 272 (2014),
+   *European Physical Journal D* **68** (9), 272 (2014),
    [doi:10.1140/epjd/e2014-50500-1](http://dx.doi.org/10.1140/epjd/e2014-50500-1)
 
         @article{CheMPS2cite2,
             author = {Sebastian Wouters and Dimitri {Van Neck}},
             title = {The density matrix renormalization group for ab initio quantum chemistry},
-            journal = {The European Physical Journal D},
+            journal = {European Physical Journal D},
             year = {2014},
             volume = {68},
             number = {9},
             pages = {272},
             doi = {10.1140/epjd/e2014-50500-1}
         }
+
+3. S. Wouters, T. Bogaerts, P. Van Der Voort, V. Van Speybroeck and D. Van Neck,
+   Communication: DMRG-SCF study of the singlet, triplet, and quintet states of oxo-Mn(Salen),
+   *Journal of Chemical Physics* **140** (24), 241103 (2014),
+   [doi:10.1063/1.4885815](http://dx.doi.org/10.1063/1.4885815)
+   
+        @article{CheMPS2cite3,
+            author = {Sebastian Wouters and Thomas Bogaerts and Pascal {Van Der Voort} and Veronique {Van Speybroeck} and Dimitri {Van Neck}},
+            title = {Communication: DMRG-SCF study of the singlet, triplet, and quintet states of oxo-Mn(Salen)},
+            journal = {Journal of Chemical Physics},
+            year = {2014},
+            volume = {140},
+            number = {24},
+            pages = {241103},
+            doi = {10.1063/1.4885815}
+        }
+
 
 Installation
 ------------
@@ -138,6 +150,7 @@ The files
     /myfolder/chemps2/CheMPS2/CMakeLists.txt
     /myfolder/chemps2/tests/CMakeLists.txt
     /myfolder/chemps2/PyCheMPS2/CMakeLists.txt
+    /myfolder/chemps2/sphinx/CMakeLists.txt
 
 provide a minimal compilation. In your terminal, run:
 
@@ -147,7 +160,7 @@ provide a minimal compilation. In your terminal, run:
 
 CMake generates makefiles based on the user’s specifications:
 
-    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
+    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
 
 1.  Option1 is the `c++` compiler; typically `g++`, `icpc`, or `clang++`
     on Linux.
@@ -157,22 +170,21 @@ CMake generates makefiles based on the user’s specifications:
     possibility to compile the doxygen documentation.
 4.  Option4 is the prefix of the installation directory; typically
     `/usr` or `/usr/local` on Linux. On my computer, libchemps2 is then
-    installed in `prefix/lib/x86_64-linux-gnu/` and the headers in
-    `prefix/include/chemps2`.
+    installed in `/prefix/lib/x86_64-linux-gnu/` and the headers in
+    `/prefix/include/chemps2`.
 5.  Option5 can be `ON` or `OFF` and is used to avoid building the
     shared library (please use the default here).
+6.  Option6 can be `ON` or `OFF` and is used to switch on the
+    possibility to compile the user manual with sphinx.
 
 If one or more of the required libraries are not found, use the command
 
-    > CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5
+    > CMAKE_INCLUDE_PATH=option7 CMAKE_LIBRARY_PATH=option8 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
 
-instead, where option6 and option7 are respectively the missing
-colon-separated include and library paths, e.g.
+instead, where option7 and option8 are respectively the missing
+colon-separated include and library paths:
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
-
-and
-
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 
 To compile, run:
@@ -246,8 +258,8 @@ require a very limited amount of memory (order 10-120 MB).
 
 ### 7. Doxygen
 
-To build and view the doxygen manual, the documentation flag should have
-been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
+To build the doxygen manual, the `BUILD_DOCUMENTATION` flag
+should have been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
 
     > cd /myfolder/chemps2/build
     > make doc
@@ -256,155 +268,33 @@ been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
     > evince refman.pdf &
     > cd ../html
     > firefox index.html &
+    
+### 8. Sphinx user manual
+
+To build the sphinx user manual, the `BUILD_SPHINX` flag
+should have been on: `-DBUILD_SPHINX=ON`. In your terminal, run:
+
+    > cd /myfolder/chemps2/build
+    > make sphinx
+    > cd sphinx/html
+    > firefox index.html &
 
 
 User manual
 -----------
 
-Doxygen output can be generated: see the [installation section](#installation)
-or the [doxygen html output](http://sebwouters.github.io/CheMPS2/index.html).
+For information on how to perform DMRG and DMRG-SCF calculations with CheMPS2,
+please consult the
 
-For an overview of the concepts and ideas used in CheMPS2, please read the
-[code release paper and review](#how-to-acknowledge-chemps2) listed above.
+1. [publications](#how-to-acknowledge-chemps2)
+2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
+3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
 
-
-FCIDUMP files
--------------
-
-The CheMPS2::Hamiltonian object is able to read in FCIDUMP files.
-Such files can for example be generated by a plugin to
-[psi4, ab initio quantum chemistry](http://www.psicode.org).
-The plugin has been tested on commit
-14c78eabdca86f8e094576890518d93d300d2500 (February 27, 2015)
-on [https://github.com/psi4/psi4public](https://github.com/psi4/psi4public),
-and should work on later versions as well.
-
-To make use of this feature, build psi4 with the plugin option, and then run:
-
-    > psi4 --new-plugin fcidump
-    > cd fcidump
-
-Now, replace the file `fcidump.cc` with 
-[integrals/psi4plugins/fcidump.cc](integrals/psi4plugins/fcidump.cc). To
-compile the plugin, run:
-
-    > make
-
-Examples of output generated with this
-plugin can be found in [tests/matrixelements](tests/matrixelements).
-
-
-Matrix elements from psi4 in HDF5
----------------------------------
-
-The CheMPS2::Hamiltonian object is able to read in HDF5 files
-generated by a plugin to
-[psi4, ab initio quantum chemistry](http://www.psicode.org).
-The remark on psi4's commit version from the previous section remains.
-
-To make use of this feature, build psi4 with the plugin option, and then run:
-
-    > psi4 --new-plugin savehdf
-    > cd savehdf
-
-Now, replace the file `savehdf.cc` with 
-[integrals/psi4plugins/savehdf.cc](integrals/psi4plugins/savehdf.cc)
-to store all unique matrix elements (remember that there is eightfold
-permutation symmetry) in binary form with HDF5.
-
-To compile the plugin, libchemps2 should be installed as described
-above, and the `Makefile` should be adjusted. Change the line
-
-    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin
-
-to
-
-    PSIPLUGIN = -L$(OBJDIR)/lib -lplugin -lchemps2
-
-To compile the plugin, run:
-
-    > make
-
-
-DMRG-CI and DMRG-SCF calculations with psi4
--------------------------------------------
-
-DMRG-CI and DMRG-SCF calculations can also be performed directly with
-[psi4, ab initio quantum chemistry](http://www.psicode.org).
-The remark on psi4's commit version from the previous section remains. To
-perform DMRG-CI calculations, build psi4 with the plugin option, and then
-run:
-
-    > psi4 --new-plugin dmrgci
-    > cd dmrgci
-
-Now, replace the file `dmrgci.cc` with 
-[integrals/psi4plugins/dmrgci.cc](integrals/psi4plugins/dmrgci.cc).
-For the compilation of this plugin, the same instructions as above should
-be followed (linking to libchemps2).
-
-Example input files to use the plugin are provided in
-
-1. [integrals/psi4plugins/N2.dat](integrals/psi4plugins/N2.dat)
-
-2. [integrals/psi4plugins/H2O.dat](integrals/psi4plugins/H2O.dat)
-
-After compilation of the dmrgci plugin, place these input files one directory
-higher than the plugin. In that folder, run:
-
-    > psi4 N2.dat
-    > psi4 H2O.dat
-
-To perform DMRG-SCF calculations, build psi4 with the plugin option,
-and then run:
-
-    > psi4 --new-plugin dmrgscf
-    > cd dmrgscf
-    
-Now, replace the file `dmrgscf.cc` with 
-[integrals/psi4plugins/dmrgscf.cc](integrals/psi4plugins/dmrgscf.cc).
-For the compilation of this plugin, the same instructions as above should
-be followed (linking to libchemps2).
-
-Example input files to use the plugin are provided in
-
-1. [integrals/psi4plugins/test6.dat](integrals/psi4plugins/test6.dat)
-
-2. [integrals/psi4plugins/test8.dat](integrals/psi4plugins/test8.dat)
-
-3. [integrals/psi4plugins/test9.dat](integrals/psi4plugins/test9.dat)
-
-These DMRG-SCF tests are the analogs of the corresponding `c++` and python
-tests (with the same number). After compilation of the dmrgscf plugin, place
-these input files one directory higher than the plugin. In that folder, run:
-
-    > psi4 test6.dat
-    > psi4 test8.dat
-    > psi4 test9.dat
-
-DMRG-CI and DMRG-SCF calculations with pyscf
---------------------------------------------
-
-[pyscf](https://github.com/sunqm/pyscf) is a new quantum chemistry package,
-in which all layers are written or interfaced in python. In the future, the
-package will be able to perform DMRG-CI and DMRG-SCF calculations using
-PyCheMPS2: [chemps2.py](https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py).
-
-Examples of how to extract MO integrals from pyscf to perform DMRG-CI
-calculations with PyCheMPS2 can be found in
-
-1. [integrals/pyscf/example.py](integrals/pyscf/example.py)
-
-2. [integrals/pyscf/example2.py](integrals/pyscf/example2.py)
-
-3. [integrals/pyscf/example3.py](integrals/pyscf/example3.py)
-
-4. [integrals/pyscf/dmrgci.py](integrals/pyscf/dmrgci.py)
-
-5. [integrals/pyscf/call_chemps2.py](integrals/pyscf/call_chemps2.py)
-
-Please remember to append the correct pyscf and PyCheMPS2 directories to
-`sys.path` at the top of these files.
+The user manual contains elaborate information on the DMRG and DMRG-SCF
+algorithms, the symmetries which are exploited in CheMPS2, how to
+generate matrix elements with plugins to [psi4](http://www.psicode.org),
+how to perform DMRG and DMRG-SCF calculations, and the interfaces of CheMPS2
+to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf).
 
 
 List of files in libchemps2
