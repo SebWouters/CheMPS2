@@ -180,18 +180,17 @@ $(document).ready(function(){initNavTree('index.html','');});
 &gt; mkdir build
 &gt; cd build
 </pre><p>CMake generates makefiles based on the user’s specifications: </p>
-<pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
+<pre class="fragment">&gt; CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 </pre><ol type="1">
 <li>Option1 is the <code>c++</code> compiler; typically <code>g++</code>, <code>icpc</code>, or <code>clang++</code> on Linux.</li>
 <li>Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library.</li>
-<li>Option3 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation.</li>
-<li>Option4 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>/prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>/prefix/include/chemps2</code>.</li>
-<li>Option5 can be <code>ON</code> or <code>OFF</code> and is used to avoid building the shared library (please use the default here).</li>
-<li>Option6 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
+<li>Option3 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>/prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>/prefix/include/chemps2</code>.</li>
+<li>Option4 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation.</li>
+<li>Option5 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
 </ol>
 <p>If one or more of the required libraries are not found, use the command </p>
-<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option7 CMAKE_LIBRARY_PATH=option8 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
-</pre><p>instead, where option7 and option8 are respectively the missing colon-separated include and library paths: </p>
+<pre class="fragment">&gt; CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
+</pre><p>instead, where option6 and option7 are respectively the missing colon-separated include and library paths: </p>
 <pre class="fragment">CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
 CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre><p>To compile, run: </p>
@@ -227,7 +226,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <pre class="fragment">&gt; export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
 </pre><p>The python tests do exactly the same thing as the <code>c++</code> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>7. Doxygen</h3>
-<p>To build the doxygen manual, the <code>BUILD_DOCUMENTATION</code> flag should have been on: <code>-DBUILD_DOCUMENTATION=ON</code>. In your terminal, run: </p>
+<p>To build the doxygen manual, the <code>BUILD_DOXYGGEN</code> flag should have been on: <code>-DBUILD_DOXYGGEN=ON</code>. In your terminal, run: </p>
 <pre class="fragment">&gt; cd /myfolder/chemps2/build
 &gt; make doc
 &gt; cd LaTeX-documents
@@ -248,7 +247,14 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <li><a href="http://sebwouters.github.io/CheMPS2/index.html">user manual</a></li>
 <li><a href="http://sebwouters.github.io/CheMPS2/doxygen/index.html">doxygen html output</a></li>
 </ol>
-<p>The user manual contains elaborate information on the DMRG and DMRG-SCF algorithms, the symmetries which are exploited in CheMPS2, how to generate matrix elements with plugins to <a href="http://www.psicode.org">psi4</a>, how to perform DMRG and DMRG-SCF calculations, and the interfaces of CheMPS2 to <a href="http://www.psicode.org">psi4</a> and <a href="https://github.com/sunqm/pyscf">pyscf</a>.</p>
+<p>The <a href="http://sebwouters.github.io/CheMPS2/index.html">user manual</a> contains elaborate information on</p>
+<ul>
+<li>the DMRG and DMRG-SCF algorithms</li>
+<li>the symmetries which are exploited in CheMPS2</li>
+<li>how to generate matrix elements with plugins to <a href="http://www.psicode.org">psi4</a></li>
+<li>how to perform DMRG and DMRG-SCF calculations</li>
+<li>the interfaces of CheMPS2 to <a href="http://www.psicode.org">psi4</a> and <a href="https://github.com/sunqm/pyscf">pyscf</a></li>
+</ul>
 <h2>List of files in libchemps2 </h2>
 <p><a href="CheMPS2/CASSCF.cpp">CheMPS2/CASSCF.cpp</a> contains the constructor and destructor of the CASSCF class, as well as the functions which allow to update, get or set its variables.</p>
 <p><a href="CheMPS2/CASSCFdebug.cpp">CheMPS2/CASSCFdebug.cpp</a> contains two functions: one for calculating the ROHF energy; and one for fetching FCI coefficients to determine the point group symmetry of certain electronic states of the carbon dimer.</p>
@@ -394,7 +400,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sun Apr 19 2015 18:18:12 for CheMPS2 by
+    <li class="footer">Generated on Mon Apr 20 2015 09:20:47 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

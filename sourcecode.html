@@ -94,7 +94,7 @@
 </pre></div>
 </div>
 <p>CMake generates makefiles based on the user&#8217;s specifications:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DBUILD_DOCUMENTATION<span class="o">=</span>option3 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option4 -DSTATIC_ONLY<span class="o">=</span>option5 -DBUILD_SPHINX<span class="o">=</span>option6
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option3 -DBUILD_DOXYGEN<span class="o">=</span>option4 -DBUILD_SPHINX<span class="o">=</span>option5
 </pre></div>
 </div>
 <ol class="arabic simple">
@@ -104,12 +104,17 @@
 <li>Option4 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/prefix/lib/x86_64-linux-gnu</span></code> and the headers in <code class="docutils literal"><span class="pre">/prefix/include/chemps2</span></code>.</li>
 <li>Option5 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to avoid building the shared library (please use the default here).</li>
 <li>Option6 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
+<li>Option1 is the <code class="docutils literal"><span class="pre">c++</span></code> compiler; typically <code class="docutils literal"><span class="pre">g++</span></code>, <code class="docutils literal"><span class="pre">icpc</span></code>, or <code class="docutils literal"><span class="pre">clang++</span></code> on Linux.</li>
+<li>Option2 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the intel math kernel library.</li>
+<li>Option3 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/prefix/lib/x86_64-linux-gnu/</span></code> and the headers in <code class="docutils literal"><span class="pre">/prefix/include/chemps2</span></code>.</li>
+<li>Option4 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile the doxygen documentation.</li>
+<li>Option5 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
 </ol>
 <p>If one or more of the required libraries are not found, use the command</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CMAKE_INCLUDE_PATH</span><span class="o">=</span>option7 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>option8 <span class="nv">CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DBUILD_DOCUMENTATION<span class="o">=</span>option3 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option4 -DSTATIC_ONLY<span class="o">=</span>option5 -DBUILD_SPHINX<span class="o">=</span>option6
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CMAKE_INCLUDE_PATH</span><span class="o">=</span>option6 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>option7 <span class="nv">CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>option3 -DBUILD_DOXYGEN<span class="o">=</span>option4 -DBUILD_SPHINX<span class="o">=</span>option5
 </pre></div>
 </div>
-<p>instead, where option7 and option8 are respectively the missing colon-separated include and library paths:</p>
+<p>instead, where option6 and option7 are respectively the missing colon-separated include and library paths:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">CMAKE_INCLUDE_PATH</span><span class="o">=</span>/my_libs/lib1/include:/my_libs/lib2/include
 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre></div>
@@ -169,7 +174,7 @@
 </div>
 <div class="section" id="doxygen">
 <h2>1.7. Doxygen<a class="headerlink" href="#doxygen" title="Permalink to this headline">¶</a></h2>
-<p>To build the doxygen manual, the <code class="docutils literal"><span class="pre">BUILD_DOCUMENTATION</span></code> flag should have been on: <code class="docutils literal"><span class="pre">-DBUILD_DOCUMENTATION=ON</span></code>. In your terminal, run:</p>
+<p>To build the doxygen manual, the <code class="docutils literal"><span class="pre">BUILD_DOXYGEN</span></code> flag should have been on: <code class="docutils literal"><span class="pre">-DBUILD_DOXYGEN=ON</span></code>. In your terminal, run:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /myfolder/chemps2/build
 <span class="nv">$ </span>make doc
 <span class="nv">$ </span><span class="nb">cd </span>LaTeX-documents
