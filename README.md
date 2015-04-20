@@ -256,8 +256,8 @@ require a very limited amount of memory (order 10-120 MB).
 
 ### 7. Doxygen
 
-To build the doxygen manual, the `BUILD_DOXYGGEN` flag
-should have been on: `-DBUILD_DOXYGGEN=ON`. In your terminal, run:
+To build the doxygen manual, the `BUILD_DOXYGEN` flag
+should have been on: `-DBUILD_DOXYGEN=ON`. In your terminal, run:
 
     > cd /myfolder/chemps2/build
     > make doc
