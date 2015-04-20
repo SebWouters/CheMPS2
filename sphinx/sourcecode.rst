@@ -63,7 +63,7 @@ CMake generates makefiles based on the user's specifications:
 
 .. code-block:: bash
 
-    $ CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
+    $ CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 
 #. Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux.
 #. Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
@@ -72,13 +72,19 @@ CMake generates makefiles based on the user's specifications:
 #. Option5 can be ``ON`` or ``OFF`` and is used to avoid building the shared library (please use the default here).
 #. Option6 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the user manual with sphinx.
 
+#.  Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux.
+#.  Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
+#.  Option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/prefix/lib/x86_64-linux-gnu/`` and the headers in ``/prefix/include/chemps2``.
+#.  Option4 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the doxygen documentation.
+#.  Option5 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the user manual with sphinx.
+
 If one or more of the required libraries are not found, use the command
 
 .. code-block:: bash
 
-    $ CMAKE_INCLUDE_PATH=option7 CMAKE_LIBRARY_PATH=option8 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
+    $ CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 
-instead, where option7 and option8 are respectively the missing colon-separated include and library paths:
+instead, where option6 and option7 are respectively the missing colon-separated include and library paths:
 
 .. code-block:: bash
     
@@ -158,7 +164,7 @@ The python tests do exactly the same thing as the ``c++`` tests above, and illus
 Doxygen
 -------
 
-To build the doxygen manual, the ``BUILD_DOCUMENTATION`` flag should have been on: ``-DBUILD_DOCUMENTATION=ON``. In your terminal, run:
+To build the doxygen manual, the ``BUILD_DOXYGEN`` flag should have been on: ``-DBUILD_DOXYGEN=ON``. In your terminal, run:
 
 .. code-block:: bash
     

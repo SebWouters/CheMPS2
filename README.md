@@ -160,28 +160,26 @@ provide a minimal compilation. In your terminal, run:
 
 CMake generates makefiles based on the user’s specifications:
 
-    > CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
+    > CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 
 1.  Option1 is the `c++` compiler; typically `g++`, `icpc`, or `clang++`
     on Linux.
 2.  Option2 can be `ON` or `OFF` and is used to switch on the intel math
     kernel library.
-3.  Option3 can be `ON` or `OFF` and is used to switch on the
-    possibility to compile the doxygen documentation.
-4.  Option4 is the prefix of the installation directory; typically
+3.  Option3 is the prefix of the installation directory; typically
     `/usr` or `/usr/local` on Linux. On my computer, libchemps2 is then
     installed in `/prefix/lib/x86_64-linux-gnu/` and the headers in
     `/prefix/include/chemps2`.
-5.  Option5 can be `ON` or `OFF` and is used to avoid building the
-    shared library (please use the default here).
-6.  Option6 can be `ON` or `OFF` and is used to switch on the
+4.  Option4 can be `ON` or `OFF` and is used to switch on the
+    possibility to compile the doxygen documentation.
+5.  Option5 can be `ON` or `OFF` and is used to switch on the
     possibility to compile the user manual with sphinx.
 
 If one or more of the required libraries are not found, use the command
 
-    > CMAKE_INCLUDE_PATH=option7 CMAKE_LIBRARY_PATH=option8 CXX=option1 cmake .. -DMKL=option2 -DBUILD_DOCUMENTATION=option3 -DCMAKE_INSTALL_PREFIX=option4 -DSTATIC_ONLY=option5 -DBUILD_SPHINX=option6
+    > CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 
-instead, where option7 and option8 are respectively the missing
+instead, where option6 and option7 are respectively the missing
 colon-separated include and library paths:
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
@@ -258,8 +256,8 @@ require a very limited amount of memory (order 10-120 MB).
 
 ### 7. Doxygen
 
-To build the doxygen manual, the `BUILD_DOCUMENTATION` flag
-should have been on: `-DBUILD_DOCUMENTATION=ON`. In your terminal, run:
+To build the doxygen manual, the `BUILD_DOXYGGEN` flag
+should have been on: `-DBUILD_DOXYGGEN=ON`. In your terminal, run:
 
     > cd /myfolder/chemps2/build
     > make doc
@@ -290,11 +288,14 @@ please consult the
 2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
 3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
 
-The user manual contains elaborate information on the DMRG and DMRG-SCF
-algorithms, the symmetries which are exploited in CheMPS2, how to
-generate matrix elements with plugins to [psi4](http://www.psicode.org),
-how to perform DMRG and DMRG-SCF calculations, and the interfaces of CheMPS2
-to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf).
+The [user manual](http://sebwouters.github.io/CheMPS2/index.html) contains
+elaborate information on
+
+* the DMRG and DMRG-SCF algorithms
+* the symmetries which are exploited in CheMPS2
+* how to generate matrix elements with plugins to [psi4](http://www.psicode.org)
+* how to perform DMRG and DMRG-SCF calculations
+* the interfaces of CheMPS2 to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
 
 
 List of files in libchemps2
