@@ -1,0 +1,37 @@
+molecule O2 {
+  O       0.0   0.0   0.0
+  O       0.0   0.0   3.0 
+units au
+}
+
+plugin_load("dmrgscf/dmrgscf.so")
+
+set basis     cc-pVDZ
+set reference rhf
+
+set dmrgscf wfn_irrep            0
+set dmrgscf wfn_multp            1
+set dmrgscf frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
+set dmrgscf active               [ 2 , 0 , 2 , 2 , 0 , 2 , 2 , 2 ]
+
+set dmrgscf dmrg_states          [   500,  1000,  1000 ]
+set dmrgscf dmrg_econv           [ 1e-10, 1e-10, 1e-10 ]
+set dmrgscf dmrg_maxsweeps       [     5,     5,    10 ]
+set dmrgscf dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrgscf dmrg_print_corr      false
+set dmrgscf mps_chkpt            false
+
+set dmrgscf dmrgscf_convergence  1e-6
+set dmrgscf dmrgscf_store_unit   true
+set dmrgscf dmrgscf_do_diis      true
+set dmrgscf dmrgscf_diis_branch  1e-2
+set dmrgscf dmrgscf_store_diis   true
+
+set dmrgscf dmrgscf_which_root   2   # First excited state
+set dmrgscf dmrgscf_state_avg    true
+set dmrgscf dmrgscf_active_space NO  # INPUT; NO; LOC
+set dmrgscf dmrgscf_loc_random   false
+
+scf()
+
+plugin("dmrgscf.so")
