@@ -70,7 +70,7 @@ With the ``CheMPS2::Problem`` and ``CheMPS2::ConvergenceScheme`` objects, DMRG c
 
 .. code-block:: c++
 
-    CheMPS2::DMRG::DMRG( CheMPS2::Problem * Probin, CheMPS2::ConvergenceScheme * OptSchemeIn, bool makechkpt )
+    CheMPS2::DMRG::DMRG( CheMPS2::Problem * Probin, CheMPS2::ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder="/tmp" )
     double CheMPS2::DMRG::Solve()
 
 If the variable ``makechkpt`` is ``true``, MPS checkpoints of the form ``CheMPS2_MPS*.h5`` are generated in the execution folder. They are stored/overwritten each time a full left and right sweep has been performed. The checkpoints allow to restart calculations. It is the responsibility of the user to remove the completed instructions from the ``CheMPS2::ConvergenceScheme`` before restarting a calculation!
