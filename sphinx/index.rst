@@ -27,6 +27,7 @@ Contents
    symmetry
    matrixelements
    inoutput
+   resources
    dmrgscf
    dmrgscfcalcs
    interfaces
