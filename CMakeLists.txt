@@ -16,6 +16,7 @@ option (BUILD_SPHINX         "Build the user manual with Sphinx"       OFF)
 option (STATIC_ONLY          "Compile only the static library"         OFF)
 option (ENABLE_TESTS         "Compile the tests"                       ON)
 option (ENABLE_XHOST         "Enable processor-specific optimizations" ON)
+option (ENABLE_GENERIC       "Enable mostly static linking in shared library" OFF)
 
 if (MKL)
     cmake_minimum_required (VERSION 2.8.11)
@@ -50,6 +51,14 @@ if (HAS_IPO)
 endif (HAS_IPO)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3")
+ 
+if (ENABLE_GENERIC)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")
+    check_cxx_compiler_flag (-static-intel HAS_INTEL_COMPILERS)
+    if (HAS_INTEL_COMPILERS)
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-intel -wd10237")
+    endif (HAS_INTEL_COMPILERS)
+endif (ENABLE_GENERIC)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CheMPS2_SOURCE_DIR}/CMake/")
 
