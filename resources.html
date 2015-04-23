@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. Typical resource requirements &mdash; CheMPS2 1.5 documentation</title>
+    
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <link rel="next" title="8. DMRG-SCF" href="dmrgscf.html" />
+    <link rel="prev" title="6. DMRG calculations" href="inoutput.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="dmrgscf.html" title="8. DMRG-SCF"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><div class="section" id="typical-resource-requirements">
+<span id="index-3"></span><h1>7. Typical resource requirements<a class="headerlink" href="#typical-resource-requirements" title="Permalink to this headline">¶</a></h1>
+<p>In this section, typical resource requirements for DMRG calculations are discussed. With <span class="math">\(L\)</span> spatial orbitals and <span class="math">\(D\)</span> virtual basis states, the algorithm has a theoretical scaling per sweep of</p>
+<ul class="simple">
+<li><span class="math">\(\mathcal{O}(L^4D^2 + L^3D^3)\)</span> in CPU time</li>
+<li><span class="math">\(\mathcal{O}(L^2D^2)\)</span> in memory</li>
+<li><span class="math">\(\mathcal{O}(L^3D^2)\)</span> in disk</li>
+</ul>
+<p>The block-sparsity and information compression due to the exploitation of symmetry have not been taken into account in these scalings! Ref. <a class="reference internal" href="#timing" id="id1">[TIMING]</a> contains CPU time measurements for polyenes of increasing length, and demonstrates the scaling of CheMPS2 with <span class="math">\(L\)</span>.</p>
+<div class="section" id="n2-cc-pvdz">
+<h2>7.1. N2/cc-pVDZ<a class="headerlink" href="#n2-cc-pvdz" title="Permalink to this headline">¶</a></h2>
+<p>The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{d2h}\)</span>, and the targeted state was <span class="math">\(X^1\Sigma_g^+\)</span> at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. <a class="reference internal" href="#nitrogen" id="id2">[NITROGEN]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores &#64; 2.6 GHz. The calculation was performed on a single node, and needed ~ 6 Gb of memory.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="26%" />
+<col width="21%" />
+<col width="24%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(D_{\mathsf{SU(2)}}\)</span></th>
+<th class="head">Wall time per sweep (s)</th>
+<th class="head"><span class="math">\(w_D^{disc}\)</span></th>
+<th class="head"><span class="math">\(E_D\)</span> (Hartree)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1000</td>
+<td>117</td>
+<td>9.9532e-07</td>
+<td>-109.28209681</td>
+</tr>
+<tr class="row-odd"><td>1500</td>
+<td>279</td>
+<td>3.7204e-07</td>
+<td>-109.28214478</td>
+</tr>
+<tr class="row-even"><td>2000</td>
+<td>529</td>
+<td>1.7795e-07</td>
+<td>-109.28216006</td>
+</tr>
+<tr class="row-odd"><td>2500</td>
+<td>1339</td>
+<td>9.6998e-08</td>
+<td>-109.28216623</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="h2o-roos-ano-dz">
+<h2>7.2. H2O/Roos&#8217; ANO DZ<a class="headerlink" href="#h2o-roos-ano-dz" title="Permalink to this headline">¶</a></h2>
+<p>Water in Roos&#8217; ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{c2v}\)</span>, and the targeted state was <span class="math">\(^1A_1\)</span> at equilibrium geometry: O &#64; (0, 0, 0) and H &#64; (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. <a class="reference internal" href="#water" id="id3">[WATER]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores &#64; 2.5 GHz. The calculation was performed on a single node, and needed ~ 64 Gb of memory.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="26%" />
+<col width="21%" />
+<col width="24%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(D_{\mathsf{SU(2)}}\)</span></th>
+<th class="head">Wall time per sweep (s)</th>
+<th class="head"><span class="math">\(w_D^{disc}\)</span></th>
+<th class="head"><span class="math">\(E_D\)</span> (Hartree)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1000</td>
+<td>820</td>
+<td>8.6093e-08</td>
+<td>-76.31468322</td>
+</tr>
+<tr class="row-odd"><td>2000</td>
+<td>4304</td>
+<td>1.1262e-08</td>
+<td>-76.31471043</td>
+</tr>
+<tr class="row-even"><td>3000</td>
+<td>11872</td>
+<td>2.8027e-09</td>
+<td>-76.31471338</td>
+</tr>
+<tr class="row-odd"><td>4000</td>
+<td>23915</td>
+<td>6.9927e-10</td>
+<td>-76.31471401</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<table class="docutils citation" frame="void" id="timing" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[TIMING]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters and D. Van Neck, <em>European Physical Journal D</em> <strong>68</strong>, 272 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">10.1140/epjd/e2014-50500-1</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="nitrogen" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[NITROGEN]</a></td><td>G.K.-L. Chan, M. Kallay and J. Gauss, <em>Journal of Chemical Physics</em> <strong>121</strong>, 6110 (2004), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.1783212">10.1063/1.1783212</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="water" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[WATER]</a></td><td><ol class="first last upperalpha simple" start="7">
+<li>K.-L. Chan and M. Head-Gordon, <em>Journal of Chemical Physics</em> <strong>118</strong>, 8551 (2003), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.1574318">10.1063/1.1574318</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7. Typical resource requirements</a><ul>
+<li><a class="reference internal" href="#n2-cc-pvdz">7.1. N2/cc-pVDZ</a></li>
+<li><a class="reference internal" href="#h2o-roos-ano-dz">7.2. H2O/Roos&#8217; ANO DZ</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="inoutput.html"
+                        title="previous chapter">6. DMRG calculations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="dmrgscf.html"
+                        title="next chapter">8. DMRG-SCF</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/resources.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="dmrgscf.html" title="8. DMRG-SCF"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="inoutput.html" title="6. DMRG calculations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2015, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

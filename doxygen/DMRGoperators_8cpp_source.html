@@ -724,7 +724,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> Cbound = movingRight ? L-1-index : index+1;</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;   std::stringstream thefilename;</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;   thefilename &lt;&lt; tempfolder &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;   </div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;   <span class="comment">//The hdf5 file</span></div>
 <div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;   hid_t file_id = H5Fcreate(thefilename.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);</div>
@@ -834,7 +834,7 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> Cbound = movingRight ? L-1-index : index+1;</div>
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;   std::stringstream thefilename;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;   thefilename &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;   thefilename &lt;&lt; tempfolder &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;_index_&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;.h5&quot;</span>;</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;   </div>
 <div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;   <span class="comment">//The hdf5 file</span></div>
 <div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;   hid_t file_id = H5Fopen(thefilename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);</div>
@@ -982,21 +982,21 @@ $(document).ready(function(){initNavTree('DMRGoperators_8cpp_source.html','');})
 <div class="line"><a name="l00876"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">  876</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a>(){</div>
 <div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;</div>
 <div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;   std::stringstream temp;</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;   temp &lt;&lt; <span class="stringliteral">&quot;rm &quot;</span> &lt;&lt; CheMPS2::TMPpath &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;*.h5&quot;</span>;</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;   temp &lt;&lt; <span class="stringliteral">&quot;rm &quot;</span> &lt;&lt; tempfolder &lt;&lt; <span class="stringliteral">&quot;/&quot;</span> &lt;&lt; CheMPS2::DMRG_OPERATOR_storage_prefix &lt;&lt; thePID &lt;&lt; <span class="stringliteral">&quot;*.h5&quot;</span>;</div>
 <div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;   <span class="keywordtype">int</span> info = system(temp.str().c_str());</div>
 <div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;   cout &lt;&lt; <span class="stringliteral">&quot;Info on DMRG::operators rm call to system: &quot;</span> &lt;&lt; info &lt;&lt; endl;</div>
 <div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;</div>
 <div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;}</div>
 <div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00123">Irreps.h:123</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_a2254cc31b5d9497694ea2229226b7bd6"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a></div><div class="ttdeci">void deleteStoredOperators()</div><div class="ttdoc">Call &quot;rm &quot; + CheMPS2::TMPpath + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*...</div><div class="ttdef"><b>Definition:</b> <a href="DMRGoperators_8cpp_source.html#l00876">DMRGoperators.cpp:876</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_a2254cc31b5d9497694ea2229226b7bd6"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">CheMPS2::DMRG::deleteStoredOperators</a></div><div class="ttdeci">void deleteStoredOperators()</div><div class="ttdoc">Call &quot;rm &quot; + tempfolder + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*...</div><div class="ttdef"><b>Definition:</b> <a href="DMRGoperators_8cpp_source.html#l00876">DMRGoperators.cpp:876</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRGoperators.cpp</b></li>
-    <li class="footer">Generated on Mon Apr 20 2015 09:19:58 for CheMPS2 by
+    <li class="footer">Generated on Wed Apr 22 2015 23:38:42 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

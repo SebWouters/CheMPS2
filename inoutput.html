@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
-    <link rel="next" title="7. DMRG-SCF" href="dmrgscf.html" />
+    <link rel="next" title="7. Typical resource requirements" href="resources.html" />
     <link rel="prev" title="5. CheMPS2::Hamiltonian" href="matrixelements.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="dmrgscf.html" title="7. DMRG-SCF"
+          <a href="resources.html" title="7. Typical resource requirements"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"
@@ -140,7 +140,7 @@
 <div class="section" id="chemps2-dmrg">
 <span id="chemps2-dmrg-object"></span><h2>6.3. <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code><a class="headerlink" href="#chemps2-dmrg" title="Permalink to this headline">¶</a></h2>
 <p>With the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> and <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> objects, DMRG calculations are completely defined:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">DMRG</span><span class="p">(</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span> <span class="o">*</span> <span class="n">Probin</span><span class="p">,</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span> <span class="o">*</span> <span class="n">OptSchemeIn</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">makechkpt</span> <span class="p">)</span>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">DMRG</span><span class="p">(</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span> <span class="o">*</span> <span class="n">Probin</span><span class="p">,</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span> <span class="o">*</span> <span class="n">OptSchemeIn</span><span class="p">,</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">makechkpt</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span> <span class="n">tmpfolder</span><span class="o">=</span><span class="s">&quot;/tmp&quot;</span> <span class="p">)</span>
 <span class="kt">double</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">Solve</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -274,8 +274,8 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
   <p class="topless"><a href="matrixelements.html"
                         title="previous chapter">5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code></a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="dmrgscf.html"
-                        title="next chapter">7. DMRG-SCF</a></p>
+  <p class="topless"><a href="resources.html"
+                        title="next chapter">7. Typical resource requirements</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -307,7 +307,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="dmrgscf.html" title="7. DMRG-SCF"
+          <a href="resources.html" title="7. Typical resource requirements"
              >next</a> |</li>
         <li class="right" >
           <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"

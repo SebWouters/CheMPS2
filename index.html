@@ -48,8 +48,13 @@
             
   <div class="section" id="chemps2-documentation">
 <h1>CheMPS2 documentation<a class="headerlink" href="#chemps2-documentation" title="Permalink to this headline">¶</a></h1>
-<p>CheMPS2 is a scientific library in the field of ab initio quantum chemistry. It contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI).</p>
-<p>For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
+<p>CheMPS2 is a scientific library which contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI):</p>
+<ul class="simple">
+<li>up to 40 electrons in 40 orbitals for general active spaces</li>
+<li>up to 100 electrons in 100 orbitals for one-dimensional active spaces, such as the <span class="math">\(\pi\)</span>-system of all-trans polyenes</li>
+</ul>
+<p>In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods, when the active space sizes become prohibitively expensive for FCI. The corresponding methods are called DMRG-CI and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active space sizes, it allows to obtain FCI energies for small systems such as dimers, while for larger systems it is ideal to treat the static/strong correlation in a large active space.</p>
+<p>The design philosophy for CheMPS2 is to be a lightweight, efficient, and stable library. For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
 <p>In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
 <p>CheMPS2 is distributed under the GNU General Public License version 2, and can be downloaded from <a class="reference external" href="https://github.com/sebwouters/chemps2">https://github.com/sebwouters/chemps2</a>.</p>
 <div class="section" id="contents">
@@ -85,20 +90,25 @@
 <li class="toctree-l2"><a class="reference internal" href="inoutput.html#orbital-choice-and-ordering">6.6. Orbital choice and ordering</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dmrgscf.html">7. DMRG-SCF</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#augmented-hessian-newton-raphson">7.1. Augmented Hessian Newton-Raphson</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#diis">7.2. DIIS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">7. Typical resource requirements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="resources.html#n2-cc-pvdz">7.1. N2/cc-pVDZ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resources.html#h2o-roos-ano-dz">7.2. H2O/Roos&#8217; ANO DZ</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="dmrgscfcalcs.html">8. DMRG-SCF calculations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-dmrgscfoptions">8.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-casscf">8.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="dmrgscf.html">8. DMRG-SCF</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#augmented-hessian-newton-raphson">8.1. Augmented Hessian Newton-Raphson</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscf.html#diis">8.2. DIIS</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="interfaces.html">9. Interfaces to psi4 and pyscf</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgci-plugin">9.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgscf-plugin">9.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interfaces.html#id12">9.3. pyscf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dmrgscfcalcs.html">9. DMRG-SCF calculations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-dmrgscfoptions">9.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dmrgscfcalcs.html#chemps2-casscf">9.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interfaces.html">10. Interfaces to psi4 and pyscf</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgci-plugin">10.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#psi4-dmrgscf-plugin">10.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interfaces.html#id12">10.3. pyscf</a></li>
 </ul>
 </li>
 </ul>

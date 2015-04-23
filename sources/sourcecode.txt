@@ -65,13 +65,6 @@ CMake generates makefiles based on the user's specifications:
 
     $ CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
 
-#. Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux.
-#. Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
-#. Option3 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the doxygen documentation.
-#. Option4 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/prefix/lib/x86_64-linux-gnu`` and the headers in ``/prefix/include/chemps2``.
-#. Option5 can be ``ON`` or ``OFF`` and is used to avoid building the shared library (please use the default here).
-#. Option6 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the user manual with sphinx.
-
 #.  Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux.
 #.  Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
 #.  Option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/prefix/lib/x86_64-linux-gnu/`` and the headers in ``/prefix/include/chemps2``.

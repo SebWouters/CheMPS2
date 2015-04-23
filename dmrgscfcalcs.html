@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>8. DMRG-SCF calculations &mdash; CheMPS2 1.5 documentation</title>
+    <title>9. DMRG-SCF calculations &mdash; CheMPS2 1.5 documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
-    <link rel="next" title="9. Interfaces to psi4 and pyscf" href="interfaces.html" />
-    <link rel="prev" title="7. DMRG-SCF" href="dmrgscf.html" /> 
+    <link rel="next" title="10. Interfaces to psi4 and pyscf" href="interfaces.html" />
+    <link rel="prev" title="8. DMRG-SCF" href="dmrgscf.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,10 +36,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="interfaces.html" title="9. Interfaces to psi4 and pyscf"
+          <a href="interfaces.html" title="10. Interfaces to psi4 and pyscf"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="dmrgscf.html" title="7. DMRG-SCF"
+          <a href="dmrgscf.html" title="8. DMRG-SCF"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>
@@ -51,9 +51,9 @@
           <div class="body" role="main">
             
   <div class="section" id="dmrg-scf-calculations">
-<h1>8. DMRG-SCF calculations<a class="headerlink" href="#dmrg-scf-calculations" title="Permalink to this headline">¶</a></h1>
+<h1>9. DMRG-SCF calculations<a class="headerlink" href="#dmrg-scf-calculations" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="chemps2-dmrgscfoptions">
-<h2>8.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code><a class="headerlink" href="#chemps2-dmrgscfoptions" title="Permalink to this headline">¶</a></h2>
+<h2>9.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code><a class="headerlink" href="#chemps2-dmrgscfoptions" title="Permalink to this headline">¶</a></h2>
 <p>An instance of the <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code> class is required to perform DMRG-SCF calculations. It allows to overwrite the default algorithmic choices.</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="p">()</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="o">::</span><span class="n">setDoDIIS</span><span class="p">(</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">DoDIIS_in</span><span class="o">=</span><span class="nb">false</span> <span class="p">)</span>
@@ -109,7 +109,7 @@
 </ul>
 </div>
 <div class="section" id="chemps2-casscf">
-<h2>8.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code><a class="headerlink" href="#chemps2-casscf" title="Permalink to this headline">¶</a></h2>
+<h2>9.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code><a class="headerlink" href="#chemps2-casscf" title="Permalink to this headline">¶</a></h2>
 <p>Augmented Hessian Newton-Raphson DMRG-SCF calculations can be performed with the <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code> class:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">CASSCF</span><span class="p">(</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span> <span class="o">*</span> <span class="n">HamIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">DOCCin</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">SOCCin</span> <span class="p">)</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">setupStart</span><span class="p">(</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NoccIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NDMRGIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NvirtIn</span> <span class="p">)</span>
@@ -133,19 +133,19 @@
             </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">8. DMRG-SCF calculations</a><ul>
-<li><a class="reference internal" href="#chemps2-dmrgscfoptions">8.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
-<li><a class="reference internal" href="#chemps2-casscf">8.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
+<li><a class="reference internal" href="#">9. DMRG-SCF calculations</a><ul>
+<li><a class="reference internal" href="#chemps2-dmrgscfoptions">9.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
+<li><a class="reference internal" href="#chemps2-casscf">9.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="dmrgscf.html"
-                        title="previous chapter">7. DMRG-SCF</a></p>
+                        title="previous chapter">8. DMRG-SCF</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="interfaces.html"
-                        title="next chapter">9. Interfaces to psi4 and pyscf</a></p>
+                        title="next chapter">10. Interfaces to psi4 and pyscf</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -177,10 +177,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="interfaces.html" title="9. Interfaces to psi4 and pyscf"
+          <a href="interfaces.html" title="10. Interfaces to psi4 and pyscf"
              >next</a> |</li>
         <li class="right" >
-          <a href="dmrgscf.html" title="7. DMRG-SCF"
+          <a href="dmrgscf.html" title="8. DMRG-SCF"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>

@@ -115,9 +115,9 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1DMRG.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a873b3e58f248e3c7c1e6deb0c52e2899"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#a873b3e58f248e3c7c1e6deb0c52e2899">DMRG</a> (<a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> *Probin, <a class="el" href="classCheMPS2_1_1ConvergenceScheme.html">ConvergenceScheme</a> *OptSchemeIn, bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk)</td></tr>
-<tr class="memdesc:a873b3e58f248e3c7c1e6deb0c52e2899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a873b3e58f248e3c7c1e6deb0c52e2899">More...</a><br/></td></tr>
-<tr class="separator:a873b3e58f248e3c7c1e6deb0c52e2899"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53edf0724d79b964dc2130bdcda89dcb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#a53edf0724d79b964dc2130bdcda89dcb">DMRG</a> (<a class="el" href="classCheMPS2_1_1Problem.html">Problem</a> *Probin, <a class="el" href="classCheMPS2_1_1ConvergenceScheme.html">ConvergenceScheme</a> *OptSchemeIn, const bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk, const string tmpfolder=CheMPS2::defaultTMPpath)</td></tr>
+<tr class="memdesc:a53edf0724d79b964dc2130bdcda89dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a53edf0724d79b964dc2130bdcda89dcb">More...</a><br/></td></tr>
+<tr class="separator:a53edf0724d79b964dc2130bdcda89dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe701c20aeb97b48c237bed694d185b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe701c20aeb97b48c237bed694d185b5"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5">~DMRG</a> ()</td></tr>
 <tr class="memdesc:abe701c20aeb97b48c237bed694d185b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br/></td></tr>
@@ -144,7 +144,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a0f4e487c40f522846288fe1b3d55e66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2254cc31b5d9497694ea2229226b7bd6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2254cc31b5d9497694ea2229226b7bd6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6">deleteStoredOperators</a> ()</td></tr>
-<tr class="memdesc:a2254cc31b5d9497694ea2229226b7bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call "rm " + CheMPS2::TMPpath + "/" + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + "*.h5";. <br/></td></tr>
+<tr class="memdesc:a2254cc31b5d9497694ea2229226b7bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call "rm " + tempfolder + "/" + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + "*.h5";. <br/></td></tr>
 <tr class="separator:a2254cc31b5d9497694ea2229226b7bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab442cbc43e2e5d877660859578849133"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">activateExcitations</a> (const int maxExcIn)</td></tr>
 <tr class="memdesc:ab442cbc43e2e5d877660859578849133"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activate the necessary storage and machinery to handle excitations.  <a href="#ab442cbc43e2e5d877660859578849133">More...</a><br/></td></tr>
@@ -171,11 +171,12 @@ Computer Physics Communications 185, 1501-1514 (2014) <br/>
 The density matrix renormalization group for ab initio quantum chemistry, <br/>
 European Physical Journal D 68, 272 (2014) <br/>
 <a href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">http://dx.doi.org/10.1140/epjd/e2014-50500-1</a> <br/>
-<a href="http://arxiv.org/abs/1407.2040">http://arxiv.org/abs/1407.2040</a> </p>
+<a href="http://arxiv.org/abs/1407.2040">http://arxiv.org/abs/1407.2040</a></p>
+<p>The user manual: <a href="http://sebwouters.github.io/CheMPS2/index.html">http://sebwouters.github.io/CheMPS2/index.html</a> </p>
 
-<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00067">67</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00069">69</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a873b3e58f248e3c7c1e6deb0c52e2899"></a>
+<a class="anchor" id="a53edf0724d79b964dc2130bdcda89dcb"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -194,8 +195,14 @@ European Physical Journal D 68, 272 (2014) <br/>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>makechkpt</em> = <code>CheMPS2::DMRG_storeMpsOnDisk</code>&#160;</td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>makechkpt</em> = <code>CheMPS2::DMRG_storeMpsOnDisk</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>tmpfolder</em> = <code>CheMPS2::defaultTMPpath</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -211,6 +218,7 @@ European Physical Journal D 68, 272 (2014) <br/>
     <tr><td class="paramname">Probin</td><td>The problem to be solved </td></tr>
     <tr><td class="paramname">OptSchemeIn</td><td>The optimization scheme for the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> sweeps </td></tr>
     <tr><td class="paramname">makechkpt</td><td>Whether or not to save MPS checkpoints in the working directory </td></tr>
+    <tr><td class="paramname">tmpfolder</td><td>Temporary folder on a large partition to store the renormalized operators on disk (by default "/tmp") </td></tr>
   </table>
   </dd>
 </dl>
@@ -222,8 +230,8 @@ European Physical Journal D 68, 272 (2014) <br/>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1DMRG_a873b3e58f248e3c7c1e6deb0c52e2899_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a873b3e58f248e3c7c1e6deb0c52e2899_cgraph" alt=""/></div>
-<map name="classCheMPS2_1_1DMRG_a873b3e58f248e3c7c1e6deb0c52e2899_cgraph" id="classCheMPS2_1_1DMRG_a873b3e58f248e3c7c1e6deb0c52e2899_cgraph">
+<div class="center"><img src="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph" id="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="257,5,468,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="235,56,490,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="539,49,733,90"/></map>
 </div>
 </p>
@@ -253,7 +261,7 @@ European Physical Journal D 68, 272 (2014) <br/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00314">314</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00315">315</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -390,7 +398,7 @@ European Physical Journal D 68, 272 (2014) <br/>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00325">325</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00326">326</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
 <p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -421,7 +429,7 @@ European Physical Journal D 68, 272 (2014) <br/>
 <p>Solver. </p>
 <dl class="section return"><dt>Returns</dt><dd>The min. energy encountered so far during the sweeps. </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00157">157</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00158">158</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -450,7 +458,7 @@ European Physical Journal D 68, 272 (2014) <br/>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a></li>
-    <li class="footer">Generated on Mon Apr 20 2015 09:19:59 for CheMPS2 by
+    <li class="footer">Generated on Wed Apr 22 2015 23:38:43 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

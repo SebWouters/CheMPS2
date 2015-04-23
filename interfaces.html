@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>9. Interfaces to psi4 and pyscf &mdash; CheMPS2 1.5 documentation</title>
+    <title>10. Interfaces to psi4 and pyscf &mdash; CheMPS2 1.5 documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
-    <link rel="prev" title="8. DMRG-SCF calculations" href="dmrgscfcalcs.html" /> 
+    <link rel="prev" title="9. DMRG-SCF calculations" href="dmrgscfcalcs.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -35,7 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>
@@ -47,14 +47,14 @@
           <div class="body" role="main">
             
   <span class="target" id="index-0"></span><span class="target" id="index-1"></span><div class="section" id="interfaces-to-psi4-and-pyscf">
-<span id="index-2"></span><h1>9. Interfaces to psi4 and pyscf<a class="headerlink" href="#interfaces-to-psi4-and-pyscf" title="Permalink to this headline">¶</a></h1>
+<span id="index-2"></span><h1>10. Interfaces to psi4 and pyscf<a class="headerlink" href="#interfaces-to-psi4-and-pyscf" title="Permalink to this headline">¶</a></h1>
 <p>CheMPS2 is currently interfaced with two ab initio quantum chemistry packages:</p>
 <ol class="arabic simple">
 <li>The <code class="docutils literal"><span class="pre">dmrgci</span></code> and <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugins to <a class="reference external" href="http://www.psicode.org/">psi4</a> allow to perform DMRG-CI and DMRG-SCF calculations with CheMPS2, by using <a class="reference external" href="http://www.psicode.org/">psi4</a> input files. Since April 2015, CheMPS2 is also an integral part of psi4.</li>
 <li>There are also DMRG-CI and DMRG-SCF interfaces between <a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> and CheMPS2.</li>
 </ol>
 <div class="section" id="psi4-dmrgci-plugin">
-<h2>9.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin<a class="headerlink" href="#psi4-dmrgci-plugin" title="Permalink to this headline">¶</a></h2>
+<h2>10.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin<a class="headerlink" href="#psi4-dmrgci-plugin" title="Permalink to this headline">¶</a></h2>
 <p>DMRG-CI calculations can be performed directly with <a class="reference external" href="http://www.psicode.org/">psi4</a>. The plugin has been tested on commit <code class="docutils literal"><span class="pre">14c78eabdca86f8e094576890518d93d300d2500</span></code> (February 27, 2015) on <a class="reference external" href="https://github.com/psi4/psi4public">https://github.com/psi4/psi4public</a>, and should work on later versions as well.</p>
 <p>To perform DMRG-CI calculations, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option, and then run:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
@@ -116,7 +116,7 @@ plugin(&quot;dmrgci.so&quot;)
 <p>Since April 2015, CheMPS2 is also an integral part of <a class="reference external" href="http://www.psicode.org/">psi4</a>. Please consult <a class="reference external" href="http://www.psicode.org/">psi4</a>&#8216;s documentation on how to run DMRG-CI calculations with <a class="reference external" href="http://www.psicode.org/">psi4</a>.</p>
 </div>
 <div class="section" id="psi4-dmrgscf-plugin">
-<h2>9.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin<a class="headerlink" href="#psi4-dmrgscf-plugin" title="Permalink to this headline">¶</a></h2>
+<h2>10.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin<a class="headerlink" href="#psi4-dmrgscf-plugin" title="Permalink to this headline">¶</a></h2>
 <p>DMRG-SCF calculations can be performed directly with <a class="reference external" href="http://www.psicode.org/">psi4</a>. The plugin has been tested on commit <code class="docutils literal"><span class="pre">14c78eabdca86f8e094576890518d93d300d2500</span></code> (February 27, 2015) on <a class="reference external" href="https://github.com/psi4/psi4public">https://github.com/psi4/psi4public</a>, and should work on later versions as well.</p>
 <p>To perform DMRG-SCF calculations, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option, and then run:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
@@ -185,7 +185,7 @@ plugin(&quot;dmrgscf.so&quot;)
 <p>Since April 2015, CheMPS2 is also an integral part of <a class="reference external" href="http://www.psicode.org/">psi4</a>. Please consult <a class="reference external" href="http://www.psicode.org/">psi4</a>&#8216;s documentation on how to run DMRG-SCF calculations with <a class="reference external" href="http://www.psicode.org/">psi4</a>.</p>
 </div>
 <div class="section" id="id12">
-<h2>9.3. pyscf<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<h2>10.3. pyscf<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a class="reference external" href="https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py">chemps2.py</a>.</p>
 <p>Examples of how to extract MO integrals from <a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> to perform DMRG-CI calculations with PyCheMPS2 can be found in:</p>
 <ol class="arabic simple">
@@ -210,17 +210,17 @@ plugin(&quot;dmrgscf.so&quot;)
             </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">9. Interfaces to psi4 and pyscf</a><ul>
-<li><a class="reference internal" href="#psi4-dmrgci-plugin">9.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin</a></li>
-<li><a class="reference internal" href="#psi4-dmrgscf-plugin">9.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin</a></li>
-<li><a class="reference internal" href="#id12">9.3. pyscf</a></li>
+<li><a class="reference internal" href="#">10. Interfaces to psi4 and pyscf</a><ul>
+<li><a class="reference internal" href="#psi4-dmrgci-plugin">10.1. psi4 <code class="docutils literal"><span class="pre">dmrgci</span></code> plugin</a></li>
+<li><a class="reference internal" href="#psi4-dmrgscf-plugin">10.2. psi4 <code class="docutils literal"><span class="pre">dmrgscf</span></code> plugin</a></li>
+<li><a class="reference internal" href="#id12">10.3. pyscf</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="dmrgscfcalcs.html"
-                        title="previous chapter">8. DMRG-SCF calculations</a></p>
+                        title="previous chapter">9. DMRG-SCF calculations</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -252,7 +252,7 @@ plugin(&quot;dmrgscf.so&quot;)
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>

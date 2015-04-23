@@ -13,7 +13,7 @@ var searchData=
   ['diaghamsquared',['DiagHamSquared',['../classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e',1,'CheMPS2::FCI']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html#a9cbcd9c6176fdfe09844aa7c89d8e583',1,'CheMPS2::DIIS']]],
   ['directprod',['directProd',['../classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047',1,'CheMPS2::Irreps']]],
-  ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#a873b3e58f248e3c7c1e6deb0c52e2899',1,'CheMPS2::DMRG']]],
+  ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#a53edf0724d79b964dc2130bdcda89dcb',1,'CheMPS2::DMRG']]],
   ['dmrgscfindices',['DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3',1,'CheMPS2::DMRGSCFindices']]],
   ['dmrgscfintegrals',['DMRGSCFintegrals',['../classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426',1,'CheMPS2::DMRGSCFintegrals']]],
   ['dmrgscfmatrix',['DMRGSCFmatrix',['../classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39',1,'CheMPS2::DMRGSCFmatrix']]],

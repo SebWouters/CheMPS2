@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7. DMRG-SCF &mdash; CheMPS2 1.5 documentation</title>
+    <title>8. DMRG-SCF &mdash; CheMPS2 1.5 documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
-    <link rel="next" title="8. DMRG-SCF calculations" href="dmrgscfcalcs.html" />
-    <link rel="prev" title="6. DMRG calculations" href="inoutput.html" /> 
+    <link rel="next" title="9. DMRG-SCF calculations" href="dmrgscfcalcs.html" />
+    <link rel="prev" title="7. Typical resource requirements" href="resources.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,10 +36,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="inoutput.html" title="6. DMRG calculations"
+          <a href="resources.html" title="7. Typical resource requirements"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>
@@ -51,10 +51,10 @@
           <div class="body" role="main">
             
   <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><div class="section" id="dmrg-scf">
-<span id="index-3"></span><h1>7. DMRG-SCF<a class="headerlink" href="#dmrg-scf" title="Permalink to this headline">¶</a></h1>
+<span id="index-3"></span><h1>8. DMRG-SCF<a class="headerlink" href="#dmrg-scf" title="Permalink to this headline">¶</a></h1>
 <p>In methods which use a FCI solver, this solver can be replaced by DMRG. DMRG allows for an efficient extraction of the 2-RDM. The 2-RDM of the active space is required in the complete active space self-consistent field (CASSCF) method to compute the gradient and the Hessian with respect to orbital rotations <a class="reference internal" href="#dmrgscf1" id="id1">[DMRGSCF1]</a>. It is therefore natural to introduce a CASSCF variant with DMRG as active space solver, called DMRG-SCF <a class="reference internal" href="#dmrgscf2" id="id2">[DMRGSCF2]</a> <a class="reference internal" href="#dmrgscf3" id="id3">[DMRGSCF3]</a> <a class="reference internal" href="#dmrgscf4" id="id4">[DMRGSCF4]</a>, which allows to treat static correlation in large active spaces. In CheMPS2, the augmented Hessian Newton-Raphson DMRG-SCF method is implemented, with exact Hessian <a class="reference internal" href="#dmrgscf5" id="id5">[DMRGSCF5]</a> <a class="reference internal" href="#dmrgscf6" id="id6">[DMRGSCF6]</a>.</p>
 <div class="section" id="augmented-hessian-newton-raphson">
-<h2>7.1. Augmented Hessian Newton-Raphson<a class="headerlink" href="#augmented-hessian-newton-raphson" title="Permalink to this headline">¶</a></h2>
+<h2>8.1. Augmented Hessian Newton-Raphson<a class="headerlink" href="#augmented-hessian-newton-raphson" title="Permalink to this headline">¶</a></h2>
 <p>The basic idea is to express the energy with the unitary group generators up to second order:</p>
 <div class="math">
 \[\begin{split}\hat{E}_{pq} &amp; = &amp; \sum\limits_{\sigma} \hat{a}^{\dagger}_{p \sigma} \hat{a}_{q \sigma} \\
@@ -71,7 +71,7 @@ E(\vec{x}) &amp; = &amp; \left\langle 0 \mid e^{\hat{T}(\vec{x})} \hat{H} e^{-\h
 <p>The eigenvector with smallest algebraic eigenvalue determines a stable update <span class="math">\(\vec{x}\)</span>, as is well explained in Ref. <a class="reference internal" href="#dmrgscf7" id="id7">[DMRGSCF7]</a>.</p>
 </div>
 <div class="section" id="diis">
-<h2>7.2. DIIS<a class="headerlink" href="#diis" title="Permalink to this headline">¶</a></h2>
+<h2>8.2. DIIS<a class="headerlink" href="#diis" title="Permalink to this headline">¶</a></h2>
 <p>When the update norm <span class="math">\(\|\vec{x}\|_2\)</span> is small enough, the convergence can be accelerated by the direct inversion of the iterative subspace (DIIS) <a class="reference internal" href="#dmrgscf8" id="id8">[DMRGSCF8]</a> <a class="reference internal" href="#dmrgscf9" id="id9">[DMRGSCF9]</a>. For a given set of orbitals <span class="math">\(\mathbf{U}(n)\)</span>, the update <span class="math">\(\vec{x}(n)\)</span> is calculated with the augmented Hessian Newton-Raphson method. This update defines the next set of orbitals:</p>
 <div class="math">
 \[\mathbf{U}(n+1) = \mathbf{U}_{add} \mathbf{U}(n) = \exp(\mathbf{T}(\vec{x}(n))) \mathbf{U}(n).\]</div>
@@ -177,19 +177,19 @@ E(\vec{x}) &amp; = &amp; \left\langle 0 \mid e^{\hat{T}(\vec{x})} \hat{H} e^{-\h
             </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">7. DMRG-SCF</a><ul>
-<li><a class="reference internal" href="#augmented-hessian-newton-raphson">7.1. Augmented Hessian Newton-Raphson</a></li>
-<li><a class="reference internal" href="#diis">7.2. DIIS</a></li>
+<li><a class="reference internal" href="#">8. DMRG-SCF</a><ul>
+<li><a class="reference internal" href="#augmented-hessian-newton-raphson">8.1. Augmented Hessian Newton-Raphson</a></li>
+<li><a class="reference internal" href="#diis">8.2. DIIS</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="inoutput.html"
-                        title="previous chapter">6. DMRG calculations</a></p>
+  <p class="topless"><a href="resources.html"
+                        title="previous chapter">7. Typical resource requirements</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="dmrgscfcalcs.html"
-                        title="next chapter">8. DMRG-SCF calculations</a></p>
+                        title="next chapter">9. DMRG-SCF calculations</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -221,10 +221,10 @@ E(\vec{x}) &amp; = &amp; \left\langle 0 \mid e^{\hat{T}(\vec{x})} \hat{H} e^{-\h
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="dmrgscfcalcs.html" title="8. DMRG-SCF calculations"
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              >next</a> |</li>
         <li class="right" >
-          <a href="inoutput.html" title="6. DMRG calculations"
+          <a href="resources.html" title="7. Typical resource requirements"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
       </ul>

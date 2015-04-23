@@ -108,8 +108,13 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.</p>
 <h2>Information </h2>
-<p>CheMPS2 is a scientific library in the field of ab initio quantum chemistry. It contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI).</p>
-<p>For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
+<p>CheMPS2 is a scientific library which contains a spin-adapted implementation of the density matrix renormalization group (DMRG) for ab initio quantum chemistry. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI):</p>
+<ul>
+<li>up to 40 electrons in 40 orbitals for general active spaces</li>
+<li>up to 100 electrons in 100 orbitals for one-dimensional active spaces, such as the pi-system of all-trans polyenes</li>
+</ul>
+<p>In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods, when the active space sizes become prohibitively expensive for FCI. The corresponding methods are called DMRG-CI and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active space sizes, it allows to obtain FCI energies for small systems such as dimers, while for larger systems it is ideal to treat the static/strong correlation in a large active space.</p>
+<p>The design philosophy for CheMPS2 is to be a lightweight, efficient, and stable library. For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
 <p>To gain a better understanding of how to perform DMRG calculations for large active spaces, you are encouraged to read the <a href="#how-to-acknowledge-chemps2">three papers</a> listed below.</p>
 <p>Incorporation of the library into other codes is very simple due a minimal API, as well as a python interface. Direct usage of the library is illustrated in the <a href="#4-test-libchemps2">c++</a> and <a href="#6-test-pychemps2">python</a> tests, which can be easily adapted to your needs. The interfaces to <a href="http://www.psicode.org">psi4</a> and <a href="https://github.com/sunqm/pyscf">pyscf</a> are described in the <a href="http://sebwouters.github.io/CheMPS2/index.html">user manual</a>.</p>
 <p>In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
@@ -226,7 +231,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <pre class="fragment">&gt; export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
 </pre><p>The python tests do exactly the same thing as the <code>c++</code> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>7. Doxygen</h3>
-<p>To build the doxygen manual, the <code>BUILD_DOXYGGEN</code> flag should have been on: <code>-DBUILD_DOXYGGEN=ON</code>. In your terminal, run: </p>
+<p>To build the doxygen manual, the <code>BUILD_DOXYGEN</code> flag should have been on: <code>-DBUILD_DOXYGEN=ON</code>. In your terminal, run: </p>
 <pre class="fragment">&gt; cd /myfolder/chemps2/build
 &gt; make doc
 &gt; cd LaTeX-documents
@@ -400,7 +405,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Mon Apr 20 2015 09:20:47 for CheMPS2 by
+    <li class="footer">Generated on Wed Apr 22 2015 23:39:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
