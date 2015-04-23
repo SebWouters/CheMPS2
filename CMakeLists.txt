@@ -9,6 +9,7 @@ set (CheMPS2_INC_RELPATH  "include/chemps2")
 set (CheMPS2_LIB_SOVERSION 1)
 
 include (GNUInstallDirs)
+cmake_minimum_required (VERSION 2.8.11)
 
 option (MKL                  "Compile using the MKL"                   OFF)
 option (BUILD_DOXYGEN        "Use Doxygen to create a HTML/PDF manual" OFF)
@@ -17,12 +18,6 @@ option (STATIC_ONLY          "Compile only the static library"         OFF)
 option (ENABLE_TESTS         "Compile the tests"                       ON)
 option (ENABLE_XHOST         "Enable processor-specific optimizations" ON)
 option (ENABLE_GENERIC       "Enable mostly static linking in shared library" OFF)
-
-if (MKL)
-    cmake_minimum_required (VERSION 2.8.11)
-else (MKL)
-    cmake_minimum_required (VERSION 2.8)
-endif (MKL)
 
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
