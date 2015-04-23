@@ -52,6 +52,7 @@ in the active space.
 
 To gain a better understanding of how to perform DMRG calculations for
 large active spaces, you are encouraged to read the
+[user manual](http://sebwouters.github.io/CheMPS2/index.html) and the
 [three papers](#how-to-acknowledge-chemps2) listed below.
 
 Incorporation of the library into other codes is very simple due a
