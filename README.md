@@ -22,19 +22,33 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 Information
 -----------
 
-CheMPS2 is a scientific library in the field of ab initio quantum chemistry.
-It contains a spin-adapted implementation of the density matrix
-renormalization group (DMRG) for ab initio quantum chemistry. This method
-allows to obtain numerical accuracy in active spaces beyond the capabilities
-of full configuration interaction (FCI).
+CheMPS2 is a scientific library which contains a spin-adapted implementation 
+of the density matrix renormalization group (DMRG) for ab initio quantum 
+chemistry. This method allows to obtain numerical accuracy in active spaces 
+beyond the capabilities of full configuration interaction (FCI):
 
-For an input Hamiltonian and targeted symmetry sector, the library performs
-successive DMRG sweeps according to a user-defined convergence scheme. As
-output, the library returns the minimal encountered energy as well as the
-2-RDM of the active space. With the latter, various molecular properties
-can be calculated, as well as the gradient and Hessian for orbital rotations
-or nuclear displacements. In addition, several correlation functions can be
-obtained to investigate the electronic structure in the active space.
+* up to 40 electrons in 40 orbitals for general active spaces
+* up to 100 electrons in 100 orbitals for one-dimensional active spaces, such as the pi-system of all-trans polyenes
+
+In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. 
+The method is therefore ideal to replace the FCI solver in the complete active 
+space configuration interaction (CASCI) and complete active space self 
+consistent field (CASSCF) methods, when the active space sizes become 
+prohibitively expensive for FCI. The corresponding methods are called DMRG-CI 
+and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active 
+space sizes, it allows to obtain FCI energies for small systems such as dimers, 
+while for larger systems it is ideal to treat the static/strong correlation in 
+a large active space.
+
+The design philosophy for CheMPS2 is to be a lightweight, efficient, and 
+stable library. For an input Hamiltonian and targeted symmetry sector, the 
+library performs successive DMRG sweeps according to a user-defined 
+convergence scheme. As output, the library returns the minimal encountered 
+energy as well as the 2-RDM of the active space. With the latter, various 
+molecular properties can be calculated, as well as the gradient and Hessian 
+for orbital rotations or nuclear displacements. In addition, several 
+correlation functions can be obtained to investigate the electronic structure 
+in the active space.
 
 To gain a better understanding of how to perform DMRG calculations for
 large active spaces, you are encouraged to read the
