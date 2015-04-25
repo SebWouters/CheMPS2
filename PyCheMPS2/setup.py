@@ -26,9 +26,6 @@ from distutils.extension import Extension
 from distutils.command.install_data import install_data
 from Cython.Distutils import build_ext
 
-inc_chemps2path = '${CMAKE_SOURCE_DIR}/CheMPS2/include'
-lib_chemps2path = '${CMAKE_BINARY_DIR}/CheMPS2'
-
 def get_depends(dirname):
     result = glob('%s/*.h' % dirname)
     result += glob('%s/*.pxd' % dirname)
@@ -36,22 +33,20 @@ def get_depends(dirname):
 
 setup(
     name='CheMPS2',
-    version='${CheMPS2_VERSION}',
-    description='${CheMPS2_DESCRIPTION}',
-    author='${CheMPS2_AUTHORS}',
-    author_email='${CheMPS2_EMAIL}',
-    download_url='${CheMPS2_URL}',
-    license='${CheMPS2_LICENSE}',
-    package_dir = {'CheMPS2': 'PyCheMPS2'},
-    packages=['CheMPS2'],
-    cmdclass = {'build_ext': build_ext},
+    version='1.5',
+    description='A spin-adapted implementation of DMRG for ab initio quantum chemistry',
+    author='Sebastian Wouters',
+    author_email='sebastianwouters@gmail.com',
+    download_url='https://github.com/SebWouters/CheMPS2',
+    license='GNU General Public License, version 2',
+    py_modules=['ReadinHamiltonianFCIDUMP', 'ReadinHamiltonianPsi4'],
+    cmdclass={'build_ext': build_ext},
     ext_modules=[
-        Extension("CheMPS2.PyCheMPS2",
-            sources=['${PyCheMPS2_SOURCES}/PyCheMPS2.pyx'],
-            depends=get_depends('${PyCheMPS2_SOURCES}')+get_depends(inc_chemps2path),
-            library_dirs=[lib_chemps2path],
+        Extension("PyCheMPS2",
+            sources=['PyCheMPS2.pyx'],
+            depends=get_depends('.'),
             libraries=['chemps2'],
-            include_dirs=[np.get_include(), inc_chemps2path],
+            include_dirs=[np.get_include()],
             language="c++"),
     ],
     classifiers=[

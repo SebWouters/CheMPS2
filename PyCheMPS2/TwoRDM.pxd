@@ -17,7 +17,7 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "TwoDM.h" namespace "CheMPS2":
+cdef extern from "chemps2/TwoDM.h" namespace "CheMPS2":
     cdef cppclass TwoDM:
         double getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4)
         double getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4)

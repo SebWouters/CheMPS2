@@ -19,7 +19,6 @@
 
 import numpy as np
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianFCIDUMP
 import ctypes
@@ -29,14 +28,14 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.CCPVDZ.FCIDUMP', 'd2h')
-DOCC = np.array([ 3, 0, 0, 0, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see N2.ccpvdz.out
+Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/O2.CCPVDZ.FCIDUMP', 'd2h')
+DOCC = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see O2.ccpvdz.out
 SOCC = np.zeros([ 8 ], dtype=ctypes.c_int)
 L = Ham.getL()
 
 # Define the symmetry sector
 TwoS = 0     # Two times the targeted spin
-N = 14       # The number of electrons
+N = 16       # The number of electrons
 Irrep = 0    # The targeted irrep
 
 # Define the CASSCF
@@ -48,12 +47,11 @@ NDMRG = np.zeros([L], dtype=ctypes.c_int)
 Nvirt = np.zeros([L], dtype=ctypes.c_int)
 Nocc[0] = Nocc[5] = 1
 Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0
-NDMRG[0] = NDMRG[5] = 4
+NDMRG[0] = NDMRG[5] = 2
 NDMRG[1] = NDMRG[4] = 0
-NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 1
-Nvirt[0] = Nvirt[5] = 2
-Nvirt[2] = Nvirt[3] = Nvirt[6] = Nvirt[7] = 2
-Nvirt[1] = Nvirt[4] = 1
+NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 2
+Nvirt[0] = Nvirt[5] = 4
+Nvirt[1] = Nvirt[2] = Nvirt[3] = Nvirt[4] = Nvirt[6] = Nvirt[7] = 1
 theDMRGSCF.setupStart(Nocc,NDMRG,Nvirt)
 
 # Setting up the ConvergenceScheme
@@ -62,10 +60,11 @@ OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
 OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
 
 # Setting the DMRGSCFoptions and run DMRGSCF
-rootNum = 1 # Ground state only
+rootNum = 2 # Do the first excited state
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
-theDMRGSCFoptions.setWhichActiveSpace(2) # 2 means localized orbitals
+theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
+theDMRGSCFoptions.setStateAveraging(True)
 Energy = theDMRGSCF.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
 
 # Clean-up
@@ -82,8 +81,8 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 109.15104350802) < 1e-10):
-    print "================> Did test 9 succeed : yes"
+if (np.fabs(Energy + 149.6802657522) < 1e-10):
+    print "================> Did test 6 succeed : yes"
 else:
-    print "================> Did test 9 succeed : no"
+    print "================> Did test 6 succeed : no"
 

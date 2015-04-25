@@ -21,7 +21,7 @@ cimport Ham
 cimport ConvScheme
 cimport DMRGSCFopt
 
-cdef extern from "CASSCF.h" namespace "CheMPS2":
+cdef extern from "chemps2/CASSCF.h" namespace "CheMPS2":
     cdef cppclass CASSCF:
         CASSCF(Ham.Hamiltonian *, int *, int *) except +
         void setupStart(int *, int *, int *)

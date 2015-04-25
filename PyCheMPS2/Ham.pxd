@@ -17,7 +17,7 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "Hamiltonian.h" namespace "CheMPS2":
+cdef extern from "chemps2/Hamiltonian.h" namespace "CheMPS2":
     cdef cppclass Hamiltonian:
         Hamiltonian(const int, const int, const int *) except +
         int getL()
