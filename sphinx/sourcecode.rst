@@ -119,8 +119,8 @@ PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://c
 
     $ cd /myfolder/chemps2/PyCheMPS2
     $ PREFIX=... # Whatever prefix was given to CMake through -DCMAKE_INSTALL_PREFIX
-    $ export CPATH=${PREFIX}/include
-    $ export LD_LIBRARY_PATH=${PREFIX}/lib64
+    $ export CPATH=${CPATH}:${PREFIX}/include
+    $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PREFIX}/lib64
     $ python setup.py build_ext -L ${LD_LIBRARY_PATH}
     $ python setup.py install --prefix=${PREFIX}
 
@@ -137,7 +137,7 @@ To test PyCheMPS2, run:
 .. code-block:: bash
     
     $ cd /myfolder/chemps2/PyChems2/tests
-    $ export LD_LIBRARY_PATH=${PREFIX}/lib64
+    $ export PYTHONPATH=${PYTHONPATH}:${PREFIX}/lib64/python2.7/site-packages
     $ python test1.py
     $ python test2.py
     $ python test3.py
