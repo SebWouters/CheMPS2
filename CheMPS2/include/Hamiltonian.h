@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -60,9 +60,10 @@ namespace CheMPS2{
              \param OrbIrreps Pointer to array containing the orbital irreps */
          Hamiltonian(const int Norbitals, const int nGroup, const int * OrbIrreps);
          
-         //! Constructor which loads a Psi4 text dump of the Hamiltonian from disk. A Psi4 text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT.
-         /** \param file_psi4text The filename of the Psi4 text dump of the Hamiltonian */
-         Hamiltonian(const string file_psi4text);
+         //! Constructor which loads a text dump of a Hamiltonian from disk
+         /** \param filename The filename of the Hamiltonian text dump
+             \param psi4groupnumber If (psi4groupnumber==-1), a psi4 text dump (which can be generated with the plugin psi4plugins/mointegrals.cc_PRINT) is loaded from disk. If psi4groupnumber is an actual group number, a FCIDUMP text dump (which can be generated with the plugin psi4plugins/fcidump.cc) is loaded from disk. Note that the orbital symmetries in the latter are Molpro orbital symmetries! */
+         Hamiltonian(const string filename, const int psi4groupnumber=-1);
          
          //! Constructor which loads a Hamiltonian from disk which was previously saved as a Psi4 text dump or in HDF5 format. A Psi4 text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with one of the other constructors, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save().
          /** \param fileh5 If true, attempt to load a Hamiltonian in HDF5 format. All three filenames should be set then! If false, attempt to load a Hamiltonian which was previously saved as a Psi4 text dump. Only the first filename should be set then!
@@ -177,6 +178,9 @@ namespace CheMPS2{
          
          //If filename!="LOADH5" in Hamiltonian::Hamiltonian then a Psi4 dump in the file with name "filename" is loaded
          void CreateAndFillFromPsi4dump(const string filename);
+         
+         //Load the FCIDUMP Hamiltonian (with molpro irreps!)
+         void CreateAndFillFromFCIDUMP( const string fcidumpfile );
          
    };
 }

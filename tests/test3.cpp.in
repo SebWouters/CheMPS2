@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,10 +32,11 @@ int main(void){
    CheMPS2::Initialize::Init();
    
    //The path to the matrix elements
-   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4_N10_S0_c2v_I0.dat";
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4.STO3G.FCIDUMP";
    
    //The Hamiltonian
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(matrixelements);
+   const int psi4groupnumber = 5; // c2v -- see Irreps.h and CH4.sto3g.out
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
    cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
    
    //The targeted state

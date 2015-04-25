@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -618,7 +618,7 @@ void CheMPS2::DMRG::storeOperators(const int index, const bool movingRight){
    const int Cbound = movingRight ? L-1-index : index+1;
 
    std::stringstream thefilename;
-   thefilename << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
+   thefilename << tempfolder << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
    
    //The hdf5 file
    hid_t file_id = H5Fcreate(thefilename.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -728,7 +728,7 @@ void CheMPS2::DMRG::loadOperators(const int index, const bool movingRight){
    const int Cbound = movingRight ? L-1-index : index+1;
 
    std::stringstream thefilename;
-   thefilename << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
+   thefilename << tempfolder << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "_index_" << index << ".h5";
    
    //The hdf5 file
    hid_t file_id = H5Fopen(thefilename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -876,7 +876,7 @@ void CheMPS2::DMRG::deleteTensors(const int index, const bool movingRightOfTenso
 void CheMPS2::DMRG::deleteStoredOperators(){
 
    std::stringstream temp;
-   temp << "rm " << CheMPS2::TMPpath << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "*.h5";
+   temp << "rm " << tempfolder << "/" << CheMPS2::DMRG_OPERATOR_storage_prefix << thePID << "*.h5";
    int info = system(temp.str().c_str());
    cout << "Info on DMRG::operators rm call to system: " << info << endl;
 

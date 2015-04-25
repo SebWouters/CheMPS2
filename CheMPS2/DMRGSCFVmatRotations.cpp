@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -190,6 +190,170 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFu
       }
    }
 
+}
+
+void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEI(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * temp1, double * temp2) const{
+
+   // First do Coulomb object : ( c1 <= c2 | a1 <= a2 )
+   for (int Ic1 = 0; Ic1 < numberOfIrreps; Ic1++){
+      for (int Ic2 = Ic1; Ic2 < numberOfIrreps; Ic2++){
+         const int Icc = Irreps::directProd( Ic1, Ic2 );
+         for (int Ia1 = 0; Ia1 < numberOfIrreps; Ia1++){
+            const int Ia2 = Irreps::directProd( Ia1, Icc );
+            if ( Ia1 <= Ia2 ){
+               
+               int linsize_orig_c1 = iHandler->getNORB( Ic1 );
+               int linsize_orig_c2 = iHandler->getNORB( Ic2 );
+               int linsize_small_c1 = iHandler->getNOCC( Ic1 ) + iHandler->getNDMRG( Ic1 );
+               int linsize_small_c2 = iHandler->getNOCC( Ic2 ) + iHandler->getNDMRG( Ic2 );
+               int linsize_a1 = iHandler->getNORB( Ia1 );
+               int linsize_a2 = iHandler->getNORB( Ia2 );
+               
+               if (( linsize_small_c1 > 0 ) && ( linsize_small_c2 > 0 ) && ( linsize_a1 > 0 ) && ( linsize_a2 > 0 )){
+               
+                  for (int c1 = 0; c1 < linsize_orig_c1; c1++){
+                     for (int c2 = 0; c2 < linsize_orig_c2; c2++){
+                        for (int a1 = 0; a1 < linsize_a1; a1++){
+                           for (int a2 = 0; a2 < linsize_a2; a2++){
+                              // We try to make the Coulomb elements !
+                              temp1[ c1 + linsize_orig_c1 * ( c2 + linsize_orig_c2 * ( a1 + linsize_a1 * a2 ) ) ]
+                                = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + c1, iHandler->getOrigNOCCstart( Ia1 ) + a1,
+                                                    iHandler->getOrigNOCCstart( Ic2 ) + c2, iHandler->getOrigNOCCstart( Ia2 ) + a2 );
+                           }
+                        }
+                     }
+                  }
+                  
+                  char trans = 'T';
+                  char notrans = 'N';
+                  double alpha = 1.0;
+                  double beta = 0.0; //SET !!!
+                  
+                  int rightdim = linsize_orig_c2 * linsize_a1 * linsize_a2; //( ij | kl ) -> ( c1 j | kl )
+                  double * Umx = unitary->getBlock( Ic1 );
+                  dgemm_(&notrans, &notrans, &linsize_small_c1, &rightdim, &linsize_orig_c1, &alpha,
+                         Umx, &linsize_orig_c1, temp1, &linsize_orig_c1, &beta, temp2, &linsize_small_c1);
+                  
+                  rightdim = linsize_a1 * linsize_a2; //( c1 j | kl ) -> ( c1 c2 | kl )
+                  int jump1 = linsize_small_c1 * linsize_small_c2;
+                  int jump2 = linsize_small_c1 * linsize_orig_c2;
+                  Umx = unitary->getBlock( Ic2 );
+                  for (int loop = 0; loop < rightdim; loop++){
+                     dgemm_(&notrans, &trans, &linsize_small_c1, &linsize_small_c2, &linsize_orig_c2, &alpha,
+                            temp2+loop*jump2, &linsize_small_c1, Umx, &linsize_orig_c2, &beta, temp1+loop*jump1, &linsize_small_c1);
+                  }
+                  
+                  int leftdim = linsize_small_c1 * linsize_small_c2 * linsize_a1; //( c1 c2 | kl ) -> ( c1 c2 | k a2 )
+                  Umx = unitary->getBlock( Ia2 );
+                  dgemm_(&notrans, &trans, &leftdim, &linsize_a2, &linsize_a2, &alpha,
+                         temp1, &leftdim, Umx, &linsize_a2, &beta, temp2, &leftdim);
+                  
+                  jump1 = linsize_small_c1 * linsize_small_c2 * linsize_a1; //( c1 c2 | k a2 ) -> ( c1 c2 | a1 a2 )
+                  leftdim = linsize_small_c1 * linsize_small_c2;
+                  Umx = unitary->getBlock( Ia1 );
+                  for (int loop = 0; loop < linsize_a2; loop++){
+                     dgemm_(&notrans, &trans, &leftdim, &linsize_a1, &linsize_a1, &alpha,
+                            temp2+jump1*loop, &leftdim, Umx, &linsize_a1, &beta, temp1+jump1*loop, &leftdim);
+                  }
+                  
+                  for (int c1 = 0; c1 < linsize_small_c1; c1++){
+                     for (int c2 = 0; c2 < linsize_small_c2; c2++){
+                        for (int a1 = 0; a1 < linsize_a1; a1++){
+                           for (int a2 = 0; a2 < linsize_a2; a2++){
+                              theRotatedTEI->set_coulomb( Ic1, Ic2, Ia1, Ia2, c1, c2, a1, a2,
+                                  temp1[ c1 + linsize_small_c1 * ( c2 + linsize_small_c2 * ( a1 + linsize_a1 * a2 ) ) ] );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+   // Now do Exchange object ( c1 v1 | c2 v2 ) with c1 <= c2
+   for (int Ic1 = 0; Ic1 < numberOfIrreps; Ic1++){
+      for (int Ic2 = Ic1; Ic2 < numberOfIrreps; Ic2++){
+         const int Icc = Irreps::directProd( Ic1, Ic2 );
+         for (int Iv1 = 0; Iv1 < numberOfIrreps; Iv1++){
+            const int Iv2 = Irreps::directProd( Iv1, Icc );
+               
+            int linsize_orig_c1 = iHandler->getNORB( Ic1 );
+            int linsize_orig_c2 = iHandler->getNORB( Ic2 );
+            int linsize_small_c1 = iHandler->getNOCC( Ic1 ) + iHandler->getNDMRG( Ic1 );
+            int linsize_small_c2 = iHandler->getNOCC( Ic2 ) + iHandler->getNDMRG( Ic2 );
+            
+            int linsize_orig_v1 = iHandler->getNORB( Iv1 );
+            int linsize_orig_v2 = iHandler->getNORB( Iv2 );
+            int linsize_small_v1 = iHandler->getNVIRT( Iv1 );
+            int linsize_small_v2 = iHandler->getNVIRT( Iv2 );
+            
+            if (( linsize_small_c1 > 0 ) && ( linsize_small_c2 > 0 ) && ( linsize_small_v1 > 0 ) && ( linsize_small_v2 > 0 )){
+            
+               for (int c1 = 0; c1 < linsize_orig_c1; c1++){
+                  for (int c2 = 0; c2 < linsize_orig_c2; c2++){
+                     for (int v1 = 0; v1 < linsize_orig_v1; v1++){
+                        for (int v2 = 0; v2 < linsize_orig_v2; v2++){
+                           // We try to make the Exchange elements !
+                           temp1[ c1 + linsize_orig_c1 * ( c2 + linsize_orig_c2 * ( v1 + linsize_orig_v1 * v2 ) ) ]
+                             = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + c1, iHandler->getOrigNOCCstart( Ic2 ) + c2,
+                                                 iHandler->getOrigNOCCstart( Iv1 ) + v1, iHandler->getOrigNOCCstart( Iv2 ) + v2 );
+                        }
+                     }
+                  }
+               }
+               
+               char trans = 'T';
+               char notrans = 'N';
+               double alpha = 1.0;
+               double beta = 0.0; //SET !!!
+               const int shiftv1 = linsize_orig_v1 - linsize_small_v1;
+               const int shiftv2 = linsize_orig_v2 - linsize_small_v2;
+               
+               int rightdim = linsize_orig_c2 * linsize_orig_v1 * linsize_orig_v2; //( ij | kl ) -> ( c1 j | kl )
+               double * Umx = unitary->getBlock( Ic1 );
+               dgemm_(&notrans, &notrans, &linsize_small_c1, &rightdim, &linsize_orig_c1, &alpha,
+                      Umx, &linsize_orig_c1, temp1, &linsize_orig_c1, &beta, temp2, &linsize_small_c1);
+               
+               rightdim = linsize_orig_v1 * linsize_orig_v2; //( c1 j | kl ) -> ( c1 j | c2 l )
+               int jump1 = linsize_small_c1 * linsize_small_c2;
+               int jump2 = linsize_small_c1 * linsize_orig_c2;
+               Umx = unitary->getBlock( Ic2 );
+               for (int loop = 0; loop < rightdim; loop++){
+                  dgemm_(&notrans, &trans, &linsize_small_c1, &linsize_small_c2, &linsize_orig_c2, &alpha,
+                         temp2+loop*jump2, &linsize_small_c1, Umx, &linsize_orig_c2, &beta, temp1+loop*jump1, &linsize_small_c1);
+               }
+               
+               int leftdim = linsize_small_c1 * linsize_small_c2 * linsize_orig_v1; //( c1 j | c2 l ) -> ( c1 j | c2 v2 )
+               Umx = unitary->getBlock( Iv2 ) + shiftv2;
+               dgemm_(&notrans, &trans, &leftdim, &linsize_small_v2, &linsize_orig_v2, &alpha,
+                      temp1, &leftdim, Umx, &linsize_orig_v2, &beta, temp2, &leftdim);
+               
+               jump1 = linsize_small_c1 * linsize_small_c2 * linsize_orig_v1; //( c1 j | c2 v2 ) ->  ( c1 v1 | c2 v2 )
+               jump2 = linsize_small_c1 * linsize_small_c2 * linsize_small_v1;
+               leftdim = linsize_small_c1 * linsize_small_c2;
+               Umx = unitary->getBlock( Iv1 ) + shiftv1;
+               for (int loop = 0; loop < linsize_small_v2; loop++){
+                  dgemm_(&notrans, &trans, &leftdim, &linsize_small_v1, &linsize_orig_v1, &alpha,
+                         temp2+jump1*loop, &leftdim, Umx, &linsize_orig_v1, &beta, temp1+jump2*loop, &leftdim);
+               }
+               
+               for (int c1 = 0; c1 < linsize_small_c1; c1++){
+                  for (int c2 = 0; c2 < linsize_small_c2; c2++){
+                     for (int v1 = 0; v1 < linsize_small_v1; v1++){
+                        for (int v2 = 0; v2 < linsize_small_v2; v2++){
+                           theRotatedTEI->set_exchange( Ic1, Ic2, Iv1, Iv2, c1, c2, shiftv1 + v1, shiftv2 + v2,
+                               temp1[ c1 + linsize_small_c1 * ( c2 + linsize_small_c2 * ( v1 + linsize_small_v1 * v2 ) ) ] );
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   
 }
 
 void CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners) const{
@@ -786,6 +950,442 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRGBlockWise(Hamiltonian * HamDMRG,
                      }
                   }
                } // End of non-zero irrep block (all linsizes > 0)
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEIBlockWise(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize) const{
+
+   // First do Coulomb object : ( c1 <= c2 | a3 <= a4 )
+   for (int Ic1 = 0; Ic1 < numberOfIrreps; Ic1++){
+      for (int Ic2 = Ic1; Ic2 < numberOfIrreps; Ic2++){
+         const int Icc = Irreps::directProd( Ic1, Ic2 );
+         for (int Ia3 = 0; Ia3 < numberOfIrreps; Ia3++){
+            const int Ia4 = Irreps::directProd( Ia3, Icc );
+            if ( Ia3 <= Ia4 ){
+               
+               int linsize1 = iHandler->getNORB( Ic1 );
+               int linsize2 = iHandler->getNORB( Ic2 );
+               int linsize3 = iHandler->getNORB( Ia3 );
+               int linsize4 = iHandler->getNORB( Ia4 );
+               
+               int linsizeOA1 = iHandler->getNOCC( Ic1 ) + iHandler->getNDMRG( Ic1 );
+               int linsizeOA2 = iHandler->getNOCC( Ic2 ) + iHandler->getNDMRG( Ic2 );
+               
+               if (( linsizeOA1 > 0 ) && ( linsizeOA2 > 0 ) && ( linsize3 > 0 ) && ( linsize4 > 0 )){
+               
+                  int factor1 = max( (int) ( ceil((1.0 * linsize1) / maxBlockSize) + 0.01 ) , 1 ); //factor >= linsize/maxBlockSize
+                  int factor2 = max( (int) ( ceil((1.0 * linsize2) / maxBlockSize) + 0.01 ) , 1 );
+                  int factor3 = max( (int) ( ceil((1.0 * linsize3) / maxBlockSize) + 0.01 ) , 1 );
+                  int factor4 = max( (int) ( ceil((1.0 * linsize4) / maxBlockSize) + 0.01 ) , 1 );
+                  
+                  const int blocksize1 = min( (int) ( ceil( (1.0 * linsize1) / factor1 ) + 0.01 ) , maxBlockSize ); //Hence at most maxBlockSize
+                  const int blocksize2 = min( (int) ( ceil( (1.0 * linsize2) / factor2 ) + 0.01 ) , maxBlockSize );
+                  const int blocksize3 = min( (int) ( ceil( (1.0 * linsize3) / factor3 ) + 0.01 ) , maxBlockSize );
+                  const int blocksize4 = min( (int) ( ceil( (1.0 * linsize4) / factor4 ) + 0.01 ) , maxBlockSize );
+                  
+                  while (factor1 * blocksize1 < linsize1){ factor1++; }
+                  while (factor2 * blocksize2 < linsize2){ factor2++; }
+                  while (factor3 * blocksize3 < linsize3){ factor3++; }
+                  while (factor4 * blocksize4 < linsize4){ factor4++; }
+                  
+                  int factorOA1 = (linsizeOA1 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA1) / maxBlockSize) + 0.01 ) , 1 );
+                  int factorOA2 = (linsizeOA2 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA2) / maxBlockSize) + 0.01 ) , 1 );
+                  
+                  const int blocksizeOA1 = (linsizeOA1 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA1) / factorOA1 ) + 0.01 ) , maxBlockSize );
+                  const int blocksizeOA2 = (linsizeOA2 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA2) / factorOA2 ) + 0.01 ) , maxBlockSize );
+                  
+                  if (linsizeOA1 > 0){ while (factorOA1 * blocksizeOA1 < linsizeOA1){ factorOA1++; } }
+                  if (linsizeOA2 > 0){ while (factorOA2 * blocksizeOA2 < linsizeOA2){ factorOA2++; } }
+                  
+                  //Clear the Coulomb object
+                  for (int c1 = 0; c1 < linsizeOA1; c1++){
+                     for (int c2 = 0; c2 < linsizeOA2; c2++){
+                        for (int a3 = 0; a3 < linsize3; a3++){
+                           for (int a4 = 0; a4 < linsize4; a4++){
+                              theRotatedTEI->set_coulomb( Ic1, Ic2, Ia3, Ia4, c1, c2, a3, a4, 0.0 );
+                           }
+                        }
+                     }
+                  }
+                  
+                  //Loop original blocks
+                  for (int origBlock1 = 0; origBlock1 < factor1; origBlock1++){
+                  
+                     const int origStart1 = origBlock1 * blocksize1;
+                     const int origStop1  = min( (origBlock1 + 1) * blocksize1 , linsize1 );
+                     const int origSize1  = max( origStop1 - origStart1 , 0 );
+                     
+                     for (int origBlock2 = 0; origBlock2 < factor2; origBlock2++){
+                     
+                        const int origStart2 = origBlock2 * blocksize2;
+                        const int origStop2  = min( (origBlock2 + 1) * blocksize2 , linsize2 );
+                        const int origSize2  = max( origStop2 - origStart2 , 0 );
+                     
+                        for (int origBlock3 = 0; origBlock3 < factor3; origBlock3++){
+                        
+                           const int origStart3 = origBlock3 * blocksize3;
+                           const int origStop3  = min( (origBlock3 + 1) * blocksize3 , linsize3 );
+                           const int origSize3  = max( origStop3 - origStart3 , 0 );
+                        
+                           for (int origBlock4 = 0; origBlock4 < factor4; origBlock4++){
+                           
+                              const int origStart4 = origBlock4 * blocksize4;
+                              const int origStop4  = min( (origBlock4 + 1) * blocksize4 , linsize4 );
+                              const int origSize4  = max( origStop4 - origStart4 , 0 );
+                              
+                              //Loop target blocks
+                              for (int targetBlock1 = 0; targetBlock1 < factorOA1; targetBlock1++){
+                              
+                                 const int targetStart1 = targetBlock1 * blocksizeOA1;
+                                 const int targetStop1  = min( (targetBlock1 + 1) * blocksizeOA1 , linsizeOA1 );
+                                 const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
+                              
+                                 //Copy HamOrig->getVmat(c1,a3,c2,a4) for the particular ORIGINAL block into mem2[c1,c2,a3,a4]
+                                 for (int origIndex1 = 0; origIndex1 < origSize1; origIndex1++){
+                                    for (int origIndex2 = 0; origIndex2 < origSize2; origIndex2++){
+                                       for (int origIndex3 = 0; origIndex3 < origSize3; origIndex3++){
+                                          for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
+                                             mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
+                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + origStart1 + origIndex1,
+                                                                    iHandler->getOrigNOCCstart( Ia3 ) + origStart3 + origIndex3,
+                                                                    iHandler->getOrigNOCCstart( Ic2 ) + origStart2 + origIndex2,
+                                                                    iHandler->getOrigNOCCstart( Ia4 ) + origStart4 + origIndex4 );
+                                          }
+                                       }
+                                    }
+                                 }
+                                 
+                                 //Rotate mem1[ c1, j, k, l ] = U[ c1, i ] * mem2[ i, j, k, l ]
+                                 {
+                                    char notrans = 'N';
+                                    double alpha = 1.0;
+                                    double beta = 0.0; //SET !!!
+                                    int rightdim = origSize2 * origSize3 * origSize4;
+                                    int leftdim = targetSize1;
+                                    int middledim = origSize1;
+                                    double * rotationBlock = unitary->getBlock( Ic1 ) + targetStart1 + linsize1 * origStart1; // --> lda = linsize1;
+                                    int lda = linsize1;
+                                    dgemm_(&notrans, &notrans ,&leftdim, &rightdim, &middledim, &alpha,
+                                           rotationBlock, &lda, mem2, &middledim, &beta, mem1, &leftdim);
+                                 }
+                                 
+                                 //Loop target block 2
+                                 for (int targetBlock2 = (( Icc==0 ) ? targetBlock1 : 0); targetBlock2 < factorOA2; targetBlock2++){
+                                 
+                                    const int targetStart2 = targetBlock2 * blocksizeOA2;
+                                    const int targetStop2  = min( (targetBlock2 + 1) * blocksizeOA2 , linsizeOA2 );
+                                    const int targetSize2  = max( targetStop2 - targetStart2 , 0 );
+                                    
+                                    //Rotate mem2[ c1, c2, k, l ] = U[ c2, j ] * mem1[ c1, j, k, l ]
+                                    {
+                                       char trans = 'T';
+                                       char notrans = 'N';
+                                       double alpha = 1.0;
+                                       double beta = 0.0; //SET !!!
+                                       int loopsize = origSize3 * origSize4;
+                                       int jump_mem1 = targetSize1 * origSize2;
+                                       int jump_mem2 = targetSize1 * targetSize2;
+                                       int rightdim = targetSize2;
+                                       int leftdim = targetSize1;
+                                       int middledim = origSize2;
+                                       double * rotationBlock = unitary->getBlock( Ic2 ) + targetStart2 + linsize2 * origStart2; // --> ldb = linsize2;
+                                       int ldb = linsize2;
+                                       for (int cntloop = 0; cntloop < loopsize; cntloop++){
+                                          dgemm_(&notrans, &trans, &leftdim, &rightdim, &middledim, &alpha,
+                                                 mem1 + cntloop * jump_mem1, &leftdim, rotationBlock, &ldb, &beta, mem2 + cntloop * jump_mem2, &leftdim);
+                                       }
+                                    }
+                                    
+                                    //Loop target block 3
+                                    for (int targetBlock3 = 0; targetBlock3 < factor3; targetBlock3++){
+                                    
+                                       const int targetStart3 = targetBlock3 * blocksize3;
+                                       const int targetStop3  = min( (targetBlock3 + 1) * blocksize3 , linsize3 );
+                                       const int targetSize3  = max( targetStop3 - targetStart3 , 0 );
+                                       
+                                       //Rotate mem3[ c1, c2, a3, l ] = U[ a3, k ] * mem2[ c1, c2, l, l ]
+                                       {
+                                          char trans = 'T';
+                                          char notrans = 'N';
+                                          double alpha = 1.0;
+                                          double beta = 0.0; //SET !!!
+                                          int jump_mem2 = targetSize1 * targetSize2 * origSize3;
+                                          int jump_mem3 = targetSize1 * targetSize2 * targetSize3;
+                                          int rightdim = targetSize3;
+                                          int leftdim = targetSize1 * targetSize2;
+                                          int middledim = origSize3;
+                                          double * rotationBlock = unitary->getBlock( Ia3 ) + targetStart3 + linsize3 * origStart3; // --> ldb = linsize3;
+                                          int ldb = linsize3;
+                                          for (int cntloop = 0; cntloop < origSize4; cntloop++){
+                                             dgemm_(&notrans, &trans, &leftdim, &rightdim, &middledim, &alpha,
+                                                    mem2 + cntloop * jump_mem2, &leftdim, rotationBlock, &ldb, &beta, mem3 + cntloop * jump_mem3, &leftdim);
+                                          }
+                                       }
+                                       
+                                       //Calculate ( c1 c2 | a3 a4 )_partial and add to the relevant parts of the Coulomb object
+                                       const int loopsize = targetSize1 * targetSize2 * targetSize3;
+                                       
+                                       #pragma omp parallel for schedule(static)
+                                       for (int counter = 0; counter < loopsize; counter++){
+                                       
+                                          const int c1_rel = counter % targetSize1;
+                                          int temp = ( counter - c1_rel ) / targetSize1;
+                                          const int c2_rel = temp % targetSize2;
+                                          const int a3_rel = ( temp - c2_rel ) / targetSize2;
+                                          
+                                          const int c1 = c1_rel + targetStart1;
+                                          const int c2 = c2_rel + targetStart2;
+                                          const int a3 = a3_rel + targetStart3;
+                                          
+                                          int a4start      = 0;
+                                          const int a4stop = linsize4;
+                                          // If Icc==0 --> be careful that ( c1 <= c2 | a3 <= a4 ) valid
+                                          // If Icc!=0 --> automatically OK because Ic1 < Ic2 and Ia3 < Ia4 checked at beginning
+                                          if ( Icc == 0 ){ a4start = (( c1 <= c2 ) ? a3 : a4stop); }
+                                          for (int a4 = a4start; a4 < a4stop; a4++){
+                                             
+                                             double value = 0.0;
+                                             double * rotatedBlock = unitary->getBlock( Ia4 ) + linsize4 * origStart4;
+                                             for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
+                                                value += mem3[counter + loopsize * origIndex4] * rotatedBlock[a4 + linsize4 * origIndex4];
+                                             }
+                                             
+                                             theRotatedTEI->add_coulomb( Ic1, Ic2, Ia3, Ia4, c1, c2, a3, a4, value );
+                                             
+                                          }
+                                       }
+                                    }
+                                 }
+                              }//targetBlock1
+                           }
+                        }
+                     }
+                  }//origBlock1
+               }
+            }
+         }
+      }
+   }
+   
+   // Then do Exchange object : ( c1 v3 | c2 v4 )
+   for (int Ic1 = 0; Ic1 < numberOfIrreps; Ic1++){
+      for (int Ic2 = Ic1; Ic2 < numberOfIrreps; Ic2++){
+         const int Icc = Irreps::directProd( Ic1, Ic2 );
+         for (int Iv3 = 0; Iv3 < numberOfIrreps; Iv3++){
+            const int Iv4 = Irreps::directProd( Iv3, Icc ); //No restriction on Iv4, only Ic1 <= Ic2
+            
+            int linsize1 = iHandler->getNORB( Ic1 );
+            int linsize2 = iHandler->getNORB( Ic2 );
+            int linsize3 = iHandler->getNORB( Iv3 );
+            int linsize4 = iHandler->getNORB( Iv4 );
+            
+            int linsizeOA1    = iHandler->getNOCC(  Ic1 ) + iHandler->getNDMRG( Ic1 );
+            int linsizeOA2    = iHandler->getNOCC(  Ic2 ) + iHandler->getNDMRG( Ic2 );
+            int linsizeV3     = iHandler->getNVIRT( Iv3 );
+            int linsizeV4     = iHandler->getNVIRT( Iv4 );
+            const int shiftv3 = iHandler->getNOCC(  Iv3 ) + iHandler->getNDMRG( Iv3 );
+            const int shiftv4 = iHandler->getNOCC(  Iv4 ) + iHandler->getNDMRG( Iv4 );
+            
+            if (( linsizeOA1 > 0 ) && ( linsizeOA2 > 0 ) && ( linsizeV3 > 0 ) && ( linsizeV4 > 0 )){
+            
+               int factor1 = max( (int) ( ceil((1.0 * linsize1) / maxBlockSize) + 0.01 ) , 1 ); //factor >= linsize/maxBlockSize
+               int factor2 = max( (int) ( ceil((1.0 * linsize2) / maxBlockSize) + 0.01 ) , 1 );
+               int factor3 = max( (int) ( ceil((1.0 * linsize3) / maxBlockSize) + 0.01 ) , 1 );
+               int factor4 = max( (int) ( ceil((1.0 * linsize4) / maxBlockSize) + 0.01 ) , 1 );
+               
+               const int blocksize1 = min( (int) ( ceil( (1.0 * linsize1) / factor1 ) + 0.01 ) , maxBlockSize ); //Hence at most maxBlockSize
+               const int blocksize2 = min( (int) ( ceil( (1.0 * linsize2) / factor2 ) + 0.01 ) , maxBlockSize );
+               const int blocksize3 = min( (int) ( ceil( (1.0 * linsize3) / factor3 ) + 0.01 ) , maxBlockSize );
+               const int blocksize4 = min( (int) ( ceil( (1.0 * linsize4) / factor4 ) + 0.01 ) , maxBlockSize );
+               
+               while (factor1 * blocksize1 < linsize1){ factor1++; }
+               while (factor2 * blocksize2 < linsize2){ factor2++; }
+               while (factor3 * blocksize3 < linsize3){ factor3++; }
+               while (factor4 * blocksize4 < linsize4){ factor4++; }
+               
+               int factorOA1 = (linsizeOA1 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA1) / maxBlockSize) + 0.01 ) , 1 );
+               int factorOA2 = (linsizeOA2 == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeOA2) / maxBlockSize) + 0.01 ) , 1 );
+               int factorV3  = (linsizeV3  == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV3 ) / maxBlockSize) + 0.01 ) , 1 );
+               int factorV4  = (linsizeV4  == 0) ? 0 : max( (int) ( ceil((1.0 * linsizeV4 ) / maxBlockSize) + 0.01 ) , 1 );
+               
+               const int blocksizeOA1 = (linsizeOA1 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA1) / factorOA1 ) + 0.01 ) , maxBlockSize );
+               const int blocksizeOA2 = (linsizeOA2 == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeOA2) / factorOA2 ) + 0.01 ) , maxBlockSize );
+               const int blocksizeV3  = (linsizeV3  == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV3 ) / factorV3  ) + 0.01 ) , maxBlockSize );
+               const int blocksizeV4  = (linsizeV4  == 0) ? 1 : min( (int) ( ceil( (1.0 * linsizeV4 ) / factorV4  ) + 0.01 ) , maxBlockSize );
+               
+               if (linsizeOA1 > 0){ while (factorOA1 * blocksizeOA1 < linsizeOA1){ factorOA1++; } }
+               if (linsizeOA2 > 0){ while (factorOA2 * blocksizeOA2 < linsizeOA2){ factorOA2++; } }
+               if (linsizeV3  > 0){ while (factorV3  * blocksizeV3  < linsizeV3 ){ factorV3++;  } }
+               if (linsizeV4  > 0){ while (factorV4  * blocksizeV4  < linsizeV4 ){ factorV4++;  } }
+               
+               //Clear the Exchange object
+               for (int c1 = 0; c1 < linsizeOA1; c1++){
+                  for (int c2 = 0; c2 < linsizeOA2; c2++){
+                     for (int v3 = 0; v3 < linsizeV3; v3++){
+                        for (int v4 = 0; v4 < linsizeV4; v4++){
+                           theRotatedTEI->set_exchange( Ic1, Ic2, Iv3, Iv4, c1, c2, shiftv3 + v3, shiftv4 + v4, 0.0 );
+                        }
+                     }
+                  }
+               }
+               
+               //Loop original blocks
+               for (int origBlock1 = 0; origBlock1 < factor1; origBlock1++){
+               
+                  const int origStart1 = origBlock1 * blocksize1;
+                  const int origStop1  = min( (origBlock1 + 1) * blocksize1 , linsize1 );
+                  const int origSize1  = max( origStop1 - origStart1 , 0 );
+                  
+                  for (int origBlock2 = 0; origBlock2 < factor2; origBlock2++){
+                  
+                     const int origStart2 = origBlock2 * blocksize2;
+                     const int origStop2  = min( (origBlock2 + 1) * blocksize2 , linsize2 );
+                     const int origSize2  = max( origStop2 - origStart2 , 0 );
+                  
+                     for (int origBlock3 = 0; origBlock3 < factor3; origBlock3++){
+                     
+                        const int origStart3 = origBlock3 * blocksize3;
+                        const int origStop3  = min( (origBlock3 + 1) * blocksize3 , linsize3 );
+                        const int origSize3  = max( origStop3 - origStart3 , 0 );
+                     
+                        for (int origBlock4 = 0; origBlock4 < factor4; origBlock4++){
+                        
+                           const int origStart4 = origBlock4 * blocksize4;
+                           const int origStop4  = min( (origBlock4 + 1) * blocksize4 , linsize4 );
+                           const int origSize4  = max( origStop4 - origStart4 , 0 );
+                           
+                           //Loop target blocks
+                           for (int targetBlock1 = 0; targetBlock1 < factorOA1; targetBlock1++){
+                           
+                              const int targetStart1 = targetBlock1 * blocksizeOA1;
+                              const int targetStop1  = min( (targetBlock1 + 1) * blocksizeOA1 , linsizeOA1 );
+                              const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
+                           
+                              //Copy HamOrig->getVmat(c1,c2,v3,v4) for the particular ORIGINAL block into mem2[c1,c2,v3,v4]
+                              for (int origIndex1 = 0; origIndex1 < origSize1; origIndex1++){
+                                 for (int origIndex2 = 0; origIndex2 < origSize2; origIndex2++){
+                                    for (int origIndex3 = 0; origIndex3 < origSize3; origIndex3++){
+                                       for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
+                                          mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
+                                             = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + origStart1 + origIndex1,
+                                                                 iHandler->getOrigNOCCstart( Ic2 ) + origStart2 + origIndex2,
+                                                                 iHandler->getOrigNOCCstart( Iv3 ) + origStart3 + origIndex3,
+                                                                 iHandler->getOrigNOCCstart( Iv4 ) + origStart4 + origIndex4 );
+                                       }
+                                    }
+                                 }
+                              }
+                              
+                              //Rotate mem1[ c1, j, k, l ] = U[ c1, i ] * mem2[ i, j, k, l ]
+                              {
+                                 char notrans = 'N';
+                                 double alpha = 1.0;
+                                 double beta = 0.0; //SET !!!
+                                 int rightdim = origSize2 * origSize3 * origSize4;
+                                 int leftdim = targetSize1;
+                                 int middledim = origSize1;
+                                 double * rotationBlock = unitary->getBlock( Ic1 ) + targetStart1 + linsize1 * origStart1; // --> lda = linsize1;
+                                 int lda = linsize1;
+                                 dgemm_(&notrans, &notrans ,&leftdim, &rightdim, &middledim, &alpha,
+                                        rotationBlock, &lda, mem2, &middledim, &beta, mem1, &leftdim);
+                              }
+                              
+                              //Loop target block 2
+                              for (int targetBlock2 = (( Icc==0 ) ? targetBlock1 : 0); targetBlock2 < factorOA2; targetBlock2++){
+                              
+                                 const int targetStart2 = targetBlock2 * blocksizeOA2;
+                                 const int targetStop2  = min( (targetBlock2 + 1) * blocksizeOA2 , linsizeOA2 );
+                                 const int targetSize2  = max( targetStop2 - targetStart2 , 0 );
+                                 
+                                 //Rotate mem2[ c1, c2, k, l ] = U[ c2, j ] * mem1[ c1, j, k, l ]
+                                 {
+                                    char trans = 'T';
+                                    char notrans = 'N';
+                                    double alpha = 1.0;
+                                    double beta = 0.0; //SET !!!
+                                    int loopsize = origSize3 * origSize4;
+                                    int jump_mem1 = targetSize1 * origSize2;
+                                    int jump_mem2 = targetSize1 * targetSize2;
+                                    int rightdim = targetSize2;
+                                    int leftdim = targetSize1;
+                                    int middledim = origSize2;
+                                    double * rotationBlock = unitary->getBlock( Ic2 ) + targetStart2 + linsize2 * origStart2; // --> ldb = linsize2;
+                                    int ldb = linsize2;
+                                    for (int cntloop = 0; cntloop < loopsize; cntloop++){
+                                       dgemm_(&notrans, &trans, &leftdim, &rightdim, &middledim, &alpha,
+                                              mem1 + cntloop * jump_mem1, &leftdim, rotationBlock, &ldb, &beta, mem2 + cntloop * jump_mem2, &leftdim);
+                                    }
+                                 }
+                                 
+                                 //Loop target block 3
+                                 for (int targetBlock3 = 0; targetBlock3 < factorV3; targetBlock3++){
+                                 
+                                    const int targetStart3 = shiftv3 + targetBlock3 * blocksizeV3;
+                                    const int targetStop3  = shiftv3 + min( (targetBlock3 + 1) * blocksizeV3 , linsizeV3 );
+                                    const int targetSize3  = max( targetStop3 - targetStart3 , 0 );
+                                    
+                                    //Rotate mem3[ c1, c2, v3, l ] = U[ v3, k ] * mem2[ c1, c2, l, l ]
+                                    {
+                                       char trans = 'T';
+                                       char notrans = 'N';
+                                       double alpha = 1.0;
+                                       double beta = 0.0; //SET !!!
+                                       int jump_mem2 = targetSize1 * targetSize2 * origSize3;
+                                       int jump_mem3 = targetSize1 * targetSize2 * targetSize3;
+                                       int rightdim = targetSize3;
+                                       int leftdim = targetSize1 * targetSize2;
+                                       int middledim = origSize3;
+                                       double * rotationBlock = unitary->getBlock( Iv3 ) + targetStart3 + linsize3 * origStart3; // --> ldb = linsize3;
+                                       int ldb = linsize3;
+                                       for (int cntloop = 0; cntloop < origSize4; cntloop++){
+                                          dgemm_(&notrans, &trans, &leftdim, &rightdim, &middledim, &alpha,
+                                                 mem2 + cntloop * jump_mem2, &leftdim, rotationBlock, &ldb, &beta, mem3 + cntloop * jump_mem3, &leftdim);
+                                       }
+                                    }
+                                    
+                                    //Calculate ( c1 c2 | v3 v4 )_partial and add to the relevant parts of the Exchange object
+                                    const int loopsize = targetSize1 * targetSize2 * targetSize3;
+                                    
+                                    #pragma omp parallel for schedule(static)
+                                    for (int counter = 0; counter < loopsize; counter++){
+                                    
+                                       const int c1_rel = counter % targetSize1;
+                                       int temp = ( counter - c1_rel ) / targetSize1;
+                                       const int c2_rel = temp % targetSize2;
+                                       const int v3_rel = ( temp - c2_rel ) / targetSize2;
+                                       
+                                       const int c1 = c1_rel + targetStart1;
+                                       const int c2 = c2_rel + targetStart2;
+                                       const int v3 = v3_rel + targetStart3;
+                                       
+                                       int v4start      = shiftv4;
+                                       const int v4stop = linsize4;
+                                       // If Icc==0 --> be careful that c1 <= c2 is valid
+                                       // If Icc!=0 --> automatically OK because Ic1 < Ic2
+                                       if (( Icc == 0 ) && ( c1 > c2 )){ v4start = v4stop; }
+                                       for (int v4 = v4start; v4 < v4stop; v4++){
+                                          
+                                          double value = 0.0;
+                                          double * rotatedBlock = unitary->getBlock( Iv4 ) + linsize4 * origStart4;
+                                          for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
+                                             value += mem3[counter + loopsize * origIndex4] * rotatedBlock[v4 + linsize4 * origIndex4];
+                                          }
+                                          
+                                          theRotatedTEI->add_exchange( Ic1, Ic2, Iv3, Iv4, c1, c2, v3, v4, value );
+                                          
+                                       }
+                                    }
+                                 }
+                              }
+                           }//targetBlock1
+                        }
+                     }
+                  }
+               }//origBlock1
             }
          }
       }

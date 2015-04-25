@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ namespace CheMPS2{
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date February 7, 2013
     
-    Class containing the irrep conventions and multiplication tables. The program requires Abelian point groups with real character tables, with hence \f$I_{\alpha} \otimes I_{\alpha} = I_{trivial}\f$.
+    This class contains the symmetry group and irrep conventions. The program requires Abelian point groups with real character tables, with hence \f$I_{\alpha} \otimes I_{\alpha} = I_{trivial}\f$.
   
     \section irreps_conv Irrep conventions
     
@@ -64,7 +64,8 @@ namespace CheMPS2{
     <tr><td> 6: c2h              </td><td> Ag </td><td> Bg  </td><td> Au  </td><td> Bu  </td><td>    </td><td>     </td><td>     </td><td>     </td></tr>
     <tr><td> 7: d2h              </td><td> Ag </td><td> B1g </td><td> B2g </td><td> B3g </td><td> Au </td><td> B1u </td><td> B2u </td><td> B3u </td></tr>
     </table>
-    \endhtmlonly */
+    \endhtmlonly
+    Note that these conventions allow to use the XOR operation for irrep multiplication. */
    class Irreps{
 
       public:
@@ -105,12 +106,17 @@ namespace CheMPS2{
          /** \return The number of irreps for the currently activated group (-1 means not activated) */
          int getNumberOfIrreps() const;
          
+         //! Get the number of irreps for a certain group number
+         /** \param nGroup The group number for which the number of irreps will be returned
+             \return The number of irreps of that group (-1 means wrong group number) */
+         static int getNumberOfIrreps(const int nGroup);
+         
          //! Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is always the trivial irrep.
          /** \param irrepNumber The irrep number
              \return The irrep name (not activated returns "error1"; wrong number returns "error2") */
          string getIrrepName(const int irrepNumber) const;
          
-         //! Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for Psi4's conventions
+         //! Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4's conventions
          /** \param Irrep1 The number of the first irrep
              \param Irrep2 The number of the second irrep
              \return The direct product of I1 and I2 */
@@ -132,7 +138,6 @@ namespace CheMPS2{
          
          //static member functions containing the group names, the number of irreps, and the names of the irreps
          static string getGroupNamePrivate(const int nGroup);
-         static int getNumberOfIrrepsPrivate(const int nGroup);
          static string getIrrepNamePrivate(const int nGroup, const int nIrrep);
 
    };

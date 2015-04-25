@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ namespace CheMPS2{
    const bool   DMRGSCF_storeDIIS             = true;
    const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
 
-   const string TMPpath                       = "/tmp";
+   const string defaultTMPpath                = "/tmp";
    const bool   DMRG_printDiscardedWeight     = false;
    const bool   DMRG_storeRenormOptrOnDisk    = true;
    const bool   DMRG_storeMpsOnDisk           = false;

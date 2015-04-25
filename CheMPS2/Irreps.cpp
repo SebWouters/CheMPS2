@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ CheMPS2::Irreps::Irreps(const int nGroup){
    if ((nGroup >= 0) && (nGroup <= 7)){
       isActivated = true;
       groupNumber = nGroup;
-      nIrreps = getNumberOfIrrepsPrivate(groupNumber);
+      nIrreps = getNumberOfIrreps(groupNumber);
    } else {
       isActivated = false;
    }
@@ -52,7 +52,7 @@ bool CheMPS2::Irreps::setGroup(const int nGroup){
    if ((nGroup >= 0) && (nGroup <= 7)){
       isActivated = true;
       groupNumber = nGroup;
-      nIrreps = getNumberOfIrrepsPrivate(groupNumber);
+      nIrreps = getNumberOfIrreps(groupNumber);
    } else {
       isActivated = false;
    }
@@ -97,8 +97,9 @@ int CheMPS2::Irreps::getNumberOfIrreps() const{
 
 }
 
-int CheMPS2::Irreps::getNumberOfIrrepsPrivate(const int nGroup){
+int CheMPS2::Irreps::getNumberOfIrreps(const int nGroup){
    
+   if ((nGroup < 0) || ( nGroup > 7)){ return -1; }
    if (nGroup == 0) return 1;
    if (nGroup <= 3) return 2;
    if (nGroup <= 6) return 4;
@@ -178,10 +179,10 @@ void CheMPS2::Irreps::printAll(){
    for (int thegroup=0; thegroup<8; thegroup++){
       cout << "######################################################" << endl;
       cout << "Name = " << getGroupNamePrivate(thegroup) << endl;
-      cout << "nIrreps = " << getNumberOfIrrepsPrivate(thegroup) << endl;
+      cout << "nIrreps = " << getNumberOfIrreps(thegroup) << endl;
       cout << "Multiplication table :" << endl;
-      for (int irrep1=-1; irrep1<getNumberOfIrrepsPrivate(thegroup); irrep1++){
-         for (int irrep2=-1; irrep2<getNumberOfIrrepsPrivate(thegroup); irrep2++){
+      for (int irrep1=-1; irrep1<getNumberOfIrreps(thegroup); irrep1++){
+         for (int irrep2=-1; irrep2<getNumberOfIrreps(thegroup); irrep2++){
             if ((irrep1 == -1) && (irrep2 == -1)) cout << "\t";
             if ((irrep1 == -1) && (irrep2 >= 0 )) cout << getIrrepNamePrivate(thegroup, irrep2) << "\t";
             if ((irrep2 == -1) && (irrep1 >= 0 )) cout << getIrrepNamePrivate(thegroup, irrep1) << "\t";

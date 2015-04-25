@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
+CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder){
 
    PrintLicense();
    
@@ -64,6 +64,8 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn){
    theCorrAllocated = false;
    theCorr = NULL;
    Exc_activated = false;
+   makecheckpoints = makechkpt;
+   tempfolder = tmpfolder;
    
    setupBookkeeperAndMPS();
    PreSolve();
@@ -81,7 +83,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
    
    struct stat stFileInfo;
    int intStat = stat(MPSstoragename.c_str(),&stFileInfo);
-   loadedMPS = ((CheMPS2::DMRG_storeMpsOnDisk) && (intStat==0))? true : false ;
+   loadedMPS = ((makecheckpoints) && (intStat==0))? true : false ;
    
    if (loadedMPS){ loadDIM(MPSstoragename,denBK); }
    
@@ -185,7 +187,7 @@ double CheMPS2::DMRG::Solve(){
          cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
          cout << "***     Minimum energy           = " << LastMinEnergy << endl;
          cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
-         if (CheMPS2::DMRG_storeMpsOnDisk){ saveMPS(MPSstoragename, MPS, denBK, false); }
+         if (makecheckpoints){ saveMPS(MPSstoragename, MPS, denBK, false); }
          
          nIterations++;
          

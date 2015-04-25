@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@
 #include <math.h>
 #include <algorithm>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include "CASSCF.h"
 #include "Lapack.h"
 #include "DMRGSCFVmatRotations.h"
 #include "EdmistonRuedenberg.h"
+#include "Davidson.h"
 
 using std::string;
 using std::ifstream;
@@ -44,7 +46,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
    double * theDIISparameterVector = NULL;
    int theDIISvectorParamSize = 0;
-   double Energy;
+   double Energy = 1e8;
    
    //The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
@@ -146,8 +148,8 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       if ((theDMRGSCFoptions->getStoreDIIS()) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
    
       //Fill HamDMRG
-      buildQmatrixOCC();
-      buildOneBodyMatrixElements();
+      buildQmatOCC();
+      buildTmatrix();
       fillConstAndTmatDMRG(HamDMRG);
       if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
       else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
@@ -156,10 +158,10 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
          theLocalizer->Optimize(mem1, mem2, theDMRGSCFoptions->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
-         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), mem1);
+         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);
-         buildQmatrixOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
-         buildOneBodyMatrixElements();
+         buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
+         buildTmatrix();
          fillConstAndTmatDMRG(HamDMRG);
          if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
          else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
@@ -174,13 +176,13 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          Energy = theDMRG->Solve();
          if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
             theDMRG->calc2DMandCorrelations();
-            copy2DMover( theDMRG->get2DM() );
+            copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
          if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
       if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
          theDMRG->calc2DMandCorrelations();
-         copy2DMover( theDMRG->get2DM() );
+         copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
       }
       if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
@@ -190,26 +192,27 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
          const double averagingfactor = 1.0 / rootNum;
          for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
       }
-      setDMRG1DM(N);
+      setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
       
       //Calculate the NOON and possibly rotate the active space to the natural orbitals
-      calcNOON(mem1, mem2);
+      calcNOON(iHandler, mem1, mem2, DMRG1DM);
       if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         rotate2DMand1DM(N, mem1, mem2);
+         rotate2DMand1DM(N, nOrbDMRG, mem1, mem2, DMRG1DM, DMRG2DM);
          unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
-         buildQmatrixOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
-         buildOneBodyMatrixElements();
+         buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
+         buildTmatrix();
          cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
-      buildQmatrixACT();
-      if (doBlockWise){ theRotator.fillVmatRotatedBlockWise(VmatRotated, unitary, mem1, mem2, mem3, maxBlockSize, true); }
-      else {            theRotator.fillVmatRotated(VmatRotated, unitary, mem1, mem2); }
-      buildFmat();
+      buildQmatACT();
+      if (doBlockWise){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, maxBlockSize); }
+      else {            theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
+      buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
+      buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
-      gradNorm = augmentedHessianNR(gradient, &updateNorm);
+      augmentedHessianNR(theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm);
    
    }
    
@@ -227,7 +230,7 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
 
 }
 
-double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNorm){
+void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm){
 
    /* A good read to understand
             (1) how the augmented Hessian arises from a rational function optimization
@@ -237,70 +240,92 @@ double CheMPS2::CASSCF::augmentedHessianNR(double * gradient, double * updateNor
       J. Phys. Chem. 1985, volume 89, pages 52-57, doi:10.1021/j100247a015  */
    
    //Calculate the gradient
-   int x_linearlength = unitary->getNumVariablesX();
-   double gradNorm = calcGradient(gradient);
+   const int x_linearlength = localUmat->getNumVariablesX();
+   gradNorm[0] = calcGradient(localFmat, localIdx, localUmat, theupdate);
    
    //Calculate the Hessian
-   int aug_linlength = x_linearlength+1;
-   int size = aug_linlength * aug_linlength;
+   int dim = x_linearlength + 1;
+   int size = dim * dim;
    double * hessian = new double[size];
-   calcHessian(hessian, aug_linlength);
+   calcHessian(localFmat, localwtilde, localIdx, localUmat, hessian, dim);
    
    //Augment the gradient into the Hessian matrix
    for (int cnt=0; cnt<x_linearlength; cnt++){
-      hessian[cnt + x_linearlength*aug_linlength] = gradient[cnt];
-      hessian[x_linearlength + aug_linlength*cnt] = gradient[cnt];
+      hessian[cnt + x_linearlength*dim] = theupdate[cnt];
+      hessian[x_linearlength + dim*cnt] = theupdate[cnt];
    }
-   hessian[x_linearlength + aug_linlength*x_linearlength] = 0.0;
-   
-   //Find its lowest eigenvalue and vector
-   double * work = new double[size];
-   double * eigen = new double[aug_linlength];
-   char jobz = 'V';
-   char uplo = 'U';
-   int info;
-   dsyev_(&jobz,&uplo,&aug_linlength,hessian,&aug_linlength,eigen,work,&size,&info);
-   
-   if (CheMPS2::DMRGSCF_debugPrint){
-      cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << eigen[0] << endl;
-      cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << hessian[x_linearlength] << endl;
+   hessian[x_linearlength + dim*x_linearlength] = 0.0;
+
+   //Find the lowest eigenvalue and corresponding eigenvector of the augmented hessian
+   {
+      const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * dim );
+      Davidson deBoskabouter(dim, CheMPS2::HEFF_DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false); // No debug printing
+      double ** whichpointers = new double*[2];
+
+      char instruction = deBoskabouter.FetchInstruction( whichpointers );
+      assert( instruction == 'A' );
+      for (int cnt = 0; cnt < dim; cnt++){ whichpointers[1][cnt] = hessian[cnt*(1+dim)]; } // Preconditioner = diagonal elements of the augmented Hessian
+      for (int cnt = 0; cnt < x_linearlength; cnt++){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
+         const double denom = ( whichpointers[1][cnt] > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+         whichpointers[0][cnt] = - theupdate[cnt] / denom;
+      }
+      whichpointers[0][x_linearlength] = 1.0;
+
+      instruction = deBoskabouter.FetchInstruction( whichpointers );
+      while ( instruction == 'B' ){
+         char notrans = 'N';
+         int one = 1;
+         double alpha = 1.0;
+         double beta = 0.0;
+         dgemm_(&notrans, &notrans, &dim, &one, &dim, &alpha, hessian, &dim, whichpointers[0], &dim, &beta, whichpointers[1], &dim);
+         instruction = deBoskabouter.FetchInstruction( whichpointers );
+      }
+
+      assert( instruction == 'C' );
+      double scalar = 1.0 / whichpointers[0][x_linearlength];
+      cout << "DMRGSCF::augmentedHessianNR : Augmented Hessian update found with " << deBoskabouter.GetNumMultiplications() << " Davidson iterations." << endl;
+      if (CheMPS2::DMRGSCF_debugPrint){
+         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[1][0] << endl;
+         cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << scalar << endl;
+      }
+      for (int cnt = 0; cnt < x_linearlength; cnt++){ theupdate[cnt] = scalar * whichpointers[0][cnt]; }
+      delete [] whichpointers;
    }
-   double scalar = 1.0/hessian[x_linearlength];
-   int inc = 1;
-   dscal_(&x_linearlength,&scalar,hessian,&inc);
    
-   //Copy the update to the gradient vector --> needed for updates of the unitary and DIIS
-   dcopy_(&x_linearlength,hessian,&inc,gradient,&inc);
+   //Calculate the update norm
    updateNorm[0] = 0.0;
-   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ updateNorm[0] += gradient[cnt] * gradient[cnt]; }
+   for (int cnt = 0; cnt < x_linearlength; cnt++){ updateNorm[0] += theupdate[cnt] * theupdate[cnt]; }
    updateNorm[0] = sqrt(updateNorm[0]);
    cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
    
    delete [] hessian;
-   delete [] eigen;
-   delete [] work;
-   
-   return gradNorm;
 
 }
 
-double CheMPS2::CASSCF::calcGradient(double * gradient){
+double CheMPS2::CASSCF::calcGradient(const DMRGSCFmatrix * localFmat, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * gradient){
 
-   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){
-      gradient[cnt] = 2*( Fmat( unitary->getFirstIndex(cnt), unitary->getSecondIndex(cnt) ) - Fmat( unitary->getSecondIndex(cnt), unitary->getFirstIndex(cnt) ));
+   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){
+      const int index1 = localUmat->getFirstIndex(cnt);
+      const int index2 = localUmat->getSecondIndex(cnt);
+      // irrep1 == irrep2 due to construction DMRGSCFunitary
+      const int irrep  = localIdx->getOrbitalIrrep( index1 );
+      const int shift  = localIdx->getOrigNOCCstart( irrep );
+      const int relIndex1 = index1 - shift;
+      const int relIndex2 = index2 - shift;
+      gradient[cnt] = 2 * ( localFmat->get( irrep, relIndex1, relIndex2 ) - localFmat->get( irrep, relIndex2, relIndex1 ) );
    }
    
    double gradNorm = 0.0;
-   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
+   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
    gradNorm = sqrt(gradNorm);
    cout << "DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
    return gradNorm;
 
 }
 
-void CheMPS2::CASSCF::calcHessian(double * hessian, const int rowjump){
+void CheMPS2::CASSCF::calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump){
 
-   const int lindim = ( unitary->getNumVariablesX() * ( unitary->getNumVariablesX() + 1 ))/2;
+   const int lindim = ( localUmat->getNumVariablesX() * ( localUmat->getNumVariablesX() + 1 ))/2;
    
    #pragma omp parallel for schedule(static)
    for (int count=0; count<lindim; count++){
@@ -310,209 +335,314 @@ void CheMPS2::CASSCF::calcHessian(double * hessian, const int rowjump){
       col -= 1;
       int row = count - (col*(col+1))/2;
       
-      int p_index = unitary->getFirstIndex(row);
-      int q_index = unitary->getSecondIndex(row);
-      int r_index = unitary->getFirstIndex(col);
-      int s_index = unitary->getSecondIndex(col);
-      hessian[row + rowjump * col] = Wmat(p_index,q_index,r_index,s_index)
-                                   - Wmat(q_index,p_index,r_index,s_index)
-                                   - Wmat(p_index,q_index,s_index,r_index)
-                                   + Wmat(q_index,p_index,s_index,r_index);
+      const int p_index = localUmat->getFirstIndex(row);
+      const int q_index = localUmat->getSecondIndex(row);
+      // irrep_p == irrep_q due to construction DMRGSCFunitary
+      const int irrep_pq = localIdx->getOrbitalIrrep( p_index );
+      
+      const int r_index = localUmat->getFirstIndex(col);
+      const int s_index = localUmat->getSecondIndex(col);
+      // irrep_r == irrep_s due to construction DMRGSCFunitary
+      const int irrep_rs = localIdx->getOrbitalIrrep( r_index );
+      
+      const int rel_p_index = p_index - localIdx->getOrigNOCCstart( irrep_pq );
+      const int rel_q_index = q_index - localIdx->getOrigNOCCstart( irrep_pq );
+      const int rel_r_index = r_index - localIdx->getOrigNOCCstart( irrep_rs );
+      const int rel_s_index = s_index - localIdx->getOrigNOCCstart( irrep_rs );
+      
+      hessian[row + rowjump * col] = Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_r_index, rel_s_index)
+                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_r_index, rel_s_index)
+                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_s_index, rel_r_index)
+                                   + Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_s_index, rel_r_index);
       hessian[col + rowjump * row] = hessian[row + rowjump * col];
       
    }
 
 }
 
-double CheMPS2::CASSCF::Wmat(const int index1, const int index2, const int index3, const int index4) const{
+double CheMPS2::CASSCF::Wmat(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS){
 
-   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
-   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
-   if (irrep1 != irrep2){ return 0.0; } //From now on: irrep1 == irrep2
-   
-   const int irrep3 = HamOrig->getOrbitalIrrep(index3);
-   const int irrep4 = HamOrig->getOrbitalIrrep(index4);
-   if (irrep3 != irrep4){ return 0.0; } //From now on: irrep3 == irrep4
-   
    double value = 0.0;
    
-   if ( (irrep1 == irrep3) && (index2 == index3) ) { //irrep1 == irrep2 == irrep3 == irrep4
-      value = Fmat(index1,index4) + Fmat(index4,index1);
+   if ( ( irrep_pq == irrep_rs ) && ( relindexQ == relindexR ) ) {
+      value = localFmat->get(irrep_pq, relindexP, relindexS) + localFmat->get(irrep_pq, relindexS, relindexP);
    }
    
-   if (index1 >= iHandler->getOrigNVIRTstart(irrep1)){ return value; }
-   if (index3 >= iHandler->getOrigNVIRTstart(irrep3)){ return value; } //index1 and index3 are now certainly not virtual!
+   if (relindexP >= localIdx->getNOCC(irrep_pq) + localIdx->getNDMRG(irrep_pq)){ return value; }
+   if (relindexR >= localIdx->getNOCC(irrep_rs) + localIdx->getNDMRG(irrep_rs)){ return value; } //index1 and index3 are now certainly not virtual!
    
-   const int relIndex1 = index1 - iHandler->getOrigNOCCstart(irrep1);
-   const int relIndex2 = index2 - iHandler->getOrigNOCCstart(irrep2);
-   const int relIndex3 = index3 - iHandler->getOrigNOCCstart(irrep3);
-   const int relIndex4 = index4 - iHandler->getOrigNOCCstart(irrep4);
-   
-   if (index1 < iHandler->getOrigNDMRGstart(irrep1)){
-      if (index3 < iHandler->getOrigNDMRGstart(irrep3)){
-      
-         // (index1,index3) (occupied,occupied) --> (alpha,beta) can be (occupied,occupied) or (active,active)
-         if (index1==index3){
-         
-            // Part of one-body matrix elements if 1-RDM occ indices
-            value += 4 * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) + QmatACT(index2, index4) );
-            value += 12 * VmatRotated->get(irrep2, irrep4, irrep1, irrep1, relIndex2, relIndex4, relIndex1, relIndex1)
-                   - 4  * VmatRotated->get(irrep2, irrep1, irrep4, irrep1, relIndex2, relIndex1, relIndex4, relIndex1);
-            return value;
-            
-         } else { //index1 != index3
-         
-            value += 16 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relIndex1, relIndex3)
-                   - 4  * VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relIndex1, relIndex4, relIndex3)
-                   - 4  * VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relIndex3, relIndex1);
-            return value;
-            
-         }
-      
-      } else {
-      
-         const int DMRGindex3 = iHandler->getDMRGcumulative(irrep3) + index3 - iHandler->getOrigNDMRGstart(irrep3);
-      
-         // (index1,index3) (occupied,active) --> (alpha,beta) can be (active,occupied) or (occupied,active)
-         for (int alpha_index=iHandler->getOrigNDMRGstart(irrep3); alpha_index<iHandler->getOrigNVIRTstart(irrep3); alpha_index++){
-            const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep3) + alpha_index - iHandler->getOrigNDMRGstart(irrep3);
-            const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep3);
-            value += 2 * DMRG1DM[ DMRGindex3 + nOrbDMRG * DMRGindexALPHA ]
-                          * ( 4 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relIndex1, relALPHA)
-                                - VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relALPHA,  relIndex1)
-                                - VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relIndex1, relIndex4, relALPHA) );
-         }
-         return value;
-         
-      }
-   } else {
-      
-      const int DMRGindex1 = iHandler->getDMRGcumulative(irrep1) + index1 - iHandler->getOrigNDMRGstart(irrep1);
-   
-      if (index3 < iHandler->getOrigNDMRGstart(irrep3)){
-      
-         // (index1,index3) (active,occupied) --> (alpha,beta) can be (active,occupied) or (occupied,active)
-         for (int alpha_index=iHandler->getOrigNDMRGstart(irrep1); alpha_index<iHandler->getOrigNVIRTstart(irrep1); alpha_index++){
-            const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep1) + alpha_index - iHandler->getOrigNDMRGstart(irrep1);
-            const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep1);
-            value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexALPHA ]
-                          * ( 4 * VmatRotated->get(irrep2, irrep4, irrep1, irrep3, relIndex2, relIndex4, relALPHA,  relIndex3)
-                                - VmatRotated->get(irrep2, irrep1, irrep4, irrep3, relIndex2, relALPHA,  relIndex4, relIndex3)
-                                - VmatRotated->get(irrep2, irrep4, irrep3, irrep1, relIndex2, relIndex4, relIndex3, relALPHA) );
-         }
-         return value;
-         
-      } else {
-      
-         const int DMRGindex3 = iHandler->getDMRGcumulative(irrep3) + index3 - iHandler->getOrigNDMRGstart(irrep3);
-      
-         // (index1,index3) (active,active) --> (alpha,beta) can be (occupied,occupied) or (active,active)
-         // Case1: (alpha,beta)==(occ,occ) --> alpha == beta
-         // Part of one-body matrix elements if 1-RDM active indices
-         value += 2 * DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindex3 ] * ( TmatRotated(index2,index4) + QmatOCC(index2,index4) );
-         
-         // Case2: (alpha,beta)==(act,act)
-         const int productIrrep = Irreps::directProd(irrep1,irrep3);
-         for (int irrep_alpha=0; irrep_alpha<numberOfIrreps; irrep_alpha++){
-            int irrep_beta = Irreps::directProd(productIrrep,irrep_alpha);
-            for (int alpha_index=iHandler->getOrigNDMRGstart(irrep_alpha); alpha_index<iHandler->getOrigNVIRTstart(irrep_alpha); alpha_index++){
-               const int DMRGindexALPHA = iHandler->getDMRGcumulative(irrep_alpha) + alpha_index - iHandler->getOrigNDMRGstart(irrep_alpha);
-               const int relALPHA = alpha_index - iHandler->getOrigNOCCstart(irrep_alpha);
-               for (int beta_index=iHandler->getOrigNDMRGstart(irrep_beta); beta_index<iHandler->getOrigNVIRTstart(irrep_beta); beta_index++){
-                  const int DMRGindexBETA = iHandler->getDMRGcumulative(irrep_beta) + beta_index - iHandler->getOrigNDMRGstart(irrep_beta);
-                  const int relBETA = beta_index - iHandler->getOrigNOCCstart(irrep_beta);
-                  const double TwoDMval1 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindexALPHA + nOrbDMRG * ( DMRGindex1 + nOrbDMRG * DMRGindexBETA ) ) ];
-                  const double TwoDMval2 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindexALPHA + nOrbDMRG * ( DMRGindexBETA + nOrbDMRG * DMRGindex1 ) ) ];
-                  const double TwoDMval3 = DMRG2DM[ DMRGindex3 + nOrbDMRG * ( DMRGindex1 + nOrbDMRG * ( DMRGindexBETA + nOrbDMRG * DMRGindexALPHA ) ) ];
-                  value += 2 * (   TwoDMval1 * VmatRotated->get(irrep2, irrep_alpha, irrep4, irrep_beta, relIndex2, relALPHA, relIndex4, relBETA)
-                     + (TwoDMval2+TwoDMval3) * VmatRotated->get(irrep2, irrep4, irrep_alpha, irrep_beta, relIndex2, relIndex4, relALPHA, relBETA) );
-               }
-            }
-         }
-         return value;
-         
-      }
-   }
-   
+   value += localwtilde->get( irrep_pq, irrep_rs, relindexP, relindexQ, relindexR, relindexS );
    return value;
 
 }
 
-void CheMPS2::CASSCF::buildFmat(){
+void CheMPS2::CASSCF::buildWtilde(DMRGSCFwtilde * localwtilde, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM){
 
-   for (int cnt=0; cnt<numberOfIrreps; cnt++){
-      const int nOrbitals = iHandler->getNORB(cnt);
-      const int nOrbSquar = nOrbitals*nOrbitals;
+   localwtilde->clear();
+   const int numIrreps  = localIdx->getNirreps();
+   const int totOrbDMRG = localIdx->getDMRGcumulative( numIrreps );
+   for (int irrep_pq = 0; irrep_pq < numIrreps; irrep_pq++){
+   
+      const int NumOCCpq  = localIdx->getNOCC(  irrep_pq );
+      const int NumDMRGpq = localIdx->getNDMRG( irrep_pq );
+      const int NumORBpq  = localIdx->getNORB(  irrep_pq );
+      const int NumCOREpq = NumOCCpq + NumDMRGpq;
+      
+      //If irrep_pq == irrep_rs and P == R occupied --> QS only active or virtual
       #pragma omp parallel for schedule(static)
-      for (int cnt2=0; cnt2<nOrbSquar; cnt2++){
-         int row = cnt2 % nOrbitals;
-         int col = cnt2 / nOrbitals;
-         Fmatrix[cnt][cnt2] = FmatHelper(iHandler->getOrigNOCCstart(cnt) + row, iHandler->getOrigNOCCstart(cnt) + col);
+      for (int relindexP = 0; relindexP < NumOCCpq; relindexP++){
+         double * subblock = localwtilde->getBlock( irrep_pq, irrep_pq, relindexP, relindexP);
+         for (int relindexS = NumOCCpq; relindexS < NumORBpq; relindexS++){
+            for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 4 * ( localTmat->get( irrep_pq, relindexQ, relindexS)
+                                                                   + localJKocc->get(irrep_pq, relindexQ, relindexS)
+                                                                   + localJKact->get(irrep_pq, relindexQ, relindexS) );
+            }
+         }
+      }
+      
+      //If irrep_pq == irrep_rs and P,R active --> QS only occupied or virtual
+      #pragma omp parallel for schedule(static)
+      for (int combined = 0; combined < NumDMRGpq*NumDMRGpq; combined++){
+         
+         const int relindexP  = NumOCCpq + ( combined % NumDMRGpq );
+         const int relindexR  = NumOCCpq + ( combined / NumDMRGpq );
+         double * subblock    = localwtilde->getBlock( irrep_pq, irrep_pq, relindexP, relindexR );
+         const int DMRGindexP = relindexP - NumOCCpq + localIdx->getDMRGcumulative( irrep_pq );
+         const int DMRGindexR = relindexR - NumOCCpq + localIdx->getDMRGcumulative( irrep_pq );
+         const double OneDMvalue = local1DM[ DMRGindexP + totOrbDMRG * DMRGindexR ];
+         
+         for (int relindexS = 0; relindexS < NumOCCpq; relindexS++){
+            for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( localTmat->get( irrep_pq, relindexQ, relindexS)
+                                                                                + localJKocc->get(irrep_pq, relindexQ, relindexS) );
+            }
+            for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( localTmat->get( irrep_pq, relindexQ, relindexS)
+                                                                                + localJKocc->get(irrep_pq, relindexQ, relindexS) );
+            }
+         }
+         for (int relindexS = NumCOREpq; relindexS < NumORBpq; relindexS++){
+            for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( localTmat->get( irrep_pq, relindexQ, relindexS)
+                                                                                + localJKocc->get(irrep_pq, relindexQ, relindexS) );
+            }
+            for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+               subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue * ( localTmat->get( irrep_pq, relindexQ, relindexS)
+                                                                                + localJKocc->get(irrep_pq, relindexQ, relindexS) );
+            }
+         }
+      }
+   
+      for (int irrep_rs = 0; irrep_rs < numIrreps; irrep_rs++){
+      
+         const int NumOCCrs  = localIdx->getNOCC(  irrep_rs );
+         const int NumDMRGrs = localIdx->getNDMRG( irrep_rs );
+         const int NumORBrs  = localIdx->getNORB(  irrep_rs );
+         const int NumCORErs = NumOCCrs + NumDMRGrs;
+         const int productirrep = Irreps::directProd( irrep_pq, irrep_rs );
+      
+         // P and R occupied --> QS only active or virtual
+         #pragma omp parallel for schedule(static)
+         for (int combined = 0; combined < NumOCCpq*NumOCCrs; combined++){
+         
+            const int relindexP = combined % NumOCCpq;
+            const int relindexR = combined / NumOCCpq;
+            double * subblock   = localwtilde->getBlock( irrep_pq, irrep_rs, relindexP, relindexR);
+            
+            for (int relindexS = NumOCCrs; relindexS < NumORBrs; relindexS++){
+               for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
+                  subblock[ relindexQ + NumORBpq * relindexS ] +=  
+                      4 * ( 4 * theInts->FourIndexAPI(irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relindexR)
+                              - theInts->FourIndexAPI(irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relindexR)
+                              - theInts->FourIndexAPI(irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relindexP) );
+               }
+            }
+         } // End combined P and R occupied
+         
+         // P and R active --> QS only occupied or virtual
+         #pragma omp parallel for schedule(static)
+         for (int combined = 0; combined < NumDMRGpq*NumDMRGrs; combined++){
+         
+            const int relindexP  = NumOCCpq + ( combined % NumDMRGpq );
+            const int relindexR  = NumOCCrs + ( combined / NumDMRGpq );
+            double * subblock    = localwtilde->getBlock( irrep_pq, irrep_rs, relindexP, relindexR );
+            const int DMRGindexP = relindexP - NumOCCpq + localIdx->getDMRGcumulative( irrep_pq );
+            const int DMRGindexR = relindexR - NumOCCrs + localIdx->getDMRGcumulative( irrep_rs );
+            
+            for (int irrep_alpha = 0; irrep_alpha < numIrreps; irrep_alpha++){
+               
+               const int irrep_beta   = Irreps::directProd( irrep_alpha, productirrep );
+               const int NumDMRGalpha = localIdx->getNDMRG( irrep_alpha );
+               const int NumDMRGbeta  = localIdx->getNDMRG( irrep_beta  );
+               
+               for (int alpha = 0; alpha < NumDMRGalpha; alpha++){
+               
+                  const int DMRGalpha = localIdx->getDMRGcumulative( irrep_alpha ) + alpha;
+                  const int relalpha  = localIdx->getNOCC( irrep_alpha ) + alpha;
+                  
+                  for (int beta = 0; beta < NumDMRGbeta; beta++){
+                  
+                     const int DMRGbeta = localIdx->getDMRGcumulative( irrep_beta ) + beta;
+                     const int relbeta  = localIdx->getNOCC( irrep_beta ) + beta;
+                     
+                     const double TwoDMvalue1  = local2DM[ DMRGindexR + totOrbDMRG * ( DMRGalpha + totOrbDMRG * ( DMRGindexP + totOrbDMRG * DMRGbeta ) ) ];
+                     const double TwoDMvalue23 = local2DM[ DMRGindexR + totOrbDMRG * ( DMRGalpha + totOrbDMRG * ( DMRGbeta + totOrbDMRG * DMRGindexP ) ) ]
+                                               + local2DM[ DMRGindexR + totOrbDMRG * ( DMRGindexP + totOrbDMRG * ( DMRGbeta + totOrbDMRG * DMRGalpha ) ) ];
+                     
+                     for (int relindexS = 0; relindexS < NumOCCrs; relindexS++){
+                        for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theInts->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                        for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theInts->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                     }
+                     for (int relindexS = NumCORErs; relindexS < NumORBrs; relindexS++){
+                        for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theInts->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                        for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+                           subblock[ relindexQ + NumORBpq * relindexS ] +=
+                              2 * ( TwoDMvalue1  * theInts->FourIndexAPI( irrep_pq, irrep_alpha, irrep_rs, irrep_beta, relindexQ, relalpha, relindexS, relbeta)
+                                  + TwoDMvalue23 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_alpha, irrep_beta, relindexQ, relindexS, relalpha, relbeta) );
+                        }
+                     }
+                  }
+               }
+            }
+         } // End combined P and R active
+         
+         // P active and R occupied  -->  Q occupied or virtual  //  S active or virtual
+         #pragma omp parallel for schedule(static)
+         for (int combined = 0; combined < NumDMRGpq*NumOCCrs; combined++){
+            
+            const int relindexP  = NumOCCpq + ( combined % NumDMRGpq );
+            const int relindexR  = combined / NumDMRGpq;
+            double * subblock    = localwtilde->getBlock( irrep_pq, irrep_rs, relindexP, relindexR );
+            const int DMRGindexP = relindexP - NumOCCpq + localIdx->getDMRGcumulative( irrep_pq );
+            
+            for (int alpha = 0; alpha < NumDMRGpq; alpha++){
+            
+               const int DMRGalpha     = localIdx->getDMRGcumulative( irrep_pq ) + alpha;
+               const int relalpha      = localIdx->getNOCC( irrep_pq ) + alpha;
+               const double OneDMvalue = local1DM[ DMRGalpha + totOrbDMRG * DMRGindexP ];
+               
+               for (int relindexS = NumOCCrs; relindexS < NumORBrs; relindexS++){
+                  for (int relindexQ = 0; relindexQ < NumOCCpq; relindexQ++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relalpha) );
+                  }
+                  for (int relindexQ = NumCOREpq; relindexQ < NumORBpq; relindexQ++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relalpha, relindexR)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relalpha, relindexS, relindexR)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relindexR, relalpha) );
+                  }
+               }
+            }
+         } // End combined P active and R occupied
+         
+         // P occupied and R active  -->  Q active or virtual  //  S occupied or virtual
+         #pragma omp parallel for schedule(static)
+         for (int combined = 0; combined < NumOCCpq*NumDMRGrs; combined++){
+            
+            const int relindexP  = combined % NumOCCpq;
+            const int relindexR  = NumOCCrs + ( combined / NumOCCpq );
+            double * subblock    = localwtilde->getBlock( irrep_pq, irrep_rs, relindexP, relindexR );
+            const int DMRGindexR = relindexR - NumOCCrs + localIdx->getDMRGcumulative( irrep_rs );
+            
+            for (int beta = 0; beta < NumDMRGrs; beta++){
+            
+               const int DMRGbeta      = localIdx->getDMRGcumulative( irrep_rs ) + beta;
+               const int relbeta       = localIdx->getNOCC( irrep_rs ) + beta;
+               const double OneDMvalue = local1DM[ DMRGindexR + totOrbDMRG * DMRGbeta ];
+               
+               for (int relindexQ = NumOCCpq; relindexQ < NumORBpq; relindexQ++){
+                  for (int relindexS = 0; relindexS < NumOCCrs; relindexS++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relbeta, relindexP) );
+                  }
+                  for (int relindexS = NumCORErs; relindexS < NumORBrs; relindexS++){
+                     subblock[ relindexQ + NumORBpq * relindexS ] += 2 * OneDMvalue *
+                         ( 4 * theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_pq, irrep_rs, relindexQ, relindexS, relindexP, relbeta)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_pq, irrep_rs, irrep_rs, relindexQ, relindexP, relindexS, relbeta)
+                             - theInts->FourIndexAPI( irrep_pq, irrep_rs, irrep_rs, irrep_pq, relindexQ, relindexS, relbeta, relindexP) );
+                  }
+               }
+            }
+         } // End combined P occupied and R active
+         
       }
    }
 
 }
 
-double CheMPS2::CASSCF::Fmat(const int index1, const int index2) const{
-
-   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
-   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
-   if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
+void CheMPS2::CASSCF::buildFmat(DMRGSCFmatrix * localFmat, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM){
    
-   return Fmatrix[irrep1][ index1 - iHandler->getOrigNOCCstart(irrep1) + iHandler->getNORB(irrep1) * ( index2 - iHandler->getOrigNOCCstart(irrep1) ) ];
-
-}
-
-double CheMPS2::CASSCF::FmatHelper(const int index1, const int index2) const{
+   localFmat->clear();
+   const int numIrreps  = localIdx->getNirreps();
+   const int totOrbDMRG = localIdx->getDMRGcumulative( numIrreps );
+   for (int irrep_pq = 0; irrep_pq < numIrreps; irrep_pq++){
    
-   const int irrep1 = HamOrig->getOrbitalIrrep(index1);
-   const int irrep2 = HamOrig->getOrbitalIrrep(index2);
-   if (irrep1 != irrep2){ return 0.0; } //From now on: both irreps are the same.
-   
-   if (index1 >= iHandler->getOrigNVIRTstart(irrep1)){ return 0.0; } //index1 virtual: 1/2DM returns 0.0
-   
-   double value = 0.0;
-   
-   if (index1 < iHandler->getOrigNDMRGstart(irrep1)){ //index1 occupied
-   
-      value += 2 * ( TmatRotated(index2,index1) + QmatOCC(index2,index1) + QmatACT(index2,index1) );
-   
-   } else { //index1 active
-   
-      const int DMRGindex1 = iHandler->getDMRGcumulative(irrep1) + index1 - iHandler->getOrigNDMRGstart(irrep1);
-   
-      //1DM will only return non-zero if r_index also active, and corresponds to the same irrep
-      for (int r_index=iHandler->getOrigNDMRGstart(irrep1); r_index<iHandler->getOrigNVIRTstart(irrep1); r_index++){
-         const int DMRGindexR = iHandler->getDMRGcumulative(irrep1) + r_index - iHandler->getOrigNDMRGstart(irrep1);
-         value += DMRG1DM[ DMRGindex1 + nOrbDMRG * DMRGindexR ] * ( TmatRotated(index2,r_index) + QmatOCC(index2,r_index) );
+      const int NumORB  = localIdx->getNORB(  irrep_pq );
+      const int NumOCC  = localIdx->getNOCC(  irrep_pq );
+      const int NumDMRG = localIdx->getNDMRG( irrep_pq );
+      const int NumOCCDMRG = NumOCC + NumDMRG;
+      
+      #pragma omp parallel for schedule(static)
+      for (int p = 0; p < NumOCC; p++){
+         for (int q = 0; q < NumORB; q++){
+            localFmat->set( irrep_pq, p, q, 2 * ( localTmat->get(  irrep_pq, q, p )
+                                                + localJKocc->get( irrep_pq, q, p )
+                                                + localJKact->get( irrep_pq, q, p ) ) );
+         }
       }
       
-      //All the summation indices are active
-      const int relIndex2 = index2 - iHandler->getOrigNOCCstart(irrep2);
-      for (int irrep_r=0; irrep_r<numberOfIrreps; irrep_r++){
-         const int productIrrep = Irreps::directProd(irrep1,irrep_r);
-         for (int irrep_s=0; irrep_s<numberOfIrreps; irrep_s++){
-            int irrep_t = Irreps::directProd(productIrrep,irrep_s);
-            for (int r_index=iHandler->getOrigNDMRGstart(irrep_r); r_index<iHandler->getOrigNVIRTstart(irrep_r); r_index++){
-               const int DMRGindexR = iHandler->getDMRGcumulative(irrep_r) + r_index - iHandler->getOrigNDMRGstart(irrep_r);
-               const int relR = r_index - iHandler->getOrigNOCCstart(irrep_r);
-               for (int s_index=iHandler->getOrigNDMRGstart(irrep_s); s_index<iHandler->getOrigNVIRTstart(irrep_s); s_index++){
-                  const int DMRGindexS = iHandler->getDMRGcumulative(irrep_s) + s_index - iHandler->getOrigNDMRGstart(irrep_s);
-                  const int relS = s_index - iHandler->getOrigNOCCstart(irrep_s);
-                  for (int t_index=iHandler->getOrigNDMRGstart(irrep_t); t_index<iHandler->getOrigNVIRTstart(irrep_t); t_index++){
-                     const int DMRGindexT = iHandler->getDMRGcumulative(irrep_t) + t_index - iHandler->getOrigNDMRGstart(irrep_t);
-                     const int relT = t_index - iHandler->getOrigNOCCstart(irrep_t);
-                     const double TwoDMvalue = DMRG2DM[ DMRGindex1 + nOrbDMRG * ( DMRGindexR + nOrbDMRG * ( DMRGindexS + nOrbDMRG * DMRGindexT ) ) ];
-                     value += TwoDMvalue * VmatRotated->get(irrep2, irrep_r, irrep_s, irrep_t, relIndex2, relR, relS, relT);
+      #pragma omp parallel for schedule(static)
+      for (int p = NumOCC; p < NumOCCDMRG; p++){
+         const int DMRGindex_p = p - NumOCC + localIdx->getDMRGcumulative( irrep_pq );
+         
+         //One-body terms --> matrix multiplication?
+         for (int r = NumOCC; r < NumOCCDMRG; r++){
+            const double OneDMvalue = local1DM[ DMRGindex_p + totOrbDMRG * ( DMRGindex_p + r - p ) ];
+            for (int q = 0; q < NumORB; q++){
+               localFmat->getBlock(irrep_pq)[ p + NumORB * q ] += OneDMvalue * ( localTmat->get( irrep_pq, q, r ) + localJKocc->get( irrep_pq, q, r) );
+            }
+         }
+         
+         //Two-body terms --> matrix multiplication possible?
+         for (int irrep_r = 0; irrep_r < numIrreps; irrep_r++){
+            const int irrep_product = Irreps::directProd(irrep_pq, irrep_r);
+            for (int irrep_s = 0; irrep_s < numIrreps; irrep_s++){
+               const int irrep_t = Irreps::directProd(irrep_product, irrep_s);
+               for (int r = localIdx->getNOCC(irrep_r); r < localIdx->getNOCC(irrep_r) + localIdx->getNDMRG(irrep_r); r++){
+                  const int DMRGindex_r = r - localIdx->getNOCC( irrep_r ) + localIdx->getDMRGcumulative( irrep_r );
+                  for (int s = localIdx->getNOCC(irrep_s); s < localIdx->getNOCC(irrep_s) + localIdx->getNDMRG(irrep_s); s++){
+                     const int DMRGindex_s = s - localIdx->getNOCC( irrep_s ) + localIdx->getDMRGcumulative( irrep_s );
+                     for (int t = localIdx->getNOCC(irrep_t); t < localIdx->getNOCC(irrep_t) + localIdx->getNDMRG(irrep_t); t++){
+                        const int DMRGindex_t = t - localIdx->getNOCC( irrep_t ) + localIdx->getDMRGcumulative( irrep_t );
+                        const double TwoDMvalue = local2DM[ DMRGindex_p + totOrbDMRG * ( DMRGindex_r + totOrbDMRG * ( DMRGindex_s + totOrbDMRG * DMRGindex_t ) ) ];
+                        for (int q = 0; q < NumORB; q++){
+                           localFmat->getBlock(irrep_pq)[ p + NumORB * q ] += TwoDMvalue * theInts->FourIndexAPI(irrep_pq, irrep_r, irrep_s, irrep_t, q, r, s, t);
+                        }
+                     }
                   }
                }
             }
          }
       }
-   
    }
-   
-   return value;
 
 }
 

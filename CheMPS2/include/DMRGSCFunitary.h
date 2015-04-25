@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -91,6 +91,12 @@ namespace CheMPS2{
              \return The second Hamiltonian index corresponding to linearindex */
          int getSecondIndex(const int linearindex) const;
          
+         //! Get the start index for a certain block in the x-matrix
+         /** \param irrep The irrep of the block
+             \param geval If geval==0, the first and second indices are DMRG and OCC indices. If geval==1, the first and second indices are VIRT and DMRG indices. If geval==2, the first and second indices are VIRT and OCC indices.
+             \return The start index of the requested block in the x-matrix */
+         int getJumper(const int irrep, const int geval) const;
+         
          //! Get the unitary rotation for block irrep
          /** \param irrep The irreducible representation
              \return Pointer to the desired unitary block */
@@ -144,7 +150,6 @@ namespace CheMPS2{
          /** \param filename Delete this file */
          void deleteStoredUnitary(const string filename=DMRGSCF_unitaryStorageName) const;
 
-         
       private:
       
          //Externally created and destroyed index handler
@@ -156,6 +161,7 @@ namespace CheMPS2{
          //Helper arrays to jump from linear x-matrix index to orbital indices and back
          int * x_firstindex;
          int * x_secondindex;
+         int ** jumper;
          
          //The unitary matrix (e^x * previous unitary): unitary[irrep][row + size_irrep * col]
          double ** unitary;

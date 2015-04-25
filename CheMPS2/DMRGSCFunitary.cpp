@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,8 +56,11 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
    if (x_linearlength==0){ return; }
    x_firstindex  = new int[x_linearlength];
    x_secondindex = new int[x_linearlength];
+   jumper = new int*[ iHandler->getNirreps() ];
+   int jumper_previous = 0;
    int x_linearlength2 = 0;
    for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){
+      jumper[ irrep ] = new int[ 3 ];
       for (int geval=0; geval<3; geval++){
          if (geval==0){
             for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
@@ -67,6 +70,8 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
                   x_linearlength2++;
                }
             }
+            jumper[irrep][geval] = jumper_previous;
+            jumper_previous += iHandler->getNOCC(irrep)*iHandler->getNDMRG(irrep);
          }
          if (geval==1){
             for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
@@ -76,6 +81,8 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
                   x_linearlength2++;
                }
             }
+            jumper[irrep][geval] = jumper_previous;
+            jumper_previous += iHandler->getNDMRG(irrep)*iHandler->getNVIRT(irrep);
          }
          if (geval==2){
             for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
@@ -85,10 +92,13 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary(DMRGSCFindices * iHandlerIn){
                   x_linearlength2++;
                }
             }
+            jumper[irrep][geval] = jumper_previous;
+            jumper_previous += iHandler->getNOCC(irrep)*iHandler->getNVIRT(irrep);
          }
       }
    }
    assert( x_linearlength==x_linearlength2 );
+   assert( x_linearlength==jumper_previous );
 
 }
 
@@ -100,18 +110,71 @@ CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
    if (x_linearlength!=0){
       delete [] x_firstindex;
       delete [] x_secondindex;
+      for (int irrep=0; irrep<iHandler->getNirreps(); irrep++){ delete [] jumper[irrep]; }
+      delete [] jumper;
    }
       
 }
 
 int CheMPS2::DMRGSCFunitary::getNumVariablesX() const{ return x_linearlength; }
 
+int CheMPS2::DMRGSCFunitary::getJumper( const int irrep, const int geval ) const{ return jumper[ irrep ][ geval ]; }
+
 int CheMPS2::DMRGSCFunitary::getLinearIndex(const int p_index, const int q_index) const{
 
-   for (int cnt=0; cnt<x_linearlength; cnt++){
-      if ((p_index == x_firstindex[cnt]) && (q_index == x_secondindex[cnt])){ return cnt; }
+   int irrep_p = iHandler->getNirreps() - 1;
+   int irrep_q = iHandler->getNirreps() - 1;
+   
+   while ( p_index < iHandler->getOrigNOCCstart( irrep_p ) ){ irrep_p--; }
+   while ( q_index < iHandler->getOrigNOCCstart( irrep_q ) ){ irrep_q--; }
+   
+   assert( irrep_p == irrep_q );
+   const int irrep = irrep_p;
+   
+   const bool p_virt = ( p_index >= iHandler->getOrigNVIRTstart( irrep )) ? true : false;
+   const bool p_dmrg = ((p_index >= iHandler->getOrigNDMRGstart( irrep )) && (!( p_virt ))) ? true : false;
+   
+   const bool q_occ  = ( q_index < iHandler->getOrigNDMRGstart( irrep )) ? true : false;
+   const bool q_dmrg = ((q_index < iHandler->getOrigNVIRTstart( irrep )) && (!( q_occ ))) ? true : false;
+   
+   // 0 : p DMRG q OCC
+   // 1 : p VIRT q DMRG
+   // 2 : p VIRT q OCC
+   
+   if ((p_dmrg) && (q_occ)){ // geval 0
+      
+      const int p_rel = p_index - iHandler->getOrigNDMRGstart( irrep );
+      const int q_rel = q_index - iHandler->getOrigNOCCstart(  irrep );
+      const int theLinIndex = getJumper( irrep, 0 ) + p_rel + iHandler->getNDMRG( irrep ) * q_rel;
+      assert( p_index == x_firstindex[  theLinIndex ] );
+      assert( q_index == x_secondindex[ theLinIndex ] );
+      return theLinIndex;
+      
    }
    
+   if ((p_virt) && (q_dmrg)){ // geval 1
+   
+      const int p_rel = p_index - iHandler->getOrigNVIRTstart( irrep );
+      const int q_rel = q_index - iHandler->getOrigNDMRGstart( irrep );
+      const int theLinIndex = getJumper( irrep, 1 ) + p_rel + iHandler->getNVIRT( irrep ) * q_rel;
+      assert( p_index == x_firstindex[  theLinIndex ] );
+      assert( q_index == x_secondindex[ theLinIndex ] );
+      return theLinIndex;
+   
+   }
+   
+   if ((p_virt) && (q_occ)){ // geval 2
+   
+      const int p_rel = p_index - iHandler->getOrigNVIRTstart( irrep );
+      const int q_rel = q_index - iHandler->getOrigNOCCstart(  irrep );
+      const int theLinIndex = getJumper( irrep, 2 ) + p_rel + iHandler->getNVIRT( irrep ) * q_rel;
+      assert( p_index == x_firstindex[  theLinIndex ] );
+      assert( q_index == x_secondindex[ theLinIndex ] );
+      return theLinIndex;
+   
+   }
+   
+   assert( 0 == 1 );
    return -1;
 
 }
@@ -131,38 +194,27 @@ void CheMPS2::DMRGSCFunitary::buildSkewSymmX(const int irrep, double * result, d
 
       for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
          for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
-            int index1 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
-            int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
-            const int xsolindex = getLinearIndex(index1,index2);
-            assert( xsolindex!=-1 );
-            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
-            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
+            const int xsolindex = getJumper( irrep , 0 ) + cntDMRG + iHandler->getNDMRG( irrep ) * cntOcc;
+            const int index1 = iHandler->getNOCC(irrep) + cntDMRG; //Index within irrep block
+            result[ index1 + linsize*cntOcc ] =   Xelem[xsolindex];
+            result[ cntOcc + linsize*index1 ] = - Xelem[xsolindex];
          }
       }
       for (int cntDMRG=0; cntDMRG<iHandler->getNDMRG(irrep); cntDMRG++){
          for (int cntVirt=0; cntVirt<iHandler->getNVIRT(irrep); cntVirt++){
-            int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
-            int index2 = iHandler->getOrigNDMRGstart(irrep) + cntDMRG;
-            const int xsolindex = getLinearIndex(index1,index2);
-            assert( xsolindex!=-1 );
-            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
-            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
+            const int xsolindex = getJumper( irrep , 1 ) + cntVirt + iHandler->getNVIRT( irrep ) * cntDMRG;
+            const int index1 = iHandler->getNOCC(irrep) + iHandler->getNDMRG(irrep) + cntVirt; //Index within irrep block
+            const int index2 = iHandler->getNOCC(irrep) + cntDMRG; //Index within irrep block
+            result[ index1 + linsize*index2 ] =   Xelem[xsolindex];
+            result[ index2 + linsize*index1 ] = - Xelem[xsolindex];
          }
       }
       for (int cntOcc=0; cntOcc<iHandler->getNOCC(irrep); cntOcc++){
          for (int cntVirt=0; cntVirt<iHandler->getNVIRT(irrep); cntVirt++){
-            int index1 = iHandler->getOrigNVIRTstart(irrep) + cntVirt;
-            int index2 = iHandler->getOrigNOCCstart(irrep) + cntOcc;
-            const int xsolindex = getLinearIndex(index1,index2);
-            assert( xsolindex!=-1 );
-            index1 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            index2 -= iHandler->getOrigNOCCstart(irrep); //Index within irrep block
-            result[ index1 + linsize*index2 ] = Xelem[xsolindex];
-            result[ index2 + linsize*index1 ] = - result[ index1 + linsize*index2 ];
+            const int xsolindex = getJumper( irrep , 2 ) + cntVirt + iHandler->getNVIRT( irrep ) * cntOcc;
+            const int index1 = iHandler->getNOCC(irrep) + iHandler->getNDMRG(irrep) + cntVirt; //Index within irrep block
+            result[ index1 + linsize*cntOcc ] =   Xelem[xsolindex];
+            result[ cntOcc + linsize*index1 ] = - Xelem[xsolindex];
          }
       }
          

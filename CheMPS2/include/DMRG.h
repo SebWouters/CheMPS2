@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -63,6 +63,8 @@ namespace CheMPS2{
     European Physical Journal D 68, 272 (2014) \n
     http://dx.doi.org/10.1140/epjd/e2014-50500-1 \n
     http://arxiv.org/abs/1407.2040
+    
+    The user manual: http://sebwouters.github.io/CheMPS2/index.html
     */
    class DMRG{
 
@@ -70,8 +72,10 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param Probin The problem to be solved
-             \param OptSchemeIn The optimization scheme for the DMRG sweeps */
-         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn);
+             \param OptSchemeIn The optimization scheme for the DMRG sweeps
+             \param makechkpt Whether or not to save MPS checkpoints in the working directory
+             \param tmpfolder Temporary folder on a large partition to store the renormalized operators on disk (by default "/tmp") */
+         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn, const bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk, const string tmpfolder=CheMPS2::defaultTMPpath);
          
          //! Destructor
          virtual ~DMRG();
@@ -99,7 +103,7 @@ namespace CheMPS2{
          //! Call "rm " + CheMPS2::DMRG_MPS_storage_prefix + "*.h5"
          void deleteStoredMPS();
          
-         //! Call "rm " + CheMPS2::TMPpath + "/" + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + "*.h5";
+         //! Call "rm " + tempfolder + "/" + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + "*.h5";
          void deleteStoredOperators();
          
          //! Activate the necessary storage and machinery to handle excitations
@@ -213,10 +217,12 @@ namespace CheMPS2{
          void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
          void storeOperators(const int index, const bool movingRight);
          void loadOperators(const int index, const bool movingRight);
+         string tempfolder;
          
          void saveMPS(const std::string name, TensorT ** MPSlocation, SyBookkeeper * BKlocation, bool isConverged) const;
          void loadDIM(const std::string name, SyBookkeeper * BKlocation);
          void loadMPS(const std::string name, TensorT ** MPSlocation, bool * isConverged);
+         bool makecheckpoints;
          
          //Helper functions for making the boundary operators
          void updateMovingRight(const int index);

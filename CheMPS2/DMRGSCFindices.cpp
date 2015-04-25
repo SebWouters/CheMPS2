@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -63,9 +63,13 @@ CheMPS2::DMRGSCFindices::DMRGSCFindices(const int L, const int Group, int * NOCC
    assert( totalNumOrbs==L );
    
    irrepOfEachDMRGorbital = new int[NDMRGcumulative[Nirreps]];
+   irrepOfEachOrbital = new int[L];
    for (int irrep=0; irrep<Nirreps; irrep++){
       for (int cnt=0; cnt<NDMRG[irrep]; cnt++){
          irrepOfEachDMRGorbital[ NDMRGcumulative[irrep] + cnt ] = irrep;
+      }
+      for (int cnt=0; cnt<NORB[irrep]; cnt++){
+         irrepOfEachOrbital[ NORBcumulative[irrep] + cnt ] = irrep;
       }
    }
 
@@ -80,6 +84,7 @@ CheMPS2::DMRGSCFindices::~DMRGSCFindices(){
    delete [] NORBcumulative;
    delete [] NDMRGcumulative;
    delete [] irrepOfEachDMRGorbital;
+   delete [] irrepOfEachOrbital;
 
 }
 
@@ -104,6 +109,8 @@ int CheMPS2::DMRGSCFindices::getOrigNDMRGstart(const int irrep) const{ return NO
 int CheMPS2::DMRGSCFindices::getOrigNVIRTstart(const int irrep) const{ return NORBcumulative[irrep+1] - NVIRT[irrep]; }
 
 int * CheMPS2::DMRGSCFindices::getIrrepOfEachDMRGorbital(){ return irrepOfEachDMRGorbital; }
+
+int CheMPS2::DMRGSCFindices::getOrbitalIrrep(const int index) const{ return irrepOfEachOrbital[index]; }
 
 void CheMPS2::DMRGSCFindices::Print() const{
 

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -59,10 +59,15 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
 
 }
 
-CheMPS2::Hamiltonian::Hamiltonian(const string file_psi4text){
+CheMPS2::Hamiltonian::Hamiltonian( const string filename, const int psi4groupnumber ){
 
-   CreateAndFillFromPsi4dump( file_psi4text );
-   
+    if ( psi4groupnumber == -1 ){
+        CreateAndFillFromPsi4dump( filename );
+    } else {
+        SymmInfo.setGroup( psi4groupnumber );
+        CreateAndFillFromFCIDUMP( filename );
+    }
+
 }
 
 CheMPS2::Hamiltonian::Hamiltonian(const bool fileh5, const string main_file, const string file_tmat, const string file_vmat){
@@ -412,6 +417,161 @@ void CheMPS2::Hamiltonian::CreateAndFillFromPsi4dump(const string filename){
    if (CheMPS2::HAMILTONIAN_debugPrint) debugcheck();
    
    inputfile.close();
+
+}
+
+void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
+
+    const int nIrreps = SymmInfo.getNumberOfIrreps();
+    int * symm_psi2molpro = new int[ nIrreps ];
+    const string SymmLabel = SymmInfo.getGroupName();
+
+    if ( SymmLabel.compare("c1")==0 ){
+        symm_psi2molpro[0] = 1;
+    }
+    if ( ( SymmLabel.compare("ci")==0 ) || ( SymmLabel.compare("c2")==0 ) || ( SymmLabel.compare("cs")==0 ) ){
+        symm_psi2molpro[0] = 1;
+        symm_psi2molpro[1] = 2;
+    }
+    if ( ( SymmLabel.compare("d2")==0 ) ){
+        symm_psi2molpro[0] = 1;
+        symm_psi2molpro[1] = 4;
+        symm_psi2molpro[2] = 3;
+        symm_psi2molpro[3] = 2;
+    }
+    if ( ( SymmLabel.compare("c2v")==0 ) || ( SymmLabel.compare("c2h")==0 ) ){
+        symm_psi2molpro[0] = 1;
+        symm_psi2molpro[1] = 4;
+        symm_psi2molpro[2] = 2;
+        symm_psi2molpro[3] = 3;
+    }
+    if ( ( SymmLabel.compare("d2h")==0 ) ){
+        symm_psi2molpro[0] = 1;
+        symm_psi2molpro[1] = 4;
+        symm_psi2molpro[2] = 6;
+        symm_psi2molpro[3] = 7;
+        symm_psi2molpro[4] = 8;
+        symm_psi2molpro[5] = 5;
+        symm_psi2molpro[6] = 3;
+        symm_psi2molpro[7] = 2;
+    }
+
+    ifstream thefcidump( fcidumpfile.c_str() );
+    string line, part;
+    int pos, pos2;
+    
+    // Get the number of orbitals
+    getline( thefcidump, line ); // &FCI NORB= X,NELEC= Y,MS2= Z,   
+    pos  = line.find( "NORB" );
+    pos  = line.find( "=", pos ); //1
+    pos2 = line.find( ",", pos ); //4
+    part = line.substr( pos+1, pos2-pos-1 );
+    L = atoi( part.c_str() );
+    if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << "The number of orbitals <<" << part << ">> or " << L << "." << endl; }
+
+    // Get the orbital irreps in psi4 convention (XOR, see Irreps.h).
+    orb2irrep = new int[ L ];
+    getline( thefcidump, line ); //  ORBSYM=A,B,C,D,
+    pos = line.find( "ORBSYM" );
+    pos = line.find( "=", pos ); //1
+    for ( int orb = 0; orb < L; orb++ ){
+        pos2 = line.find( ",", pos+1 ); //3
+        part = line.substr( pos+1, pos2-pos-1 );
+        const int molproirrep = atoi( part.c_str() );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << "This molpro irrep <<" << part << ">> or " << molproirrep << "." << endl; }
+        orb2irrep[ orb ] = -1;
+        for ( int irrep = 0; irrep < nIrreps; irrep++ ){
+            if ( molproirrep == symm_psi2molpro[ irrep ] ){
+                orb2irrep[ orb ] = irrep;
+            }
+        }
+        assert( orb2irrep[ orb ] != -1 );
+        pos = pos2;
+    }
+
+    getline( thefcidump, line ); //  ISYM=W,
+    getline( thefcidump, line ); // /
+    assert( line.size() < 16 );
+
+    orb2indexSy = new int[ L ];
+    irrep2num_orb = new int[ nIrreps ];
+    for ( int cnt = 0; cnt < nIrreps; cnt++){ irrep2num_orb[cnt] = 0; }
+    for ( int cnt = 0; cnt < L; cnt++){
+        orb2indexSy[cnt] = irrep2num_orb[orb2irrep[cnt]];
+        irrep2num_orb[orb2irrep[cnt]]++;
+    }
+    Tmat = new TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
+    Vmat = new FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
+
+    // Clear the Hamiltonian
+    Econst = 0.0;
+    for ( int orb1 = 0; orb1 < L; orb1++ ){
+        for ( int orb2 = orb1; orb2 < L; orb2++ ){
+            const int irrepprod12 = SymmInfo.directProd( orb2irrep[ orb1 ] , orb2irrep[ orb2 ] );
+            if ( irrepprod12 == 0 ){ setTmat( orb1, orb2, 0.0 ); }
+            for ( int orb3 = orb1; orb3 < L; orb3++ ){
+                for ( int orb4 = orb2; orb4 < L; orb4++ ){
+                    const int irrepprod34 = SymmInfo.directProd( orb2irrep[ orb3 ] , orb2irrep[ orb4 ] );
+                    if ( irrepprod12 == irrepprod34 ){ setVmat( orb1, orb2, orb3, orb4, 0.0 ); }
+                }
+            }
+        }
+    }
+    
+    // Read the Hamiltonian in
+    bool stop = false;
+    while ( stop == false ){
+    
+        getline( thefcidump, line ); // value i1 i2 i3 i4
+        pos  = line.find( " " );
+        pos2 = line.find( "." );
+        pos2 = line.find( " ", pos2 );
+        part = line.substr( pos, pos2-pos );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << "Next line: <<" << part << ">> <<"; }
+        const double value = atof( part.c_str() );
+        pos  = pos2;
+        while ( line.substr( pos, 1 ).compare(" ")==0 ){ pos++; }
+        pos2 = line.find( " ", pos );
+        part = line.substr( pos, pos2-pos );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << part << ">> <<"; }
+        const int index1 = atoi( part.c_str() );
+        pos  = pos2;
+        while ( line.substr( pos, 1 ).compare(" ")==0 ){ pos++; }
+        pos2 = line.find( " ", pos );
+        part = line.substr( pos, pos2-pos );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << part << ">> <<"; }
+        const int index2 = atoi( part.c_str() );
+        pos  = pos2;
+        while ( line.substr( pos, 1 ).compare(" ")==0 ){ pos++; }
+        pos2 = line.find( " ", pos );
+        part = line.substr( pos, pos2-pos );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << part << ">> <<"; }
+        const int index3 = atoi( part.c_str() );
+        pos  = pos2;
+        while ( line.substr( pos, 1 ).compare(" ")==0 ){ pos++; }
+        part = line.substr( pos, line.size()-pos );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << part << ">>." << endl; }
+        const int index4 = atoi( part.c_str() );
+        if ( CheMPS2::HAMILTONIAN_debugPrint ){
+           cout << "Same line: " << value << " " << index1 << " " << index2 << " " << index3 << " " << index4 << endl;
+        }
+        
+        if ( index4 != 0 ){
+            setVmat( index1-1, index3-1, index2-1, index4-1, value ); // From chemists to physicist notation!
+        } else {
+            if ( index2 != 0 ){ setTmat( index1-1, index2-1, value ); }
+            else {
+                Econst = value;
+                stop = true;
+            }
+        }
+    
+    }
+    
+    if ( CheMPS2::HAMILTONIAN_debugPrint ){ debugcheck(); }
+
+    delete [] symm_psi2molpro;
+    thefcidump.close();
 
 }
 

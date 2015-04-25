@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013, 2014 Sebastian Wouters
+   Copyright (C) 2013-2015 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "Options.h"
 #include "Hamiltonian.h"
 #include "DMRGSCFunitary.h"
+#include "DMRGSCFintegrals.h"
 
 namespace CheMPS2{
 /** DMRGSCFVmatRotations class.
@@ -57,6 +58,13 @@ namespace CheMPS2{
              \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
          void fillVmatRotated(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
          
+         //! Fill the rotated two-body matrix elements with max. two virtual indices, based on HamOrig and unitary. Do entire blocks at once.
+         /** \param theRotatedTEI The rotated two-body matrix elements are stored here.
+             \param unitary The unitary matrix to rotate Vmat(HamOrig) to theRotatedTEI.
+             \param mem1 Work memory with at least the size max(linsize of irreps)^4.
+             \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
+         void fillRotatedTEI(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
+         
          //! Fill the rotated two-body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize.
          /** \param HamDMRG The rotated two-body matrix elements are stored here.
              \param unitary The unitary matrix to rotate Vmat(HamOrig) to Vmat(HamDMRG).
@@ -75,6 +83,15 @@ namespace CheMPS2{
              \param maxBlockSize Parameter which indicates the size of the work memories.
              \param cutCorners If false, all rotated two-body matrix elements are calculated. If true, at most two virtual indices are considered. */
          void fillVmatRotatedBlockWise(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners) const;
+         
+         //! Fill the rotated two-body matrix elements with max. two virtual indices, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize.
+         /** \param theRotatedTEI The rotated two-body matrix elements are stored here.
+             \param unitary The unitary matrix to rotate Vmat(HamOrig) to theRotatedTEI.
+             \param mem1 Work memory with at least the size maxBlockSize^4.
+             \param mem2 Work memory with at least the size maxBlockSize^4.
+             \param mem3 Work memory with at least the size maxBlockSize^4.
+             \param maxBlockSize Parameter which indicates the size of the work memories. */
+         void fillRotatedTEIBlockWise(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize) const;
          
       private:
       
