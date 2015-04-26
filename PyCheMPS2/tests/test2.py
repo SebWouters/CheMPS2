@@ -19,7 +19,6 @@
 
 import numpy as np
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianFCIDUMP
 import ctypes
@@ -29,7 +28,7 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4.STO3G.FCIDUMP', 'c2v')
+Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/H2O.631G.FCIDUMP', 'c2v')
 
 # Define the symmetry sector
 TwoS  = 0    # Two times the targeted spin
@@ -42,13 +41,20 @@ Prob = PyCheMPS2.PyProblem(Ham, TwoS, Nelec, Irrep)
 # Setting up the ConvergenceScheme
 # setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
 OptScheme = PyCheMPS2.PyConvergenceScheme(2) # 2 instructions
-OptScheme.setInstruction(0,   30, 1e-10,  3, 0.1)
-OptScheme.setInstruction(1, 1000, 1e-10, 10, 0.0)
+OptScheme.setInstruction(0,  100, 1e-10,  3, 0.1)
+OptScheme.setInstruction(1, 3000, 1e-10, 10, 0.0)
 
 # Do DMRG calculation
 theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
 EnergyDMRG = theDMRG.Solve()
 theDMRG.calc2DMandCorrelations()
+
+# Clean-up
+# theDMRG.deleteStoredMPS()
+theDMRG.deleteStoredOperators()
+del theDMRG
+del OptScheme
+del Prob
 
 # Do FCI calculation
 Nel_up   = ( Nelec + TwoS ) / 2
@@ -60,31 +66,15 @@ GSvector = np.zeros([ theFCI.getVecLength() ], dtype=ctypes.c_double)
 GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
 EnergyFCI = theFCI.GSDavidson(GSvector)
 theFCI.CalcSpinSquared(GSvector)
-TwoRDM = np.zeros([ Ham.getL()**4 ], dtype=ctypes.c_double)
-theFCI.Fill2RDM(GSvector, TwoRDM)
-RMSerror2DM = 0.0
-for orb1 in range(0, Ham.getL()):
-    for orb2 in range(0, Ham.getL()):
-        for orb3 in range(0, Ham.getL()):
-            for orb4 in range(0, Ham.getL()):
-                temp = TwoRDM[orb1 + Ham.getL()*(orb2 + Ham.getL()*(orb3 + Ham.getL()*orb4))] - theDMRG.get2DMA(orb1,orb2,orb3,orb4)
-                RMSerror2DM += temp*temp
-RMSerror2DM = np.sqrt(RMSerror2DM)
-print "Frobenius norm of the difference of the DMRG and FCI 2-RDMs =", RMSerror2DM
 
 # Clean-up
-# theDMRG.deleteStoredMPS()
-theDMRG.deleteStoredOperators()
 del theFCI
-del theDMRG
-del OptScheme
-del Prob
 del Ham
 del Initializer
 
 # Check whether the test succeeded
-if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-10) and (RMSerror2DM < 1e-6)):
-    print "================> Did test 3 succeed : yes"
+if (np.fabs(EnergyDMRG - EnergyFCI) < 1e-10):
+    print "================> Did test 2 succeed : yes"
 else:
-    print "================> Did test 3 succeed : no"
+    print "================> Did test 2 succeed : no"
 

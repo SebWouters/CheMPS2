@@ -19,7 +19,6 @@
 
 import numpy as np
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianFCIDUMP
 import ctypes
@@ -29,7 +28,7 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.CCPVDZ.FCIDUMP', 'd2h')
+Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/N2.CCPVDZ.FCIDUMP', 'd2h')
 DOCC = np.array([ 3, 0, 0, 0, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see N2.ccpvdz.out
 SOCC = np.zeros([ 8 ], dtype=ctypes.c_int)
 L = Ham.getL()
@@ -48,10 +47,10 @@ NDMRG = np.zeros([L], dtype=ctypes.c_int)
 Nvirt = np.zeros([L], dtype=ctypes.c_int)
 Nocc[0] = Nocc[5] = 1
 Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0
-NDMRG[0] = NDMRG[5] = 2
+NDMRG[0] = NDMRG[5] = 4
 NDMRG[1] = NDMRG[4] = 0
 NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 1
-Nvirt[0] = Nvirt[5] = 4
+Nvirt[0] = Nvirt[5] = 2
 Nvirt[2] = Nvirt[3] = Nvirt[6] = Nvirt[7] = 2
 Nvirt[1] = Nvirt[4] = 1
 theDMRGSCF.setupStart(Nocc,NDMRG,Nvirt)
@@ -65,8 +64,7 @@ OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
 rootNum = 1 # Ground state only
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
-theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
-theDMRGSCFoptions.setDumpCorrelations(True)
+theDMRGSCFoptions.setWhichActiveSpace(2) # 2 means localized orbitals
 Energy = theDMRGSCF.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
 
 # Clean-up
@@ -83,8 +81,8 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 109.103502335253) < 1e-10):
-    print "================> Did test 8 succeed : yes"
+if (np.fabs(Energy + 109.15104350802) < 1e-10):
+    print "================> Did test 9 succeed : yes"
 else:
-    print "================> Did test 8 succeed : no"
+    print "================> Did test 9 succeed : no"
 

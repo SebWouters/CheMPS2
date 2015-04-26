@@ -19,7 +19,6 @@
 
 import numpy as np
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ctypes
 

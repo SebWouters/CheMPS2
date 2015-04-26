@@ -19,7 +19,7 @@
 
 cimport Ham
 
-cdef extern from "Problem.h" namespace "CheMPS2":
+cdef extern from "chemps2/Problem.h" namespace "CheMPS2":
     cdef cppclass Problem:
         Problem(const Ham.Hamiltonian *, const int, const int, const int) except +
         int gL()

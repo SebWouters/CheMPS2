@@ -21,7 +21,7 @@ cimport Ham
 cimport ConvScheme
 cimport DMRGSCFopt
 
-cdef extern from "FCI.h" namespace "CheMPS2":
+cdef extern from "chemps2/FCI.h" namespace "CheMPS2":
     cdef cppclass FCI:
         FCI(Ham.Hamiltonian *, const unsigned int, const unsigned int, const int, const double, const int) except +
         unsigned long long getVecLength(const int)

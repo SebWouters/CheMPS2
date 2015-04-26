@@ -20,7 +20,6 @@
 import numpy as np
 import math as m
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianFCIDUMP
 import ctypes
@@ -31,7 +30,7 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/O2.CCPVDZ.FCIDUMP', 'd2h')
+Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/O2.CCPVDZ.FCIDUMP', 'd2h')
 L = Ham.getL()
 
 # Dump the Hamiltonian HDF5 file

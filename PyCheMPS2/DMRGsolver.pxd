@@ -22,7 +22,7 @@ cimport Prob
 cimport Corr
 cimport TwoRDM
 
-cdef extern from "DMRG.h" namespace "CheMPS2":
+cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
     cdef cppclass DMRG:
         DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *) except +
         double Solve()

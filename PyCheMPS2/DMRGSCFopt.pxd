@@ -17,7 +17,7 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "DMRGSCFoptions.h" namespace "CheMPS2":
+cdef extern from "chemps2/DMRGSCFoptions.h" namespace "CheMPS2":
     cdef cppclass DMRGSCFoptions:
         DMRGSCFoptions() except +
         bint getDoDIIS()

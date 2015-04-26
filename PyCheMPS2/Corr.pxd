@@ -17,7 +17,7 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "Correlations.h" namespace "CheMPS2":
+cdef extern from "chemps2/Correlations.h" namespace "CheMPS2":
     cdef cppclass Correlations:
         double getCspin_HAM(const int row, const int col)
         double getCdens_HAM(const int row, const int col)

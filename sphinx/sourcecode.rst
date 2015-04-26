@@ -113,14 +113,21 @@ The tests only require a very limited amount of memory (order 10-120 MB).
 Build PyCheMPS2
 ---------------
 
-PyCheMPS2, a python inferface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation above generated the file ``/myfolder/chemps2/build/setup.py``, in which the library and include paths have been set to the ones in the build directory. In your terminal, run:
+PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with ``make install``. If you used a non-standard installation prefix, some environment variables must be set before installing the Python wrapper.
 
 .. code-block:: bash
-    
-    $ cd /myfolder/chemps2/build
-    $ python setup.py build_ext -i
 
-Compilation of PyCheMPS2 occurs by linking to the ``c++`` library in the build directory. However, when you want to run the tests in the next section, you should first install the ``c++`` library! If you have pulled a newer version of CheMPS2, please remember to (re)install the ``c++`` library first, before using PyCheMPS2!
+    $ cd /myfolder/chemps2/PyCheMPS2
+    $ PREFIX=... # Whatever prefix was given to CMake through -DCMAKE_INSTALL_PREFIX
+    $ export CPATH=${CPATH}:${PREFIX}/include
+    $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PREFIX}/lib64
+    $ python setup.py build_ext -L ${LD_LIBRARY_PATH}
+    $ python setup.py install --prefix=${PREFIX}
+
+The variable ``LD_LIBRARY_PATH`` must also be set at runtime, e.g. when running the tests below.
+
+Compilation of PyCheMPS2 occurs by linking to the ``c++`` library in installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to (re)install the ``c++`` library first, before reinstalling PyCheMPS2!
+
 
 Test PyCheMPS2
 --------------
@@ -129,7 +136,8 @@ To test PyCheMPS2, run:
 
 .. code-block:: bash
     
-    $ cd /myfolder/chemps2/build/PyTests
+    $ cd /myfolder/chemps2/PyChems2/tests
+    $ export PYTHONPATH=${PYTHONPATH}:${PREFIX}/lib64/python2.7/site-packages
     $ python test1.py
     $ python test2.py
     $ python test3.py

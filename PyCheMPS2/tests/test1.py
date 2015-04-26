@@ -19,7 +19,6 @@
 
 import numpy as np
 import sys
-sys.path.append('${CMAKE_BINARY_DIR}/PyCheMPS2')
 import PyCheMPS2
 import ReadinHamiltonianFCIDUMP
 import ctypes
@@ -29,7 +28,7 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.STO3G.FCIDUMP', 'd2h')
+Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/N2.STO3G.FCIDUMP', 'd2h')
 
 # Define the symmetry sector
 Nelec = 14 # The number of electrons
