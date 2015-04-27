@@ -66,7 +66,7 @@ CMake generates makefiles based on the user's specifications:
 
 #.  Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux.
 #.  Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
-#.  Option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/prefix/lib/x86_64-linux-gnu/`` and the headers in ``/prefix/include/chemps2``.
+#.  Option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/prefix/lib/x86_64-linux-gnu`` and the headers in ``/prefix/include/chemps2``.
 #.  Option4 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the doxygen documentation.
 #.  Option5 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile the user manual with sphinx.
 
@@ -112,13 +112,13 @@ The tests only require a very limited amount of memory (order 10-120 MB).
 Build PyCheMPS2
 ---------------
 
-PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with ``make install``. For non-standard installation directories of CheMPS2, please remember to append the library path to ``LD_LIBRARY_PATH`` in your ``.bashrc``. In addition, the include path should be appended to `CPATH`:
+PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with ``make install``. For non-standard installation directories of CheMPS2, please remember to append the library path to ``LD_LIBRARY_PATH`` in your ``.bashrc``. In addition, the include path should be appended to ``CPATH``:
 
 .. code-block:: bash
 
     $ export CPATH=${CPATH}:option3/include
     
-where ``option3`` is the one provided to CMake with ``-DCMAKE_INSTALL_PREFIX=option3`` above. Then the python wrapper can be installed with:
+where ``option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=option3`` above. Then the python wrapper can be installed with:
 
 .. code-block:: bash
 
