@@ -131,7 +131,8 @@ On my machine, the python wrapper is installed to the folder ``option3/lib/pytho
 Compilation of PyCheMPS2 occurs by linking to the ``c++`` library in the installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to reinstall the ``c++`` library first, before reinstalling PyCheMPS2!
 
 
-### 6. Test PyCheMPS2
+Test PyCheMPS2
+--------------
 
 To test PyCheMPS2 (remember that the python site-packages folder can vary), run:
 
