@@ -25,7 +25,7 @@ To perform DMRG-CI calculations, build `psi4 <http://www.psicode.org/>`_ with th
     $ psi4 --new-plugin dmrgci
     $ cd dmrgci
 
-Now, replace the file ``dmrgci.cc`` with ``/myfolder/chemps2/integrals/psi4plugins/dmrgci.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
+Now, replace the file ``dmrgci.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/dmrgci.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
 
 .. code-block:: bash
 
@@ -71,7 +71,7 @@ To perform DMRG-SCF calculations, build `psi4 <http://www.psicode.org/>`_ with t
     $ psi4 --new-plugin dmrgscf
     $ cd dmrgscf
 
-Now, replace the file ``dmrgscf.cc`` with ``/myfolder/chemps2/integrals/psi4plugins/dmrgscf.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
+Now, replace the file ``dmrgscf.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/dmrgscf.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
 
 .. code-block:: bash
 
@@ -111,11 +111,11 @@ pyscf
 
 Examples of how to extract MO integrals from `pyscf <http://sunqm.github.io/pyscf/>`_ to perform DMRG-CI calculations with PyCheMPS2 can be found in:
 
-#. ``/myfolder/chemps2/integrals/pyscf/example.py``
-#. ``/myfolder/chemps2/integrals/pyscf/example2.py``
-#. ``/myfolder/chemps2/integrals/pyscf/example3.py``
-#. ``/myfolder/chemps2/integrals/pyscf/dmrgci.py``
-#. ``/myfolder/chemps2/integrals/pyscf/call_chemps2.py``
+#. ``/sourcefolder/chemps2/integrals/pyscf/example.py``
+#. ``/sourcefolder/chemps2/integrals/pyscf/example2.py``
+#. ``/sourcefolder/chemps2/integrals/pyscf/example3.py``
+#. ``/sourcefolder/chemps2/integrals/pyscf/dmrgci.py``
+#. ``/sourcefolder/chemps2/integrals/pyscf/call_chemps2.py``
 
 Please remember to append the correct pyscf and PyCheMPS2 directories to ``sys.path`` at the top of these files.
 

@@ -62,7 +62,7 @@
 <span class="nv">$ </span><span class="nb">cd </span>dmrgci
 </pre></div>
 </div>
-<p>Now, replace the file <code class="docutils literal"><span class="pre">dmrgci.cc</span></code> with <code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/psi4plugins/dmrgci.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
+<p>Now, replace the file <code class="docutils literal"><span class="pre">dmrgci.cc</span></code> with <code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/psi4plugins/dmrgci.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">PSIPLUGIN</span> <span class="o">=</span> -L<span class="k">$(</span>OBJDIR<span class="k">)</span>/lib -lplugin
 </pre></div>
 </div>
@@ -124,7 +124,7 @@ plugin(&quot;dmrgci.so&quot;)
 <span class="nv">$ </span><span class="nb">cd </span>dmrgscf
 </pre></div>
 </div>
-<p>Now, replace the file <code class="docutils literal"><span class="pre">dmrgscf.cc</span></code> with <code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/psi4plugins/dmrgscf.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
+<p>Now, replace the file <code class="docutils literal"><span class="pre">dmrgscf.cc</span></code> with <code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/psi4plugins/dmrgscf.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">PSIPLUGIN</span> <span class="o">=</span> -L<span class="k">$(</span>OBJDIR<span class="k">)</span>/lib -lplugin
 </pre></div>
 </div>
@@ -189,11 +189,11 @@ plugin(&quot;dmrgscf.so&quot;)
 <p><a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a class="reference external" href="https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py">chemps2.py</a>.</p>
 <p>Examples of how to extract MO integrals from <a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> to perform DMRG-CI calculations with PyCheMPS2 can be found in:</p>
 <ol class="arabic simple">
-<li><code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/pyscf/example.py</span></code></li>
-<li><code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/pyscf/example2.py</span></code></li>
-<li><code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/pyscf/example3.py</span></code></li>
-<li><code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/pyscf/dmrgci.py</span></code></li>
-<li><code class="docutils literal"><span class="pre">/myfolder/chemps2/integrals/pyscf/call_chemps2.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example2.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example3.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/dmrgci.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/call_chemps2.py</span></code></li>
 </ol>
 <p>Please remember to append the correct pyscf and PyCheMPS2 directories to <code class="docutils literal"><span class="pre">sys.path</span></code> at the top of these files.</p>
 </div>
