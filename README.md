@@ -231,7 +231,7 @@ to `CPATH`:
 
     > export CPATH=${CPATH}:option3/include
     
-where `option3` is the one provided to CMake with
+where `option3` is the option provided to CMake with
 `-DCMAKE_INSTALL_PREFIX=option3` above. Then the python wrapper can
 be installed with:
 
