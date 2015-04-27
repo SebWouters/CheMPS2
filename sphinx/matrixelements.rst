@@ -41,7 +41,7 @@ To make use of this feature, build `psi4 <http://www.psicode.org/>`_ with the pl
     $ psi4 --new-plugin fcidump
     $ cd fcidump
 
-Now, replace the file ``fcidump.cc`` with ``/myfolder/chemps2/integrals/psi4plugins/fcidump.cc``. To compile the plugin, run:
+Now, replace the file ``fcidump.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/fcidump.cc``. To compile the plugin, run:
 
 .. code-block:: bash
 
@@ -58,7 +58,7 @@ This file (``N2.fcidump.in``) should be placed in the folder ``/mypsi4plugins``.
     $ cd /mypsi4plugins
     $ psi4 N2.fcidump.in N2.fcidump.out
 
-Examples of output generated with this plugin can be found in ``/myfolder/chemps2/tests/matrixelements``.
+Examples of output generated with this plugin can be found in ``/sourcefolder/chemps2/tests/matrixelements``.
 
 
 psi4 ``savehdf`` plugin
@@ -74,7 +74,7 @@ To make use of this feature, build `psi4 <http://www.psicode.org/>`_ with the pl
     $ psi4 --new-plugin savehdf
     $ cd savehdf
 
-Now, replace the file ``savehdf.cc`` with ``/myfolder/chemps2/integrals/psi4plugins/savehdf.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
+Now, replace the file ``savehdf.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/savehdf.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
 
 .. code-block:: bash
 

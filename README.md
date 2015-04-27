@@ -148,28 +148,27 @@ extended to a hybrid scheme with both shared (OpenMP) and distributed
 It is advised to clone the CheMPS2 git repository from github. In your
 terminal, run:
 
-    > cd /myfolder
+    > cd /sourcefolder
     > git clone 'https://github.com/sebwouters/chemps2'
     > cd chemps2
 
 That way, future updates and bug fixes can be easily pulled in:
 
-    > cd /myfolder/chemps2
+    > cd /sourcefolder/chemps2
     > git pull
 
 ### 3. Build libchemps2
 
 The files
 
-    /myfolder/chemps2/CMakeLists.txt
-    /myfolder/chemps2/CheMPS2/CMakeLists.txt
-    /myfolder/chemps2/tests/CMakeLists.txt
-    /myfolder/chemps2/PyCheMPS2/CMakeLists.txt
-    /myfolder/chemps2/sphinx/CMakeLists.txt
+    /sourcefolder/chemps2/CMakeLists.txt
+    /sourcefolder/chemps2/CheMPS2/CMakeLists.txt
+    /sourcefolder/chemps2/tests/CMakeLists.txt
+    /sourcefolder/chemps2/sphinx/CMakeLists.txt
 
 provide a minimal compilation. In your terminal, run:
 
-    > cd /myfolder/chemps2
+    > cd /sourcefolder/chemps2
     > mkdir build
     > cd build
 
@@ -183,7 +182,7 @@ CMake generates makefiles based on the user’s specifications:
     kernel library.
 3.  Option3 is the prefix of the installation directory; typically
     `/usr` or `/usr/local` on Linux. On my computer, libchemps2 is then
-    installed in `/prefix/lib/x86_64-linux-gnu/` and the headers in
+    installed in `/prefix/lib/x86_64-linux-gnu` and the headers in
     `/prefix/include/chemps2`.
 4.  Option4 can be `ON` or `OFF` and is used to switch on the
     possibility to compile the doxygen documentation.
@@ -215,34 +214,49 @@ library path to `LD_LIBRARY_PATH` in your `.bashrc`.
 
 To test libchemps2, run:
 
-    > cd /myfolder/chemps2/build
+    > cd /sourcefolder/chemps2/build
     > make test
 
-The tests only require a very limited amount of memory (order 10-120
-MB).
+The tests only require a very limited amount of memory (order 10-120 MB).
 
 ### 5. Build PyCheMPS2
 
-PyCheMPS2, a python inferface to libchemps2, can be built with
-[Cython](http://cython.org/). The installation above generated the file
-`/myfolder/chemps2/build/setup.py`, in which the library and include
-paths have been set to the ones in the build directory. In your
-terminal, run:
+PyCheMPS2, a python interface to libchemps2, can be built with
+[Cython](http://cython.org/). The installation is independent of
+CMake and assumes that you have installed the CheMPS2 library with
+`make install`. For non-standard installation directories of CheMPS2,
+please remember to append the library path to `LD_LIBRARY_PATH` in
+your `.bashrc`. In addition, the include path should be appended
+to `CPATH`:
 
-    > cd /myfolder/chemps2/build
-    > python setup.py build_ext -i
+    > export CPATH=${CPATH}:option3/include
+    
+where `option3` is the one provided to CMake with
+`-DCMAKE_INSTALL_PREFIX=option3` above. Then the python wrapper can
+be installed with:
 
-Compilation of PyCheMPS2 occurs by linking to the `c++` library in the
-build directory. However, when you want to run the tests in the next
-section, you should first install the `c++` library! If you have pulled
-a newer version of CheMPS2, please remember to (re)install the `c++`
-library first, before using PyCheMPS2!
+    > cd /sourcefolder/chemps2/PyCheMPS2
+    > python setup.py build_ext -L ${LD_LIBRARY_PATH}
+    > python setup.py install --prefix=option3
+
+On my machine, the python wrapper is installed to the folder
+`option3/lib/python2.7/site-packages`, but the folder `lib` and
+the distribution of python can vary.
+
+Compilation of PyCheMPS2 occurs by linking to the `c++` library in
+installation directory. The installation of PyCheMPS2 will fail if that
+library is not properly installed. If you have pulled a newer version of
+CheMPS2, please remember to (re)install the `c++` library first, before
+reinstalling PyCheMPS2!
+
 
 ### 6. Test PyCheMPS2
 
-To test PyCheMPS2, run:
+To test PyCheMPS2 (remember that the folder `lib` and the
+distribution of python can vary), run:
 
-    > cd /myfolder/chemps2/build/PyTests
+    > cd /sourcefolder/chemps2/PyChemps2/tests
+    > export PYTHONPATH=${PYTHONPATH}:option3/lib/python2.7/site-packages
     > python test1.py
     > python test2.py
     > python test3.py
@@ -274,7 +288,7 @@ require a very limited amount of memory (order 10-120 MB).
 To build the doxygen manual, the `BUILD_DOXYGEN` flag
 should have been on: `-DBUILD_DOXYGEN=ON`. In your terminal, run:
 
-    > cd /myfolder/chemps2/build
+    > cd /sourcefolder/chemps2/build
     > make doc
     > cd LaTeX-documents
     > make
@@ -287,7 +301,7 @@ should have been on: `-DBUILD_DOXYGEN=ON`. In your terminal, run:
 To build the sphinx user manual, the `BUILD_SPHINX` flag
 should have been on: `-DBUILD_SPHINX=ON`. In your terminal, run:
 
-    > cd /myfolder/chemps2/build
+    > cd /sourcefolder/chemps2/build
     > make sphinx
     > cd sphinx/html
     > firefox index.html &

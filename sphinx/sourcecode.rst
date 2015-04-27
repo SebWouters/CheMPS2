@@ -27,7 +27,7 @@ It is advised to clone the CheMPS2 git repository from github. In your terminal,
 
 .. code-block:: bash
 
-    $ cd /myfolder
+    $ cd /sourcefolder
     $ git clone 'https://github.com/sebwouters/chemps2'
     $ cd chemps2
     
@@ -35,7 +35,7 @@ That way, future updates and bug fixes can be easily pulled in:
 
 .. code-block:: bash
 
-    $ cd /myfolder/chemps2
+    $ cd /sourcefolder/chemps2
     $ git pull
 
 Build libchemps2
@@ -45,17 +45,16 @@ The files
 
 .. code-block:: bash
 
-    /myfolder/chemps2/CMakeLists.txt
-    /myfolder/chemps2/CheMPS2/CMakeLists.txt
-    /myfolder/chemps2/tests/CMakeLists.txt
-    /myfolder/chemps2/PyCheMPS2/CMakeLists.txt
-    /myfolder/chemps2/sphinx/CMakeLists.txt
+    /sourcefolder/chemps2/CMakeLists.txt
+    /sourcefolder/chemps2/CheMPS2/CMakeLists.txt
+    /sourcefolder/chemps2/tests/CMakeLists.txt
+    /sourcefolder/chemps2/sphinx/CMakeLists.txt
 
 provide a minimal compilation. In your terminal, run:
 
 .. code-block:: bash
 
-    $ cd /myfolder/chemps2
+    $ cd /sourcefolder/chemps2
     $ mkdir build
     $ cd build
 
@@ -105,7 +104,7 @@ To test libchemps2, run:
 
 .. code-block:: bash
     
-    $ cd /myfolder/chemps2/build
+    $ cd /sourcefolder/chemps2/build
     $ make test
 
 The tests only require a very limited amount of memory (order 10-120 MB).
@@ -113,31 +112,33 @@ The tests only require a very limited amount of memory (order 10-120 MB).
 Build PyCheMPS2
 ---------------
 
-PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with ``make install``. If you used a non-standard installation prefix, some environment variables must be set before installing the Python wrapper.
+PyCheMPS2, a python interface to libchemps2, can be built with `Cython <http://cython.org/>`_. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with ``make install``. For non-standard installation directories of CheMPS2, please remember to append the library path to ``LD_LIBRARY_PATH`` in your ``.bashrc``. In addition, the include path should be appended to `CPATH`:
 
 .. code-block:: bash
 
-    $ cd /myfolder/chemps2/PyCheMPS2
-    $ PREFIX=... # Whatever prefix was given to CMake through -DCMAKE_INSTALL_PREFIX
-    $ export CPATH=${CPATH}:${PREFIX}/include
-    $ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${PREFIX}/lib64
-    $ python setup.py build_ext -L ${LD_LIBRARY_PATH}
-    $ python setup.py install --prefix=${PREFIX}
+    $ export CPATH=${CPATH}:option3/include
+    
+where ``option3`` is the one provided to CMake with ``-DCMAKE_INSTALL_PREFIX=option3`` above. Then the python wrapper can be installed with:
 
-The variable ``LD_LIBRARY_PATH`` must also be set at runtime, e.g. when running the tests below.
+.. code-block:: bash
+
+    $ cd /sourcefolder/chemps2/PyCheMPS2
+    $ python setup.py build_ext -L ${LD_LIBRARY_PATH}
+    $ python setup.py install --prefix=option3
+
+On my machine, the python wrapper is installed to the folder ``option3/lib/python2.7/site-packages``, but the folder ``lib`` and the distribution of python can vary.
 
 Compilation of PyCheMPS2 occurs by linking to the ``c++`` library in installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to (re)install the ``c++`` library first, before reinstalling PyCheMPS2!
 
 
-Test PyCheMPS2
---------------
+### 6. Test PyCheMPS2
 
-To test PyCheMPS2, run:
+To test PyCheMPS2 (remember that the folder ``lib`` and the distribution of python can vary), run:
 
 .. code-block:: bash
-    
-    $ cd /myfolder/chemps2/PyChems2/tests
-    $ export PYTHONPATH=${PYTHONPATH}:${PREFIX}/lib64/python2.7/site-packages
+
+    $ cd /sourcefolder/chemps2/PyChemps2/tests
+    $ export PYTHONPATH=${PYTHONPATH}:option3/lib/python2.7/site-packages
     $ python test1.py
     $ python test2.py
     $ python test3.py
@@ -169,7 +170,7 @@ To build the doxygen manual, the ``BUILD_DOXYGEN`` flag should have been on: ``-
 
 .. code-block:: bash
     
-    $ cd /myfolder/chemps2/build
+    $ cd /sourcefolder/chemps2/build
     $ make doc
     $ cd LaTeX-documents
     $ make
@@ -186,7 +187,7 @@ To build the sphinx user manual, the ``BUILD_SPHINX`` flag should have been on: 
 
 .. code-block:: bash
 
-    $ cd /myfolder/chemps2/build
+    $ cd /sourcefolder/chemps2/build
     $ make sphinx
     $ cd sphinx/html
     $ firefox index.html &

@@ -6,4 +6,6 @@ objects
 *.o
 *.swp
 integrals/pyscf/*.pyc
+PyCheMPS2/build
+PyCheMPS2/PyCheMPS2.cpp
 
