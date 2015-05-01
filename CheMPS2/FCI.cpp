@@ -548,7 +548,7 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
       const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
       const unsigned int numPairs = irrep_center_num[ irrep_center ];
 
-      const unsigned int space_per_vectorpiece = (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);
+      const unsigned int space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));
       unsigned int numIterations = localVecLength / space_per_vectorpiece;
       if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
 
@@ -745,7 +745,7 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
       const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
       const unsigned int numPairs = irrep_center_num[ irrep_center ];
       
-      const unsigned int space_per_vectorpiece = (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);
+      const unsigned int space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));
       unsigned int numIterations = localVecLength / space_per_vectorpiece;
       if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
 
