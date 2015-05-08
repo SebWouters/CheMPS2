@@ -113,7 +113,7 @@ del Initializer
 success = True
 for cnt in range(len(TwoS)):
     success = success and (np.fabs(FCIenergies[cnt] - DMRGenergies[cnt]) < 1e-10)
-    success = success and (RMS_detcoeff[cnt] < 1e-6) # Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
+    success = success and (RMS_detcoeff[cnt] < 1e-4) # Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
 if (success):
     print "================> Did test 1 succeed : yes"
 else:
