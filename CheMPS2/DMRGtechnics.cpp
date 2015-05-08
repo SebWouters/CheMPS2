@@ -208,6 +208,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff) const{
    int * alpha = new int[ L ];
    int * beta  = new int[ L ];
    for ( int orb=0; orb<L; orb++ ){
+      assert( ( coeff[orb] >= 0 ) && ( coeff[orb] <= 2 ) );
       if ( coeff[orb] == 0 ){ alpha[orb] = 0; beta[orb] = 0; }
       if ( coeff[orb] == 1 ){ alpha[orb] = 1; beta[orb] = 0; }
       if ( coeff[orb] == 2 ){ alpha[orb] = 1; beta[orb] = 1; }
@@ -219,7 +220,7 @@ double CheMPS2::DMRG::getSpecificCoefficient(int * coeff) const{
 
 }
 
-double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGcoeff = coeff[Hamindex = Prob->gf2(DMRGindex)]
+double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGcoeff = alpha/beta[Hamindex = Prob->gf2(DMRGindex)]
 
    //Check if it's possible
    {
@@ -227,7 +228,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGco
       int twoSz = 0;
       int iTot = 0;
       for (int DMRGindex=0; DMRGindex<L; DMRGindex++){
-         int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
+         const int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
          assert( ( alpha[HamIndex] == 0 ) || ( alpha[HamIndex] == 1 ) );
          assert( (  beta[HamIndex] == 0 ) || (  beta[HamIndex] == 1 ) );
          nTot  += alpha[HamIndex] + beta[HamIndex];
@@ -235,16 +236,16 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGco
          if ((alpha[HamIndex]+beta[HamIndex])==1){ iTot = Irreps::directProd(iTot,denBK->gIrrep(DMRGindex)); }
       }
       if ( Prob->gN() != nTot ){
-         cout << "Ndesired = " << Prob->gN() << " and Ntotal in alpha and beta strings = " << nTot << endl;
+         cout << "DMRG::getFCIcoefficient : Ndesired = " << Prob->gN() << " and Ntotal in alpha and beta strings = " << nTot << endl;
          return 0.0;
       }
       // 2Sz can be -Prob->2S() ; -Prob->2S()+2 ; -Prob->2S()+4 ; ... ; Prob->2S()
       if ( ( Prob->gTwoS() < twoSz ) || ( twoSz < -Prob->gTwoS() ) || ( ( Prob->gTwoS() - twoSz ) % 2 != 0 ) ){
-         cout << "2Sdesired = " << Prob->gTwoS() << " and Sz in alpha and beta strings = " << twoSz << endl;
+         cout << "DMRG::getFCIcoefficient : 2Sdesired = " << Prob->gTwoS() << " and Sz in alpha and beta strings = " << twoSz << endl;
          return 0.0;
       }
       if ( Prob->gIrrep() != iTot ){
-         cout << "Idesired = " << Prob->gIrrep() << " and Irrep of alpha and beta strings = " << iTot << endl;
+         cout << "DMRG::getFCIcoefficient : Idesired = " << Prob->gIrrep() << " and Irrep of alpha and beta strings = " << iTot << endl;
          return 0.0;
       }
    }
@@ -321,6 +322,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGco
             for ( int cntSL = 0; cntSL < num_SL; cntSL++ ){
                if ( twoSL[cntSL] == TwoSLvalue ){
                   indexSL = cntSL;
+                  cntSL = num_SL; //exit loop
                }
             }
             if ( indexSL != -1 ){
@@ -331,8 +333,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGco
                                 * Heff::phase( -TwoSLvalue + spread - twoSRz );
                double add2array = 1.0;
                char notrans = 'N';
-               dgemm_( &notrans, &notrans, &dimFirst, &dimR, &dimL, &prefactor, arrayL + jumpL[indexSL], &dimFirst, Tblock, &dimL,
-                                                                    &add2array, arrayR + jumpR[cntSR], &dimFirst);
+               dgemm_( &notrans, &notrans, &dimFirst, &dimR, &dimL, &prefactor, arrayL + jumpL[indexSL], &dimFirst, Tblock, &dimL, &add2array, arrayR + jumpR[cntSR], &dimFirst);
             }
          }
       }

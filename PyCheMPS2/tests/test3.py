@@ -71,21 +71,6 @@ for orb1 in range(0, Ham.getL()):
 RMSerror2DM = np.sqrt(RMSerror2DM)
 print "Frobenius norm of the difference of the DMRG and FCI 2-RDMs =", RMSerror2DM
 
-'''# Check coefficients
-for orb1 in range( Ham.getL() ):
-    for orb2 in range( orb1 + 1, Ham.getL() ):
-        for orb3 in range( orb2 + 1, Ham.getL() ):
-            for orb4 in range( orb3 + 1, Ham.getL() ):
-                for orb5 in range( orb4 + 1, Ham.getL() ):
-                    alpha = np.zeros([ Ham.getL() ], dtype=ctypes.c_int)
-                    alpha[ orb1 ] = alpha[ orb2 ] = alpha[ orb3 ] = alpha[ orb4 ] = alpha[ orb5 ] = 1
-                    print alpha
-                    dmrg_coeff1 = theDMRG.getFCIcoefficient( alpha, alpha )
-                    fci_coeff   = theFCI.getFCIcoefficient( alpha, alpha, GSvector )
-                    print dmrg_coeff1
-                    print fci_coeff
-                    print "---------------"'''
-
 # Clean-up
 # theDMRG.deleteStoredMPS()
 theDMRG.deleteStoredOperators()

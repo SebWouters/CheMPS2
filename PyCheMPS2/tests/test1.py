@@ -36,6 +36,25 @@ TwoS  = np.array([0, 2, 4, 4, 2, 2], dtype=ctypes.c_int) # Two times the targete
 Irrep = np.array([0, 5, 0, 5, 2, 6], dtype=ctypes.c_int) # The targeted irreps (Ag, B1u, Ag, ... )
 FCIenergies  = np.zeros([len(TwoS)] ,dtype=ctypes.c_double)
 DMRGenergies = np.ones( [len(TwoS)] ,dtype=ctypes.c_double)
+RMS_detcoeff = np.ones( [len(TwoS)] ,dtype=ctypes.c_double)
+
+# Obtain a list of single species Slater determinants and their irrep
+def stringlist(theHam, theNel):
+    arrays = []
+    irreps = []
+    for counter in range(2**theHam.getL()):
+        thestring = np.array(list(bin(counter)[2:]))
+        theints   = map(int, thestring)
+        if (np.sum(theints) == theNel):
+            thearray = np.zeros([theHam.getL()], dtype=ctypes.c_int)
+            thearray[theHam.getL() - len(theints):] = theints
+            theirrep = 0
+            for orb in range(theHam.getL()):
+                if (thearray[ orb ] == 1):
+                    theirrep = theirrep ^ theHam.getOrbitalIrrep(orb) # XOR
+            arrays.append(thearray)
+            irreps.append(theirrep)
+    return (arrays, irreps)
 
 for cnt in range(0, len(TwoS)):
 
@@ -49,11 +68,10 @@ for cnt in range(0, len(TwoS)):
     GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
     FCIenergies[cnt] = theFCI.GSDavidson(GSvector)
     theFCI.CalcSpinSquared(GSvector)
-    del theFCI
     
     # Setting up the Problem
     Prob = PyCheMPS2.PyProblem(Ham, TwoS[cnt], Nelec, Irrep[cnt])
-    # Prob.SetupReorderD2h() # Not used in cpp file
+    Prob.SetupReorderD2h() # Determinant coefficient comparison OK both with option ON and OFF
     
     # To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
     OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
@@ -64,10 +82,25 @@ for cnt in range(0, len(TwoS)):
     theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
     DMRGenergies[cnt] = theDMRG.Solve()
     theDMRG.calc2DMandCorrelations()
+    
+    # Compare the FCI and DMRG determinant coefficients
+    list_alpha, irrep_alpha = stringlist(Ham, Nel_up  )
+    list_beta,  irrep_beta  = stringlist(Ham, Nel_down)
+    rms_abs = 0.0
+    for count_alpha in range(len(irrep_alpha)):
+        for count_beta in range(len(irrep_beta)):
+            if ((irrep_alpha[count_alpha] ^ irrep_beta[count_beta]) == Irrep[cnt]):
+                dmrg_coeff = theDMRG.getFCIcoefficient(list_alpha[count_alpha], list_beta[count_beta])
+                fci_coeff  =  theFCI.getFCIcoefficient(list_alpha[count_alpha], list_beta[count_beta], GSvector)
+                temp       = abs(dmrg_coeff) - abs(fci_coeff)
+                rms_abs   += temp * temp
+    RMS_detcoeff[cnt] = np.sqrt(rms_abs)
+    print "RMS difference FCI and DMRG determinant coefficients =", RMS_detcoeff[cnt]
 
     # Clean-up
     # theDMRG.deleteStoredMPS()
     theDMRG.deleteStoredOperators()
+    del theFCI
     del theDMRG
     del OptScheme
     del Prob
@@ -78,8 +111,9 @@ del Initializer
 
 # Check whether the test succeeded
 success = True
-for cnt in range(0, len(TwoS)):
+for cnt in range(len(TwoS)):
     success = success and (np.fabs(FCIenergies[cnt] - DMRGenergies[cnt]) < 1e-10)
+    success = success and (RMS_detcoeff[cnt] < 1e-6) # Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
 if (success):
     print "================> Did test 1 succeed : yes"
 else:
