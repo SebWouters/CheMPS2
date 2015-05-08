@@ -548,140 +548,140 @@ sectors.
 [CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container
 class for the one-body matrix elements.
     
-[CheMPS2/include/CASSCF.h](CheMPS2/include/CASSCF.h) contains the definitions of the CASSCF class.
+[CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.
 
-[CheMPS2/include/ConvergenceScheme.h](CheMPS2/include/ConvergenceScheme.h) contains the definitions of the
+[CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the
 ConvergenceScheme class.
 
-[CheMPS2/include/Correlations.h](CheMPS2/include/Correlations.h) contains the definitions of the
+[CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the
 Correlations class.
 
-[CheMPS2/include/Davidson.h](CheMPS2/include/Davidson.h) contains the definitions of the
+[CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the
 Davidson class.
 
-[CheMPS2/include/DIIS.h](CheMPS2/include/DIIS.h) contains the definitions of the DIIS class.
+[CheMPS2/include/chemps2/DIIS.h](CheMPS2/include/chemps2/DIIS.h) contains the definitions of the DIIS class.
 
-[CheMPS2/include/DMRG.h](CheMPS2/include/DMRG.h) contains the definitions of the DMRG class.
+[CheMPS2/include/chemps2/DMRG.h](CheMPS2/include/chemps2/DMRG.h) contains the definitions of the DMRG class.
 
-[CheMPS2/include/DMRGSCFindices.h](CheMPS2/include/DMRGSCFindices.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFindices.h](CheMPS2/include/chemps2/DMRGSCFindices.h) contains the definitions of the
 DMRGSCFindices class.
 
-[CheMPS2/include/DMRGSCFintegrals.h](CheMPS2/include/DMRGSCFintegrals.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFintegrals.h](CheMPS2/include/chemps2/DMRGSCFintegrals.h) contains the definitions of the
 DMRGSCFintegrals class.
 
-[CheMPS2/include/DMRGSCFmatrix.h](CheMPS2/include/DMRGSCFmatrix.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFmatrix.h](CheMPS2/include/chemps2/DMRGSCFmatrix.h) contains the definitions of the
 DMRGSCFmatrix class.
 
-[CheMPS2/include/DMRGSCFoptions.h](CheMPS2/include/DMRGSCFoptions.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the
 DMRGSCFoptions container class.
 
-[CheMPS2/include/DMRGSCFunitary.h](CheMPS2/include/DMRGSCFunitary.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the
 DMRGSCFunitary class.
 
-[CheMPS2/include/DMRGSCFVmatRotations.h](CheMPS2/include/DMRGSCFVmatRotations.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFVmatRotations.h](CheMPS2/include/chemps2/DMRGSCFVmatRotations.h) contains the definitions of the
 DMRGSCFVmatRotations class.
 
-[CheMPS2/include/DMRGSCFwtilde.h](CheMPS2/include/DMRGSCFwtilde.h) contains the definitions of the
+[CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the
 DMRGSCFwtilde class.
 
-[CheMPS2/include/EdmistonRuedenberg.h](CheMPS2/include/EdmistonRuedenberg.h) contains the definitions of the
+[CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the
 EdmistonRuedenberg class.
 
-[CheMPS2/include/FCI.h](CheMPS2/include/FCI.h) contains the definitions of the FCI class.
+[CheMPS2/include/chemps2/FCI.h](CheMPS2/include/chemps2/FCI.h) contains the definitions of the FCI class.
 
-[CheMPS2/include/FourIndex.h](CheMPS2/include/FourIndex.h) contains the definitions of the FourIndex
+[CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex
 class.
 
-[CheMPS2/include/Gsl.h](CheMPS2/include/Gsl.h) contains the definitions of the external GSL
+[CheMPS2/include/chemps2/Gsl.h](CheMPS2/include/chemps2/Gsl.h) contains the definitions of the external GSL
 routines.
 
-[CheMPS2/include/Hamiltonian.h](CheMPS2/include/Hamiltonian.h) contains the definitions of the Hamiltonian
+[CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian
 class.
 
-[CheMPS2/include/Heff.h](CheMPS2/include/Heff.h) contains the definitions of the Heff class.
+[CheMPS2/include/chemps2/Heff.h](CheMPS2/include/chemps2/Heff.h) contains the definitions of the Heff class.
 
-[CheMPS2/include/Initialize.h](CheMPS2/include/Initialize.h) contains the definitions of the Initialize
+[CheMPS2/include/chemps2/Initialize.h](CheMPS2/include/chemps2/Initialize.h) contains the definitions of the Initialize
 class.
 
-[CheMPS2/include/Irreps.h](CheMPS2/include/Irreps.h) contains the definitions of the Irrep class.
+[CheMPS2/include/chemps2/Irreps.h](CheMPS2/include/chemps2/Irreps.h) contains the definitions of the Irrep class.
 
-[CheMPS2/include/Lapack.h](CheMPS2/include/Lapack.h) contains the definitions of the external BLAS
+[CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS
 and LAPACK routines.
 
-[CheMPS2/include/MyHDF5.h](CheMPS2/include/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. 
+[CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. 
 H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.
 
-[CheMPS2/include/Options.h](CheMPS2/include/Options.h) contains all the options of the CheMPS2
+[CheMPS2/include/chemps2/Options.h](CheMPS2/include/chemps2/Options.h) contains all the options of the CheMPS2
 namespace. Here the checkpoint storage names and folders can be set, as well
 as parameters related to memory usage and convergence.
 
-[CheMPS2/include/Problem.h](CheMPS2/include/Problem.h) contains the definitions of the Problem class.
+[CheMPS2/include/chemps2/Problem.h](CheMPS2/include/chemps2/Problem.h) contains the definitions of the Problem class.
 
-[CheMPS2/include/Sobject.h](CheMPS2/include/Sobject.h) contains the definitions of the Sobject class.
+[CheMPS2/include/chemps2/Sobject.h](CheMPS2/include/chemps2/Sobject.h) contains the definitions of the Sobject class.
 
-[CheMPS2/include/SyBookkeeper.h](CheMPS2/include/SyBookkeeper.h) contains the definitions of the
+[CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
 
-[CheMPS2/include/TensorA.h](CheMPS2/include/TensorA.h) contains the definitions of the TensorA class.
+[CheMPS2/include/chemps2/TensorA.h](CheMPS2/include/chemps2/TensorA.h) contains the definitions of the TensorA class.
 
-[CheMPS2/include/TensorB.h](CheMPS2/include/TensorB.h) contains the definitions of the TensorB class.
+[CheMPS2/include/chemps2/TensorB.h](CheMPS2/include/chemps2/TensorB.h) contains the definitions of the TensorB class.
 
-[CheMPS2/include/TensorC.h](CheMPS2/include/TensorC.h) contains the definitions of the TensorC class.
+[CheMPS2/include/chemps2/TensorC.h](CheMPS2/include/chemps2/TensorC.h) contains the definitions of the TensorC class.
 
-[CheMPS2/include/TensorD.h](CheMPS2/include/TensorD.h) contains the definitions of the TensorD class.
+[CheMPS2/include/chemps2/TensorD.h](CheMPS2/include/chemps2/TensorD.h) contains the definitions of the TensorD class.
 
-[CheMPS2/include/TensorDiag.h](CheMPS2/include/TensorDiag.h) contains the definitions of the
+[CheMPS2/include/chemps2/TensorDiag.h](CheMPS2/include/chemps2/TensorDiag.h) contains the definitions of the
 TensorDiag class.
 
-[CheMPS2/include/TensorF0Cbase.h](CheMPS2/include/TensorF0Cbase.h) contains the definitions of the
+[CheMPS2/include/chemps2/TensorF0Cbase.h](CheMPS2/include/chemps2/TensorF0Cbase.h) contains the definitions of the
 TensorF0Cbase class.
 
-[CheMPS2/include/TensorF0.h](CheMPS2/include/TensorF0.h) contains the definitions of the TensorF0 class.
+[CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.
 
-[CheMPS2/include/TensorF1Dbase.h](CheMPS2/include/TensorF1Dbase.h) contains the definitions of the
+[CheMPS2/include/chemps2/TensorF1Dbase.h](CheMPS2/include/chemps2/TensorF1Dbase.h) contains the definitions of the
 TensorF1Dbase class.
 
-[CheMPS2/include/TensorF1.h](CheMPS2/include/TensorF1.h) contains the definitions of the TensorF1 class.
+[CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.
 
-[CheMPS2/include/TensorGYZ.h](CheMPS2/include/TensorGYZ.h) contains the definitions of the TensorGYZ
+[CheMPS2/include/chemps2/TensorGYZ.h](CheMPS2/include/chemps2/TensorGYZ.h) contains the definitions of the TensorGYZ
 class.
 
-[CheMPS2/include/Tensor.h](CheMPS2/include/Tensor.h) contains the definitions of the virtual Tensor
+[CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor
 class.
 
-[CheMPS2/include/TensorK.h](CheMPS2/include/TensorK.h) contains the definitions of the TensorK class.
+[CheMPS2/include/chemps2/TensorK.h](CheMPS2/include/chemps2/TensorK.h) contains the definitions of the TensorK class.
 
-[CheMPS2/include/TensorL.h](CheMPS2/include/TensorL.h) contains the definitions of the TensorL class.
+[CheMPS2/include/chemps2/TensorL.h](CheMPS2/include/chemps2/TensorL.h) contains the definitions of the TensorL class.
 
-[CheMPS2/include/TensorM.h](CheMPS2/include/TensorM.h) contains the definitions of the TensorM class.
+[CheMPS2/include/chemps2/TensorM.h](CheMPS2/include/chemps2/TensorM.h) contains the definitions of the TensorM class.
 
-[CheMPS2/include/TensorO.h](CheMPS2/include/TensorO.h) contains the definitions of the TensorO class.
+[CheMPS2/include/chemps2/TensorO.h](CheMPS2/include/chemps2/TensorO.h) contains the definitions of the TensorO class.
 
-[CheMPS2/include/TensorQ.h](CheMPS2/include/TensorQ.h) contains the definitions of the TensorQ class.
+[CheMPS2/include/chemps2/TensorQ.h](CheMPS2/include/chemps2/TensorQ.h) contains the definitions of the TensorQ class.
 
-[CheMPS2/include/TensorS0Abase.h](CheMPS2/include/TensorS0Abase.h) contains the definitions of the
+[CheMPS2/include/chemps2/TensorS0Abase.h](CheMPS2/include/chemps2/TensorS0Abase.h) contains the definitions of the
 TensorS0Abase class.
 
-[CheMPS2/include/TensorS0.h](CheMPS2/include/TensorS0.h) contains the definitions of the TensorS0 class.
+[CheMPS2/include/chemps2/TensorS0.h](CheMPS2/include/chemps2/TensorS0.h) contains the definitions of the TensorS0 class.
 
-[CheMPS2/include/TensorS1Bbase.h](CheMPS2/include/TensorS1Bbase.h) contains the definitions of the
+[CheMPS2/include/chemps2/TensorS1Bbase.h](CheMPS2/include/chemps2/TensorS1Bbase.h) contains the definitions of the
 TensorS1Bbase class.
 
-[CheMPS2/include/TensorS1.h](CheMPS2/include/TensorS1.h) contains the definitions of the TensorS1 class.
+[CheMPS2/include/chemps2/TensorS1.h](CheMPS2/include/chemps2/TensorS1.h) contains the definitions of the TensorS1 class.
 
-[CheMPS2/include/TensorSwap.h](CheMPS2/include/TensorSwap.h) contains the definitions of the TensorSwap
+[CheMPS2/include/chemps2/TensorSwap.h](CheMPS2/include/chemps2/TensorSwap.h) contains the definitions of the TensorSwap
 class.
 
-[CheMPS2/include/TensorT.h](CheMPS2/include/TensorT.h) contains the definitions of the TensorT class.
+[CheMPS2/include/chemps2/TensorT.h](CheMPS2/include/chemps2/TensorT.h) contains the definitions of the TensorT class.
 
-[CheMPS2/include/TensorX.h](CheMPS2/include/TensorX.h) contains the definitions of the TensorX class.
+[CheMPS2/include/chemps2/TensorX.h](CheMPS2/include/chemps2/TensorX.h) contains the definitions of the TensorX class.
 
-[CheMPS2/include/TwoDM.h](CheMPS2/include/TwoDM.h) contains the definitions of the TwoDM class.
+[CheMPS2/include/chemps2/TwoDM.h](CheMPS2/include/chemps2/TwoDM.h) contains the definitions of the TwoDM class.
 
-[CheMPS2/include/TwoDMstorage.h](CheMPS2/include/TwoDMstorage.h) contains the definitions of the
+[CheMPS2/include/chemps2/TwoDMstorage.h](CheMPS2/include/chemps2/TwoDMstorage.h) contains the definitions of the
 TwoDMstorage class.
 
-[CheMPS2/include/TwoIndex.h](CheMPS2/include/TwoIndex.h) contains the definitions of the TwoIndex
+[CheMPS2/include/chemps2/TwoIndex.h](CheMPS2/include/chemps2/TwoIndex.h) contains the definitions of the TwoIndex
 class.
 
 Please note that these files are documented with doxygen comments. The

@@ -743,7 +743,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CheMPS2_SOURCE_DIR@/CheMPS2/include/ \
+INPUT                  = @CheMPS2_SOURCE_DIR@/CheMPS2/include/chemps2 \
                          @CheMPS2_SOURCE_DIR@/CheMPS2/ \
                          @CheMPS2_SOURCE_DIR@
 

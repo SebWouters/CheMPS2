@@ -1,4 +1,4 @@
-include_directories (${CMAKE_SOURCE_DIR}/CheMPS2/include/ ${HDF5_INCLUDE_DIRS})
+include_directories (${CMAKE_SOURCE_DIR}/CheMPS2/include/chemps2/ ${HDF5_INCLUDE_DIRS})
 
 link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
 
