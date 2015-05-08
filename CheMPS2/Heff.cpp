@@ -245,11 +245,4 @@ double CheMPS2::Heff::SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, Tensor
 
 }
 
-int CheMPS2::Heff::phase(const int TwoTimesPower){
-
-   return (((TwoTimesPower/2)%2)!=0)?-1:1;
-
-}
-
-
 

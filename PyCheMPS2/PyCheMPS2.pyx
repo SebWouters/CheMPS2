@@ -162,7 +162,11 @@ cdef class PyDMRG:
         self.thisptr.get2DM().save()
     def read(self):
         self.thisptr.get2DM().read()
-    
+    def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None):
+        assert alpha.flags['C_CONTIGUOUS']
+        assert  beta.flags['C_CONTIGUOUS']
+        return self.thisptr.getFCIcoefficient(&alpha[0],&beta[0])
+
 cdef class PyDMRGSCFoptions:
     cdef DMRGSCFopt.DMRGSCFoptions * thisptr
     def __cinit__(self):
@@ -256,6 +260,11 @@ cdef class PyFCI:
     def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
         self.thisptr.FillRandom(vecLength, &vector[0])
+    def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None, np.ndarray[double, ndim=1, mode="c"] GSvector not None):
+        assert    alpha.flags['C_CONTIGUOUS']
+        assert     beta.flags['C_CONTIGUOUS']
+        assert GSvector.flags['C_CONTIGUOUS']
+        return self.thisptr.getFCIcoeff(&alpha[0], &beta[0], &GSvector[0])
     def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])

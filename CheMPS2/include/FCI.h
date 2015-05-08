@@ -268,6 +268,13 @@ namespace CheMPS2{
          
          //void CheckHamDEBUG() const;
          
+         //! Function which returns a FCI coefficient
+         /** \param bits_up The bit string representation of the up or alpha electron Slater determinant
+             \param bits_down The bit string representation of the down or beta electron Slater determinant
+             \param vector The FCI vector with getVecLength(0) variables from which a coefficient is desired
+             \return The corresponding FCI coefficient; 0.0 if bits_up and bits_down do not form a valid FCI determinant */
+         double getFCIcoeff(int * bits_up, int * bits_down, double * vector) const;
+         
       protected:
       
 //==========> Functions involving Hamiltonian matrix elements
@@ -295,13 +302,6 @@ namespace CheMPS2{
          double GetMatrixElement(int * bits_bra_up, int * bits_bra_down, int * bits_ket_up, int * bits_ket_down, int * work) const;
          
 //==========> Basic conversions between bit string representations
-      
-         //! Function which returns a FCI coefficient
-         /** \param bits_up The bit string representation of the up or alpha electron Slater determinant
-             \param bits_down The bit string representation of the down or beta electron Slater determinant
-             \param vector The FCI vector with getVecLength(0) variables from which a coefficient is desired
-             \return The corresponding FCI coefficient; 0.0 if bits_up and bits_down do not form a valid FCI determinant */
-         double getFCIcoeff(int * bits_up, int * bits_down, double * vector) const;
       
          //! Find the bit representation of a global counter corresponding to " E_ij | FCI vector > " ; where irrep_center = I_i x I_j
          /** \param irrep_center The single electron excitation irrep I_i x I_j

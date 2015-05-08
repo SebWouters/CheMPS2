@@ -23,12 +23,15 @@
 #include <string>
 #include <algorithm>
 #include <math.h>
+#include <assert.h>
 
 #include "DMRG.h"
 #include "Lapack.h"
 #include "TensorK.h"
 #include "TensorM.h"
 #include "TensorGYZ.h"
+#include "Gsl.h"
+#include "Heff.h"
 
 using std::cout;
 using std::endl;
@@ -200,88 +203,174 @@ CheMPS2::TwoDM * CheMPS2::DMRG::get2DM(){ return the2DM; }
 
 CheMPS2::Correlations * CheMPS2::DMRG::getCorrelations(){ return theCorr; }
 
-double CheMPS2::DMRG::getSpecificCoefficient(int * coeff){ //DMRGcoeff = coeff[Hamindex = Prob->gf2(DMRGindex)]
+double CheMPS2::DMRG::getSpecificCoefficient(int * coeff) const{
+   
+   int * alpha = new int[ L ];
+   int * beta  = new int[ L ];
+   for ( int orb=0; orb<L; orb++ ){
+      if ( coeff[orb] == 0 ){ alpha[orb] = 0; beta[orb] = 0; }
+      if ( coeff[orb] == 1 ){ alpha[orb] = 1; beta[orb] = 0; }
+      if ( coeff[orb] == 2 ){ alpha[orb] = 1; beta[orb] = 1; }
+   }
+   const double FCIcoeff = getFCIcoefficient( alpha, beta );
+   delete [] alpha;
+   delete [] beta;
+   return FCIcoeff;
+
+}
+
+double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta) const{ //DMRGcoeff = coeff[Hamindex = Prob->gf2(DMRGindex)]
 
    //Check if it's possible
-   int nTot = 0;
-   int twoStot = 0;
-   int iTot = 0;
-   for (int cnt=0; cnt<L; cnt++){
-      int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(cnt) : cnt;
-      nTot += coeff[HamIndex];
-      twoStot += (coeff[HamIndex]==1)?1:0;
-      if (coeff[HamIndex]==1){ iTot = Irreps::directProd(iTot,denBK->gIrrep(cnt)); }
-   }
-   if ( Prob->gN() != nTot ){
-      cout << "Ndesired = " << Prob->gN() << " and nTot in int * coeff = " << nTot << endl;
-      return 0.0;
-   }
-   if ( Prob->gTwoS() != twoStot ){
-      cout << "2Sdesired = " << Prob->gTwoS() << " and number of unpaired electrons in int * coeff = " << twoStot << endl;
-      return 0.0;
-   }
-   if (Prob->gIrrep() != iTot ){
-      cout << "Idesired = " << Prob->gIrrep() << " and global irrep of the unpaired electrons in int * coeff = " << iTot << endl;
-      return 0.0;
-   }
-   
-   //Construct two matrices
-   int Dmax = 1;
-   for (int cnt=1; cnt<L; cnt++){
-      int DmaxBound = denBK->gMaxDimAtBound(cnt);
-      if (DmaxBound>Dmax){ Dmax = DmaxBound; }
-   }
-   double * matA = new double[Dmax*Dmax];
-   double * matB = new double[Dmax*Dmax];
-   
-   //Multiply and find coefficient
-   matA[0] = 1.0;
-   int dimFirst = 1;
-   int NL = 0;
-   int TwoSL = 0;
-   int IL = 0;
-   int dimL = 1;
-   
-   double alpha = 1.0;
-   double beta = 0.0;
-   char notrans = 'N';
-   
-   for (int cnt=0; cnt<L; cnt++){
-
-      //Right symmetry sector
-      int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(cnt) : cnt;
-      int NR = NL + coeff[HamIndex];
-      int TwoSR, IR;
-      if (coeff[HamIndex]==1){
-         TwoSR = TwoSL + 1;
-         IR = Irreps::directProd(IL,denBK->gIrrep(cnt));
-      } else {
-         TwoSR = TwoSL;
-         IR = IL;
+   {
+      int nTot = 0;
+      int twoSz = 0;
+      int iTot = 0;
+      for (int DMRGindex=0; DMRGindex<L; DMRGindex++){
+         int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
+         assert( ( alpha[HamIndex] == 0 ) || ( alpha[HamIndex] == 1 ) );
+         assert( (  beta[HamIndex] == 0 ) || (  beta[HamIndex] == 1 ) );
+         nTot  += alpha[HamIndex] + beta[HamIndex];
+         twoSz += alpha[HamIndex] - beta[HamIndex];
+         if ((alpha[HamIndex]+beta[HamIndex])==1){ iTot = Irreps::directProd(iTot,denBK->gIrrep(DMRGindex)); }
       }
-      int dimR = denBK->gCurrentDim(cnt+1,NR,TwoSR,IR);
-      
-      //Multiply
-      double * Tblock = MPS[cnt]->gStorage(NL,TwoSL,IL,NR,TwoSR,IR);
-      dgemm_(&notrans,&notrans,&dimFirst,&dimR,&dimL,&alpha,matA,&dimFirst,Tblock,&dimL,&beta,matB,&dimFirst);
-      Tblock = matA;
-      matA = matB;
-      matB = Tblock;
-      
-      //Right becomes left
-      dimL = dimR;
-      NL = NR;
-      TwoSL = TwoSR;
-      IL = IR;
-
+      if ( Prob->gN() != nTot ){
+         cout << "Ndesired = " << Prob->gN() << " and Ntotal in alpha and beta strings = " << nTot << endl;
+         return 0.0;
+      }
+      // 2Sz can be -Prob->2S() ; -Prob->2S()+2 ; -Prob->2S()+4 ; ... ; Prob->2S()
+      if ( ( Prob->gTwoS() < twoSz ) || ( twoSz < -Prob->gTwoS() ) || ( ( Prob->gTwoS() - twoSz ) % 2 != 0 ) ){
+         cout << "2Sdesired = " << Prob->gTwoS() << " and Sz in alpha and beta strings = " << twoSz << endl;
+         return 0.0;
+      }
+      if ( Prob->gIrrep() != iTot ){
+         cout << "Idesired = " << Prob->gIrrep() << " and Irrep of alpha and beta strings = " << iTot << endl;
+         return 0.0;
+      }
    }
    
-   double desCoeff = matA[0];
+   //Construct necessary arrays
+   int Dmax = 1;
+   for (int DMRGindex=1; DMRGindex<L; DMRGindex++){
+      const int DtotBound = denBK->gTotDimAtBound(DMRGindex);
+      if (DtotBound>Dmax){ Dmax = DtotBound; }
+   }
+   double * arrayL = new double[Dmax];
+   double * arrayR = new double[Dmax];
+   int * twoSL = new int[L];
+   int * twoSR = new int[L];
+   int * jumpL = new int[L+1];
+   int * jumpR = new int[L+1];
    
-   delete [] matA;
-   delete [] matB;
+   //Start the iterator
+   int num_SL = 0;
+   jumpL[num_SL] = 0;
+   int dimFirst = 1;
+   jumpL[num_SL+1] = jumpL[num_SL] + dimFirst;
+   twoSL[num_SL] = 0;
+   num_SL++;
+   arrayL[0] = 1.0;
+   int NL = 0;
+   int IL = 0;
+   int twoSLz = 0;
    
-   return desCoeff;
+   for (int DMRGindex=0; DMRGindex<L; DMRGindex++){
+   
+      //Clear the right array
+      for (int count = 0; count < Dmax; count++){ arrayR[count] = 0.0; }
+      
+      //The local occupation
+      const int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
+      const int Nlocal   = alpha[HamIndex] + beta[HamIndex];
+      const int twoSzloc = alpha[HamIndex] - beta[HamIndex];
+      
+      //The right symmetry sectors
+      const int NR     = NL + Nlocal;
+      const int twoSRz = twoSLz + twoSzloc;
+      const int IR     = (( Nlocal == 1 ) ? (Irreps::directProd(IL,denBK->gIrrep(DMRGindex))) : IL);
+      
+      int num_SR = 0;
+      jumpR[num_SR] = 0;
+      const int spread = ( ( Nlocal == 1 ) ? 1 : 0 );
+      for ( int cntSL = 0; cntSL < num_SL; cntSL++ ){
+         for ( int TwoSRattempt = twoSL[cntSL] - spread; TwoSRattempt <= twoSL[cntSL] + spread; TwoSRattempt+=2 ){
+            bool encountered = false;
+            for ( int cntSR = 0; cntSR < num_SR; cntSR++ ){
+               if ( twoSR[cntSR] == TwoSRattempt ){
+                  encountered = true;
+               }
+            }
+            if ( encountered == false ){
+               const int dimR = denBK->gCurrentDim(DMRGindex+1,NR,TwoSRattempt,IR);
+               if ( dimR > 0 ){
+                  jumpR[num_SR+1] = jumpR[num_SR] + dimR;
+                  twoSR[num_SR] = TwoSRattempt;
+                  num_SR++;
+               }
+            }
+         }
+      }
+      assert( jumpR[num_SR] <= Dmax );
+      
+      for ( int cntSR = 0; cntSR < num_SR; cntSR++ ){
+         int TwoSRvalue = twoSR[ cntSR ];
+         int dimR = jumpR[ cntSR+1 ] - jumpR[ cntSR ];
+         for ( int TwoSLvalue = TwoSRvalue - spread; TwoSLvalue <= TwoSRvalue + spread; TwoSLvalue += 2 ){
+         
+            int indexSL = -1;
+            for ( int cntSL = 0; cntSL < num_SL; cntSL++ ){
+               if ( twoSL[cntSL] == TwoSLvalue ){
+                  indexSL = cntSL;
+               }
+            }
+            if ( indexSL != -1 ){
+               int dimL = jumpL[ indexSL+1 ] - jumpL[ indexSL ];
+               double * Tblock = MPS[DMRGindex]->gStorage(NL,TwoSLvalue,IL,NR,TwoSRvalue,IR);
+               double prefactor = sqrt( TwoSRvalue + 1 )
+                                * gsl_sf_coupling_3j(TwoSLvalue, spread, TwoSRvalue, twoSLz, twoSzloc, -twoSRz)
+                                * Heff::phase( -TwoSLvalue + spread - twoSRz );
+               double add2array = 1.0;
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimFirst, &dimR, &dimL, &prefactor, arrayL + jumpL[indexSL], &dimFirst, Tblock, &dimL,
+                                                                    &add2array, arrayR + jumpR[cntSR], &dimFirst);
+            }
+         }
+      }
+      
+      //Swap L <--> R
+      {
+         double * temp = arrayR;
+         arrayR = arrayL;
+         arrayL = temp;
+         int * temp2 = twoSR;
+         twoSR = twoSL;
+         twoSL = temp2;
+         temp2 = jumpR;
+         jumpR = jumpL;
+         jumpL = temp2;
+         num_SL = num_SR;
+         NL = NR;
+         IL = IR;
+         twoSLz = twoSRz;
+      }
+   }
+   
+   const double theCoeff = arrayL[0];
+   
+   assert(   num_SL == 1              );
+   assert( jumpL[1] == 1              );
+   assert( twoSL[0] == Prob->gTwoS()  );
+   assert(       NL == Prob->gN()     );
+   assert(       IL == Prob->gIrrep() );
+   
+   delete [] arrayL;
+   delete [] arrayR;
+   delete [] twoSL;
+   delete [] twoSR;
+   delete [] jumpL;
+   delete [] jumpR;
+   
+   return theCoeff;
 
 }
 

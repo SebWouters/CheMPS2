@@ -285,6 +285,20 @@ int CheMPS2::SyBookkeeper::gMaxDimAtBound(const int iBound) const{
 
 }
 
+int CheMPS2::SyBookkeeper::gTotDimAtBound(const int iBound) const{
+
+   int totDim = 0;
+   for (int N=gNmin(iBound); N<=gNmax(iBound); N++){
+      for (int TwoS=gTwoSmin(iBound,N); TwoS<=gTwoSmax(iBound,N); TwoS+=2){
+         for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
+            totDim += gCurrentDim(iBound,N,TwoS,Icnt);
+         }
+      }
+   }
+   return totDim;
+
+}
+
 void CheMPS2::SyBookkeeper::print() const{
 
    for (int bound=0; bound<=gL(); bound++){

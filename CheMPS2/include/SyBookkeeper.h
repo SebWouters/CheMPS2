@@ -125,6 +125,11 @@ namespace CheMPS2{
              \return The max. virtual dimension at iBound */
          int gMaxDimAtBound(const int iBound) const;
          
+         //! Get the total reduced virtual dimension at a certain boundary
+         /** \param iBound The boundary index
+             \return The total reduced virtual dimension at iBound */
+         int gTotDimAtBound(const int iBound) const;
+         
       private:
       
          //Pointer to the Problem --> constructed and destructed outside of this class

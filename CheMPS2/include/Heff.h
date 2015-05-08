@@ -71,6 +71,11 @@ namespace CheMPS2{
              \param VeffTilde The projection operators to project the nLower lower-lying states out */
          double SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower = 0, double ** VeffTilde = NULL) const;
          
+         //! Phase function
+         /** \param TwoTimesPower Twice the power of the phase (-1)^{power}
+             \return The phase (-1)^{TwoTimesPower/2} */
+         static int phase(const int TwoTimesPower){ return (((TwoTimesPower/2)%2)!=0)?-1:1; }
+         
       private:
       
          //The SyBookkeeper
@@ -78,9 +83,6 @@ namespace CheMPS2{
          
          //The Problem (and hence Hamiltonian)
          const Problem * Prob;
-         
-         //Phase function
-         static int phase(const int TwoTimesPower);
       
          //Do Heff * memS -> memHeff
          void makeHeff(double * memS, double * memHeff, const Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const;

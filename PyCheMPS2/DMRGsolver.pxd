@@ -33,4 +33,5 @@ cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
         void deleteStoredOperators()
         void activateExcitations(const int)
         void newExcitation(const double)
+        double getFCIcoefficient(int *, int *)
 

@@ -95,10 +95,16 @@ namespace CheMPS2{
          /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
          Correlations * getCorrelations();
          
-         //! Get a specific FCI coefficient. coeff contains the occupation numbers of the L orbitals. It is assumed that the number of unpaired electrons equals twice the total targeted spin.
-         /** \param coeff Array containing the occupation numbers of the L Hamiltonian orbitals.
-             \return the desired FCI coefficient */
-         double getSpecificCoefficient(int * coeff);
+         //! Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian orbitals. It is assumed that the unpaired electrons are all alpha electrons, and that this number equals twice the total targeted spin.
+         /** \param coeff Array containing the occupation numbers of the L Hamiltonian orbitals (occupations can be 0, 1, or 2).
+             \return The desired FCI coefficient */
+         double getSpecificCoefficient(int * coeff) const;
+         
+         //! Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbers of the L Hamiltonian orbitals.
+         /** \param alpha Array containing the alpha electron occupation numbers of the L Hamiltonian orbitals (occupations can be 0 or 1).
+             \param beta  Array containing the beta  electron occupation numbers of the L Hamiltonian orbitals (occupations can be 0 or 1).
+             \return The desired FCI coefficient */
+         double getFCIcoefficient(int * alpha, int * beta) const;
          
          //! Call "rm " + CheMPS2::DMRG_MPS_storage_prefix + "*.h5"
          void deleteStoredMPS();
