@@ -71,7 +71,7 @@ for cnt in range(0, len(TwoS)):
     
     # Setting up the Problem
     Prob = PyCheMPS2.PyProblem(Ham, TwoS[cnt], Nelec, Irrep[cnt])
-    Prob.SetupReorderD2h() # Determinant coefficient comparison OK both with option ON and OFF
+    # Prob.SetupReorderD2h() # Determinant coefficient comparison OK both with option ON and OFF
     
     # To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
     OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction

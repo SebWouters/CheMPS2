@@ -209,7 +209,7 @@ double CheMPS2::Correlations::MutualInformationDistance(const double power) cons
    for (int row=0; row<L; row++){
       for (int col=0; col<L; col++){
          if (row != col){
-            Idist += MutInfo[row + L*col] * pow( fabs( row - col ) , power );
+            Idist += MutInfo[row + L*col] * pow(abs(row - col), power);
          }
       }
    }

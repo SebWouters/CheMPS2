@@ -86,7 +86,7 @@ int main(void){
       
       //The targeted symmetry sector and the Hamiltonian form together a FCI problem
       CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS[counter], Nelec, Irreps[counter]);
-      Prob->SetupReorderD2h(); // Determinant coefficient comparison OK both with option ON and OFF
+      //Prob->SetupReorderD2h(); // Determinant coefficient comparison OK both with option ON and OFF
       
       //To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
       CheMPS2::ConvergenceScheme OptScheme(1);
