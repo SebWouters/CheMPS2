@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                  <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL+1,TwoSLdown,ILdown,1,N2,TwoJdown,NR,TwoSR,IR);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                  <span class="keywordflow">if</span> (memSkappa!=-1){</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                     <span class="keywordtype">int</span> fase = phase(TwoSL+TwoSR+2+TwoS2);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                     <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSL+TwoSR+2+TwoS2);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                     <span class="keywordtype">double</span> factor = sqrt((TwoJdown+1)*(TwoSLdown+1.0))*fase*gsl_sf_coupling_6j(TwoJdown,TwoS2,1,TwoSL,TwoSLdown,TwoSR);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                     <span class="keywordtype">double</span> beta = 1.0; <span class="comment">//add</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                     <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
@@ -193,7 +193,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keywordtype">int</span> dimLdown = denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">gCurrentDim</a>(theindex, NL+1, TwoSLdown, ILdown);</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL+1,TwoSLdown,ILdown,0,N2,TwoS2,NR,TwoSR,IR);</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            <span class="keywordflow">if</span> (memSkappa!=-1){</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;               <span class="keywordtype">int</span> fase = phase(TwoSL+TwoSR+1+TwoS2);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;               <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSL+TwoSR+1+TwoS2);</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;               <span class="keywordtype">double</span> factor = sqrt((TwoSLdown+1)*(TwoJ+1.0))*fase*gsl_sf_coupling_6j(TwoS2,TwoJ,1,TwoSL,TwoSLdown,TwoSR);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;               <span class="keywordtype">double</span> beta = 1.0;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;               <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
@@ -216,7 +216,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            </div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                  <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL-1,TwoSLdown,ILdown,1,N2,TwoJdown,NR,TwoSR,IR);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;                  <span class="keywordflow">if</span> (memSkappa!=-1){</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                     <span class="keywordtype">int</span> fase = phase(TwoSLdown+TwoSR+1+TwoS2);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                     <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSLdown+TwoSR+1+TwoS2);</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                     <span class="keywordtype">double</span> factor = fase*sqrt((TwoSL+1)*(TwoJdown+1.0))*gsl_sf_coupling_6j(TwoJdown,TwoS2,1,TwoSL,TwoSLdown,TwoSR);</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                     <span class="keywordtype">double</span> beta = 1.0;</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;                     <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
@@ -236,7 +236,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            <span class="keywordtype">int</span> dimLdown = denBK-&gt;<a class="code" href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">gCurrentDim</a>(theindex, NL-1, TwoSLdown, ILdown);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keywordtype">int</span> memSkappa = denS-&gt;gKappa(NL-1,TwoSLdown,ILdown,2,N2,TwoS2,NR,TwoSR,IR);</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <span class="keywordflow">if</span> (memSkappa!=-1){</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;               <span class="keywordtype">int</span> fase = phase(TwoSLdown+TwoSR+2+TwoS2);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;               <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSLdown+TwoSR+2+TwoS2);</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;               <span class="keywordtype">double</span> factor = fase*sqrt((TwoSL+1)*(TwoJ+1.0))*gsl_sf_coupling_6j(TwoS2,TwoJ,1,TwoSL,TwoSLdown,TwoSR);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;               <span class="keywordtype">double</span> beta = 1.0;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;               <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
@@ -923,13 +923,14 @@ $(document).ready(function(){initNavTree('HeffDiagrams3_8cpp_source.html','');})
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html_ab06fa32f4e352d248ebfe67d850a574a"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">CheMPS2::SyBookkeeper::gIrrep</a></div><div class="ttdeci">int gIrrep(const int nOrb) const </div><div class="ttdoc">Get an orbital irrep. </div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8cpp_source.html#l00110">SyBookkeeper.cpp:110</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_af3ad2a73da9b8af05d145b448cf8bc36"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36">CheMPS2::Problem::gMxElement</a></div><div class="ttdeci">double gMxElement(const int alpha, const int beta, const int gamma, const int delta) const </div><div class="ttdoc">Get a specific interaction matrix element. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00107">Problem.cpp:107</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00123">Irreps.h:123</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Heff_html_aeb78aeaca1e19055b9ed31b41b2cfcd1"><div class="ttname"><a href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">CheMPS2::Heff::phase</a></div><div class="ttdeci">static int phase(const int TwoTimesPower)</div><div class="ttdoc">Phase function. </div><div class="ttdef"><b>Definition:</b> <a href="Heff_8h_source.html#l00077">Heff.h:77</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>HeffDiagrams3.cpp</b></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:43 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:03:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

@@ -194,6 +194,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CGSolveSystem</a> (const double alpha, const double beta, const double eta, double *RHS, double *RealSol, double *ImagSol, const bool checkError=true) const </td></tr>
 <tr class="memdesc:ab41b5c8e777fcdfeb700c7763f64f805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the solution of the equation ( alpha + beta * <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> + I * eta ) Solution = RHS with conjugate gradient.  <a href="#ab41b5c8e777fcdfeb700c7763f64f805">More...</a><br/></td></tr>
 <tr class="separator:ab41b5c8e777fcdfeb700c7763f64f805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f">getFCIcoeff</a> (int *bits_up, int *bits_down, double *vector) const </td></tr>
+<tr class="memdesc:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient.  <a href="#a87f310673fe8b183cb4a5bf3d3051f9f">More...</a><br/></td></tr>
+<tr class="separator:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -221,9 +224,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:adf8c063a9d17fe98f0bcaba1281c648f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#adf8c063a9d17fe98f0bcaba1281c648f">GetMatrixElement</a> (int *bits_bra_up, int *bits_bra_down, int *bits_ket_up, int *bits_ket_down, int *work) const </td></tr>
 <tr class="memdesc:adf8c063a9d17fe98f0bcaba1281c648f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sandwich the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> between two Slater determinants (return a specific element) (without Econstant!!)  <a href="#adf8c063a9d17fe98f0bcaba1281c648f">More...</a><br/></td></tr>
 <tr class="separator:adf8c063a9d17fe98f0bcaba1281c648f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a87f310673fe8b183cb4a5bf3d3051f9f">getFCIcoeff</a> (int *bits_up, int *bits_down, double *vector) const </td></tr>
-<tr class="memdesc:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient.  <a href="#a87f310673fe8b183cb4a5bf3d3051f9f">More...</a><br/></td></tr>
-<tr class="separator:a87f310673fe8b183cb4a5bf3d3051f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a258401fbd7000fd62455914746c4c246"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1FCI.html#a258401fbd7000fd62455914746c4c246">getBitsOfCounter</a> (const int irrep_center, const unsigned long long counter, int *bits_up, int *bits_down) const </td></tr>
 <tr class="memdesc:a258401fbd7000fd62455914746c4c246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the bit representation of a global counter corresponding to " E_ij | FCI vector &gt; " ; where irrep_center = I_i x I_j.  <a href="#a258401fbd7000fd62455914746c4c246">More...</a><br/></td></tr>
 <tr class="separator:a258401fbd7000fd62455914746c4c246"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1872,9 +1872,6 @@ Static Protected Member Functions</h2></td></tr>
 <a class="anchor" id="a87f310673fe8b183cb4a5bf3d3051f9f"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">double CheMPS2::FCI::getFCIcoeff </td>
@@ -1900,11 +1897,6 @@ Static Protected Member Functions</h2></td></tr>
           <td></td><td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Function which returns a <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient. </p>
@@ -3156,7 +3148,7 @@ Static Protected Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1FCI.html">FCI</a></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:43 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:03:29 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

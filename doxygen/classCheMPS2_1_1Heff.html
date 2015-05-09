@@ -105,6 +105,7 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1Heff.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classCheMPS2_1_1Heff-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">CheMPS2::Heff Class Reference</div>  </div>
@@ -125,6 +126,12 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ab8ccd23cc035ed40e13705c3f2e581a3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3">SolveDAVIDSON</a> (<a class="el" href="classCheMPS2_1_1Sobject.html">Sobject</a> *denS, <a class="el" href="classCheMPS2_1_1TensorL.html">TensorL</a> ***Ltensors, <a class="el" href="classCheMPS2_1_1TensorA.html">TensorA</a> ****Atensors, <a class="el" href="classCheMPS2_1_1TensorB.html">TensorB</a> ****Btensors, <a class="el" href="classCheMPS2_1_1TensorC.html">TensorC</a> ****Ctensors, <a class="el" href="classCheMPS2_1_1TensorD.html">TensorD</a> ****Dtensors, <a class="el" href="classCheMPS2_1_1TensorS0.html">TensorS0</a> ****S0tensors, <a class="el" href="classCheMPS2_1_1TensorS1.html">TensorS1</a> ****S1tensors, <a class="el" href="classCheMPS2_1_1TensorF0.html">TensorF0</a> ****F0tensors, <a class="el" href="classCheMPS2_1_1TensorF1.html">TensorF1</a> ****F1tensors, <a class="el" href="classCheMPS2_1_1TensorQ.html">TensorQ</a> ***Qtensors, <a class="el" href="classCheMPS2_1_1TensorX.html">TensorX</a> **Xtensors, int nLower=0, double **VeffTilde=NULL) const </td></tr>
 <tr class="memdesc:ab8ccd23cc035ed40e13705c3f2e581a3"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classCheMPS2_1_1Davidson.html">Davidson</a> Solver.  <a href="#ab8ccd23cc035ed40e13705c3f2e581a3">More...</a><br/></td></tr>
 <tr class="separator:ab8ccd23cc035ed40e13705c3f2e581a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aeb78aeaca1e19055b9ed31b41b2cfcd1"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a> (const int TwoTimesPower)</td></tr>
+<tr class="memdesc:aeb78aeaca1e19055b9ed31b41b2cfcd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Phase function.  <a href="#aeb78aeaca1e19055b9ed31b41b2cfcd1">More...</a><br/></td></tr>
+<tr class="separator:aeb78aeaca1e19055b9ed31b41b2cfcd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1Heff.html">Heff</a> class. </p>
@@ -172,6 +179,52 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="aeb78aeaca1e19055b9ed31b41b2cfcd1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int CheMPS2::Heff::phase </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>TwoTimesPower</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Phase function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">TwoTimesPower</td><td>Twice the power of the phase (-1)^{power} </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The phase (-1)^{TwoTimesPower/2} </dd></dl>
+
+<p>Definition at line <a class="el" href="Heff_8h_source.html#l00077">77</a> of file <a class="el" href="Heff_8h_source.html">Heff.h</a>.</p>
+
+<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1Heff_aeb78aeaca1e19055b9ed31b41b2cfcd1_icgraph.png" border="0" usemap="#classCheMPS2_1_1Heff_aeb78aeaca1e19055b9ed31b41b2cfcd1_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1Heff_aeb78aeaca1e19055b9ed31b41b2cfcd1_icgraph" id="classCheMPS2_1_1Heff_aeb78aeaca1e19055b9ed31b41b2cfcd1_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#a105422e9a4fd150629cd77d885bb264c" title="Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbe..." alt="" coords="214,5,453,32"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="ab8ccd23cc035ed40e13705c3f2e581a3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -291,22 +344,22 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Definition at line <a class="el" href="Heff_8cpp_source.html#l00216">216</a> of file <a class="el" href="Heff_8cpp_source.html">Heff.cpp</a>.</p>
 
-<p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-0-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_cgraph.png" border="0" usemap="#classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_cgraph" id="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="280,5,504,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="294,56,490,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="315,107,469,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="287,173,497,200"/><area shape="rect" id="node6" href="classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="295,224,489,251"/><area shape="rect" id="node7" href="classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="287,275,497,301"/><area shape="rect" id="node8" href="classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="315,326,469,367"/></map>
 </div>
 </p>
 
-<p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-2-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-1-content" class="dyncontent" style="display:none;">
+<div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_icgraph.png" border="0" usemap="#classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_icgraph" id="classCheMPS2_1_1Heff_ab8ccd23cc035ed40e13705c3f2e581a3_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!! ..." alt="" coords="281,5,493,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="542,12,853,39"/></map>
@@ -331,7 +384,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Heff.html">Heff</a></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:43 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:03:29 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

@@ -162,7 +162,7 @@ $(document).ready(function(){initNavTree('HeffDiagrams5_8cpp_source.html','');})
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> TwoJdown=0; TwoJdown&lt;=2; TwoJdown+=2){</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;               <span class="keywordflow">if</span> ((abs(TwoSLdown-TwoSRdown)&lt;=TwoJdown) &amp;&amp; (TwoSLdown&gt;=0) &amp;&amp; (TwoSRdown&gt;=0)){</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                  <span class="keywordtype">int</span> fase = phase(TwoSLdown+TwoSRdown+2);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                  <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSLdown+TwoSRdown+2);</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                  <span class="keyword">const</span> <span class="keywordtype">double</span> factor = fase * sqrt((TwoJdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> Irrep=0; Irrep&lt;(denBK-&gt;<a class="code" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">getNumberOfIrreps</a>()); Irrep++){</div>
@@ -235,9 +235,9 @@ $(document).ready(function(){initNavTree('HeffDiagrams5_8cpp_source.html','');})
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;               <span class="keywordtype">double</span> factor1 = 0.0;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;               <span class="keywordtype">double</span> factor2 = 0.0;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;               <span class="keywordflow">if</span> (TwoSL == TwoSRdown){ factor2 = phase(TwoSRdown + 1 - TwoSR); }</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;               <span class="keywordflow">if</span> (TwoSL == TwoSRdown){ factor2 = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSRdown + 1 - TwoSR); }</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;               <span class="keywordflow">if</span> (TwoSLdown == TwoSR){</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                  <span class="keywordtype">int</span> fase = phase(TwoSLdown + 1 - TwoSL);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                  <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSLdown + 1 - TwoSL);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                  factor1 = fase * sqrt(((TwoSRdown+1)*(TwoSL+1.0))/((TwoSR+1)*(TwoSLdown+1.0)));</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;               }</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            </div>
@@ -310,9 +310,9 @@ $(document).ready(function(){initNavTree('HeffDiagrams5_8cpp_source.html','');})
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;               <span class="keywordtype">double</span> factor1 = 0.0;</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;               <span class="keywordtype">double</span> factor2 = 0.0;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            </div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;               <span class="keywordflow">if</span> (TwoSL == TwoSRdown){ factor1 = phase(TwoSRdown + 1 - TwoSR); }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;               <span class="keywordflow">if</span> (TwoSL == TwoSRdown){ factor1 = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSRdown + 1 - TwoSR); }</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;               <span class="keywordflow">if</span> (TwoSLdown == TwoSR){</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                  <span class="keywordtype">int</span> fase = phase(TwoSLdown + 1 - TwoSL);</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                  <span class="keywordtype">int</span> fase = <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">phase</a>(TwoSLdown + 1 - TwoSL);</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                  factor2 = fase * sqrt(((TwoSRdown+1)*(TwoSL+1.0))/((TwoSR+1)*(TwoSLdown+1.0)));</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;               }</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;            </div>
@@ -1948,13 +1948,14 @@ $(document).ready(function(){initNavTree('HeffDiagrams5_8cpp_source.html','');})
 <div class="ttc" id="classCheMPS2_1_1Problem_html_af3ad2a73da9b8af05d145b448cf8bc36"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36">CheMPS2::Problem::gMxElement</a></div><div class="ttdeci">double gMxElement(const int alpha, const int beta, const int gamma, const int delta) const </div><div class="ttdoc">Get a specific interaction matrix element. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00107">Problem.cpp:107</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00123">Irreps.h:123</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a3e7be26cd15d22f4e0a65a34616cbcdd"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd">CheMPS2::Problem::gL</a></div><div class="ttdeci">int gL() const </div><div class="ttdoc">Get the number of orbitals. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00085">Problem.cpp:85</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Heff_html_aeb78aeaca1e19055b9ed31b41b2cfcd1"><div class="ttname"><a href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">CheMPS2::Heff::phase</a></div><div class="ttdeci">static int phase(const int TwoTimesPower)</div><div class="ttdoc">Phase function. </div><div class="ttdef"><b>Definition:</b> <a href="Heff_8h_source.html#l00077">Heff.h:77</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>HeffDiagrams5.cpp</b></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:43 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:03:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

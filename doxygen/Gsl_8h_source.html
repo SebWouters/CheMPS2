@@ -128,19 +128,22 @@ $(document).ready(function(){initNavTree('Gsl_8h_source.html','');});
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;   </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;   <span class="keywordtype">double</span> gsl_sf_coupling_6j(<span class="keywordtype">int</span> two_ja, <span class="keywordtype">int</span> two_jb, <span class="keywordtype">int</span> two_jc, <span class="keywordtype">int</span> two_jd, <span class="keywordtype">int</span> two_je, <span class="keywordtype">int</span> two_jf);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;   <span class="keywordtype">double</span> gsl_sf_coupling_9j(<span class="keywordtype">int</span> two_ja, <span class="keywordtype">int</span> two_jb, <span class="keywordtype">int</span> two_jc, <span class="keywordtype">int</span> two_jd, <span class="keywordtype">int</span> two_je, <span class="keywordtype">int</span> two_jf, <span class="keywordtype">int</span> two_jg, <span class="keywordtype">int</span> two_jh, <span class="keywordtype">int</span> two_ji);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;   <span class="comment">//To be able to print the coefficients belonging to certain Slater determinants Wigner 3-j symbols are now also needed...</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;   <span class="keywordtype">double</span> gsl_sf_coupling_3j(<span class="keywordtype">int</span> two_ja, <span class="keywordtype">int</span> two_jb, <span class="keywordtype">int</span> two_jc, <span class="keywordtype">int</span> two_ma, <span class="keywordtype">int</span> two_mb, <span class="keywordtype">int</span> two_mc);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;   </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;   <span class="keywordtype">double</span> gsl_sf_coupling_6j(<span class="keywordtype">int</span> two_ja, <span class="keywordtype">int</span> two_jb, <span class="keywordtype">int</span> two_jc, <span class="keywordtype">int</span> two_jd, <span class="keywordtype">int</span> two_je, <span class="keywordtype">int</span> two_jf);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;   <span class="keywordtype">double</span> gsl_sf_coupling_9j(<span class="keywordtype">int</span> two_ja, <span class="keywordtype">int</span> two_jb, <span class="keywordtype">int</span> two_jc, <span class="keywordtype">int</span> two_jd, <span class="keywordtype">int</span> two_je, <span class="keywordtype">int</span> two_jf, <span class="keywordtype">int</span> two_jg, <span class="keywordtype">int</span> two_jh, <span class="keywordtype">int</span> two_ji);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><b>Gsl.h</b></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:42 for CheMPS2 by
+    <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9b42c04f8fd95b4f9151c9c6b143cac5.html">chemps2</a></li><li class="navelem"><b>Gsl.h</b></li>
+    <li class="footer">Generated on Sat May 9 2015 00:03:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

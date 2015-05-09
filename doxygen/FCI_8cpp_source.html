@@ -654,7 +654,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );</div>
 <div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numPairs = irrep_center_num[ irrep_center ];</div>
 <div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;</div>
-<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> space_per_vectorpiece = (<span class="keywordtype">unsigned</span> int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);</div>
+<div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));</div>
 <div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numIterations = localVecLength / space_per_vectorpiece;</div>
 <div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;      <span class="keywordflow">if</span> ( localVecLength &gt; numIterations * space_per_vectorpiece ){ numIterations++; }</div>
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;</div>
@@ -851,7 +851,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );</div>
 <div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numPairs = irrep_center_num[ irrep_center ];</div>
 <div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;      </div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> space_per_vectorpiece = (<span class="keywordtype">unsigned</span> int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs);</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));</div>
 <div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> numIterations = localVecLength / space_per_vectorpiece;</div>
 <div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;      <span class="keywordflow">if</span> ( localVecLength &gt; numIterations * space_per_vectorpiece ){ numIterations++; }</div>
 <div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;</div>
@@ -2323,7 +2323,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>FCI.cpp</b></li>
-    <li class="footer">Generated on Wed Apr 22 2015 23:38:42 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:03:28 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

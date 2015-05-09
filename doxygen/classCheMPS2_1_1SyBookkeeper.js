@@ -12,6 +12,7 @@ var classCheMPS2_1_1SyBookkeeper =
     [ "gN", "classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3", null ],
     [ "gNmax", "classCheMPS2_1_1SyBookkeeper.html#a39bc51595360d808a224ca6021ead99b", null ],
     [ "gNmin", "classCheMPS2_1_1SyBookkeeper.html#a00b1b29641aade9ff5f4ce68e46c8320", null ],
+    [ "gTotDimAtBound", "classCheMPS2_1_1SyBookkeeper.html#a56f68c25d1c637c55e94d59edd3bdfff", null ],
     [ "gTwoS", "classCheMPS2_1_1SyBookkeeper.html#a72189d68fe5a90d9b5e4f11aa752a393", null ],
     [ "gTwoSmax", "classCheMPS2_1_1SyBookkeeper.html#a5203e4ac44a9c369974d9f817f634ddb", null ],
     [ "gTwoSmin", "classCheMPS2_1_1SyBookkeeper.html#aa1a9f3397c15a44e10035f22161fc825", null ],

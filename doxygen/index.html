@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </ul>
 <p>In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods, when the active space sizes become prohibitively expensive for FCI. The corresponding methods are called DMRG-CI and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active space sizes, it allows to obtain FCI energies for small systems such as dimers, while for larger systems it is ideal to treat the static/strong correlation in a large active space.</p>
 <p>The design philosophy for CheMPS2 is to be a lightweight, efficient, and stable library. For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
-<p>To gain a better understanding of how to perform DMRG calculations for large active spaces, you are encouraged to read the <a href="#how-to-acknowledge-chemps2">three papers</a> listed below.</p>
+<p>To gain a better understanding of how to perform DMRG calculations for large active spaces, you are encouraged to read the <a href="http://sebwouters.github.io/CheMPS2/index.html">user manual</a> and the <a href="#how-to-acknowledge-chemps2">three papers</a> listed below.</p>
 <p>Incorporation of the library into other codes is very simple due a minimal API, as well as a python interface. Direct usage of the library is illustrated in the <a href="#4-test-libchemps2">c++</a> and <a href="#6-test-pychemps2">python</a> tests, which can be easily adapted to your needs. The interfaces to <a href="http://www.psicode.org">psi4</a> and <a href="https://github.com/sunqm/pyscf">pyscf</a> are described in the <a href="http://sebwouters.github.io/CheMPS2/index.html">user manual</a>.</p>
 <p>In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
 <h2>How to acknowledge CheMPS2 </h2>
@@ -167,21 +167,20 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>It is parallelized for shared memory architectures with the Open Multi-Processing (<a href="http://openmp.org/wp/">OpenMP</a>) API. In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization.</p>
 <h3>2. Download</h3>
 <p>It is advised to clone the CheMPS2 git repository from github. In your terminal, run: </p>
-<pre class="fragment">&gt; cd /myfolder
+<pre class="fragment">&gt; cd /sourcefolder
 &gt; git clone 'https://github.com/sebwouters/chemps2'
 &gt; cd chemps2
 </pre><p>That way, future updates and bug fixes can be easily pulled in: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2
+<pre class="fragment">&gt; cd /sourcefolder/chemps2
 &gt; git pull
 </pre><h3>3. Build libchemps2</h3>
 <p>The files </p>
-<pre class="fragment">/myfolder/chemps2/CMakeLists.txt
-/myfolder/chemps2/CheMPS2/CMakeLists.txt
-/myfolder/chemps2/tests/CMakeLists.txt
-/myfolder/chemps2/PyCheMPS2/CMakeLists.txt
-/myfolder/chemps2/sphinx/CMakeLists.txt
+<pre class="fragment">/sourcefolder/chemps2/CMakeLists.txt
+/sourcefolder/chemps2/CheMPS2/CMakeLists.txt
+/sourcefolder/chemps2/tests/CMakeLists.txt
+/sourcefolder/chemps2/sphinx/CMakeLists.txt
 </pre><p>provide a minimal compilation. In your terminal, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2
+<pre class="fragment">&gt; cd /sourcefolder/chemps2
 &gt; mkdir build
 &gt; cd build
 </pre><p>CMake generates makefiles based on the user’s specifications: </p>
@@ -189,7 +188,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 </pre><ol type="1">
 <li>Option1 is the <code>c++</code> compiler; typically <code>g++</code>, <code>icpc</code>, or <code>clang++</code> on Linux.</li>
 <li>Option2 can be <code>ON</code> or <code>OFF</code> and is used to switch on the intel math kernel library.</li>
-<li>Option3 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>/prefix/lib/x86_64-linux-gnu/</code> and the headers in <code>/prefix/include/chemps2</code>.</li>
+<li>Option3 is the prefix of the installation directory; typically <code>/usr</code> or <code>/usr/local</code> on Linux. On my computer, libchemps2 is then installed in <code>/prefix/lib/x86_64-linux-gnu</code> and the headers in <code>/prefix/include/chemps2</code>.</li>
 <li>Option4 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the doxygen documentation.</li>
 <li>Option5 can be <code>ON</code> or <code>OFF</code> and is used to switch on the possibility to compile the user manual with sphinx.</li>
 </ol>
@@ -205,17 +204,22 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre><p>For non-standard installation directories, please remember to append the library path to <code>LD_LIBRARY_PATH</code> in your <code>.bashrc</code>.</p>
 <h3>4. Test libchemps2</h3>
 <p>To test libchemps2, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2/build
+<pre class="fragment">&gt; cd /sourcefolder/chemps2/build
 &gt; make test
 </pre><p>The tests only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>5. Build PyCheMPS2</h3>
-<p>PyCheMPS2, a python inferface to libchemps2, can be built with <a href="http://cython.org/">Cython</a>. The installation above generated the file <code>/myfolder/chemps2/build/setup.py</code>, in which the library and include paths have been set to the ones in the build directory. In your terminal, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2/build
-&gt; python setup.py build_ext -i
-</pre><p>Compilation of PyCheMPS2 occurs by linking to the <code>c++</code> library in the build directory. However, when you want to run the tests in the next section, you should first install the <code>c++</code> library! If you have pulled a newer version of CheMPS2, please remember to (re)install the <code>c++</code> library first, before using PyCheMPS2!</p>
+<p>PyCheMPS2, a python interface to libchemps2, can be built with <a href="http://cython.org/">Cython</a>. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with <code>make install</code>. For non-standard installation directories of CheMPS2, please remember to append the library path to <code>LD_LIBRARY_PATH</code> in your <code>.bashrc</code>. In addition, the include path should be appended to <code>CPATH</code>: </p>
+<pre class="fragment">&gt; export CPATH=${CPATH}:option3/include
+</pre><p>where <code>option3</code> is the option provided to CMake with <code>-DCMAKE_INSTALL_PREFIX=option3</code> above. Then the python wrapper can be installed with: </p>
+<pre class="fragment">&gt; cd /sourcefolder/chemps2/PyCheMPS2
+&gt; python setup.py build_ext -L ${LD_LIBRARY_PATH}
+&gt; python setup.py install --prefix=option3
+</pre><p>On my machine, the python wrapper is installed to the folder <code>option3/lib/python2.7/site-packages</code>, but the folder <code>lib</code> and the distribution of python can vary.</p>
+<p>Compilation of PyCheMPS2 occurs by linking to the <code>c++</code> library in the installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to reinstall the <code>c++</code> library first, before reinstalling PyCheMPS2!</p>
 <h3>6. Test PyCheMPS2</h3>
-<p>To test PyCheMPS2, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2/build/PyTests
+<p>To test PyCheMPS2 (remember that the python site-packages folder can vary), run: </p>
+<pre class="fragment">&gt; cd /sourcefolder/chemps2/PyCheMPS2/tests
+&gt; export PYTHONPATH=${PYTHONPATH}:option3/lib/python2.7/site-packages
 &gt; python test1.py
 &gt; python test2.py
 &gt; python test3.py
@@ -232,7 +236,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre><p>The python tests do exactly the same thing as the <code>c++</code> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 10-120 MB).</p>
 <h3>7. Doxygen</h3>
 <p>To build the doxygen manual, the <code>BUILD_DOXYGEN</code> flag should have been on: <code>-DBUILD_DOXYGEN=ON</code>. In your terminal, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2/build
+<pre class="fragment">&gt; cd /sourcefolder/chemps2/build
 &gt; make doc
 &gt; cd LaTeX-documents
 &gt; make
@@ -241,7 +245,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 &gt; firefox index.html &amp;
 </pre><h3>8. Sphinx user manual</h3>
 <p>To build the sphinx user manual, the <code>BUILD_SPHINX</code> flag should have been on: <code>-DBUILD_SPHINX=ON</code>. In your terminal, run: </p>
-<pre class="fragment">&gt; cd /myfolder/chemps2/build
+<pre class="fragment">&gt; cd /sourcefolder/chemps2/build
 &gt; make sphinx
 &gt; cd sphinx/html
 &gt; firefox index.html &amp;
@@ -321,59 +325,59 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <p><a href="CheMPS2/TwoDM.cpp">CheMPS2/TwoDM.cpp</a> contains all functions to calculate the 2-RDM from the DMRG-optimized MPS.</p>
 <p><a href="CheMPS2/TwoDMstorage.cpp">CheMPS2/TwoDMstorage.cpp</a> contains all functions to store the 2-RDM from the DMRG-optimized MPS.</p>
 <p><a href="CheMPS2/TwoIndex.cpp">CheMPS2/TwoIndex.cpp</a> contains all functions of the TwoIndex container class for the one-body matrix elements.</p>
-<p><a href="CheMPS2/include/CASSCF.h">CheMPS2/include/CASSCF.h</a> contains the definitions of the CASSCF class.</p>
-<p><a href="CheMPS2/include/ConvergenceScheme.h">CheMPS2/include/ConvergenceScheme.h</a> contains the definitions of the ConvergenceScheme class.</p>
-<p><a href="CheMPS2/include/Correlations.h">CheMPS2/include/Correlations.h</a> contains the definitions of the Correlations class.</p>
-<p><a href="CheMPS2/include/Davidson.h">CheMPS2/include/Davidson.h</a> contains the definitions of the Davidson class.</p>
-<p><a href="CheMPS2/include/DIIS.h">CheMPS2/include/DIIS.h</a> contains the definitions of the DIIS class.</p>
-<p><a href="CheMPS2/include/DMRG.h">CheMPS2/include/DMRG.h</a> contains the definitions of the DMRG class.</p>
-<p><a href="CheMPS2/include/DMRGSCFindices.h">CheMPS2/include/DMRGSCFindices.h</a> contains the definitions of the DMRGSCFindices class.</p>
-<p><a href="CheMPS2/include/DMRGSCFintegrals.h">CheMPS2/include/DMRGSCFintegrals.h</a> contains the definitions of the DMRGSCFintegrals class.</p>
-<p><a href="CheMPS2/include/DMRGSCFmatrix.h">CheMPS2/include/DMRGSCFmatrix.h</a> contains the definitions of the DMRGSCFmatrix class.</p>
-<p><a href="CheMPS2/include/DMRGSCFoptions.h">CheMPS2/include/DMRGSCFoptions.h</a> contains the definitions of the DMRGSCFoptions container class.</p>
-<p><a href="CheMPS2/include/DMRGSCFunitary.h">CheMPS2/include/DMRGSCFunitary.h</a> contains the definitions of the DMRGSCFunitary class.</p>
-<p><a href="CheMPS2/include/DMRGSCFVmatRotations.h">CheMPS2/include/DMRGSCFVmatRotations.h</a> contains the definitions of the DMRGSCFVmatRotations class.</p>
-<p><a href="CheMPS2/include/DMRGSCFwtilde.h">CheMPS2/include/DMRGSCFwtilde.h</a> contains the definitions of the DMRGSCFwtilde class.</p>
-<p><a href="CheMPS2/include/EdmistonRuedenberg.h">CheMPS2/include/EdmistonRuedenberg.h</a> contains the definitions of the EdmistonRuedenberg class.</p>
-<p><a href="CheMPS2/include/FCI.h">CheMPS2/include/FCI.h</a> contains the definitions of the FCI class.</p>
-<p><a href="CheMPS2/include/FourIndex.h">CheMPS2/include/FourIndex.h</a> contains the definitions of the FourIndex class.</p>
-<p><a href="CheMPS2/include/Gsl.h">CheMPS2/include/Gsl.h</a> contains the definitions of the external GSL routines.</p>
-<p><a href="CheMPS2/include/Hamiltonian.h">CheMPS2/include/Hamiltonian.h</a> contains the definitions of the Hamiltonian class.</p>
-<p><a href="CheMPS2/include/Heff.h">CheMPS2/include/Heff.h</a> contains the definitions of the Heff class.</p>
-<p><a href="CheMPS2/include/Initialize.h">CheMPS2/include/Initialize.h</a> contains the definitions of the Initialize class.</p>
-<p><a href="CheMPS2/include/Irreps.h">CheMPS2/include/Irreps.h</a> contains the definitions of the Irrep class.</p>
-<p><a href="CheMPS2/include/Lapack.h">CheMPS2/include/Lapack.h</a> contains the definitions of the external BLAS and LAPACK routines.</p>
-<p><a href="CheMPS2/include/MyHDF5.h">CheMPS2/include/MyHDF5.h</a> forces the use of the HDF5 1.8 API, e.g. H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.</p>
-<p><a href="CheMPS2/include/Options.h">CheMPS2/include/Options.h</a> contains all the options of the CheMPS2 namespace. Here the checkpoint storage names and folders can be set, as well as parameters related to memory usage and convergence.</p>
-<p><a href="CheMPS2/include/Problem.h">CheMPS2/include/Problem.h</a> contains the definitions of the Problem class.</p>
-<p><a href="CheMPS2/include/Sobject.h">CheMPS2/include/Sobject.h</a> contains the definitions of the Sobject class.</p>
-<p><a href="CheMPS2/include/SyBookkeeper.h">CheMPS2/include/SyBookkeeper.h</a> contains the definitions of the SyBookkeeper class.</p>
-<p><a href="CheMPS2/include/TensorA.h">CheMPS2/include/TensorA.h</a> contains the definitions of the TensorA class.</p>
-<p><a href="CheMPS2/include/TensorB.h">CheMPS2/include/TensorB.h</a> contains the definitions of the TensorB class.</p>
-<p><a href="CheMPS2/include/TensorC.h">CheMPS2/include/TensorC.h</a> contains the definitions of the TensorC class.</p>
-<p><a href="CheMPS2/include/TensorD.h">CheMPS2/include/TensorD.h</a> contains the definitions of the TensorD class.</p>
-<p><a href="CheMPS2/include/TensorDiag.h">CheMPS2/include/TensorDiag.h</a> contains the definitions of the TensorDiag class.</p>
-<p><a href="CheMPS2/include/TensorF0Cbase.h">CheMPS2/include/TensorF0Cbase.h</a> contains the definitions of the TensorF0Cbase class.</p>
-<p><a href="CheMPS2/include/TensorF0.h">CheMPS2/include/TensorF0.h</a> contains the definitions of the TensorF0 class.</p>
-<p><a href="CheMPS2/include/TensorF1Dbase.h">CheMPS2/include/TensorF1Dbase.h</a> contains the definitions of the TensorF1Dbase class.</p>
-<p><a href="CheMPS2/include/TensorF1.h">CheMPS2/include/TensorF1.h</a> contains the definitions of the TensorF1 class.</p>
-<p><a href="CheMPS2/include/TensorGYZ.h">CheMPS2/include/TensorGYZ.h</a> contains the definitions of the TensorGYZ class.</p>
-<p><a href="CheMPS2/include/Tensor.h">CheMPS2/include/Tensor.h</a> contains the definitions of the virtual Tensor class.</p>
-<p><a href="CheMPS2/include/TensorK.h">CheMPS2/include/TensorK.h</a> contains the definitions of the TensorK class.</p>
-<p><a href="CheMPS2/include/TensorL.h">CheMPS2/include/TensorL.h</a> contains the definitions of the TensorL class.</p>
-<p><a href="CheMPS2/include/TensorM.h">CheMPS2/include/TensorM.h</a> contains the definitions of the TensorM class.</p>
-<p><a href="CheMPS2/include/TensorO.h">CheMPS2/include/TensorO.h</a> contains the definitions of the TensorO class.</p>
-<p><a href="CheMPS2/include/TensorQ.h">CheMPS2/include/TensorQ.h</a> contains the definitions of the TensorQ class.</p>
-<p><a href="CheMPS2/include/TensorS0Abase.h">CheMPS2/include/TensorS0Abase.h</a> contains the definitions of the TensorS0Abase class.</p>
-<p><a href="CheMPS2/include/TensorS0.h">CheMPS2/include/TensorS0.h</a> contains the definitions of the TensorS0 class.</p>
-<p><a href="CheMPS2/include/TensorS1Bbase.h">CheMPS2/include/TensorS1Bbase.h</a> contains the definitions of the TensorS1Bbase class.</p>
-<p><a href="CheMPS2/include/TensorS1.h">CheMPS2/include/TensorS1.h</a> contains the definitions of the TensorS1 class.</p>
-<p><a href="CheMPS2/include/TensorSwap.h">CheMPS2/include/TensorSwap.h</a> contains the definitions of the TensorSwap class.</p>
-<p><a href="CheMPS2/include/TensorT.h">CheMPS2/include/TensorT.h</a> contains the definitions of the TensorT class.</p>
-<p><a href="CheMPS2/include/TensorX.h">CheMPS2/include/TensorX.h</a> contains the definitions of the TensorX class.</p>
-<p><a href="CheMPS2/include/TwoDM.h">CheMPS2/include/TwoDM.h</a> contains the definitions of the TwoDM class.</p>
-<p><a href="CheMPS2/include/TwoDMstorage.h">CheMPS2/include/TwoDMstorage.h</a> contains the definitions of the TwoDMstorage class.</p>
-<p><a href="CheMPS2/include/TwoIndex.h">CheMPS2/include/TwoIndex.h</a> contains the definitions of the TwoIndex class.</p>
+<p><a href="CheMPS2/include/chemps2/CASSCF.h">CheMPS2/include/chemps2/CASSCF.h</a> contains the definitions of the CASSCF class.</p>
+<p><a href="CheMPS2/include/chemps2/ConvergenceScheme.h">CheMPS2/include/chemps2/ConvergenceScheme.h</a> contains the definitions of the ConvergenceScheme class.</p>
+<p><a href="CheMPS2/include/chemps2/Correlations.h">CheMPS2/include/chemps2/Correlations.h</a> contains the definitions of the Correlations class.</p>
+<p><a href="CheMPS2/include/chemps2/Davidson.h">CheMPS2/include/chemps2/Davidson.h</a> contains the definitions of the Davidson class.</p>
+<p><a href="CheMPS2/include/chemps2/DIIS.h">CheMPS2/include/chemps2/DIIS.h</a> contains the definitions of the DIIS class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRG.h">CheMPS2/include/chemps2/DMRG.h</a> contains the definitions of the DMRG class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFindices.h">CheMPS2/include/chemps2/DMRGSCFindices.h</a> contains the definitions of the DMRGSCFindices class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFintegrals.h">CheMPS2/include/chemps2/DMRGSCFintegrals.h</a> contains the definitions of the DMRGSCFintegrals class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFmatrix.h">CheMPS2/include/chemps2/DMRGSCFmatrix.h</a> contains the definitions of the DMRGSCFmatrix class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFoptions.h">CheMPS2/include/chemps2/DMRGSCFoptions.h</a> contains the definitions of the DMRGSCFoptions container class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFunitary.h">CheMPS2/include/chemps2/DMRGSCFunitary.h</a> contains the definitions of the DMRGSCFunitary class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFVmatRotations.h">CheMPS2/include/chemps2/DMRGSCFVmatRotations.h</a> contains the definitions of the DMRGSCFVmatRotations class.</p>
+<p><a href="CheMPS2/include/chemps2/DMRGSCFwtilde.h">CheMPS2/include/chemps2/DMRGSCFwtilde.h</a> contains the definitions of the DMRGSCFwtilde class.</p>
+<p><a href="CheMPS2/include/chemps2/EdmistonRuedenberg.h">CheMPS2/include/chemps2/EdmistonRuedenberg.h</a> contains the definitions of the EdmistonRuedenberg class.</p>
+<p><a href="CheMPS2/include/chemps2/FCI.h">CheMPS2/include/chemps2/FCI.h</a> contains the definitions of the FCI class.</p>
+<p><a href="CheMPS2/include/chemps2/FourIndex.h">CheMPS2/include/chemps2/FourIndex.h</a> contains the definitions of the FourIndex class.</p>
+<p><a href="CheMPS2/include/chemps2/Gsl.h">CheMPS2/include/chemps2/Gsl.h</a> contains the definitions of the external GSL routines.</p>
+<p><a href="CheMPS2/include/chemps2/Hamiltonian.h">CheMPS2/include/chemps2/Hamiltonian.h</a> contains the definitions of the Hamiltonian class.</p>
+<p><a href="CheMPS2/include/chemps2/Heff.h">CheMPS2/include/chemps2/Heff.h</a> contains the definitions of the Heff class.</p>
+<p><a href="CheMPS2/include/chemps2/Initialize.h">CheMPS2/include/chemps2/Initialize.h</a> contains the definitions of the Initialize class.</p>
+<p><a href="CheMPS2/include/chemps2/Irreps.h">CheMPS2/include/chemps2/Irreps.h</a> contains the definitions of the Irrep class.</p>
+<p><a href="CheMPS2/include/chemps2/Lapack.h">CheMPS2/include/chemps2/Lapack.h</a> contains the definitions of the external BLAS and LAPACK routines.</p>
+<p><a href="CheMPS2/include/chemps2/MyHDF5.h">CheMPS2/include/chemps2/MyHDF5.h</a> forces the use of the HDF5 1.8 API, e.g. H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.</p>
+<p><a href="CheMPS2/include/chemps2/Options.h">CheMPS2/include/chemps2/Options.h</a> contains all the options of the CheMPS2 namespace. Here the checkpoint storage names and folders can be set, as well as parameters related to memory usage and convergence.</p>
+<p><a href="CheMPS2/include/chemps2/Problem.h">CheMPS2/include/chemps2/Problem.h</a> contains the definitions of the Problem class.</p>
+<p><a href="CheMPS2/include/chemps2/Sobject.h">CheMPS2/include/chemps2/Sobject.h</a> contains the definitions of the Sobject class.</p>
+<p><a href="CheMPS2/include/chemps2/SyBookkeeper.h">CheMPS2/include/chemps2/SyBookkeeper.h</a> contains the definitions of the SyBookkeeper class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorA.h">CheMPS2/include/chemps2/TensorA.h</a> contains the definitions of the TensorA class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorB.h">CheMPS2/include/chemps2/TensorB.h</a> contains the definitions of the TensorB class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorC.h">CheMPS2/include/chemps2/TensorC.h</a> contains the definitions of the TensorC class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorD.h">CheMPS2/include/chemps2/TensorD.h</a> contains the definitions of the TensorD class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorDiag.h">CheMPS2/include/chemps2/TensorDiag.h</a> contains the definitions of the TensorDiag class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorF0Cbase.h">CheMPS2/include/chemps2/TensorF0Cbase.h</a> contains the definitions of the TensorF0Cbase class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorF0.h">CheMPS2/include/chemps2/TensorF0.h</a> contains the definitions of the TensorF0 class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorF1Dbase.h">CheMPS2/include/chemps2/TensorF1Dbase.h</a> contains the definitions of the TensorF1Dbase class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorF1.h">CheMPS2/include/chemps2/TensorF1.h</a> contains the definitions of the TensorF1 class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorGYZ.h">CheMPS2/include/chemps2/TensorGYZ.h</a> contains the definitions of the TensorGYZ class.</p>
+<p><a href="CheMPS2/include/chemps2/Tensor.h">CheMPS2/include/chemps2/Tensor.h</a> contains the definitions of the virtual Tensor class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorK.h">CheMPS2/include/chemps2/TensorK.h</a> contains the definitions of the TensorK class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorL.h">CheMPS2/include/chemps2/TensorL.h</a> contains the definitions of the TensorL class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorM.h">CheMPS2/include/chemps2/TensorM.h</a> contains the definitions of the TensorM class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorO.h">CheMPS2/include/chemps2/TensorO.h</a> contains the definitions of the TensorO class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorQ.h">CheMPS2/include/chemps2/TensorQ.h</a> contains the definitions of the TensorQ class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorS0Abase.h">CheMPS2/include/chemps2/TensorS0Abase.h</a> contains the definitions of the TensorS0Abase class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorS0.h">CheMPS2/include/chemps2/TensorS0.h</a> contains the definitions of the TensorS0 class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorS1Bbase.h">CheMPS2/include/chemps2/TensorS1Bbase.h</a> contains the definitions of the TensorS1Bbase class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorS1.h">CheMPS2/include/chemps2/TensorS1.h</a> contains the definitions of the TensorS1 class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorSwap.h">CheMPS2/include/chemps2/TensorSwap.h</a> contains the definitions of the TensorSwap class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorT.h">CheMPS2/include/chemps2/TensorT.h</a> contains the definitions of the TensorT class.</p>
+<p><a href="CheMPS2/include/chemps2/TensorX.h">CheMPS2/include/chemps2/TensorX.h</a> contains the definitions of the TensorX class.</p>
+<p><a href="CheMPS2/include/chemps2/TwoDM.h">CheMPS2/include/chemps2/TwoDM.h</a> contains the definitions of the TwoDM class.</p>
+<p><a href="CheMPS2/include/chemps2/TwoDMstorage.h">CheMPS2/include/chemps2/TwoDMstorage.h</a> contains the definitions of the TwoDMstorage class.</p>
+<p><a href="CheMPS2/include/chemps2/TwoIndex.h">CheMPS2/include/chemps2/TwoIndex.h</a> contains the definitions of the TwoIndex class.</p>
 <p>Please note that these files are documented with doxygen comments. The <a href="#installation">installation section</a> discusses how a manual can be generated from these comments.</p>
 <h2>List of files to perform test runs </h2>
 <p><a href="tests/test1.cpp.in">tests/test1.cpp.in</a> contains several DMRG ground state calculations in different symmetry sectors for the N2 molecule (d2h symmetry) in the minimal STO-3G basis set.</p>
@@ -405,7 +409,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Wed Apr 22 2015 23:39:28 for CheMPS2 by
+    <li class="footer">Generated on Sat May 9 2015 00:04:15 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
