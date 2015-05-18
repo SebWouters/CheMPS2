@@ -27,6 +27,7 @@ set dmrgscf dmrgscf_do_diis      true
 set dmrgscf dmrgscf_diis_branch  1e-2
 set dmrgscf dmrgscf_store_diis   true
 
+set dmrgscf dmrgscf_max_iter     100
 set dmrgscf dmrgscf_which_root   2   # First excited state
 set dmrgscf dmrgscf_state_avg    true
 set dmrgscf dmrgscf_active_space NO  # INPUT; NO; LOC

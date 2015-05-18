@@ -29,6 +29,7 @@ set dmrgscf dmrgscf_do_diis      true
 set dmrgscf dmrgscf_diis_branch  1e-2
 set dmrgscf dmrgscf_store_diis   true
 
+set dmrgscf dmrgscf_max_iter     100
 set dmrgscf dmrgscf_which_root   1   # Ground state
 set dmrgscf dmrgscf_state_avg    false
 set dmrgscf dmrgscf_active_space LOC  # INPUT; NO; LOC

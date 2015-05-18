@@ -4,26 +4,29 @@ molecule N2 {
 units au
 }
 
-plugin_load("dmrgci/dmrgci.so")
+plugin_load("dmrgscf/dmrgscf.so")
 
 set basis          cc-pVDZ
 set reference      rhf
 set e_convergence  1e-12
 set d_convergence  1e-12
 
-set dmrgci wfn_irrep            0
-set dmrgci wfn_multp            1
-set dmrgci frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
-set dmrgci active               [ 4 , 0 , 1 , 1 , 0 , 4 , 1 , 1 ]
-set dmrgci dmrg_states          [   500,  1000,  1000 ]
-set dmrgci dmrg_econv           [ 1e-10, 1e-10, 1e-10 ]
-set dmrgci dmrg_maxsweeps       [     5,     5,    10 ]
-set dmrgci dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
-set dmrgci dmrg_print_corr      false
-set dmrgci mps_chkpt            false
+set dmrgscf wfn_irrep            0
+set dmrgscf wfn_multp            1
+set dmrgscf frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
+set dmrgscf active               [ 4 , 0 , 1 , 1 , 0 , 4 , 1 , 1 ]
+
+set dmrgscf dmrg_states          [   500,  1000,  1000 ]
+set dmrgscf dmrg_econv           [ 1e-10, 1e-10, 1e-10 ]
+set dmrgscf dmrg_maxsweeps       [     5,     5,    10 ]
+set dmrgscf dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrgscf dmrg_print_corr      false
+set dmrgscf mps_chkpt            false
+
+set dmrgscf dmrgscf_max_iter     1
 
 scf()
 
-plugin("dmrgci.so")
+plugin("dmrgscf.so")
 
 
