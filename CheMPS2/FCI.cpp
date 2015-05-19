@@ -1890,8 +1890,8 @@ void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, cons
    // Check whether some stuff is OK
    assert( numLeft  > 0 );
    assert( numRight > 0 );
-   for ( unsigned int cnt = 0; cnt < numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] < L ) && (  orbsLeft[ cnt ] >= 0 ) ); }
-   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){ assert( ( orbsRight[ cnt ] < L ) && ( orbsRight[ cnt ] >= 0 ) ); }
+   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ unsigned int orbl = orbsLeft[  cnt ]; assert((orbl < L) && (orbl >= 0)); }
+   for (unsigned int cnt = 0; cnt < numRight; cnt++){ unsigned int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
    assert( RePartsGF != NULL );
    assert( ImPartsGF != NULL );
    for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
@@ -1910,7 +1910,7 @@ void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, cons
    
       const int orbitalRight = orbsRight[ cnt_right ];
       bool matchingIrrep = false;
-      for ( int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+      for ( unsigned int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
          if ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = true; }
       }
       
@@ -1981,8 +1981,8 @@ void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const
    // Check whether some stuff is OK
    assert( numLeft  > 0 );
    assert( numRight > 0 );
-   for ( unsigned int cnt = 0; cnt < numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] < L ) && (  orbsLeft[ cnt ] >= 0 ) ); }
-   for ( unsigned int cnt = 0; cnt < numRight; cnt++ ){ assert( ( orbsRight[ cnt ] < L ) && ( orbsRight[ cnt ] >= 0 ) ); }
+   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ unsigned int orbl = orbsLeft [ cnt ]; assert((orbl < L) && (orbl >= 0)); }
+   for (unsigned int cnt = 0; cnt < numRight; cnt++){ unsigned int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
    assert( RePartsGF != NULL );
    assert( ImPartsGF != NULL );
    for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
@@ -2001,7 +2001,7 @@ void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const
    
       const int orbitalRight = orbsRight[ cnt_right ];
       bool matchingIrrep = false;
-      for ( int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
+      for ( unsigned int cnt_left = 0; cnt_left < numLeft; cnt_left++ ){
          if ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = true; }
       }
       
