@@ -3,6 +3,7 @@ var classCheMPS2_1_1Problem =
     [ "Problem", "classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c", null ],
     [ "~Problem", "classCheMPS2_1_1Problem.html#a9bc13e74cc92e3d697e9cc2ac589afc2", null ],
     [ "checkConsistency", "classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e", null ],
+    [ "construct_mxelem", "classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4", null ],
     [ "gEconst", "classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1", null ],
     [ "gf1", "classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9", null ],
     [ "gf2", "classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a", null ],

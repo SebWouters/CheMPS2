@@ -20,8 +20,9 @@ var searchData=
   ['clearstorage',['ClearStorage',['../classCheMPS2_1_1TensorA.html#ae7eb489c981ac455279a53e187953880',1,'CheMPS2::TensorA::ClearStorage()'],['../classCheMPS2_1_1TensorB.html#a28ab08500c8aa76cba2f155f284274ee',1,'CheMPS2::TensorB::ClearStorage()'],['../classCheMPS2_1_1TensorC.html#ab91ebced267050ea37b3bacbcf08ac6e',1,'CheMPS2::TensorC::ClearStorage()'],['../classCheMPS2_1_1TensorD.html#aa50056f6f5e242f8933c3ed0177faade',1,'CheMPS2::TensorD::ClearStorage()'],['../classCheMPS2_1_1TensorQ.html#aa8b8725cc9529f5954b7c16398fa7b00',1,'CheMPS2::TensorQ::ClearStorage()']]],
   ['clearvector',['ClearVector',['../classCheMPS2_1_1FCI.html#a030bc8d72d2f0c1fcaf570ab397c49a9',1,'CheMPS2::FCI']]],
   ['construct',['construct',['../classCheMPS2_1_1TensorGYZ.html#a8470ec48e82ff7d002a1b248afc98787',1,'CheMPS2::TensorGYZ::construct()'],['../classCheMPS2_1_1TensorK.html#af50dfd56702742ce0d0642e28413a893',1,'CheMPS2::TensorK::construct()'],['../classCheMPS2_1_1TensorM.html#a3621e74cd5fdbc2c7e4ca04d045dbb4c',1,'CheMPS2::TensorM::construct()']]],
-  ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html',1,'CheMPS2']]],
+  ['construct_5fmxelem',['construct_mxelem',['../classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4',1,'CheMPS2::Problem']]],
   ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#a8aa20cc325aa2c2332bec394bb05823c',1,'CheMPS2::ConvergenceScheme']]],
+  ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html',1,'CheMPS2']]],
   ['copy2dmover',['copy2DMover',['../classCheMPS2_1_1CASSCF.html#ae8305d7f87c340f9001e497aaf7ba93f',1,'CheMPS2::CASSCF']]],
   ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html#aeb2b17926e78c7735821a13c1faf6867',1,'CheMPS2::Correlations']]],
   ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html',1,'CheMPS2']]]

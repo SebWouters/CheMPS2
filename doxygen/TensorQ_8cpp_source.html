@@ -237,7 +237,7 @@ $(document).ready(function(){initNavTree('TensorQ_8cpp_source.html','');});
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> loca=0; loca&lt;index-1; loca++){</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;               <span class="keywordflow">if</span> (Ltensors[index-2-loca]-&gt;gIdiff() == Idiff){</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                  <span class="keywordtype">double</span> * BlockL = Ltensors[index-2-loca]-&gt;<a class="code" href="classCheMPS2_1_1TensorSwap.html#aec2821e3014652b3498a35a30b410d18">gStorage</a>(sectorN1[ikappa]-1,sectorTwoSD[ikappa],ID,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                  <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(loca,index-1,index-1,site);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                  <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(loca,site,index-1,index-1);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                  <span class="keywordtype">int</span> inc = 1;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                  daxpy_(&amp;dimLUxLD, &amp;alpha, BlockL, &amp;inc, workmem, &amp;inc);</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;               }</div>
@@ -372,7 +372,7 @@ $(document).ready(function(){initNavTree('TensorQ_8cpp_source.html','');});
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> loca=index+1; loca&lt;Prob-&gt;gL(); loca++){</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;               <span class="keywordflow">if</span> (Ltensors[loca-index-1]-&gt;gIdiff() == Idiff){</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                  <span class="keywordtype">double</span> * BlockL = Ltensors[loca-index-1]-&gt;gStorage(sectorN1[ikappa]+1,sectorTwoSD[ikappa],ID,sectorN1[ikappa]+2,sectorTwoS1[ikappa],sectorI1[ikappa]);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                  <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(site,index,index,loca);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                  <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(site,loca,index,index);</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                  <span class="keywordtype">int</span> inc = 1;</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                  daxpy_(&amp;dimRUxRD, &amp;alpha, BlockL, &amp;inc, workmem, &amp;inc);</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;               }</div>
@@ -908,7 +908,7 @@ $(document).ready(function(){initNavTree('TensorQ_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TensorQ.cpp</b></li>
-    <li class="footer">Generated on Mon May 18 2015 20:46:51 for CheMPS2 by
+    <li class="footer">Generated on Thu May 21 2015 18:16:31 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

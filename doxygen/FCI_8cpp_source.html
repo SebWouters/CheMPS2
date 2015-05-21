@@ -1996,8 +1996,8 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;   <span class="comment">// Check whether some stuff is OK</span></div>
 <div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;   assert( numLeft  &gt; 0 );</div>
 <div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;   assert( numRight &gt; 0 );</div>
-<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] &lt; L ) &amp;&amp; (  orbsLeft[ cnt ] &gt;= 0 ) ); }</div>
-<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numRight; cnt++ ){ assert( ( orbsRight[ cnt ] &lt; L ) &amp;&amp; ( orbsRight[ cnt ] &gt;= 0 ) ); }</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numLeft;  cnt++){ <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> orbl = orbsLeft[  cnt ]; assert((orbl &lt; L) &amp;&amp; (orbl &gt;= 0)); }</div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numRight; cnt++){ <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> orbr = orbsRight[ cnt ]; assert((orbr &lt; L) &amp;&amp; (orbr &gt;= 0)); }</div>
 <div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;   assert( RePartsGF != NULL );</div>
 <div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;   assert( ImPartsGF != NULL );</div>
 <div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> counter = 0; counter &lt; numLeft * numRight; counter++ ){</div>
@@ -2016,7 +2016,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;   </div>
 <div class="line"><a name="l01911"></a><span class="lineno"> 1911</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> orbitalRight = orbsRight[ cnt_right ];</div>
 <div class="line"><a name="l01912"></a><span class="lineno"> 1912</span>&#160;      <span class="keywordtype">bool</span> matchingIrrep = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> cnt_left = 0; cnt_left &lt; numLeft; cnt_left++ ){</div>
+<div class="line"><a name="l01913"></a><span class="lineno"> 1913</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt_left = 0; cnt_left &lt; numLeft; cnt_left++ ){</div>
 <div class="line"><a name="l01914"></a><span class="lineno"> 1914</span>&#160;         <span class="keywordflow">if</span> ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = <span class="keyword">true</span>; }</div>
 <div class="line"><a name="l01915"></a><span class="lineno"> 1915</span>&#160;      }</div>
 <div class="line"><a name="l01916"></a><span class="lineno"> 1916</span>&#160;      </div>
@@ -2087,8 +2087,8 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l01981"></a><span class="lineno"> 1981</span>&#160;   <span class="comment">// Check whether some stuff is OK</span></div>
 <div class="line"><a name="l01982"></a><span class="lineno"> 1982</span>&#160;   assert( numLeft  &gt; 0 );</div>
 <div class="line"><a name="l01983"></a><span class="lineno"> 1983</span>&#160;   assert( numRight &gt; 0 );</div>
-<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numLeft;  cnt++ ){ assert( (  orbsLeft[ cnt ] &lt; L ) &amp;&amp; (  orbsLeft[ cnt ] &gt;= 0 ) ); }</div>
-<div class="line"><a name="l01985"></a><span class="lineno"> 1985</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numRight; cnt++ ){ assert( ( orbsRight[ cnt ] &lt; L ) &amp;&amp; ( orbsRight[ cnt ] &gt;= 0 ) ); }</div>
+<div class="line"><a name="l01984"></a><span class="lineno"> 1984</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numLeft;  cnt++){ <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> orbl = orbsLeft [ cnt ]; assert((orbl &lt; L) &amp;&amp; (orbl &gt;= 0)); }</div>
+<div class="line"><a name="l01985"></a><span class="lineno"> 1985</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt = 0; cnt &lt; numRight; cnt++){ <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> orbr = orbsRight[ cnt ]; assert((orbr &lt; L) &amp;&amp; (orbr &gt;= 0)); }</div>
 <div class="line"><a name="l01986"></a><span class="lineno"> 1986</span>&#160;   assert( RePartsGF != NULL );</div>
 <div class="line"><a name="l01987"></a><span class="lineno"> 1987</span>&#160;   assert( ImPartsGF != NULL );</div>
 <div class="line"><a name="l01988"></a><span class="lineno"> 1988</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> counter = 0; counter &lt; numLeft * numRight; counter++ ){</div>
@@ -2107,7 +2107,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div class="line"><a name="l02001"></a><span class="lineno"> 2001</span>&#160;   </div>
 <div class="line"><a name="l02002"></a><span class="lineno"> 2002</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> orbitalRight = orbsRight[ cnt_right ];</div>
 <div class="line"><a name="l02003"></a><span class="lineno"> 2003</span>&#160;      <span class="keywordtype">bool</span> matchingIrrep = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l02004"></a><span class="lineno"> 2004</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> cnt_left = 0; cnt_left &lt; numLeft; cnt_left++ ){</div>
+<div class="line"><a name="l02004"></a><span class="lineno"> 2004</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cnt_left = 0; cnt_left &lt; numLeft; cnt_left++ ){</div>
 <div class="line"><a name="l02005"></a><span class="lineno"> 2005</span>&#160;         <span class="keywordflow">if</span> ( getOrb2Irrep( orbsLeft[ cnt_left] ) == getOrb2Irrep( orbitalRight ) ){ matchingIrrep = <span class="keyword">true</span>; }</div>
 <div class="line"><a name="l02006"></a><span class="lineno"> 2006</span>&#160;      }</div>
 <div class="line"><a name="l02007"></a><span class="lineno"> 2007</span>&#160;      </div>
@@ -2323,7 +2323,7 @@ $(document).ready(function(){initNavTree('FCI_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>FCI.cpp</b></li>
-    <li class="footer">Generated on Mon May 18 2015 20:46:51 for CheMPS2 by
+    <li class="footer">Generated on Thu May 21 2015 18:16:30 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
