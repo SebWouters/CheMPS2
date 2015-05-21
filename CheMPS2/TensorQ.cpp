@@ -131,7 +131,7 @@ void CheMPS2::TensorQ::AddTermsLRight(TensorL ** Ltensors, TensorT * denT, doubl
             for (int loca=0; loca<index-1; loca++){
                if (Ltensors[index-2-loca]->gIdiff() == Idiff){
                   double * BlockL = Ltensors[index-2-loca]->gStorage(sectorN1[ikappa]-1,sectorTwoSD[ikappa],ID,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-                  double alpha = Prob->gMxElement(loca,index-1,index-1,site);
+                  double alpha = Prob->gMxElement(loca,site,index-1,index-1);
                   int inc = 1;
                   daxpy_(&dimLUxLD, &alpha, BlockL, &inc, workmem, &inc);
                }
@@ -266,7 +266,7 @@ void CheMPS2::TensorQ::AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double
             for (int loca=index+1; loca<Prob->gL(); loca++){
                if (Ltensors[loca-index-1]->gIdiff() == Idiff){
                   double * BlockL = Ltensors[loca-index-1]->gStorage(sectorN1[ikappa]+1,sectorTwoSD[ikappa],ID,sectorN1[ikappa]+2,sectorTwoS1[ikappa],sectorI1[ikappa]);
-                  double alpha = Prob->gMxElement(site,index,index,loca);
+                  double alpha = Prob->gMxElement(site,loca,index,index);
                   int inc = 1;
                   daxpy_(&dimRUxRD, &alpha, BlockL, &inc, workmem, &inc);
                }

@@ -48,11 +48,11 @@ namespace CheMPS2{
          
          //! Get the number of orbitals
          /** \return The number of orbitals */
-         int gL() const;
+         int gL() const{ return L; }
          
          //! Get the point group symmetry
          /** \return The point group symmetry */
-         int gSy() const;
+         int gSy() const{ return Ham->getNGroup(); }
          
          //! Get an orbital irrep
          /** \param nOrb The orbital index
@@ -61,19 +61,19 @@ namespace CheMPS2{
          
          //! Get twice the targeted spin
          /** \return Twice the targeted spin */
-         int gTwoS() const;
+         int gTwoS() const{ return TwoS; }
          
          //! Get the targeted particle number
          /** \return The targeted particle number */
-         int gN() const;
+         int gN() const{ return N; }
          
          //! Get the targeted irrep
          /** \return The targeted irrep */
-         int gIrrep() const;
+         int gIrrep() const{ return Irrep; }
          
          //! Get the constant part of the Hamiltonian
          /** \return The constant part of the Hamiltonian */
-         double gEconst() const;
+         double gEconst() const{ return Ham->getEconst(); }
          
          //! Get a specific interaction matrix element
          /** \param alpha The first index (0 <= alpha < L)
@@ -82,6 +82,9 @@ namespace CheMPS2{
              \param delta The fourth index
              \return \f$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) \f$ */
          double gMxElement(const int alpha, const int beta, const int gamma, const int delta) const;
+         
+         //! Construct a table with the h-matrix elements (two-body augmented with one-body). Remember to recall this function each time you change the Hamiltonian!
+         void construct_mxelem();
          
          //! Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0<=Irrep<nIrreps. A more thorough test will be done when the FCI virtual dimensions are constructed.
          /** \return True if consistent, else false */
@@ -109,14 +112,14 @@ namespace CheMPS2{
          //Pointer to the Hamiltonian --> constructed and destructed outside of this class
          const Hamiltonian * Ham;
          
+         //The number of orbitals
+         int L;
+         
          //Twice the targeted spin
          int TwoS;
          
          //The targeted particle number
          int N;
-         
-         //1/(N-1)
-         double OneOverNMinusOne;
          
          //The targeted irrep
          int Irrep;
@@ -129,6 +132,9 @@ namespace CheMPS2{
          
          //f2[DMRGIndex] = HamiltonianIndex
          int * f2;
+         
+         //Matrix element table
+         double * mx_elem;
          
    };
 }

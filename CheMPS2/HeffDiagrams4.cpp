@@ -2151,7 +2151,7 @@ void CheMPS2::Heff::addDiagram4D(const int ikappa, double * memS, double * memHe
                int number = 0;
                for (int l_index=0; l_index<theindex; l_index++){
                   if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex+1)){
-                     double alpha = Prob->gMxElement(l_index,theindex,theindex,theindex+1);
+                     double alpha = Prob->gMxElement(l_index,theindex+1,theindex,theindex);
                      double * Lblock = Lleft[theindex-1-l_index]->gStorage(NL-1,TwoSLdown,ILdown,NL,TwoSL,IL);
                      daxpy_(&size,&alpha,Lblock,&inc,temp,&inc);
                      number++;
@@ -2189,7 +2189,7 @@ void CheMPS2::Heff::addDiagram4D(const int ikappa, double * memS, double * memHe
                int number = 0;
                for (int l_index=0; l_index<theindex; l_index++){
                   if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex+1)){
-                     double alpha = Prob->gMxElement(l_index,theindex,theindex,theindex+1);
+                     double alpha = Prob->gMxElement(l_index,theindex+1,theindex,theindex);
                      double * Lblock = Lleft[theindex-1-l_index]->gStorage(NL,TwoSL,IL,NL+1,TwoSLdown,ILdown);
                      daxpy_(&size,&alpha,Lblock,&inc,temp,&inc);
                      number++;
@@ -2412,7 +2412,7 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (Irrep == denBK->gIrrep(l_beta)){
                                     double * LblockRight = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
-                                    double prefact = Prob->gMxElement(l_alpha,theindex,theindex,l_beta);
+                                    double prefact = Prob->gMxElement(l_alpha,l_beta,theindex,theindex);
                                     daxpy_(&size,&prefact,LblockRight,&inc,temp,&inc);
                                  }
                               }
@@ -2472,7 +2472,7 @@ void CheMPS2::Heff::addDiagram4E(const int ikappa, double * memS, double * memHe
                               for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
                                  if (Irrep == denBK->gIrrep(l_delta)){
                                     double * LblockRight = Lright[l_delta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
-                                    double prefact = Prob->gMxElement(l_gamma,theindex,theindex,l_delta);
+                                    double prefact = Prob->gMxElement(l_gamma,l_delta,theindex,theindex);
                                     daxpy_(&size,&prefact,LblockRight,&inc,temp,&inc);
                                  }
                               }
@@ -2901,14 +2901,16 @@ void CheMPS2::Heff::addDiagram4F(const int ikappa, double * memS, double * memHe
                      if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex+1)){
                         double prefact = 0.0;
                         if ((N1==1) && (N2==1)){ // 4F3A
-                           prefact = factor * ( Prob->gMxElement(theindex,theindex+1,theindex,l_index) + ((TwoJ==0)?1:-1) * Prob->gMxElement(theindex,theindex,theindex+1,l_index) );
+                           prefact = factor * ( Prob->gMxElement(theindex,theindex+1,theindex,l_index)
+                           + ((TwoJ==0)?1:-1) * Prob->gMxElement(theindex,theindex+1,l_index,theindex) );
                         }
                         if ((N1==1) && (N2==2)){ // 4F3B
-                           prefact = Prob->gMxElement(theindex,theindex+1,theindex,l_index) * factor;
-                           if (TwoJdown==0){ prefact += factor2 * Prob->gMxElement(theindex,theindex,theindex+1,l_index); }
+                                             prefact  = factor  * Prob->gMxElement(theindex,theindex+1,theindex,l_index);
+                           if (TwoJdown==0){ prefact += factor2 * Prob->gMxElement(theindex,theindex+1,l_index,theindex); }
                         }
                         if (N1==2){ // 4F3C and 4F3D
-                           prefact = factor*(2 * Prob->gMxElement(theindex,theindex+1,theindex,l_index) - Prob->gMxElement(theindex,theindex,theindex+1,l_index));
+                           prefact = factor * ( 2 * Prob->gMxElement(theindex,theindex+1,theindex,l_index)
+                                                  - Prob->gMxElement(theindex,theindex+1,l_index,theindex) );
                         }
                         
                         double * Lblock = Lright[l_index-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
@@ -2971,14 +2973,16 @@ void CheMPS2::Heff::addDiagram4F(const int ikappa, double * memS, double * memHe
                      if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex+1)){
                         double prefact = 0.0;
                         if ((N1==1) && (N2==0)){ // 4F3A
-                           prefact = factor * ( Prob->gMxElement(theindex,theindex+1,theindex,l_index) + ((TwoJdown==0)?1:-1) * Prob->gMxElement(theindex,theindex,theindex+1,l_index) );
+                              prefact = factor * ( Prob->gMxElement(theindex,theindex+1,theindex,l_index)
+                          + ((TwoJdown==0)?1:-1) * Prob->gMxElement(theindex,theindex+1,l_index,theindex) );
                         }
                         if ((N1==1) && (N2==1)){ // 4F3B
-                           prefact = Prob->gMxElement(theindex,theindex+1,theindex,l_index) * factor;
-                           if (TwoJ==0){ prefact += factor2 * Prob->gMxElement(theindex,theindex,theindex+1,l_index); }
+                                         prefact  = factor  * Prob->gMxElement(theindex,theindex+1,theindex,l_index);
+                           if (TwoJ==0){ prefact += factor2 * Prob->gMxElement(theindex,theindex+1,l_index,theindex); }
                         }
                         if (N1==2){ // 4F3C and 4F3D
-                           prefact = factor*(2 * Prob->gMxElement(theindex,theindex+1,theindex,l_index) - Prob->gMxElement(theindex,theindex,theindex+1,l_index));
+                           prefact = factor * ( 2 * Prob->gMxElement(theindex,theindex+1,theindex,l_index)
+                                                  - Prob->gMxElement(theindex,theindex+1,l_index,theindex) );
                         }
                         
                         double * Lblock = Lright[l_index-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
@@ -3042,7 +3046,7 @@ void CheMPS2::Heff::addDiagram4G(const int ikappa, double * memS, double * memHe
                int number = 0;
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
                   if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex)){
-                     double alpha = Prob->gMxElement(theindex,theindex+1,theindex+1,l_index);
+                     double alpha = Prob->gMxElement(theindex,l_index,theindex+1,theindex+1);
                      double * Lblock = Lright[l_index-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                      daxpy_(&size,&alpha,Lblock,&inc,temp,&inc);
                      number++;
@@ -3081,7 +3085,7 @@ void CheMPS2::Heff::addDiagram4G(const int ikappa, double * memS, double * memHe
                int number = 0;
                for (int l_index=theindex+2; l_index<Prob->gL(); l_index++){
                   if (denBK->gIrrep(l_index) == denBK->gIrrep(theindex)){
-                     double alpha = Prob->gMxElement(theindex,theindex+1,theindex+1,l_index);
+                     double alpha = Prob->gMxElement(theindex,l_index,theindex+1,theindex+1);
                      double * Lblock = Lright[l_index-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                      daxpy_(&size,&alpha,Lblock,&inc,temp,&inc);
                      number++;
@@ -3306,7 +3310,7 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                               
                               for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
                                  if (Irrep == denBK->gIrrep(l_delta)){
-                                    double fact = factor * Prob->gMxElement(l_gamma,theindex+1,theindex+1,l_delta);
+                                    double fact = factor * Prob->gMxElement(l_gamma,l_delta,theindex+1,theindex+1);
                                     double * LblockR = Lright[l_delta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     int inc = 1;
                                     daxpy_(&size,&fact,LblockR,&inc,temp,&inc);
@@ -3369,7 +3373,7 @@ void CheMPS2::Heff::addDiagram4H(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (Irrep == denBK->gIrrep(l_beta)){
-                                    double fact = factor * Prob->gMxElement(l_alpha,theindex+1,theindex+1,l_beta);
+                                    double fact = factor * Prob->gMxElement(l_alpha,l_beta,theindex+1,theindex+1);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     int inc = 1;
                                     daxpy_(&size,&fact,LblockR,&inc,temp,&inc);
@@ -3813,14 +3817,16 @@ void CheMPS2::Heff::addDiagram4I(const int ikappa, double * memS, double * memHe
                         number++;
                         double alpha = 0.0;
                         if ((N1==0)&&(N2==1)){
-                           alpha = prefact * (Prob->gMxElement(l_index,theindex+1,theindex,theindex+1) + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_index,theindex,theindex+1,theindex+1) );
+                                alpha = prefact * ( Prob->gMxElement(l_index,theindex+1,theindex,theindex+1)
+                           + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_index,theindex+1,theindex+1,theindex) );
                         }
                         if ((N1==1)&&(N2==1)){
-                           alpha = prefact * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1);
-                           if (TwoJ==0){ alpha += sqrt(2.0) * Prob->gMxElement(l_index,theindex,theindex+1,theindex+1); }
+                                         alpha  =   prefact * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1);
+                           if (TwoJ==0){ alpha += sqrt(2.0) * Prob->gMxElement(l_index,theindex+1,theindex+1,theindex); }
                         }
                         if (N2==2){
-                           alpha = prefact * (2 * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1) - Prob->gMxElement(l_index,theindex,theindex+1,theindex+1));
+                           alpha = prefact * ( 2 * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1)
+                                                 - Prob->gMxElement(l_index,theindex+1,theindex+1,theindex) );
                         }
                         
                         double * Lblock = Lleft[theindex-1-l_index]->gStorage(NL-1,TwoSLdown,ILdown,NL,TwoSL,IL);
@@ -3881,14 +3887,16 @@ void CheMPS2::Heff::addDiagram4I(const int ikappa, double * memS, double * memHe
                         number++;
                         double alpha = 0.0;
                         if ((N1==1)&&(N2==1)){
-                           alpha = prefact * (Prob->gMxElement(l_index,theindex+1,theindex,theindex+1) + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_index,theindex,theindex+1,theindex+1) );
+                            alpha = prefact * ( Prob->gMxElement(l_index,theindex+1,theindex,theindex+1)
+                           + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_index,theindex+1,theindex+1,theindex) );
                         }
                         if ((N1==2)&&(N2==1)){
-                           alpha = prefact * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1);
-                           if (TwoJdown==0){ alpha += sqrt(2.0) * Prob->gMxElement(l_index,theindex,theindex+1,theindex+1); }
+                                             alpha  =   prefact * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1);
+                           if (TwoJdown==0){ alpha += sqrt(2.0) * Prob->gMxElement(l_index,theindex+1,theindex+1,theindex); }
                         }
                         if (N2==2){
-                           alpha = prefact * (2 * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1) - Prob->gMxElement(l_index,theindex,theindex+1,theindex+1));
+                           alpha = prefact * ( 2 * Prob->gMxElement(l_index,theindex+1,theindex,theindex+1)
+                                                 - Prob->gMxElement(l_index,theindex+1,theindex+1,theindex) );
                         }
                         
                         double * Lblock = Lleft[theindex-1-l_index]->gStorage(NL,TwoSL,IL,NL+1,TwoSLdown,ILdown);

@@ -71,10 +71,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
 
    if ((denS->gN1(ikappa)==2)&&(denS->gN2(ikappa)==2)){ //2d3a
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 4 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - 2 * Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 4 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                          - 2 * Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -82,11 +83,12 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==1)&&(denS->gN2(ikappa)==1)){ //2d3b
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      int fase = (denS->gTwoJ(ikappa) == 2)? -1: 1;
-      double factor = Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) + fase * Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const int fase = (denS->gTwoJ(ikappa) == 2)? -1: 1;
+      const double factor = Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                   + fase * Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -94,10 +96,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==2)&&(denS->gN2(ikappa)==1)){ //2d3c
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                              - Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -105,10 +108,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==1)&&(denS->gN2(ikappa)==2)){ //2d3d
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                              - Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       

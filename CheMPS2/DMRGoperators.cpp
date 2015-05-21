@@ -259,10 +259,11 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
                if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
                Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
 
-               alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+               alpha = 2 * Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3)
+                         - Prob->gMxElement(index-num,index+1+cnt3,index+1+cnt2+cnt3,index);
                Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
                
-               alpha = - Prob->gMxElement(index-num,index,index+1+cnt2+cnt3,index+1+cnt3);
+               alpha = - Prob->gMxElement(index-num,index+1+cnt3,index+1+cnt2+cnt3,index); // Second line for Ctensors
                Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
                
                if (num>0){
@@ -271,10 +272,11 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
                      Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
                   }
                   
-                  alpha = 2*Prob->gMxElement(index-num,index+1+cnt3,index,index+1+cnt2+cnt3) - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
+                  alpha = 2 * Prob->gMxElement(index-num,index+1+cnt2+cnt3,index,index+1+cnt3)
+                            - Prob->gMxElement(index-num,index+1+cnt2+cnt3,index+1+cnt3,index);
                   Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
                   
-                  alpha = - Prob->gMxElement(index-num,index,index+1+cnt3,index+1+cnt2+cnt3);
+                  alpha = - Prob->gMxElement(index-num,index+1+cnt2+cnt3,index+1+cnt3,index); // Second line for Ctensors
                   Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
                }
             }
@@ -396,10 +398,11 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
                if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
                Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
                
-               alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+               alpha = 2 * Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num)
+                         - Prob->gMxElement(index-cnt2-cnt3,index+1,index+1+num,index-cnt3);
                Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
                
-               alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1+num,index+1);
+               alpha = - Prob->gMxElement(index-cnt2-cnt3,index+1,index+1+num,index-cnt3); // Second line for Ctensors
                Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
                
                if (num>0){
@@ -408,10 +411,11 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
                      Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
                   }
                   
-                  alpha = 2*Prob->gMxElement(index-cnt2-cnt3,index+1,index-cnt3,index+1+num) - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
+                  alpha = 2 * Prob->gMxElement(index-cnt2-cnt3,index+1+num,index-cnt3,index+1)
+                            - Prob->gMxElement(index-cnt2-cnt3,index+1+num,index+1,index-cnt3);
                   Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
                   
-                  alpha = - Prob->gMxElement(index-cnt2-cnt3,index-cnt3,index+1,index+1+num);
+                  alpha = - Prob->gMxElement(index-cnt2-cnt3,index+1+num,index+1,index-cnt3); // Second line for Ctensors
                   Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
                }
             }

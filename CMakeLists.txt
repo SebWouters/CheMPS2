@@ -38,13 +38,17 @@ if (ENABLE_XHOST)
     endif ()
 endif (ENABLE_XHOST)
 
-check_cxx_compiler_flag (-ipo HAS_IPO)
+set (CMAKE_CXX_FLAGS "-g -O3 ${CMAKE_CXX_FLAGS}")
 
+check_cxx_compiler_flag (-ipo HAS_IPO)
 if (HAS_IPO)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
 endif (HAS_IPO)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3")
+check_cxx_compiler_flag (-flto HAS_FLTO)
+if (HAS_FLTO)
+    set (CMAKE_CXX_FLAGS "-flto ${CMAKE_CXX_FLAGS}")
+endif (HAS_FLTO)
  
 if (ENABLE_GENERIC)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc")

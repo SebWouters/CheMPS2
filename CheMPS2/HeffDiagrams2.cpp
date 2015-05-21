@@ -890,9 +890,9 @@ void CheMPS2::Heff::addDiagram2c1and2c2(const int ikappa, double * memS, double 
 
 void CheMPS2::Heff::addDiagram2dall(const int ikappa, double * memS, double * memHeff, const Sobject * denS) const{
 
-   int N1 = denS->gN1(ikappa);
-   int N2 = denS->gN2(ikappa);
-   int theindex = denS->gIndex();
+   const int N1 = denS->gN1(ikappa);
+   const int N2 = denS->gN2(ikappa);
+   const int theindex = denS->gIndex();
    int size = denBK->gCurrentDim(theindex,  denS->gNL(ikappa),denS->gTwoSL(ikappa),denS->gIL(ikappa))
             * denBK->gCurrentDim(theindex+2,denS->gNR(ikappa),denS->gTwoSR(ikappa),denS->gIR(ikappa));
    int inc = 1;
@@ -919,7 +919,8 @@ void CheMPS2::Heff::addDiagram2dall(const int ikappa, double * memS, double * me
    
    if ((N1==2) && (N2==2)){ //2d3a
    
-      double factor = 4 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1) - 2 * Prob->gMxElement(theindex, theindex, theindex+1, theindex+1);
+      double factor = 4 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1)
+                    - 2 * Prob->gMxElement(theindex, theindex+1, theindex+1, theindex);
       daxpy_(&size,&factor,memS+denS->gKappa2index(ikappa),&inc,memHeff+denS->gKappa2index(ikappa),&inc);
    
    }
@@ -927,21 +928,24 @@ void CheMPS2::Heff::addDiagram2dall(const int ikappa, double * memS, double * me
    if ((N1==1) && (N2==1)){ //2d3b
    
       int fase = (denS->gTwoJ(ikappa) == 0)? 1: -1;
-      double factor = Prob->gMxElement(theindex, theindex+1, theindex, theindex+1) + fase * Prob->gMxElement(theindex, theindex, theindex+1, theindex+1);
+      double factor = Prob->gMxElement(theindex, theindex+1, theindex, theindex+1)
+             + fase * Prob->gMxElement(theindex, theindex+1, theindex+1, theindex);
       daxpy_(&size,&factor,memS+denS->gKappa2index(ikappa),&inc,memHeff+denS->gKappa2index(ikappa),&inc);
    
    }
    
    if ((N1==2) && (N2==1)){ //2d3c
    
-      double factor = 2 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1) - Prob->gMxElement(theindex, theindex, theindex+1, theindex+1);
+      double factor = 2 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1)
+                        - Prob->gMxElement(theindex, theindex+1, theindex+1, theindex);
       daxpy_(&size,&factor,memS+denS->gKappa2index(ikappa),&inc,memHeff+denS->gKappa2index(ikappa),&inc);
    
    }
    
    if ((N1==1) && (N2==2)){ //2d3d
    
-      double factor = 2 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1) - Prob->gMxElement(theindex, theindex, theindex+1, theindex+1);
+      double factor = 2 * Prob->gMxElement(theindex, theindex+1, theindex, theindex+1)
+                        - Prob->gMxElement(theindex, theindex+1, theindex+1, theindex);
       daxpy_(&size,&factor,memS+denS->gKappa2index(ikappa),&inc,memHeff+denS->gKappa2index(ikappa),&inc);
    
    }

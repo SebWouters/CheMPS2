@@ -29,13 +29,14 @@ using std::endl;
 CheMPS2::Problem::Problem(const Hamiltonian * Hamin, const int TwoSin, const int Nin, const int Irrepin){
 
    Ham = Hamin;
+   L = Ham->getL();
    TwoS = TwoSin;
    N = Nin;
-   OneOverNMinusOne = 1.0/(N-1);
    Irrep = Irrepin;
    bReorderD2h = false;
    
    checkConsistency();
+   mx_elem = NULL;
 
 }
 
@@ -45,6 +46,8 @@ CheMPS2::Problem::~Problem(){
       delete [] f1;
       delete [] f2;
    }
+   
+   if ( mx_elem != NULL ){ delete [] mx_elem; }
 
 }
 
@@ -82,9 +85,6 @@ void CheMPS2::Problem::SetupReorderD2h(){
 
 }
 
-int CheMPS2::Problem::gL() const{ return Ham->getL(); }
-int CheMPS2::Problem::gSy() const{ return Ham->getNGroup(); }
-
 int CheMPS2::Problem::gIrrep(const int nOrb) const{
    
    if (!bReorderD2h){
@@ -95,22 +95,36 @@ int CheMPS2::Problem::gIrrep(const int nOrb) const{
 
 }
 
-int CheMPS2::Problem::gTwoS() const{ return TwoS; }
-int CheMPS2::Problem::gN() const{ return N; }
-int CheMPS2::Problem::gIrrep() const{ return Irrep; }
-double CheMPS2::Problem::gEconst() const{ return Ham->getEconst(); }
-
 bool CheMPS2::Problem::gReorderD2h() const{ return bReorderD2h; }
 int CheMPS2::Problem::gf1(const int HamOrb) const{ return (bReorderD2h)?f1[HamOrb]:-1; }
 int CheMPS2::Problem::gf2(const int DMRGOrb) const{ return (bReorderD2h)?f2[DMRGOrb]:-1; }
 
 double CheMPS2::Problem::gMxElement(const int alpha, const int beta, const int gamma, const int delta) const{
 
-   if (!bReorderD2h){
-      return Ham->getVmat(alpha, beta, gamma, delta) + OneOverNMinusOne*(((alpha==gamma)?Ham->getTmat(beta,delta):0) + ((beta==delta)?Ham->getTmat(alpha,gamma):0));
-   }
+   return mx_elem[ alpha + L * ( beta + L * ( gamma + L * delta ) ) ];
+
+}
+
+void CheMPS2::Problem::construct_mxelem(){
+
+   if ( mx_elem == NULL ){ mx_elem = new double[ L*L*L*L ]; }
+   const double prefact = 1.0/(N-1);
    
-   return Ham->getVmat(f2[alpha],f2[beta],f2[gamma],f2[delta]) + OneOverNMinusOne*(((alpha==gamma)?Ham->getTmat(f2[beta],f2[delta]):0) + ((beta==delta)?Ham->getTmat(f2[alpha],f2[gamma]):0));
+   for (int orb1 = 0; orb1 < L; orb1++){
+      const int map1 = (( !bReorderD2h ) ? orb1 : f2[ orb1 ]);
+      for (int orb2 = 0; orb2 < L; orb2++){
+         const int map2 = (( !bReorderD2h ) ? orb2 : f2[ orb2 ]);
+         for (int orb3 = 0; orb3 < L; orb3++){
+            const int map3 = (( !bReorderD2h ) ? orb3 : f2[ orb3 ]);
+            for (int orb4 = 0; orb4 < L; orb4++){
+               const int map4 = (( !bReorderD2h ) ? orb4 : f2[ orb4 ]);
+               mx_elem[orb1+L*(orb2+L*(orb3+L*orb4))] = Ham->getVmat(map1,map2,map3,map4)
+                                                      + prefact*((orb1==orb3)?Ham->getTmat(map2,map4):0)
+                                                      + prefact*((orb2==orb4)?Ham->getTmat(map1,map3):0);
+            }
+         }
+      }
+   }
 
 }
 

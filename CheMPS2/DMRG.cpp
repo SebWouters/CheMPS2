@@ -40,6 +40,7 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    assert( ProbIn->checkConsistency() );
    Prob = ProbIn;
    L = Prob->gL();
+   Prob->construct_mxelem();
    OptScheme = OptSchemeIn;
    thePID = getpid();
    nStates = 1;

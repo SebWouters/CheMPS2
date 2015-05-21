@@ -90,8 +90,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -166,8 +166,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -241,8 +241,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -309,8 +309,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                              
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                 double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -400,8 +400,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -473,8 +473,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -547,8 +547,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -616,8 +616,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -1308,7 +1308,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha,theindex+1,theindex,l_beta)
-                                                  + factor2 * Prob->gMxElement(l_alpha,theindex,l_beta,theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha,theindex+1,l_beta,theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1377,7 +1377,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                        double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                     + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -1446,7 +1446,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                  double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                               + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -1512,7 +1512,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1605,7 +1605,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha,theindex+1,theindex,l_beta)
-                                                  + factor2 * Prob->gMxElement(l_alpha,theindex,l_beta,theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha,theindex+1,l_beta,theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1672,7 +1672,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                  double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                               + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -1739,7 +1739,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                        double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                     + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -1807,7 +1807,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
