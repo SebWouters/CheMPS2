@@ -1,0 +1,144 @@
+/*
+   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+   Copyright (C) 2013-2015 Sebastian Wouters
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include <iostream>
+#include <math.h>
+
+#include "Initialize.h"
+#include "DMRG.h"
+
+using namespace std;
+
+int main(void){
+
+   CheMPS2::Initialize::Init();
+   
+   //Square 2D Hubbard model with PBC
+   const int L_linear = 3;                    // Linear size
+   const int L_square = L_linear * L_linear;  // Number of orbitals
+   const int group = 0;                       // C1 symmetry
+   const double U =  5.0;                     // On-site repulsion
+   const double T = -1.0;                     // Hopping term
+   
+   const int N = 9;                           // Number of electrons
+   const int TwoS = 1;                        // Two times the spin
+   const int Irrep = 0;                       // Irrep = A (C1 symmetry)
+   
+   //Create the Hamiltonian (eightfold permutation symmetry is OK for site basis)
+   int * irreps = new int[L_square];
+   for (int cnt=0; cnt<L_square; cnt++){ irreps[cnt] = 0; }
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L_square, group, irreps);
+   delete [] irreps;
+   
+   //Clear the Hamiltonian completely
+   Ham->setEconst(0.0);
+   for (int cnt1=0; cnt1<L_square; cnt1++){
+      for (int cnt2=0; cnt2<L_square; cnt2++){
+         Ham->setTmat(cnt1,cnt2,0.0);
+         for (int cnt3=0; cnt3<L_square; cnt3++){
+            for (int cnt4=0; cnt4<L_square; cnt4++){
+               Ham->setVmat(cnt1,cnt2,cnt3,cnt4,0.0);
+            }
+         }
+      }
+   }
+   
+   //Fill with the site-basis matrix elements
+   for (int cnt=0; cnt<L_square; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }
+   for (int ix=0; ix<L_linear; ix++){
+      for (int iy=0; iy<L_linear; iy++){
+          const int idx1 = ix + L_linear * iy;                        // This site
+          const int idx2 = (( ix + 1 ) % L_linear) + L_linear * iy;   // Right neighbour (PBC)
+          const int idx3 = ix + L_linear * ((( iy + 1 ) % L_linear)); //Upper neighbour (PBC)
+          Ham->setTmat(idx1,idx2,T);
+          Ham->setTmat(idx1,idx3,T);
+      }
+   }
+   
+   //The problem object
+   CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
+   
+   //The convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
+   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0,  500, 1e-10,  3, 0.05);
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0 );
+   
+   //Run ground state calculation
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+   const double EnergySite = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
+   
+   //Clean up DMRG
+   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+   delete theDMRG;
+   
+   //Hack: overwrite the matrix elements in momentum space (4-fold symmetry!!!) directly in the Problem object
+   theDMRG = new CheMPS2::DMRG(Prob, OptScheme);  // Prob->construct_mxelem() is called now
+   for (int orb1=0; orb1<L_square; orb1++){
+      const int k1x = orb1 % L_linear;
+      const int k1y = orb1 / L_linear;
+      const double Telem1 = 2*T*( cos((2*M_PI*k1x)/L_linear)
+                                + cos((2*M_PI*k1y)/L_linear) );
+      for (int orb2=0; orb2<L_square; orb2++){
+         const int k2x = orb2 % L_linear;
+         const int k2y = orb2 / L_linear;
+         const double Telem2 = 2*T*( cos((2*M_PI*k2x)/L_linear)
+                                   + cos((2*M_PI*k2y)/L_linear) );
+         for (int orb3=0; orb3<L_square; orb3++){
+            const int k3x = orb3 % L_linear;
+            const int k3y = orb3 / L_linear;
+            for (int orb4=0; orb4<L_square; orb4++){
+               const int k4x = orb4 % L_linear;
+               const int k4y = orb4 / L_linear;
+               const bool kx_conservation = (((k1x+k2x) % L_linear) == ((k3x+k4x) % L_linear))?true:false;
+               const bool ky_conservation = (((k1y+k2y) % L_linear) == ((k3y+k4y) % L_linear))?true:false;
+               double temp = 0.0;
+               if ( kx_conservation && ky_conservation ){ temp += U/L_square; }
+               if (( orb1 == orb3 ) && ( orb2 == orb4 )){ temp += (Telem1+Telem2)/(N-1); }
+               Prob->setMxElement(orb1,orb2,orb3,orb4,temp);
+            }
+         }
+      }
+   }
+   const double EnergyMomentum = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
+   
+   //Clean up
+   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+   delete theDMRG;
+   delete OptScheme;
+   delete Prob;
+   delete Ham;
+   
+   //Check succes
+   const bool success = ( fabs( EnergySite - EnergyMomentum ) < 1e-10 ) ? true : false;
+   cout << "================> Did test 10 succeed : ";
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
+
+}
+
+

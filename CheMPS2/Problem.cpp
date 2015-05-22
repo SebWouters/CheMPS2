@@ -105,6 +105,12 @@ double CheMPS2::Problem::gMxElement(const int alpha, const int beta, const int g
 
 }
 
+void CheMPS2::Problem::setMxElement(const int alpha, const int beta, const int gamma, const int delta, const double value){
+
+   mx_elem[ alpha + L * ( beta + L * ( gamma + L * delta ) ) ] = value;
+
+}
+
 void CheMPS2::Problem::construct_mxelem(){
 
    if ( mx_elem == NULL ){ mx_elem = new double[ L*L*L*L ]; }
@@ -118,9 +124,9 @@ void CheMPS2::Problem::construct_mxelem(){
             const int map3 = (( !bReorderD2h ) ? orb3 : f2[ orb3 ]);
             for (int orb4 = 0; orb4 < L; orb4++){
                const int map4 = (( !bReorderD2h ) ? orb4 : f2[ orb4 ]);
-               mx_elem[orb1+L*(orb2+L*(orb3+L*orb4))] = Ham->getVmat(map1,map2,map3,map4)
-                                                      + prefact*((orb1==orb3)?Ham->getTmat(map2,map4):0)
-                                                      + prefact*((orb2==orb4)?Ham->getTmat(map1,map3):0);
+               setMxElement( orb1, orb2, orb3, orb4, Ham->getVmat(map1,map2,map3,map4)
+                                                     + prefact*((orb1==orb3)?Ham->getTmat(map2,map4):0)
+                                                     + prefact*((orb2==orb4)?Ham->getTmat(map1,map3):0) );
             }
          }
       }

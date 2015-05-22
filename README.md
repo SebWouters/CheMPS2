@@ -266,6 +266,7 @@ run:
     > python test7.py
     > python test8.py
     > python test9.py
+    > python test10.py
 
 If you compiled the `c++` library with `-DMKL=ON`, you might get the
 error
@@ -736,6 +737,11 @@ space and which works with ordered localized orbitals instead of natural
 orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
 ordering based on the Fiedler vector with the exchange matrix as cost function.
 
+[tests/test10.cpp.in](tests/test10.cpp.in) contains a ground state DMRG
+calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site
+basis and in the momentum basis. For the latter, the matrix elements only have
+fourfold permutation symmetry.
+
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
 contains the matrix elements for test3.
 
@@ -777,6 +783,9 @@ contains the matrix elements for test8 and test9.
 
 [PyCheMPS2/test9.py.in](PyCheMPS2/test9.py.in) is the python version of
 [tests/test9.cpp.in](tests/test9.cpp.in)
+
+[PyCheMPS2/test10.py.in](PyCheMPS2/test10.py.in) is the python version of
+[tests/test10.cpp.in](tests/test10.cpp.in)
 
 These test files illustrate how to use libchemps2. The tests only
 require a very limited amount of memory (order 10-120 MB).

@@ -83,6 +83,14 @@ namespace CheMPS2{
              \return \f$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) \f$ */
          double gMxElement(const int alpha, const int beta, const int gamma, const int delta) const;
          
+         //! Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with the eightfold permutation symmetric Hamiltonian again!!!
+         /** \param alpha The first index (0 <= alpha < L)
+             \param beta The second index
+             \param gamma The third index
+             \param delta The fourth index
+             \param value The value to set the matrix element to */
+         void setMxElement(const int alpha, const int beta, const int gamma, const int delta, const double value);
+         
          //! Construct a table with the h-matrix elements (two-body augmented with one-body). Remember to recall this function each time you change the Hamiltonian!
          void construct_mxelem();
          

@@ -111,6 +111,8 @@ cdef class PyProblem:
         return self.thisptr.gEconst()
     def gMxElement(self, int index1, int index2, int index3, int index4):
         return self.thisptr.gMxElement(index1, index2, index3, index4)
+    def setMxElement(self, int index1, int index2, int index3, int index4, double value):
+        self.thisptr.setMxElement(index1, index2, index3, index4, value)
     def SetupReorderD2h(self):
         self.thisptr.SetupReorderD2h()
         

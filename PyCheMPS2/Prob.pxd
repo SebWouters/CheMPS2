@@ -30,5 +30,6 @@ cdef extern from "chemps2/Problem.h" namespace "CheMPS2":
         int gIrrep()
         double gEconst()
         double gMxElement(const int, const int, const int, const int)
+        void setMxElement(const int, const int, const int, const int, const double)
         void SetupReorderD2h()
 
