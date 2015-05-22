@@ -757,34 +757,34 @@ contains the matrix elements for test6 and test7.
 [tests/matrixelements/N2.CCPVDZ.FCIDUMP](tests/matrixelements/N2.CCPVDZ.FCIDUMP)
 contains the matrix elements for test8 and test9.
 
-[PyCheMPS2/test1.py.in](PyCheMPS2/test1.py.in) is the python version of
+[PyCheMPS2/tests/test1.py](PyCheMPS2/tests/test1.py) is the python version of
 [tests/test1.cpp.in](tests/test1.cpp.in)
 
-[PyCheMPS2/test2.py.in](PyCheMPS2/test2.py.in) is the python version of
+[PyCheMPS2/tests/test2.py](PyCheMPS2/tests/test2.py) is the python version of
 [tests/test2.cpp.in](tests/test2.cpp.in)
 
-[PyCheMPS2/test3.py.in](PyCheMPS2/test3.py.in) is the python version of
+[PyCheMPS2/tests/test3.py](PyCheMPS2/tests/test3.py) is the python version of
 [tests/test3.cpp.in](tests/test3.cpp.in)
 
-[PyCheMPS2/test4.py.in](PyCheMPS2/test4.py.in) is the python version of
+[PyCheMPS2/tests/test4.py](PyCheMPS2/tests/test4.py) is the python version of
 [tests/test4.cpp.in](tests/test4.cpp.in)
 
-[PyCheMPS2/test5.py.in](PyCheMPS2/test5.py.in) is the python version of
+[PyCheMPS2/tests/test5.py](PyCheMPS2/tests/test5.py) is the python version of
 [tests/test5.cpp.in](tests/test5.cpp.in)
 
-[PyCheMPS2/test6.py.in](PyCheMPS2/test6.py.in) is the python version of
+[PyCheMPS2/tests/test6.py](PyCheMPS2/tests/test6.py) is the python version of
 [tests/test6.cpp.in](tests/test6.cpp.in)
 
-[PyCheMPS2/test7.py.in](PyCheMPS2/test7.py.in) is the python version of
+[PyCheMPS2/tests/test7.py](PyCheMPS2/tests/test7.py) is the python version of
 [tests/test7.cpp.in](tests/test7.cpp.in)
 
-[PyCheMPS2/test8.py.in](PyCheMPS2/test8.py.in) is the python version of
+[PyCheMPS2/tests/test8.py](PyCheMPS2/tests/test8.py) is the python version of
 [tests/test8.cpp.in](tests/test8.cpp.in)
 
-[PyCheMPS2/test9.py.in](PyCheMPS2/test9.py.in) is the python version of
+[PyCheMPS2/tests/test9.py](PyCheMPS2/tests/test9.py) is the python version of
 [tests/test9.cpp.in](tests/test9.cpp.in)
 
-[PyCheMPS2/test10.py.in](PyCheMPS2/test10.py.in) is the python version of
+[PyCheMPS2/tests/test10.py](PyCheMPS2/tests/test10.py) is the python version of
 [tests/test10.cpp.in](tests/test10.cpp.in)
 
 These test files illustrate how to use libchemps2. The tests only
