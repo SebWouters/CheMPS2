@@ -21,6 +21,7 @@ var searchData=
   ['setgroup',['setGroup',['../classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c',1,'CheMPS2::Irreps']]],
   ['setinstruction',['setInstruction',['../classCheMPS2_1_1ConvergenceScheme.html#a454421f377a2be63872d9199b84bad95',1,'CheMPS2::ConvergenceScheme']]],
   ['setmaxiterations',['setMaxIterations',['../classCheMPS2_1_1DMRGSCFoptions.html#a1f659a5a28e4511b42e4392d4a0c6af1',1,'CheMPS2::DMRGSCFoptions']]],
+  ['setmxelement',['setMxElement',['../classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14',1,'CheMPS2::Problem']]],
   ['setnumdiisvecs',['setNumDIISVecs',['../classCheMPS2_1_1DMRGSCFoptions.html#a4c87f8a2df0db9687e868c961e8d6ebf',1,'CheMPS2::DMRGSCFoptions']]],
   ['setstartlocrandom',['setStartLocRandom',['../classCheMPS2_1_1DMRGSCFoptions.html#ab1482f548cb2dd885d19a14d578691de',1,'CheMPS2::DMRGSCFoptions']]],
   ['setstateaveraging',['setStateAveraging',['../classCheMPS2_1_1DMRGSCFoptions.html#ad2c42bcb89f55bafa0558d276ba562b7',1,'CheMPS2::DMRGSCFoptions']]],
@@ -41,7 +42,7 @@ var searchData=
   ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
   ['storage',['storage',['../classCheMPS2_1_1Tensor.html#ae38c4be492a8bf729d472e5a0c1d6d12',1,'CheMPS2::Tensor']]],
   ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e',1,'CheMPS2::FCI']]],
-  ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html',1,'CheMPS2']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],
+  ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html',1,'CheMPS2']]],
   ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]]
 ];

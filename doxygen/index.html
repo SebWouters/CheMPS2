@@ -229,6 +229,7 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 &gt; python test7.py
 &gt; python test8.py
 &gt; python test9.py
+&gt; python test10.py
 </pre><p>If you compiled the <code>c++</code> library with <code>-DMKL=ON</code>, you might get the error </p>
 <pre class="fragment">Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 </pre><p>This issue of using Intel’s MKL inside python is known and reported. To get the python tests to run, you can set the variable <code>LD_PRELOAD</code> in order to preload libmkl_rt.so. On my system, this is done with </p>
@@ -389,27 +390,29 @@ CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 <p><a href="tests/test7.cpp.in">tests/test7.cpp.in</a> reads in <a href="tests/matrixelements/O2.CCPVDZ.FCIDUMP">tests/matrixelements/O2.CCPVDZ.FCIDUMP</a>, stores these matrix elements to disk, reads them back in from disk, and compares the two versions.</p>
 <p><a href="tests/test8.cpp.in">tests/test8.cpp.in</a> contains a DMRG-SCF ground state calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital (pi bonding and antibonding) are chosen as active space. A significant speedup is obtained with DIIS. This test is smaller than test6, and is included for debugging with valgrind.</p>
 <p><a href="tests/test9.cpp.in">tests/test9.cpp.in</a> is a copy of <a href="tests/test8.cpp.in">tests/test8.cpp.in</a>, with a slightly larger active space and which works with ordered localized orbitals instead of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the ordering based on the Fiedler vector with the exchange matrix as cost function.</p>
+<p><a href="tests/test10.cpp.in">tests/test10.cpp.in</a> contains a ground state DMRG calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site basis and in the momentum basis. For the latter, the matrix elements only have fourfold permutation symmetry.</p>
 <p><a href="tests/matrixelements/CH4.STO3G.FCIDUMP">tests/matrixelements/CH4.STO3G.FCIDUMP</a> contains the matrix elements for test3.</p>
 <p><a href="tests/matrixelements/H2O.631G.FCIDUMP">tests/matrixelements/H2O.631G.FCIDUMP</a> contains the matrix elements for test2.</p>
 <p><a href="tests/matrixelements/N2.STO3G.FCIDUMP">tests/matrixelements/N2.STO3G.FCIDUMP</a> contains the matrix elements for test1 and test5.</p>
 <p><a href="tests/matrixelements/O2.CCPVDZ.FCIDUMP">tests/matrixelements/O2.CCPVDZ.FCIDUMP</a> contains the matrix elements for test6 and test7.</p>
 <p><a href="tests/matrixelements/N2.CCPVDZ.FCIDUMP">tests/matrixelements/N2.CCPVDZ.FCIDUMP</a> contains the matrix elements for test8 and test9.</p>
-<p><a href="PyCheMPS2/test1.py.in">PyCheMPS2/test1.py.in</a> is the python version of <a href="tests/test1.cpp.in">tests/test1.cpp.in</a></p>
-<p><a href="PyCheMPS2/test2.py.in">PyCheMPS2/test2.py.in</a> is the python version of <a href="tests/test2.cpp.in">tests/test2.cpp.in</a></p>
-<p><a href="PyCheMPS2/test3.py.in">PyCheMPS2/test3.py.in</a> is the python version of <a href="tests/test3.cpp.in">tests/test3.cpp.in</a></p>
-<p><a href="PyCheMPS2/test4.py.in">PyCheMPS2/test4.py.in</a> is the python version of <a href="tests/test4.cpp.in">tests/test4.cpp.in</a></p>
-<p><a href="PyCheMPS2/test5.py.in">PyCheMPS2/test5.py.in</a> is the python version of <a href="tests/test5.cpp.in">tests/test5.cpp.in</a></p>
-<p><a href="PyCheMPS2/test6.py.in">PyCheMPS2/test6.py.in</a> is the python version of <a href="tests/test6.cpp.in">tests/test6.cpp.in</a></p>
-<p><a href="PyCheMPS2/test7.py.in">PyCheMPS2/test7.py.in</a> is the python version of <a href="tests/test7.cpp.in">tests/test7.cpp.in</a></p>
-<p><a href="PyCheMPS2/test8.py.in">PyCheMPS2/test8.py.in</a> is the python version of <a href="tests/test8.cpp.in">tests/test8.cpp.in</a></p>
-<p><a href="PyCheMPS2/test9.py.in">PyCheMPS2/test9.py.in</a> is the python version of <a href="tests/test9.cpp.in">tests/test9.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test1.py">PyCheMPS2/tests/test1.py</a> is the python version of <a href="tests/test1.cpp.in">tests/test1.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test2.py">PyCheMPS2/tests/test2.py</a> is the python version of <a href="tests/test2.cpp.in">tests/test2.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test3.py">PyCheMPS2/tests/test3.py</a> is the python version of <a href="tests/test3.cpp.in">tests/test3.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test4.py">PyCheMPS2/tests/test4.py</a> is the python version of <a href="tests/test4.cpp.in">tests/test4.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test5.py">PyCheMPS2/tests/test5.py</a> is the python version of <a href="tests/test5.cpp.in">tests/test5.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test6.py">PyCheMPS2/tests/test6.py</a> is the python version of <a href="tests/test6.cpp.in">tests/test6.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test7.py">PyCheMPS2/tests/test7.py</a> is the python version of <a href="tests/test7.cpp.in">tests/test7.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test8.py">PyCheMPS2/tests/test8.py</a> is the python version of <a href="tests/test8.cpp.in">tests/test8.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test9.py">PyCheMPS2/tests/test9.py</a> is the python version of <a href="tests/test9.cpp.in">tests/test9.cpp.in</a></p>
+<p><a href="PyCheMPS2/tests/test10.py">PyCheMPS2/tests/test10.py</a> is the python version of <a href="tests/test10.cpp.in">tests/test10.cpp.in</a></p>
 <p>These test files illustrate how to use libchemps2. The tests only require a very limited amount of memory (order 10-120 MB). </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu May 21 2015 18:17:19 for CheMPS2 by
+    <li class="footer">Generated on Fri May 22 2015 14:13:12 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

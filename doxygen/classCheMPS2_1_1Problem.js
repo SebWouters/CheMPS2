@@ -15,5 +15,6 @@ var classCheMPS2_1_1Problem =
     [ "gReorderD2h", "classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679", null ],
     [ "gSy", "classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f", null ],
     [ "gTwoS", "classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49", null ],
+    [ "setMxElement", "classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14", null ],
     [ "SetupReorderD2h", "classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9", null ]
 ];

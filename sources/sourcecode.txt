@@ -149,6 +149,7 @@ To test PyCheMPS2 (remember that the python site-packages folder can vary), run:
     $ python test7.py
     $ python test8.py
     $ python test9.py
+    $ python test10.py
 
 If you compiled the ``c++`` library with ``-DMKL=ON``, you might get the error
 
