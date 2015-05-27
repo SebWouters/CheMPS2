@@ -158,7 +158,7 @@ The variable ``Norbitals`` should be the total number of orbitals in the active 
 
 Two important remarks:
 
-#. Every matrix element which can be nonzero according to the point group symmetry should be assigned (also if its value is 0.0).
+#. On creation of the ``CheMPS2::Hamiltonian`` object, every matrix element is set to zero.
 #. Physics notation is used for the two-electron integrals in CheMPS2: :math:`V_{ij;kl} = ( ik \mid jl )` or ``CheMPS2::Hamiltonian::setVmat( i, j, k, l, (ik|jl) )``.
 
 

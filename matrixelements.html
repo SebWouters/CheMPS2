@@ -322,7 +322,7 @@ plugin(&quot;savehdf.so&quot;)
 </div></blockquote>
 <p>Two important remarks:</p>
 <ol class="arabic simple">
-<li>Every matrix element which can be nonzero according to the point group symmetry should be assigned (also if its value is 0.0).</li>
+<li>On creation of the <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object, every matrix element is set to zero.</li>
 <li>Physics notation is used for the two-electron integrals in CheMPS2: <span class="math">\(V_{ij;kl} = ( ik \mid jl )\)</span> or <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian::setVmat(</span> <span class="pre">i,</span> <span class="pre">j,</span> <span class="pre">k,</span> <span class="pre">l,</span> <span class="pre">(ik|jl)</span> <span class="pre">)</span></code>.</li>
 </ol>
 </div>
