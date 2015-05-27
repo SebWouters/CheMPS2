@@ -78,10 +78,11 @@ var NAVTREEINDEX1 =
 "classCheMPS2_1_1FourIndex.html#a48e9e1b0939679da974e35c26281ba87":[0,0,0,15,2],
 "classCheMPS2_1_1FourIndex.html#a4988b7745b0ec4d5f86c4af89ba20430":[0,0,0,15,1],
 "classCheMPS2_1_1FourIndex.html#a552ebf0c200713acdd4ce8b5222bc6ac":[0,0,0,15,0],
-"classCheMPS2_1_1FourIndex.html#a557d6a17fa93c708a94fa5924626c405":[0,0,0,15,4],
-"classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d":[0,0,0,15,5],
-"classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f":[0,0,0,15,6],
-"classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1":[0,0,0,15,3],
+"classCheMPS2_1_1FourIndex.html#a557d6a17fa93c708a94fa5924626c405":[0,0,0,15,5],
+"classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d":[0,0,0,15,6],
+"classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f":[0,0,0,15,7],
+"classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1":[0,0,0,15,4],
+"classCheMPS2_1_1FourIndex.html#ae9f8cf8b6d2c444ee151876c11fd2418":[0,0,0,15,3],
 "classCheMPS2_1_1Hamiltonian.html":[0,0,0,16],
 "classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd":[0,0,0,16,9],
 "classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab":[0,0,0,16,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classCheMPS2_1_1TensorF1.html":[0,0,0,31],
 "classCheMPS2_1_1TensorF1.html#a291d1188b6283eab3ded27547b02b29b":[0,0,0,31,1],
 "classCheMPS2_1_1TensorF1.html#a68be6d1fe69d7bdeba915f621832ed91":[0,0,0,31,3],
-"classCheMPS2_1_1TensorF1.html#adfde222e4c39d48f7dbd549eee300d12":[0,0,0,31,0],
-"classCheMPS2_1_1TensorF1.html#af877d99d7863f3dd6764c85bc2704bc9":[0,0,0,31,2]
+"classCheMPS2_1_1TensorF1.html#adfde222e4c39d48f7dbd549eee300d12":[0,0,0,31,0]
 };
