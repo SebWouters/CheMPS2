@@ -37,7 +37,7 @@ int main(void){
    const double T = -1.0;
    int * irreps = new int[L];
    for (int cnt=0; cnt<L; cnt++){ irreps[cnt] = 0; }
-   // The Hamiltonian initializes all its matrix elements to 0.0
+   //The Hamiltonian initializes all its matrix elements to 0.0
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L, Group, irreps);
    delete [] irreps;
    for (int cnt=0; cnt<L; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }

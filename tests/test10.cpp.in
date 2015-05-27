@@ -43,7 +43,7 @@ int main(void){
    //Create the Hamiltonian (eightfold permutation symmetry is OK for site basis)
    int * irreps = new int[L_square];
    for (int cnt=0; cnt<L_square; cnt++){ irreps[cnt] = 0; }
-   // The Hamiltonian initializes all its matrix elements to 0.0
+   //The Hamiltonian initializes all its matrix elements to 0.0
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L_square, group, irreps);
    delete [] irreps;
    

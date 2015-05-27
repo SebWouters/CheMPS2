@@ -39,16 +39,9 @@ TwoS  = 5    # Two times the targeted spin
 Nelec = 9    # The number of electrons
 Irrep = 0    # The targeted irrep
 
-# Setting up the Hamiltonian
+# The Hamiltonian initializes all its matrix elements to 0.0
 orbirreps = np.zeros([L], dtype=ctypes.c_int)
 Ham = PyCheMPS2.PyHamiltonian(L, Group, orbirreps)
-Ham.setEconst(0.0)
-for cnt1 in range(0, L):
-    for cnt2 in range(0, L):
-        Ham.setTmat(cnt1, cnt2, 0.0)
-        for cnt3 in range(0, L):
-            for cnt4 in range(0, L):
-                Ham.setVmat(cnt1, cnt2, cnt3, cnt4, 0.0)
 for cnt in range(0, L):
     Ham.setVmat(cnt, cnt, cnt, cnt, U)
 for cnt in range(0, L-1):

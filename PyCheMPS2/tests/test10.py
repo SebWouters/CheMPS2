@@ -40,18 +40,10 @@ Nelec = 9                       # Number of electrons
 TwoS = 1                        # Two times the spin
 Irrep = 0                       # Irrep = A (C1 symmetry)
 
-# Setting up the Hamiltonian
+# The Hamiltonian initializes all its matrix elements to 0.0
 orbirreps = np.zeros([L_square], dtype=ctypes.c_int)
 Ham = PyCheMPS2.PyHamiltonian(L_square, group, orbirreps)
-Ham.setEconst(0.0)
-for cnt1 in range(0, L_square):
-    for cnt2 in range(0, L_square):
-        Ham.setTmat(cnt1, cnt2, 0.0)
-        for cnt3 in range(0, L_square):
-            for cnt4 in range(0, L_square):
-                Ham.setVmat(cnt1, cnt2, cnt3, cnt4, 0.0)
-                
-                
+
 # Fill with the site-basis matrix elements
 for orb in range(L_square):
     Ham.setVmat(orb,orb,orb,orb,U)
