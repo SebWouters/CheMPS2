@@ -41,6 +41,9 @@ namespace CheMPS2{
          //! Destructor
          virtual ~TwoIndex();
          
+         //! Set all one-body matrix elements to zero
+         void Clear();
+         
          //! Set an element
          /** \param irrep The irrep number (see Irreps.h)
              \param i The first index (within the symmetry block)

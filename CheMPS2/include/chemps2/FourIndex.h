@@ -43,6 +43,9 @@ namespace CheMPS2{
          //! Destructor
          virtual ~FourIndex();
          
+         //! Set all two-body matrix elements to zero
+         void Clear();
+         
          //! Set an element
          /** \param irrep_i The irrep number of the first orbital (see Irreps.h)
              \param irrep_j The irrep number of the second orbital

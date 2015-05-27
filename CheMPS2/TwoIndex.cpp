@@ -39,6 +39,8 @@ CheMPS2::TwoIndex::TwoIndex(const int nGroup, const int * IrrepSizes){
       Isizes[cnt] = IrrepSizes[cnt];
       if (Isizes[cnt]>0) storage[cnt] = new double[Isizes[cnt]*(Isizes[cnt]+1)/2];
    }
+   
+   Clear();
 
 }
 
@@ -48,6 +50,15 @@ CheMPS2::TwoIndex::~TwoIndex(){
    delete [] storage;
    delete [] Isizes;
    
+}
+
+void CheMPS2::TwoIndex::Clear(){
+
+   for (int irrep = 0; irrep < SymmInfo.getNumberOfIrreps(); irrep++){
+      const int loopsize = (Isizes[irrep]*(Isizes[irrep]+1))/2;
+      for (int count = 0; count < loopsize; count++){ storage[irrep][count] = 0.0; }
+   }
+
 }
 
 void CheMPS2::TwoIndex::set(const int irrep, const int i, const int j, const double val){

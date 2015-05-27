@@ -54,6 +54,7 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
       irrep2num_orb[orb2irrep[cnt]]++;
    }
    
+   Econst = 0.0;
    Tmat = new TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
    Vmat = new FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
 

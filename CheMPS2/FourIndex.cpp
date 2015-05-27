@@ -41,6 +41,8 @@ CheMPS2::FourIndex::FourIndex(const int nGroup, const int * IrrepSizes){
    arrayLength = calcNumberOfUniqueElements(true); //true means allocate the storage!
    theElements = new double[arrayLength];
    
+   Clear();
+   
 }
 
 long long CheMPS2::FourIndex::calcNumberOfUniqueElements(const bool allocate){
@@ -148,6 +150,12 @@ CheMPS2::FourIndex::~FourIndex(){
    delete [] theElements;
    delete [] Isizes;
    
+}
+
+void CheMPS2::FourIndex::Clear(){
+
+   for (long long count = 0; count < arrayLength; count++){ theElements[ count ] = 0.0; }
+
 }
 
 void CheMPS2::FourIndex::set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val){
