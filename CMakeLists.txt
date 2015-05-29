@@ -17,6 +17,7 @@ option (STATIC_ONLY          "Compile only the static library"         OFF)
 option (ENABLE_TESTS         "Compile the tests"                       ON)
 option (ENABLE_XHOST         "Enable processor-specific optimizations" ON)
 option (ENABLE_GENERIC       "Enable mostly static linking in shared library" OFF)
+option (WITH_MPI             "Build the library with MPI"              OFF)
 
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
@@ -64,6 +65,10 @@ link_directories ($ENV{LD_LIBRARY_PATH})
 if (MKL)
     set ( ENV{BLA_VENDOR} "Intel10_64lp" )
 endif (MKL)
+
+if (WITH_MPI)
+    add_definitions (-DCHEMPS2_MPI_COMPILATION)
+endif (WITH_MPI)
 
 if (LAPACK_LIBRARIES)
     message(STATUS "LAPACK detection suppressed. Using: ${LAPACK_LIBRARIES}")

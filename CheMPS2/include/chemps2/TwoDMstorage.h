@@ -71,6 +71,12 @@ namespace CheMPS2{
          //! Load the TwoDMstorage object
          /** \param name filename */
          void read(const std::string name);
+         
+         //! Set all 2-RDM elements to zero
+         void Clear();
+         
+         //! Add the 2-RDM elements of all MPI processes
+         void mpi_allreduce();
       
       private:
       

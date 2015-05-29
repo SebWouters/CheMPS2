@@ -23,8 +23,13 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "Gsl.h"
+#include "MPIchemps2.h"
 
 void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -49,7 +54,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5A1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A1 ) == MPIRANK ) && (N1==0) && (N2==0)){
+   #else
    if ((N1==0) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -119,7 +128,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
 
    //5A2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A2 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -194,7 +207,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
    
    //5A3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A3 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -269,7 +286,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
    
    //5A4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A4 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -338,6 +359,10 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -360,7 +385,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5B1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B1 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -426,7 +455,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
 
    //5B2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B2 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -501,7 +534,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
    
    //5B3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B3 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -575,7 +612,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
    
    //5B4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B4 ) == MPIRANK ) && (N1==2) && (N2==2)){
+   #else
    if ((N1==2) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -647,6 +688,10 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -670,7 +715,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5C1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C1 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -738,7 +787,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
 
    //5C2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C2 ) == MPIRANK ) && (N1==2) && (N2==0)){
+   #else
    if ((N1==2) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -808,7 +861,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
    
    //5C3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C3 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -875,7 +932,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
    
    //5C4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C4 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -945,6 +1006,10 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -968,7 +1033,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5D1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D1 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1037,7 +1106,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
 
    //5D2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D2 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1104,7 +1177,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
    
    //5D3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D3 ) == MPIRANK ) && (N1==0) && (N2==2)){
+   #else
    if ((N1==0) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1174,7 +1251,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
    
    //5D4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D4 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1244,6 +1325,10 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -1267,7 +1352,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5E1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E1 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1334,7 +1423,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
 
    //5E2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E2 ) == MPIRANK ) && (N1==0) && (N2==2)){
+   #else
    if ((N1==0) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1404,7 +1497,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
    
    //5E3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E3 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1471,7 +1568,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
    
    //5E4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E4 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1541,6 +1642,10 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -1564,7 +1669,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5F1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F1 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1631,7 +1740,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
 
    //5F2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F2 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1697,7 +1810,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
    
    //5F3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F3 ) == MPIRANK ) && (N1==2) && (N2==0)){
+   #else
    if ((N1==2) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1766,7 +1883,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
    
    //5F4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F4 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){

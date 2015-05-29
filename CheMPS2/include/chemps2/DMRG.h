@@ -89,11 +89,11 @@ namespace CheMPS2{
          
          //! Get the pointer to the 2DM
          /** \return The 2DM. Returns a NULL pointer if not yet calculated. */
-         TwoDM * get2DM();
+         TwoDM * get2DM(){ return the2DM; }
          
          //! Get the pointer to the Correlations
          /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
-         Correlations * getCorrelations();
+         Correlations * getCorrelations(){ return theCorr; }
          
          //! Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian orbitals. It is assumed that the unpaired electrons are all alpha electrons, and that this number equals twice the total targeted spin.
          /** \param coeff Array containing the occupation numbers of the L Hamiltonian orbitals (occupations can be 0, 1, or 2).
@@ -103,8 +103,9 @@ namespace CheMPS2{
          //! Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbers of the L Hamiltonian orbitals.
          /** \param alpha Array containing the alpha electron occupation numbers of the L Hamiltonian orbitals (occupations can be 0 or 1).
              \param beta  Array containing the beta  electron occupation numbers of the L Hamiltonian orbitals (occupations can be 0 or 1).
+             \param mpi_chemps2_master_only When running with MPI, whether only the master process should calculate the FCI coefficient. If false, any process can calculate the FCI coefficient, and it won't be broadcasted (allows for parallel FCI coefficient calculation).
              \return The desired FCI coefficient */
-         double getFCIcoefficient(int * alpha, int * beta) const;
+         double getFCIcoefficient(int * alpha, int * beta, const bool mpi_chemps2_master_only=true) const;
          
          //! Call "rm " + CheMPS2::DMRG_MPS_storage_prefix + "*.h5"
          void deleteStoredMPS();
@@ -213,16 +214,15 @@ namespace CheMPS2{
          void PreSolve();
          
          //sweepleft
-         double sweepleft(const bool change, const int instruction);
+         double sweepleft(const bool change, const int instruction, const bool am_i_master);
          
          //sweepright
-         double sweepright(const bool change, const int instruction);
+         double sweepright(const bool change, const int instruction, const bool am_i_master);
          
          //Load and save functions
-         void MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor);
-         void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
-         void storeOperators(const int index, const bool movingRight);
-         void loadOperators(const int index, const bool movingRight);
+         static void MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor);
+         static void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
+         void OperatorsOnDisk(const int index, const bool movingRight, const bool store);
          string tempfolder;
          
          void saveMPS(const std::string name, TensorT ** MPSlocation, SyBookkeeper * BKlocation, bool isConverged) const;
@@ -233,7 +233,7 @@ namespace CheMPS2{
          //Helper functions for making the boundary operators
          void updateMovingRight(const int index);
          void updateMovingLeft(const int index);
-         void deleteTensors(const int index, const bool movingRightOfTensors);
+         void deleteTensors(const int index, const bool movingRight);
          void allocateTensors(const int index, const bool movingRight);
          void updateMovingRightSafe(const int cnt);
          void updateMovingRightSafeFirstTime(const int cnt);
@@ -250,9 +250,10 @@ namespace CheMPS2{
          TensorT *** Exc_MPSs;
          SyBookkeeper ** Exc_BKs;
          TensorO *** Exc_Overlaps;
+         double ** prepare_excitations(Sobject * denS);
+         void cleanup_excitations(double ** VeffTilde) const;
          void calcVeffTilde(double * result, Sobject * currentS, int state_number);
          void calcOverlapsWithLowerStates();
-         void calcOverlapsWithLowerStatesDuringSweeps_debug(double ** VeffTilde, Sobject * denS);
          
    };
 }

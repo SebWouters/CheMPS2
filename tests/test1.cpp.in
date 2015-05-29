@@ -24,6 +24,7 @@
 #include "Initialize.h"
 #include "DMRG.h"
 #include "FCI.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
@@ -45,6 +46,10 @@ void counter2bits(const int L, const int counter, int * bits, CheMPS2::Hamiltoni
 
 int main(void){
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
+
    CheMPS2::Initialize::Init();
   
    //The path to the matrix elements
@@ -60,8 +65,8 @@ int main(void){
    const int nSectors = 6;
    int * TwoS      = new int[nSectors];
    int * Irreps    = new int[nSectors];
-   double * EFCI   = new double[nSectors];
    double * EDMRG  = new double[nSectors];
+   double * EFCI   = new double[nSectors];
    double * RMSdev = new double[nSectors];
    TwoS[0] = 0; Irreps[0] = 0;
    TwoS[1] = 2; Irreps[1] = 5;
@@ -71,18 +76,6 @@ int main(void){
    TwoS[5] = 2; Irreps[5] = 6;
    
    for (int counter=0; counter<nSectors; counter++){
-      
-      //Perform full configuration interation
-      const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
-      const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
-      const double maxMemWorkMB = 10.0;
-      const int FCIverbose = 1;
-      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
-      double * GSvector = new double[theFCI->getVecLength(0)];
-      theFCI->ClearVector(theFCI->getVecLength(0), GSvector);
-      GSvector[ theFCI->LowestEnergyDeterminant() ] = 1.0;
-      EFCI[counter] = theFCI->GSDavidson(GSvector);
-      theFCI->CalcSpinSquared(GSvector);
       
       //The targeted symmetry sector and the Hamiltonian form together a FCI problem
       CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS[counter], Nelec, Irreps[counter]);
@@ -98,48 +91,68 @@ int main(void){
       EDMRG[counter] = theDMRG->Solve();
       theDMRG->calc2DMandCorrelations();
       
-      //Compare the FCI and DMRG determinant coefficients
+      //Perform full configuration interation
+      #ifdef CHEMPS2_MPI_COMPILATION
+      if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+      #endif
       {
-         int maxcount = 1;
-         for (int orb=0; orb<(Ham->getL()); orb++){ maxcount *= 2; }
-         int Nalpha;
-         int Nbeta;
-         int Ialpha;
-         int Ibeta;
-         int * alphastring = new int[ Ham->getL() ];
-         int *  betastring = new int[ Ham->getL() ];
-         double RMSerrorCoeff = 0.0;
-         for (int count_alpha=0; count_alpha<maxcount; count_alpha++){
-            counter2bits(Ham->getL(), count_alpha, alphastring, Ham, &Nalpha, &Ialpha);
-            if (Nalpha==Nel_up){
-               for (int count_beta=0; count_beta<maxcount; count_beta++){
-                  counter2bits(Ham->getL(), count_beta, betastring, Ham, &Nbeta, &Ibeta);
-                  if ((Nbeta==Nel_down) && (CheMPS2::Irreps::directProd(Ialpha,Ibeta)==Irreps[counter])){
-                     const double coeff_dmrg = theDMRG->getFCIcoefficient(alphastring, betastring);
-                     const double coeff_fci = theFCI->getFCIcoeff(alphastring, betastring, GSvector);
-                     double temp = fabs(coeff_dmrg) - fabs(coeff_fci);
-                     RMSerrorCoeff += temp * temp;
+         const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
+         const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
+         const double maxMemWorkMB = 10.0;
+         const int FCIverbose = 1;
+         CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
+         double * GSvector = new double[theFCI->getVecLength(0)];
+         theFCI->ClearVector(theFCI->getVecLength(0), GSvector);
+         GSvector[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+         EFCI[counter] = theFCI->GSDavidson(GSvector);
+         theFCI->CalcSpinSquared(GSvector);
+         {  //Compare the FCI and DMRG determinant coefficients
+            int maxcount = 1;
+            for (int orb=0; orb<(Ham->getL()); orb++){ maxcount *= 2; }
+            int Nalpha;
+            int Nbeta;
+            int Ialpha;
+            int Ibeta;
+            int * alphastring = new int[ Ham->getL() ];
+            int *  betastring = new int[ Ham->getL() ];
+            double RMSerrorCoeff = 0.0;
+            for (int count_alpha=0; count_alpha<maxcount; count_alpha++){
+               counter2bits(Ham->getL(), count_alpha, alphastring, Ham, &Nalpha, &Ialpha);
+               if (Nalpha==Nel_up){
+                  for (int count_beta=0; count_beta<maxcount; count_beta++){
+                     counter2bits(Ham->getL(), count_beta, betastring, Ham, &Nbeta, &Ibeta);
+                     if ((Nbeta==Nel_down) && (CheMPS2::Irreps::directProd(Ialpha,Ibeta)==Irreps[counter])){
+                        const double coeff_dmrg = theDMRG->getFCIcoefficient(alphastring, betastring, false);
+                        const double coeff_fci = theFCI->getFCIcoeff(alphastring, betastring, GSvector);
+                        double temp = fabs(coeff_dmrg) - fabs(coeff_fci);
+                        RMSerrorCoeff += temp * temp;
+                     }
                   }
                }
             }
+            RMSdev[counter] = sqrt(RMSerrorCoeff);
+            cout << "RMS difference FCI and DMRG determinant coefficients = " << RMSdev[counter] << endl;
+            delete [] alphastring;
+            delete []  betastring;
          }
-         RMSdev[counter] = sqrt(RMSerrorCoeff);
-         cout << "RMS difference FCI and DMRG determinant coefficients = " << RMSdev[counter] << endl;
-         delete [] alphastring;
-         delete []  betastring;
+         delete [] GSvector;
+         delete theFCI;
       }
       
       //Clean up
       if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
       if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-      delete [] GSvector;
-      delete theFCI;
       delete theDMRG;
       delete Prob;
 
    }
    
-   //Clean up
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( EFCI,   nSectors, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( RMSdev, nSectors, MPI_CHEMPS2_MASTER );
+   #endif
+   
+   //Clean up the Hamiltonian
    delete Ham;
    
    //Check success
@@ -154,6 +167,10 @@ int main(void){
    delete [] RMSdev;
    delete [] TwoS;
    delete [] Irreps;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
    
    cout << "================> Did test 1 succeed : ";
    if (success){

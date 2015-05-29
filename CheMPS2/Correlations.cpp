@@ -25,6 +25,7 @@
 
 #include "Correlations.h"
 #include "Lapack.h"
+#include "MPIchemps2.h"
 
 using std::cout;
 using std::cerr;
@@ -216,6 +217,16 @@ double CheMPS2::Correlations::MutualInformationDistance(const double power) cons
    return Idist;
 
 }
+
+#ifdef CHEMPS2_MPI_COMPILATION
+void CheMPS2::Correlations::mpi_broadcast(){
+
+   int size = L*L;
+   MPIchemps2::broadcast_array_double( MutInfo, size, MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_array_double( Cdirad,  size, MPI_CHEMPS2_MASTER );
+
+}
+#endif
 
 void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorK ** Ktensors, TensorM ** Mtensors){
 

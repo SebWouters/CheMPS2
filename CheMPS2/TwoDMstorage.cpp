@@ -21,9 +21,11 @@
 #include <assert.h>
 #include <iostream>
 #include <string>
+#include <climits>
 
 #include "TwoDMstorage.h"
 #include "MyHDF5.h"
+#include "MPIchemps2.h"
 
 using std::cout;
 using std::endl;
@@ -85,6 +87,26 @@ CheMPS2::TwoDMstorage::~TwoDMstorage(){
    delete [] Isizes;
    delete [] storage;
    
+}
+
+#ifdef CHEMPS2_MPI_COMPILATION
+void CheMPS2::TwoDMstorage::mpi_allreduce(){
+
+   const int max_integer = INT_MAX;
+   assert( max_integer >= arrayLength );
+   const int size = arrayLength;
+   double * temp = new double[ size ];
+   MPIchemps2::allreduce_array_double( theElements, temp, size );
+   for (int count = 0; count < size; count++){ theElements[ count ] = temp[ count ]; }
+   delete [] temp;
+
+}
+#endif
+
+void CheMPS2::TwoDMstorage::Clear(){
+
+   for (long long count = 0; count < arrayLength; count++){ theElements[ count ] = 0.0; }
+
 }
 
 void CheMPS2::TwoDMstorage::set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val){

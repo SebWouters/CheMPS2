@@ -90,6 +90,12 @@ namespace CheMPS2{
          //Fill the diagonal elements
          void fillHeffDiag(double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorD **** Dtensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const;
          
+         //Solve Davidson for the MPI_CHEMPS2_MASTER process
+         double SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const;
+         
+         //Solve Davidson for the helper processes
+         double SolveDAVIDSON_help(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const;
+         
          //The diagrams: Type 1/5
          void addDiagram1A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorX * Xleft) const;
          void addDiagram1B(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorX * Xright) const;

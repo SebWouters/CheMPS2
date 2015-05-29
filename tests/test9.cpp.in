@@ -24,10 +24,17 @@
 #include "Initialize.h"
 #include "CASSCF.h"
 #include "DMRGSCFoptions.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   cout << "CheMPS2::CASSCF does not work with MPI yet." << endl;
+   return 7;
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
    
@@ -100,6 +107,11 @@ int main(void){
    
    //Check succes
    bool success = (fabs(Energy + 109.15104350802) < 1e-10) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 9 succeed : ";
    if (success){
       cout << "yes" << endl;

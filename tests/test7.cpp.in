@@ -24,98 +24,119 @@
 
 #include "Initialize.h"
 #include "Hamiltonian.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
 
-   CheMPS2::Initialize::Init();
+   double RMS  = 1.0;
+   double RMS2 = 1.0;
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
    
-   //The path to the matrix elements
-   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/O2.CCPVDZ.FCIDUMP";
-   
-   //The Hamiltonian
-   const int psi4groupnumber = 7; // d2h -- see Irreps.h and O2.ccpvdz.out
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
-   Ham->save();
-   const int L = Ham->getL();
-   const int GroupNumber = Ham->getNGroup();
-   int * OrbitalIrreps = new int[ L ];
-   for (int orb = 0; orb < L; orb++){ OrbitalIrreps[orb] = Ham->getOrbitalIrrep(orb); }
-   
-   //Use the other initializer
-   CheMPS2::Hamiltonian * HamLoaded = new CheMPS2::Hamiltonian(L, GroupNumber, OrbitalIrreps);
-   delete [] OrbitalIrreps;
-   HamLoaded->read();
-   
-   //Test whether it's the same thing
-   double RMS = 0.0;
-   double RMSabs = 0.0;
-   double temp = 0.0;
-   temp = Ham->getEconst();
-   RMSabs += temp * temp;
-   temp = Ham->getEconst() - HamLoaded->getEconst();
-   RMS += temp * temp;
-   for (int i1=0; i1<L; i1++){
-      for (int i2=0; i2<L; i2++){
-         temp = Ham->getTmat(i1,i2);
-         RMSabs += temp * temp;
-         temp = Ham->getTmat(i1,i2) - HamLoaded->getTmat(i1,i2);
-         RMS += temp * temp;
-         for (int i3=0; i3<L; i3++){
-            for (int i4=0; i4<L; i4++){
-               temp = Ham->getVmat(i1,i2,i3,i4);
-               RMSabs += temp * temp;
-               temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded->getVmat(i1,i2,i3,i4);
-               RMS += temp * temp;
+      CheMPS2::Initialize::Init();
+      
+      //The path to the matrix elements
+      string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/O2.CCPVDZ.FCIDUMP";
+      
+      //The Hamiltonian
+      const int psi4groupnumber = 7; // d2h -- see Irreps.h and O2.ccpvdz.out
+      CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
+      Ham->save();
+      const int L = Ham->getL();
+      const int GroupNumber = Ham->getNGroup();
+      int * OrbitalIrreps = new int[ L ];
+      for (int orb = 0; orb < L; orb++){ OrbitalIrreps[orb] = Ham->getOrbitalIrrep(orb); }
+      
+      //Use the other initializer
+      CheMPS2::Hamiltonian * HamLoaded = new CheMPS2::Hamiltonian(L, GroupNumber, OrbitalIrreps);
+      delete [] OrbitalIrreps;
+      HamLoaded->read();
+      
+      //Test whether it's the same thing
+      RMS = 0.0;
+      double RMSabs = 0.0;
+      double temp = 0.0;
+      temp = Ham->getEconst();
+      RMSabs += temp * temp;
+      temp = Ham->getEconst() - HamLoaded->getEconst();
+      RMS += temp * temp;
+      for (int i1=0; i1<L; i1++){
+         for (int i2=0; i2<L; i2++){
+            temp = Ham->getTmat(i1,i2);
+            RMSabs += temp * temp;
+            temp = Ham->getTmat(i1,i2) - HamLoaded->getTmat(i1,i2);
+            RMS += temp * temp;
+            for (int i3=0; i3<L; i3++){
+               for (int i4=0; i4<L; i4++){
+                  temp = Ham->getVmat(i1,i2,i3,i4);
+                  RMSabs += temp * temp;
+                  temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded->getVmat(i1,i2,i3,i4);
+                  RMS += temp * temp;
+               }
             }
          }
       }
-   }
-   RMS = sqrt(RMS);
-   RMSabs = sqrt(RMSabs);
-   cout << "The 2-norm of all Hamiltonian matrix elements is " << RMSabs << endl;
-   cout << "The RMS difference between Ham and HamLoaded is " << RMS << endl;
-   delete HamLoaded;
-   
-   //To load an HDF5 dump and immediately fill the Hamiltonian
-   const bool fileh5 = true;
-   CheMPS2::Hamiltonian * HamLoaded2 = new CheMPS2::Hamiltonian( fileh5 );
-   
-   //Test whether it's the same thing
-   double RMS2 = 0.0;
-   temp = Ham->getEconst() - HamLoaded2->getEconst();
-   RMS2 += temp * temp;
-   for (int i1=0; i1<L; i1++){
-      for (int i2=0; i2<L; i2++){
-         temp = Ham->getTmat(i1,i2) - HamLoaded2->getTmat(i1,i2);
-         RMS2 += temp * temp;
-         for (int i3=0; i3<L; i3++){
-            for (int i4=0; i4<L; i4++){
-               temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded2->getVmat(i1,i2,i3,i4);
-               RMS2 += temp * temp;
+      RMS = sqrt(RMS);
+      RMSabs = sqrt(RMSabs);
+      cout << "The 2-norm of all Hamiltonian matrix elements is " << RMSabs << endl;
+      cout << "The RMS difference between Ham and HamLoaded is " << RMS << endl;
+      delete HamLoaded;
+      
+      //To load an HDF5 dump and immediately fill the Hamiltonian
+      const bool fileh5 = true;
+      CheMPS2::Hamiltonian * HamLoaded2 = new CheMPS2::Hamiltonian( fileh5 );
+      
+      //Test whether it's the same thing
+      RMS2 = 0.0;
+      temp = Ham->getEconst() - HamLoaded2->getEconst();
+      RMS2 += temp * temp;
+      for (int i1=0; i1<L; i1++){
+         for (int i2=0; i2<L; i2++){
+            temp = Ham->getTmat(i1,i2) - HamLoaded2->getTmat(i1,i2);
+            RMS2 += temp * temp;
+            for (int i3=0; i3<L; i3++){
+               for (int i4=0; i4<L; i4++){
+                  temp = Ham->getVmat(i1,i2,i3,i4) - HamLoaded2->getVmat(i1,i2,i3,i4);
+                  RMS2 += temp * temp;
+               }
             }
          }
       }
-   }
-   RMS2 = sqrt(RMS2);
-   cout << "The RMS difference between Ham and HamLoaded2 is " << RMS2 << endl;
+      RMS2 = sqrt(RMS2);
+      cout << "The RMS difference between Ham and HamLoaded2 is " << RMS2 << endl;
+      
+      //Clean up
+      delete Ham;
+      delete HamLoaded2;
+      stringstream temp1;
+      temp1 << "rm " << CheMPS2::HAMILTONIAN_TmatStorageName;
+      int info = system(temp1.str().c_str());
+      stringstream temp2;
+      temp2 << "rm " << CheMPS2::HAMILTONIAN_VmatStorageName;
+      info = system(temp2.str().c_str());
+      stringstream temp3;
+      temp3 << "rm " << CheMPS2::HAMILTONIAN_ParentStorageName;
+      info = system(temp3.str().c_str());
    
-   //Clean up
-   delete Ham;
-   delete HamLoaded2;
-   stringstream temp1;
-   temp1 << "rm " << CheMPS2::HAMILTONIAN_TmatStorageName;
-   int info = system(temp1.str().c_str());
-   stringstream temp2;
-   temp2 << "rm " << CheMPS2::HAMILTONIAN_VmatStorageName;
-   info = system(temp2.str().c_str());
-   stringstream temp3;
-   temp3 << "rm " << CheMPS2::HAMILTONIAN_ParentStorageName;
-   info = system(temp3.str().c_str());
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMS,  1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMS2, 1, MPI_CHEMPS2_MASTER );
+   #endif
    
    //Check succes
-   bool success = ((RMS < 1e-10) && (RMS2 < 1e-10)) ? true : false;
+   const bool success = ((RMS < 1e-10) && (RMS2 < 1e-10)) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 7 succeed : ";
    if (success){
       cout << "yes" << endl;

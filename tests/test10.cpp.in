@@ -22,10 +22,15 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
    
@@ -119,6 +124,11 @@ int main(void){
    
    //Check succes
    const bool success = ( fabs( EnergySite - EnergyMomentum ) < 1e-10 ) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 10 succeed : ";
    if (success){
       cout << "yes" << endl;

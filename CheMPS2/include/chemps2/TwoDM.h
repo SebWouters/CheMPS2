@@ -108,6 +108,9 @@ namespace CheMPS2{
          //! Load the TwoDMs from disk
          void read();
          
+         //! Add the 2-RDM elements of all MPI processes
+         void mpi_allreduce();
+         
       private:
       
          //The BK containing all the irrep information

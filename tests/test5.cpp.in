@@ -23,10 +23,15 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
 
@@ -80,6 +85,11 @@ int main(void){
    bool OK3 = (fabs(Energy2 + 106.92314213886 )<1e-10)? true : false;
    
    bool success = (OK1 && OK2 && OK3);
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 5 succeed : ";
    if (success){
       cout << "yes" << endl;

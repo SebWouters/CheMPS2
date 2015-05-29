@@ -22,6 +22,7 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "Gsl.h"
+#include "MPIchemps2.h"
 
 void CheMPS2::Heff::addDiagram1A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorX * Xleft) const{
    int dimL = denBK->gCurrentDim(denS->gIndex(), denS->gNL(ikappa), denS->gTwoSL(ikappa), denS->gIL(ikappa));
@@ -65,14 +66,21 @@ void CheMPS2::Heff::addDiagram1D(const int ikappa, double * memS, double * memHe
 void CheMPS2::Heff::addDiagramExcitations(const int ikappa, double * memS, double * memHeff, const Sobject * denS, int nLower, double ** VeffTilde) const{
 
    int dimTotal = denS->gKappa2index(denS->gNKappa());
-   
    int ptr = denS->gKappa2index(ikappa);
    int dimBlock = denS->gKappa2index(ikappa+1) - ptr;
    int inc = 1;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
    
    for (int state=0; state<nLower; state++){
-      double alpha = ddot_(&dimTotal, memS, &inc, VeffTilde[state], &inc);
-      daxpy_(&dimBlock,&alpha,VeffTilde[state]+ptr,&inc,memHeff+ptr,&inc);
+      #ifdef CHEMPS2_MPI_COMPILATION
+      if ( MPIchemps2::owner_specific_excitation( Prob->gL(), state ) == MPIRANK )
+      #endif
+      {
+         double alpha = ddot_(&dimTotal, memS, &inc, VeffTilde[state], &inc);
+         daxpy_(&dimBlock,&alpha,VeffTilde[state]+ptr,&inc,memHeff+ptr,&inc);
+      }
    }
 
 }

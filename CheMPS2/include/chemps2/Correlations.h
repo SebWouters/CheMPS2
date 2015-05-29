@@ -198,6 +198,9 @@ namespace CheMPS2{
              \param columnsPerLine Rarara: The number of columns per line */
          void Print(const int precision=6, const int columnsPerLine=8) const;
          
+         //! Broadcast the diradical correlation function and the two-orbital mutual information
+         void mpi_broadcast();
+         
       private:
       
          //The BK containing all the irrep information
