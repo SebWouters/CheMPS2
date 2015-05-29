@@ -53,6 +53,7 @@ var files =
     [ "Irreps.cpp", "Irreps_8cpp_source.html", null ],
     [ "Irreps.h", "Irreps_8h_source.html", null ],
     [ "Lapack.h", "Lapack_8h_source.html", null ],
+    [ "MPIchemps2.h", "MPIchemps2_8h_source.html", null ],
     [ "MyHDF5.h", "MyHDF5_8h_source.html", null ],
     [ "Options.h", "Options_8h_source.html", null ],
     [ "PrintLicense.cpp", "PrintLicense_8cpp_source.html", null ],

@@ -151,6 +151,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a371ffeddaa5c310b32449fed92071ac3">read</a> ()</td></tr>
 <tr class="memdesc:a371ffeddaa5c310b32449fed92071ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the TwoDMs from disk. <br/></td></tr>
 <tr class="separator:a371ffeddaa5c310b32449fed92071ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a520ebec8dd2e56a475105e651a98fec3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a520ebec8dd2e56a475105e651a98fec3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a520ebec8dd2e56a475105e651a98fec3">mpi_allreduce</a> ()</td></tr>
+<tr class="memdesc:a520ebec8dd2e56a475105e651a98fec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the 2-RDM elements of all MPI processes. <br/></td></tr>
+<tr class="separator:a520ebec8dd2e56a475105e651a98fec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1TwoDM.html">TwoDM</a> class. </p>
@@ -198,7 +202,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00030">30</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00031">31</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -207,7 +211,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1TwoDM_adafda7081d8bb8670482ef8d79485961_cgraph.png" border="0" usemap="#classCheMPS2_1_1TwoDM_adafda7081d8bb8670482ef8d79485961_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1TwoDM_adafda7081d8bb8670482ef8d79485961_cgraph" id="classCheMPS2_1_1TwoDM_adafda7081d8bb8670482ef8d79485961_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="245,5,443,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="247,57,441,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="255,123,433,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="259,173,429,200"/><area shape="rect" id="node6" href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="491,166,650,207"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="245,5,443,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="247,57,441,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="255,123,433,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="259,173,429,200"/><area shape="rect" id="node7" href="classCheMPS2_1_1TwoDMstorage.html#aa5b2df3bb874ef7004be64c424c17945" title="Set all 2&#45;RDM elements to zero. " alt="" coords="255,225,433,266"/><area shape="rect" id="node6" href="classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="491,166,650,207"/></map>
 </div>
 </p>
 
@@ -230,7 +234,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <p>Calculate the energy based on the 2DM-A. </p>
 <dl class="section return"><dt>Returns</dt><dd>The energy calculated as 0.5*trace(2DM-A * Ham) </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00151">151</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00166">166</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -261,7 +265,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <p>Return the double trace of 2DM-A (should be N(N-1)) </p>
 <dl class="section return"><dt>Returns</dt><dd>Double trace of 2DM-A </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00139">139</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00154">154</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -337,7 +341,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00191">191</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00206">206</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -346,7 +350,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1TwoDM_a5c5bf12b31aa9cb4b0b31bd53dad1ed3_cgraph.png" border="0" usemap="#classCheMPS2_1_1TwoDM_a5c5bf12b31aa9cb4b0b31bd53dad1ed3_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1TwoDM_a5c5bf12b31aa9cb4b0b31bd53dad1ed3_cgraph" id="classCheMPS2_1_1TwoDM_a5c5bf12b31aa9cb4b0b31bd53dad1ed3_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="241,5,426,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="238,56,429,83"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="250,5,417,46"/><area shape="rect" id="node3" href="classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="241,71,426,97"/><area shape="rect" id="node4" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="238,121,429,148"/></map>
 </div>
 </p>
 
@@ -411,7 +415,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00089">89</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00104">104</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -474,7 +478,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00119">119</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00134">134</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -537,7 +541,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00104">104</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00119">119</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -600,7 +604,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00129">129</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00144">144</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 </div>
 </div>
@@ -614,7 +618,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1TwoDM.html">TwoDM</a></li>
-    <li class="footer">Generated on Wed May 27 2015 10:27:42 for CheMPS2 by
+    <li class="footer">Generated on Fri May 29 2015 20:43:20 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

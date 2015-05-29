@@ -1,9 +1,3 @@
 <map id="CheMPS2::Heff::SolveDAVIDSON" name="CheMPS2::Heff::SolveDAVIDSON">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="280,5,504,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="294,56,490,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="315,107,469,149"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="287,173,497,200"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="295,224,489,251"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="287,275,497,301"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="315,326,469,367"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="281,5,447,46"/>
 </map>

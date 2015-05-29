@@ -22,6 +22,7 @@ var hierarchy =
     [ "CheMPS2::Irreps", "classCheMPS2_1_1Irreps.html", [
       [ "CheMPS2::SyBookkeeper", "classCheMPS2_1_1SyBookkeeper.html", null ]
     ] ],
+    [ "CheMPS2::MPIchemps2", "classCheMPS2_1_1MPIchemps2.html", null ],
     [ "CheMPS2::Problem", "classCheMPS2_1_1Problem.html", null ],
     [ "CheMPS2::Sobject", "classCheMPS2_1_1Sobject.html", null ],
     [ "CheMPS2::Tensor", "classCheMPS2_1_1Tensor.html", [

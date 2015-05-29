@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['problem',['Problem',['../classCheMPS2_1_1Problem.html',1,'CheMPS2']]]
+  ['mpichemps2',['MPIchemps2',['../classCheMPS2_1_1MPIchemps2.html',1,'CheMPS2']]]
 ];

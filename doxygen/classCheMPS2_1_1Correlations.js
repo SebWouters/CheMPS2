@@ -13,6 +13,7 @@ var classCheMPS2_1_1Correlations =
     [ "getCspinflip_HAM", "classCheMPS2_1_1Correlations.html#ac56698f9c69276a9f24829904a50f0ed", null ],
     [ "getMutualInformation_DMRG", "classCheMPS2_1_1Correlations.html#a6fd4628a95b8ca83f05f5b4ff27056a8", null ],
     [ "getMutualInformation_HAM", "classCheMPS2_1_1Correlations.html#a7bca21ac7e7e53f6266f52901dddcd19", null ],
+    [ "mpi_broadcast", "classCheMPS2_1_1Correlations.html#ae175e3599bab50c3fe334e3a98c41f23", null ],
     [ "MutualInformationDistance", "classCheMPS2_1_1Correlations.html#a3e4a935011b95ad18b28b88ac56990fc", null ],
     [ "Print", "classCheMPS2_1_1Correlations.html#a9e99dc1d7c2d571e2743ff6b472c50f6", null ],
     [ "SingleOrbitalEntropy_DMRG", "classCheMPS2_1_1Correlations.html#a7414689fc9e58291884af75779f18f85", null ],

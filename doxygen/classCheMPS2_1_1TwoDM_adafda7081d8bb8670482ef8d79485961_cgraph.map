@@ -3,5 +3,6 @@
 <area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="247,57,441,98"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="255,123,433,149"/>
 <area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="259,173,429,200"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDMstorage.html#aa5b2df3bb874ef7004be64c424c17945" title="Set all 2&#45;RDM elements to zero. " alt="" coords="255,225,433,266"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="491,166,650,207"/>
 </map>

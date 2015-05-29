@@ -149,58 +149,64 @@ $(document).ready(function(){initNavTree('TwoDMstorage_8h_source.html','');});
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;         </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1TwoDMstorage.html#a7d1ba6f22b269a0a97853fb08665439e">read</a>(<span class="keyword">const</span> std::string name);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;         <span class="comment">//Contains the group number, the number of irreps, and the multiplication table</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;         <a class="code" href="classCheMPS2_1_1Irreps.html">Irreps</a> SymmInfo;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;         <span class="comment">//Array with length the number of irreps of the specified group, containing the number of orbitals of that irrep</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;         <span class="keywordtype">int</span> * Isizes;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;         </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         <span class="comment">/*The following conventions are used for storage:</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">            - 4-fold permutation symmetry: 2DM_ijkl = 2DM_jilk = 2DM_klij = 2DM_lkji</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">            - Abelian point group symmetry: I_i x I_j = I_k x I_l</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">            - Reorder indices untill irreps I_i &lt;= {I_j , I_k , I_l}</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">            - Icenter = I_i x I_j = I_k x I_l</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">            - storage[Icenter][I_i][I_k - I_i][ i + dim_i * ( j + dim_j * ( k + dim_k * l ) ) ]</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">                   with   * I_i given</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">                          * I_j = I_i x I_center &gt;= I_i</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">                          * I_k &gt;= I_i given</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">                          * I_l = Icenter x I_k with I_l &gt;= I_i   */</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> *** storage;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;         </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;         <span class="comment">//Calculate the number of elements --&gt; true means allocate the storage and false means deallocate the storage!</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> calcNumberOfElements(<span class="keyword">const</span> <span class="keywordtype">bool</span> allocateStorage);</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;         </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;         <span class="comment">//The number of TwoDMstorage elements</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> arrayLength;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;         </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1TwoDMstorage.html#aa5b2df3bb874ef7004be64c424c17945">Clear</a>();</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;         </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         <span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1TwoDMstorage.html#a526815c15ed02b8841f902a586fafd56">mpi_allreduce</a>();</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;      </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;         <span class="comment">//Contains the group number, the number of irreps, and the multiplication table</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;         <a class="code" href="classCheMPS2_1_1Irreps.html">Irreps</a> SymmInfo;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;         </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;         <span class="comment">//Array with length the number of irreps of the specified group, containing the number of orbitals of that irrep</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;         <span class="keywordtype">int</span> * Isizes;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;         </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;         <span class="comment">/*The following conventions are used for storage:</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">            - 4-fold permutation symmetry: 2DM_ijkl = 2DM_jilk = 2DM_klij = 2DM_lkji</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">            - Abelian point group symmetry: I_i x I_j = I_k x I_l</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">            - Reorder indices untill irreps I_i &lt;= {I_j , I_k , I_l}</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">            - Icenter = I_i x I_j = I_k x I_l</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">            - storage[Icenter][I_i][I_k - I_i][ i + dim_i * ( j + dim_j * ( k + dim_k * l ) ) ]</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">                   with   * I_i given</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">                          * I_j = I_i x I_center &gt;= I_i</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">                          * I_k &gt;= I_i given</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">                          * I_l = Icenter x I_k with I_l &gt;= I_i   */</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> *** storage;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;         </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;         <span class="comment">//The actual TwoDM elements</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;         <span class="keywordtype">double</span> * theElements;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;         <span class="comment">//Calculate the number of elements --&gt; true means allocate the storage and false means deallocate the storage!</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> calcNumberOfElements(<span class="keyword">const</span> <span class="keywordtype">bool</span> allocateStorage);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         <span class="comment">//Functions to get the correct pointer to memory</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> getPointer(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;   };</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;}</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor"></span></div>
-<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a2eb0495511d151e372b77edb3f9d5d36"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a2eb0495511d151e372b77edb3f9d5d36">CheMPS2::TwoDMstorage::set</a></div><div class="ttdeci">void set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val)</div><div class="ttdoc">Set an element. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00090">TwoDMstorage.cpp:90</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a7d1ba6f22b269a0a97853fb08665439e"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a7d1ba6f22b269a0a97853fb08665439e">CheMPS2::TwoDMstorage::read</a></div><div class="ttdeci">void read(const std::string name)</div><div class="ttdoc">Load the TwoDMstorage object. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00188">TwoDMstorage.cpp:188</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a928943351fa0c262c422e6f03712dbe1"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a928943351fa0c262c422e6f03712dbe1">CheMPS2::TwoDMstorage::~TwoDMstorage</a></div><div class="ttdeci">virtual ~TwoDMstorage()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00081">TwoDMstorage.cpp:81</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a3558e85e4d8467e40393cdb1964a2e19"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a3558e85e4d8467e40393cdb1964a2e19">CheMPS2::TwoDMstorage::TwoDMstorage</a></div><div class="ttdeci">TwoDMstorage(const int nGroup, const int *IrrepSizes)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00032">TwoDMstorage.cpp:32</a></div></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         <span class="comment">//The number of TwoDMstorage elements</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> arrayLength;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;         </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;         <span class="comment">//The actual TwoDM elements</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;         <span class="keywordtype">double</span> * theElements;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;         </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;         <span class="comment">//Functions to get the correct pointer to memory</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;         <span class="keywordtype">long</span> <span class="keywordtype">long</span> getPointer(<span class="keyword">const</span> <span class="keywordtype">int</span> irrep_i, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_j, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_k, <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_l, <span class="keyword">const</span> <span class="keywordtype">int</span> i, <span class="keyword">const</span> <span class="keywordtype">int</span> j, <span class="keyword">const</span> <span class="keywordtype">int</span> k, <span class="keyword">const</span> <span class="keywordtype">int</span> l) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;   };</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;}</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor"></span></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a2eb0495511d151e372b77edb3f9d5d36"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a2eb0495511d151e372b77edb3f9d5d36">CheMPS2::TwoDMstorage::set</a></div><div class="ttdeci">void set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val)</div><div class="ttdoc">Set an element. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00112">TwoDMstorage.cpp:112</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a526815c15ed02b8841f902a586fafd56"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a526815c15ed02b8841f902a586fafd56">CheMPS2::TwoDMstorage::mpi_allreduce</a></div><div class="ttdeci">void mpi_allreduce()</div><div class="ttdoc">Add the 2-RDM elements of all MPI processes. </div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a7d1ba6f22b269a0a97853fb08665439e"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a7d1ba6f22b269a0a97853fb08665439e">CheMPS2::TwoDMstorage::read</a></div><div class="ttdeci">void read(const std::string name)</div><div class="ttdoc">Load the TwoDMstorage object. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00210">TwoDMstorage.cpp:210</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_aa5b2df3bb874ef7004be64c424c17945"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#aa5b2df3bb874ef7004be64c424c17945">CheMPS2::TwoDMstorage::Clear</a></div><div class="ttdeci">void Clear()</div><div class="ttdoc">Set all 2-RDM elements to zero. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00106">TwoDMstorage.cpp:106</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a928943351fa0c262c422e6f03712dbe1"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a928943351fa0c262c422e6f03712dbe1">CheMPS2::TwoDMstorage::~TwoDMstorage</a></div><div class="ttdeci">virtual ~TwoDMstorage()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00083">TwoDMstorage.cpp:83</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_a3558e85e4d8467e40393cdb1964a2e19"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#a3558e85e4d8467e40393cdb1964a2e19">CheMPS2::TwoDMstorage::TwoDMstorage</a></div><div class="ttdeci">TwoDMstorage(const int nGroup, const int *IrrepSizes)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00034">TwoDMstorage.cpp:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html">CheMPS2::TwoDMstorage</a></div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8h_source.html#l00032">TwoDMstorage.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html">CheMPS2::Irreps</a></div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00069">Irreps.h:69</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_ada1dcc9a9e78132a0d33a47e5a290ba5"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#ada1dcc9a9e78132a0d33a47e5a290ba5">CheMPS2::TwoDMstorage::save</a></div><div class="ttdeci">void save(const std::string name) const </div><div class="ttdoc">Save the TwoDMstorage object. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00130">TwoDMstorage.cpp:130</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TwoDMstorage_html_ada1dcc9a9e78132a0d33a47e5a290ba5"><div class="ttname"><a href="classCheMPS2_1_1TwoDMstorage.html#ada1dcc9a9e78132a0d33a47e5a290ba5">CheMPS2::TwoDMstorage::save</a></div><div class="ttdeci">void save(const std::string name) const </div><div class="ttdoc">Save the TwoDMstorage object. </div><div class="ttdef"><b>Definition:</b> <a href="TwoDMstorage_8cpp_source.html#l00152">TwoDMstorage.cpp:152</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9b42c04f8fd95b4f9151c9c6b143cac5.html">chemps2</a></li><li class="navelem"><b>TwoDMstorage.h</b></li>
-    <li class="footer">Generated on Wed May 27 2015 10:27:42 for CheMPS2 by
+    <li class="footer">Generated on Fri May 29 2015 20:43:19 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

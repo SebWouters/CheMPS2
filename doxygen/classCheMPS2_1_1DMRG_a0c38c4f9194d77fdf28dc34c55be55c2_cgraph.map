@@ -1,4 +1,5 @@
 <map id="CheMPS2::DMRG::getFCIcoefficient" name="CheMPS2::DMRG::getFCIcoefficient">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="294,5,485,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="310,56,469,83"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="306,57,473,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="310,123,469,149"/>
 </map>
