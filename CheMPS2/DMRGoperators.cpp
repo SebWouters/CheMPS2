@@ -220,8 +220,10 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
          const int cnt2 = trianglefunction(k1,glob);
          const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
          //Operator[index][cnt2][cnt3] corresponds to site indices (index-cnt3) and (index-cnt3-cnt2)
+         #ifdef CHEMPS2_MPI_COMPILATION
          const int siteindex1 = index-cnt3-cnt2;
          const int siteindex2 = index-cnt3;
+         #endif
          if (cnt3==0){ //Every MPI process owns the Operator[index][cnt2][cnt3==0]
             if (cnt2==0){
                F0tensors[index][cnt2][cnt3]->makenew(MPS[index]);
@@ -539,8 +541,10 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
          const int cnt2 = trianglefunction(k1,glob);
          const int cnt3 = glob - (k1-1-cnt2)*(k1-cnt2)/2;
          //Operator[index][cnt2][cnt3] corresponds to site indices (index+1+cnt3) and (index+1+cnt2+cnt3)
+         #ifdef CHEMPS2_MPI_COMPILATION
          const int siteindex1 = index+1+cnt3;
          const int siteindex2 = index+1+cnt2+cnt3;
+         #endif
          if (cnt3==0){ //Every MPI process owns the Operator[index][cnt2][cnt3==0]
             if (cnt2==0){
                F0tensors[index][cnt2][cnt3]->makenew(MPS[index+1]);
