@@ -5,7 +5,7 @@ set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio q
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
 set (CheMPS2_URL          "https://github.com/SebWouters/CheMPS2")
 set (CheMPS2_LICENSE      "GNU General Public License, version 2")
-set (CheMPS2_LIB_SOVERSION 1)
+set (CheMPS2_LIB_SOVERSION 1.5.1)
 
 include (GNUInstallDirs)
 cmake_minimum_required (VERSION 2.8.11)
