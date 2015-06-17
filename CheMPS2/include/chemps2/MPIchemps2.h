@@ -17,8 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef MPIBOOKKEEPER_CHEMPS2_H
-#define MPIBOOKKEEPER_CHEMPS2_H
+#ifndef MPICHEMPS2_CHEMPS2_H
+#define MPICHEMPS2_CHEMPS2_H
 
 //#define CHEMPS2_MPI_COMPILATION
 

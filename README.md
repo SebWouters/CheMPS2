@@ -609,6 +609,10 @@ class.
 [CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS
 and LAPACK routines.
 
+[CheMPS2/include/chemps2/MPIchemps2.h](CheMPS2/include/chemps2/MPIchemps2.h) contains the
+distribution of (complementary) renormalized operators over MPI processes, as well as
+wrappers for the MPI communication routines in the C API.
+
 [CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. 
 H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.
 
