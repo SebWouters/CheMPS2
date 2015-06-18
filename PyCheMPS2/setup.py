@@ -46,8 +46,7 @@ setup(
             sources=['PyCheMPS2.pyx'],
             depends=get_depends('.'),
             libraries=['chemps2'],
-            include_dirs=[np.get_include(), '/usr/include/hdf5/serial/'],
-            # Last option for libhdf5-dev changes https://packages.debian.org/sid/amd64/libhdf5-dev/filelist in debian/sid
+            include_dirs=[np.get_include()],
             language="c++"),
     ],
     classifiers=[

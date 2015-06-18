@@ -1,7 +1,4 @@
-include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2/
-                     ${HDF5_INCLUDE_DIRS}
-                     /usr/include/hdf5/serial/)
-# Last line for libhdf5-dev changes https://packages.debian.org/sid/amd64/libhdf5-dev/filelist in debian/sid until CMake catches up
+include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2/ ${HDF5_INCLUDE_DIRS})
 
 link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
 
