@@ -21,10 +21,11 @@ cimport ConvScheme
 cimport Prob
 cimport Corr
 cimport TwoRDM
+from libcpp.string cimport string
 
 cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
     cdef cppclass DMRG:
-        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *) except +
+        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bint makechkpt, const string tmpfolder) except +
         double Solve()
         void calc2DMandCorrelations()
         TwoRDM.TwoDM * get2DM()

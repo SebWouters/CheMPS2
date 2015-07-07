@@ -19,6 +19,7 @@
 
 import numpy as np
 cimport numpy as np
+from libcpp.string cimport string
 np.import_array()
 
 cimport Init
@@ -118,8 +119,8 @@ cdef class PyProblem:
         
 cdef class PyDMRG:
     cdef DMRGsolver.DMRG * thisptr
-    def __cinit__(self, PyProblem Probl, PyConvergenceScheme OptScheme):
-        self.thisptr = new DMRGsolver.DMRG(Probl.thisptr, OptScheme.thisptr)
+    def __cinit__(self, PyProblem Probl, PyConvergenceScheme OptScheme, bint makechkpt=False, string tmpfolder='/tmp'):
+        self.thisptr = new DMRGsolver.DMRG(Probl.thisptr, OptScheme.thisptr, makechkpt, tmpfolder)
     def __dealloc__(self):
         del self.thisptr
     def Solve(self):
