@@ -98,8 +98,8 @@ namespace CheMPS2{
          /** \return True if consistent, else false */
          bool checkConsistency() const;
          
-         //! Get whether the Hamiltonian orbitals are reordered for the DMRG calculation
-         /** \return Whether the Hamiltonian orbitals are reordered */
+         //! Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps, not only d2h)
+         /** \return Whether the Hamiltonian orbitals are reordered (for all irreps, not only d2h) */
          bool gReorderD2h() const;
          
          //! Get the DMRG index corresponding to a Ham index
@@ -112,8 +112,11 @@ namespace CheMPS2{
              \return The Ham index */
          int gf2(const int DMRGOrb) const;
          
-         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g Au
+         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g Au (based on N2, cc-pVDZ, 2.118 a.u.)
          void SetupReorderD2h();
+         
+         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2 (based on CO, cc-pVTZ, 1.15 Angstrom)
+         void SetupReorderC2v();
          
       private:
       

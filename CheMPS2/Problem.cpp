@@ -85,6 +85,54 @@ void CheMPS2::Problem::SetupReorderD2h(){
 
 }
 
+void CheMPS2::Problem::SetupReorderC2v(){
+
+   if (gSy()==5){ //Only if C2v of course
+   
+      bReorderD2h = true;
+      f1 = new int[Ham->getL()];
+      f2 = new int[Ham->getL()];
+      
+      int DMRGirrepOrder[4];
+      DMRGirrepOrder[0] = 0; //A1
+      DMRGirrepOrder[1] = 2; //B1
+      DMRGirrepOrder[2] = 3; //B2
+      DMRGirrepOrder[3] = 1; //A2
+      
+      int DMRGOrb = 0;
+      {
+         const int irrep = 0; // Irrep = 0 = A1 : reverse the order of the orbitals
+         for (int HamOrb=Ham->getL()-1; HamOrb>=0; HamOrb--){
+            if (Ham->getOrbitalIrrep(HamOrb)==DMRGirrepOrder[irrep]){
+               f1[HamOrb] = DMRGOrb;
+               f2[DMRGOrb] = HamOrb;
+               DMRGOrb++;
+            }
+         }
+      }
+      for (int irrep=1; irrep<4; irrep++){
+         for (int HamOrb=0; HamOrb<Ham->getL(); HamOrb++){
+            if (Ham->getOrbitalIrrep(HamOrb)==DMRGirrepOrder[irrep]){
+               f1[HamOrb] = DMRGOrb;
+               f2[DMRGOrb] = HamOrb;
+               DMRGOrb++;
+            }
+         }
+      }
+      assert( DMRGOrb==Ham->getL() );
+      
+      /*
+      cout << "The new orbital order in c2v:" << endl;
+      for ( int DMRGOrb=0; DMRGOrb<Ham->getL()-1; DMRGOrb++ ){
+          cout << f2[DMRGOrb] << ", ";
+      }
+      cout << f2[Ham->getL()-1] << endl;
+      */
+      
+   }
+
+}
+
 int CheMPS2::Problem::gIrrep(const int nOrb) const{
    
    if (!bReorderD2h){
