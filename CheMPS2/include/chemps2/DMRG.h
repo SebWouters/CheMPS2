@@ -45,6 +45,13 @@
 #include "ConvergenceScheme.h"
 #include "MyHDF5.h"
 
+//For the timings of the different parts of DMRG
+#define CHEMPS2_TIME_S_JOIN    0
+#define CHEMPS2_TIME_S_SOLVE   1
+#define CHEMPS2_TIME_S_SPLIT   2
+#define CHEMPS2_TIME_TENS_UPD  3
+#define CHEMPS2_TIME_VECLENGTH 4
+
 namespace CheMPS2{
 /** DMRG class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
@@ -254,6 +261,9 @@ namespace CheMPS2{
          void cleanup_excitations(double ** VeffTilde) const;
          void calcVeffTilde(double * result, Sobject * currentS, int state_number);
          void calcOverlapsWithLowerStates();
+         
+         //For the timings
+         double timings[CHEMPS2_TIME_VECLENGTH];
          
    };
 }

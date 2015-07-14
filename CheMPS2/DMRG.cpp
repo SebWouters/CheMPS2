@@ -196,6 +196,7 @@ double CheMPS2::DMRG::Solve(){
       
       while ( (fabs(Energy-EnergyPrevious) > OptScheme->getEconv(instruction) ) && ( nIterations < OptScheme->getMaxSweeps(instruction) )){
       
+         for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
          struct timeval start, end;
          EnergyPrevious = Energy;
          gettimeofday(&start, NULL);
@@ -205,10 +206,15 @@ double CheMPS2::DMRG::Solve(){
          if ( am_i_master ){
             cout << "***  Information on left sweep " << nIterations << " of instruction " << instruction << ":" << endl;
             cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
+            cout << "***            --> S.join        = " << timings[ CHEMPS2_TIME_S_JOIN   ] << " seconds" << endl;
+            cout << "***            --> S.solve       = " << timings[ CHEMPS2_TIME_S_SOLVE  ] << " seconds" << endl;
+            cout << "***            --> S.split       = " << timings[ CHEMPS2_TIME_S_SPLIT  ] << " seconds" << endl;
+            cout << "***            --> Tensor update = " << timings[ CHEMPS2_TIME_TENS_UPD ] << " seconds" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
          }
          if (!change) change = true; //rest of sweeps: variable virtual dimensions
+         for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
          gettimeofday(&start, NULL);
          Energy = sweepright(change, instruction, am_i_master);
          gettimeofday(&end, NULL);
@@ -216,6 +222,10 @@ double CheMPS2::DMRG::Solve(){
          if ( am_i_master ){
             cout << "***  Information on right sweep " << nIterations << " of instruction " << instruction << ":" << endl;
             cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
+            cout << "***            --> S.join        = " << timings[ CHEMPS2_TIME_S_JOIN   ] << " seconds" << endl;
+            cout << "***            --> S.solve       = " << timings[ CHEMPS2_TIME_S_SOLVE  ] << " seconds" << endl;
+            cout << "***            --> S.split       = " << timings[ CHEMPS2_TIME_S_SPLIT  ] << " seconds" << endl;
+            cout << "***            --> Tensor update = " << timings[ CHEMPS2_TIME_TENS_UPD ] << " seconds" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
             if ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, false); } // Only the master proc makes MPS checkpoints !!
@@ -250,14 +260,19 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
    double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
+   struct timeval start, end;
    
    for (int index = L-2; index>0; index--){
       //Construct S
+      gettimeofday(&start, NULL);
       Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
       //Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
       denS->Join(MPS[index],MPS[index+1]);
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Feed everything to the solver
+      gettimeofday(&start, NULL);
       Heff Solver(denBK, Prob);
       double ** VeffTilde = NULL;
       if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
@@ -267,13 +282,18 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
       Energy += Prob->gEconst();
       if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
       if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Decompose the S-object
+      gettimeofday(&start, NULL);
       if (( NoiseLevel>0.0 ) && ( am_i_master )){ denS->addNoise(NoiseLevel); }
       //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
       double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->getD(instruction),false,change);
       delete denS;
       if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Print info
       if ( am_i_master ){
@@ -282,7 +302,10 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
       }
       
       //Prepare for next step
+      gettimeofday(&start, NULL);
       updateMovingLeftSafe(index);
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_TENS_UPD ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
 
    }
    
@@ -296,14 +319,19 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
    double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
+   struct timeval start, end;
    
    for (int index = 0; index<L-2; index++){
       //Construct S
+      gettimeofday(&start, NULL);
       Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
       //Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
       denS->Join(MPS[index],MPS[index+1]);
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Feed everything to solver
+      gettimeofday(&start, NULL);
       Heff Solver(denBK, Prob);
       double ** VeffTilde = NULL;
       if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
@@ -313,13 +341,18 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
       Energy += Prob->gEconst();
       if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
       if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Decompose the S-object
+      gettimeofday(&start, NULL);
       if (( NoiseLevel>0.0 ) && ( am_i_master )){ denS->addNoise(NoiseLevel); }
       //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
       double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->getD(instruction),true,change);
       delete denS;
       if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       
       //Print info
       if ( am_i_master ){
@@ -328,7 +361,10 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
       }
       
       //Prepare for next step
+      gettimeofday(&start, NULL);
       updateMovingRightSafe(index);
+      gettimeofday(&end, NULL);
+      timings[ CHEMPS2_TIME_TENS_UPD ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
 
    }
    
