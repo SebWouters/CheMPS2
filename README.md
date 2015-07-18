@@ -198,6 +198,8 @@ colon-separated include and library paths:
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
+    
+For debian/sid, the HDF5 headers are located in the folder `/usr/include/hdf5/serial`. If CMake complains about the HDF5 headers, try to pass it with the option `-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial`.
 
 To compile, run:
 
