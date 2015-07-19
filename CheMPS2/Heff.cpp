@@ -331,9 +331,11 @@ double CheMPS2::Heff::SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, T
 
    int inc1 = 1;
    int veclength = denS->gKappa2index( denS->gNKappa() );
-   const double RTOL = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * veclength );
 
-   Davidson deBoskabouter( veclength, CheMPS2::HEFF_DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, CheMPS2::HEFF_debugPrint );
+   Davidson deBoskabouter( veclength, CheMPS2::HEFF_DAVIDSON_NUM_VEC,
+                                      CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP,
+                                      CheMPS2::HEFF_DAVIDSON_DMRG_RTOL,
+                                      CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, CheMPS2::HEFF_debugPrint );
    double ** whichpointers = new double*[2];
 
    char instruction = deBoskabouter.FetchInstruction( whichpointers );

@@ -123,7 +123,7 @@ int main(void){
    delete Ham;
    
    //Check succes
-   const bool success = ( fabs( EnergySite - EnergyMomentum ) < 1e-10 ) ? true : false;
+   const bool success = ( fabs( EnergySite - EnergyMomentum ) < 1e-8 ) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

@@ -82,7 +82,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-10) and (RMSerror2DM < 1e-6)):
+if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-8) and (RMSerror2DM < 1e-3)):
     print "================> Did test 3 succeed : yes"
 else:
     print "================> Did test 3 succeed : no"

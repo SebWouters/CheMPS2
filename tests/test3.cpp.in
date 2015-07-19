@@ -112,7 +112,7 @@ int main(void){
    delete Ham;
 
    //Check success
-   bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) && ( RMSerror2DM < 1e-6 )) ? true : false;
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 )) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

@@ -80,11 +80,11 @@ int main(void){
    delete Ham;
    
    //Check succes
-   bool OK1 = (fabs(Energy0 + 107.648250974014)<1e-10)? true : false;
-   bool OK2 = (fabs(Energy1 + 106.944757308768)<1e-10)? true : false;
-   bool OK3 = (fabs(Energy2 + 106.92314213886 )<1e-10)? true : false;
+   const bool OK1 = ( fabs( Energy0 + 107.648250974014 ) < 1e-8 )? true : false;
+   const bool OK2 = ( fabs( Energy1 + 106.944757308768 ) < 1e-8 )? true : false;
+   const bool OK3 = ( fabs( Energy2 + 106.92314213886  ) < 1e-8 )? true : false;
    
-   bool success = (OK1 && OK2 && OK3);
+   const bool success = (OK1 && OK2 && OK3);
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

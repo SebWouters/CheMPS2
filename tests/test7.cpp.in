@@ -131,7 +131,7 @@ int main(void){
    #endif
    
    //Check succes
-   const bool success = ((RMS < 1e-10) && (RMS2 < 1e-10)) ? true : false;
+   const bool success = (( RMS < 1e-10 ) && ( RMS2 < 1e-10 )) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

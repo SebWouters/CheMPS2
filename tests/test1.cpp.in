@@ -158,8 +158,8 @@ int main(void){
    //Check success
    bool success = true;
    for (int cnt=0; cnt<nSectors; cnt++){
-      success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-10 );
-      success = ( success ) && ( RMSdev[cnt] < 1e-4 ); // Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
+      success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-8 );
+      success = ( success ) && ( RMSdev[cnt] < 1e-3 ); // Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
    }
    
    delete [] EFCI;

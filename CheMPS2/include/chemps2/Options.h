@@ -64,7 +64,8 @@ namespace CheMPS2{
    const int    HEFF_DAVIDSON_NUM_VEC         = 32;
    const int    HEFF_DAVIDSON_NUM_VEC_KEEP    = 3;
    const double HEFF_DAVIDSON_PRECOND_CUTOFF  = 1e-12;
-   const double HEFF_DAVIDSON_RTOL_BASE       = 1e-10;
+   const double HEFF_DAVIDSON_RTOL_BASE       = 1e-10;  // Base value for FCI and augmented Hessian diagonalization
+   const double HEFF_DAVIDSON_DMRG_RTOL       = 1e-5;   // Block's Davidson tolerance would correspond to HEFF_DAVIDSON_DMRG_RTOL^2
    
    const bool   SYBK_debugPrint               = false;
    const int    SYBK_dimensionCutoff          = 262144;

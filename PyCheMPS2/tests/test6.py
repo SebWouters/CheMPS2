@@ -81,7 +81,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 149.6802657522) < 1e-10):
+if (np.fabs(Energy + 149.6802657522) < 1e-8):
     print "================> Did test 6 succeed : yes"
 else:
     print "================> Did test 6 succeed : no"
