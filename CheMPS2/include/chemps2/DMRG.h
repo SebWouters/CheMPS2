@@ -46,11 +46,15 @@
 #include "MyHDF5.h"
 
 //For the timings of the different parts of DMRG
-#define CHEMPS2_TIME_S_JOIN    0
-#define CHEMPS2_TIME_S_SOLVE   1
-#define CHEMPS2_TIME_S_SPLIT   2
-#define CHEMPS2_TIME_TENS_UPD  3
-#define CHEMPS2_TIME_VECLENGTH 4
+#define CHEMPS2_TIME_S_JOIN      0
+#define CHEMPS2_TIME_S_SOLVE     1
+#define CHEMPS2_TIME_S_SPLIT     2
+#define CHEMPS2_TIME_TENS_TOTAL  3
+#define CHEMPS2_TIME_TENS_ALLOC  4
+#define CHEMPS2_TIME_TENS_FREE   5
+#define CHEMPS2_TIME_TENS_DISKIO 6
+#define CHEMPS2_TIME_TENS_CALC   7
+#define CHEMPS2_TIME_VECLENGTH   8
 
 namespace CheMPS2{
 /** DMRG class.

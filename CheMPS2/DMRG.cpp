@@ -64,6 +64,7 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    isAllocated = new int[L-1]; //0 not allocated, 1 allocated with movingRight true, 2 allocated with movingRight false
    
    for (int cnt=0; cnt<L-1; cnt++){ isAllocated[cnt] = 0; }
+   for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; } // Clear here so that valgrind can never complain :-)
    
    the2DMallocated = false;
    the2DM = NULL;
@@ -206,10 +207,14 @@ double CheMPS2::DMRG::Solve(){
          if ( am_i_master ){
             cout << "***  Information on left sweep " << nIterations << " of instruction " << instruction << ":" << endl;
             cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
-            cout << "***            --> S.join        = " << timings[ CHEMPS2_TIME_S_JOIN   ] << " seconds" << endl;
-            cout << "***            --> S.solve       = " << timings[ CHEMPS2_TIME_S_SOLVE  ] << " seconds" << endl;
-            cout << "***            --> S.split       = " << timings[ CHEMPS2_TIME_S_SPLIT  ] << " seconds" << endl;
-            cout << "***            --> Tensor update = " << timings[ CHEMPS2_TIME_TENS_UPD ] << " seconds" << endl;
+            cout << "***       |--> S.join            = " << timings[ CHEMPS2_TIME_S_JOIN      ] << " seconds" << endl;
+            cout << "***       |--> S.solve           = " << timings[ CHEMPS2_TIME_S_SOLVE     ] << " seconds" << endl;
+            cout << "***       |--> S.split           = " << timings[ CHEMPS2_TIME_S_SPLIT     ] << " seconds" << endl;
+            cout << "***       |--> Tensor update     = " << timings[ CHEMPS2_TIME_TENS_TOTAL  ] << " seconds" << endl;
+            cout << "***               |--> create    = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
+            cout << "***               |--> destroy   = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
+            cout << "***               |--> disk io   = " << timings[ CHEMPS2_TIME_TENS_DISKIO ] << " seconds" << endl;
+            cout << "***               |--> calc      = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
          }
@@ -222,10 +227,14 @@ double CheMPS2::DMRG::Solve(){
          if ( am_i_master ){
             cout << "***  Information on right sweep " << nIterations << " of instruction " << instruction << ":" << endl;
             cout << "***     Elapsed wall time        = " << elapsed << " seconds" << endl;
-            cout << "***            --> S.join        = " << timings[ CHEMPS2_TIME_S_JOIN   ] << " seconds" << endl;
-            cout << "***            --> S.solve       = " << timings[ CHEMPS2_TIME_S_SOLVE  ] << " seconds" << endl;
-            cout << "***            --> S.split       = " << timings[ CHEMPS2_TIME_S_SPLIT  ] << " seconds" << endl;
-            cout << "***            --> Tensor update = " << timings[ CHEMPS2_TIME_TENS_UPD ] << " seconds" << endl;
+            cout << "***       |--> S.join            = " << timings[ CHEMPS2_TIME_S_JOIN      ] << " seconds" << endl;
+            cout << "***       |--> S.solve           = " << timings[ CHEMPS2_TIME_S_SOLVE     ] << " seconds" << endl;
+            cout << "***       |--> S.split           = " << timings[ CHEMPS2_TIME_S_SPLIT     ] << " seconds" << endl;
+            cout << "***       |--> Tensor update     = " << timings[ CHEMPS2_TIME_TENS_TOTAL  ] << " seconds" << endl;
+            cout << "***               |--> create    = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
+            cout << "***               |--> destroy   = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
+            cout << "***               |--> disk io   = " << timings[ CHEMPS2_TIME_TENS_DISKIO ] << " seconds" << endl;
+            cout << "***               |--> calc      = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
             if ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, false); } // Only the master proc makes MPS checkpoints !!
@@ -305,7 +314,7 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
       gettimeofday(&start, NULL);
       updateMovingLeftSafe(index);
       gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_TENS_UPD ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
 
    }
    
@@ -364,7 +373,7 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
       gettimeofday(&start, NULL);
       updateMovingRightSafe(index);
       gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_TENS_UPD ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
 
    }
    

@@ -21,6 +21,9 @@
 #include <string.h>
 #include <iostream>
 #include <sstream>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "DMRG.h"
 #include "Lapack.h"
@@ -185,6 +188,9 @@ int CheMPS2::DMRG::trianglefunction(const int k, const int glob){
 }
 
 void CheMPS2::DMRG::updateMovingRight(const int index){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
 
    const int dimL = denBK->gMaxDimAtBound(index);
    const int dimR = denBK->gMaxDimAtBound(index+1);
@@ -503,9 +509,15 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
       }
    }
    
+   gettimeofday(&end, NULL);
+   timings[ CHEMPS2_TIME_TENS_CALC ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
 }
 
 void CheMPS2::DMRG::updateMovingLeft(const int index){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
 
    const int dimL = denBK->gMaxDimAtBound(index+1);
    const int dimR = denBK->gMaxDimAtBound(index+2);
@@ -824,9 +836,15 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
       }
    }
 
+   gettimeofday(&end, NULL);
+   timings[ CHEMPS2_TIME_TENS_CALC ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
 }
 
 void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -1056,6 +1074,9 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
    }
 
+   gettimeofday(&end, NULL);
+   timings[ CHEMPS2_TIME_TENS_ALLOC ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
 }
 
 void CheMPS2::DMRG::MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor){
@@ -1098,6 +1119,9 @@ void CheMPS2::DMRG::MY_HDF5_READ(const hid_t file_id, const std::string sPath, T
 }
 
 void CheMPS2::DMRG::OperatorsOnDisk(const int index, const bool movingRight, const bool store){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
 
    const int Nbound = movingRight ? index+1 : L-1-index;
    const int Cbound = movingRight ? L-1-index : index+1;
@@ -1241,9 +1265,15 @@ void CheMPS2::DMRG::OperatorsOnDisk(const int index, const bool movingRight, con
 
    H5Fclose(file_id);
 
+   gettimeofday(&end, NULL);
+   timings[ CHEMPS2_TIME_TENS_DISKIO ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
 }
 
 void CheMPS2::DMRG::deleteTensors(const int index, const bool movingRight){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
 
    const int Nbound = movingRight ? index+1 : L-1-index;
    const int Cbound = movingRight ? L-1-index : index+1;
@@ -1340,7 +1370,10 @@ void CheMPS2::DMRG::deleteTensors(const int index, const bool movingRight){
          { delete Exc_Overlaps[state][index]; }
       }
    }
-   
+
+   gettimeofday(&end, NULL);
+   timings[ CHEMPS2_TIME_TENS_FREE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
 }
 
 void CheMPS2::DMRG::deleteStoredOperators(){
