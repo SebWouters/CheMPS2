@@ -52,9 +52,10 @@
 #define CHEMPS2_TIME_TENS_TOTAL  3
 #define CHEMPS2_TIME_TENS_ALLOC  4
 #define CHEMPS2_TIME_TENS_FREE   5
-#define CHEMPS2_TIME_TENS_DISKIO 6
-#define CHEMPS2_TIME_TENS_CALC   7
-#define CHEMPS2_TIME_VECLENGTH   8
+#define CHEMPS2_TIME_DISK_WRITE  6
+#define CHEMPS2_TIME_DISK_READ   7
+#define CHEMPS2_TIME_TENS_CALC   8
+#define CHEMPS2_TIME_VECLENGTH   9
 
 namespace CheMPS2{
 /** DMRG class.
@@ -231,8 +232,8 @@ namespace CheMPS2{
          double sweepright(const bool change, const int instruction, const bool am_i_master);
          
          //Load and save functions
-         static void MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor);
-         static void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
+         void MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor);
+         void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
          void OperatorsOnDisk(const int index, const bool movingRight, const bool store);
          string tempfolder;
          
@@ -266,8 +267,10 @@ namespace CheMPS2{
          void calcVeffTilde(double * result, Sobject * currentS, int state_number);
          void calcOverlapsWithLowerStates();
          
-         //For the timings
-         double timings[CHEMPS2_TIME_VECLENGTH];
+         // Performance counters
+         double timings[ CHEMPS2_TIME_VECLENGTH ];
+         long long num_double_write_disk;
+         long long num_double_read_disk;
          
    };
 }

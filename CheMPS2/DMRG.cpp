@@ -65,6 +65,8 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    
    for (int cnt=0; cnt<L-1; cnt++){ isAllocated[cnt] = 0; }
    for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; } // Clear here so that valgrind can never complain :-)
+   num_double_write_disk = 0;
+   num_double_read_disk  = 0;
    
    the2DMallocated = false;
    the2DM = NULL;
@@ -198,10 +200,12 @@ double CheMPS2::DMRG::Solve(){
       while ( (fabs(Energy-EnergyPrevious) > OptScheme->getEconv(instruction) ) && ( nIterations < OptScheme->getMaxSweeps(instruction) )){
       
          for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
+         num_double_write_disk = 0;
+         num_double_read_disk  = 0;
          struct timeval start, end;
          EnergyPrevious = Energy;
          gettimeofday(&start, NULL);
-         Energy = sweepleft(change, instruction, am_i_master);
+         Energy = sweepleft(change, instruction, am_i_master); // Only relevant call in this block of code
          gettimeofday(&end, NULL);
          double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
          if ( am_i_master ){
@@ -211,17 +215,22 @@ double CheMPS2::DMRG::Solve(){
             cout << "***       |--> S.solve           = " << timings[ CHEMPS2_TIME_S_SOLVE     ] << " seconds" << endl;
             cout << "***       |--> S.split           = " << timings[ CHEMPS2_TIME_S_SPLIT     ] << " seconds" << endl;
             cout << "***       |--> Tensor update     = " << timings[ CHEMPS2_TIME_TENS_TOTAL  ] << " seconds" << endl;
-            cout << "***               |--> create    = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
-            cout << "***               |--> destroy   = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
-            cout << "***               |--> disk io   = " << timings[ CHEMPS2_TIME_TENS_DISKIO ] << " seconds" << endl;
-            cout << "***               |--> calc      = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
+            cout << "***              |--> create     = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
+            cout << "***              |--> destroy    = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
+            cout << "***              |--> disk write = " << timings[ CHEMPS2_TIME_DISK_WRITE  ] << " seconds" << endl;
+            cout << "***              |--> disk read  = " << timings[ CHEMPS2_TIME_DISK_READ   ] << " seconds" << endl;
+            cout << "***              |--> calc       = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
+            cout << "***     Disk write bandwidth     = " << num_double_write_disk * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_WRITE ] * 1048576 ) << " MB/s" << endl;
+            cout << "***     Disk read  bandwidth     = " << num_double_read_disk  * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_READ  ] * 1048576 ) << " MB/s" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
          }
          if (!change) change = true; //rest of sweeps: variable virtual dimensions
          for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
+         num_double_write_disk = 0;
+         num_double_read_disk  = 0;
          gettimeofday(&start, NULL);
-         Energy = sweepright(change, instruction, am_i_master);
+         Energy = sweepright(change, instruction, am_i_master); // Only relevant call in this block of code
          gettimeofday(&end, NULL);
          elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
          if ( am_i_master ){
@@ -231,10 +240,13 @@ double CheMPS2::DMRG::Solve(){
             cout << "***       |--> S.solve           = " << timings[ CHEMPS2_TIME_S_SOLVE     ] << " seconds" << endl;
             cout << "***       |--> S.split           = " << timings[ CHEMPS2_TIME_S_SPLIT     ] << " seconds" << endl;
             cout << "***       |--> Tensor update     = " << timings[ CHEMPS2_TIME_TENS_TOTAL  ] << " seconds" << endl;
-            cout << "***               |--> create    = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
-            cout << "***               |--> destroy   = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
-            cout << "***               |--> disk io   = " << timings[ CHEMPS2_TIME_TENS_DISKIO ] << " seconds" << endl;
-            cout << "***               |--> calc      = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
+            cout << "***              |--> create     = " << timings[ CHEMPS2_TIME_TENS_ALLOC  ] << " seconds" << endl;
+            cout << "***              |--> destroy    = " << timings[ CHEMPS2_TIME_TENS_FREE   ] << " seconds" << endl;
+            cout << "***              |--> disk write = " << timings[ CHEMPS2_TIME_DISK_WRITE  ] << " seconds" << endl;
+            cout << "***              |--> disk read  = " << timings[ CHEMPS2_TIME_DISK_READ   ] << " seconds" << endl;
+            cout << "***              |--> calc       = " << timings[ CHEMPS2_TIME_TENS_CALC   ] << " seconds" << endl;
+            cout << "***     Disk write bandwidth     = " << num_double_write_disk * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_WRITE ] * 1048576 ) << " MB/s" << endl;
+            cout << "***     Disk read  bandwidth     = " << num_double_read_disk  * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_READ  ] * 1048576 ) << " MB/s" << endl;
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
             if ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, false); } // Only the master proc makes MPS checkpoints !!

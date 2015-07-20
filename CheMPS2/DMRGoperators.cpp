@@ -1096,6 +1096,7 @@ void CheMPS2::DMRG::MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, 
 
       H5Gclose(group_id);
    
+      num_double_write_disk += size;
    }
 
 }
@@ -1114,6 +1115,7 @@ void CheMPS2::DMRG::MY_HDF5_READ(const hid_t file_id, const std::string sPath, T
 
       H5Gclose(group_id);
       
+      num_double_read_disk += size;
    }
 
 }
@@ -1266,7 +1268,8 @@ void CheMPS2::DMRG::OperatorsOnDisk(const int index, const bool movingRight, con
    H5Fclose(file_id);
 
    gettimeofday(&end, NULL);
-   timings[ CHEMPS2_TIME_TENS_DISKIO ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+   if ( store ){ timings[ CHEMPS2_TIME_DISK_WRITE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec); }
+   else {        timings[ CHEMPS2_TIME_DISK_READ  ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec); }
 
 }
 
