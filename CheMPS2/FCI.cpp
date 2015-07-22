@@ -1068,6 +1068,9 @@ void CheMPS2::FCI::DiagHam(double * diag) const{
 
 void CheMPS2::FCI::DiagHamSquared(double * output) const{
 
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
+
    const unsigned long long vecLength = getVecLength( 0 );
    
    /*
@@ -1339,7 +1342,235 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
    
    }
 
+   gettimeofday(&end, NULL);
+   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+   if ( FCIverbose > 0 ){ cout << "FCI::DiagHamSquared : Wall time = " << elapsed << " seconds" << endl; }
+
 }
+
+
+/*void CheMPS2::FCI::DiagHamSquared_WICK(double * output) const{
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
+
+   const unsigned long long vecLength = getVecLength( 0 );
+   
+   //
+   //   Wick's theorem to evaluate the Hamiltonian squared:
+   //
+   //      H = g_ij E_ij + 0.5 * (ij|kl) E_ij E_kl
+   //
+   //      H^2 = g_ij g_kl E_ij E_kl
+   //          + 0.5 * [ g_ab (ij|kl) + (ab|ij) g_kl ] E_ab E_ij E_kl
+   //          + 0.25 * (ab|cd) * (ij|kl) E_ab E_cd E_ij E_kl
+   //
+   //      Short illustration of what is being done:
+   //
+   //          E_ij E_kl = (i,s1)^+ (j,s1) (k,s2)^+ (l,s2)
+   //
+   //                    = (i,s1)^+ (j,s1) (k,s2)^+ (l,s2)
+   //                        |        |      |        |
+   //                        ----------      ----------
+   //                    + (i,s1)^+ (j,s1) (k,s2)^+ (l,s2)
+   //                        |        |      |        |
+   //                        |        --------        |
+   //                        --------------------------
+   //                    = num(i,s1) delta(i,j) num(k,s2) delta(k,l)
+   //                    + num(i,s1) delta(i,l) delta(s1,s2) [1-num(k,s2)] delta(k,j)
+   //          
+   //          g_ij g_kl E_ij E_kl = g_ii g_kk num(i,s1) num(k,s2) + g_ik g_ki num(i,s1) [1-num(k,s2)] delta(s1,s2)
+   //
+   
+   #pragma omp parallel
+   {
+
+      int * bits_up    = new int[ L ];
+      int * bits_down  = new int[ L ];
+      
+      #pragma omp for schedule(static)
+      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      
+         double myResult = 0.0;
+         getBitsOfCounter( 0 , counter , bits_up , bits_down ); // Fetch the corresponding bits
+         
+         for ( unsigned int i = 0; i < L; i++ ){
+         
+            const int num_i = bits_up[i] + bits_down[i];
+            
+            for ( unsigned int k = 0; k < L; k++ ){
+            
+               const int num_k = bits_up[k] + bits_down[k];
+               const int special_ik = ( bits_up[i]   * ( 1 - bits_up[k]   )
+                                      + bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(i,s1) [1-num(k,s1)]
+               
+               myResult += ( getGmat(i, i) * getGmat(k, k) * num_i * num_k
+                           + getGmat(i, k) * getGmat(k, i) * special_ik );
+               
+               for ( unsigned int a = 0; a < L; a++ ){
+               
+                  const int num_a = bits_up[a] + bits_down[a];
+                  const int special_ai = ( bits_up[a]   * ( 1 - bits_up[i]   )
+                                         + bits_down[a] * ( 1 - bits_down[i] ) );  // sum_s1 of num(a,s1) [1-num(i,s1)]
+                  const int special_ak = ( bits_up[a]   * ( 1 - bits_up[k]   )
+                                         + bits_down[a] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) [1-num(k,s1)]
+                  const int combo1_aik = ( bits_up[a]   * bits_up[i]   * ( 1 - bits_up[k]   )
+                                         + bits_down[a] * bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) num(i,s1) [1-num(k,s1)]
+                  const int combo2_aik = ( bits_up[a]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
+                                         + bits_down[a] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) [1-num(i,s1)] [1-num(k,s1)]
+                  
+                  double prefactor = getGmat(a, a) * getERI(i, i, k, k) + getERI(a, a, i, i) * getGmat(k, k);
+                  myResult += 0.5 * prefactor * num_a * num_i * num_k;
+                  
+                  prefactor = getGmat(a, a) * getERI(i, k, k, i) + getERI(a, a, i, k) * getGmat(k, i);
+                  myResult += 0.5 * prefactor * num_a * special_ik;
+                  
+                  prefactor = getGmat(a, i) * getERI(i, a, k, k) + getERI(a, i, i, a) * getGmat(k, k);
+                  myResult += 0.5 * prefactor * special_ai * num_k;
+                  
+                  prefactor = getGmat(a, k) * getERI(i, i, k, a) + getERI(a, k, i, i) * getGmat(k, a);
+                  myResult += 0.5 * prefactor * num_i * special_ak;
+                  
+                  prefactor = getGmat(a, k) * getERI(i, a, k, i) + getERI(a, k, i, a) * getGmat(k, i);
+                  myResult -= 0.5 * prefactor * combo1_aik; //Minus sign !!!!!
+                  
+                  prefactor = getGmat(a, i) * getERI(i, k, k, a) + getERI(a, i, i, k) * getGmat(k, a);
+                  myResult += 0.5 * prefactor * combo2_aik;
+                  
+                  for ( unsigned int c = 0; c < L; c++ ){
+                  
+                     const int num_c = bits_up[c] + bits_down[c];
+                     const int special_ci = ( bits_up[c]   * ( 1 - bits_up[i]   )
+                                            + bits_down[c] * ( 1 - bits_down[i] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)]
+                     const int special_ck = ( bits_up[c]   * ( 1 - bits_up[k]   )
+                                            + bits_down[c] * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)]
+                     const int combo1_cik = ( bits_up[c]   * bits_up[i]   * ( 1 - bits_up[k]   )
+                                            + bits_down[c] * bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) num(i,s1) [1-num(k,s1)]
+                     const int combo2_cik = ( bits_up[c]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
+                                            + bits_down[c] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)] [1-num(k,s1)]
+                  
+                     //
+                     //    1-->6 (24 total):
+                     //
+                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
+                     //                             |   |
+                     //                             -----
+                     //
+                  
+                     myResult += 0.25 * num_a * ( num_c * num_i * num_k * getERI(a, a, c, c) * getERI(i, i, k, k)
+                     
+                                                + special_ci * num_k    * getERI(a, a, c, i) * getERI(i, c, k, k)
+                                                
+                                                - combo1_cik            * getERI(a, a, c, k) * getERI(i, c, k, i)
+                                                
+                                                + num_c * special_ik    * getERI(a, a, c, c) * getERI(i, k, k, i)
+                                                
+                                                + combo2_cik            * getERI(a, a, c, i) * getERI(i, k, k, c)
+                                                
+                                                + num_i * special_ck    * getERI(a, a, c, k) * getERI(i, i, k, c) );
+                                                
+                     //
+                     //    7-->12 (24 total):
+                     //
+                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
+                     //                             |         |
+                     //                             -----------
+                     //
+                     
+                     const int special_ac = ( bits_up[a]   * ( 1 - bits_up[c]   )
+                                            + bits_down[a] * ( 1 - bits_down[c] ) );  // sum_s1 of num(a,s1) [1-num(c,s1)]
+                     const int combo1_aci = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[i]   )
+                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[i] ) );  // sum_s1 of num(a,s1) num(c,s1) [1-num(i,s1)]
+                     const int combo1_ack = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) num(c,s1) [1-num(k,s1)]
+                     const int local1     = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
+                     const int local2     = ( bits_up[a]   * bits_up[c]   * bits_up[i]   * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * bits_down[c] * bits_down[i] * ( 1 - bits_down[k] ) );
+                     
+                     myResult += 0.25 * ( special_ac * num_i * num_k * getERI(a, c, c, a) * getERI(i, i, k, k)
+                     
+                                        + special_ac * special_ik    * getERI(a, c, c, a) * getERI(i, k, k, i)
+                                        
+                                        - combo1_aci * num_k         * getERI(a, i, c, a) * getERI(i, c, k, k)
+                                        
+                                        - local1                     * getERI(a, i, c, a) * getERI(i, k, k, c)
+                                        
+                                        - combo1_ack * num_i         * getERI(a, k, c, a) * getERI(i, i, k, c)
+                                        
+                                        + local2                     * getERI(a, k, c, a) * getERI(i, c, k, i) );
+                     
+                     //
+                     //    13-->18 (24 total):
+                     //
+                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
+                     //                             |               |
+                     //                             -----------------
+                     //
+                     
+                     const int combo2_aci = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[i]   )
+                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[i] ) );
+                     const int local3     = ( bits_up[a]   * ( 1 - bits_up[c]   ) * bits_up[i]   * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * ( 1 - bits_down[c] ) * bits_down[i] * ( 1 - bits_down[k] ) );
+                     
+                     myResult += 0.25 * ( combo2_aci * num_k         * getERI(a, c, c, i) * getERI(i, a, k, k)
+                     
+                                        + special_ai * num_c * num_k * getERI(a, i, c, c) * getERI(i, a, k, k)
+                                        
+                                        - combo1_aik * num_c         * getERI(a, k, c, c) * getERI(i, a, k, i)
+                                        
+                                        - local1                     * getERI(a, k, c, i) * getERI(i, a, k, c)
+                                        
+                                        - local3                     * getERI(a, c, c, k) * getERI(i, a, k, i)
+                                        
+                                        + special_ai * special_ck    * getERI(a, i, c, k) * getERI(i, a, k, c) );
+                     
+                     //
+                     //    19-->24 (24 total):
+                     //
+                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
+                     //                             |                     |
+                     //                             -----------------------
+                     //
+                     
+                     const int combo2_aik = ( bits_up[a]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
+                     const int combo2_ack = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[k] ) );
+                     const int local4     = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
+                     
+                     myResult += 0.25 * ( special_ak * num_c * num_i * getERI(a, k, c, c) * getERI(i, i, k, a)
+                     
+                                        + special_ak * special_ci    * getERI(a, k, c, i) * getERI(i, c, k, a)
+                                        
+                                        + combo2_aik * num_c         * getERI(a, i, c, c) * getERI(i, k, k, a)
+                                        
+                                        - local1                     * getERI(a, i, c, k) * getERI(i, c, k, a)
+                                        
+                                        + local4                     * getERI(a, c, c, i) * getERI(i, k, k, a)
+                                        
+                                        + combo2_ack * num_i         * getERI(a, c, c, k) * getERI(i, i, k, a) );
+                  
+                  }
+               }
+            }
+         }
+         
+         output[ counter ] = myResult;
+      
+      }
+      
+      delete [] bits_up;
+      delete [] bits_down;
+   
+   }
+   
+   gettimeofday(&end, NULL);
+   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+   if ( FCIverbose > 0 ){ cout << "FCI::DiagHamSquared(WICK) : Wall time = " << elapsed << " seconds" << endl; }
+
+}*/
 
 
 unsigned long long CheMPS2::FCI::LowestEnergyDeterminant() const{
