@@ -1066,290 +1066,8 @@ void CheMPS2::FCI::DiagHam(double * diag) const{
 
 }
 
+
 void CheMPS2::FCI::DiagHamSquared(double * output) const{
-
-   struct timeval start, end;
-   gettimeofday(&start, NULL);
-
-   const unsigned long long vecLength = getVecLength( 0 );
-   
-   /*
-      Completeness relation strategy to calculate the diagonal elements of Ham*Ham:
-      Loop over the FCI determinants |det>
-         < det | Ham * Ham | det > = 0.0
-         Loop over the FCI determinants which are connected with |det> by Ham |det2>
-            < det | Ham * Ham | det > += ( < det2 | Ham | det > )^2
-   */
-   
-   #pragma omp parallel
-   {
-
-      int * bits_up_ket    = new int[ L ];
-      int * bits_down_ket  = new int[ L ];
-      int * bits_up_bra    = new int[ L ];
-      int * bits_down_bra  = new int[ L ];
-      int * work = new int[ 8 ];
-      bool * workspace = new bool[ vecLength ];
-      
-      #pragma omp for schedule(static)
-      for (unsigned long long outcounter = 0; outcounter < vecLength; outcounter++){
-      
-         double myResult = 0.0;
-         
-         //Workspace keeps track that a det2 is used only once for the completeness relation
-         for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ workspace[ cnt ] = true; }
-      
-         //Find the irrep_up and irrep_down
-         const int irrep_out_up   = getUpIrrepOfCounter( 0 , outcounter );
-         const int irrep_out_down = getIrrepProduct( irrep_out_up , TargetIrrep );
-         
-         //Find the counters for the alpha and the beta electrons
-         const unsigned int outcount_up   = ( outcounter - irrep_center_jumps[ 0 ][ irrep_out_up ] ) % numPerIrrep_up[ irrep_out_up ];
-         const unsigned int outcount_down = ( outcounter - irrep_center_jumps[ 0 ][ irrep_out_up ] ) / numPerIrrep_up[ irrep_out_up ];
-         const unsigned int string_out_up   = cnt2str_up  [ irrep_out_up   ][ outcount_up   ];
-         const unsigned int string_out_down = cnt2str_down[ irrep_out_down ][ outcount_down ];
-         str2bits(L, string_out_up,   bits_up_ket  );
-         str2bits(L, string_out_down, bits_down_ket);
-         
-         for (unsigned int cnt = 0; cnt < L; cnt++){
-            bits_up_bra  [ cnt ] = bits_up_ket  [ cnt ];
-            bits_down_bra[ cnt ] = bits_down_ket[ cnt ];
-         }
-         
-         // If only 1 electron: Acting with a^+_i,up a_k,up
-         if (( Nel_up == 1 ) && ( Nel_down == 0 )){
-            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
-            
-            //Loop i to remove from the vector
-            for (unsigned int orbi = 0; orbi < L; orbi++){
-               if ( bits_up_bra[ orbi ] ){
-                  bits_up_bra[ orbi ] = 0;
-
-                  //Loop k to add again to the vector
-                  for (unsigned int orbk = 0; orbk < L; orbk++){
-                     if (( orb2irrep[ orbi ] == orb2irrep[ orbk ] ) && ( !(bits_up_bra[ orbk ]) )){
-                        bits_up_bra[ orbk ] = 1;
-
-                        //find the corresponding string and counter
-                        const unsigned int string_in_up = bits2str(L, bits_up_bra);
-                        const unsigned long long incounter = incounter_offset + str2cnt_up[ irrep_out_up ][ string_in_up ];
-                        
-                        if ( workspace[ incounter ] ){
-                           workspace[ incounter ] = false;
-                           const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
-                           myResult += factor * factor;
-                        }
-
-                        bits_up_bra[ orbk ] = 0;
-                     }
-                  }
-                  bits_up_bra[ orbi ] = 1;
-               }
-            }
-         
-         }
-         
-         // If only 1 electron: Acting with a^+_i,down a_k,down
-         if (( Nel_up == 0 ) && ( Nel_down == 1 )){
-            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + outcount_up;
-            
-            //Loop i to remove from the vector
-            for (unsigned int orbi = 0; orbi < L; orbi++){
-               if ( bits_down_bra[ orbi ] ){
-                  bits_down_bra[ orbi ] = 0;
-                        
-                  //Loop k to add again to the vector
-                  for (unsigned int orbk = 0; orbk < L; orbk++){
-                     if (( orb2irrep[ orbi ] == orb2irrep[ orbk ] ) && ( !(bits_down_bra[ orbk ]) )){
-                        bits_down_bra[ orbk ] = 1;
-                                                      
-                        //find the corresponding string and counter
-                        const unsigned int string_in_down = bits2str(L, bits_down_bra);
-                        const unsigned long long incounter = incounter_offset + numPerIrrep_up[ irrep_out_up ] * str2cnt_down[ irrep_out_down ][ string_in_down ];
-                        
-                        if ( workspace[ incounter ] ){
-                           workspace[ incounter ] = false;
-                           const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
-                           myResult += factor * factor;
-                        }
-                        
-                        bits_down_bra[ orbk ] = 0;
-                     }
-                  }
-
-                  bits_down_bra[ orbi ] = 1;
-               }
-            }
-            
-         }
-         
-         // Case 1: Acting with a^+_i,up a^+_j,up a_l,up a_k,up
-         if ( Nel_up >= 2 ){
-            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + numPerIrrep_up[ irrep_out_up ] * outcount_down;
-            
-            //Loop i<j to remove from the vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_up_bra[ orbi ] ){
-                  bits_up_bra[ orbi ] = 0;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_up_bra[ orbj ] ){
-                        bits_up_bra[ orbj ] = 0;
-                        const int IrrepProd_ij = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_up_bra[ orbk ]) ){
-                              bits_up_bra[ orbk ] = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_up_bra[ orbl ]) ) && ( IrrepProd_ij == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_up_bra[ orbl ] = 1;
-                                    
-                                    //find the corresponding string and counter
-                                    const unsigned int string_in_up = bits2str(L, bits_up_bra);
-                                    const unsigned long long incounter = incounter_offset + str2cnt_up[ irrep_out_up ][ string_in_up ];
-                                    
-                                    if ( workspace[ incounter ] ){
-                                       workspace[ incounter ] = false;
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
-                                       myResult += factor * factor;
-                                    }
-                                    
-                                    bits_up_bra[ orbl ] = 0;
-                                 }
-                              }
-                              bits_up_bra[ orbk ] = 0;
-                           }
-                        }
-                        bits_up_bra[ orbj ] = 1;
-                     }
-                  }
-                  bits_up_bra[ orbi ] = 1;
-               }
-            }
-         
-         }
-         
-         // Case 2: Acting with a^+_i,down a^+_j,down a_l,down a_k,down
-         if ( Nel_down >=2 ){
-            const unsigned long long incounter_offset = irrep_center_jumps[ 0 ][ irrep_out_up ] + outcount_up;
-            
-            //Loop i<j to remove from the vector
-            for (unsigned int orbi = 0; orbi < L-1; orbi++){
-               if ( bits_down_bra[ orbi ] ){
-                  bits_down_bra[ orbi ] = 0;
-                  for (unsigned int orbj = orbi+1; orbj < L; orbj++){
-                     if ( bits_down_bra[ orbj ] ){
-                        bits_down_bra[ orbj ] = 0;
-                        const int IrrepProd12 = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbj ] );
-                        
-                        //Loop k<l to add again to the vector
-                        for (unsigned int orbk = 0; orbk < L-1; orbk++){
-                           if ( !(bits_down_bra[ orbk ]) ){
-                              bits_down_bra[ orbk ] = 1;
-                              for (unsigned int orbl = orbk+1; orbl < L; orbl++){
-                                 if (( !(bits_down_bra[ orbl ]) ) && ( IrrepProd12 == getIrrepProduct( orb2irrep[ orbk ] , orb2irrep[ orbl ] ) )){
-                                    bits_down_bra[ orbl ] = 1;
-                                    
-                                    //find the corresponding string and counter
-                                    const unsigned int string_in_down = bits2str(L, bits_down_bra);
-                                    const unsigned long long incounter = incounter_offset + numPerIrrep_up[ irrep_out_up ] * str2cnt_down[ irrep_out_down ][ string_in_down ];
-                                    
-                                    if ( workspace[ incounter ] ){
-                                       workspace[ incounter ] = false;
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
-                                       myResult += factor * factor;
-                                    }
-                                    
-                                    bits_down_bra[ orbl ] = 0;
-                                 }
-                              }
-                              bits_down_bra[ orbk ] = 0;
-                           }
-                        }
-                        bits_down_bra[ orbj ] = 1;
-                     }
-                  }
-                  bits_down_bra[ orbi ] = 1;
-               }
-            }
-            
-         }
-         
-         // Case 3: Acting with a^+_i,up a_k,up a^+_j,down a_l,down
-         if (( Nel_up >= 1 ) && ( Nel_down >= 1 )){
-         
-            //Loop orbi to REMOVE an UP electron from the vector
-            for (unsigned int orbi = 0; orbi < L; orbi++){
-               if ( bits_up_bra[ orbi ] ){
-                  bits_up_bra[ orbi ] = 0;
-                  
-                  //Loop orbk to ADD an UP electron again to the vector
-                  for (unsigned int orbk = 0; orbk < L; orbk++){
-                     if ( !(bits_up_bra[ orbk ]) ){
-                        bits_up_bra[ orbk ] = 1;
-                        const int IrrepProd_ik = getIrrepProduct( orb2irrep[ orbi ] , orb2irrep[ orbk ] );
-                        const int irrep_in_up = getIrrepProduct( irrep_out_up , IrrepProd_ik );
-                        const unsigned int string_in_up = bits2str(L, bits_up_bra);
-                        const int incount_up = str2cnt_up[ irrep_in_up ][ string_in_up ];
-                        
-                        //Loop orbj to REMOVE a DOWN electron from the vector
-                        for (unsigned int orbj = 0; orbj < L; orbj++){
-                           if ( bits_down_bra[ orbj ] ){
-                              bits_down_bra[ orbj ] = 0;
-
-                              //Loop orbl to ADD a DOWN electron again to the vector
-                              for (unsigned int orbl = 0; orbl < L; orbl++){
-                                 const int IrrepProd_jl = getIrrepProduct( orb2irrep[ orbj ] , orb2irrep[ orbl ] );
-                                 if (( bits_down_bra[ orbl ] == 0 ) && ( IrrepProd_ik == IrrepProd_jl )){
-                                    bits_down_bra[ orbl ] = 1;
-                                    
-                                    const int irrep_in_down = getIrrepProduct( irrep_out_down , IrrepProd_jl );
-                                    const unsigned int string_in_down = bits2str(L, bits_down_bra);
-                                    const int incount_down = str2cnt_down[ irrep_in_down ][ string_in_down ];
-                                    const unsigned long long incounter = irrep_center_jumps[ 0 ][ irrep_in_up ] + incount_up + numPerIrrep_up[ irrep_in_up ] * incount_down;
-                                    
-                                    if ( workspace[ incounter ] ){
-                                       workspace[ incounter ] = false;
-                                       const double factor = GetMatrixElement(bits_up_bra, bits_down_bra, bits_up_ket, bits_down_ket, work);
-                                       myResult += factor * factor;
-                                    }
-                                    
-                                    bits_down_bra[ orbl ] = 0;
-                                 }
-                              }
-                              bits_down_bra[ orbj ] = 1;
-                           }
-                        }
-                        bits_up_bra[ orbk ] = 0;
-                     }
-                  }
-                  bits_up_bra[ orbi ] = 1;
-               }
-            }
-         
-         }
-         
-         output[ outcounter ] = myResult;
-      
-      }
-      
-      delete [] bits_up_ket;
-      delete [] bits_down_ket;
-      delete [] bits_up_bra;
-      delete [] bits_down_bra;
-      delete [] work;
-      delete [] workspace;
-   
-   }
-
-   gettimeofday(&end, NULL);
-   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-   if ( FCIverbose > 0 ){ cout << "FCI::DiagHamSquared : Wall time = " << elapsed << " seconds" << endl; }
-
-}
-
-
-/*void CheMPS2::FCI::DiagHamSquared_WICK(double * output) const{
 
    struct timeval start, end;
    gettimeofday(&start, NULL);
@@ -1388,170 +1106,134 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
       int * bits_up    = new int[ L ];
       int * bits_down  = new int[ L ];
       
+      double * Jmat       = new double[ L * L ]; // (ij|kk)( n_k,up + n_k,down )
+      double * K_reg_up   = new double[ L * L ]; // (ik|kj)( n_k,up )
+      double * K_reg_down = new double[ L * L ]; // (ik|kj)( n_k,down )
+      double * K_bar_up   = new double[ L * L ]; // (ik|kj)( 1 - n_k,up )
+      double * K_bar_down = new double[ L * L ]; // (ik|kj)( 1 - n_k,down )
+      
+      int * specific_orbs_irrep = new int[ NumIrreps * ( L + 1 ) ];
+      for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+         int count = 0;
+         for ( unsigned int orb = 0; orb < L; orb++){
+            specific_orbs_irrep[ orb + ( L + 1 ) * irrep ] = 0;
+            if ( getOrb2Irrep(orb) == irrep ){
+               specific_orbs_irrep[ count + ( L + 1 ) * irrep ] = orb;
+               count++;
+            }
+         }
+         specific_orbs_irrep[ L + ( L + 1 ) * irrep ] = count;
+      }
+      
       #pragma omp for schedule(static)
       for (unsigned long long counter = 0; counter < vecLength; counter++){
       
-         double myResult = 0.0;
          getBitsOfCounter( 0 , counter , bits_up , bits_down ); // Fetch the corresponding bits
          
+         // Construct the J and K matrices properly
          for ( unsigned int i = 0; i < L; i++ ){
+            for ( unsigned int j = i; j < L; j++ ){
+               
+               double val_J        = 0.0;
+               double val_KregUP   = 0.0;
+               double val_KregDOWN = 0.0;
+               double val_KbarUP   = 0.0;
+               double val_KbarDOWN = 0.0;
+               
+               if ( getOrb2Irrep(i) == getOrb2Irrep(j) ){
+                  for ( unsigned int k = 0; k < L; k++ ){
+                     const double temp = getERI(i,k,k,j);
+                     val_J        += getERI(i,j,k,k) * ( bits_up[k] + bits_down[k] );
+                     val_KregUP   += temp * bits_up[k];
+                     val_KregDOWN += temp * bits_down[k];
+                     val_KbarUP   += temp * ( 1 - bits_up[k] );
+                     val_KbarDOWN += temp * ( 1 - bits_down[k] );
+                  }
+               }
+               
+               Jmat[ i + L * j ] = val_J;
+               Jmat[ j + L * i ] = val_J;
+               K_reg_up[ i + L * j ] = val_KregUP;
+               K_reg_up[ j + L * i ] = val_KregUP;
+               K_reg_down[ i + L * j ] = val_KregDOWN;
+               K_reg_down[ j + L * i ] = val_KregDOWN;
+               K_bar_up[ i + L * j ] = val_KbarUP;
+               K_bar_up[ j + L * i ] = val_KbarUP;
+               K_bar_down[ i + L * j ] = val_KbarDOWN;
+               K_bar_down[ j + L * i ] = val_KbarDOWN;
+               
+            }
+         }
          
+         double temp = 0.0;
+         // G[i,i] (n_i,up + n_i,down) + 0.5 * ( J[i,i] (n_i,up + n_i,down) + K_bar_up[i,i] * n_i,up + K_bar_down[i,i] * n_i,down )
+         for ( unsigned int i = 0; i < L; i++ ){
             const int num_i = bits_up[i] + bits_down[i];
+            temp += getGmat(i, i) * num_i + 0.5 * ( Jmat[ i + L * i ] * num_i + K_bar_up[ i + L * i ]   * bits_up[i]
+                                                                              + K_bar_down[ i + L * i ] * bits_down[i] );
+         }
+         double myResult = temp*temp;
+         
+         for ( unsigned int p = 0; p < L; p++ ){
+            for ( unsigned int q = 0; q < L; q++ ){
+               if ( getOrb2Irrep(p) == getOrb2Irrep(q) ){
             
-            for ( unsigned int k = 0; k < L; k++ ){
+                  const int special_pq         = bits_up[p] * ( 1 - bits_up[q] ) + bits_down[p] * ( 1 - bits_down[q] );
+                  const double GplusJ_pq       = getGmat(p, q) + Jmat[ p + L * q ];
+                  const double K_cross_pq_up   = ( K_bar_up[ p + L * q ] - K_reg_up[ p + L * q ]     ) * bits_up[p]   * ( 1 - bits_up[q]   );
+                  const double K_cross_pq_down = ( K_bar_down[ p + L * q ] - K_reg_down[ p + L * q ] ) * bits_down[p] * ( 1 - bits_down[q] );
+                  
+                  myResult += ( GplusJ_pq * ( special_pq * GplusJ_pq + K_cross_pq_up + K_cross_pq_down )
+                              + 0.25 * ( K_cross_pq_up * K_cross_pq_up + K_cross_pq_down * K_cross_pq_down ) );
+                  
+               }
+            }
+         }
+         
+         /*
+         
+            Part which can be optimized most still --> For H2O/6-31G takes 82.8 % of time with Intel compiler
+            Optimization can in principle be done with lookup tables + dgemm_ as matvec product --> bit of work :-(
+         
+            For future reference: the quantity which is computed here:
             
-               const int num_k = bits_up[k] + bits_down[k];
-               const int special_ik = ( bits_up[i]   * ( 1 - bits_up[k]   )
-                                      + bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(i,s1) [1-num(k,s1)]
-               
-               myResult += ( getGmat(i, i) * getGmat(k, k) * num_i * num_k
-                           + getGmat(i, k) * getGmat(k, i) * special_ik );
-               
+               0.5 * (ak|ci) * (ak|ci) * [ n_a,up * (1-n_k,up) + n_a,down * (1-n_k,down) ] * [ n_c,up * (1-n_i,up) + n_c,down * (1-n_i,down) ]
+             - 0.5 * (ak|ci) * (ai|ck) * [ n_a,up * n_c,up * (1-n_i,up) * (1-n_k,up) + n_a,down * n_c,down * (1-n_i,down) * (1-n_k,down) ]
+         
+         */
+         for ( unsigned int k = 0; k < L; k++ ){
+            if ( bits_up[k] + bits_down[k] < 2 ){
                for ( unsigned int a = 0; a < L; a++ ){
                
-                  const int num_a = bits_up[a] + bits_down[a];
-                  const int special_ai = ( bits_up[a]   * ( 1 - bits_up[i]   )
-                                         + bits_down[a] * ( 1 - bits_down[i] ) );  // sum_s1 of num(a,s1) [1-num(i,s1)]
-                  const int special_ak = ( bits_up[a]   * ( 1 - bits_up[k]   )
-                                         + bits_down[a] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) [1-num(k,s1)]
-                  const int combo1_aik = ( bits_up[a]   * bits_up[i]   * ( 1 - bits_up[k]   )
-                                         + bits_down[a] * bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) num(i,s1) [1-num(k,s1)]
-                  const int combo2_aik = ( bits_up[a]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
-                                         + bits_down[a] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) [1-num(i,s1)] [1-num(k,s1)]
+                  const int special_ak    = ( bits_up[a]   * ( 1 - bits_up[k]   )
+                                            + bits_down[a] * ( 1 - bits_down[k] ) );
+                  const int local_ak_up   = bits_up[a]   * ( 1 - bits_up[k]   );
+                  const int local_ak_down = bits_down[a] * ( 1 - bits_down[k] );
+               
+                  if ( ( special_ak > 0 ) || ( local_ak_up > 0 ) || ( local_ak_down > 0 ) ){
                   
-                  double prefactor = getGmat(a, a) * getERI(i, i, k, k) + getERI(a, a, i, i) * getGmat(k, k);
-                  myResult += 0.5 * prefactor * num_a * num_i * num_k;
+                     const int irrep_ak = getIrrepProduct( getOrb2Irrep(a), getOrb2Irrep(k) );
+                        
+                     for ( unsigned int i = 0; i < L; i++ ){
+                        if ( bits_up[i] + bits_down[i] < 2 ){
                   
-                  prefactor = getGmat(a, a) * getERI(i, k, k, i) + getERI(a, a, i, k) * getGmat(k, i);
-                  myResult += 0.5 * prefactor * num_a * special_ik;
-                  
-                  prefactor = getGmat(a, i) * getERI(i, a, k, k) + getERI(a, i, i, a) * getGmat(k, k);
-                  myResult += 0.5 * prefactor * special_ai * num_k;
-                  
-                  prefactor = getGmat(a, k) * getERI(i, i, k, a) + getERI(a, k, i, i) * getGmat(k, a);
-                  myResult += 0.5 * prefactor * num_i * special_ak;
-                  
-                  prefactor = getGmat(a, k) * getERI(i, a, k, i) + getERI(a, k, i, a) * getGmat(k, i);
-                  myResult -= 0.5 * prefactor * combo1_aik; //Minus sign !!!!!
-                  
-                  prefactor = getGmat(a, i) * getERI(i, k, k, a) + getERI(a, i, i, k) * getGmat(k, a);
-                  myResult += 0.5 * prefactor * combo2_aik;
-                  
-                  for ( unsigned int c = 0; c < L; c++ ){
-                  
-                     const int num_c = bits_up[c] + bits_down[c];
-                     const int special_ci = ( bits_up[c]   * ( 1 - bits_up[i]   )
-                                            + bits_down[c] * ( 1 - bits_down[i] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)]
-                     const int special_ck = ( bits_up[c]   * ( 1 - bits_up[k]   )
-                                            + bits_down[c] * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)]
-                     const int combo1_cik = ( bits_up[c]   * bits_up[i]   * ( 1 - bits_up[k]   )
-                                            + bits_down[c] * bits_down[i] * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) num(i,s1) [1-num(k,s1)]
-                     const int combo2_cik = ( bits_up[c]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
-                                            + bits_down[c] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );  // sum_s1 of num(c,s1) [1-num(i,s1)] [1-num(k,s1)]
-                  
-                     //
-                     //    1-->6 (24 total):
-                     //
-                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
-                     //                             |   |
-                     //                             -----
-                     //
-                  
-                     myResult += 0.25 * num_a * ( num_c * num_i * num_k * getERI(a, a, c, c) * getERI(i, i, k, k)
-                     
-                                                + special_ci * num_k    * getERI(a, a, c, i) * getERI(i, c, k, k)
-                                                
-                                                - combo1_cik            * getERI(a, a, c, k) * getERI(i, c, k, i)
-                                                
-                                                + num_c * special_ik    * getERI(a, a, c, c) * getERI(i, k, k, i)
-                                                
-                                                + combo2_cik            * getERI(a, a, c, i) * getERI(i, k, k, c)
-                                                
-                                                + num_i * special_ck    * getERI(a, a, c, k) * getERI(i, i, k, c) );
-                                                
-                     //
-                     //    7-->12 (24 total):
-                     //
-                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
-                     //                             |         |
-                     //                             -----------
-                     //
-                     
-                     const int special_ac = ( bits_up[a]   * ( 1 - bits_up[c]   )
-                                            + bits_down[a] * ( 1 - bits_down[c] ) );  // sum_s1 of num(a,s1) [1-num(c,s1)]
-                     const int combo1_aci = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[i]   )
-                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[i] ) );  // sum_s1 of num(a,s1) num(c,s1) [1-num(i,s1)]
-                     const int combo1_ack = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[k] ) );  // sum_s1 of num(a,s1) num(c,s1) [1-num(k,s1)]
-                     const int local1     = ( bits_up[a]   * bits_up[c]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * bits_down[c] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
-                     const int local2     = ( bits_up[a]   * bits_up[c]   * bits_up[i]   * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * bits_down[c] * bits_down[i] * ( 1 - bits_down[k] ) );
-                     
-                     myResult += 0.25 * ( special_ac * num_i * num_k * getERI(a, c, c, a) * getERI(i, i, k, k)
-                     
-                                        + special_ac * special_ik    * getERI(a, c, c, a) * getERI(i, k, k, i)
-                                        
-                                        - combo1_aci * num_k         * getERI(a, i, c, a) * getERI(i, c, k, k)
-                                        
-                                        - local1                     * getERI(a, i, c, a) * getERI(i, k, k, c)
-                                        
-                                        - combo1_ack * num_i         * getERI(a, k, c, a) * getERI(i, i, k, c)
-                                        
-                                        + local2                     * getERI(a, k, c, a) * getERI(i, c, k, i) );
-                     
-                     //
-                     //    13-->18 (24 total):
-                     //
-                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
-                     //                             |               |
-                     //                             -----------------
-                     //
-                     
-                     const int combo2_aci = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[i]   )
-                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[i] ) );
-                     const int local3     = ( bits_up[a]   * ( 1 - bits_up[c]   ) * bits_up[i]   * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * ( 1 - bits_down[c] ) * bits_down[i] * ( 1 - bits_down[k] ) );
-                     
-                     myResult += 0.25 * ( combo2_aci * num_k         * getERI(a, c, c, i) * getERI(i, a, k, k)
-                     
-                                        + special_ai * num_c * num_k * getERI(a, i, c, c) * getERI(i, a, k, k)
-                                        
-                                        - combo1_aik * num_c         * getERI(a, k, c, c) * getERI(i, a, k, i)
-                                        
-                                        - local1                     * getERI(a, k, c, i) * getERI(i, a, k, c)
-                                        
-                                        - local3                     * getERI(a, c, c, k) * getERI(i, a, k, i)
-                                        
-                                        + special_ai * special_ck    * getERI(a, i, c, k) * getERI(i, a, k, c) );
-                     
-                     //
-                     //    19-->24 (24 total):
-                     //
-                     //    0.25 * (ab|cd) * (ij|kl) a^+ b c^+ d i^+ j k^+ l
-                     //                             |                     |
-                     //                             -----------------------
-                     //
-                     
-                     const int combo2_aik = ( bits_up[a]   * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
-                     const int combo2_ack = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[k] ) );
-                     const int local4     = ( bits_up[a]   * ( 1 - bits_up[c]   ) * ( 1 - bits_up[i]   ) * ( 1 - bits_up[k]   )
-                                            + bits_down[a] * ( 1 - bits_down[c] ) * ( 1 - bits_down[i] ) * ( 1 - bits_down[k] ) );
-                     
-                     myResult += 0.25 * ( special_ak * num_c * num_i * getERI(a, k, c, c) * getERI(i, i, k, a)
-                     
-                                        + special_ak * special_ci    * getERI(a, k, c, i) * getERI(i, c, k, a)
-                                        
-                                        + combo2_aik * num_c         * getERI(a, i, c, c) * getERI(i, k, k, a)
-                                        
-                                        - local1                     * getERI(a, i, c, k) * getERI(i, c, k, a)
-                                        
-                                        + local4                     * getERI(a, c, c, i) * getERI(i, k, k, a)
-                                        
-                                        + combo2_ack * num_i         * getERI(a, c, c, k) * getERI(i, i, k, a) );
-                  
+                           const int offset     = getIrrepProduct( irrep_ak, getOrb2Irrep(i) ) * ( L + 1 );
+                           const int bar_i_up   = 1 - bits_up[i];
+                           const int bar_i_down = 1 - bits_down[i];
+                           const int max_c_cnt  = specific_orbs_irrep[ L + offset ];
+                              
+                           for ( int c_cnt = 0; c_cnt < max_c_cnt; c_cnt++ ){
+                              const int c            = specific_orbs_irrep[ c_cnt + offset ];
+                              const int fact_ic_up   = bits_up[c]   * bar_i_up;
+                              const int fact_ic_down = bits_down[c] * bar_i_down;
+                              const int prefactor1   = ( fact_ic_up + fact_ic_down ) * special_ak;
+                              const int prefactor2   = local_ak_up * fact_ic_up + local_ak_down * fact_ic_down;
+                              const double eri_akci  = getERI(a, k, c, i);
+                              const double eri_aick  = getERI(a, i, c, k);
+                              myResult += 0.5 * eri_akci * ( prefactor1 * eri_akci - prefactor2 * eri_aick );
+                           }
+                        }
+                     }
                   }
                }
             }
@@ -1563,14 +1245,22 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
       
       delete [] bits_up;
       delete [] bits_down;
+      
+      delete [] Jmat;
+      delete [] K_reg_up;
+      delete [] K_reg_down;
+      delete [] K_bar_up;
+      delete [] K_bar_down;
+      
+      delete [] specific_orbs_irrep;
    
    }
    
    gettimeofday(&end, NULL);
    const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-   if ( FCIverbose > 0 ){ cout << "FCI::DiagHamSquared(WICK) : Wall time = " << elapsed << " seconds" << endl; }
+   if ( FCIverbose > 0 ){ cout << "FCI::DiagHamSquared : Wall time = " << elapsed << " seconds" << endl; }
 
-}*/
+}
 
 
 unsigned long long CheMPS2::FCI::LowestEnergyDeterminant() const{
@@ -1949,12 +1639,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
    double * temp   = new double[ vecLength ];
    double * temp2  = new double[ vecLength ];
    double * precon = new double[ vecLength ];
-   if ( L <= 12 ){
-      CGDiagPrecond( alpha , beta , eta , precon , temp );
-   } else {
-      for ( unsigned long long count=0; count<vecLength; count++ ){ precon[ count ] = 1.0; }
-      cout << "FCI::CGSolveSystem : Calculating the diagonal preconditioner is skipped for more than 12 orbitals." << endl;
-   }
+   CGDiagPrecond( alpha , beta , eta , precon , temp );
    
    assert( RealSol != NULL );
    assert( ImagSol != NULL );
