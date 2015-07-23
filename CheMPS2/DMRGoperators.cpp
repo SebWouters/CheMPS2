@@ -23,7 +23,7 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <unistd.h>
+#include <assert.h>
 
 #include "DMRG.h"
 #include "Lapack.h"
@@ -1079,48 +1079,81 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
 
 }
 
-void CheMPS2::DMRG::MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor){
+void CheMPS2::DMRG::MY_HDF5_READ_BATCH( const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag ){
 
-   const int size = theTensor->gKappa2index(theTensor->gNKappa());
-   if (size > 0){
-
-      hid_t group_id          = H5Gcreate(file_id, sPath.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-      hsize_t dimarray        = size;
-      hid_t dataspace_id      = H5Screate_simple(1, &dimarray, NULL);
-      hid_t dataset_id        = H5Dcreate(group_id, "tensorStorage", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-      H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, theTensor->gStorage());
-
-      H5Dclose(dataset_id);
-      H5Sclose(dataspace_id);
-
-      H5Gclose(group_id);
+   const hid_t   group_id     = H5Gopen(file_id, tag.c_str(), H5P_DEFAULT);
+   const hsize_t dimarray     = totalsize;
+   const hid_t   dataspace_id = H5Screate_simple(1, &dimarray, NULL);
+   const hid_t   dataset_id   = H5Dopen(group_id, "storage", H5P_DEFAULT);
    
-      num_double_write_disk += size;
+   long long offset = 0;
+   for (int cnt=0; cnt<number; cnt++){
+      const int tensor_size = batch[cnt]->gKappa2index(batch[cnt]->gNKappa());
+      if ( tensor_size > 0 ){
+      
+         const hsize_t start = offset;
+         const hsize_t count = tensor_size;
+         H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &start, NULL, &count, NULL);
+         const hid_t memspace_id = H5Screate_simple(1, &count, NULL);
+         H5Dread(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, batch[cnt]->gStorage());
+         H5Sclose(memspace_id);
+
+         offset += tensor_size;
+      }
    }
+   
+   H5Dclose(dataset_id);
+   H5Sclose(dataspace_id);
+   H5Gclose(group_id);
+   
+   assert( totalsize == offset );
+   num_double_read_disk += totalsize;
 
 }
 
-void CheMPS2::DMRG::MY_HDF5_READ(const hid_t file_id, const std::string sPath, Tensor * theTensor){
+void CheMPS2::DMRG::MY_HDF5_WRITE_BATCH( const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag ){
 
-   const int size = theTensor->gKappa2index(theTensor->gNKappa());
-   if (size > 0){
-
-      hid_t group_id    = H5Gopen(file_id, sPath.c_str(), H5P_DEFAULT);
-
-      hid_t dataset_id  = H5Dopen(group_id, "tensorStorage", H5P_DEFAULT);
-      H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, theTensor->gStorage());
+   const hid_t   group_id     = H5Gcreate(file_id, tag.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+   const hsize_t dimarray     = totalsize;
+   const hid_t   dataspace_id = H5Screate_simple(1, &dimarray, NULL);
+   const hid_t   dataset_id   = H5Dcreate(group_id, "storage", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                                /* Switch from H5T_IEEE_F64LE to H5T_NATIVE_DOUBLE to avoid processing of the doubles
+                                   --> only MPS checkpoint is reused in between calculations anyway                   */
+   
+   long long offset = 0;
+   for (int cnt=0; cnt<number; cnt++){
+      const int tensor_size = batch[cnt]->gKappa2index(batch[cnt]->gNKappa());
+      if ( tensor_size > 0 ){
       
-      H5Dclose(dataset_id);
-
-      H5Gclose(group_id);
-      
-      num_double_read_disk += size;
+         const hsize_t start = offset;
+         const hsize_t count = tensor_size;
+         H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &start, NULL, &count, NULL);
+         const hid_t memspace_id = H5Screate_simple(1, &count, NULL);
+	      H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, batch[cnt]->gStorage());
+         H5Sclose(memspace_id);
+         
+         offset += tensor_size;
+      }
    }
+   
+   H5Dclose(dataset_id);
+   H5Sclose(dataspace_id);
+   H5Gclose(group_id);
+   
+   assert( totalsize == offset );
+   num_double_write_disk += totalsize;
 
 }
 
 void CheMPS2::DMRG::OperatorsOnDisk(const int index, const bool movingRight, const bool store){
+
+   /*
+   
+      By working with hyperslabs and batches of tensors, there
+      are exactly 11 groups which need to be written to the file
+      ( 12 when there are excitations ).
+   
+   */
 
    struct timeval start, end;
    gettimeofday(&start, NULL);
@@ -1140,129 +1173,190 @@ void CheMPS2::DMRG::OperatorsOnDisk(const int index, const bool movingRight, con
                                    : H5Fopen(   thefilename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
    //Ltensors : all processes own all Ltensors
-   for (int cnt2=0; cnt2<Nbound ; cnt2++){
-      std::stringstream sstream;
-      sstream << "/Ltensor_" << cnt2 ;
-      if ( store ){ MY_HDF5_WRITE(file_id, sstream.str(), Ltensors[index][cnt2]); }
-      else {        MY_HDF5_READ( file_id, sstream.str(), Ltensors[index][cnt2]); }
+   {
+      long long totalsizeL = 0;
+      Tensor ** batchL = new Tensor*[ Nbound ];
+      for (int cnt2=0; cnt2<Nbound; cnt2++){
+         totalsizeL += Ltensors[index][cnt2]->gKappa2index(Ltensors[index][cnt2]->gNKappa());
+         batchL[cnt2] = Ltensors[index][cnt2];
+      }
+      if ( totalsizeL > 0 ){
+         const std::string tag = "Ltensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, Nbound, batchL, totalsizeL, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, Nbound, batchL, totalsizeL, tag ); }
+      }
+      delete [] batchL;
    }
+   
+   //Renormalized two-operator tensors : certain processes own certain two-operator tensors
+   {
+      long long totalsizeF0 = 0;  int numF0 = 0;  Tensor ** batchF0 = new Tensor*[ (Nbound*(Nbound + 1))/2 ];
+      long long totalsizeF1 = 0;  int numF1 = 0;  Tensor ** batchF1 = new Tensor*[ (Nbound*(Nbound + 1))/2 ];
+      long long totalsizeS0 = 0;  int numS0 = 0;  Tensor ** batchS0 = new Tensor*[ (Nbound*(Nbound + 1))/2 ];
+      long long totalsizeS1 = 0;  int numS1 = 0;  Tensor ** batchS1 = new Tensor*[ (Nbound*(Nbound + 1))/2 ];
 
-   //Two-operator tensors : certain processes own certain two-operator tensors
-   for (int cnt2=0; cnt2<Nbound ; cnt2++){
-      for (int cnt3=0; cnt3<Nbound-cnt2 ; cnt3++){
-
-         #ifdef CHEMPS2_MPI_COMPILATION
-         const int siteindex1 = movingRight ? index - cnt2 - cnt3 : index + 1 + cnt3;
-         const int siteindex2 = movingRight ? index - cnt3        : index + 1 + cnt2 + cnt3;
-         if (( cnt3 == 0 ) || ( MPIchemps2::owner_cdf(L, siteindex1, siteindex2) == MPIRANK ))
-         #endif
-         {
-            std::stringstream sstream1;
-            sstream1 << "/F0tensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream1.str(), F0tensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream1.str(), F0tensors[index][cnt2][cnt3]); }
-            
-            std::stringstream sstream2;
-            sstream2 << "/F1tensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream2.str(), F1tensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream2.str(), F1tensors[index][cnt2][cnt3]); }
-         }
-         #ifdef CHEMPS2_MPI_COMPILATION
-         if (( cnt3 == 0 ) || ( MPIchemps2::owner_absigma(siteindex1, siteindex2) == MPIRANK ))
-         #endif
-         {
-            std::stringstream sstream3;
-            sstream3 << "/S0tensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream3.str(), S0tensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream3.str(), S0tensors[index][cnt2][cnt3]); }
-            
-            if (cnt2>0){
-               std::stringstream sstream4;
-               sstream4 << "/S1tensor_" << cnt2 << "_" << cnt3 ;
-               if ( store ){ MY_HDF5_WRITE(file_id, sstream4.str(), S1tensors[index][cnt2][cnt3]); }
-               else {        MY_HDF5_READ( file_id, sstream4.str(), S1tensors[index][cnt2][cnt3]); }
+      for (int cnt2=0; cnt2<Nbound; cnt2++){
+         for (int cnt3=0; cnt3<Nbound-cnt2; cnt3++){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            const int siteindex1 = movingRight ? index - cnt2 - cnt3 : index + 1 + cnt3;
+            const int siteindex2 = movingRight ? index - cnt3        : index + 1 + cnt2 + cnt3;
+            if (( cnt3 == 0 ) || ( MPIchemps2::owner_cdf(L, siteindex1, siteindex2) == MPIRANK ))
+            #endif
+            {
+               batchF0[numF0] = F0tensors[index][cnt2][cnt3];  totalsizeF0 += batchF0[numF0]->gKappa2index(batchF0[numF0]->gNKappa());  numF0++;
+               batchF1[numF1] = F1tensors[index][cnt2][cnt3];  totalsizeF1 += batchF1[numF1]->gKappa2index(batchF1[numF1]->gNKappa());  numF1++;
+            }
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if (( cnt3 == 0 ) || ( MPIchemps2::owner_absigma(siteindex1, siteindex2) == MPIRANK ))
+            #endif
+            {
+               batchS0[numS0] = S0tensors[index][cnt2][cnt3];  totalsizeS0 += batchS0[numS0]->gKappa2index(batchS0[numS0]->gNKappa());  numS0++;
+  if (cnt2>0){ batchS1[numS1] = S1tensors[index][cnt2][cnt3];  totalsizeS1 += batchS1[numS1]->gKappa2index(batchS1[numS1]->gNKappa());  numS1++; }
             }
          }
       }
+      
+      if ( totalsizeF0 > 0 ){
+         const std::string tag = "F0tensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numF0, batchF0, totalsizeF0, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numF0, batchF0, totalsizeF0, tag ); }
+      }
+      if ( totalsizeF1 > 0 ){
+         const std::string tag = "F1tensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numF1, batchF1, totalsizeF1, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numF1, batchF1, totalsizeF1, tag ); }
+      }
+      if ( totalsizeS0 > 0 ){
+         const std::string tag = "S0tensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numS0, batchS0, totalsizeS0, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numS0, batchS0, totalsizeS0, tag ); }
+      }
+      if ( totalsizeS1 > 0 ){
+         const std::string tag = "S1tensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numS1, batchS1, totalsizeS1, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numS1, batchS1, totalsizeS1, tag ); }
+      }
+      
+      delete [] batchF0;
+      delete [] batchF1;
+      delete [] batchS0;
+      delete [] batchS1;
+      
    }
    
    //Complementary two-operator tensors : certain processes own certain complementary two-operator tensors
-   for (int cnt2=0; cnt2<Cbound ; cnt2++){
-      for (int cnt3=0; cnt3<Cbound-cnt2 ; cnt3++){
+   {
+      long long totalsizeA = 0;  int numA = 0;  Tensor ** batchA = new Tensor*[ (Cbound*(Cbound + 1))/2 ];
+      long long totalsizeB = 0;  int numB = 0;  Tensor ** batchB = new Tensor*[ (Cbound*(Cbound + 1))/2 ];
+      long long totalsizeC = 0;  int numC = 0;  Tensor ** batchC = new Tensor*[ (Cbound*(Cbound + 1))/2 ];
+      long long totalsizeD = 0;  int numD = 0;  Tensor ** batchD = new Tensor*[ (Cbound*(Cbound + 1))/2 ];
 
-         #ifdef CHEMPS2_MPI_COMPILATION
-         const int siteindex1 = movingRight ? index + 1 + cnt3        : index - cnt2 - cnt3;
-         const int siteindex2 = movingRight ? index + 1 + cnt2 + cnt3 : index - cnt3;
-         if ( MPIchemps2::owner_absigma(siteindex1, siteindex2) == MPIRANK )
-         #endif
-         {
-            std::stringstream sstream1;
-            sstream1 << "/Atensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream1.str(), Atensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream1.str(), Atensors[index][cnt2][cnt3]); }
-
-            if (cnt2>0){
-               std::stringstream sstream2;
-               sstream2 << "/Btensor_" << cnt2 << "_" << cnt3 ;
-               if ( store ){ MY_HDF5_WRITE(file_id, sstream2.str(), Btensors[index][cnt2][cnt3]); }
-               else {        MY_HDF5_READ( file_id, sstream2.str(), Btensors[index][cnt2][cnt3]); }
+      for (int cnt2=0; cnt2<Cbound; cnt2++){
+         for (int cnt3=0; cnt3<Cbound-cnt2; cnt3++){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            const int siteindex1 = movingRight ? index + 1 + cnt3        : index - cnt2 - cnt3;
+            const int siteindex2 = movingRight ? index + 1 + cnt2 + cnt3 : index - cnt3;
+            if ( MPIchemps2::owner_absigma(siteindex1, siteindex2) == MPIRANK )
+            #endif
+            {
+               batchA[numA] = Atensors[index][cnt2][cnt3];  totalsizeA += batchA[numA]->gKappa2index(batchA[numA]->gNKappa());  numA++;
+  if (cnt2>0){ batchB[numB] = Btensors[index][cnt2][cnt3];  totalsizeB += batchB[numB]->gKappa2index(batchB[numB]->gNKappa());  numB++; }
+            }
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf(L, siteindex1, siteindex2) == MPIRANK )
+            #endif
+            {
+               batchC[numC] = Ctensors[index][cnt2][cnt3];  totalsizeC += batchC[numC]->gKappa2index(batchC[numC]->gNKappa());  numC++;
+               batchD[numD] = Dtensors[index][cnt2][cnt3];  totalsizeD += batchD[numD]->gKappa2index(batchD[numD]->gNKappa());  numD++;
             }
          }
+      }
+      
+      if ( totalsizeA > 0 ){
+         const std::string tag = "Atensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numA, batchA, totalsizeA, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numA, batchA, totalsizeA, tag ); }
+      }
+      if ( totalsizeB > 0 ){
+         const std::string tag = "Btensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numB, batchB, totalsizeB, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numB, batchB, totalsizeB, tag ); }
+      }
+      if ( totalsizeC > 0 ){
+         const std::string tag = "Ctensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numC, batchC, totalsizeC, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numC, batchC, totalsizeC, tag ); }
+      }
+      if ( totalsizeD > 0 ){
+         const std::string tag = "Dtensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numD, batchD, totalsizeD, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numD, batchD, totalsizeD, tag ); }
+      }
+      
+      delete [] batchA;
+      delete [] batchB;
+      delete [] batchC;
+      delete [] batchD;
+      
+   }
+   
+   //Complementary Q-tensors : certain processes own certain complementary Q-tensors
+   {
+      long long totalsizeQ = 0;
+      int numQ = 0;
+      Tensor ** batchQ = new Tensor*[ Cbound ];
+      for (int cnt2=0; cnt2<Cbound; cnt2++){
          #ifdef CHEMPS2_MPI_COMPILATION
-         if ( MPIchemps2::owner_cdf(L, siteindex1, siteindex2) == MPIRANK )
+         const int siteindex = movingRight ? index + 1 + cnt2 : index - cnt2;
+         if ( MPIchemps2::owner_q(L, siteindex) == MPIRANK )
          #endif
          {
-            std::stringstream sstream3;
-            sstream3 << "/Ctensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream3.str(), Ctensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream3.str(), Ctensors[index][cnt2][cnt3]); }
-
-            std::stringstream sstream4;
-            sstream4 << "/Dtensor_" << cnt2 << "_" << cnt3 ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream4.str(), Dtensors[index][cnt2][cnt3]); }
-            else {        MY_HDF5_READ( file_id, sstream4.str(), Dtensors[index][cnt2][cnt3]); }
+            batchQ[numQ] = Qtensors[index][cnt2];  totalsizeQ += batchQ[numQ]->gKappa2index(batchQ[numQ]->gNKappa());  numQ++;
          }
       }
-   }
-
-   //Qtensors : certain processes own certain Qtensors
-   for (int cnt2=0; cnt2<Cbound; cnt2++){
-
-      #ifdef CHEMPS2_MPI_COMPILATION
-      const int siteindex = movingRight ? index + 1 + cnt2 : index - cnt2;
-      if ( MPIchemps2::owner_q(L, siteindex) == MPIRANK )
-      #endif
-      {
-         std::stringstream sstream;
-         sstream << "/Qtensor_" << cnt2 ;
-         if ( store ){ MY_HDF5_WRITE(file_id, sstream.str(), Qtensors[index][cnt2]); }
-         else {        MY_HDF5_READ( file_id, sstream.str(), Qtensors[index][cnt2]); }
+      if ( totalsizeQ > 0 ){
+         const std::string tag = "Qtensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numQ, batchQ, totalsizeQ, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numQ, batchQ, totalsizeQ, tag ); }
       }
+      delete [] batchQ;
    }
-
-   //Xtensors : a certain process owns the Xtensors
+   
+   //Complementary X-tensor : one process owns the X-tensors
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( MPIchemps2::owner_x() == MPIRANK )
    #endif
    {
-      std::string sPathX = "/Xtensor" ;
-      if ( store ){ MY_HDF5_WRITE(file_id, sPathX, Xtensors[index]); }
-      else {        MY_HDF5_READ( file_id, sPathX, Xtensors[index]); }
+      Tensor ** batchX = new Tensor*[ 1 ];
+      const long long totalsizeX = Xtensors[index]->gKappa2index(Xtensors[index]->gNKappa());
+      batchX[0] = Xtensors[index];
+      if ( totalsizeX > 0 ){
+         const std::string tag = "Xtensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, 1, batchX, totalsizeX, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, 1, batchX, totalsizeX, tag ); }
+      }
+      delete [] batchX;
    }
-
-   //Otensors : certain processes own certain excitations
+   
+   //O-tensors : certain processes own certain excitations
    if (Exc_activated){
+      long long totalsizeO = 0;
+      int numO = 0;
+      Tensor ** batchO = new Tensor*[ nStates-1 ];
       for (int state=0; state<nStates-1; state++){
          #ifdef CHEMPS2_MPI_COMPILATION
          if ( MPIchemps2::owner_specific_excitation( L, state ) == MPIRANK )
          #endif
          {
-            std::stringstream sstream;
-            sstream << "/Otensor_" << state ;
-            if ( store ){ MY_HDF5_WRITE(file_id, sstream.str(), Exc_Overlaps[state][index]); }
-            else {        MY_HDF5_READ( file_id, sstream.str(), Exc_Overlaps[state][index]); }
+            batchO[numO] = Exc_Overlaps[state][index];  totalsizeO += batchO[numO]->gKappa2index(batchO[numO]->gNKappa());  numO++;
          }
       }
+      if ( totalsizeO > 0 ){
+         const std::string tag = "Otensors";
+         if ( store ){ MY_HDF5_WRITE_BATCH( file_id, numO, batchO, totalsizeO, tag ); }
+         else{         MY_HDF5_READ_BATCH(  file_id, numO, batchO, totalsizeO, tag ); }
+      }
+      delete [] batchO;
    }
 
    H5Fclose(file_id);

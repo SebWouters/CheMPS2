@@ -232,8 +232,8 @@ namespace CheMPS2{
          double sweepright(const bool change, const int instruction, const bool am_i_master);
          
          //Load and save functions
-         void MY_HDF5_WRITE(const hid_t file_id, const std::string sPath, Tensor * theTensor);
-         void MY_HDF5_READ( const hid_t file_id, const std::string sPath, Tensor * theTensor);
+         void MY_HDF5_WRITE_BATCH(const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag);
+         void MY_HDF5_READ_BATCH( const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag);
          void OperatorsOnDisk(const int index, const bool movingRight, const bool store);
          string tempfolder;
          
