@@ -18,18 +18,18 @@ The block-sparsity and information compression due to the exploitation of symmet
 N2/cc-pVDZ
 ----------
 
-The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was :math:`\mathsf{d2h}`, and the targeted state was :math:`X^1\Sigma_g^+` at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. [NITROGEN]_. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores @ 2.6 GHz. The calculation was performed on a single node, and needed ~ 6 Gb of memory.
+The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was :math:`\mathsf{d2h}`, and the targeted state was :math:`X^1\Sigma_g^+` at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. [NITROGEN]_. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores @ 2.6 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 6 Gb of memory.
 
  +----------------------------+-------------------------+--------------------+-----------------------+
  | :math:`D_{\mathsf{SU(2)}}` | Wall time per sweep (s) | :math:`w_D^{disc}` | :math:`E_D` (Hartree) |
  +============================+=========================+====================+=======================+
- | 1000                       | 117                     | 9.9532e-07         | -109.28209681         |
+ | 1000                       | 48                      | 9.8027e-07         | -109.28209711         |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 1500                       | 279                     | 3.7204e-07         | -109.28214478         |
+ | 1500                       | 113                     | 3.9381e-07         | -109.28214593         |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 2000                       | 529                     | 1.7795e-07         | -109.28216006         |
+ | 2000                       | 219                     | 1.8910e-07         | -109.28216077         |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 2500                       | 1339                    | 9.6998e-08         | -109.28216623         |
+ | 2500                       | 371                     | 1.0083e-07         | -109.28216667         |
  +----------------------------+-------------------------+--------------------+-----------------------+
 
 
