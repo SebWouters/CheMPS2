@@ -43,7 +43,6 @@ int main(void){
    
    //Setup the Hamiltonian
    const int psi4groupnumber = 7; // d2h -- see Irreps.h and N2.ccpvdz.out
-   const int nIrreps = CheMPS2::Irreps::getNumberOfIrreps( psi4groupnumber );
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
    
    //Setup CASSCF --> number of irreps = 8
