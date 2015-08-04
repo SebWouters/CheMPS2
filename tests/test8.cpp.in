@@ -43,40 +43,17 @@ int main(void){
    
    //Setup the Hamiltonian
    const int psi4groupnumber = 7; // d2h -- see Irreps.h and N2.ccpvdz.out
-   const int nIrreps = CheMPS2::Irreps::getNumberOfIrreps( psi4groupnumber );
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
    
-   //Setup CASSCF
-   int * DOCC = new int[ nIrreps ];
-   int * SOCC = new int[ nIrreps ];
-   for ( int irrep = 0; irrep < nIrreps; irrep++ ){ DOCC[ irrep ] = SOCC[ irrep ] = 0; }
-   DOCC[ 0 ] = 3;
-   DOCC[ 5 ] = 2;
-   DOCC[ 6 ] = DOCC[ 7 ] = 1; // see N2.ccpvdz.out : DOCC [     3,    0,    0,    0,    0,    2,    1,    1 ]
+   //Setup CASSCF --> number of irreps = 8
+   int DOCC[] = { 3, 0, 0, 0, 0, 2, 1, 1 }; // see N2.ccpvdz.out
+   int SOCC[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
    CheMPS2::CASSCF koekoek( Ham, DOCC, SOCC );
-   delete [] DOCC;
-   delete [] SOCC;
    
-   int * Nocc  = new int[ nIrreps ];
-   int * NDMRG = new int[ nIrreps ];
-   int * Nvirt = new int[ nIrreps ];
-   
-   Nocc[0] = Nocc[5] = 1;
-   Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0;
-   
-   NDMRG[0] = NDMRG[5] = 2;
-   NDMRG[1] = NDMRG[4] = 0;
-   NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 1;
-   
-   Nvirt[0] = Nvirt[5] = 4;
-   Nvirt[2] = Nvirt[3] = Nvirt[6] = Nvirt[7] = 2;
-   Nvirt[1] = Nvirt[4] = 1;
-   
+   int Nocc[]  = { 1, 0, 0, 0, 0, 1, 0, 0 };
+   int NDMRG[] = { 2, 0, 1, 1, 0, 2, 1, 1 };
+   int Nvirt[] = { 4, 1, 2, 2, 1, 4, 2, 2 };
    koekoek.setupStart(Nocc,NDMRG,Nvirt);
-   
-   delete [] Nocc;
-   delete [] NDMRG;
-   delete [] Nvirt;
    
    //Setup symmetry sector
    int N = 14;

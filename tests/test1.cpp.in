@@ -63,17 +63,11 @@ int main(void){
    //Look at a few symmetry sectors
    const int Nelec    = 14;
    const int nSectors = 6;
-   int * TwoS      = new int[nSectors];
-   int * Irreps    = new int[nSectors];
-   double * EDMRG  = new double[nSectors];
-   double * EFCI   = new double[nSectors];
-   double * RMSdev = new double[nSectors];
-   TwoS[0] = 0; Irreps[0] = 0;
-   TwoS[1] = 2; Irreps[1] = 5;
-   TwoS[2] = 4; Irreps[2] = 0;
-   TwoS[3] = 4; Irreps[3] = 5;
-   TwoS[4] = 2; Irreps[4] = 2;
-   TwoS[5] = 2; Irreps[5] = 6;
+   int TwoS[]   = { 0, 2, 4, 4, 2, 2 };
+   int Irreps[] = { 0, 5, 0, 5, 2, 6 };
+   double EDMRG[6];
+   double EFCI[6];
+   double RMSdev[6];
    
    for (int counter=0; counter<nSectors; counter++){
       
@@ -161,12 +155,6 @@ int main(void){
       success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-8 );
       success = ( success ) && ( RMSdev[cnt] < 1e-3 ); // Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
    }
-   
-   delete [] EFCI;
-   delete [] EDMRG;
-   delete [] RMSdev;
-   delete [] TwoS;
-   delete [] Irreps;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
