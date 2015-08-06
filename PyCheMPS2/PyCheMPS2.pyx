@@ -61,10 +61,13 @@ cdef class PyConvergenceScheme:
 
 cdef class PyHamiltonian:
     cdef Ham.Hamiltonian * thisptr
-    def __cinit__(self, int Norbitals, int nGroup, np.ndarray[int, ndim=1, mode="c"] OrbIrreps not None):
-        assert OrbIrreps.flags['C_CONTIGUOUS']
-        assert OrbIrreps.shape[0] == Norbitals
-        self.thisptr = new Ham.Hamiltonian(Norbitals, nGroup, &OrbIrreps[0])
+    def __cinit__(self, int Norbitals, int nGroup, np.ndarray[int, ndim=1, mode="c"] OrbIrreps not None, string filename='none'):
+        if ( filename.compare('none')==0 ):
+            assert OrbIrreps.flags['C_CONTIGUOUS']
+            assert OrbIrreps.shape[0] == Norbitals
+            self.thisptr = new Ham.Hamiltonian(Norbitals, nGroup, &OrbIrreps[0])
+        else:
+            self.thisptr = new Ham.Hamiltonian(filename, nGroup)
     def __dealloc__(self):
         del self.thisptr
     def getL(self):
@@ -89,6 +92,8 @@ cdef class PyHamiltonian:
         self.thisptr.save()
     def read(self):
         self.thisptr.read()
+    def writeFCIDUMP(self, string filename, int Nelec, int TwoS, int TargetIrrep):
+        self.thisptr.writeFCIDUMP( filename, Nelec, TwoS, TargetIrrep )
         
 cdef class PyProblem:
     cdef Prob.Problem * thisptr

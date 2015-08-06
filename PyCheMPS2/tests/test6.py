@@ -20,7 +20,6 @@
 import numpy as np
 import sys
 import PyCheMPS2
-import ReadinHamiltonianFCIDUMP
 import ctypes
 
 # Set the seed of the random number generator and cout.precision
@@ -28,7 +27,10 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/O2.CCPVDZ.FCIDUMP', 'd2h')
+psi4group = 7 # d2h: see chemps2/Irreps.h
+filename  = '../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
+orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
+Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 DOCC = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see O2.ccpvdz.out
 SOCC = np.zeros([ 8 ], dtype=ctypes.c_int)
 L = Ham.getL()

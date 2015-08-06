@@ -20,7 +20,6 @@
 import numpy as np
 import sys
 import PyCheMPS2
-import ReadinHamiltonianFCIDUMP
 import ctypes
 
 # Set the seed of the random number generator and cout.precision
@@ -28,7 +27,10 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/CH4.STO3G.FCIDUMP', 'c2v')
+psi4group = 5 # c2v: see chemps2/Irreps.h
+filename  = '../../tests/matrixelements/CH4.STO3G.FCIDUMP'
+orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
+Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 
 # Define the symmetry sector
 TwoS  = 0    # Two times the targeted spin

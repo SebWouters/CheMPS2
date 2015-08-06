@@ -21,7 +21,6 @@ import numpy as np
 import math as m
 import sys
 import PyCheMPS2
-import ReadinHamiltonianFCIDUMP
 import ctypes
 import os
 
@@ -30,7 +29,10 @@ Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
 # Read in the FCIDUMP
-Ham = ReadinHamiltonianFCIDUMP.Read('../../tests/matrixelements/O2.CCPVDZ.FCIDUMP', 'd2h')
+psi4group = 7 # d2h: see chemps2/Irreps.h
+filename  = '../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
+orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
+Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 L = Ham.getL()
 
 # Dump the Hamiltonian HDF5 file
