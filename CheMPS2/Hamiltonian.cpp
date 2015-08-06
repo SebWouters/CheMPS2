@@ -17,6 +17,7 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <iostream>
@@ -424,38 +425,8 @@ void CheMPS2::Hamiltonian::CreateAndFillFromPsi4dump(const string filename){
 void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
 
     const int nIrreps = SymmInfo.getNumberOfIrreps();
-    int * symm_psi2molpro = new int[ nIrreps ];
-    const string SymmLabel = SymmInfo.getGroupName();
-
-    if ( SymmLabel.compare("c1")==0 ){
-        symm_psi2molpro[0] = 1;
-    }
-    if ( ( SymmLabel.compare("ci")==0 ) || ( SymmLabel.compare("c2")==0 ) || ( SymmLabel.compare("cs")==0 ) ){
-        symm_psi2molpro[0] = 1;
-        symm_psi2molpro[1] = 2;
-    }
-    if ( ( SymmLabel.compare("d2")==0 ) ){
-        symm_psi2molpro[0] = 1;
-        symm_psi2molpro[1] = 4;
-        symm_psi2molpro[2] = 3;
-        symm_psi2molpro[3] = 2;
-    }
-    if ( ( SymmLabel.compare("c2v")==0 ) || ( SymmLabel.compare("c2h")==0 ) ){
-        symm_psi2molpro[0] = 1;
-        symm_psi2molpro[1] = 4;
-        symm_psi2molpro[2] = 2;
-        symm_psi2molpro[3] = 3;
-    }
-    if ( ( SymmLabel.compare("d2h")==0 ) ){
-        symm_psi2molpro[0] = 1;
-        symm_psi2molpro[1] = 4;
-        symm_psi2molpro[2] = 6;
-        symm_psi2molpro[3] = 7;
-        symm_psi2molpro[4] = 8;
-        symm_psi2molpro[5] = 5;
-        symm_psi2molpro[6] = 3;
-        symm_psi2molpro[7] = 2;
-    }
+    int * psi2molpro = new int[ nIrreps ];
+    SymmInfo.symm_psi2molpro( psi2molpro );
 
     ifstream thefcidump( fcidumpfile.c_str() );
     string line, part;
@@ -491,7 +462,7 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
         if ( CheMPS2::HAMILTONIAN_debugPrint ){ cout << "This molpro irrep <<" << part << ">> or " << molproirrep << "." << endl; }
         orb2irrep[ orb ] = -1;
         for ( int irrep = 0; irrep < nIrreps; irrep++ ){
-            if ( molproirrep == symm_psi2molpro[ irrep ] ){
+            if ( molproirrep == psi2molpro[ irrep ] ){
                 orb2irrep[ orb ] = irrep;
             }
         }
@@ -579,8 +550,53 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
     
     if ( CheMPS2::HAMILTONIAN_debugPrint ){ debugcheck(); }
 
-    delete [] symm_psi2molpro;
+    delete [] psi2molpro;
     thefcidump.close();
+
+}
+
+void CheMPS2::Hamiltonian::writeFCIDUMP( const string fcidumpfile, const int Nelec, const int TwoS, const int TargetIrrep ) const{
+
+   int * psi2molpro = new int[ SymmInfo.getNumberOfIrreps() ];
+   SymmInfo.symm_psi2molpro( psi2molpro );
+   
+   FILE * capturing;
+   capturing = fopen( fcidumpfile.c_str(), "w" ); // "w" with fopen means truncate file
+   fprintf( capturing, " &FCI NORB= %d,NELEC= %d,MS2= %d,\n", getL(), Nelec, TwoS );
+   fprintf( capturing, "  ORBSYM=" );
+   for (int orb=0; orb<getL(); orb++){
+      fprintf( capturing, "%d,", psi2molpro[getOrbitalIrrep(orb)] );
+   }
+   fprintf( capturing, "\n  ISYM=%d,\n /\n", psi2molpro[TargetIrrep] );
+   delete [] psi2molpro;
+   
+   for (int p=0; p<getL(); p++){
+      for (int q=0; q<=p; q++){ // p>=q
+         const int irrep_pq = Irreps::directProd( getOrbitalIrrep(p), getOrbitalIrrep(q) );
+         for (int r=0; r<getL(); r++){
+            for (int s=0; s<getL(); s++){
+               const int irrep_rs = Irreps::directProd( getOrbitalIrrep(r), getOrbitalIrrep(s) );
+               if ( irrep_pq == irrep_rs ){
+                  if ( ( r >= s ) && ( ( p > r ) || ( ( p == r ) && ( q >= s ) ) ) ){
+                     fprintf( capturing, " % 23.16E %3d %3d %3d %3d\n", getVmat(p,r,q,s), p+1, q+1, r+1, s+1 );
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   for (int p=0; p<getL(); p++){
+      for (int q=0; q<=p; q++){ // p>=q
+         if ( getOrbitalIrrep(p) == getOrbitalIrrep(q) ){
+            fprintf( capturing, " % 23.16E %3d %3d %3d %3d\n", getTmat(p,q), p+1, q+1, 0, 0 );
+         }
+      }
+   }
+   
+   fprintf( capturing, " % 23.16E %3d %3d %3d %3d", getEconst(), 0, 0, 0, 0 );
+   fclose( capturing );
+   cout << "Created the FCIDUMP file " << fcidumpfile << "." << endl;
 
 }
 

@@ -122,6 +122,15 @@ namespace CheMPS2{
              \return The direct product of I1 and I2 */
          static int directProd(const int Irrep1, const int Irrep2){ return Irrep1 ^ Irrep2; }
          
+         //! Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group
+         /** \param psi2molpro The array to be filled: psi2molpro[psi_irrep] = molpro_irrep */
+         void symm_psi2molpro( int * psi2molpro ) const;
+         
+         //! Fill the array psi2molpro with the irrep conventions of molpro for the group with symmetry label SymmLabel
+         /** \param psi2molpro The array to be filled: psi2molpro[psi_irrep] = molpro_irrep
+             \param SymmLabel The group for which psi2molpro needs to be filled */
+         static void symm_psi2molpro( int * psi2molpro, const string SymmLabel );
+         
          //! Print all info contained in this class
          static void printAll();
       

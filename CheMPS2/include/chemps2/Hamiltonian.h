@@ -144,6 +144,13 @@ namespace CheMPS2{
              \param file_vmat The HDF5 Hamiltonian Vmat filename */
          void read(const string file_parent=HAMILTONIAN_ParentStorageName, const string file_tmat=HAMILTONIAN_TmatStorageName, const string file_vmat=HAMILTONIAN_VmatStorageName);
          
+         //! Write the Hamiltonian to a FCIDUMP file
+         /** \param fcidumpfile The filename for the FCIDUMP file
+             \param Nelec The number of electrons
+             \param TwoS Two times the spin; multiplicity minus one
+             \param TargetIrrep The target irrep (in psi4 numbering conventions) */
+         void writeFCIDUMP( const string fcidumpfile, const int Nelec, const int TwoS, const int TargetIrrep ) const;
+         
          //! Debug check certain elements and sums
          void debugcheck() const;
       
