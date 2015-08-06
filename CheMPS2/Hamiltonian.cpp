@@ -473,6 +473,15 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
     // Get the orbital irreps in psi4 convention (XOR, see Irreps.h).
     orb2irrep = new int[ L ];
     getline( thefcidump, line ); //  ORBSYM=A,B,C,D,
+    getline( thefcidump, part );
+    while ( part.find( "ISYM" ) == string::npos ){
+       pos = line.find("\n");
+       if ( pos != string::npos ){ line.erase( pos ); }
+       pos = part.find(" ");
+       if ( pos != string::npos ){ part.erase( pos, 1 ); }
+       line.append( part );
+       getline( thefcidump, part );
+    }
     pos = line.find( "ORBSYM" );
     pos = line.find( "=", pos ); //1
     for ( int orb = 0; orb < L; orb++ ){
@@ -490,7 +499,6 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
         pos = pos2;
     }
 
-    getline( thefcidump, line ); //  ISYM=W,
     getline( thefcidump, line ); // /
     assert( line.size() < 16 );
 

@@ -63,6 +63,10 @@ def Read(filename, groupName):
     L = int(part)
     
     line = thefile.readline() #Orbital irreps
+    nextline = thefile.readline()
+    while ( 'ISYM' not in nextline ):
+        line = line.rstrip() + nextline.lstrip()
+        nextline = thefile.readline()
     orbirreps = np.zeros([L], dtype=ctypes.c_int)
     pos1 = line.find('=')
     for orb in range(L):
@@ -86,7 +90,6 @@ def Read(filename, groupName):
                     if ( orbirreps[orb1] ^ orbirreps[orb2] == orbirreps[orb3] ^ orbirreps[orb4] ):
                         Ham.setVmat(orb1, orb2, orb3, orb4, 0.0)
     
-    line = thefile.readline() #Skip
     line = thefile.readline() #Skip
     
     stop = False
