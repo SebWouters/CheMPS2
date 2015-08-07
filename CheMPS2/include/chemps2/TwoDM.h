@@ -102,6 +102,9 @@ namespace CheMPS2{
          /** \return The energy calculated as 0.5*trace(2DM-A * Ham) */
          double calcEnergy();
          
+         //! Print the natural orbital occupation numbers
+         void printNOON() const;
+         
          //! Save the TwoDMs to disk
          void save();
          

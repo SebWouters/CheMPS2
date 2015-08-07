@@ -194,9 +194,9 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
       }
       setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
       
-      //Calculate the NOON and possibly rotate the active space to the natural orbitals
-      calcNOON(iHandler, mem1, mem2, DMRG1DM);
+      //Possibly rotate the active space to the natural orbitals
       if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
+         calcNOON(iHandler, mem1, mem2, DMRG1DM);
          rotate2DMand1DM(N, nOrbDMRG, mem1, mem2, DMRG1DM, DMRG2DM);
          unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.

@@ -167,15 +167,8 @@ void CheMPS2::CASSCF::calcNOON(DMRGSCFindices * localIdx, double * eigenvecs, do
 
       int NDMRG = localIdx->getNDMRG(irrep);
       if (NDMRG > 0){
-
          //Calculate the eigenvectors and values per block
          dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+totOrbDMRG), &totOrbDMRG, eigenval + passed, workmem, &size, &info);
-
-         //Print the NOON
-         if (irrep==0){ cout << "DMRGSCF::calcNOON : DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
-         else {         cout << "                    DMRG 1DM eigenvalues [NOON] of irrep " << irrep << " = [ "; }
-         for (int cnt=0; cnt<NDMRG-1; cnt++){ cout << eigenval[passed + NDMRG-1-cnt] << " , "; }
-         cout << eigenval[passed + 0] << " ]." << endl;
 
          //Sort the eigenvecs
          for (int col=0; col<NDMRG/2; col++){
@@ -185,7 +178,6 @@ void CheMPS2::CASSCF::calcNOON(DMRGSCFindices * localIdx, double * eigenvecs, do
                eigenvecs[passed + row + totOrbDMRG * (passed + col)] = temp;
             }
          }
-
       }
 
       //Update the number of passed DMRG orbitals

@@ -115,6 +115,7 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
       cout << "   N(N-1) = " << denBK->gN() * (denBK->gN() - 1) << " and calculated by double trace of the 2DM-A = " << NtimesNminus1 << endl;
       const double Energy2DMA = the2DM->calcEnergy();
       cout << "   Energy obtained by Heffective at edge = " << Energy << " and as Econst + 0.5*trace(2DM-A*Ham) = " << Energy2DMA << endl;
+      the2DM->printNOON();
    }
    
    //Now the MPS has the gauge form CRRRRRRRRR

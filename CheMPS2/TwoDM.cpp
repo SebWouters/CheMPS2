@@ -17,6 +17,8 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdlib.h>
+#include <iostream>
 #include <math.h>
 #include <algorithm>
 
@@ -27,6 +29,8 @@
 #include "MPIchemps2.h"
 
 using std::max;
+using std::cout;
+using std::endl;
 
 CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
 
@@ -177,6 +181,51 @@ double CheMPS2::TwoDM::calcEnergy(){
    }
    val *= 0.5;
    return val + Prob->gEconst();
+
+}
+
+void CheMPS2::TwoDM::printNOON() const{
+
+   const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
+   int lwork = 3 * L;
+   double * OneRDM = new double[ L * L ];
+   double * work   = new double[ lwork ];
+   double * eigs   = new double[ L ];
+   for ( int irrep = 0; irrep < denBK->getNumberOfIrreps(); irrep++ ){
+   
+      int jump1 = 0;
+      for ( int orb1 = 0; orb1 < L; orb1++ ){
+         if ( Prob->gIrrep( orb1 ) == irrep ){
+            int jump2 = jump1;
+            for ( int orb2 = orb1; orb2 < L; orb2++ ){
+               if ( Prob->gIrrep( orb2 ) == irrep ){
+                  double value = 0.0;
+                  for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( orb1, orbsum, orb2, orbsum ); }
+                  value *= prefactor;
+                  OneRDM[ jump1 + L * jump2 ] = value;
+                  OneRDM[ jump2 + L * jump1 ] = value;
+                  jump2 += 1;
+               }
+            }
+            jump1 += 1;
+         }
+      }
+      
+      if ( jump1 > 0 ){
+         char jobz = 'N'; // Eigenvalues only
+         char uplo = 'U';
+         int lda = L;
+         int info;
+         dsyev_(&jobz, &uplo, &jump1, OneRDM, &lda, eigs, work, &lwork, &info);
+         cout << "   NOON of irrep " << denBK->getIrrepName(irrep) << " = [ ";
+         for ( int cnt = 0; cnt < jump1 - 1; cnt++ ){ cout << eigs[ jump1 - 1 - cnt ] << " , "; } // Print from large to small
+         cout << eigs[ 0 ] << " ]." << endl;
+      }
+   
+   }
+   delete [] OneRDM;
+   delete [] work;
+   delete [] eigs;
 
 }
 
