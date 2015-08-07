@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <iostream>
+#include <math.h> // fabs
 
 #include "Problem.h"
 
@@ -169,6 +170,160 @@ void CheMPS2::Problem::setup_reorder_custom(int * dmrg2ham){
    }
    // Check all elements f1 set
    for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){ assert( f1[ ham_orb ] >= 0 ); }
+
+}
+
+void CheMPS2::Problem::setup_reorder_dinfh(int * docc, const double sp_threshold){
+
+   assert( gSy() == 7 ); // Only for d2h of course
+   const int num_irreps = 8;
+   const int irrep_ag   = 0;
+   const int irrep_b1g  = 1;
+   const int irrep_b2g  = 2;
+   const int irrep_b3g  = 3;
+   const int irrep_au   = 4;
+   const int irrep_b1u  = 5;
+   const int irrep_b2u  = 6;
+   const int irrep_b3u  = 7;
+   
+   double * sp_energies = new double[ Ham->getL() ];
+   int * dmrg2ham = new int[ Ham->getL() ];
+   int * partners = new int[ Ham->getL() ];
+   
+   // Get the single particle energies
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){
+      double value = Ham->getTmat( ham_orb, ham_orb );
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         int counter = 0;
+         for ( int frozen_orb = 0; frozen_orb < Ham->getL(); frozen_orb++ ){
+            if ( Ham->getOrbitalIrrep( frozen_orb ) == irrep ){
+               if ( counter < docc[ irrep ] ){
+                  value += 2 * Ham->getVmat( ham_orb, frozen_orb, ham_orb, frozen_orb )
+                             - Ham->getVmat( ham_orb, ham_orb, frozen_orb, frozen_orb );
+               }
+               counter += 1;
+            }
+         }
+      }
+      sp_energies[ ham_orb ] = value;
+   }
+
+   // To check that they have been set, put the partners to a negative value.
+   for ( int cnt = 0; cnt < Ham->getL(); cnt++ ){ partners[ cnt ] = -2; }
+   int dmrg_orb = 0;
+   
+   // Copy the b1g ( Delta_g ) orbitals
+   for ( int ham_orb = Ham->getL() - 1; ham_orb >= 0; ham_orb-- ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b1g ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         for ( int partner_orb = 0; partner_orb < Ham->getL(); partner_orb++ ){
+            if ( Ham->getOrbitalIrrep( partner_orb ) == irrep_ag ){
+               if ( fabs( sp_energies[ ham_orb ] - sp_energies[ partner_orb ] ) < sp_threshold ){
+                  partners[ dmrg_orb ] = partner_orb;
+               }
+            }
+         }
+         dmrg_orb++;
+      }
+   }
+   
+   // Copy the au ( Delta_u ) orbitals
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_au ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         for ( int partner_orb = 0; partner_orb < Ham->getL(); partner_orb++ ){
+            if ( Ham->getOrbitalIrrep( partner_orb ) == irrep_b1u ){
+               if ( fabs( sp_energies[ ham_orb ] - sp_energies[ partner_orb ] ) < sp_threshold ){
+                  partners[ dmrg_orb ] = partner_orb;
+               }
+            }
+         }
+         dmrg_orb++;
+      }
+   }
+   const int num_delta_ug = dmrg_orb;
+   assert( (num_delta_ug % 2) == 0 );
+   
+   // Copy the partner orbitals
+   for ( int cnt = 0; cnt < num_delta_ug; cnt++ ){
+      assert( partners[ cnt ] >= 0 ); // Check that each one found a partner
+      dmrg2ham[ dmrg_orb ] = partners[ cnt ];
+      dmrg_orb++;
+   }
+   
+   // Copy the remaining ag orbitals
+   for ( int ham_orb = Ham->getL() - 1; ham_orb >= 0; ham_orb-- ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_ag ){
+         bool is_a_partner = false;
+         for ( int cnt = 0; cnt < num_delta_ug; cnt++ ){
+            if ( ham_orb == partners[ cnt ] ){ is_a_partner = true; }
+         }
+         if ( is_a_partner == false ){
+            dmrg2ham[ dmrg_orb ] = ham_orb;
+            dmrg_orb++;
+         }
+      }
+   }
+   
+   // Copy the remaining b1u orbitals
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b1u ){
+         bool is_a_partner = false;
+         for ( int cnt = 0; cnt < num_delta_ug; cnt++ ){
+            if ( ham_orb == partners[ cnt ] ){ is_a_partner = true; }
+         }
+         if ( is_a_partner == false ){
+            dmrg2ham[ dmrg_orb ] = ham_orb;
+            dmrg_orb++;
+         }
+      }
+   }
+   
+   // Copy the b3u ( Pi_u, pi_x ) orbitals
+   for ( int ham_orb = Ham->getL() - 1; ham_orb >= 0; ham_orb-- ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b3u ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         dmrg_orb++;
+      }
+   }
+   
+   // Copy the b2g ( Pi_g, pi_x^* ) orbitals
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b2g ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         dmrg_orb++;
+      }
+   }
+   
+   // Copy the b2u ( Pi_u, pi_y ) orbitals
+   for ( int ham_orb = Ham->getL() - 1; ham_orb >= 0; ham_orb-- ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b2u ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         dmrg_orb++;
+      }
+   }
+   
+   // Copy the b3g ( Pi_g, pi_y^* ) orbitals
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){
+      if ( Ham->getOrbitalIrrep( ham_orb ) == irrep_b3g ){
+         dmrg2ham[ dmrg_orb ] = ham_orb;
+         dmrg_orb++;
+      }
+   }
+   
+   assert( dmrg_orb == Ham->getL() );
+   setup_reorder_custom( dmrg2ham );
+   
+   cout << "Reordered the orbitals according to d(infinity)h:" << endl;
+   Irreps myIrreps( gSy() );
+   for ( dmrg_orb = 0; dmrg_orb < Ham->getL(); dmrg_orb++ ){
+      const int ham_orb = dmrg2ham[ dmrg_orb ];
+      cout << "   DMRG orb " << dmrg_orb << " [" << myIrreps.getIrrepName(Ham->getOrbitalIrrep( ham_orb )) << "] has SP energy = " << sp_energies[ ham_orb ] << endl;
+   }
+   
+   delete [] dmrg2ham;
+   delete [] partners;
+   delete [] sp_energies;
 
 }
 

@@ -122,6 +122,11 @@ namespace CheMPS2{
          /** \param dmrg2ham Array which contains the reordering: dmrg2ham[ dmrg_lattice_site ] = hamiltonian_index. */
          void setup_reorder_custom(int * dmrg2ham);
          
+         //! Reorder the orbitals for d(infinity)h. Previous reorderings are cleared.
+         /** \param docc Array which contains for each irrep the number of doubly occupied orbitals
+             \param sp_threshold Threshold to detect Delta_g and Delta_u partners based on single-particle energies */
+         void setup_reorder_dinfh(int * docc, const double sp_threshold=1e-5);
+         
       private:
       
          //Pointer to the Hamiltonian --> constructed and destructed outside of this class

@@ -36,18 +36,18 @@ The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 2
 H2O/Roos' ANO DZ
 ----------------
 
-Water in Roos' ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was :math:`\mathsf{c2v}`, and the targeted state was :math:`^1A_1` at equilibrium geometry: O @ (0, 0, 0) and H @ (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. [WATER]_. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores @ 2.5 GHz. The calculation was performed on a single node, and needed ~ 64 Gb of memory.
+Water in Roos' ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was :math:`\mathsf{c2v}`, and the targeted state was :math:`^1A_1` at equilibrium geometry: O @ (0, 0, 0) and H @ (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. [WATER]_. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores @ 2.5 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 64 Gb of memory.
 
  +----------------------------+-------------------------+--------------------+-----------------------+
  | :math:`D_{\mathsf{SU(2)}}` | Wall time per sweep (s) | :math:`w_D^{disc}` | :math:`E_D` (Hartree) |
  +============================+=========================+====================+=======================+
- | 1000                       | 820                     | 8.6093e-08         | -76.31468322          |
+ | 1000                       | 401                     | 8.7950e-08         | -76.31468302          |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 2000                       | 4304                    | 1.1262e-08         | -76.31471043          |
+ | 2000                       | 2111                    | 1.1366e-08         | -76.31471044          |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 3000                       | 11872                   | 2.8027e-09         | -76.31471338          |
+ | 3000                       | 5686                    | 2.9114e-09         | -76.31471342          |
  +----------------------------+-------------------------+--------------------+-----------------------+
- | 4000                       | 23915                   | 6.9927e-10         | -76.31471401          |
+ | 4000                       | 10958                   | 6.8011e-10         | -76.31471402          |
  +----------------------------+-------------------------+--------------------+-----------------------+
 
 
