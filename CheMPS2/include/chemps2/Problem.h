@@ -112,11 +112,15 @@ namespace CheMPS2{
              \return The Ham index */
          int gf2(const int DMRGOrb) const;
          
-         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g Au (based on N2, cc-pVDZ, 2.118 a.u.)
+         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g Au. Previous reorderings are cleared.
          void SetupReorderD2h();
          
-         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2 (based on CO, cc-pVTZ, 1.15 Angstrom)
+         //! Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2. Previous reorderings are cleared.
          void SetupReorderC2v();
+         
+         //! Reorder the orbitals to a custom ordering. Previous reorderings are cleared.
+         /** \param dmrg2ham Array which contains the reordering: dmrg2ham[ dmrg_lattice_site ] = hamiltonian_index. */
+         void setup_reorder_custom(int * dmrg2ham);
          
       private:
       

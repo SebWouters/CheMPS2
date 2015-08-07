@@ -53,6 +53,12 @@ CheMPS2::Problem::~Problem(){
 
 void CheMPS2::Problem::SetupReorderD2h(){
 
+   if (bReorderD2h){
+      delete [] f1;
+      delete [] f2;
+      bReorderD2h = false;
+   }
+
    if (gSy()==7){ //Only if D2h of course
    
       bReorderD2h = true;
@@ -86,6 +92,12 @@ void CheMPS2::Problem::SetupReorderD2h(){
 }
 
 void CheMPS2::Problem::SetupReorderC2v(){
+
+   if (bReorderD2h){
+      delete [] f1;
+      delete [] f2;
+      bReorderD2h = false;
+   }
 
    if (gSy()==5){ //Only if C2v of course
    
@@ -130,6 +142,33 @@ void CheMPS2::Problem::SetupReorderC2v(){
       */
       
    }
+
+}
+
+void CheMPS2::Problem::setup_reorder_custom(int * dmrg2ham){
+
+   if (bReorderD2h){
+      delete [] f1;
+      delete [] f2;
+      bReorderD2h = false;
+   }
+   
+   bReorderD2h = true;
+   f1 = new int[Ham->getL()]; // Is going to be the inverse of dmrg2ham
+   f2 = new int[Ham->getL()]; // Is going to be dmrg2ham copied
+
+   // Set f1 entries negative to check all elements set
+   for ( int  ham_orb = 0;  ham_orb < Ham->getL();  ham_orb++ ){ f1[ ham_orb ] = -2; }
+   for ( int dmrg_orb = 0; dmrg_orb < Ham->getL(); dmrg_orb++ ){
+   
+      assert( dmrg2ham[ dmrg_orb ] >= 0           );
+      assert( dmrg2ham[ dmrg_orb ] <  Ham->getL() );
+      f2[ dmrg_orb ] = dmrg2ham[ dmrg_orb ];
+      f1[ dmrg2ham[ dmrg_orb ] ] = dmrg_orb;
+   
+   }
+   // Check all elements f1 set
+   for ( int ham_orb = 0; ham_orb < Ham->getL(); ham_orb++ ){ assert( f1[ ham_orb ] >= 0 ); }
 
 }
 
