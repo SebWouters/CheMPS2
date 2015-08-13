@@ -1129,7 +1129,7 @@ void CheMPS2::DMRG::MY_HDF5_WRITE_BATCH( const hid_t file_id, const int number, 
          const hsize_t count = tensor_size;
          H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &start, NULL, &count, NULL);
          const hid_t memspace_id = H5Screate_simple(1, &count, NULL);
-	      H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, batch[cnt]->gStorage());
+         H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, memspace_id, dataspace_id, H5P_DEFAULT, batch[cnt]->gStorage());
          H5Sclose(memspace_id);
          
          offset += tensor_size;
