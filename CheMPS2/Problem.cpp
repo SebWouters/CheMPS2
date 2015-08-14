@@ -23,6 +23,7 @@
 #include <math.h> // fabs
 
 #include "Problem.h"
+#include "MPIchemps2.h"
 
 using std::cout;
 using std::endl;
@@ -314,11 +315,16 @@ void CheMPS2::Problem::setup_reorder_dinfh(int * docc, const double sp_threshold
    assert( dmrg_orb == Ham->getL() );
    setup_reorder_custom( dmrg2ham );
    
-   cout << "Reordered the orbitals according to d(infinity)h:" << endl;
-   Irreps myIrreps( gSy() );
-   for ( dmrg_orb = 0; dmrg_orb < Ham->getL(); dmrg_orb++ ){
-      const int ham_orb = dmrg2ham[ dmrg_orb ];
-      cout << "   DMRG orb " << dmrg_orb << " [" << myIrreps.getIrrepName(Ham->getOrbitalIrrep( ham_orb )) << "] has SP energy = " << sp_energies[ ham_orb ] << endl;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      cout << "Reordered the orbitals according to d(infinity)h:" << endl;
+      Irreps myIrreps( gSy() );
+      for ( dmrg_orb = 0; dmrg_orb < Ham->getL(); dmrg_orb++ ){
+         const int ham_orb = dmrg2ham[ dmrg_orb ];
+         cout << "   DMRG orb " << dmrg_orb << " [" << myIrreps.getIrrepName(Ham->getOrbitalIrrep( ham_orb )) << "] has SP energy = " << sp_energies[ ham_orb ] << endl;
+      }
    }
    
    delete [] dmrg2ham;
