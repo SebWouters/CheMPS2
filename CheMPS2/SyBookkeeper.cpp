@@ -191,14 +191,8 @@ void CheMPS2::SyBookkeeper::fillFCIdim(){
 void CheMPS2::SyBookkeeper::ScaleCurrentDim(const int virtualD){
 
    for (int bound=1; bound<gL(); bound++){
-      int totaldim = 0;
-      for (int N=gNmin(bound); N<=gNmax(bound); N++){
-         for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
-            for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
-               totaldim += gCurrentDim(bound,N,TwoS,Icnt);
-            }
-         }
-      }
+   
+      const int totaldim = gTotDimAtBound( bound );
       
       if (totaldim > virtualD){
          double factor = (1.0 * virtualD) / totaldim;
@@ -214,15 +208,8 @@ void CheMPS2::SyBookkeeper::ScaleCurrentDim(const int virtualD){
       if (CheMPS2::SYBK_debugPrint){
          cout << "Bound = " << bound << endl;
          cout << "   Totaldim (FCI)        = " << totaldim << endl;
-         totaldim = 0;
-         for (int N=gNmin(bound); N<=gNmax(bound); N++){
-            for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
-               for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
-                  totaldim += gCurrentDim(bound,N,TwoS,Icnt);
-               }
-            }
-         }
-         cout << "   Totaldim (rescaled)   = " << totaldim << endl;
+         const int totaldim_rescaled = gTotDimAtBound( bound );
+         cout << "   Totaldim (rescaled)   = " << totaldim_rescaled << endl;
       }
    }
    
