@@ -145,61 +145,46 @@ void CheMPS2::SyBookkeeper::fillFCIdim(){
       for (int N=gNmin(bound); N<=gNmax(bound); N++){
          for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
             for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
-               FCIdim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min( CheMPS2::SYBK_dimensionCutoff, gFCIdim(bound-1,N,TwoS,Icnt) + gFCIdim(bound-1,N-2,TwoS,Icnt) + gFCIdim(bound-1,N-1,TwoS+1,directProd(Icnt,gIrrep(bound-1))) + gFCIdim(bound-1,N-1,TwoS-1,directProd(Icnt,gIrrep(bound-1))) );
+               FCIdim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min( CheMPS2::SYBK_dimensionCutoff,
+                                                                                          gFCIdim(bound-1, N,   TwoS,   Icnt)
+                                                                                        + gFCIdim(bound-1, N-2, TwoS,   Icnt)
+                                                                                        + gFCIdim(bound-1, N-1, TwoS+1, directProd(Icnt, gIrrep( bound-1 )))
+                                                                                        + gFCIdim(bound-1, N-1, TwoS-1, directProd(Icnt, gIrrep( bound-1 ))) );
             }
          }
       }
    }
-
-   //Then allocate FCIdimRight
-   int **** FCIdimRight = new int***[gL()+1];
-   for (int bound=0; bound<=gL(); bound++){
-      FCIdimRight[bound] = new int**[gNmax(bound)-gNmin(bound)+1];
-      for (int N=gNmin(bound); N<=gNmax(bound); N++){
-         FCIdimRight[bound][N-gNmin(bound)] = new int*[(gTwoSmax(bound,N)-gTwoSmin(bound,N))/2+1];
-         for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
-            FCIdimRight[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2] = new int[getNumberOfIrreps()];
-         }
-      }
-   }
    
-   //Then calculate FCI dim from right -->FCIdimRight
-   for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++) FCIdimRight[gL()][0][0][Icnt] = 0;
-   FCIdimRight[gL()][0][0][gIrrep()] = 1;
+   //Then fill CurrentDim from right
+   for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++) CurrentDim[gL()][0][0][Icnt] = 0;
+   CurrentDim[gL()][0][0][gIrrep()] = 1;
    
    for (int bound=gL()-1; bound>=0; bound--){
       for (int N=gNmin(bound); N<=gNmax(bound); N++){
          for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
             for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
-               FCIdimRight[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min( CheMPS2::SYBK_dimensionCutoff, gDimPrivate(FCIdimRight,bound+1,N,TwoS,Icnt) + gDimPrivate(FCIdimRight,bound+1,N+2,TwoS,Icnt) + gDimPrivate(FCIdimRight,bound+1,N+1,TwoS+1,directProd(Icnt,gIrrep(bound))) + gDimPrivate(FCIdimRight,bound+1,N+1,TwoS-1,directProd(Icnt,gIrrep(bound))) );
+               CurrentDim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min( CheMPS2::SYBK_dimensionCutoff,
+                                                                                          gCurrentDim(bound+1, N,   TwoS,   Icnt)
+                                                                                        + gCurrentDim(bound+1, N+2, TwoS,   Icnt)
+                                                                                        + gCurrentDim(bound+1, N+1, TwoS+1, directProd(Icnt, gIrrep( bound )))
+                                                                                        + gCurrentDim(bound+1, N+1, TwoS-1, directProd(Icnt, gIrrep( bound ))) );
             }
          }
       }
    }
    
-   //Then take min from FCIdim and FCIdimRight and store in FCIdim; and copy it to CurrentDim
+   //Then take min from FCIdim and CurrentDim and store in FCIdim; and copy it to CurrentDim
    for (int bound=0; bound<=gL(); bound++){
       for (int N=gNmin(bound); N<=gNmax(bound); N++){
          for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
             for (int Icnt=0; Icnt<getNumberOfIrreps(); Icnt++){
-               FCIdim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min( gFCIdim(bound,N,TwoS,Icnt), gDimPrivate(FCIdimRight,bound,N,TwoS,Icnt) );
-               CurrentDim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = gFCIdim(bound,N,TwoS,Icnt);
+               const int min_left_right = min( gFCIdim(bound,N,TwoS,Icnt), gCurrentDim(bound,N,TwoS,Icnt) );
+                   FCIdim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min_left_right;
+               CurrentDim[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2][Icnt] = min_left_right;
             }
          }
       }
    }
-   
-   //Deallocate FCIdimRight
-   for (int bound=0; bound<=gL(); bound++){
-      for (int N=gNmin(bound); N<=gNmax(bound); N++){
-         for (int TwoS=gTwoSmin(bound,N); TwoS<=gTwoSmax(bound,N); TwoS+=2){
-            delete [] FCIdimRight[bound][N-gNmin(bound)][(TwoS-gTwoSmin(bound,N))/2];
-         }
-         delete [] FCIdimRight[bound][N-gNmin(bound)];
-      }
-      delete [] FCIdimRight[bound];
-   }
-   delete [] FCIdimRight;
 
 }
 
