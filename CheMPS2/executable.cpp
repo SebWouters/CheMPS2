@@ -22,6 +22,7 @@
 #include <math.h>
 #include <string.h>
 #include <getopt.h>
+#include <sys/stat.h>
 
 #include "Initialize.h"
 #include "DMRG.h"
@@ -123,6 +124,14 @@ int main(int argc, char **argv){
             break;
          case 'f':
             fcidump = optarg;
+            {
+               struct stat file_info;
+               const bool file_exists = ( stat( fcidump.c_str(), &file_info ) == 0 );
+               if ( file_exists == false ){
+                  if ( output ){ cerr << "fcidump file " << fcidump << " does not exist!" << endl; }
+                  return -1;
+               }
+            }
             break;
          case 'g':
             group = atoi(optarg);
@@ -185,6 +194,14 @@ int main(int argc, char **argv){
             if ( tmpfolder.length()==0 ){
                if ( output ){ cerr << "Invalid tmp path!" << endl; }
                return -1;
+            }
+            {
+               struct stat file_info;
+               const bool file_exists = ( stat( tmpfolder.c_str(), &file_info ) == 0 );
+               if ( file_exists == false ){
+                  if ( output ){ cerr << "tmp folder " << tmpfolder << " does not exist!" << endl; }
+                  return -1;
+               }
             }
             break;
       }
@@ -320,8 +337,8 @@ int main(int argc, char **argv){
    //Calculate the 2-RDM and correlation functions
    if (( twodmfile.length() > 0 ) || ( print_corr == true )){
       theDMRG->calc2DMandCorrelations();
-      if ( twodmfile.length() > 0 ){ theDMRG->get2DM()->write2DMAfile( twodmfile ); }
-      if ( print_corr == true ){ theDMRG->getCorrelations()->Print(); }
+      if (( twodmfile.length() > 0 ) && ( output )){ theDMRG->get2DM()->write2DMAfile( twodmfile ); }
+      if (( print_corr == true ) && ( output )){ theDMRG->getCorrelations()->Print(); }
    }
    
    //Clean up DMRG
