@@ -573,11 +573,11 @@ void CheMPS2::Hamiltonian::writeFCIDUMP( const string fcidumpfile, const int Nel
    for (int p=0; p<getL(); p++){
       for (int q=0; q<=p; q++){ // p>=q
          const int irrep_pq = Irreps::directProd( getOrbitalIrrep(p), getOrbitalIrrep(q) );
-         for (int r=0; r<getL(); r++){
-            for (int s=0; s<getL(); s++){
+         for (int r=0; r<=p; r++){ // p>=r
+            for (int s=0; s<=r; s++){ // r>=s
                const int irrep_rs = Irreps::directProd( getOrbitalIrrep(r), getOrbitalIrrep(s) );
                if ( irrep_pq == irrep_rs ){
-                  if ( ( r >= s ) && ( ( p > r ) || ( ( p == r ) && ( q >= s ) ) ) ){
+                  if ( ( p > r ) || ( ( p == r ) && ( q >= s ) ) ){
                      fprintf( capturing, " % 23.16E %3d %3d %3d %3d\n", getVmat(p,r,q,s), p+1, q+1, r+1, s+1 );
                   }
                }
