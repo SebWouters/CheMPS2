@@ -82,7 +82,11 @@ int main(int argc, char **argv){
          case 'h':
          case '?':
             if ( output ){
-               cout << "Usage: " << argv[0] << " [OPTIONS]\n"
+               cout << "\n"
+                  "CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry\n"
+                  "Copyright (C) 2013-2015 Sebastian Wouters\n"
+                  "\n"
+                  "Usage: " << argv[0] << " [OPTIONS]\n"
                   "\n"
                   "    Conventions for the symmetry group and irrep numbers (same as psi4):\n"
                   "                 |  0    1    2    3    4    5    6    7   \n"
