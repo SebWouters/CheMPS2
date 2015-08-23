@@ -55,6 +55,7 @@ int main(int argc, char **argv){
    string twodmfile   = "";
    bool checkpoint    = false;
    bool print_corr    = false;
+   string tmpfolder   = CheMPS2::defaultTMPpath;
 
    struct option long_options[] =
    {
@@ -71,13 +72,14 @@ int main(int argc, char **argv){
       {"twodmfile",    required_argument, 0, 'o'},
       {"checkpoint",   no_argument,       0, 'c'},
       {"print_corr",   no_argument,       0, 'p'},
+      {"tmpfolder",    required_argument, 0, 't'},
       {"help",         no_argument,       0, 'h'},
       {0, 0, 0, 0}
    };
 
    int option_index = 0;
    int c;
-   while((c = getopt_long(argc, argv, "hf:g:m:n:i:D:E:M:N:e:o:cp", long_options, &option_index)) != -1){
+   while((c = getopt_long(argc, argv, "hf:g:m:n:i:D:E:M:N:e:o:cpt:", long_options, &option_index)) != -1){
       switch(c){
          case 'h':
          case '?':
@@ -113,6 +115,7 @@ int main(int argc, char **argv){
                   "    -o, --twodmfile=filename       Set the filename to dump the 2-RDM.\n"
                   "    -c, --checkpoint               Read and create MPS checkpoints.\n"
                   "    -p, --print_corr               Print correlation functions.\n"
+                  "    -t, --tmpfolder=path           Overwrite the tmp folder for the renormalized operators (default " << CheMPS2::defaultTMPpath << ").\n"
                   "    -h, --help                     Display this help.\n"
                   " " << endl;
             }
@@ -176,6 +179,13 @@ int main(int argc, char **argv){
             break;
          case 'p':
             print_corr = true;
+            break;
+         case 't':
+            tmpfolder = optarg;
+            if ( tmpfolder.length()==0 ){
+               if ( output ){ cerr << "Invalid tmp path!" << endl; }
+               return -1;
+            }
             break;
       }
    }
@@ -269,8 +279,9 @@ int main(int argc, char **argv){
       cout << "  --sweep_noise = [ "; for (int cnt=0; cnt<ni_d-1; cnt++ ){ cout << value_noise[cnt] << " ; "; } cout << value_noise[ ni_d-1 ] << " ]" << endl;
       if ( excitation > 0 ){           cout << "  --excitation = "   << excitation   << endl; }
       if ( twodmfile.length() > 0 ){   cout << "  --twodmfile = "    << twodmfile    << endl; }
-      if ( checkpoint > 0 ){           cout << "  --checkpoint"                    << endl; }
-      if ( print_corr > 0 ){           cout << "  --print_corr"                    << endl; }
+      if ( checkpoint ){               cout << "  --checkpoint"      << endl; }
+      if ( print_corr ){               cout << "  --print_corr"      << endl; }
+      cout << "  --tmpfolder = "    << tmpfolder    << endl;
    }
    
    /********************************
@@ -298,7 +309,7 @@ int main(int argc, char **argv){
    delete [] value_noise;
    
    //Run the DMRG calculations
-   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme, checkpoint);
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme, checkpoint, tmpfolder);
    double Energy = 0.0;
    for (int state = 0; state <= excitation; state++){
       if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }

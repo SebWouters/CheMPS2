@@ -251,7 +251,7 @@ void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
    
    FILE * capturing;
    capturing = fopen( filename.c_str(), "w" ); // "w" with fopen means truncate file
-   fprintf( capturing, " &FCI NORB= %d,NELEC= %d,MS2= %d,\n", L, Prob->gN(), Prob->gTwoS() );
+   fprintf( capturing, " &2-RDM NORB= %d,NELEC= %d,MS2= %d,\n", L, Prob->gN(), Prob->gTwoS() );
    fprintf( capturing, "  ORBSYM=" );
    for (int HamOrb=0; HamOrb<L; HamOrb++){
       const int DMRGOrb = ( Prob->gReorderD2h() ) ? Prob->gf1( HamOrb ) : HamOrb;
