@@ -21,3 +21,16 @@ endif (NOT STATIC_ONLY)
 install (TARGETS chemps2-static DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 install (DIRECTORY include/chemps2/ DESTINATION include/chemps2 FILES_MATCHING PATTERN "*.h")
 
+link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
+add_executable (chemps2bin executable.cpp)
+if (STATIC_ONLY)
+    add_dependencies (chemps2bin chemps2-static)
+    target_link_libraries (chemps2bin chemps2 ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES} ${GSL_LIBRARIES})
+else (STATIC_ONLY)
+    add_dependencies (chemps2bin chemps2-shared)
+    target_link_libraries (chemps2bin chemps2)
+endif (STATIC_ONLY)
+set_target_properties (chemps2bin PROPERTIES OUTPUT_NAME "chemps2")
+
+install (TARGETS chemps2bin DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
+

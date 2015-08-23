@@ -17,6 +17,7 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
@@ -240,6 +241,77 @@ void CheMPS2::TwoDM::read(){
 
    TwoDMA->read(CheMPS2::TWODM_2DM_A_storagename);
    TwoDMB->read(CheMPS2::TWODM_2DM_B_storagename);
+
+}
+
+void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
+
+   int * psi2molpro = new int[ denBK->getNumberOfIrreps() ];
+   denBK->symm_psi2molpro( psi2molpro );
+   
+   FILE * capturing;
+   capturing = fopen( filename.c_str(), "w" ); // "w" with fopen means truncate file
+   fprintf( capturing, " &FCI NORB= %d,NELEC= %d,MS2= %d,\n", L, Prob->gN(), Prob->gTwoS() );
+   fprintf( capturing, "  ORBSYM=" );
+   for (int HamOrb=0; HamOrb<L; HamOrb++){
+      const int DMRGOrb = ( Prob->gReorderD2h() ) ? Prob->gf1( HamOrb ) : HamOrb;
+      fprintf( capturing, "%d,", psi2molpro[ Prob->gIrrep( DMRGOrb ) ] );
+   }
+   fprintf( capturing, "\n  ISYM=%d,\n /\n", psi2molpro[ Prob->gIrrep() ] );
+   delete [] psi2molpro;
+   
+   for (int ham_p=0; ham_p<L; ham_p++){
+      const int dmrg_p = (Prob->gReorderD2h())?Prob->gf1(ham_p):ham_p;
+      for (int ham_q=0; ham_q<=ham_p; ham_q++){ // p >= q
+         const int dmrg_q = (Prob->gReorderD2h())?Prob->gf1(ham_q):ham_q;
+         const int irrep_pq = Irreps::directProd( Prob->gIrrep(dmrg_p), Prob->gIrrep(dmrg_q) );
+         for (int ham_r=0; ham_r<=ham_p; ham_r++){ // p >= r
+            const int dmrg_r = (Prob->gReorderD2h())?Prob->gf1(ham_r):ham_r;
+            for (int ham_s=0; ham_s<=ham_p; ham_s++){ // p >= s
+               const int dmrg_s = (Prob->gReorderD2h())?Prob->gf1(ham_s):ham_s;
+               const int irrep_rs = Irreps::directProd( Prob->gIrrep(dmrg_r), Prob->gIrrep(dmrg_s) );
+               if ( irrep_pq == irrep_rs ){
+                  const int num_equal = (( ham_q == ham_p ) ? 1 : 0 )
+                                      + (( ham_r == ham_p ) ? 1 : 0 )
+                                      + (( ham_s == ham_p ) ? 1 : 0 );
+                  /*   1. p > q,r,s
+                       2. p==q > r,s
+                       3. p==r > q,s
+                       4. p==s > q,r
+                       5. p==q==r > s
+                       6. p==q==s > r
+                       7. p==r==s > q
+                       8. p==r==s==q                  
+                  While 2-4 are inequivalent ( num_equal == 1 ), 5-7 are equivalent ( num_equal == 2 ). Hence:  */
+                  if ( ( num_equal != 2 ) || ( ham_p > ham_s ) ){
+                     const double value = getTwoDMA_DMRG(dmrg_p, dmrg_r, dmrg_q, dmrg_s);
+                     fprintf( capturing, " % 23.16E %3d %3d %3d %3d\n", value, ham_p+1, ham_q+1, ham_r+1, ham_s+1 );
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+   // 1-RDM in Hamiltonian indices with p >= q
+   const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
+   for (int ham_p=0; ham_p<L; ham_p++){
+      const int dmrg_p = (Prob->gReorderD2h())?Prob->gf1(ham_p):ham_p;
+      for (int ham_q=0; ham_q<=ham_p; ham_q++){
+         const int dmrg_q = (Prob->gReorderD2h())?Prob->gf1(ham_q):ham_q;
+         if ( Prob->gIrrep(dmrg_p) == Prob->gIrrep(dmrg_q) ){
+            double value = 0.0;
+            for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( dmrg_p, orbsum, dmrg_q, orbsum ); }
+            value *= prefactor;
+            fprintf( capturing, " % 23.16E %3d %3d %3d %3d\n", value, ham_p+1, ham_q+1, 0, 0 );
+         }
+      }
+   }
+   
+   // 0-RDM == Norm of the wavefunction?
+   fprintf( capturing, " % 23.16E %3d %3d %3d %3d", 1.0, 0, 0, 0, 0 );
+   fclose( capturing );
+   cout << "Created the file " << filename << "." << endl;
 
 }
 

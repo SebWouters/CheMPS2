@@ -111,6 +111,10 @@ namespace CheMPS2{
          //! Load the TwoDMs from disk
          void read();
          
+         //! Write the 2-RDM-A to a file
+         /** param filename where to write the 2-RDM-A elements to */
+         void write2DMAfile(const string filename) const;
+         
          //! Add the 2-RDM elements of all MPI processes
          void mpi_allreduce();
          
