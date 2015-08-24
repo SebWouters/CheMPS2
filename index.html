@@ -56,6 +56,7 @@
 <p>In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods, when the active space sizes become prohibitively expensive for FCI. The corresponding methods are called DMRG-CI and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active space sizes, it allows to obtain FCI energies for small systems such as dimers, while for larger systems it is ideal to treat the static/strong correlation in a large active space.</p>
 <p>The design philosophy for CheMPS2 is to be a lightweight, efficient, and stable library. For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.</p>
 <p>In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
+<p>CheMPS2 is parallelized for shared memory architectures with OpenMP and for distributed memory architectures with MPI. A hybrid combination of both parallelization strategies is supported. In the future, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.</p>
 <p>CheMPS2 is distributed under the GNU General Public License version 2, and can be downloaded from <a class="reference external" href="https://github.com/sebwouters/chemps2">https://github.com/sebwouters/chemps2</a>.</p>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
@@ -64,12 +65,11 @@
 <li class="toctree-l1"><a class="reference internal" href="sourcecode.html">1. Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sourcecode.html#dependencies">1.1. Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sourcecode.html#download">1.2. Download</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-libchemps2">1.3. Build libchemps2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-the-chemps2-library-and-binary">1.3. Build the chemps2 library and binary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-libchemps2">1.4. Test libchemps2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-pychemps2">1.5. Build PyCheMPS2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-pychemps2">1.6. Test PyCheMPS2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#doxygen">1.7. Doxygen</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#sphinx-user-manual">1.8. Sphinx user manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-the-chemps2-binary">1.5. Test the chemps2 binary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#build-pychemps2">1.6. Build PyCheMPS2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sourcecode.html#test-pychemps2">1.7. Test PyCheMPS2</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="publications.html">2. Publications</a></li>

@@ -16,5 +16,8 @@ var classCheMPS2_1_1Problem =
     [ "gSy", "classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f", null ],
     [ "gTwoS", "classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49", null ],
     [ "setMxElement", "classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14", null ],
+    [ "setup_reorder_custom", "classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc", null ],
+    [ "setup_reorder_dinfh", "classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59", null ],
+    [ "SetupReorderC2v", "classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873", null ],
     [ "SetupReorderD2h", "classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9", null ]
 ];

@@ -61,7 +61,7 @@
 <p>The block-sparsity and information compression due to the exploitation of symmetry have not been taken into account in these scalings! Ref. <a class="reference internal" href="#timing" id="id1">[TIMING]</a> contains CPU time measurements for polyenes of increasing length, and demonstrates the scaling of CheMPS2 with <span class="math">\(L\)</span>.</p>
 <div class="section" id="n2-cc-pvdz">
 <h2>7.1. N2/cc-pVDZ<a class="headerlink" href="#n2-cc-pvdz" title="Permalink to this headline">¶</a></h2>
-<p>The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{d2h}\)</span>, and the targeted state was <span class="math">\(X^1\Sigma_g^+\)</span> at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. <a class="reference internal" href="#nitrogen" id="id2">[NITROGEN]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores &#64; 2.6 GHz. The calculation was performed on a single node, and needed ~ 6 Gb of memory.</p>
+<p>The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{d2h}\)</span>, and the targeted state was <span class="math">\(X^1\Sigma_g^+\)</span> at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. <a class="reference internal" href="#nitrogen" id="id2">[NITROGEN]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores &#64; 2.6 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 6 Gb of memory.</p>
 <blockquote>
 <div><table border="1" class="docutils">
 <colgroup>
@@ -79,24 +79,24 @@
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>1000</td>
-<td>117</td>
-<td>9.9532e-07</td>
-<td>-109.28209681</td>
+<td>48</td>
+<td>9.8027e-07</td>
+<td>-109.28209711</td>
 </tr>
 <tr class="row-odd"><td>1500</td>
-<td>279</td>
-<td>3.7204e-07</td>
-<td>-109.28214478</td>
+<td>113</td>
+<td>3.9381e-07</td>
+<td>-109.28214593</td>
 </tr>
 <tr class="row-even"><td>2000</td>
-<td>529</td>
-<td>1.7795e-07</td>
-<td>-109.28216006</td>
+<td>219</td>
+<td>1.8910e-07</td>
+<td>-109.28216077</td>
 </tr>
 <tr class="row-odd"><td>2500</td>
-<td>1339</td>
-<td>9.6998e-08</td>
-<td>-109.28216623</td>
+<td>371</td>
+<td>1.0083e-07</td>
+<td>-109.28216667</td>
 </tr>
 </tbody>
 </table>
@@ -104,7 +104,7 @@
 </div>
 <div class="section" id="h2o-roos-ano-dz">
 <h2>7.2. H2O/Roos&#8217; ANO DZ<a class="headerlink" href="#h2o-roos-ano-dz" title="Permalink to this headline">¶</a></h2>
-<p>Water in Roos&#8217; ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{c2v}\)</span>, and the targeted state was <span class="math">\(^1A_1\)</span> at equilibrium geometry: O &#64; (0, 0, 0) and H &#64; (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. <a class="reference internal" href="#water" id="id3">[WATER]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores &#64; 2.5 GHz. The calculation was performed on a single node, and needed ~ 64 Gb of memory.</p>
+<p>Water in Roos&#8217; ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{c2v}\)</span>, and the targeted state was <span class="math">\(^1A_1\)</span> at equilibrium geometry: O &#64; (0, 0, 0) and H &#64; (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. <a class="reference internal" href="#water" id="id3">[WATER]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores &#64; 2.5 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 64 Gb of memory.</p>
 <blockquote>
 <div><table border="1" class="docutils">
 <colgroup>
@@ -122,24 +122,24 @@
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>1000</td>
-<td>820</td>
-<td>8.6093e-08</td>
-<td>-76.31468322</td>
+<td>401</td>
+<td>8.7950e-08</td>
+<td>-76.31468302</td>
 </tr>
 <tr class="row-odd"><td>2000</td>
-<td>4304</td>
-<td>1.1262e-08</td>
-<td>-76.31471043</td>
+<td>2111</td>
+<td>1.1366e-08</td>
+<td>-76.31471044</td>
 </tr>
 <tr class="row-even"><td>3000</td>
-<td>11872</td>
-<td>2.8027e-09</td>
-<td>-76.31471338</td>
+<td>5686</td>
+<td>2.9114e-09</td>
+<td>-76.31471342</td>
 </tr>
 <tr class="row-odd"><td>4000</td>
-<td>23915</td>
-<td>6.9927e-10</td>
-<td>-76.31471401</td>
+<td>10958</td>
+<td>6.8011e-10</td>
+<td>-76.31471402</td>
 </tr>
 </tbody>
 </table>

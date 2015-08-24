@@ -16,5 +16,6 @@ var classCheMPS2_1_1Hamiltonian =
     [ "save", "classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074", null ],
     [ "setEconst", "classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5", null ],
     [ "setTmat", "classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32", null ],
-    [ "setVmat", "classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1", null ]
+    [ "setVmat", "classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1", null ],
+    [ "writeFCIDUMP", "classCheMPS2_1_1Hamiltonian.html#af5d7ab013d03c1f6e76e3885a1775df3", null ]
 ];

@@ -8,5 +8,6 @@ var classCheMPS2_1_1Irreps =
     [ "getIrrepName", "classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4", null ],
     [ "getIsActivated", "classCheMPS2_1_1Irreps.html#a4417e98f495d58ac530c73366667e1ae", null ],
     [ "getNumberOfIrreps", "classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d", null ],
-    [ "setGroup", "classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c", null ]
+    [ "setGroup", "classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c", null ],
+    [ "symm_psi2molpro", "classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67", null ]
 ];

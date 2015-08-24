@@ -10,6 +10,8 @@ var classCheMPS2_1_1TwoDM =
     [ "getTwoDMB_DMRG", "classCheMPS2_1_1TwoDM.html#ad7615a0d2458408de29de4b8b88868f1", null ],
     [ "getTwoDMB_HAM", "classCheMPS2_1_1TwoDM.html#adbf8c64ef9c9f687c51fded841961e88", null ],
     [ "mpi_allreduce", "classCheMPS2_1_1TwoDM.html#a520ebec8dd2e56a475105e651a98fec3", null ],
+    [ "printNOON", "classCheMPS2_1_1TwoDM.html#ac2fc3b7337fcbfa98294e9975b3a68c1", null ],
     [ "read", "classCheMPS2_1_1TwoDM.html#a371ffeddaa5c310b32449fed92071ac3", null ],
-    [ "save", "classCheMPS2_1_1TwoDM.html#a46d24ed5f6ce42c1453475d77c60e143", null ]
+    [ "save", "classCheMPS2_1_1TwoDM.html#a46d24ed5f6ce42c1453475d77c60e143", null ],
+    [ "write2DMAfile", "classCheMPS2_1_1TwoDM.html#a6f92c64ecb8fb2bcd72c4d9addd98d3b", null ]
 ];

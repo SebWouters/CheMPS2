@@ -218,6 +218,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:acc6050a0690e8e940f9de7cf312bbac4 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4">getIrrepName</a> (const int irrepNumber) const </td></tr>
 <tr class="memdesc:acc6050a0690e8e940f9de7cf312bbac4 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is always the trivial irrep.  <a href="#acc6050a0690e8e940f9de7cf312bbac4">More...</a><br/></td></tr>
 <tr class="separator:acc6050a0690e8e940f9de7cf312bbac4 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78b964944caac0cf835e42a428cfef67 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67">symm_psi2molpro</a> (int *psi2molpro) const </td></tr>
+<tr class="memdesc:a78b964944caac0cf835e42a428cfef67 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group.  <a href="#a78b964944caac0cf835e42a428cfef67">More...</a><br/></td></tr>
+<tr class="separator:a78b964944caac0cf835e42a428cfef67 inherit pub_methods_classCheMPS2_1_1Irreps"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -231,6 +234,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a1d86c7a8b3c3a7b9215c0e298f0ae047 inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">directProd</a> (const int Irrep1, const int Irrep2)</td></tr>
 <tr class="memdesc:a1d86c7a8b3c3a7b9215c0e298f0ae047 inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4's conventions.  <a href="#a1d86c7a8b3c3a7b9215c0e298f0ae047">More...</a><br/></td></tr>
 <tr class="separator:a1d86c7a8b3c3a7b9215c0e298f0ae047 inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfe240ed34c83d42cd263eec6365e08d inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#acfe240ed34c83d42cd263eec6365e08d">symm_psi2molpro</a> (int *psi2molpro, const string SymmLabel)</td></tr>
+<tr class="memdesc:acfe240ed34c83d42cd263eec6365e08d inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the array psi2molpro with the irrep conventions of molpro for the group with symmetry label SymmLabel.  <a href="#acfe240ed34c83d42cd263eec6365e08d">More...</a><br/></td></tr>
+<tr class="separator:acfe240ed34c83d42cd263eec6365e08d inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd70b3b21e33a3f8163db04a768ef848 inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd70b3b21e33a3f8163db04a768ef848"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848">printAll</a> ()</td></tr>
 <tr class="memdesc:afd70b3b21e33a3f8163db04a768ef848 inherit pub_static_methods_classCheMPS2_1_1Irreps"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print all info contained in this class. <br/></td></tr>
@@ -543,7 +549,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The max. virtual dimension at iBound </dd></dl>
 
-<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00273">273</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
+<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00245">245</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -688,7 +694,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total reduced virtual dimension at iBound </dd></dl>
 
-<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00288">288</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
+<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00260">260</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
 
 </div>
 </div>
@@ -837,7 +843,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <p>Get whether the desired symmetry sector is possible. </p>
 <dl class="section return"><dt>Returns</dt><dd>The virtual dimension (reduced) </dd></dl>
 
-<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00328">328</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
+<p>Definition at line <a class="el" href="SyBookkeeper_8cpp_source.html#l00300">300</a> of file <a class="el" href="SyBookkeeper_8cpp_source.html">SyBookkeeper.cpp</a>.</p>
 
 <p><div id="dynsection-13" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-13-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -920,7 +926,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a></li>
-    <li class="footer">Generated on Fri May 29 2015 20:43:20 for CheMPS2 by
+    <li class="footer">Generated on Sun Aug 23 2015 22:28:17 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

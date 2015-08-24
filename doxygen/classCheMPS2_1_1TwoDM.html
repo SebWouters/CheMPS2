@@ -143,6 +143,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:a1e1714c5e2d9cd7bf756ea9263f4711d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a1e1714c5e2d9cd7bf756ea9263f4711d">calcEnergy</a> ()</td></tr>
 <tr class="memdesc:a1e1714c5e2d9cd7bf756ea9263f4711d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the energy based on the 2DM-A.  <a href="#a1e1714c5e2d9cd7bf756ea9263f4711d">More...</a><br/></td></tr>
 <tr class="separator:a1e1714c5e2d9cd7bf756ea9263f4711d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2fc3b7337fcbfa98294e9975b3a68c1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac2fc3b7337fcbfa98294e9975b3a68c1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#ac2fc3b7337fcbfa98294e9975b3a68c1">printNOON</a> () const </td></tr>
+<tr class="memdesc:ac2fc3b7337fcbfa98294e9975b3a68c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the natural orbital occupation numbers. <br/></td></tr>
+<tr class="separator:ac2fc3b7337fcbfa98294e9975b3a68c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46d24ed5f6ce42c1453475d77c60e143"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46d24ed5f6ce42c1453475d77c60e143"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a46d24ed5f6ce42c1453475d77c60e143">save</a> ()</td></tr>
 <tr class="memdesc:a46d24ed5f6ce42c1453475d77c60e143"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the TwoDMs to disk. <br/></td></tr>
@@ -151,6 +155,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a371ffeddaa5c310b32449fed92071ac3">read</a> ()</td></tr>
 <tr class="memdesc:a371ffeddaa5c310b32449fed92071ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load the TwoDMs from disk. <br/></td></tr>
 <tr class="separator:a371ffeddaa5c310b32449fed92071ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f92c64ecb8fb2bcd72c4d9addd98d3b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a6f92c64ecb8fb2bcd72c4d9addd98d3b">write2DMAfile</a> (const string filename) const </td></tr>
+<tr class="memdesc:a6f92c64ecb8fb2bcd72c4d9addd98d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the 2-RDM-A to a file.  <a href="#a6f92c64ecb8fb2bcd72c4d9addd98d3b">More...</a><br/></td></tr>
+<tr class="separator:a6f92c64ecb8fb2bcd72c4d9addd98d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a520ebec8dd2e56a475105e651a98fec3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a520ebec8dd2e56a475105e651a98fec3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1TwoDM.html#a520ebec8dd2e56a475105e651a98fec3">mpi_allreduce</a> ()</td></tr>
 <tr class="memdesc:a520ebec8dd2e56a475105e651a98fec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the 2-RDM elements of all MPI processes. <br/></td></tr>
@@ -202,7 +209,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00031">31</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00036">36</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -234,7 +241,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <p>Calculate the energy based on the 2DM-A. </p>
 <dl class="section return"><dt>Returns</dt><dd>The energy calculated as 0.5*trace(2DM-A * Ham) </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00166">166</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00171">171</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -265,7 +272,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <p>Return the double trace of 2DM-A (should be N(N-1)) </p>
 <dl class="section return"><dt>Returns</dt><dd>Double trace of 2DM-A </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00154">154</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00159">159</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -341,7 +348,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00206">206</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00327">327</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -415,7 +422,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00104">104</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00109">109</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -478,7 +485,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00134">134</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00139">139</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -541,7 +548,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00119">119</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00124">124</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
 
 <p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -604,7 +611,39 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the desired value </dd></dl>
 
-<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00144">144</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00149">149</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6f92c64ecb8fb2bcd72c4d9addd98d3b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::TwoDM::write2DMAfile </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write the 2-RDM-A to a file. </p>
+<p>param filename where to write the 2-RDM-A elements to </p>
+
+<p>Definition at line <a class="el" href="TwoDM_8cpp_source.html#l00247">247</a> of file <a class="el" href="TwoDM_8cpp_source.html">TwoDM.cpp</a>.</p>
+
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1TwoDM_a6f92c64ecb8fb2bcd72c4d9addd98d3b_cgraph.png" border="0" usemap="#classCheMPS2_1_1TwoDM_a6f92c64ecb8fb2bcd72c4d9addd98d3b_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1TwoDM_a6f92c64ecb8fb2bcd72c4d9addd98d3b_cgraph" id="classCheMPS2_1_1TwoDM_a6f92c64ecb8fb2bcd72c4d9addd98d3b_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="281,5,471,32"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -618,7 +657,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1TwoDM.html">TwoDM</a></li>
-    <li class="footer">Generated on Fri May 29 2015 20:43:20 for CheMPS2 by
+    <li class="footer">Generated on Sun Aug 23 2015 22:28:17 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>

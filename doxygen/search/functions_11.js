@@ -25,6 +25,9 @@ var searchData=
   ['setstoreunitary',['setStoreUnitary',['../classCheMPS2_1_1DMRGSCFoptions.html#a6062c3bdb369f528e5420fb10ae7f5b4',1,'CheMPS2::DMRGSCFoptions']]],
   ['settmat',['setTmat',['../classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32',1,'CheMPS2::Hamiltonian']]],
   ['setunitarystoragename',['setUnitaryStorageName',['../classCheMPS2_1_1DMRGSCFoptions.html#a86a90bfdd622b92e8c0471f0922676fa',1,'CheMPS2::DMRGSCFoptions']]],
+  ['setup_5freorder_5fcustom',['setup_reorder_custom',['../classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc',1,'CheMPS2::Problem']]],
+  ['setup_5freorder_5fdinfh',['setup_reorder_dinfh',['../classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59',1,'CheMPS2::Problem']]],
+  ['setupreorderc2v',['SetupReorderC2v',['../classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873',1,'CheMPS2::Problem']]],
   ['setupreorderd2h',['SetupReorderD2h',['../classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9',1,'CheMPS2::Problem']]],
   ['setupstart',['setupStart',['../classCheMPS2_1_1CASSCF.html#a701bdaa40881168d6b386683eaa01cea',1,'CheMPS2::CASSCF']]],
   ['setvmat',['setVmat',['../classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1',1,'CheMPS2::Hamiltonian']]],
@@ -37,5 +40,6 @@ var searchData=
   ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
   ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e',1,'CheMPS2::FCI']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],
-  ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]]
+  ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]],
+  ['symm_5fpsi2molpro',['symm_psi2molpro',['../classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67',1,'CheMPS2::Irreps::symm_psi2molpro(int *psi2molpro) const '],['../classCheMPS2_1_1Irreps.html#acfe240ed34c83d42cd263eec6365e08d',1,'CheMPS2::Irreps::symm_psi2molpro(int *psi2molpro, const string SymmLabel)']]]
 ];
