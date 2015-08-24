@@ -18,6 +18,7 @@
 */
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <math.h>
 #include <string.h>
@@ -133,15 +134,15 @@ int main(int argc, char **argv){
                   "\n"
                   "    -f, --fcidump=filename         Set the fcidump filename.\n"
                   "    -g, --group=[0-7]              Set the psi4 symmetry group number which corresponds to the fcidump file.\n"
-                  "    -m, --multiplicity=[2S+1]      Set the spin multiplicity of the targeted wavefunction.\n"
-                  "    -n, --nelectrons=[N]           Set the number of electrons of the targeted wavefunction.\n"
-                  "    -i, --irrep=[0-7]              Set the irrep of the targeted wavefunction.\n"
+                  "    -m, --multiplicity=[2S+1]      Overwrite the spin multiplicity of the fcidump file.\n"
+                  "    -n, --nelectrons=[N]           Overwrite the number of electrons of the fcidump file.\n"
+                  "    -i, --irrep=[0-7]              Overwrite the target wavefunction irrep of the fcidump file.\n"
                   "    -D, --sweep_d=D1,D2,D3         Set the bond dimensions for the successive sweep instructions (positive integer).\n"
                   "    -E, --sweep_econv=E1,E2,E3     Set the energy convergence to stop a sweep instruction (positive float).\n"
                   "    -M, --sweep_maxit=M1,M2,M3     Set the maximum number of sweeps for a sweep instruction (positive integer).\n"
                   "    -N, --sweep_noise=N1,N2,N3     Set the noise prefactor for the successive sweep instructions (float).\n"
                   "    -e, --excitation=[E>=1]        Set which excitation should be calculated. If not set, the ground state is calculated.\n"
-                  "    -o, --twodmfile=filename       Set the filename to dump the 2-RDM.\n"
+                  "    -o, --twodmfile=filename       Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.\n"
                   "    -c, --checkpoint               Read and create MPS checkpoints.\n"
                   "    -p, --print_corr               Print correlation functions.\n"
                   "    -t, --tmpfolder=path           Overwrite the tmp folder for the renormalized operators (default " << CheMPS2::defaultTMPpath << ").\n"
@@ -239,9 +240,9 @@ int main(int argc, char **argv){
       }
    }
    
-   /**********************************
-   *  Checking argument consistency  *
-   **********************************/
+   /*******************************************
+   *  Checking argument consistency (part 1)  *
+   *******************************************/
    
    if ( fcidump.length()==0 ){
       if ( output ){ cerr << "The fcidump file should be specified!" << endl; }
@@ -251,18 +252,57 @@ int main(int argc, char **argv){
       if ( output ){ cerr << "The group number should be specified!" << endl; }
       return -1;
    }
-   if ( multiplicity == -1 ){
-      if ( output ){ cerr << "The multiplicity should be specified!" << endl; }
-      return -1;
+   
+   /******************************************
+   *  Fetching unset arguments from FCIDUMP  *
+   ******************************************/
+   
+   int fcidump_norb  = -1;
+   int fcidump_nelec = -1;
+   int fcidump_two_s = -1;
+   int fcidump_irrep = -1;
+   {
+      ifstream thefcidump( fcidump.c_str() );
+      string line;
+      int pos, pos2;
+      getline( thefcidump, line ); // &FCI NORB= X,NELEC= Y,MS2= Z,
+      pos = line.find( "FCI" );
+      if ( pos == string::npos ){
+         if ( output ){ cerr << "The file " << fcidump << " is not a fcidump file!" << endl; }
+         return -1;
+      }
+      pos = line.find( "NORB"  ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
+      fcidump_norb = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
+      pos = line.find( "NELEC" ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
+      fcidump_nelec = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
+      pos = line.find( "MS2"   ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
+      fcidump_two_s = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
+      do { getline( thefcidump, line ); } while ( line.find( "ISYM" ) == string::npos );
+      pos = line.find( "ISYM"  ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
+      const int molpro_wfn_irrep = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
+      thefcidump.close();
+      
+      CheMPS2::Irreps Symmhelper(group);
+      const int nIrreps = Symmhelper.getNumberOfIrreps();
+      int * psi2molpro = new int[ nIrreps ];
+      Symmhelper.symm_psi2molpro( psi2molpro );
+      for ( int irrep = 0; irrep < nIrreps; irrep++ ){
+         if ( molpro_wfn_irrep == psi2molpro[ irrep ] ){ fcidump_irrep = irrep; }
+      }
+      if ( fcidump_irrep == -1 ){
+         if ( output ){ cerr << "Could not find the molpro wavefunction symmetry (ISYM) in the fcidump file!" << endl; }
+         return -1;
+      }
+      delete [] psi2molpro;
    }
-   if ( nelectrons == -1 ){
-      if ( output ){ cerr << "The number of electrons should be specified!" << endl; }
-      return -1;
-   }
-   if ( irrep == -1 ){
-      if ( output ){ cerr << "The irrep should be specified!" << endl; }
-      return -1;
-   }
+   if ( multiplicity == -1 ){ multiplicity = fcidump_two_s + 1; }
+   if ( nelectrons   == -1 ){   nelectrons = fcidump_nelec;     }
+   if ( irrep        == -1 ){        irrep = fcidump_irrep;     }
+   
+   /*******************************************
+   *  Checking argument consistency (part 2)  *
+   *******************************************/
+   
    if (( sweep_d.length() == 0 ) || ( sweep_econv.length() == 0 ) || ( sweep_maxit.length() == 0 ) || ( sweep_noise.length() == 0 )){
       if ( output ){ cerr << "All sweep instructions should be specified!" << endl; }
       return -1;
@@ -290,6 +330,22 @@ int main(int argc, char **argv){
       ni_reo = count( reorder.begin(), reorder.end(), ',') + 1;
       val_reorder = new int[ ni_reo ];
       fetch_ints( reorder, val_reorder, ni_reo );
+      if ( fcidump_norb != ni_reo ){
+         if ( output ){ cerr << "The orbital reordering should contain as many elements as there are orbitals in the fcidump!" << endl; }
+         return -1;
+      }
+      int * doublecheck = new int[ ni_reo ];
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ doublecheck[ cnt ] = 0; }
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){
+         if (( val_reorder[ cnt ] >= 0 ) && ( val_reorder[ cnt ] < ni_reo )){ doublecheck[ val_reorder[ cnt ] ] += 1; }
+      }
+      bool is_ok = true;
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ if ( doublecheck[ cnt ] != 1 ){ is_ok = false; } }
+      delete [] doublecheck;
+      if ( is_ok == false ){
+         if ( output ){ cerr << "The orbital reordering should have all orbitals from 0 to " << fcidump_norb - 1 << " exactly once!" << endl; }
+         return -1;
+      }
    }
    
    if ( output ){
@@ -313,21 +369,6 @@ int main(int argc, char **argv){
       cout << " " << endl;
    }
    
-   if ( ni_reo > 0 ){
-      int * doublecheck = new int[ ni_reo ];
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ doublecheck[ cnt ] = 0; }
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){
-         if (( val_reorder[ cnt ] >= 0 ) && ( val_reorder[ cnt ] < ni_reo )){ doublecheck[ val_reorder[ cnt ] ] += 1; }
-      }
-      bool is_ok = true;
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ if ( doublecheck[ cnt ] != 1 ){ is_ok = false; } }
-      delete [] doublecheck;
-      if ( is_ok == false ){
-         if ( output ){ cerr << "The orbital reordering should have all orbitals from 0 to len(reorder)-1 exactly once!" << endl; }
-         return -1;
-      }
-   }
-   
    /********************************
    *  Running the DMRG calculation *
    ********************************/
@@ -337,10 +378,6 @@ int main(int argc, char **argv){
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( fcidump, group );
    CheMPS2::Problem * Prob = new CheMPS2::Problem( Ham, multiplicity-1, nelectrons, irrep );
    if ( ni_reo > 0 ){
-      if ( Ham->getL() != ni_reo ){
-         if ( output ){ cerr << "The orbital reordering should contain as many elements as there are orbitals in the fcidump!" << endl; }
-         return -1;
-      }
       Prob->setup_reorder_custom( val_reorder );
       delete [] val_reorder;
    }

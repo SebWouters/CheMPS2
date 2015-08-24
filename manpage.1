@@ -52,17 +52,17 @@ Set the psi4 symmetry group number which corresponds to the fcidump file.
 .PP
 .B -m, --multiplicity=[2S+1]
 .RS
-Set the spin multiplicity of the targeted wavefunction.
+Overwrite the spin multiplicity of the fcidump file.
 .RE
 .PP
 .B -n, --nelectrons=[N]
 .RS
-Set the number of electrons of the targeted wavefunction.
+Overwrite the number of electrons of the fcidump file.
 .RE
 .PP
 .B -i, --irrep=[0-7]
 .RS
-Set the irrep of the targeted wavefunction.
+Overwrite the target wavefunction irrep of the fcidump file.
 .RE
 .PP
 .B -D, --sweep_d=D1,D2,D3
@@ -92,7 +92,7 @@ Set which excitation should be calculated. If not set, the ground state is calcu
 .PP
 .B -o, --twodmfile=filename
 .RS
-Set the filename to dump the 2-RDM.
+Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.
 .RE
 .PP
 .B -c, --checkpoint

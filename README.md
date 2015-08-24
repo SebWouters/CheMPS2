@@ -255,9 +255,6 @@ To test the chemps2 binary for compilation **without MPI**, run:
     > ./chemps2 --help
     > ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \
                 --group=5 \
-                --multiplicity=1 \
-                --nelectrons=10 \
-                --irrep=0 \
                 --sweep_d=200,1000 \
                 --sweep_econv=1e-8,1e-8 \
                 --sweep_maxit=2,10 \
