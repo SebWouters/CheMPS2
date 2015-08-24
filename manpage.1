@@ -1,0 +1,163 @@
+.\" Manpage for chemps2 binary
+.\" Contact sebastianwouters [at] gmail.com
+.TH CHEMPS2 1 "24 August 2015" "version 1.5" "chemps2 v1.5"
+
+.SH NAME
+chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
+
+.SH SYNOPSIS
+.B chemps2
+.RI "[" "OPTION" "]"
+.RI "..."
+.br
+
+.SH DESCRIPTION
+Perform spin-adapted DMRG calculations for ab initio quantum chemistry fcidump files.
+
+.SH SYMMETRY
+.PP
+Conventions for the symmetry group and irrep numbers (same as psi4):
+.PP
+                 |  0    1    2    3    4    5    6    7   
+.br
+        ---------|-----------------------------------------
+.br
+        0 : c1   |  A                                      
+.br
+        1 : ci   |  Ag   Au                                
+.br
+        2 : c2   |  A    B                                 
+.br
+        3 : cs   |  Ap   App                               
+.br
+        4 : d2   |  A    B1   B2   B3                      
+.br
+        5 : c2v  |  A1   A2   B1   B2                      
+.br
+        6 : c2h  |  Ag   Bg   Au   Bu                      
+.br
+        7 : d2h  |  Ag   B1g  B2g  B3g  Au   B1u  B2u  B3u 
+
+.SH OPTIONS
+.PP
+.B -f, --fcidump=filename
+.RS
+Set the fcidump filename.
+.RE
+.PP
+.B -g, --group=[0-7]
+.RS
+Set the psi4 symmetry group number which corresponds to the fcidump file.
+.RE
+.PP
+.B -m, --multiplicity=[2S+1]
+.RS
+Set the spin multiplicity of the targeted wavefunction.
+.RE
+.PP
+.B -n, --nelectrons=[N]
+.RS
+Set the number of electrons of the targeted wavefunction.
+.RE
+.PP
+.B -i, --irrep=[0-7]
+.RS
+Set the irrep of the targeted wavefunction.
+.RE
+.PP
+.B -D, --sweep_d=D1,D2,D3
+.RS
+Set the bond dimensions for the successive sweep instructions (positive integer).
+.RE
+.PP
+.B -E, --sweep_econv=E1,E2,E3
+.RS
+Set the energy convergence to stop a sweep instruction (positive float).
+.RE
+.PP
+.B -M, --sweep_maxit=M1,M2,M3
+.RS
+Set the maximum number of sweeps for a sweep instruction (positive integer).
+.RE
+.PP
+.B -N, --sweep_noise=N1,N2,N3
+.RS
+Set the noise prefactor for the successive sweep instructions (float).
+.RE
+.PP
+.B -e, --excitation=[E>=1]
+.RS
+Set which excitation should be calculated. If not set, the ground state is calculated.
+.RE
+.PP
+.B -o, --twodmfile=filename
+.RS
+Set the filename to dump the 2-RDM.
+.RE
+.PP
+.B -c, --checkpoint
+.RS
+Read and create MPS checkpoints.
+.RE
+.PP
+.B -p, --print_corr
+.RS
+Print correlation functions.
+.RE
+.PP
+.B -t, --tmpfolder=path
+.RS
+Overwrite the tmp folder for the renormalized operators (default /tmp).
+.RE
+.PP
+.B -r, --reorder=R1,R2,R3
+.RS
+Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).
+.RE
+.PP
+.B -h, --help
+.RS
+Display this help.
+.RE
+
+.SH AUTHOR
+Written by Sebastian Wouters (sebastianwouters [at] gmail.com)
+
+.SH BUGS
+.PP
+Reporting bugs: https://github.com/sebwouters/CheMPS2/issues
+.br
+                sebastianwouters [at] gmail.com
+
+.SH SEE ALSO
+User manual: http://sebwouters.github.io/CheMPS2/index.html
+
+.SH COPYRIGHT
+.PP
+CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+.br
+Copyright (C) 2013-2015 Sebastian Wouters
+.PP
+This program is free software; you can redistribute it and/or modify
+.br
+it under the terms of the GNU General Public License as published by
+.br
+the Free Software Foundation; either version 2 of the License, or
+.br
+(at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+.br
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+.br
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.br
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along
+.br
+with this program; if not, write to the Free Software Foundation, Inc.,
+.br
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
