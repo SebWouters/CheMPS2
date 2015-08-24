@@ -67,7 +67,7 @@ CMake generates makefiles based on the user's specifications:
 #.  Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux. It is advised to use the intel compiler if available.
 #.  Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
 #.  /option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/option3/lib/x86_64-linux-gnu``, the headers in ``/option3/include/chemps2``, and the binary in ``/option3/bin/chemps2``.
-#.  Option4 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide ``mpi.h``. Option1 should then be the ``mpic++`` compiler; typically ``mpic++`` or ``mpiicpc`` on Linux. It is advised to use the intel compiler if available.
+#.  Option4 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide ``mpi.h``. Option1 should hence be the ``mpic++`` compiler; typically ``mpic++`` or ``mpiicpc`` on Linux. It is advised to use the intel compiler if available.
 
 If one or more of the required libraries are not found, use the command
 

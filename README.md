@@ -57,15 +57,21 @@ large active spaces, you are encouraged to read the
 
 Incorporation of the library into other codes is very simple due a
 minimal API, as well as a python interface. Direct usage of the
-library is illustrated in the [c++](#4-test-libchemps2) and
-[python](#6-test-pychemps2) tests, which can be easily adapted
-to your needs. The interfaces to [psi4](http://www.psicode.org)
+library is illustrated in
+
+* the [c++](#4-test-libchemps2) tests
+* the [python](#7-test-pychemps2) tests
+* the [binary](#5-test-the-chemps2-binary) example
+
+The interfaces to [psi4](http://www.psicode.org)
 and [pyscf](https://github.com/sunqm/pyscf) are described in the
 [user manual](http://sebwouters.github.io/CheMPS2/index.html).
 
-In the future, the parallelization of CheMPS2 for shared memory
-architectures will be extended to a hybrid scheme with both shared
-(OpenMP) and distributed (MPI) memory parallelization. In addition,
+CheMPS2 is parallelized for shared memory architectures with the Open
+Multi-Processing ([OpenMP](http://openmp.org/wp/)) API and for
+distributed memory architectures with the Message Passing Interface
+([MPI](http://www.mpi-forum.org/)). A hybrid combination of both
+parallelization strategies is supported. In the future,
 the calculation of the 2-RDM of the active space will be extended
 to the 3-RDM.
 
@@ -138,10 +144,10 @@ CheMPS2 can be built with [CMake](http://www.cmake.org/) and depends on
 -   HDF5 ([Hierarchical Data Format Release 5](http://www.hdfgroup.org/HDF5/))
 
 It is parallelized for shared memory architectures with the Open
-Multi-Processing ([OpenMP](http://openmp.org/wp/)) API. In the future,
-the parallelization of CheMPS2 for shared memory architectures will be
-extended to a hybrid scheme with both shared (OpenMP) and distributed
-(MPI) memory parallelization.
+Multi-Processing ([OpenMP](http://openmp.org/wp/)) API and for
+distributed memory architectures with the Message Passing Interface
+([MPI](http://www.mpi-forum.org/)). A hybrid combination of both
+parallelization strategies is supported.
 
 ### 2. Download
 
@@ -157,7 +163,7 @@ That way, future updates and bug fixes can be easily pulled in:
     > cd /sourcefolder/chemps2
     > git pull
 
-### 3. Build libchemps2
+### 3. Build the chemps2 library and binary
 
 The files
 
@@ -174,32 +180,37 @@ provide a minimal compilation. In your terminal, run:
 
 CMake generates makefiles based on the user’s specifications:
 
-    > CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
+    > CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=/option3 -DWITH_MPI=option4
 
 1.  Option1 is the `c++` compiler; typically `g++`, `icpc`, or `clang++`
-    on Linux.
+    on Linux. It is advised to use the intel compiler if available.
 2.  Option2 can be `ON` or `OFF` and is used to switch on the intel math
     kernel library.
-3.  Option3 is the prefix of the installation directory; typically
-    `/usr` or `/usr/local` on Linux. On my computer, libchemps2 is then
-    installed in `/prefix/lib/x86_64-linux-gnu` and the headers in
-    `/prefix/include/chemps2`.
-4.  Option4 can be `ON` or `OFF` and is used to switch on the
-    possibility to compile the doxygen documentation.
-5.  Option5 can be `ON` or `OFF` and is used to switch on the
-    possibility to compile the user manual with sphinx.
+3.  /option3 is the prefix of the installation directory; typically `/usr`
+    or `/usr/local` on Linux. On my computer, libchemps2 is then installed
+    in `/option3/lib/x86_64-linux-gnu`, the headers in
+    `/option3/include/chemps2`, and the binary in
+    `/option3/bin/chemps2`.
+4.  Option4 can be `ON` or `OFF` and is used to switch on the possibility
+    to compile with MPI. Please note that the compiler should then provide
+    `mpi.h`. Option1 should hence be the `mpic++` compiler; typically
+    `mpic++` or `mpiicpc` on Linux. It is advised to use the intel compiler
+    if available.
 
 If one or more of the required libraries are not found, use the command
 
-    > CMAKE_INCLUDE_PATH=option6 CMAKE_LIBRARY_PATH=option7 CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=option3 -DBUILD_DOXYGEN=option4 -DBUILD_SPHINX=option5
+    > CMAKE_INCLUDE_PATH=option5 CMAKE_LIBRARY_PATH=option6 CXX=option1 cmake .. -DMKL=option2 -DCMAKE_INSTALL_PREFIX=/option3 -DWITH_MPI=option4
 
-instead, where option6 and option7 are respectively the missing
+instead, where option5 and option6 are respectively the missing
 colon-separated include and library paths:
 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
     
-For debian/sid, the HDF5 headers are located in the folder `/usr/include/hdf5/serial`. If CMake complains about the HDF5 headers, try to pass it with the option `-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial`.
+For debian/sid, the HDF5 headers are located in the folder
+`/usr/include/hdf5/serial`. If CMake complains about the HDF5 headers,
+try to pass it with the option
+`-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial`.
 
 To compile, run:
 
@@ -214,16 +225,53 @@ library path to `LD_LIBRARY_PATH` in your `.bashrc`.
 
 ### 4. Test libchemps2
 
-To test libchemps2, run:
+To test libchemps2 for compilation **without MPI**, run:
 
     > cd /sourcefolder/chemps2/build
     > make test
 
-The tests only require a very limited amount of memory (order 10-120 MB).
+To test libchemps2 for compilation **with MPI**, run:
+    
+    > cd /sourcefolder/chemps2/build/tests
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test1
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test2
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test3
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test4
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test5
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test7
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test10
 
-### 5. Build PyCheMPS2
+`YYY` specifies the number of threads per process and `ZZZ` the number of
+processes. The tests only require a very limited amount of memory (order
+100 MB). Note that the tests are too small to see (near) linear scaling
+with the number of cores, although improvement should still be noticeable.
 
-PyCheMPS2, a python interface to libchemps2, can be built with
+### 5. Test the chemps2 binary
+
+To test the chemps2 binary for compilation **without MPI**, run:
+
+    > cd /sourcefolder/chemps2/build/CheMPS2
+    > ./chemps2 --help
+    > ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \
+                --group=5 \
+                --multiplicity=1 \
+                --nelectrons=10 \
+                --irrep=0 \
+                --sweep_d=200,1000 \
+                --sweep_econv=1e-8,1e-8 \
+                --sweep_maxit=2,10 \
+                --sweep_noise=0.05,0.0 \
+                --twodmfile=2dm.out \
+                --print_corr
+    
+To test the chemps2 binary for compilation **with MPI**, prepend the binary with:
+
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./chemps2 [OPTIONS]
+
+### 6. Build PyCheMPS2
+
+PyCheMPS2 is a python interface to libchemps2, for
+compilation **without MPI**. It can be built with
 [Cython](http://cython.org/). The installation is independent of
 CMake and assumes that you have installed the CheMPS2 library with
 `make install`. For non-standard installation directories of CheMPS2,
@@ -231,18 +279,23 @@ please remember to append the library path to `LD_LIBRARY_PATH` in
 your `.bashrc`. In addition, the include path should be appended
 to `CPATH`:
 
-    > export CPATH=${CPATH}:option3/include
-    
-where `option3` is the option provided to CMake with
-`-DCMAKE_INSTALL_PREFIX=option3` above. Then the python wrapper can
-be installed with:
+    > export CPATH=${CPATH}:/option3/include
+
+where `/option3` is the option provided to CMake with
+`-DCMAKE_INSTALL_PREFIX=/option3` above. For debian/sid, the HDF5
+headers are located in the folder `/usr/include/hdf5/serial`. If it
+was explicitly passed to CMake, it should also be appended to `CPATH`:
+
+    > export CPATH=${CPATH}:/option3/include:/usr/include/hdf5/serial
+
+The python wrapper can be installed with:
 
     > cd /sourcefolder/chemps2/PyCheMPS2
     > python setup.py build_ext -L ${LD_LIBRARY_PATH}
-    > python setup.py install --prefix=option3
+    > python setup.py install --prefix=/option3
 
 On my machine, the python wrapper is installed to the folder
-`option3/lib/python2.7/site-packages`, but the folder `lib` and
+`/option3/lib/python2.7/site-packages`, but the folder `lib` and
 the distribution of python can vary.
 
 Compilation of PyCheMPS2 occurs by linking to the `c++` library in the
@@ -252,13 +305,13 @@ CheMPS2, please remember to reinstall the `c++` library first, before
 reinstalling PyCheMPS2!
 
 
-### 6. Test PyCheMPS2
+### 7. Test PyCheMPS2
 
-To test PyCheMPS2 (remember that the python site-packages folder can vary),
-run:
+When libchemps2 has been compiled **without MPI**, PyCheMPS2 can be tested
+by running (remember that the python site-packages folder can vary):
 
     > cd /sourcefolder/chemps2/PyCheMPS2/tests
-    > export PYTHONPATH=${PYTHONPATH}:option3/lib/python2.7/site-packages
+    > export PYTHONPATH=${PYTHONPATH}:/option3/lib/python2.7/site-packages
     > python test1.py
     > python test2.py
     > python test3.py
@@ -270,8 +323,7 @@ run:
     > python test9.py
     > python test10.py
 
-If you compiled the `c++` library with `-DMKL=ON`, you might get the
-error
+If you compiled the `c++` library with `-DMKL=ON`, you might get the error
 
     Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 
@@ -284,30 +336,9 @@ order to preload libmkl\_rt.so. On my system, this is done with
 The python tests do exactly the same thing as the `c++` tests above, and
 illustrate the usage of the python interface to libchemps2. The tests
 should end with a line stating whether or not they succeeded. They only
-require a very limited amount of memory (order 10-120 MB).
-
-### 7. Doxygen
-
-To build the doxygen manual, the `BUILD_DOXYGEN` flag
-should have been on: `-DBUILD_DOXYGEN=ON`. In your terminal, run:
-
-    > cd /sourcefolder/chemps2/build
-    > make doc
-    > cd LaTeX-documents
-    > make
-    > evince refman.pdf &
-    > cd ../html
-    > firefox index.html &
-    
-### 8. Sphinx user manual
-
-To build the sphinx user manual, the `BUILD_SPHINX` flag
-should have been on: `-DBUILD_SPHINX=ON`. In your terminal, run:
-
-    > cd /sourcefolder/chemps2/build
-    > make sphinx
-    > cd sphinx/html
-    > firefox index.html &
+require a very limited amount of memory (order 100 MB). Note that the
+tests are too small to see (near) linear scaling with the number of cores,
+although improvement should still be noticeable.
 
 
 User manual
@@ -692,8 +723,8 @@ TwoDMstorage class.
 class.
 
 Please note that these files are documented with doxygen comments. The
-[installation section](#installation) discusses how a manual can be
-generated from these comments.
+[doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
+can be consulted online.
 
 
 List of files to perform test runs
@@ -794,5 +825,7 @@ contains the matrix elements for test8 and test9.
 [tests/test10.cpp.in](tests/test10.cpp.in)
 
 These test files illustrate how to use libchemps2. The tests only
-require a very limited amount of memory (order 10-120 MB).
+require a very limited amount of memory (order 100 MB). Note that the
+tests are too small to see (near) linear scaling with the number of cores,
+although improvement should still be noticeable.
 
