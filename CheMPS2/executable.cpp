@@ -30,6 +30,32 @@
 
 using namespace std;
 
+void fetch_ints( const string rawdata, int * result, const int num ){
+
+   int pos  = 0;
+   int pos2 = 0;
+   for ( int no = 0; no < num; no++ ){
+      pos2 = rawdata.find( ",", pos );
+      if ( pos2 == string::npos ){ pos2 = rawdata.length(); }
+      result[ no ] = atoi(rawdata.substr( pos, pos2-pos ).c_str());
+      pos = pos2 + 1;
+   }
+
+}
+
+void fetch_doubles( const string rawdata, double * result, const int num ){
+
+   int pos  = 0;
+   int pos2 = 0;
+   for ( int no = 0; no < num; no++ ){
+      pos2 = rawdata.find( ",", pos );
+      if ( pos2 == string::npos ){ pos2 = rawdata.length(); }
+      result[ no ] = atof(rawdata.substr( pos, pos2-pos ).c_str());
+      pos = pos2 + 1;
+   }
+
+}
+
 int main(int argc, char **argv){
 
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -57,6 +83,7 @@ int main(int argc, char **argv){
    bool checkpoint    = false;
    bool print_corr    = false;
    string tmpfolder   = CheMPS2::defaultTMPpath;
+   string reorder     = "";
 
    struct option long_options[] =
    {
@@ -74,13 +101,14 @@ int main(int argc, char **argv){
       {"checkpoint",   no_argument,       0, 'c'},
       {"print_corr",   no_argument,       0, 'p'},
       {"tmpfolder",    required_argument, 0, 't'},
+      {"reorder",      required_argument, 0, 'r'},
       {"help",         no_argument,       0, 'h'},
       {0, 0, 0, 0}
    };
 
    int option_index = 0;
    int c;
-   while((c = getopt_long(argc, argv, "hf:g:m:n:i:D:E:M:N:e:o:cpt:", long_options, &option_index)) != -1){
+   while((c = getopt_long(argc, argv, "hf:g:m:n:i:D:E:M:N:e:o:cpt:r:", long_options, &option_index)) != -1){
       switch(c){
          case 'h':
          case '?':
@@ -117,6 +145,7 @@ int main(int argc, char **argv){
                   "    -c, --checkpoint               Read and create MPS checkpoints.\n"
                   "    -p, --print_corr               Print correlation functions.\n"
                   "    -t, --tmpfolder=path           Overwrite the tmp folder for the renormalized operators (default " << CheMPS2::defaultTMPpath << ").\n"
+                  "    -r, --reorder=R1,R2,R3         Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).\n"
                   "    -h, --help                     Display this help.\n"
                   " " << endl;
             }
@@ -204,6 +233,9 @@ int main(int argc, char **argv){
                }
             }
             break;
+         case 'r':
+            reorder = optarg;
+            break;
       }
    }
    
@@ -247,58 +279,53 @@ int main(int argc, char **argv){
       return -1;
    }
    
-   int    * value_d     = new int[ni_d];
-   double * value_econv = new double[ni_d];
-   int    * value_maxit = new int[ni_d];
-   double * value_noise = new double[ni_d];
+   int    * value_d     = new int[ni_d];       fetch_ints( sweep_d,     value_d,     ni_d );
+   double * value_econv = new double[ni_d]; fetch_doubles( sweep_econv, value_econv, ni_d );
+   int    * value_maxit = new int[ni_d];       fetch_ints( sweep_maxit, value_maxit, ni_d );
+   double * value_noise = new double[ni_d]; fetch_doubles( sweep_noise, value_noise, ni_d );
    
-   int pos  = 0;
-   int pos2 = 0;
-   for ( int lineno = 0; lineno < ni_d; lineno++ ){
-      pos2 = sweep_d.find( ",", pos );
-      if (pos2 == string::npos){ pos2 = sweep_d.length(); }
-      value_d[ lineno ] = atoi(sweep_d.substr( pos, pos2-pos ).c_str());
-      pos = pos2 + 1;
-   }
-   pos = 0;
-   for ( int lineno = 0; lineno < ni_d; lineno++ ){
-      pos2 = sweep_econv.find( ",", pos );
-      if (pos2 == string::npos){ pos2 = sweep_econv.length(); }
-      value_econv[ lineno ] = atof(sweep_econv.substr( pos, pos2-pos ).c_str());
-      pos = pos2 + 1;
-   }
-   pos = 0;
-   for ( int lineno = 0; lineno < ni_d; lineno++ ){
-      pos2 = sweep_maxit.find( ",", pos );
-      if (pos2 == string::npos){ pos2 = sweep_maxit.length(); }
-      value_maxit[ lineno ] = atoi(sweep_maxit.substr( pos, pos2-pos ).c_str());
-      pos = pos2 + 1;
-   }
-   pos = 0;
-   for ( int lineno = 0; lineno < ni_d; lineno++ ){
-      pos2 = sweep_noise.find( ",", pos );
-      if (pos2 == string::npos){ pos2 = sweep_noise.length(); }
-      value_noise[ lineno ] = atof(sweep_noise.substr( pos, pos2-pos ).c_str());
-      pos = pos2 + 1;
+   int * val_reorder = NULL;
+   int ni_reo = -1;
+   if ( reorder.length() > 0 ){
+      ni_reo = count( reorder.begin(), reorder.end(), ',') + 1;
+      val_reorder = new int[ ni_reo ];
+      fetch_ints( reorder, val_reorder, ni_reo );
    }
    
    if ( output ){
       CheMPS2::Irreps Symmhelper(group);
-      cout << "Running chemps2 with the following options:" << endl;
+      cout << "\nRunning chemps2 with the following options:\n" << endl;
       cout << "  --fcidump = "      << fcidump      << endl;
       cout << "  --group = "        << Symmhelper.getGroupName() << endl;
       cout << "  --multiplicity = " << multiplicity << endl;
       cout << "  --nelectrons = "   << nelectrons   << endl;
       cout << "  --irrep = "        << Symmhelper.getIrrepName(irrep) << endl;
-      cout << "  --sweep_d     = [ "; for (int cnt=0; cnt<ni_d-1; cnt++ ){ cout << value_d[cnt]     << " ; "; } cout << value_d[ ni_d-1 ]     << " ]" << endl;
-      cout << "  --sweep_econv = [ "; for (int cnt=0; cnt<ni_d-1; cnt++ ){ cout << value_econv[cnt] << " ; "; } cout << value_econv[ ni_d-1 ] << " ]" << endl;
-      cout << "  --sweep_maxit = [ "; for (int cnt=0; cnt<ni_d-1; cnt++ ){ cout << value_maxit[cnt] << " ; "; } cout << value_maxit[ ni_d-1 ] << " ]" << endl;
-      cout << "  --sweep_noise = [ "; for (int cnt=0; cnt<ni_d-1; cnt++ ){ cout << value_noise[cnt] << " ; "; } cout << value_noise[ ni_d-1 ] << " ]" << endl;
+      cout << "  --sweep_d     = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_d[cnt]     << " ; "; } cout << value_d[ni_d-1]     << " ]" << endl;
+      cout << "  --sweep_econv = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_econv[cnt] << " ; "; } cout << value_econv[ni_d-1] << " ]" << endl;
+      cout << "  --sweep_maxit = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_maxit[cnt] << " ; "; } cout << value_maxit[ni_d-1] << " ]" << endl;
+      cout << "  --sweep_noise = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_noise[cnt] << " ; "; } cout << value_noise[ni_d-1] << " ]" << endl;
       if ( excitation > 0 ){           cout << "  --excitation = "   << excitation   << endl; }
       if ( twodmfile.length() > 0 ){   cout << "  --twodmfile = "    << twodmfile    << endl; }
       if ( checkpoint ){               cout << "  --checkpoint"      << endl; }
       if ( print_corr ){               cout << "  --print_corr"      << endl; }
       cout << "  --tmpfolder = "    << tmpfolder    << endl;
+      if ( ni_reo > 0 ){ cout << "  --reorder = [ "; for (int cnt=0; cnt<ni_reo-1; cnt++){ cout << val_reorder[cnt] << " ; "; } cout << val_reorder[ni_reo-1] << " ]" << endl; }
+      cout << " " << endl;
+   }
+   
+   if ( ni_reo > 0 ){
+      int * doublecheck = new int[ ni_reo ];
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ doublecheck[ cnt ] = 0; }
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){
+         if (( val_reorder[ cnt ] >= 0 ) && ( val_reorder[ cnt ] < ni_reo )){ doublecheck[ val_reorder[ cnt ] ] += 1; }
+      }
+      bool is_ok = true;
+      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ if ( doublecheck[ cnt ] != 1 ){ is_ok = false; } }
+      delete [] doublecheck;
+      if ( is_ok == false ){
+         if ( output ){ cerr << "The orbital reordering should have all orbitals from 0 to len(reorder)-1 exactly once!" << endl; }
+         return -1;
+      }
    }
    
    /********************************
@@ -309,6 +336,14 @@ int main(int argc, char **argv){
    CheMPS2::Initialize::Init();
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( fcidump, group );
    CheMPS2::Problem * Prob = new CheMPS2::Problem( Ham, multiplicity-1, nelectrons, irrep );
+   if ( ni_reo > 0 ){
+      if ( Ham->getL() != ni_reo ){
+         if ( output ){ cerr << "The orbital reordering should contain as many elements as there are orbitals in the fcidump!" << endl; }
+         return -1;
+      }
+      Prob->setup_reorder_custom( val_reorder );
+      delete [] val_reorder;
+   }
    
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(ni_d);

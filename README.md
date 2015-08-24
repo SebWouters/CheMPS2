@@ -262,7 +262,8 @@ To test the chemps2 binary for compilation **without MPI**, run:
                 --sweep_maxit=2,10 \
                 --sweep_noise=0.05,0.0 \
                 --twodmfile=2dm.out \
-                --print_corr
+                --print_corr \
+                --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
     
 To test the chemps2 binary for compilation **with MPI**, prepend the binary with:
 
