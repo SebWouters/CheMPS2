@@ -11,8 +11,6 @@ In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. Th
 
 The design philosophy for CheMPS2 is to be a lightweight, efficient, and stable library. For an input Hamiltonian and targeted symmetry sector, the library performs successive DMRG sweeps according to a user-defined convergence scheme. As output, the library returns the minimal encountered energy as well as the 2-RDM of the active space. With the latter, various molecular properties can be calculated, as well as the gradient and Hessian for orbital rotations or nuclear displacements. In addition, several correlation functions can be obtained to investigate the electronic structure in the active space.
 
-In the future, the parallelization of CheMPS2 for shared memory architectures will be extended to a hybrid scheme with both shared (OpenMP) and distributed (MPI) memory parallelization. In addition, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.
-
 CheMPS2 is parallelized for shared memory architectures with OpenMP and for distributed memory architectures with MPI. A hybrid combination of both parallelization strategies is supported. In the future, the calculation of the 2-RDM of the active space will be extended to the 3-RDM.
 
 CheMPS2 is distributed under the GNU General Public License version 2, and can be downloaded from https://github.com/sebwouters/chemps2.
