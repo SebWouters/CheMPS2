@@ -145,13 +145,11 @@
 <div class="section" id="test-the-chemps2-binary">
 <h2>1.5. Test the chemps2 binary<a class="headerlink" href="#test-the-chemps2-binary" title="Permalink to this headline">¶</a></h2>
 <p>To test the chemps2 binary for compilation <strong>without MPI</strong>, run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /sourcefolder/chemps2/build/CheMPS2
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>man /sourcefolder/chemps2/manpage.1
+<span class="nv">$ </span><span class="nb">cd</span> /sourcefolder/chemps2/build/CheMPS2
 <span class="nv">$ </span>./chemps2 --help
 <span class="nv">$ </span>./chemps2 --fcidump<span class="o">=</span>/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP <span class="se">\</span>
             --group<span class="o">=</span><span class="m">5</span> <span class="se">\</span>
-            --multiplicity<span class="o">=</span><span class="m">1</span> <span class="se">\</span>
-            --nelectrons<span class="o">=</span><span class="m">10</span> <span class="se">\</span>
-            --irrep<span class="o">=</span><span class="m">0</span> <span class="se">\</span>
             --sweep_d<span class="o">=</span>200,1000 <span class="se">\</span>
             --sweep_econv<span class="o">=</span>1e-8,1e-8 <span class="se">\</span>
             --sweep_maxit<span class="o">=</span>2,10 <span class="se">\</span>
