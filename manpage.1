@@ -9,155 +9,121 @@ chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
 .B chemps2
 .RI "[" "OPTION" "]"
 .RI "..."
-.br
 
 .SH DESCRIPTION
 Perform spin-adapted DMRG calculations for ab initio quantum chemistry fcidump files.
 
-.SH SYMMETRY
-.PP
+.SH OPTIONS
+.SS SYMMETRY
 Conventions for the symmetry group and irrep numbers (same as psi4):
 .PP
+.EX
                  |  0    1    2    3    4    5    6    7   
-.br
         ---------|-----------------------------------------
-.br
         0 : c1   |  A                                      
-.br
         1 : ci   |  Ag   Au                                
-.br
         2 : c2   |  A    B                                 
-.br
         3 : cs   |  Ap   App                               
-.br
         4 : d2   |  A    B1   B2   B3                      
-.br
         5 : c2v  |  A1   A2   B1   B2                      
-.br
         6 : c2h  |  Ag   Bg   Au   Bu                      
-.br
         7 : d2h  |  Ag   B1g  B2g  B3g  Au   B1u  B2u  B3u 
-
-.SH OPTIONS
-.PP
-.B -f, --fcidump=filename
-.RS
-Set the fcidump filename.
-.RE
-.PP
-.B -g, --group=[0-7]
-.RS
-Set the psi4 symmetry group number which corresponds to the fcidump file.
-.RE
-.PP
-.B -m, --multiplicity=[2S+1]
-.RS
-Overwrite the spin multiplicity of the fcidump file.
-.RE
-.PP
-.B -n, --nelectrons=[N]
-.RS
+.EE
+.SS ARGUMENTS
+.TP
+.BR "\-f" ", " "\-\-fcidump=\fIfilename\fB"
+Set the fcidump filename. Note that orbital irreps in this file follow molpro convention!
+.TP
+.BR "\-g" ", " "\-\-group=\fIint\fB"
+Set the psi4 symmetry group number [\fI0-7\fR] which corresponds to the fcidump file.
+.TP
+.BR "\-m" ", " "\-\-multiplicity=\fIint\fB"
+Overwrite the spin multiplicity [\fI2S+1\fR] of the fcidump file.
+.TP
+.BR "\-n" ", " "\-\-nelectrons=\fIint\fB"
 Overwrite the number of electrons of the fcidump file.
-.RE
-.PP
-.B -i, --irrep=[0-7]
-.RS
-Overwrite the target wavefunction irrep of the fcidump file.
-.RE
-.PP
-.B -D, --sweep_d=D1,D2,D3
-.RS
-Set the bond dimensions for the successive sweep instructions (positive integer).
-.RE
-.PP
-.B -E, --sweep_econv=E1,E2,E3
-.RS
-Set the energy convergence to stop a sweep instruction (positive float).
-.RE
-.PP
-.B -M, --sweep_maxit=M1,M2,M3
-.RS
-Set the maximum number of sweeps for a sweep instruction (positive integer).
-.RE
-.PP
-.B -N, --sweep_noise=N1,N2,N3
-.RS
-Set the noise prefactor for the successive sweep instructions (float).
-.RE
-.PP
-.B -e, --excitation=[E>=1]
-.RS
-Set which excitation should be calculated. If not set, the ground state is calculated.
-.RE
-.PP
-.B -o, --twodmfile=filename
-.RS
+.TP
+.BR "\-i" ", " "\-\-irrep=\fIint\fB"
+Overwrite the target wavefunction irrep [\fI0-7\fR] of the fcidump file (psi4 convention).
+.TP
+.BR "\-D" ", " "\-\-sweep_d=\fIint,int,int\fB"
+Set the bond dimensions for the successive sweep instructions (positive integers).
+.TP
+.BR "\-E" ", " "\-\-sweep_econv=\fIflt,flt,flt\fB"
+Set the energy convergence to stop sweep instructions (positive floats).
+.TP
+.BR "\-M" ", " "\-\-sweep_maxit=\fIint,int,int\fB"
+Set the maximum number of sweeps for the sweep instructions (positive integers).
+.TP
+.BR "\-N" ", " "\-\-sweep_noise=\fIflt,flt,flt\fB"
+Set the noise prefactors for the successive sweep instructions (floats).
+.TP
+.BR "\-e" ", " "\-\-excitation=\fIint\fB"
+Set which excitation should be calculated (positive integer). If not set, the ground state is calculated.
+.TP
+.BR "\-o" ", " "\-\-twodmfile=\fIfilename\fB"
 Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.
-.RE
-.PP
-.B -c, --checkpoint
-.RS
+.TP
+.BR "\-c" ", " "\-\-checkpoint"
 Read and create MPS checkpoints.
-.RE
-.PP
-.B -p, --print_corr
-.RS
+.TP
+.BR "\-p" ", " "\-\-print_corr"
 Print correlation functions.
-.RE
-.PP
-.B -t, --tmpfolder=path
-.RS
-Overwrite the tmp folder for the renormalized operators (default /tmp).
-.RE
-.PP
-.B -r, --reorder=R1,R2,R3
-.RS
+.TP
+.BR "\-t" ", " "\-\-tmpfolder=\fIpath\fB"
+Overwrite the tmp folder for the renormalized operators (default \fI/tmp\fR).
+.TP
+.BR "\-r" ", " "\-\-reorder=\fIint,int,int\fB"
 Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).
-.RE
-.PP
-.B -h, --help
-.RS
+.TP
+.BR "\-h" ", " "\-\-help"
 Display this help.
-.RE
+.SS EXAMPLE
+.PP
+.EX
+ $ cd /tmp
+ $ wget 'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/H2O.631G.FCIDUMP'
+ $ ls -al H2O.631G.FCIDUMP
+ $ chemps2 --fcidump=H2O.631G.FCIDUMP \\
+           --group=5 \\
+           --sweep_d=200,1000 \\
+           --sweep_econv=1e-8,1e-8 \\
+           --sweep_maxit=2,10 \\
+           --sweep_noise=0.05,0.0 \\
+           --twodmfile=2dm.out \\
+           --print_corr \\
+           --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
+.EE
 
 .SH AUTHOR
-Written by Sebastian Wouters (sebastianwouters [at] gmail.com)
+Written by
+Sebastian Wouters <\&\%sebastianwouters@gmail\&.com\&>
 
 .SH BUGS
-.PP
-Reporting bugs: https://github.com/sebwouters/CheMPS2/issues
-.br
-                sebastianwouters [at] gmail.com
+Reporting bugs:
+\fI\%https://github.com/sebwouters/CheMPS2/issues\fR
 
 .SH SEE ALSO
-User manual: http://sebwouters.github.io/CheMPS2/index.html
+User manual:
+\fI\%http://sebwouters.github.io/CheMPS2/index.html\fR
 
 .SH COPYRIGHT
-.PP
+.EX
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-.br
 Copyright (C) 2013-2015 Sebastian Wouters
-.PP
-This program is free software; you can redistribute it and/or modify
-.br
-it under the terms of the GNU General Public License as published by
-.br
-the Free Software Foundation; either version 2 of the License, or
-.br
-(at your option) any later version.
-.PP
-This program is distributed in the hope that it will be useful,
-.br
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-.br
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-.br
-GNU General Public License for more details.
-.PP
-You should have received a copy of the GNU General Public License along
-.br
-with this program; if not, write to the Free Software Foundation, Inc.,
-.br
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+.EE
 

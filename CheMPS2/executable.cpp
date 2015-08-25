@@ -57,6 +57,100 @@ void fetch_doubles( const string rawdata, double * result, const int num ){
 
 }
 
+void print_help(){
+
+cout << "\n"
+"CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry\n"
+"Copyright (C) 2013-2015 Sebastian Wouters\n"
+"\n"
+"Usage: chemps2 [OPTIONS]\n"
+"\n"
+
+/**************************************************
+* The following is copied directly from manpage.1 *
+**************************************************/
+
+"   SYMMETRY\n"
+"       Conventions for the symmetry group and irrep numbers (same as psi4):\n"
+"\n"
+"                        |  0    1    2    3    4    5    6    7\n"
+"               ---------|-----------------------------------------\n"
+"               0 : c1   |  A\n"
+"               1 : ci   |  Ag   Au\n"
+"               2 : c2   |  A    B\n"
+"               3 : cs   |  Ap   App\n"
+"               4 : d2   |  A    B1   B2   B3\n"
+"               5 : c2v  |  A1   A2   B1   B2\n"
+"               6 : c2h  |  Ag   Bg   Au   Bu\n"
+"               7 : d2h  |  Ag   B1g  B2g  B3g  Au   B1u  B2u  B3u\n"
+"\n"
+"   ARGUMENTS\n"
+"       -f, --fcidump=filename\n"
+"              Set the fcidump filename. Note that orbital irreps in this file follow molpro convention!\n"
+"\n"
+"       -g, --group=int\n"
+"              Set the psi4 symmetry group number [0-7] which corresponds to the fcidump file.\n"
+"\n"
+"       -m, --multiplicity=int\n"
+"              Overwrite the spin multiplicity [2S+1] of the fcidump file.\n"
+"\n"
+"       -n, --nelectrons=int\n"
+"              Overwrite the number of electrons of the fcidump file.\n"
+"\n"
+"       -i, --irrep=int\n"
+"              Overwrite the target wavefunction irrep [0-7] of the fcidump file (psi4 convention).\n"
+"\n"
+"       -D, --sweep_d=int,int,int\n"
+"              Set the bond dimensions for the successive sweep instructions (positive integers).\n"
+"\n"
+"       -E, --sweep_econv=flt,flt,flt\n"
+"              Set the energy convergence to stop sweep instructions (positive floats).\n"
+"\n"
+"       -M, --sweep_maxit=int,int,int\n"
+"              Set the maximum number of sweeps for the sweep instructions (positive integers).\n"
+"\n"
+"       -N, --sweep_noise=flt,flt,flt\n"
+"              Set the noise prefactors for the successive sweep instructions (floats).\n"
+"\n"
+"       -e, --excitation=int\n"
+"              Set which excitation should be calculated (positive integer). If not set, the ground state is calculated.\n"
+"\n"
+"       -o, --twodmfile=filename\n"
+"              Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.\n"
+"\n"
+"       -c, --checkpoint\n"
+"              Read and create MPS checkpoints.\n"
+"\n"
+"       -p, --print_corr\n"
+"              Print correlation functions.\n"
+"\n"
+"       -t, --tmpfolder=path\n"
+"              Overwrite the tmp folder for the renormalized operators (default /tmp).\n"
+"\n"
+"       -r, --reorder=int,int,int\n"
+"              Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).\n"
+"\n"
+"       -h, --help\n"
+"              Display this help.\n"
+"\n"
+"   EXAMPLE\n"
+"        $ cd /tmp\n"
+"        $ wget \'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/H2O.631G.FCIDUMP\'\n"
+"        $ ls -al H2O.631G.FCIDUMP\n"
+"        $ chemps2 --fcidump=H2O.631G.FCIDUMP \\\n"
+"                  --group=5 \\\n"
+"                  --sweep_d=200,1000 \\\n"
+"                  --sweep_econv=1e-8,1e-8 \\\n"
+"                  --sweep_maxit=2,10 \\\n"
+"                  --sweep_noise=0.05,0.0 \\\n"
+"                  --twodmfile=2dm.out \\\n"
+"                  --print_corr \\\n"
+"                  --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12\n"
+" " << endl;
+
+
+}
+
 int main(int argc, char **argv){
 
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -113,43 +207,7 @@ int main(int argc, char **argv){
       switch(c){
          case 'h':
          case '?':
-            if ( output ){
-               cout << "\n"
-                  "CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry\n"
-                  "Copyright (C) 2013-2015 Sebastian Wouters\n"
-                  "\n"
-                  "Usage: " << argv[0] << " [OPTIONS]\n"
-                  "\n"
-                  "    Conventions for the symmetry group and irrep numbers (same as psi4):\n"
-                  "                 |  0    1    2    3    4    5    6    7   \n"
-                  "        ---------|-----------------------------------------\n"
-                  "        0 : c1   |  A                                      \n"
-                  "        1 : ci   |  Ag   Au                                \n"
-                  "        2 : c2   |  A    B                                 \n"
-                  "        3 : cs   |  Ap   App                               \n"
-                  "        4 : d2   |  A    B1   B2   B3                      \n"
-                  "        5 : c2v  |  A1   A2   B1   B2                      \n"
-                  "        6 : c2h  |  Ag   Bg   Au   Bu                      \n"
-                  "        7 : d2h  |  Ag   B1g  B2g  B3g  Au   B1u  B2u  B3u \n"
-                  "\n"
-                  "    -f, --fcidump=filename         Set the fcidump filename.\n"
-                  "    -g, --group=[0-7]              Set the psi4 symmetry group number which corresponds to the fcidump file.\n"
-                  "    -m, --multiplicity=[2S+1]      Overwrite the spin multiplicity of the fcidump file.\n"
-                  "    -n, --nelectrons=[N]           Overwrite the number of electrons of the fcidump file.\n"
-                  "    -i, --irrep=[0-7]              Overwrite the target wavefunction irrep of the fcidump file.\n"
-                  "    -D, --sweep_d=D1,D2,D3         Set the bond dimensions for the successive sweep instructions (positive integer).\n"
-                  "    -E, --sweep_econv=E1,E2,E3     Set the energy convergence to stop a sweep instruction (positive float).\n"
-                  "    -M, --sweep_maxit=M1,M2,M3     Set the maximum number of sweeps for a sweep instruction (positive integer).\n"
-                  "    -N, --sweep_noise=N1,N2,N3     Set the noise prefactor for the successive sweep instructions (float).\n"
-                  "    -e, --excitation=[E>=1]        Set which excitation should be calculated. If not set, the ground state is calculated.\n"
-                  "    -o, --twodmfile=filename       Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.\n"
-                  "    -c, --checkpoint               Read and create MPS checkpoints.\n"
-                  "    -p, --print_corr               Print correlation functions.\n"
-                  "    -t, --tmpfolder=path           Overwrite the tmp folder for the renormalized operators (default " << CheMPS2::defaultTMPpath << ").\n"
-                  "    -r, --reorder=R1,R2,R3         Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).\n"
-                  "    -h, --help                     Display this help.\n"
-                  " " << endl;
-            }
+            if ( output ){ print_help(); }
             return 0;
             break;
          case 'f':
