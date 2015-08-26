@@ -11,7 +11,7 @@ chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
 .RI "..."
 
 .SH DESCRIPTION
-\fBchemps2\fR is a scientific code to perform spin-adapted density matrix renormalization group (DMRG) calculations for ab initio quantum chemistry fcidump files. This method allows to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI) and can return the active space 2-RDM. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods. The link to the user manual can be found in the section \fBSEE ALSO\fR.
+\fBchemps2\fR is a scientific code to perform spin-adapted density matrix renormalization group (DMRG) calculations for ab initio quantum chemistry fcidump files. This method allows one to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI) and can return the active space 2-RDM. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods. The link to the user manual can be found in the section \fBSEE ALSO\fR.
 
 .SH OPTIONS
 .SS SYMMETRY
@@ -83,16 +83,16 @@ Display this help.
 .EX
  $ cd /tmp
  $ wget 'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/H2O.631G.FCIDUMP'
- $ ls -al H2O.631G.FCIDUMP
- $ chemps2 --fcidump=H2O.631G.FCIDUMP \\
-           --group=5 \\
-           --sweep_d=200,1000 \\
-           --sweep_econv=1e-8,1e-8 \\
-           --sweep_maxit=2,10 \\
-           --sweep_noise=0.05,0.0 \\
-           --twodmfile=2dm.out \\
-           --print_corr \\
-           --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
+ $ ls \-al H2O.631G.FCIDUMP
+ $ chemps2 \-\-fcidump=H2O.631G.FCIDUMP \\
+           \-\-group=5 \\
+           \-\-sweep_d=200,1000 \\
+           \-\-sweep_econv=1e-8,1e-8 \\
+           \-\-sweep_maxit=2,10 \\
+           \-\-sweep_noise=0.05,0.0 \\
+           \-\-twodmfile=2dm.out \\
+           \-\-print_corr \\
+           \-\-reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
 .EE
 
 .SH AUTHOR
