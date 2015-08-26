@@ -1,4 +1,4 @@
-#### Current HEAD:
+#### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab
 * Performance counters in DMRG class
 * Faster preconditioner FCI Green's function solver
