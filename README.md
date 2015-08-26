@@ -360,8 +360,8 @@ elaborate information on
 * the interfaces of CheMPS2 to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
 
 
-List of files in libchemps2
----------------------------
+List of files in CheMPS2
+------------------------
 
 [CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the constructor and
 destructor of the CASSCF class, as well as the functions which allow to
@@ -580,6 +580,9 @@ sectors.
 
 [CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container
 class for the one-body matrix elements.
+
+[CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use
+libchemps2 from the command line.
     
 [CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.
 
