@@ -130,7 +130,7 @@ To test the chemps2 binary for compilation **without MPI**, run:
 
 .. code-block:: bash
 
-    $ man /sourcefolder/chemps2/manpage.1
+    $ man /sourcefolder/chemps2/chemps2.1
     $ cd /sourcefolder/chemps2/build/CheMPS2
     $ ./chemps2 --help
     $ ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \

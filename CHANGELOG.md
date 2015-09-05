@@ -4,7 +4,7 @@
 * Faster preconditioner FCI Green's function solver
 * Bug fix FCIDUMP read-in
 * chemps2 binary
-* manpage.1 for binary
+* manpage for binary
 
 #### Version 1.5 (2015-06-18):
 * DMRG-CI plugin pyscf
