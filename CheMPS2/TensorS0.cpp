@@ -23,31 +23,35 @@
 #include "TensorS0.h"
 #include "Lapack.h"
 
-CheMPS2::TensorS0::TensorS0(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) : TensorS0Abase(indexIn, IdiffIn, movingRightIn, denBKIn){
+CheMPS2::TensorS0::TensorS0(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) :
+TensorOperator(indexIn,
+               0, // two_j
+               2, // n_elec
+               IdiffIn,
+               movingRightIn,
+               true,  // prime_last (doesn't matter for spin-0)
+               false, // jw_phase (two 2nd quantized operators)
+               denBKIn){ }
 
-}
-
-CheMPS2::TensorS0::~TensorS0(){
-
-}
+CheMPS2::TensorS0::~TensorS0(){ }
 
 void CheMPS2::TensorS0::makenew(TensorT * denT){
 
-   if (movingRight){ makenewRight(denT); }
+   if (moving_right){ makenewRight(denT); }
    else{ makenewLeft( denT); }
 
 }
 
 void CheMPS2::TensorS0::makenew(TensorL * denL, TensorT * denT, double * workmem){
 
-   if (movingRight){ makenewRight(denL, denT, workmem); }
+   if (moving_right){ makenewRight(denL, denT, workmem); }
    else{ makenewLeft( denL, denT, workmem); }
        
 }
 
 void CheMPS2::TensorS0::makenewRight(TensorT * denT){ //Idiff = Itrivial
 
-   Clear();
+   clear();
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
@@ -71,7 +75,7 @@ void CheMPS2::TensorS0::makenewRight(TensorT * denT){ //Idiff = Itrivial
 
 void CheMPS2::TensorS0::makenewLeft(TensorT * denT){ //Idiff = Itrivial
 
-   Clear();
+   clear();
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimUL = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
@@ -95,10 +99,10 @@ void CheMPS2::TensorS0::makenewLeft(TensorT * denT){ //Idiff = Itrivial
 
 void CheMPS2::TensorS0::makenewRight(TensorL * denL, TensorT * denT, double * workmem){
 
-   Clear();
+   clear();
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int IDR = Irreps::directProd(Idiff,sectorI1[ikappa]);
+      const int IDR = Irreps::directProd(n_irrep,sectorI1[ikappa]);
       int dimUR = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimDR = denBK->gCurrentDim(index, sectorN1[ikappa]+2, sectorTwoS1[ikappa], IDR             );
       
@@ -168,10 +172,10 @@ void CheMPS2::TensorS0::makenewRight(TensorL * denL, TensorT * denT, double * wo
 
 void CheMPS2::TensorS0::makenewLeft(TensorL * denL, TensorT * denT, double * workmem){
 
-   Clear();
+   clear();
    
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      const int IDL = Irreps::directProd(Idiff,sectorI1[ikappa]);
+      const int IDL = Irreps::directProd(n_irrep,sectorI1[ikappa]);
       int dimUL = denBK->gCurrentDim(index, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
       int dimDL = denBK->gCurrentDim(index, sectorN1[ikappa]+2, sectorTwoS1[ikappa], IDL             );
       

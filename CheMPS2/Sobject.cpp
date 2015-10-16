@@ -20,12 +20,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <algorithm>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "Sobject.h"
 #include "TensorT.h"
 #include "SyBookkeeper.h"
 #include "Lapack.h"
-#include "Gsl.h"
 #include "MPIchemps2.h"
 
 using std::min;

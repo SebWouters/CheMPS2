@@ -23,7 +23,7 @@
 #include "Tensor.h"
 #include "TensorT.h"
 #include "TensorL.h"
-#include "TensorS1Bbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -32,7 +32,7 @@ namespace CheMPS2{
     \date March 1, 2013
     
     The TensorS1 class is a storage and manipulation class for the spin-1 component of two contracted creators or two contracted annihilators. */
-   class TensorS1 : public TensorS1Bbase{
+   class TensorS1 : public TensorOperator{
 
       public:
       

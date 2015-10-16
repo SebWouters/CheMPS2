@@ -19,10 +19,10 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "TensorL.h"
 #include "Lapack.h"
-#include "Gsl.h"
 
 CheMPS2::TensorL::TensorL(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) : TensorSwap(indexIn, IdiffIn, movingRightIn, denBKIn){
 

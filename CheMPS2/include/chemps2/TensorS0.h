@@ -23,7 +23,7 @@
 #include "Tensor.h"
 #include "TensorT.h"
 #include "TensorL.h"
-#include "TensorS0Abase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -32,7 +32,7 @@ namespace CheMPS2{
     \date March 1, 2013
     
     The TensorS0 class is a storage and manipulation class for the spin-0 component of two contracted creators or two contracted annihilators. */
-   class TensorS0 : public TensorS0Abase{
+   class TensorS0 : public TensorOperator{
 
       public:
       

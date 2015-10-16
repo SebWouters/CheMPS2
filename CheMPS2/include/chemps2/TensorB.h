@@ -20,7 +20,7 @@
 #ifndef TENSORB_CHEMPS2_H
 #define TENSORB_CHEMPS2_H
 
-#include "TensorS1Bbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -29,7 +29,7 @@ namespace CheMPS2{
     \date March 4, 2013
     
     The TensorB class is a storage class for the complementary operator of the spin-1 component of two contracted creators or two contracted annihilators. */
-   class TensorB : public TensorS1Bbase{
+   class TensorB : public TensorOperator{
 
       public:
       
@@ -49,7 +49,7 @@ namespace CheMPS2{
          //! Add a term
          /** \param alpha prefactor
              \param TermToAdd The TensorS1Bbase to add */
-         void AddATerm(double alpha, TensorS1Bbase * TermToAdd);
+         void AddATerm(double alpha, TensorOperator * TermToAdd);
 
    };
 }

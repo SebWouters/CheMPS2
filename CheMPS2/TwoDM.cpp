@@ -22,10 +22,10 @@
 #include <iostream>
 #include <math.h>
 #include <algorithm>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "TwoDM.h"
 #include "Lapack.h"
-#include "Gsl.h"
 #include "Options.h"
 #include "MPIchemps2.h"
 

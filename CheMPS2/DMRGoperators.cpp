@@ -311,7 +311,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
             }
          }
          for (int num=0; num<(index+1); num++){
-            if ( irrep_prod == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
+            if ( irrep_prod == S0tensors[index][num][0]->get_irrep() ){ //Then the matrix elements are not 0 due to symm.
                #ifdef CHEMPS2_MPI_COMPILATION
                if ( do_absigma )
                #endif
@@ -638,7 +638,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
             }
          }
          for (int num=0; num<L-index-1; num++){
-            if ( irrep_prod == S0tensors[index][num][0]->gIdiff() ){ //Then the matrix elements are not 0 due to symm.
+            if ( irrep_prod == S0tensors[index][num][0]->get_irrep() ){ //Then the matrix elements are not 0 due to symm.
                #ifdef CHEMPS2_MPI_COMPILATION
                if ( do_absigma )
                #endif

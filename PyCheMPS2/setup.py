@@ -33,13 +33,12 @@ def get_depends(dirname):
 
 setup(
     name='CheMPS2',
-    version='1.6',
+    version='1.7',
     description='A spin-adapted implementation of DMRG for ab initio quantum chemistry',
     author='Sebastian Wouters',
     author_email='sebastianwouters@gmail.com',
     download_url='https://github.com/SebWouters/CheMPS2',
     license='GNU General Public License, version 2',
-    py_modules=['ReadinHamiltonianFCIDUMP', 'ReadinHamiltonianPsi4'],
     cmdclass={'build_ext': build_ext},
     ext_modules=[
         Extension("PyCheMPS2",

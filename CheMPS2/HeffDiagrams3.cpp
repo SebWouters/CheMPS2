@@ -19,10 +19,10 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "Heff.h"
 #include "Lapack.h"
-#include "Gsl.h"
 #include "MPIchemps2.h"
 
 void CheMPS2::Heff::addDiagram3Aand3D(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorQ * Qleft, TensorL ** Lleft, double * temp) const{

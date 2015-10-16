@@ -23,7 +23,7 @@
 #include "Tensor.h"
 #include "TensorT.h"
 #include "TensorL.h"
-#include "TensorF0Cbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -32,7 +32,7 @@ namespace CheMPS2{
     \date March 1, 2013
     
     The TensorF0 class is a storage and manipulation class for the spin-0 component of a contracted creator & annihilator. */
-   class TensorF0 : public TensorF0Cbase{
+   class TensorF0 : public TensorOperator{
 
       public:
       

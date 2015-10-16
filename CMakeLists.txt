@@ -1,11 +1,11 @@
 project (CheMPS2)
-set (CheMPS2_VERSION      "1.6")
+set (CheMPS2_VERSION      "1.7")
 set (CheMPS2_AUTHORS      "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
 set (CheMPS2_URL          "https://github.com/SebWouters/CheMPS2")
 set (CheMPS2_LICENSE      "GNU General Public License, version 2")
-set (CheMPS2_LIB_SOVERSION 1)
+set (CheMPS2_LIB_SOVERSION 2)
 
 include (GNUInstallDirs)
 cmake_minimum_required (VERSION 2.8.11)
@@ -21,11 +21,11 @@ option (WITH_MPI             "Build the library with MPI"              OFF)
 
 set (CMAKE_VERBOSE_MAKEFILE OFF)
 
-find_package (OpenMP)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif (OPENMP_FOUND)
+#find_package (OpenMP)
+#if (OPENMP_FOUND)
+#    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+#    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+#endif (OPENMP_FOUND)
 
 include (CheckCXXCompilerFlag)
 

@@ -20,7 +20,7 @@
 #ifndef TENSORD_CHEMPS2_H
 #define TENSORD_CHEMPS2_H
 
-#include "TensorF1Dbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -29,7 +29,7 @@ namespace CheMPS2{
     \date March 4, 2013
     
     The TensorD class is a storageclass for the complementary operator of the spin-1 component of a contracted creator & annihilator. */
-   class TensorD : public TensorF1Dbase{
+   class TensorD : public TensorOperator{
 
       public:
       
@@ -49,12 +49,12 @@ namespace CheMPS2{
          //! Add a term
          /** \param alpha prefactor
              \param TermToAdd TensorF1Dbase to add */
-         void AddATerm(double alpha, TensorF1Dbase * TermToAdd);
+         void AddATerm(double alpha, TensorOperator * TermToAdd);
          
          //! Add a term
          /** \param alpha prefactor
              \param TermToAdd TensorF1Dbase to add */
-         void AddATermTranspose(const double alpha, TensorF1Dbase * TermToAdd);
+         void AddATermTranspose(const double alpha, TensorOperator * TermToAdd);
 
    };
 }

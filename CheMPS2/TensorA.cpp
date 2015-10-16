@@ -22,17 +22,21 @@
 #include "TensorA.h"
 #include "Lapack.h"
 
-CheMPS2::TensorA::TensorA(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) : TensorS0Abase(indexIn, IdiffIn, movingRightIn, denBKIn){
+CheMPS2::TensorA::TensorA(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) :
+TensorOperator(indexIn,
+               0, // two_j
+               2, // n_elec
+               IdiffIn,
+               movingRightIn,
+               true,  // prime_last (doesn't matter for spin-0)
+               false, // jw_phase (two 2nd quantized operators)
+               denBKIn){ }
 
-}
+CheMPS2::TensorA::~TensorA(){ }
 
-CheMPS2::TensorA::~TensorA(){
+void CheMPS2::TensorA::ClearStorage(){ clear(); }
 
-}
-
-void CheMPS2::TensorA::ClearStorage(){ Clear(); }
-
-void CheMPS2::TensorA::AddATerm(double alpha, TensorS0Abase * TermToAdd){
+void CheMPS2::TensorA::AddATerm(double alpha, TensorOperator * TermToAdd){
 
    int inc = 1;
    daxpy_(kappa2index+nKappa, &alpha, TermToAdd->gStorage(), &inc, storage, &inc);

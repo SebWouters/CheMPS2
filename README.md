@@ -512,9 +512,6 @@ F1-tensors.
 [CheMPS2/TensorDiag.cpp](CheMPS2/TensorDiag.cpp) contains the TensorDiag functions. This storage
 class handles reduced tensors which are diagonal in the symmetry sectors.
 
-[CheMPS2/TensorF0Cbase.cpp](CheMPS2/TensorF0Cbase.cpp) contains the common storage and handling
-functions of the TensorF0 and TensorC classes.
-
 [CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
@@ -522,9 +519,6 @@ quantized operators, of which the particle symmetry sectors are equal.
 [CheMPS2/TensorF1.cpp](CheMPS2/TensorF1.cpp) contains all TensorF1 functions. This class
 stores and handles the reduced spin-1 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
-
-[CheMPS2/TensorF1Dbase.cpp](CheMPS2/TensorF1Dbase.cpp) contains the common storage and handling
-functions of the TensorF1 and TensorD classes.
 
 [CheMPS2/TensorGYZ.cpp](CheMPS2/TensorGYZ.cpp) contains the contruct and update functions
 for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
@@ -547,15 +541,9 @@ terms which are required to calculate the overlap between two MPSs.
 and handles the complementary reduced spin-1/2 part of three sandwiched second
 quantized operators.
 
-[CheMPS2/TensorS0Abase.cpp](CheMPS2/TensorS0Abase.cpp) contains the common storage and handling
-functions of the TensorS0 and TensorA classes.
-
 [CheMPS2/TensorS0.cpp](CheMPS2/TensorS0.cpp) contains all TensorS0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors differ by 2.
-
-[CheMPS2/TensorS1Bbase.cpp](CheMPS2/TensorS1Bbase.cpp) contains the common storage and handling
-functions of the TensorS1 and TensorB classes.
 
 [CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class
 stores and handles the reduced spin-1 part of two sandwiched second
@@ -628,9 +616,6 @@ EdmistonRuedenberg class.
 [CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex
 class.
 
-[CheMPS2/include/chemps2/Gsl.h](CheMPS2/include/chemps2/Gsl.h) contains the definitions of the external GSL
-routines.
-
 [CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian
 class.
 
@@ -673,13 +658,7 @@ SyBookkeeper class.
 [CheMPS2/include/chemps2/TensorDiag.h](CheMPS2/include/chemps2/TensorDiag.h) contains the definitions of the
 TensorDiag class.
 
-[CheMPS2/include/chemps2/TensorF0Cbase.h](CheMPS2/include/chemps2/TensorF0Cbase.h) contains the definitions of the
-TensorF0Cbase class.
-
 [CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.
-
-[CheMPS2/include/chemps2/TensorF1Dbase.h](CheMPS2/include/chemps2/TensorF1Dbase.h) contains the definitions of the
-TensorF1Dbase class.
 
 [CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.
 
@@ -699,13 +678,7 @@ class.
 
 [CheMPS2/include/chemps2/TensorQ.h](CheMPS2/include/chemps2/TensorQ.h) contains the definitions of the TensorQ class.
 
-[CheMPS2/include/chemps2/TensorS0Abase.h](CheMPS2/include/chemps2/TensorS0Abase.h) contains the definitions of the
-TensorS0Abase class.
-
 [CheMPS2/include/chemps2/TensorS0.h](CheMPS2/include/chemps2/TensorS0.h) contains the definitions of the TensorS0 class.
-
-[CheMPS2/include/chemps2/TensorS1Bbase.h](CheMPS2/include/chemps2/TensorS1Bbase.h) contains the definitions of the
-TensorS1Bbase class.
 
 [CheMPS2/include/chemps2/TensorS1.h](CheMPS2/include/chemps2/TensorS1.h) contains the definitions of the TensorS1 class.
 

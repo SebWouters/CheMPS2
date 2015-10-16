@@ -20,7 +20,7 @@
 #ifndef TENSORA_CHEMPS2_H
 #define TENSORA_CHEMPS2_H
 
-#include "TensorS0Abase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -29,7 +29,7 @@ namespace CheMPS2{
     \date March 4, 2013
     
     The TensorA class is a storage class for the complementary operator of the spin-0 component of two contracted creators or two contracted annihilators. */
-   class TensorA : public TensorS0Abase{
+   class TensorA : public TensorOperator{
 
       public:
       
@@ -49,7 +49,7 @@ namespace CheMPS2{
          //! Add a term
          /** \param alpha prefactor
              \param TermToAdd The TensorS0Abase to add */
-         void AddATerm(double alpha, TensorS0Abase * TermToAdd);
+         void AddATerm(double alpha, TensorOperator * TermToAdd);
 
    };
 }

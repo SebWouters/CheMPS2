@@ -18,10 +18,10 @@
 */
 
 #include <math.h>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "Heff.h"
 #include "Lapack.h"
-#include "Gsl.h"
 #include "MPIchemps2.h"
 
 void CheMPS2::Heff::addDiagram1A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorX * Xleft) const{

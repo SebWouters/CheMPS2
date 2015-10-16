@@ -22,28 +22,32 @@
 #include "TensorC.h"
 #include "Lapack.h"
 
-CheMPS2::TensorC::TensorC(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) : TensorF0Cbase(indexIn, IdiffIn, movingRightIn, denBKIn){
+CheMPS2::TensorC::TensorC(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) :
+TensorOperator(indexIn,
+               0, // two_j
+               0, // n_elec
+               IdiffIn,
+               movingRightIn,
+               true,  // prime_last (doesn't matter for spin-0)
+               false, // jw_phase (two 2nd quantized operators)
+               denBKIn){ }
 
-}
+CheMPS2::TensorC::~TensorC(){ }
 
-CheMPS2::TensorC::~TensorC(){
+void CheMPS2::TensorC::ClearStorage(){ clear(); }
 
-}
-
-void CheMPS2::TensorC::ClearStorage(){ Clear(); }
-
-void CheMPS2::TensorC::AddATerm(double alpha, TensorF0Cbase * TermToAdd){
+void CheMPS2::TensorC::AddATerm(double alpha, TensorOperator * TermToAdd){
 
    int inc = 1;
    daxpy_(kappa2index+nKappa, &alpha, TermToAdd->gStorage(), &inc, storage, &inc);
 
 }
 
-void CheMPS2::TensorC::AddATermTranspose(const double alpha, TensorF0Cbase * TermToAdd){
+void CheMPS2::TensorC::AddATermTranspose(const double alpha, TensorOperator * TermToAdd){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       int dimU = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);
-      const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
+      const int ID = Irreps::directProd(sectorI1[ikappa],n_irrep);
       int dimD = denBK->gCurrentDim(index,sectorN1[ikappa],sectorTwoS1[ikappa],ID);
       
       double * BlockToAdd = TermToAdd->gStorage(sectorN1[ikappa],sectorTwoS1[ikappa],ID,sectorN1[ikappa],sectorTwoS1[ikappa],sectorI1[ikappa]);

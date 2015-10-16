@@ -23,7 +23,7 @@
 #include "Tensor.h"
 #include "TensorT.h"
 #include "TensorL.h"
-#include "TensorF1Dbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -32,7 +32,7 @@ namespace CheMPS2{
     \date March 1, 2013
     
     The TensorF1 class is a storage and manipulation class for the spin-1 component of a contracted creator & annihilator. */
-   class TensorF1 : public TensorF1Dbase{
+   class TensorF1 : public TensorOperator{
 
       public:
       

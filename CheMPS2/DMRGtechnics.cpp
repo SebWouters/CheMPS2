@@ -24,13 +24,13 @@
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
+#include <gsl/gsl_sf_coupling.h>
 
 #include "DMRG.h"
 #include "Lapack.h"
 #include "TensorK.h"
 #include "TensorM.h"
 #include "TensorGYZ.h"
-#include "Gsl.h"
 #include "Heff.h"
 #include "MPIchemps2.h"
 

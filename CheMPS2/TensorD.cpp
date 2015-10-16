@@ -23,33 +23,37 @@
 #include "TensorD.h"
 #include "Lapack.h"
 
-CheMPS2::TensorD::TensorD(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) : TensorF1Dbase(indexIn, IdiffIn, movingRightIn, denBKIn){
+CheMPS2::TensorD::TensorD(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) :
+TensorOperator(indexIn,
+               2, // two_j
+               0, // n_elec
+               IdiffIn,
+               movingRightIn,
+               (( movingRightIn ) ? true : false), // prime_last
+               false, // jw_phase (two 2nd quantized operators)
+               denBKIn){ }
 
-}
+CheMPS2::TensorD::~TensorD(){ }
 
-CheMPS2::TensorD::~TensorD(){
-
-}
-
-void CheMPS2::TensorD::ClearStorage(){ Clear(); }
+void CheMPS2::TensorD::ClearStorage(){ clear(); }
       
-void CheMPS2::TensorD::AddATerm(double alpha, TensorF1Dbase * TermToAdd){
+void CheMPS2::TensorD::AddATerm(double alpha, TensorOperator * TermToAdd){
 
    int inc = 1;
    daxpy_(kappa2index+nKappa, &alpha, TermToAdd->gStorage(), &inc, storage, &inc);
 
 }
 
-void CheMPS2::TensorD::AddATermTranspose(const double alpha, TensorF1Dbase * TermToAdd){
+void CheMPS2::TensorD::AddATermTranspose(const double alpha, TensorOperator * TermToAdd){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
-      int fase = ((((sectorTwoS1[ikappa]-sectorTwoSD[ikappa])/2)%2)!=0)?-1:1;
-      const double prefactor = alpha * fase * ((movingRight)?sqrt((sectorTwoS1[ikappa]+1.0)/(sectorTwoSD[ikappa]+1.0)):sqrt((sectorTwoSD[ikappa]+1.0)/(sectorTwoS1[ikappa]+1.0)));
+      int fase = ((((sectorTwoS1[ikappa]-sector_2S_down[ikappa])/2)%2)!=0)?-1:1;
+      const double prefactor = alpha * fase * ((moving_right)?sqrt((sectorTwoS1[ikappa]+1.0)/(sector_2S_down[ikappa]+1.0)):sqrt((sector_2S_down[ikappa]+1.0)/(sectorTwoS1[ikappa]+1.0)));
       int dimU = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-      int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
-      int dimD = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoSD[ikappa], ID);
+      int ID = Irreps::directProd(sectorI1[ikappa],n_irrep);
+      int dimD = denBK->gCurrentDim(index, sectorN1[ikappa], sector_2S_down[ikappa], ID);
       
-      double * BlockToAdd = TermToAdd->gStorage(sectorN1[ikappa], sectorTwoSD[ikappa], ID, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+      double * BlockToAdd = TermToAdd->gStorage(sectorN1[ikappa], sector_2S_down[ikappa], ID, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
       for (int irow=0; irow<dimU; irow++){
          for (int icol=0; icol<dimD; icol++){
             storage[kappa2index[ikappa] + irow + dimU * icol] += prefactor * BlockToAdd[icol + dimD * irow];

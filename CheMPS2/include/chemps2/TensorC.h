@@ -20,7 +20,7 @@
 #ifndef TENSORC_CHEMPS2_H
 #define TENSORC_CHEMPS2_H
 
-#include "TensorF0Cbase.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -29,7 +29,7 @@ namespace CheMPS2{
     \date March 4, 2013
     
     The TensorC class is a storage class for the complementary operator of the spin-0 component of a contracted creator & annihilator. */
-   class TensorC : public TensorF0Cbase{
+   class TensorC : public TensorOperator{
 
       public:
       
@@ -49,12 +49,12 @@ namespace CheMPS2{
          //! Add a term
          /** \param alpha prefactor
              \param TermToAdd The TensorF0Cbase to add */
-         void AddATerm(double alpha, TensorF0Cbase * TermToAdd);
+         void AddATerm(double alpha, TensorOperator * TermToAdd);
          
          //! Add a term in transpose
          /** \param alpha prefactor
              \param TermToAdd The TensorF0Cbase to add */
-         void AddATermTranspose(const double alpha, TensorF0Cbase * TermToAdd);
+         void AddATermTranspose(const double alpha, TensorOperator * TermToAdd);
 
    };
 }
