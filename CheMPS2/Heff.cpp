@@ -39,7 +39,7 @@ CheMPS2::Heff::~Heff(){
 
 }
 
-void CheMPS2::Heff::makeHeff(double * memS, double * memHeff, const Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
+void CheMPS2::Heff::makeHeff(double * memS, double * memHeff, const Sobject * denS, TensorL *** Ltensors, TensorOperator **** Atensors, TensorOperator **** Btensors, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
 
    const int indexS = denS->gIndex();
    const bool atLeft  = (indexS==0)?true:false;
@@ -246,7 +246,7 @@ void CheMPS2::Heff::makeHeff(double * memS, double * memHeff, const Sobject * de
 
 }
 
-void CheMPS2::Heff::fillHeffDiag(double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorD **** Dtensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
+void CheMPS2::Heff::fillHeffDiag(double * memHeffDiag, const Sobject * denS, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
 
    const int indexS = denS->gIndex();
    const bool atLeft  = (indexS==0)?true:false;
@@ -313,7 +313,7 @@ void CheMPS2::Heff::fillHeffDiag(double * memHeffDiag, const Sobject * denS, Ten
    
 }
 
-double CheMPS2::Heff::SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
+double CheMPS2::Heff::SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, TensorOperator **** Atensors, TensorOperator **** Btensors, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){
@@ -327,7 +327,7 @@ double CheMPS2::Heff::SolveDAVIDSON(Sobject * denS, TensorL *** Ltensors, Tensor
 
 }
 
-double CheMPS2::Heff::SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
+double CheMPS2::Heff::SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, TensorOperator **** Atensors, TensorOperator **** Btensors, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
 
    int inc1 = 1;
    int veclength = denS->gKappa2index( denS->gNKappa() );
@@ -384,7 +384,7 @@ double CheMPS2::Heff::SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, T
 }
 
 #ifdef CHEMPS2_MPI_COMPILATION
-double CheMPS2::Heff::SolveDAVIDSON_help(Sobject * denS, TensorL *** Ltensors, TensorA **** Atensors, TensorB **** Btensors, TensorC **** Ctensors, TensorD **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
+double CheMPS2::Heff::SolveDAVIDSON_help(Sobject * denS, TensorL *** Ltensors, TensorOperator **** Atensors, TensorOperator **** Btensors, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const{
 
    int veclength = denS->gKappa2index( denS->gNKappa() );
    double * vecin  = new double[ veclength ];

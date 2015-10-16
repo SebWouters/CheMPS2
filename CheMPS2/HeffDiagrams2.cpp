@@ -25,7 +25,7 @@
 #include "Lapack.h"
 #include "MPIchemps2.h"
 
-void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA **** Atensors, TensorS0 **** S0tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Atensors, TensorS0 **** S0tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -126,7 +126,7 @@ void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA **** Atensors, TensorS0 **** S0tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Atensors, TensorS0 **** S0tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -227,7 +227,7 @@ void CheMPS2::Heff::addDiagram2a2spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB **** Btensors, TensorS1 **** S1tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Btensors, TensorS1 **** S1tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -350,7 +350,7 @@ void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorB **** Btensors, TensorS1 **** S1tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Btensors, TensorS1 **** S1tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -473,7 +473,7 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Ctensors, TensorF0 **** F0tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -648,7 +648,7 @@ void CheMPS2::Heff::addDiagram2a3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors, double * workspace) const{
+void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Dtensors, TensorF1 **** F1tensors, double * workspace) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -847,7 +847,7 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2b1and2b2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const{
+void CheMPS2::Heff::addDiagram2b1and2b2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Atensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -920,7 +920,7 @@ void CheMPS2::Heff::addDiagram2b1and2b2(const int ikappa, double * memS, double 
    
 }
 
-void CheMPS2::Heff::addDiagram2c1and2c2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const{
+void CheMPS2::Heff::addDiagram2c1and2c2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Atensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1057,7 +1057,7 @@ void CheMPS2::Heff::addDiagram2dall(const int ikappa, double * memS, double * me
    
 }
 
-void CheMPS2::Heff::addDiagram2e1and2e2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const{
+void CheMPS2::Heff::addDiagram2e1and2e2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Atensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1120,7 +1120,7 @@ void CheMPS2::Heff::addDiagram2e1and2e2(const int ikappa, double * memS, double 
    
 }
 
-void CheMPS2::Heff::addDiagram2f1and2f2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorA * Atensor) const{
+void CheMPS2::Heff::addDiagram2f1and2f2(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Atensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1183,7 +1183,7 @@ void CheMPS2::Heff::addDiagram2f1and2f2(const int ikappa, double * memS, double 
    
 }
 
-void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1211,7 +1211,7 @@ void CheMPS2::Heff::addDiagram2b3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1239,7 +1239,7 @@ void CheMPS2::Heff::addDiagram2c3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1266,7 +1266,7 @@ void CheMPS2::Heff::addDiagram2e3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1293,7 +1293,7 @@ void CheMPS2::Heff::addDiagram2f3spin0(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1347,7 +1347,7 @@ void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -1401,7 +1401,7 @@ void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -1454,7 +1454,7 @@ void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double *
    
 }
 
-void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    

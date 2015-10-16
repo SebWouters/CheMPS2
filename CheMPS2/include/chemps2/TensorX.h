@@ -23,9 +23,7 @@
 #include "Tensor.h"
 #include "TensorL.h"
 #include "TensorQ.h"
-#include "TensorA.h"
-#include "TensorC.h"
-#include "TensorD.h"
+#include "TensorOperator.h"
 #include "TensorF0.h"
 #include "TensorF1.h"
 #include "Problem.h"
@@ -56,10 +54,10 @@ namespace CheMPS2{
              \param Ltensors Array with the TensorL's
              \param Xtensor The previous TensorX
              \param Qtensor The previous TensorQ
-             \param Atensor The previous TensorA
-             \param Ctensor The previous TensorC
-             \param Dtensor The previous TensorD */
-         void update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorD * Dtensor);
+             \param Atensor The previous A-tensor
+             \param Ctensor The previous C-tensor
+             \param Dtensor The previous D-tensor */
+         void update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorOperator * Atensor, TensorOperator * Ctensor, TensorOperator * Dtensor);
          
          //! Clear and add the relevant terms to the TensorX
          /** \param denT TensorT from which the new TensorX should be made */
@@ -78,12 +76,12 @@ namespace CheMPS2{
          void makenewLeft(const int ikappa, TensorT * denT);
          void addTermQLRight(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemRR, double * workmemLR, double * workmemLL);
          void addTermQLLeft(const int ikappa, TensorT * denT, TensorL ** Lprev, TensorQ * Qprev, double * workmemLL, double * workmemLR, double * workmemRR);
-         void addTermALeft(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemLR, double * workmemLL);
-         void addTermARight(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemRR, double * workmemLR);
-         void addTermCRight(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR);
-         void addTermCLeft(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR);
-         void addTermDRight(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR);
-         void addTermDLeft(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR);
+         void addTermALeft(const int ikappa, TensorT * denT, TensorOperator * Aprev, double * workmemLR, double * workmemLL);
+         void addTermARight(const int ikappa, TensorT * denT, TensorOperator * Aprev, double * workmemRR, double * workmemLR);
+         void addTermCRight(const int ikappa, TensorT * denT, TensorOperator * denC, double * workmemLR);
+         void addTermCLeft(const int ikappa, TensorT * denT, TensorOperator * denC, double * workmemLR);
+         void addTermDRight(const int ikappa, TensorT * denT, TensorOperator * denD, double * workmemLR);
+         void addTermDLeft(const int ikappa, TensorT * denT, TensorOperator * denD, double * workmemLR);
          
    };
 }

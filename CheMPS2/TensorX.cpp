@@ -49,7 +49,7 @@ void CheMPS2::TensorX::update(TensorT * denT){
 
 }
 
-void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorA * Atensor, TensorC * Ctensor, TensorD * Dtensor){
+void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorOperator * Atensor, TensorOperator * Ctensor, TensorOperator * Dtensor){
 
    if (movingRight){
       //PARALLEL
@@ -364,7 +364,7 @@ void CheMPS2::TensorX::addTermQLLeft(const int ikappa, TensorT * denT, TensorL *
 
 }
 
-void CheMPS2::TensorX::addTermARight(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemRR, double * workmemLR){
+void CheMPS2::TensorX::addTermARight(const int ikappa, TensorT * denT, TensorOperator * Aprev, double * workmemRR, double * workmemLR){
 
    int dimR     = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
    int dimLup   = denBK->gCurrentDim(index-1, sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa]);
@@ -403,7 +403,7 @@ void CheMPS2::TensorX::addTermARight(const int ikappa, TensorT * denT, TensorA *
 
 }
 
-void CheMPS2::TensorX::addTermALeft(const int ikappa, TensorT * denT, TensorA * Aprev, double * workmemLR, double * workmemLL){
+void CheMPS2::TensorX::addTermALeft(const int ikappa, TensorT * denT, TensorOperator * Aprev, double * workmemLR, double * workmemLL){
 
    int dimL     = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
    int dimRup   = denBK->gCurrentDim(index+1, sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
@@ -442,7 +442,7 @@ void CheMPS2::TensorX::addTermALeft(const int ikappa, TensorT * denT, TensorA * 
 
 }
 
-void CheMPS2::TensorX::addTermCRight(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR){
+void CheMPS2::TensorX::addTermCRight(const int ikappa, TensorT * denT, TensorOperator * denC, double * workmemLR){
 
    int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    for (int geval=0; geval<3; geval++){
@@ -485,7 +485,7 @@ void CheMPS2::TensorX::addTermCRight(const int ikappa, TensorT * denT, TensorC *
 
 }
 
-void CheMPS2::TensorX::addTermCLeft(const int ikappa, TensorT * denT, TensorC * denC, double * workmemLR){
+void CheMPS2::TensorX::addTermCLeft(const int ikappa, TensorT * denT, TensorOperator * denC, double * workmemLR){
 
    int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    for (int geval=0; geval<3; geval++){
@@ -528,7 +528,7 @@ void CheMPS2::TensorX::addTermCLeft(const int ikappa, TensorT * denT, TensorC * 
 
 }
 
-void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR){
+void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorOperator * denD, double * workmemLR){
 
    int dimR = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    
@@ -581,7 +581,7 @@ void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorD *
 
 }
 
-void CheMPS2::TensorX::addTermDLeft(const int ikappa, TensorT * denT, TensorD * denD, double * workmemLR){
+void CheMPS2::TensorX::addTermDLeft(const int ikappa, TensorT * denT, TensorOperator * denD, double * workmemLR){
 
    int dimL = denBK->gCurrentDim(index, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
    

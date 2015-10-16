@@ -284,15 +284,15 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
             if ( do_absigma )
             #endif
             {
-               Atensors[index][cnt2][cnt3]->ClearStorage();
-               if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
+               Atensors[index][cnt2][cnt3]->clear();
+               if (cnt2>0){ Btensors[index][cnt2][cnt3]->clear(); }
             }
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( do_cdf )
             #endif
             {
-               Ctensors[index][cnt2][cnt3]->ClearStorage();
-               Dtensors[index][cnt2][cnt3]->ClearStorage();
+               Ctensors[index][cnt2][cnt3]->clear();
+               Dtensors[index][cnt2][cnt3]->clear();
             }
          } else {
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -319,12 +319,12 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
                   double alpha = Prob->gMxElement(index-num,index,siteindex1,siteindex2);
                   if ((cnt2==0) && (num==0)){ alpha *= 0.5; }
                   if ((cnt2>0) && (num>0)){ alpha += Prob->gMxElement(index-num,index,siteindex2,siteindex1); }
-                  Atensors[index][cnt2][cnt3]->AddATerm(alpha, S0tensors[index][num][0]);
+                  Atensors[index][cnt2][cnt3]->daxpy(alpha, S0tensors[index][num][0]);
                   
                   if ((num>0) && (cnt2>0)){
                      alpha = Prob->gMxElement(index-num,index,siteindex1,siteindex2)
                            - Prob->gMxElement(index-num,index,siteindex2,siteindex1);
-                     Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+                     Btensors[index][cnt2][cnt3]->daxpy(alpha,S1tensors[index][num][0]);
                   }
                }
                #ifdef CHEMPS2_MPI_COMPILATION
@@ -333,18 +333,18 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
                {
                   double alpha = 2 * Prob->gMxElement(index-num,siteindex1,index,siteindex2)
                                    - Prob->gMxElement(index-num,siteindex1,siteindex2,index);
-                  Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+                  Ctensors[index][cnt2][cnt3]->daxpy(alpha,F0tensors[index][num][0]);
                   
                   alpha = - Prob->gMxElement(index-num,siteindex1,siteindex2,index); // Second line for Ctensors
-                  Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+                  Dtensors[index][cnt2][cnt3]->daxpy(alpha,F1tensors[index][num][0]);
                   
                   if (num>0){
                      alpha = 2 * Prob->gMxElement(index-num,siteindex2,index,siteindex1)
                                - Prob->gMxElement(index-num,siteindex2,siteindex1,index);
-                     Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
+                     Ctensors[index][cnt2][cnt3]->daxpy_transpose_tensorCD(alpha,F0tensors[index][num][0]);
                      
                      alpha = - Prob->gMxElement(index-num,siteindex2,siteindex1,index); // Second line for Ctensors
-                     Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
+                     Dtensors[index][cnt2][cnt3]->daxpy_transpose_tensorCD(alpha,F1tensors[index][num][0]);
                   }
                }
             }
@@ -463,14 +463,14 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
       }
       
       if ( owner_x != owner_absigma ){
-         if ( owner_x == MPIRANK ){ Atensors[index-1][0][0] = new TensorA( index, Idiff, true, denBK ); }
+         if ( owner_x == MPIRANK ){ Atensors[index-1][0][0] = new TensorOperator( index, 0, 2, Idiff, true, true, false, denBK ); }
          if (( owner_x == MPIRANK ) || ( owner_absigma == MPIRANK )){ MPIchemps2::sendreceive_tensor( Atensors[index-1][0][0], owner_absigma, owner_x, 3*L+4 ); }
       }
       
       if ( owner_x != owner_cdf ){
          if ( owner_x == MPIRANK ){
-            Ctensors[index-1][0][0] = new TensorC( index, Idiff, true, denBK );
-            Dtensors[index-1][0][0] = new TensorD( index, Idiff, true, denBK );
+            Ctensors[index-1][0][0] = new TensorOperator( index, 0, 0, Idiff, true, true, false, denBK );
+            Dtensors[index-1][0][0] = new TensorOperator( index, 2, 0, Idiff, true, true, false, denBK );
          }
          if (( owner_x == MPIRANK ) || ( owner_cdf == MPIRANK )){
             MPIchemps2::sendreceive_tensor( Ctensors[index-1][0][0], owner_cdf, owner_x, 3*L+5 );
@@ -611,15 +611,15 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
             if ( do_absigma )
             #endif
             {
-               Atensors[index][cnt2][cnt3]->ClearStorage();
-               if (cnt2>0){ Btensors[index][cnt2][cnt3]->ClearStorage(); }
+               Atensors[index][cnt2][cnt3]->clear();
+               if (cnt2>0){ Btensors[index][cnt2][cnt3]->clear(); }
             }
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( do_cdf )
             #endif
             {
-               Ctensors[index][cnt2][cnt3]->ClearStorage();
-               Dtensors[index][cnt2][cnt3]->ClearStorage();
+               Ctensors[index][cnt2][cnt3]->clear();
+               Dtensors[index][cnt2][cnt3]->clear();
             }
          } else {
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -646,12 +646,12 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
                   double alpha = Prob->gMxElement(siteindex1,siteindex2,index+1,index+1+num);
                   if ((cnt2==0) && (num==0)) alpha *= 0.5;
                   if ((cnt2>0) && (num>0)) alpha += Prob->gMxElement(siteindex1,siteindex2,index+1+num,index+1);
-                  Atensors[index][cnt2][cnt3]->AddATerm(alpha,S0tensors[index][num][0]);
+                  Atensors[index][cnt2][cnt3]->daxpy(alpha,S0tensors[index][num][0]);
                
                   if ((num>0) && (cnt2>0)){
                      alpha = Prob->gMxElement(siteindex1,siteindex2,index+1,index+1+num)
                            - Prob->gMxElement(siteindex1,siteindex2,index+1+num,index+1);
-                     Btensors[index][cnt2][cnt3]->AddATerm(alpha,S1tensors[index][num][0]);
+                     Btensors[index][cnt2][cnt3]->daxpy(alpha,S1tensors[index][num][0]);
                   }
                }
                #ifdef CHEMPS2_MPI_COMPILATION
@@ -660,18 +660,18 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
                {
                   double alpha = 2 * Prob->gMxElement(siteindex1,index+1,siteindex2,index+1+num)
                                    - Prob->gMxElement(siteindex1,index+1,index+1+num,siteindex2);
-                  Ctensors[index][cnt2][cnt3]->AddATerm(alpha,F0tensors[index][num][0]);
+                  Ctensors[index][cnt2][cnt3]->daxpy(alpha,F0tensors[index][num][0]);
                   
                   alpha = - Prob->gMxElement(siteindex1,index+1,index+1+num,siteindex2); // Second line for Ctensors
-                  Dtensors[index][cnt2][cnt3]->AddATerm(alpha,F1tensors[index][num][0]);
+                  Dtensors[index][cnt2][cnt3]->daxpy(alpha,F1tensors[index][num][0]);
                   
                   if (num>0){
                      alpha = 2 * Prob->gMxElement(siteindex1,index+1+num,siteindex2,index+1)
                                - Prob->gMxElement(siteindex1,index+1+num,index+1,siteindex2);
-                     Ctensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F0tensors[index][num][0]);
+                     Ctensors[index][cnt2][cnt3]->daxpy_transpose_tensorCD(alpha,F0tensors[index][num][0]);
                      
                      alpha = - Prob->gMxElement(siteindex1,index+1+num,index+1,siteindex2); // Second line for Ctensors
-                     Dtensors[index][cnt2][cnt3]->AddATermTranspose(alpha,F1tensors[index][num][0]);
+                     Dtensors[index][cnt2][cnt3]->daxpy_transpose_tensorCD(alpha,F1tensors[index][num][0]);
                   }
                }
             }
@@ -790,14 +790,14 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
       }
       
       if ( owner_x != owner_absigma ){
-         if ( owner_x == MPIRANK ){ Atensors[index+1][0][0] = new TensorA( index+2, Idiff, false, denBK ); }
+         if ( owner_x == MPIRANK ){ Atensors[index+1][0][0] = new TensorOperator( index+2, 0, 2, Idiff, false, true, false, denBK ); }
          if (( owner_x == MPIRANK ) || ( owner_absigma == MPIRANK )){ MPIchemps2::sendreceive_tensor( Atensors[index+1][0][0], owner_absigma, owner_x, 3*L+4 ); }
       }
       
       if ( owner_x != owner_cdf ){
          if ( owner_x == MPIRANK ){
-            Ctensors[index+1][0][0] = new TensorC( index+2, Idiff, false, denBK );
-            Dtensors[index+1][0][0] = new TensorD( index+2, Idiff, false, denBK );
+            Ctensors[index+1][0][0] = new TensorOperator( index+2, 0, 0, Idiff, false, true,  false, denBK );
+            Dtensors[index+1][0][0] = new TensorOperator( index+2, 2, 0, Idiff, false, false, false, denBK );
          }
          if (( owner_x == MPIRANK ) || ( owner_cdf == MPIRANK )){
             MPIchemps2::sendreceive_tensor( Ctensors[index+1][0][0], owner_cdf, owner_x, 3*L+5 );
@@ -895,22 +895,22 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
       //Complementary two-operator tensors : certain processes own certain complementary two-operator tensors
       //To right: Atens[cnt][cnt2][cnt3] = operators on sites cnt+1+cnt3 and cnt+1+cnt2+cnt3; at boundary cnt+1
-      Atensors[index] = new TensorA ** [L-1-index];
-      Btensors[index] = new TensorB ** [L-1-index];
-      Ctensors[index] = new TensorC ** [L-1-index];
-      Dtensors[index] = new TensorD ** [L-1-index];
+      Atensors[index] = new TensorOperator ** [L-1-index];
+      Btensors[index] = new TensorOperator ** [L-1-index];
+      Ctensors[index] = new TensorOperator ** [L-1-index];
+      Dtensors[index] = new TensorOperator ** [L-1-index];
       for (int cnt2=0; cnt2<L-1-index; cnt2++){
-         Atensors[index][cnt2] = new TensorA * [L-1-index-cnt2];
-         if (cnt2>0){ Btensors[index][cnt2] = new TensorB * [L-1-index-cnt2]; }
-         Ctensors[index][cnt2] = new TensorC * [L-1-index-cnt2];
-         Dtensors[index][cnt2] = new TensorD * [L-1-index-cnt2];
+         Atensors[index][cnt2] = new TensorOperator * [L-1-index-cnt2];
+         if (cnt2>0){ Btensors[index][cnt2] = new TensorOperator * [L-1-index-cnt2]; }
+         Ctensors[index][cnt2] = new TensorOperator * [L-1-index-cnt2];
+         Dtensors[index][cnt2] = new TensorOperator * [L-1-index-cnt2];
          for (int cnt3=0; cnt3<L-1-index-cnt2; cnt3++){
             const int Idiff = Irreps::directProd(denBK->gIrrep(index+1+cnt2+cnt3),denBK->gIrrep(index+1+cnt3));
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIchemps2::owner_absigma(index+1+cnt3, index+1+cnt2+cnt3) == MPIRANK ){
             #endif
-               Atensors[index][cnt2][cnt3] = new TensorA(index+1,Idiff,movingRight,denBK);
-               if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorB(index+1,Idiff,movingRight,denBK); }
+                            Atensors[index][cnt2][cnt3] = new TensorOperator( index+1, 0, 2, Idiff, movingRight, true, false, denBK );
+               if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorOperator( index+1, 2, 2, Idiff, movingRight, true, false, denBK ); }
             #ifdef CHEMPS2_MPI_COMPILATION
             } else {
                Atensors[index][cnt2][cnt3] = NULL;
@@ -918,8 +918,8 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
             }
             if ( MPIchemps2::owner_cdf(L, index+1+cnt3, index+1+cnt2+cnt3) == MPIRANK ){
             #endif
-               Ctensors[index][cnt2][cnt3] = new TensorC(index+1,Idiff,movingRight,denBK);
-               Dtensors[index][cnt2][cnt3] = new TensorD(index+1,Idiff,movingRight,denBK);
+               Ctensors[index][cnt2][cnt3] = new TensorOperator( index+1, 0, 0, Idiff, movingRight, true,        false, denBK );
+               Dtensors[index][cnt2][cnt3] = new TensorOperator( index+1, 2, 0, Idiff, movingRight, movingRight, false, denBK );
             #ifdef CHEMPS2_MPI_COMPILATION
             } else {
                Ctensors[index][cnt2][cnt3] = NULL;
@@ -1006,22 +1006,22 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
    
       //Complementary two-operator tensors : certain processes own certain complementary two-operator tensors
       //To left: Atens[cnt][cnt2][cnt3] = operators on sites cnt-cnt2-cnt3 and cnt-cnt3; at boundary cnt+1
-      Atensors[index] = new TensorA ** [index+1];
-      Btensors[index] = new TensorB ** [index+1];
-      Ctensors[index] = new TensorC ** [index+1];
-      Dtensors[index] = new TensorD ** [index+1];
+      Atensors[index] = new TensorOperator ** [index+1];
+      Btensors[index] = new TensorOperator ** [index+1];
+      Ctensors[index] = new TensorOperator ** [index+1];
+      Dtensors[index] = new TensorOperator ** [index+1];
       for (int cnt2=0; cnt2<index+1; cnt2++){
-         Atensors[index][cnt2] = new TensorA * [index + 1 - cnt2];
-         if (cnt2>0){ Btensors[index][cnt2] = new TensorB * [index + 1 - cnt2]; }
-         Ctensors[index][cnt2] = new TensorC * [index + 1 - cnt2];
-         Dtensors[index][cnt2] = new TensorD * [index + 1 - cnt2];
+         Atensors[index][cnt2] = new TensorOperator * [index + 1 - cnt2];
+         if (cnt2>0){ Btensors[index][cnt2] = new TensorOperator * [index + 1 - cnt2]; }
+         Ctensors[index][cnt2] = new TensorOperator * [index + 1 - cnt2];
+         Dtensors[index][cnt2] = new TensorOperator * [index + 1 - cnt2];
          for (int cnt3=0; cnt3<index+1-cnt2; cnt3++){
             const int Idiff = Irreps::directProd(denBK->gIrrep(index-cnt2-cnt3),denBK->gIrrep(index-cnt3));
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIchemps2::owner_absigma(index-cnt2-cnt3, index-cnt3) == MPIRANK ){
             #endif
-               Atensors[index][cnt2][cnt3] = new TensorA(index+1,Idiff,movingRight,denBK);
-               if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorB(index+1,Idiff,movingRight,denBK); }
+                            Atensors[index][cnt2][cnt3] = new TensorOperator( index+1, 0, 2, Idiff, movingRight, true, false, denBK );
+               if (cnt2>0){ Btensors[index][cnt2][cnt3] = new TensorOperator( index+1, 2, 2, Idiff, movingRight, true, false, denBK ); }
             #ifdef CHEMPS2_MPI_COMPILATION
             } else {
                Atensors[index][cnt2][cnt3] = NULL;
@@ -1029,8 +1029,8 @@ void CheMPS2::DMRG::allocateTensors(const int index, const bool movingRight){
             }
             if ( MPIchemps2::owner_cdf(L, index-cnt2-cnt3, index-cnt3) == MPIRANK ){
             #endif
-               Ctensors[index][cnt2][cnt3] = new TensorC(index+1,Idiff,movingRight,denBK);
-               Dtensors[index][cnt2][cnt3] = new TensorD(index+1,Idiff,movingRight,denBK);
+               Ctensors[index][cnt2][cnt3] = new TensorOperator( index+1, 0, 0, Idiff, movingRight, true,        false, denBK );
+               Dtensors[index][cnt2][cnt3] = new TensorOperator( index+1, 2, 0, Idiff, movingRight, movingRight, false, denBK );
             #ifdef CHEMPS2_MPI_COMPILATION
             } else {
                Ctensors[index][cnt2][cnt3] = NULL;

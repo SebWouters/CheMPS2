@@ -121,7 +121,7 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
 }
 
-void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -150,7 +150,7 @@ void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -179,7 +179,7 @@ void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -208,7 +208,7 @@ void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -237,7 +237,7 @@ void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -272,7 +272,7 @@ void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -307,7 +307,7 @@ void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -342,7 +342,7 @@ void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -377,7 +377,7 @@ void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors) const{
+void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator **** Ctensors, TensorF0 **** F0tensors) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
@@ -495,7 +495,7 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors) const{
+void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator **** Dtensors, TensorF1 **** F1tensors) const{
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();

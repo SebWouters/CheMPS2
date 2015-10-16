@@ -493,22 +493,6 @@ object.
 SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual
 dimensions of all symmetry sectors at all boundaries.
 
-[CheMPS2/TensorA.cpp](CheMPS2/TensorA.cpp) contains the TensorA
-functions. This class stores and handles the complementary reduced spin-0
-S0-tensors.
-
-[CheMPS2/TensorB.cpp](CheMPS2/TensorB.cpp) contains the TensorB
-functions. This class stores and handles the complementary reduced spin-1
-S1-tensors.
-
-[CheMPS2/TensorC.cpp](CheMPS2/TensorC.cpp) contains the TensorC
-functions. This class stores and handles the complementary reduced spin-0
-F0-tensors.
-
-[CheMPS2/TensorD.cpp](CheMPS2/TensorD.cpp) contains the TensorD
-functions. This class stores and handles the complementary reduced spin-1
-F1-tensors.
-
 [CheMPS2/TensorDiag.cpp](CheMPS2/TensorDiag.cpp) contains the TensorDiag functions. This storage
 class handles reduced tensors which are diagonal in the symmetry sectors.
 
@@ -536,6 +520,11 @@ for the M-tensor. It is required for the two-orbital mutual information.
 
 [CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) implements the storage and handling of the partial
 terms which are required to calculate the overlap between two MPSs.
+
+[CheMPS2/TensorOperator.cpp](CheMPS2/TensorOperator.cpp) implements the storage and handling of
+tensor operators with a given spin, particle number, and point group irrep. It replaces the
+previous classes TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase,
+TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD.
 
 [CheMPS2/TensorQ.cpp](CheMPS2/TensorQ.cpp) contains all TensorQ functions. This class stores
 and handles the complementary reduced spin-1/2 part of three sandwiched second
@@ -647,14 +636,6 @@ as parameters related to memory usage and convergence.
 [CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
 
-[CheMPS2/include/chemps2/TensorA.h](CheMPS2/include/chemps2/TensorA.h) contains the definitions of the TensorA class.
-
-[CheMPS2/include/chemps2/TensorB.h](CheMPS2/include/chemps2/TensorB.h) contains the definitions of the TensorB class.
-
-[CheMPS2/include/chemps2/TensorC.h](CheMPS2/include/chemps2/TensorC.h) contains the definitions of the TensorC class.
-
-[CheMPS2/include/chemps2/TensorD.h](CheMPS2/include/chemps2/TensorD.h) contains the definitions of the TensorD class.
-
 [CheMPS2/include/chemps2/TensorDiag.h](CheMPS2/include/chemps2/TensorDiag.h) contains the definitions of the
 TensorDiag class.
 
@@ -675,6 +656,8 @@ class.
 [CheMPS2/include/chemps2/TensorM.h](CheMPS2/include/chemps2/TensorM.h) contains the definitions of the TensorM class.
 
 [CheMPS2/include/chemps2/TensorO.h](CheMPS2/include/chemps2/TensorO.h) contains the definitions of the TensorO class.
+
+[CheMPS2/include/chemps2/TensorOperator.h](CheMPS2/include/chemps2/TensorOperator.h) contains the definitions of the TensorOperator class.
 
 [CheMPS2/include/chemps2/TensorQ.h](CheMPS2/include/chemps2/TensorQ.h) contains the definitions of the TensorQ class.
 

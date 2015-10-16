@@ -30,7 +30,7 @@ TensorOperator(indexIn,
                0, // n_elec
                IdiffIn,
                movingRightIn,
-               (( movingRightIn ) ? true : false), // prime_last
+               movingRightIn, // prime_last
                false, // jw_phase (two 2nd quantized operators)
                denBKIn){ }
 

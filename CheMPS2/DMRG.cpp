@@ -55,10 +55,10 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    F1tensors = new TensorF1 *** [L-1];
    S0tensors = new TensorS0 *** [L-1];
    S1tensors = new TensorS1 *** [L-1];
-   Atensors = new TensorA *** [L-1];
-   Btensors = new TensorB *** [L-1];
-   Ctensors = new TensorC *** [L-1];
-   Dtensors = new TensorD *** [L-1];
+   Atensors = new TensorOperator *** [L-1];
+   Btensors = new TensorOperator *** [L-1];
+   Ctensors = new TensorOperator *** [L-1];
+   Dtensors = new TensorOperator *** [L-1];
    Qtensors = new TensorQ ** [L-1];
    Xtensors = new TensorX * [L-1];
    isAllocated = new int[L-1]; //0 not allocated, 1 allocated with movingRight true, 2 allocated with movingRight false

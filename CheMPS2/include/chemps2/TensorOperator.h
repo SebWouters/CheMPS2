@@ -112,6 +112,19 @@ namespace CheMPS2{
              \param workmem Work memory */
          void update(TensorOperator * previous, TensorT * mps_tensor, double * workmem);
          
+         //! daxpy for TensorOperator
+         /** \param alpha The prefactor
+             \param to_add The TensorOperator x which should be added: this <-- this + alpha * to_add */
+         void daxpy(double alpha, TensorOperator * to_add);
+         
+         //! daxpy_transpose for C- and D-tensors (with special spin-dependent factors)
+         /** \param alpha The prefactor
+             \param to_add The TensorOperator x which should be added: this <-- this + alpha * special_spin_dependent_factor * to_add^T */
+         void daxpy_transpose_tensorCD(const double alpha, TensorOperator * to_add);
+         
+         //! Set all storage variables to 0.0
+         void clear();
+         
       protected:
       
          //! Get twice the spin of the tensor operator
@@ -128,9 +141,6 @@ namespace CheMPS2{
          
          //! The down spin symmetry sector (pointer points to sectorTwoS1 if two_j == 0)
          int * sector_2S_down;
-         
-         //! Set all storage variables to 0.0
-         void clear();
          
          //! Update moving right
          /** \param ikappa The tensor block which should be updated

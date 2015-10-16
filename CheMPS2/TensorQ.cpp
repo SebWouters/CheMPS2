@@ -376,14 +376,14 @@ void CheMPS2::TensorQ::AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double
 
 }
 
-void CheMPS2::TensorQ::AddTermsAB(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsAB(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2){
 
    if (movingRight){ AddTermsABRight(denA, denB, denT, workmem, workmem2); }
    else{ AddTermsABLeft( denA, denB, denT, workmem, workmem2); }
 
 }
 
-void CheMPS2::TensorQ::AddTermsABRight(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsABRight(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int ID = Irreps::directProd(sectorI1[ikappa],Idiff);
@@ -486,7 +486,7 @@ void CheMPS2::TensorQ::AddTermsABRight(TensorA * denA, TensorB * denB, TensorT *
 
 }
 
-void CheMPS2::TensorQ::AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsABLeft(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int ID  = Irreps::directProd(sectorI1[ikappa],Idiff);
@@ -589,14 +589,14 @@ void CheMPS2::TensorQ::AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * 
 
 }
 
-void CheMPS2::TensorQ::AddTermsCD(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCD(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2){
 
    if (movingRight){ AddTermsCDRight(denC, denD, denT, workmem, workmem2); }
    else{ AddTermsCDLeft(denC, denD, denT, workmem, workmem2); }
    
 }
 
-void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCDRight(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int IRD  = Irreps::directProd(sectorI1[ikappa],Idiff);
@@ -683,7 +683,7 @@ void CheMPS2::TensorQ::AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT *
 
 }
 
-void CheMPS2::TensorQ::AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2){
+void CheMPS2::TensorQ::AddTermsCDLeft(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2){
 
    for (int ikappa=0; ikappa<nKappa; ikappa++){
       const int ILD  = Irreps::directProd(sectorI1[ikappa],Idiff);

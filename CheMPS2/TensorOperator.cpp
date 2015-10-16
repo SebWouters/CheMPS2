@@ -394,4 +394,52 @@ void CheMPS2::TensorOperator::update_moving_left(const int ikappa, TensorOperato
 
 }
 
+void CheMPS2::TensorOperator::daxpy(double alpha, TensorOperator * to_add){
+
+   assert( kappa2index[nKappa] == to_add->gKappa2index(to_add->gNKappa()) );
+   int inc = 1;
+   daxpy_(kappa2index+nKappa, &alpha, to_add->gStorage(), &inc, storage, &inc);
+
+}
+
+void CheMPS2::TensorOperator::daxpy_transpose_tensorCD(const double alpha, TensorOperator * to_add){
+
+   assert( kappa2index[nKappa] == to_add->gKappa2index(to_add->gNKappa()) );
+   assert( n_elec == 0 );
+   assert( ( two_j == 0 ) || ( two_j == 2 ) );
+
+   for (int ikappa=0; ikappa<nKappa; ikappa++){
+
+      const int irrep_up   = sectorI1[ikappa];
+      const int irrep_down = Irreps::directProd( irrep_up, n_irrep );
+      const int two_s_up   = sectorTwoS1[ikappa];
+      const int two_s_down = sector_2S_down[ikappa];
+      const int n_updown   = sectorN1[ikappa];
+
+      const int dim_up   = denBK->gCurrentDim( index, n_updown, two_s_up,   irrep_up   );
+      const int dim_down = denBK->gCurrentDim( index, n_updown, two_s_down, irrep_down );
+
+      double prefactor = alpha;
+      /*
+         This phase factor comes historically from the TensorD and is not valid in general,
+         as it is tightly coupled to the specific change from (for moving_right == true ):
+           < 1/2 m1 1/2 -m2 | 1 (m1-m2) > * (-1)^{1/2-m2} * < j_L' j_L^z' 1 (m1-m2) | j_L  j_L^z  >
+         = < 1/2 m2 1/2 -m1 | 1 (m2-m1) > * (-1)^{1/2-m1} * < j_L  j_L^z  1 (m1-m2) | j_L' j_L^z' > * prefactor
+      */
+      if ( two_s_up != two_s_down ){
+         prefactor *= CheMPS2::Heff::phase( two_s_up - two_s_down )
+                    * sqrt(( moving_right ) ? (( two_s_up + 1.0 ) / ( two_s_down + 1.0 )) : (( two_s_down + 1.0 ) / ( two_s_up + 1.0 )));
+      }
+
+      double * block = to_add->gStorage( n_updown, two_s_down, irrep_down, n_updown, two_s_up, irrep_up );
+      for (int irow = 0; irow < dim_up; irow++){
+         for (int icol = 0; icol < dim_down; icol++){
+            storage[ kappa2index[ikappa] + irow + dim_up * icol ] += prefactor * block[ icol + dim_down * irow ];
+         }
+      }
+
+   }
+
+}
+
 

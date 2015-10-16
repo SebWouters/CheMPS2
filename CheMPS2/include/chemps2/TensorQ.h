@@ -22,10 +22,7 @@
 
 #include "TensorT.h"
 #include "TensorL.h"
-#include "TensorA.h"
-#include "TensorB.h"
-#include "TensorC.h"
-#include "TensorD.h"
+#include "TensorOperator.h"
 #include "TensorF0.h"
 #include "TensorF1.h"
 #include "TensorSwap.h"
@@ -68,21 +65,21 @@ namespace CheMPS2{
              \param workmem2 Work memory */
          void AddTermsL(TensorL ** Ltensors, TensorT * denT, double * workmem, double * workmem2);
          
-         //! Add terms after update/clear with previous TensorA's and TensorB's
-         /** \param denA The TensorA to construct the Q-term
-             \param denB The TensorB to construct the Q-term
+         //! Add terms after update/clear with previous A-tensors and B-tensors
+         /** \param denA The A-tensor to construct the Q-term
+             \param denB The B-tensor to construct the Q-term
              \param denT TensorT to construct the Q-term with previous TensorL's
              \param workmem Work memory
              \param workmem2 Work memory */
-         void AddTermsAB(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsAB(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2);
          
-         //! Add terms after update/clear with previous TensorC's, TensorD's, TensorF0's, TensorF1's
-         /** \param denC The TensorC to construct the Q-term
-             \param denD The TensorD to construct the Q-term
+         //! Add terms after update/clear with previous C-tensors and D-tensors
+         /** \param denC The C-tensor to construct the Q-term
+             \param denD The D-tensor to construct the Q-term
              \param denT TensorT to construct the Q-term with previous TensorL's
              \param workmem Work memory
              \param workmem2 Work memory */
-         void AddTermsCD(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCD(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2);
          
       private:
       
@@ -97,10 +94,10 @@ namespace CheMPS2{
          void AddTermSimpleLeft(TensorT * denT);
          void AddTermsLRight(TensorL ** Ltensors, TensorT * denT, double * workmem, double * workmem2);
          void AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsABRight(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsABLeft(TensorA * denA, TensorB * denB, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsCDRight(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
-         void AddTermsCDLeft(TensorC * denC, TensorD * denD, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsABRight(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsABLeft(TensorOperator * denA, TensorOperator * denB, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCDRight(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2);
+         void AddTermsCDLeft(TensorOperator * denC, TensorOperator * denD, TensorT * denT, double * workmem, double * workmem2);
          
    };
 }

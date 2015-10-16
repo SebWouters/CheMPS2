@@ -32,10 +32,7 @@
 #include "TensorF0.h"
 #include "TensorS0.h"
 #include "TensorS1.h"
-#include "TensorA.h"
-#include "TensorB.h"
-#include "TensorC.h"
-#include "TensorD.h"
+#include "TensorOperator.h"
 #include "TensorQ.h"
 #include "TensorO.h"
 #include "TwoDM.h"
@@ -207,17 +204,17 @@ namespace CheMPS2{
          //TensorS1's
          TensorS1 **** S1tensors;
          
-         //TensorA's
-         TensorA **** Atensors;
+         //A-tensors
+         TensorOperator **** Atensors;
          
-         //TensorB's
-         TensorB **** Btensors;
+         //B-tensors
+         TensorOperator **** Btensors;
          
-         //TensorC's
-         TensorC **** Ctensors;
+         //C-tensors
+         TensorOperator **** Ctensors;
          
-         //TensorD's
-         TensorD **** Dtensors;
+         //D-tensors
+         TensorOperator **** Dtensors;
          
          //TensorQ's
          TensorQ *** Qtensors;
