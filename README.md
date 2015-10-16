@@ -508,15 +508,12 @@ quantized operators, of which the particle symmetry sectors are equal.
 for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
 information.
 
-[CheMPS2/TensorK.cpp](CheMPS2/TensorK.cpp) contains the contruct and update functions
-for the K-tensor. It is required for the two-orbital mutual information.
+[CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and update functions
+for the K- and M-tensor. It is required for the two-orbital mutual information.
 
 [CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores
 and handles the reduced spin-1/2 part of a single sandwiched second quantized
 operator.
-
-[CheMPS2/TensorM.cpp](CheMPS2/TensorM.cpp) contains the contruct and update functions
-for the M-tensor. It is required for the two-orbital mutual information.
 
 [CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) implements the storage and handling of the partial
 terms which are required to calculate the overlap between two MPSs.
@@ -537,9 +534,6 @@ quantized operators, of which the particle symmetry sectors differ by 2.
 [CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class
 stores and handles the reduced spin-1 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors differ by 2.
-
-[CheMPS2/TensorSwap.cpp](CheMPS2/TensorSwap.cpp) contains the common storage and handling
-functions of the TensorL and TensorQ classes.
 
 [CheMPS2/TensorT.cpp](CheMPS2/TensorT.cpp) contains all TensorT functions. This class
 stores and handles the reduced part of an MPS site-tensor.
@@ -649,11 +643,9 @@ class.
 [CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor
 class.
 
-[CheMPS2/include/chemps2/TensorK.h](CheMPS2/include/chemps2/TensorK.h) contains the definitions of the TensorK class.
+[CheMPS2/include/chemps2/TensorKM.h](CheMPS2/include/chemps2/TensorKM.h) contains the definitions of the TensorKM class.
 
 [CheMPS2/include/chemps2/TensorL.h](CheMPS2/include/chemps2/TensorL.h) contains the definitions of the TensorL class.
-
-[CheMPS2/include/chemps2/TensorM.h](CheMPS2/include/chemps2/TensorM.h) contains the definitions of the TensorM class.
 
 [CheMPS2/include/chemps2/TensorO.h](CheMPS2/include/chemps2/TensorO.h) contains the definitions of the TensorO class.
 
@@ -664,9 +656,6 @@ class.
 [CheMPS2/include/chemps2/TensorS0.h](CheMPS2/include/chemps2/TensorS0.h) contains the definitions of the TensorS0 class.
 
 [CheMPS2/include/chemps2/TensorS1.h](CheMPS2/include/chemps2/TensorS1.h) contains the definitions of the TensorS1 class.
-
-[CheMPS2/include/chemps2/TensorSwap.h](CheMPS2/include/chemps2/TensorSwap.h) contains the definitions of the TensorSwap
-class.
 
 [CheMPS2/include/chemps2/TensorT.h](CheMPS2/include/chemps2/TensorT.h) contains the definitions of the TensorT class.
 

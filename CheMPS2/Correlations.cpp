@@ -228,7 +228,7 @@ void CheMPS2::Correlations::mpi_broadcast(){
 }
 #endif
 
-void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorK ** Ktensors, TensorM ** Mtensors){
+void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorKM ** Ktensors, TensorKM ** Mtensors){
 
    const int theindex = denT->gIndex();
    const int MAXDIM = max(denBK->gMaxDimAtBound(theindex), denBK->gMaxDimAtBound(theindex+1));
@@ -488,7 +488,7 @@ double CheMPS2::Correlations::diagram3(TensorT * denT, TensorGYZ * denG, double 
 
 }
 
-double CheMPS2::Correlations::diagram4(TensorT * denT, TensorSwap * denK, double * workmem) const{ //checked
+double CheMPS2::Correlations::diagram4(TensorT * denT, TensorKM * denK, double * workmem) const{ //checked
 
    const int theindex = denT->gIndex();
    
@@ -534,7 +534,7 @@ double CheMPS2::Correlations::diagram4(TensorT * denT, TensorSwap * denK, double
 
 }
 
-double CheMPS2::Correlations::diagram5(TensorT * denT, TensorSwap * denM, double * workmem) const{ //checked
+double CheMPS2::Correlations::diagram5(TensorT * denT, TensorKM * denM, double * workmem) const{ //checked
 
    const int theindex = denT->gIndex();
    

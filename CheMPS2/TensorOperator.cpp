@@ -245,15 +245,17 @@ void CheMPS2::TensorOperator::update_moving_right(const int ikappa, TensorOperat
             double * left_block     =   previous->gStorage( n_left_up,   two_s_left_up,   irrep_left_up,   n_left_down,  two_s_left_down,  irrep_left_down  );
 
             // Prefactor
-            double alpha = ( ( jw_phase ) ? -1.0 : 1.0 );
+            double alpha = 1.0;
             if ( geval >= 2 ){
-               if ( two_j > 0 ){
+               if ( two_j == 0 ){
+                  alpha = ( ( jw_phase ) ? -1.0 : 1.0 );
+               } else {
                   if ( prime_last ){
-                     alpha *= CheMPS2::Heff::phase( two_s_right_up + two_s_left_down + two_j + 1 )
+                     alpha = CheMPS2::Heff::phase( two_s_right_up + two_s_left_down + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * sqrt( ( two_s_left_down + 1.0 ) * ( two_s_right_up + 1.0 ) )
                            * gsl_sf_coupling_6j( two_s_left_up, two_s_left_down, two_j, two_s_right_down, two_s_right_up, 1 );
                   } else {
-                     alpha *= CheMPS2::Heff::phase( two_s_right_down + two_s_left_up + two_j + 1 )
+                     alpha = CheMPS2::Heff::phase( two_s_right_down + two_s_left_up + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * sqrt( ( two_s_left_up + 1.0 ) * ( two_s_right_down + 1.0 ) )
                            * gsl_sf_coupling_6j( two_s_left_down, two_s_left_up, two_j, two_s_right_up, two_s_right_down, 1 );
                   }
@@ -357,17 +359,17 @@ void CheMPS2::TensorOperator::update_moving_left(const int ikappa, TensorOperato
             double * right_block    =   previous->gStorage( n_right_up,  two_s_right_up,  irrep_right_up,  n_right_down, two_s_right_down, irrep_right_down );
 
             // Prefactor
-            double alpha = ( ( jw_phase ) ? -1.0 : 1.0 );
+            double alpha = 1.0;
             if ( geval >= 2 ){
                if ( two_j == 0 ){
-                  alpha *= ( two_s_right_up + 1.0 ) / ( two_s_left_up + 1.0 );
+                  alpha = ( ( jw_phase ) ? -1.0 : 1.0 ) * ( two_s_right_up + 1.0 ) / ( two_s_left_up + 1.0 );
                } else {
                   if ( prime_last ){
-                     alpha *= CheMPS2::Heff::phase( two_s_right_up + two_s_left_down + two_j + 1 )
+                     alpha = CheMPS2::Heff::phase( two_s_right_up + two_s_left_down + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * ( two_s_right_down + 1 ) * sqrt( ( two_s_right_up + 1.0 ) / ( two_s_left_down + 1.0 ) )
                            * gsl_sf_coupling_6j( two_s_right_up, two_s_right_down, two_j, two_s_left_down, two_s_left_up, 1 );
                   } else {
-                     alpha *= CheMPS2::Heff::phase( two_s_right_down + two_s_left_up + two_j + 1 )
+                     alpha = CheMPS2::Heff::phase( two_s_right_down + two_s_left_up + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * ( two_s_right_up + 1 ) * sqrt( ( two_s_right_down + 1.0 ) / ( two_s_left_up + 1.0 ) )
                            * gsl_sf_coupling_6j( two_s_right_down, two_s_right_up, two_j, two_s_left_up, two_s_left_down, 1 );
                   }

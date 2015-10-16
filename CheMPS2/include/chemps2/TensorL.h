@@ -22,7 +22,7 @@
 
 #include "Tensor.h"
 #include "TensorT.h"
-#include "TensorSwap.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -31,7 +31,7 @@ namespace CheMPS2{
     \date February 20, 2013
     
     The TensorL class is a storage and manipulation class for a single contracted creator/annihilitor. */
-   class TensorL : public TensorSwap{
+   class TensorL : public TensorOperator{
 
       public:
       

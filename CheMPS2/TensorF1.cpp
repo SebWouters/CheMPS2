@@ -145,14 +145,14 @@ void CheMPS2::TensorF1::makenewRight(TensorL * denL, TensorT * denT, double * wo
                TwoSLU = sectorTwoS1[ikappa];
                ILU = sectorI1[ikappa];
                TwoSLD = sector_2S_down[ikappa]-1;
-               ILD = Irreps::directProd( ILU, denL->gIdiff() );
+               ILD = Irreps::directProd( ILU, denL->get_irrep() );
                break;
             case 3:
                NLU = sectorN1[ikappa]-2;
                TwoSLU = sectorTwoS1[ikappa];
                ILU = sectorI1[ikappa];
                TwoSLD = sector_2S_down[ikappa]+1;
-               ILD = Irreps::directProd( ILU, denL->gIdiff() );
+               ILD = Irreps::directProd( ILU, denL->get_irrep() );
                break;
          }
          int dimLU = denBK->gCurrentDim(index-1, NLU,   TwoSLU, ILU);
@@ -205,14 +205,14 @@ void CheMPS2::TensorF1::makenewLeft(TensorL * denL, TensorT * denT, double * wor
                TwoSRU = sectorTwoS1[ikappa];
                IRU = sectorI1[ikappa];
                TwoSRD = sector_2S_down[ikappa] - 1;
-               IRD = Irreps::directProd( IRU , denL->gIdiff() );
+               IRD = Irreps::directProd( IRU , denL->get_irrep() );
                break;
             case 1:
                NRU = sectorN1[ikappa];
                TwoSRU = sectorTwoS1[ikappa];
                IRU = sectorI1[ikappa];
                TwoSRD = sector_2S_down[ikappa] + 1;
-               IRD = Irreps::directProd( IRU , denL->gIdiff() );
+               IRD = Irreps::directProd( IRU , denL->get_irrep() );
                break;
             case 2:
                NRU = sectorN1[ikappa] + 1;

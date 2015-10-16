@@ -24,8 +24,7 @@
 #include "Problem.h"
 #include "TwoDM.h"
 #include "TensorGYZ.h"
-#include "TensorK.h"
-#include "TensorM.h"
+#include "TensorKM.h"
 
 namespace CheMPS2{
 /** Correlations class.
@@ -186,7 +185,7 @@ namespace CheMPS2{
              \param Ztensors Tensors required for the calculation
              \param Ktensors Tensors required for the calculation
              \param Mtensors Tensors required for the calculation*/
-         void FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorK ** Ktensors, TensorM ** Mtensors);
+         void FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorKM ** Ktensors, TensorKM ** Mtensors);
          
          //! Return Idistance(power) (see return for definition)
          /** \param power The power used in Idistance
@@ -240,8 +239,8 @@ namespace CheMPS2{
          double diagram1(TensorT * denT, TensorGYZ * denY, double * workmem) const;
          double diagram2(TensorT * denT, TensorGYZ * denZ, double * workmem) const;
          double diagram3(TensorT * denT, TensorGYZ * denG, double * workmem) const;
-         double diagram4(TensorT * denT, TensorSwap * denK, double * workmem) const;
-         double diagram5(TensorT * denT, TensorSwap * denM, double * workmem) const;
+         double diagram4(TensorT * denT, TensorKM * denK, double * workmem) const;
+         double diagram5(TensorT * denT, TensorKM * denM, double * workmem) const;
          
          //Helper function to print tables in a nice format
          void PrintTableNice(const double * table, const int sPrecision, const int columnsPerLine) const;

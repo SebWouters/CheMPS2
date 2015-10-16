@@ -28,8 +28,7 @@
 
 #include "DMRG.h"
 #include "Lapack.h"
-#include "TensorK.h"
-#include "TensorM.h"
+#include "TensorKM.h"
 #include "TensorGYZ.h"
 #include "Heff.h"
 #include "MPIchemps2.h"
@@ -132,8 +131,8 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    TensorGYZ ** Gtensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
    TensorGYZ ** Ytensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
    TensorGYZ ** Ztensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
-   TensorK   ** Ktensors = ( am_i_master ) ? new TensorK  *[L-1] : NULL;
-   TensorM   ** Mtensors = ( am_i_master ) ? new TensorM  *[L-1] : NULL;
+   TensorKM  ** Ktensors = ( am_i_master ) ? new TensorKM *[L-1] : NULL;
+   TensorKM  ** Mtensors = ( am_i_master ) ? new TensorKM *[L-1] : NULL;
    
    //Do the actual work
    for (int siteindex=1; siteindex<L; siteindex++){
@@ -160,14 +159,14 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
             TensorGYZ * newG = new TensorGYZ(siteindex, 'G', denBK);
             TensorGYZ * newY = new TensorGYZ(siteindex, 'Y', denBK);
             TensorGYZ * newZ = new TensorGYZ(siteindex, 'Z', denBK);
-            TensorK   * newK = new TensorK(siteindex, denBK->gIrrep(previousindex), denBK);
-            TensorM   * newM = new TensorM(siteindex, denBK->gIrrep(previousindex), denBK);
+            TensorKM  * newK = new TensorKM( siteindex, 'K', denBK->gIrrep(previousindex), denBK );
+            TensorKM  * newM = new TensorKM( siteindex, 'M', denBK->gIrrep(previousindex), denBK );
 
             newG->update(MPS[siteindex-1], Gtensors[previousindex], workmemLR);
             newY->update(MPS[siteindex-1], Ytensors[previousindex], workmemLR);
             newZ->update(MPS[siteindex-1], Ztensors[previousindex], workmemLR);
-            newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR, false);
-            newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR, false);
+            newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR);
+            newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR);
             
             delete Gtensors[previousindex];
             delete Ytensors[previousindex];
@@ -187,8 +186,8 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
          Gtensors[siteindex-1] = new TensorGYZ(siteindex, 'G', denBK);
          Ytensors[siteindex-1] = new TensorGYZ(siteindex, 'Y', denBK);
          Ztensors[siteindex-1] = new TensorGYZ(siteindex, 'Z', denBK);
-         Ktensors[siteindex-1] = new TensorK(siteindex, denBK->gIrrep(siteindex-1), denBK);
-         Mtensors[siteindex-1] = new TensorM(siteindex, denBK->gIrrep(siteindex-1), denBK);
+         Ktensors[siteindex-1] = new TensorKM( siteindex, 'K', denBK->gIrrep(siteindex-1), denBK );
+         Mtensors[siteindex-1] = new TensorKM( siteindex, 'M', denBK->gIrrep(siteindex-1), denBK );
          
          Gtensors[siteindex-1]->construct(MPS[siteindex-1]);
          Ytensors[siteindex-1]->construct(MPS[siteindex-1]);

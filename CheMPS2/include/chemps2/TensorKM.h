@@ -17,36 +17,42 @@
    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef TENSORM_CHEMPS2_H
-#define TENSORM_CHEMPS2_H
+#ifndef TENSORKM_CHEMPS2_H
+#define TENSORKM_CHEMPS2_H
 
 #include "Tensor.h"
 #include "TensorT.h"
-#include "TensorSwap.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
-/** TensorM class.
+/** TensorKM class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date August 9, 2014
     
-    The TensorM class is a storage and manipulation class for a single contracted creator/annihilitor for the two-orbital mutual information. It only exists moving left to right. */
-   class TensorM : public TensorSwap{
+    The TensorKM class is a storage and manipulation class for a single contracted creator/annihilitor for the two-orbital mutual information. It only exists moving left to right. */
+   class TensorKM : public TensorOperator{
 
       public:
       
          //! Constructor
          /** \param indexIn The boundary index
-             \param IdiffIn The irrep of the one creator ( sandwiched since TensorM )
+             \param identityIn The identity: K, or M (capitals!)
+             \param IdiffIn The irrep of the one creator ( sandwiched since TensorK )
              \param denBKIn The symmetry bookkeeper of the problem to be solved */
-         TensorM(const int indexIn, const int IdiffIn, const SyBookkeeper * denBKIn);
+         TensorKM(const int indexIn, const char identityIn, const int IdiffIn, const SyBookkeeper * denBKIn);
          
          //! Destructor
-         virtual ~TensorM();
+         virtual ~TensorKM();
          
-         //Construct new TensorM (vs update)
-         /** \param denT TensorT from which the new TensorM should be made. */
+         //Construct new TensorKM (vs update)
+         /** \param denT TensorT from which the new TensorKM should be made. */
          void construct(TensorT * denT);
+         
+      private:
+         
+         //! The identity
+         char identity;
          
    };
 }

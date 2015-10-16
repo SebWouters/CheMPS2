@@ -25,7 +25,6 @@
 #include "TensorOperator.h"
 #include "TensorF0.h"
 #include "TensorF1.h"
-#include "TensorSwap.h"
 #include "SyBookkeeper.h"
 #include "Problem.h"
 
@@ -35,7 +34,7 @@ namespace CheMPS2{
     \date March 5, 2013
     
     The TensorQ class is a storage and manipulation class for the complementary operator of three contracted creators/annihilitors. */
-   class TensorQ : public TensorSwap{
+   class TensorQ : public TensorOperator{
 
       public:
       
@@ -50,9 +49,6 @@ namespace CheMPS2{
          
          //! Destructor
          virtual ~TensorQ();
-         
-         //! Clear storage in case an update is not possible
-         void ClearStorage();
          
          //! Add terms after update/clear without previous tensors
          /** \param denT TensorT to construct the Q-term without previous tensors */

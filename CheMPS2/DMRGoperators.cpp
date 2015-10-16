@@ -369,7 +369,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
             if ( owner_q == MPIRANK )
             #endif
             {
-               Qtensors[index][cnt2]->ClearStorage();
+               Qtensors[index][cnt2]->clear();
                Qtensors[index][cnt2]->AddTermSimple(MPS[index]);
             }
             
@@ -395,7 +395,7 @@ void CheMPS2::DMRG::updateMovingRight(const int index){
                if (( owner_q == MPIRANK ) || ( owner_absigma == MPIRANK ) || ( owner_cdf == MPIRANK )){
                
                   TensorQ * tempQ = new TensorQ(index+1,denBK->gIrrep(siteindex),true,denBK,Prob,siteindex);
-                  tempQ->ClearStorage();
+                  tempQ->clear();
                   
                   //Everyone creates his/her piece
                   double * workmemBIS = new double[dimL*dimL];
@@ -696,7 +696,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
             if ( owner_q == MPIRANK )
             #endif
             {
-               Qtensors[index][cnt2]->ClearStorage();
+               Qtensors[index][cnt2]->clear();
                Qtensors[index][cnt2]->AddTermSimple(MPS[index+1]);
             }
          
@@ -722,7 +722,7 @@ void CheMPS2::DMRG::updateMovingLeft(const int index){
                if (( owner_q == MPIRANK ) || ( owner_absigma == MPIRANK ) || ( owner_cdf == MPIRANK )){
                
                   TensorQ * tempQ = new TensorQ(index+1,denBK->gIrrep(siteindex),false,denBK,Prob,siteindex);
-                  tempQ->ClearStorage();
+                  tempQ->clear();
                   
                   //Everyone creates his/her piece
                   double * workmemBIS = new double[dimR*dimR];
