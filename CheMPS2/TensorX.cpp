@@ -24,20 +24,25 @@
 #include "TensorX.h"
 #include "Lapack.h"
 
-CheMPS2::TensorX::TensorX(const int indexIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn) : TensorDiag(indexIn, denBKIn){
+CheMPS2::TensorX::TensorX(const int indexIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn) :
+TensorOperator(indexIn,
+               0, //two_j
+               0, //n_elec
+               0, //n_irrep
+               movingRightIn,
+               true,  //prime_last (doesn't matter for spin-0 tensors)
+               false, //jw_phase (four 2nd quantized operators)
+               denBKIn){
 
-   movingRight = movingRightIn;
    Prob = ProbIn;
 
 }
 
-CheMPS2::TensorX::~TensorX(){
-
-}
+CheMPS2::TensorX::~TensorX(){ }
 
 void CheMPS2::TensorX::update(TensorT * denT){
 
-   if (movingRight){
+   if (moving_right){
       //PARALLEL
       #pragma omp parallel for schedule(dynamic)
       for (int ikappa=0; ikappa<nKappa; ikappa++){ makenewRight(ikappa, denT); }
@@ -51,7 +56,7 @@ void CheMPS2::TensorX::update(TensorT * denT){
 
 void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xtensor, TensorQ * Qtensor, TensorOperator * Atensor, TensorOperator * Ctensor, TensorOperator * Dtensor){
 
-   if (movingRight){
+   if (moving_right){
       //PARALLEL
       #pragma omp parallel
       {
@@ -67,7 +72,7 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
          for (int ikappa=0; ikappa<nKappa; ikappa++){
             makenewRight(ikappa, denT);
             if (doOtherThings){
-               updateRight(ikappa, denT, Xtensor, workmemLR);
+               update_moving_right(ikappa, Xtensor, denT, workmemLR);
                addTermQLRight(ikappa, denT, Ltensors, Qtensor, workmemRR, workmemLR, workmemLL);
                addTermARight(ikappa, denT, Atensor, workmemRR, workmemLR);
                addTermCRight(ikappa, denT, Ctensor, workmemLR);
@@ -98,7 +103,7 @@ void CheMPS2::TensorX::update(TensorT * denT, TensorL ** Ltensors, TensorX * Xte
          for (int ikappa=0; ikappa<nKappa; ikappa++){
             makenewLeft(ikappa, denT);
             if (doOtherThings){
-               updateLeft(ikappa, denT, Xtensor, workmemLR);
+               update_moving_left(ikappa, Xtensor, denT, workmemLR);
                addTermQLLeft(ikappa, denT, Ltensors, Qtensor, workmemLL, workmemLR, workmemRR);
                addTermALeft(ikappa, denT, Atensor, workmemLR, workmemLL);
                addTermCLeft(ikappa, denT, Ctensor, workmemLR);

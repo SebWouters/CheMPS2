@@ -154,7 +154,7 @@ int CheMPS2::TensorT::gIndex() const { return index; }
 
 void CheMPS2::TensorT::random(){ for (int cnt=0; cnt<kappa2index[nKappa]; cnt++){ storage[cnt] = ((double) rand())/RAND_MAX; } }
 
-void CheMPS2::TensorT::QR(TensorDiag * Rstorage){
+void CheMPS2::TensorT::QR(Tensor * Rstorage){
 
    //Left normalization occurs in T-convention: no pre or after multiplication
    //Work per right symmetry sector
@@ -257,7 +257,7 @@ void CheMPS2::TensorT::QR(TensorDiag * Rstorage){
 
 }
 
-void CheMPS2::TensorT::LQ(TensorDiag * Lstorage){
+void CheMPS2::TensorT::LQ(Tensor * Lstorage){
 
    //Right normalization occurs in U-convention: pre-multiplication with sqrt{2jR+1/2jL+1} and after multiplication with sqrt{2jL+1/2jR+1}
    //Work per left symmetry sector
@@ -359,7 +359,7 @@ void CheMPS2::TensorT::LQ(TensorDiag * Lstorage){
 
 }
 
-void CheMPS2::TensorT::LeftMultiply(TensorDiag * Mx){
+void CheMPS2::TensorT::LeftMultiply(Tensor * Mx){
 
    //PARALLEL
    #pragma omp parallel for schedule(dynamic)
@@ -380,7 +380,7 @@ void CheMPS2::TensorT::LeftMultiply(TensorDiag * Mx){
    
 }
 
-void CheMPS2::TensorT::RightMultiply(TensorDiag * Mx){
+void CheMPS2::TensorT::RightMultiply(Tensor * Mx){
 
    //PARALLEL
    #pragma omp parallel for schedule(dynamic)

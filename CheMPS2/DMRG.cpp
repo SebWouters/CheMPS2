@@ -113,10 +113,10 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
          #ifdef CHEMPS2_MPI_COMPILATION
          if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){
          #endif
-            TensorDiag * Dstor = new TensorDiag(cnt+1,denBK);
+            TensorOperator * diag = new TensorOperator(cnt+1, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
             MPS[cnt]->random();
-            MPS[cnt]->QR(Dstor);
-            delete Dstor;
+            MPS[cnt]->QR(diag);
+            delete diag;
          #ifdef CHEMPS2_MPI_COMPILATION
          }
          MPIchemps2::broadcast_tensor(MPS[cnt], MPI_CHEMPS2_MASTER);

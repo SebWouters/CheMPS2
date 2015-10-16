@@ -35,7 +35,7 @@ namespace CheMPS2{
     \date March 6, 2013
     
     The TensorX class is a storage and manipulation class for completely contracted Hamiltonian terms. */
-   class TensorX : public TensorDiag{
+   class TensorX : public TensorOperator{
 
       public:
       

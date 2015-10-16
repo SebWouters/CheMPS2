@@ -493,9 +493,6 @@ object.
 SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual
 dimensions of all symmetry sectors at all boundaries.
 
-[CheMPS2/TensorDiag.cpp](CheMPS2/TensorDiag.cpp) contains the TensorDiag functions. This storage
-class handles reduced tensors which are diagonal in the symmetry sectors.
-
 [CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
@@ -509,7 +506,7 @@ for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
 information.
 
 [CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and update functions
-for the K- and M-tensor. It is required for the two-orbital mutual information.
+for the K- and M-tensors. It is required for the two-orbital mutual information.
 
 [CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores
 and handles the reduced spin-1/2 part of a single sandwiched second quantized
@@ -629,9 +626,6 @@ as parameters related to memory usage and convergence.
 
 [CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
-
-[CheMPS2/include/chemps2/TensorDiag.h](CheMPS2/include/chemps2/TensorDiag.h) contains the definitions of the
-TensorDiag class.
 
 [CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.
 

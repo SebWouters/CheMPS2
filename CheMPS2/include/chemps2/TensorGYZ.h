@@ -22,6 +22,7 @@
 
 #include "TensorT.h"
 #include "Problem.h"
+#include "TensorOperator.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -30,7 +31,7 @@ namespace CheMPS2{
     \date August 9, 2014
     
     The TensorGYZ class is a storage and manipulation class for the two-orbital mutual information. It only exists moving left to right. */
-   class TensorGYZ : public TensorDiag{
+   class TensorGYZ : public TensorOperator{
 
       public:
       
@@ -42,12 +43,6 @@ namespace CheMPS2{
          
          //! Destructor
          virtual ~TensorGYZ();
-         
-         //! Update the TensorGYZ
-         /** \param denT TensorT to update the TensorGYZ with
-             \param denGYZ TensorGYZ which should be updated
-             \param workmemLR Work memory */
-         void update(TensorT * denT, TensorGYZ * denGYZ, double * workmemLR);
          
          //! Construct a new TensorGYZ
          /** \param denT TensorT from which the new TensorGYZ should be made */

@@ -22,7 +22,15 @@
 #include "TensorGYZ.h"
 #include "Lapack.h"
 
-CheMPS2::TensorGYZ::TensorGYZ(const int indexIn, const char identityIn, const SyBookkeeper * denBKIn) : TensorDiag(indexIn, denBKIn){
+CheMPS2::TensorGYZ::TensorGYZ(const int indexIn, const char identityIn, const SyBookkeeper * denBKIn) :
+TensorOperator(indexIn,
+               0,     // two_j
+               0,     // n_elec = 0
+               0,     // n_irrep = I_trivial = 0
+               true,  // TensorGYZ only exists moving left to right
+               true,  // prime_last (doesn't matter for spin-0 tensors)
+               false, // No jw_phase when updating (two-orbital mutual information!)
+               denBKIn){
 
    identity = identityIn;
 
@@ -84,15 +92,6 @@ void CheMPS2::TensorGYZ::construct(TensorT * denT){
          }
       }
 
-   }
-
-}
-
-void CheMPS2::TensorGYZ::update(TensorT * denT, TensorGYZ * denGYZ, double * workmemLR){
-
-   for (int ikappa=0; ikappa<nKappa; ikappa++){
-      for (int cnt=kappa2index[ikappa]; cnt<kappa2index[ikappa+1]; cnt++){ storage[cnt] = 0.0; } //Clear
-      updateRight(ikappa, denT, denGYZ, workmemLR); //Add the previous TensorGYZ
    }
 
 }

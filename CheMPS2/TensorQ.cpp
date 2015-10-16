@@ -31,7 +31,7 @@ TensorOperator(indexIn,
                IdiffIn,
                movingRightIn,
                true, //prime_last
-               true, //jw_phase (one 2nd quantized operator)
+               true, //jw_phase (three 2nd quantized operators)
                denBKIn){
 
    Prob = ProbIn;

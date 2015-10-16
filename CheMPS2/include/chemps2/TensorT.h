@@ -21,7 +21,6 @@
 #define TENSORT_CHEMPS2_H
 
 #include "Tensor.h"
-#include "TensorDiag.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -86,20 +85,20 @@ namespace CheMPS2{
          void random();
          
          //! Left-normalization
-         /** \param Rstorage Where the R-part of the QR-decomposition can be stored. */
-         void QR(TensorDiag * Rstorage);
+         /** \param Rstorage Where the R-part of the QR-decomposition can be stored (diagonal TensorOperator). */
+         void QR(Tensor * Rstorage);
          
          //! Right-normalization
-         /** \param Lstorage Where the L-part of the LQ-decomposition can be stored. */
-         void LQ(TensorDiag * Lstorage);
+         /** \param Lstorage Where the L-part of the LQ-decomposition can be stored (diagonal TensorOperator). */
+         void LQ(Tensor * Lstorage);
          
-         //! Multiply at the left with a TensorDiag
-         /** \param Mx The TensorDiag with which the current TensorT should be multiplied at the left */
-         void LeftMultiply(TensorDiag * Mx);
+         //! Multiply at the left with a diagonal TensorOperator
+         /** \param Mx The diagonal TensorOperator with which the current TensorT should be multiplied at the left */
+         void LeftMultiply(Tensor * Mx);
          
-         //! Multiply at the right with a TensorDiag
-         /** \param Mx The TensorDiag with which the current TensorT should be multiplied at the right */
-         void RightMultiply(TensorDiag * Mx);
+         //! Multiply at the right with a diagonal TensorOperator
+         /** \param Mx The diagonal TensorOperator with which the current TensorT should be multiplied at the right */
+         void RightMultiply(Tensor * Mx);
          
          //! Reset the TensorT (if virtual dimensions are changed)
          void Reset();

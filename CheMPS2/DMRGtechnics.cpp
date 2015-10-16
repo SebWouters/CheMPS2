@@ -69,9 +69,9 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    updateMovingRightSafe(index);
    
    if ( am_i_master ){
-      TensorDiag * Norm = new TensorDiag(L, denBK);
-      MPS[L-1]->QR(Norm);
-      delete Norm;
+      TensorOperator * norm = new TensorOperator(L, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+      MPS[L-1]->QR(norm);
+      delete norm;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
    MPIchemps2::broadcast_tensor(MPS[L-1], MPI_CHEMPS2_MASTER);
@@ -91,10 +91,10 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
       the2DM->FillSite(MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors);
       if (siteindex>0){
          if ( am_i_master ){
-            TensorDiag * Left = new TensorDiag(siteindex, denBK);
-            MPS[siteindex]->LQ(Left);
-            MPS[siteindex-1]->RightMultiply(Left);
-            delete Left;
+            TensorOperator * left = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+            MPS[siteindex]->LQ(left);
+            MPS[siteindex-1]->RightMultiply(left);
+            delete left;
          }
          #ifdef CHEMPS2_MPI_COMPILATION
          MPIchemps2::broadcast_tensor(MPS[siteindex],   MPI_CHEMPS2_MASTER);
@@ -139,10 +139,10 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    
       //Switch MPS gauge
       if ( am_i_master ){
-         TensorDiag * Right = new TensorDiag(siteindex, denBK);
-         MPS[siteindex-1]->QR(Right);
-         MPS[siteindex]->LeftMultiply(Right);
-         delete Right;
+         TensorOperator * right = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+         MPS[siteindex-1]->QR(right);
+         MPS[siteindex]->LeftMultiply(right);
+         delete right;
       }
       #ifdef CHEMPS2_MPI_COMPILATION
       MPIchemps2::broadcast_tensor(MPS[siteindex-1], MPI_CHEMPS2_MASTER);
@@ -162,9 +162,9 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
             TensorKM  * newK = new TensorKM( siteindex, 'K', denBK->gIrrep(previousindex), denBK );
             TensorKM  * newM = new TensorKM( siteindex, 'M', denBK->gIrrep(previousindex), denBK );
 
-            newG->update(MPS[siteindex-1], Gtensors[previousindex], workmemLR);
-            newY->update(MPS[siteindex-1], Ytensors[previousindex], workmemLR);
-            newZ->update(MPS[siteindex-1], Ztensors[previousindex], workmemLR);
+            newG->update(Gtensors[previousindex], MPS[siteindex-1], workmemLR);
+            newY->update(Ytensors[previousindex], MPS[siteindex-1], workmemLR);
+            newZ->update(Ztensors[previousindex], MPS[siteindex-1], workmemLR);
             newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR);
             newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR);
             
