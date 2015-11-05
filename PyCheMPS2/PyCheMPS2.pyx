@@ -265,6 +265,10 @@ cdef class PyFCI:
         assert   TwoRDM.flags['C_CONTIGUOUS']
         EnergyByContraction = self.thisptr.Fill2RDM(&GSvector[0], &TwoRDM[0])
         return EnergyByContraction
+    def Fill3RDM(self, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] ThreeRDM not None):
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert ThreeRDM.flags['C_CONTIGUOUS']
+        self.thisptr.Fill3RDM(&GSvector[0], &ThreeRDM[0])
     def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
         self.thisptr.FillRandom(vecLength, &vector[0])

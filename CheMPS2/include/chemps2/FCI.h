@@ -113,11 +113,16 @@ namespace CheMPS2{
          /** \return The global counter of the Slater determinant with the lowest energy */
          unsigned long long LowestEnergyDeterminant() const;
          
-         //! Construct the (spin-summed) 2-RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+j,tau a_l,tau a_k,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
+         //! Construct the (spin-summed) 2-RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
          /** \param vector The FCI vector of length getVecLength(0)
              \param TwoRDM To store the 2-RDM; needs to be of size getL()^4; point group symmetry shows in 2-RDM elements being zero
              \return The energy of the given FCI vector, calculated by contraction of the 2-RDM with Gmat and ERI */
          double Fill2RDM(double * vector, double * TwoRDM) const;
+         
+         //! Construct the (spin-summed) 3-RDM of a FCI vector: Gamma^3(i,j,k,l,m,n) = sum_sigma,tau,s < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,sigma} > = ThreeRDM[ i + L * ( j + L * ( k + L * ( l + L * ( m + L * n ) ) ) ) ]
+         /** \param vector The FCI vector of length getVecLength(0)
+             \param ThreeRDM To store the 3-RDM; needs to be of size getL()^6; point group symmetry shows in 3-RDM elements being zero */
+         void Fill3RDM(double * vector, double * ThreeRDM) const;
          
          //! Measure S(S+1) (spin squared)
          /** \param vector The FCI vector of length getVecLength(0)
