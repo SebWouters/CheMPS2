@@ -61,15 +61,9 @@ int main(void){
    const double EnergyDMRG = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    
-   //Clean up DMRG
-   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
-   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-   delete theDMRG;
-   delete OptScheme;
-   delete Prob;
-   
    //Calculate FCI reference energy
    double EnergyFCI = 0.0;
+   double RMSerror2DM = 0.0;
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
    #endif
@@ -84,18 +78,41 @@ int main(void){
       inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
       EnergyFCI = theFCI->GSDavidson(inoutput);
       theFCI->CalcSpinSquared(inoutput);
+      const int L = Ham->getL();
+      double * TwoDMspace = new double[ L*L*L*L ];
+      theFCI->Fill2RDM(inoutput, TwoDMspace);
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  const double difference = TwoDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
+                                          - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
+                  RMSerror2DM += difference * difference;
+               }
+            }
+         }
+      }
+      delete [] TwoDMspace;
       delete [] inoutput;
       delete theFCI;
+      RMSerror2DM = sqrt(RMSerror2DM);
+      cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDMs = " << RMSerror2DM << endl;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
-   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI, 1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI,   1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror2DM, 1, MPI_CHEMPS2_MASTER );
    #endif
    
-   //Clean up the Hamiltonian
+   //Clean up DMRG
+   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+   delete theDMRG;
+   delete OptScheme;
+   delete Prob;
    delete Ham;
    
    //Check succes
-   const bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) ? true : false;
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 )) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

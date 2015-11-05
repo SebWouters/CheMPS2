@@ -744,201 +744,125 @@ void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
 
 }
 
-double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
+void CheMPS2::FCI::apply_excitation( double * orig_vector, double * result_vector, const int crea, const int anni, const int orig_target_irrep ) const{
+
+   const int result_target_irrep          = getIrrepProduct( getIrrepProduct( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ), orig_target_irrep );
+   const int   orig_irrep_center          = getIrrepProduct( TargetIrrep,   orig_target_irrep );
+   const int result_irrep_center          = getIrrepProduct( TargetIrrep, result_target_irrep );
+   const unsigned long long   orig_length = getVecLength(   orig_irrep_center );
+   const unsigned long long result_length = getVecLength( result_irrep_center );
+   
+   ClearVector( result_length , result_vector );
+   
+   for ( int result_irrep_up = 0; result_irrep_up < NumIrreps; result_irrep_up++ ){
+      const int result_irrep_down = getIrrepProduct( result_irrep_up, result_target_irrep );
+      
+      // E^{alpha}_{crea,anni}
+      #pragma omp parallel for schedule(static)
+      for ( int result_count_up = 0; result_count_up < numPerIrrep_up[ result_irrep_up ]; result_count_up++ ){
+         const int entry_up = crea + L * ( anni + L * result_count_up );
+         const int sign_up  = lookup_sign_alpha[ result_irrep_up ][ entry_up ];
+         if ( sign_up != 0 ){
+            const int orig_irrep_up = lookup_irrep_alpha[ result_irrep_up ][ entry_up ];
+            const int orig_count_up = lookup_cnt_alpha  [ result_irrep_up ][ entry_up ];
+            const unsigned long long result_location_base = irrep_center_jumps[ result_irrep_center ][ result_irrep_up ] + result_count_up;
+            const unsigned long long   orig_location_base = irrep_center_jumps[   orig_irrep_center ][   orig_irrep_up ] +   orig_count_up;
+            const int result_stride = numPerIrrep_up[ result_irrep_up ];
+            const int   orig_stride = numPerIrrep_up[   orig_irrep_up ];
+            for ( int count_down = 0; count_down < numPerIrrep_down[ result_irrep_down ]; count_down++ ){
+               result_vector[ result_location_base + result_stride * count_down ] += sign_up * orig_vector[ orig_location_base + orig_stride * count_down ];
+            }
+         }
+      }
+      
+      // E^{beta}_{crea,anni}
+      #pragma omp parallel for schedule(static)
+      for ( int result_count_down = 0; result_count_down < numPerIrrep_down[ result_irrep_down ]; result_count_down++ ){
+         const int entry_down = crea + L * ( anni + L * result_count_down );
+         const int sign_down  = lookup_sign_beta[ result_irrep_down ][ entry_down ];
+         if ( sign_down != 0 ){
+            const int orig_count_down = lookup_cnt_beta[ result_irrep_down ][ entry_down ];
+            const unsigned long long result_location_base = irrep_center_jumps[ result_irrep_center ][ result_irrep_up ] + numPerIrrep_up[ result_irrep_up ] * result_count_down;
+            const unsigned long long   orig_location_base = irrep_center_jumps[   orig_irrep_center ][ result_irrep_up ] + numPerIrrep_up[ result_irrep_up ] *   orig_count_down;
+            for ( int count_up = 0; count_up < numPerIrrep_up[ result_irrep_up ]; count_up++ ){
+               result_vector[ result_location_base + count_up ] += sign_down * orig_vector[ orig_location_base + count_up ];
+            }
+         }
+      }
+      
+   }
+
+}
+
+double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
 
    struct timeval start, end;
    gettimeofday(&start, NULL);
-
-   ClearVector( L*L*L*L , TwoRDM );
-   assert( Nel_up + Nel_down >= 2 );
-
-   // Based HamTimesVec: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+j,tau a_l,tau a_l,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
    
-   // irrep_center is the center irrep of the ERI : <ij|kl> --> irrep_center = I_i x I_j = I_k x I_l
-   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   ClearVector( L*L*L*L, two_rdm );
+   const unsigned long long length2 = getVecLength( 0 );
+   double * workspace2              = new double[ length2 ];
    
-      const unsigned long long localVecLength = getVecLength( irrep_center );
-      const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
-      const unsigned int numPairs = irrep_center_num[ irrep_center ];
-      const unsigned int * center_crea_orb = irrep_center_crea_orb[ irrep_center ];
-      const unsigned int * center_anni_orb = irrep_center_anni_orb[ irrep_center ];
-      const unsigned long long * center_jumps    = irrep_center_jumps[ irrep_center ];
-      const unsigned long long * zero_jumps      = irrep_center_jumps[ 0 ];
+   for ( unsigned int irrep_center1 = 0; irrep_center1 < NumIrreps; irrep_center1++ ){
+   
+      const unsigned long long length1 = getVecLength( irrep_center1 );
+      const int target_irrep1          = getIrrepProduct( TargetIrrep , irrep_center1 );
+      double * workspace1              = new double[ length1 ];
       
-      const unsigned int space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));
-      unsigned int numIterations = localVecLength / space_per_vectorpiece;
-      if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
-
-      for ( unsigned int iteration = 0; iteration < numIterations; iteration++ ){
-      
-         const unsigned long long veccounter_start = iteration * space_per_vectorpiece;
-         const unsigned long long guess_stop       = ( iteration + 1 ) * space_per_vectorpiece;
-         const unsigned long long veccounter_stop  = ( guess_stop > localVecLength ) ? localVecLength : guess_stop;
+      // Gamma_{ijkl} = < E_ik E_jl > - delta_jk < E_il >
+      for ( int crea1 = 0; crea1 < L; crea1++ ){ // crea1 = j
+         for ( int anni1 = crea1; anni1 < L; anni1++ ){ // anni1 = l
+         
+            const int irrep_prod1 = getIrrepProduct( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) );
+            if ( irrep_prod1 == irrep_center1 ){
+            
+               apply_excitation( vector, workspace1, crea1, anni1, TargetIrrep );
+               
+               if ( irrep_prod1 == 0 ){
+                  const double value = ( ( crea1 == anni1 ) ? 0.5 : 1.0 ) * FCIddot( length2, workspace1, vector );
+                  for ( int jk = 0; jk < L; jk++ ){
+                     two_rdm[ crea1 + L * ( jk + L * ( jk + L * anni1 ) ) ] -= value;
+                     two_rdm[ anni1 + L * ( jk + L * ( jk + L * crea1 ) ) ] -= value;
+                  }
+               }
+               
+               for ( int crea2 = crea1; crea2 < L; crea2++ ){ // crea2 = i
+                  for ( int anni2 = crea1; anni2 < L; anni2++ ){ // anni2 = k
+                  
+                     const int irrep_prod2 = getIrrepProduct( getOrb2Irrep( crea2 ) , getOrb2Irrep( anni2 ) );
+                     if ( irrep_prod2 == irrep_prod1 ){
+                     
+                        apply_excitation( workspace1, workspace2, crea2, anni2, target_irrep1 );
+                        const double value = FCIddot( length2, workspace2, vector );
+                        two_rdm[ crea2 + L * ( crea1 + L * ( anni2 + L * anni1 ) ) ] += value;
+                        
+                     }
+                  }
+               }
+            }
+         }
+      }
+      delete [] workspace1;
+   }
+   delete [] workspace2;
    
-         /*************************************************************************************************
-          *   First build workbig1[ i<=j + size(i<=j) * veccounter ] = E_{i<=j} (irrep_center) | input >  *
-          *************************************************************************************************/
-         const unsigned long long loopsize = numPairs * ( veccounter_stop - veccounter_start );
-         #pragma omp parallel for schedule(static)
-         for ( unsigned long long loopvariable = 0; loopvariable < loopsize; loopvariable++ ){
-         
-            const unsigned int pair               = loopvariable % numPairs;
-            const unsigned long long veccounter   = veccounter_start + ( loopvariable / numPairs );
-            const unsigned int creator            = center_crea_orb[ pair ];
-            const unsigned int annihilator        = center_anni_orb[ pair ];
-            const int irrep_new_up                = getUpIrrepOfCounter( irrep_center , veccounter );
-            const int irrep_new_down              = getIrrepProduct( irrep_new_up , localTargetIrrep );
-            const unsigned int count_new_up       = ( veccounter - center_jumps[ irrep_new_up ] ) % numPerIrrep_up[ irrep_new_up ];
-            const unsigned int count_new_down     = ( veccounter - center_jumps[ irrep_new_up ] ) / numPerIrrep_up[ irrep_new_up ];
-            
-            double myResult = 0.0;
-
-            // E^{alpha}_{creator <= annihilator}
-            const int entry_up = creator + L * ( annihilator + L * count_new_up );
-            const int sign_up  = lookup_sign_alpha[ irrep_new_up ][ entry_up ];
-            if ( sign_up != 0 ){ // Required for one-electron calculations
-               const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ entry_up ];
-               const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ entry_up ];
-               myResult = sign_up * vector[ zero_jumps[ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
-            }
-            
-            // E^{beta}_{creator <= annihilator}
-            const int entry_down = creator + L * ( annihilator + L * count_new_down );
-            const int sign_down  = lookup_sign_beta[ irrep_new_down ][ entry_down ];
-            if ( sign_down != 0 ){ // Required for one-electron calculations
-               const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ entry_down ];
-               myResult += sign_down * vector[ zero_jumps[ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
-            }
-            
-            HXVworkbig1[ loopvariable ] = myResult;
-            
-         }
-         
-         /************************************************
-          *   If irrep_center==0, do the one-body terms  *
-          ************************************************/
-         if ( irrep_center==0 ){
-            
-            int mdim = numPairs;
-            int kdim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
-            int ndim = 1;
-            
-            char notran = 'N';
-            double one  = 1.0;
-            double zero = 0.0;
-            dgemm_( &notran, &notran, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, vector + veccounter_start, &kdim, &zero, HXVworksmall, &mdim );
-            
-            for ( unsigned int pair = 0; pair < numPairs; pair++ ){
-               const unsigned int orb1 = center_crea_orb[ pair ];
-               const unsigned int orb2 = center_anni_orb[ pair ];
-               for ( unsigned int orbk = 0; orbk < L; orbk++ ){
-                  TwoRDM[ orb1 + L * ( orbk + L * ( orbk + L * orb2 ) ) ] -= HXVworksmall[ pair ];
+   for ( int crea1 = 0; crea1 < L; crea1++ ){
+      for ( int anni1 = crea1; anni1 < L; anni1++ ){
+         const int irrep_prod1 = getIrrepProduct( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) );
+         for ( int crea2 = crea1; crea2 < L; crea2++ ){
+            for ( int anni2 = crea1; anni2 < L; anni2++ ){
+               const int irrep_prod2 = getIrrepProduct( getOrb2Irrep( crea2 ) , getOrb2Irrep( anni2 ) );
+               if ( irrep_prod2 == irrep_prod1 ){
+                  const double value = two_rdm[ crea2 + L * ( crea1 + L * ( anni2 + L * anni1 ) ) ];
+                  two_rdm[ crea1 + L * ( crea2 + L * ( anni1 + L * anni2 ) ) ] = value;
+                  two_rdm[ anni2 + L * ( anni1 + L * ( crea2 + L * crea1 ) ) ] = value;
+                  two_rdm[ anni1 + L * ( anni2 + L * ( crea1 + L * crea2 ) ) ] = value;
                }
-               if ( orb2 > orb1 ){
-                  for ( unsigned int orbk = 0; orbk < L; orbk++ ){
-                     TwoRDM[ orb2 + L * ( orbk + L * ( orbk + L * orb1 ) ) ] -= HXVworksmall[ pair ];
-                  }
-               }
-            }
-            
-         }
-         
-         /*********************************************************************
-          *   Finally do E_{i<=k} workbig1[ j<=l + size(j<=l) * veccounter ]  *
-          *              E_{k> i} workbig1[ j<=l + size(j<=l) * veccounter ]  *
-          *********************************************************************/
-         const unsigned int numPairsSquared = numPairs * numPairs;
-         #pragma omp parallel for schedule(static) //Thread safe since each thread can only write to its own location in TwoRDM
-         for ( unsigned int pairproduct = 0; pairproduct < numPairsSquared; pairproduct++ ){
-         
-            const unsigned int pair1 = pairproduct % numPairs;
-            const unsigned int pair2 = pairproduct / numPairs;
-            const unsigned int orb_i = center_crea_orb[ pair1 ];
-            const unsigned int orb_k = center_anni_orb[ pair1 ];
-            const unsigned int orb_j = center_crea_orb[ pair2 ];
-            const unsigned int orb_l = center_anni_orb[ pair2 ];
-            // orb_i <= orb_k and orb_j <= orb_l
-            
-            double myResult = 0.0;
-            
-            // E_{i<=k} E_{j<=l} vector
-            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-            
-               const unsigned long long location_old = pair2 + numPairs * ( veccounter - veccounter_start );
-               const int irrep_old_up                = getUpIrrepOfCounter( irrep_center , veccounter );
-               const int irrep_old_down              = getIrrepProduct( irrep_old_up , localTargetIrrep );
-               const unsigned int count_old_up       = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-               const unsigned int count_old_down     = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-               
-               // E^{alpha}_{i<=k}
-               const int entry_up = orb_k + L * ( orb_i + L * count_old_up );
-               const int sign_up  = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
-               if ( sign_up != 0 ){
-                  const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
-                  const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
-                  myResult += sign_up * HXVworkbig1[ location_old ] * vector[ zero_jumps[ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
-               }
-               
-               // E^{beta}_{i<=k}
-               const int entry_down = orb_k + L * ( orb_i + L * count_old_down );
-               const int sign_down  = lookup_sign_beta[ irrep_old_down ][ entry_down ];
-               if ( sign_down != 0 ){
-                  const int cnt_new_down = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
-                  myResult += sign_down * HXVworkbig1[ location_old ] * vector[ zero_jumps[ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
-               }
-            }
-            
-            TwoRDM[ orb_i + L * ( orb_j + L * ( orb_k + L * orb_l ) ) ] += myResult; // i<=k and j<=l
-            
-            if ( orb_k > orb_i ){
-            
-               myResult = 0.0;
-               
-               // E_{k>i} E_{j<=l} vector
-               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-               
-                  const unsigned long long location_old = pair2 + numPairs * ( veccounter - veccounter_start );
-                  const int irrep_old_up                = getUpIrrepOfCounter( irrep_center , veccounter );
-                  const int irrep_old_down              = getIrrepProduct( irrep_old_up , localTargetIrrep );
-                  const unsigned int count_old_up       = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-                  const unsigned int count_old_down     = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-                  
-                  // E^{alpha}_{k>i}
-                  const int entry_up = orb_i + L * ( orb_k + L * count_old_up );
-                  const int sign_up  = lookup_sign_alpha [ irrep_old_up ][ entry_up ];
-                  if ( sign_up != 0 ){
-                     const int irrep_new_up = lookup_irrep_alpha[ irrep_old_up ][ entry_up ];
-                     const int cnt_new_up   = lookup_cnt_alpha  [ irrep_old_up ][ entry_up ];
-                     myResult += sign_up * HXVworkbig1[ location_old ] * vector[ zero_jumps[ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down ];
-                  }
-                  
-                  // E^{beta}_{k>i}
-                  const int entry_down = orb_i + L * ( orb_k + L * count_old_down );
-                  const int sign_down  = lookup_sign_beta[ irrep_old_down ][ entry_down ];
-                  if ( sign_down != 0 ){
-                     const int cnt_new_down = lookup_cnt_beta[ irrep_old_down ][ entry_down ];
-                     myResult += sign_down * HXVworkbig1[ location_old ] * vector[ zero_jumps[ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down ];
-                  }
-               }
-            
-               TwoRDM[ orb_k + L * ( orb_j + L * ( orb_i + L * orb_l ) ) ] += myResult; // "i>k" and j<=l
-               
             }
          }
       }
    }
    
-   // For Gamma^2_{ijkl} the elements with i,k anything and j<=l are set: fill the rest
-   for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
-      for ( unsigned int orb3 = 0; orb3 < L; orb3++ ){
-         for ( unsigned int orb2 = 0; orb2 < L-1; orb2++ ){
-            for ( unsigned int orb4 = orb2+1; orb4 < L; orb4++ ){
-               TwoRDM[ orb3 + L * ( orb4 + L * ( orb1 + L * orb2 ) ) ] = TwoRDM[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ];
-            }
-         }
-      }
-   }
-
    // Calculate the FCI energy
    double FCIenergy = getEconst();
    for ( unsigned int orb1 = 0; orb1 < L; orb1++ ){
@@ -947,18 +871,19 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * TwoRDM) const{
          double tempvar2 = 0.0;
          for ( unsigned int orb3 = 0; orb3 < L; orb3++ ){
             tempvar  += getERI( orb1 , orb3 , orb3 , orb2 );
-            tempvar2 += TwoRDM[ orb1 + L * ( orb3 + L * ( orb2 + L * orb3 ) ) ];
+            tempvar2 += two_rdm[ orb1 + L * ( orb3 + L * ( orb2 + L * orb3 ) ) ];
             for ( unsigned int orb4 = 0; orb4 < L; orb4++ ){
-               FCIenergy += 0.5 * TwoRDM[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] * getERI( orb1 , orb3 , orb2 , orb4 );
+               FCIenergy += 0.5 * two_rdm[ orb1 + L * ( orb2 + L * ( orb3 + L * orb4 ) ) ] * getERI( orb1 , orb3 , orb2 , orb4 );
             }
          }
          FCIenergy += ( getGmat( orb1 , orb2 ) + 0.5 * tempvar ) * tempvar2 / ( Nel_up + Nel_down - 1.0);
       }
    }
+   
    gettimeofday(&end, NULL);
    const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
    if ( FCIverbose > 0 ){ cout << "FCI::Fill2RDM : Wall time = " << elapsed << " seconds" << endl; }
-   if ( FCIverbose > 0 ){ cout << "FCI::Fill2RDM : Energy based on 2-RDM = " << FCIenergy << endl; }
+   if ( FCIverbose > 0 ){ cout << "FCI::Fill2RDM : Energy (Ham * 2-RDM)  = " << FCIenergy << endl; }
    return FCIenergy;
 
 }

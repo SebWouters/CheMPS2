@@ -417,6 +417,16 @@ namespace CheMPS2{
              \param precon Array of size getVecLength(0), which contains on exit (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 }
              \param workspace Workspace of size getVecLength(0) */
          void CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const;
+         
+//==========> Protected functions regarding the higher order RDMs
+
+         //! Apply E_{crea,anni} to |orig_vector> and store the result in |result_vector>
+         /** \param orig_vector The original vector
+             \param result_vector The result vector
+             \param crea The orbital index of the creator
+             \param anni The orbital index of the annihilator
+             \param orig_target_irrep The irrep of the orig_vector */
+         void apply_excitation( double * orig_vector, double * result_vector, const int crea, const int anni, const int orig_target_irrep ) const;
       
       private:
       
