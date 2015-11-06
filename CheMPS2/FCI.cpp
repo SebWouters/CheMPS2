@@ -969,8 +969,8 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
                            
                            }
                            
-                           for ( unsigned int crea3 = anni1; crea3 < L; crea3++ ){ // crea3 = i >= n
-                              for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){ // anni3 = l >= n = anni1
+                           for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){ // crea3 = i >= j = crea2 >= n = anni1
+                              for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){ // anni3 = l >= n
                               
                                  const int irrep_prod3 = getIrrepProduct( getOrb2Irrep( crea3 ) , getOrb2Irrep( anni3 ) );
                                  if ( irrep_prod3 == irrep_center3 ){
@@ -1003,17 +1003,31 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
             const int irrep_prod2 = getIrrepProduct( irrep_prod1 , getOrb2Irrep( crea2 ) ); // Ic1 x Ia1 x Ic2
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){
                const int irrep_prod3 = getIrrepProduct( irrep_prod2 , getOrb2Irrep( anni2 ) ); // Ic1 x Ia1 x Ic2 x Ia2
-               for ( unsigned int crea3 = anni1; crea3 < L; crea3++ ){
+               for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){
                   const int irrep_prod4 = getIrrepProduct( irrep_prod3 , getOrb2Irrep( crea3 ) ); // Ic1 x Ia1 x Ic2 x Ia2 x Ic3
                   for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){
                      if ( irrep_prod4 == getOrb2Irrep( anni3 )){ // Ic1 x Ia1 x Ic2 x Ia2 x Ic3 == Ia3
+                     
+                        /*      crea3 >= crea2 >= anni1
+                           crea1, anni3, anni2 >= anni1  */
                   
    const double value = three_rdm[ crea3 + L * ( crea2 + L * ( crea1 + L * ( anni3 + L * ( anni2 + L * anni1 ) ) ) ) ];
+                        three_rdm[ crea2 + L * ( crea3 + L * ( crea1 + L * ( anni2 + L * ( anni3 + L * anni1 ) ) ) ) ] = value;
+                        
                         three_rdm[ crea2 + L * ( crea1 + L * ( crea3 + L * ( anni2 + L * ( anni1 + L * anni3 ) ) ) ) ] = value;
+                        three_rdm[ crea3 + L * ( crea1 + L * ( crea2 + L * ( anni3 + L * ( anni1 + L * anni2 ) ) ) ) ] = value;
+                        
                         three_rdm[ crea1 + L * ( crea3 + L * ( crea2 + L * ( anni1 + L * ( anni3 + L * anni2 ) ) ) ) ] = value;
+                        three_rdm[ crea1 + L * ( crea2 + L * ( crea3 + L * ( anni1 + L * ( anni2 + L * anni3 ) ) ) ) ] = value;
+                        
                         three_rdm[ anni3 + L * ( anni2 + L * ( anni1 + L * ( crea3 + L * ( crea2 + L * crea1 ) ) ) ) ] = value;
+                        three_rdm[ anni2 + L * ( anni3 + L * ( anni1 + L * ( crea2 + L * ( crea3 + L * crea1 ) ) ) ) ] = value;
+                        
                         three_rdm[ anni2 + L * ( anni1 + L * ( anni3 + L * ( crea2 + L * ( crea1 + L * crea3 ) ) ) ) ] = value;
+                        three_rdm[ anni3 + L * ( anni1 + L * ( anni2 + L * ( crea3 + L * ( crea1 + L * crea2 ) ) ) ) ] = value;
+                        
                         three_rdm[ anni1 + L * ( anni3 + L * ( anni2 + L * ( crea1 + L * ( crea3 + L * crea2 ) ) ) ) ] = value;
+                        three_rdm[ anni1 + L * ( anni2 + L * ( anni3 + L * ( crea1 + L * ( crea2 + L * crea3 ) ) ) ) ] = value;
                         
                      }
                   }

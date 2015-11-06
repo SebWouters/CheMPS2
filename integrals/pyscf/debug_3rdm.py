@@ -2,6 +2,7 @@ import PyCheMPS2
 from pyscf import gto, scf, ao2mo, symm, fci
 import numpy as np
 import ctypes
+import time
 
 ##################
 #   Molecule 1   #
@@ -68,6 +69,7 @@ for geval in range(2):
     fci_solver = fci.FCI(mol, mf.mo_coeff)
     fci_energy, fci_vector = fci_solver.kernel()
     print "PySCF FCI energy     =", fci_energy + CONST
+    pyscf_start = time.time()
     dm1, dm2, dm3 = fci.rdm.make_dm123('FCI3pdm_kern_spin0', fci_vector, fci_vector, L, N)
     #dm3[p,q,r,s,t,u] is the matrix element of <p^+ r^+ t^+ u s q>
     pyscf_dm3 = np.array( dm3, copy=True )
@@ -81,6 +83,7 @@ for geval in range(2):
         for orb2 in range(L):
             pyscf_dm3[:,orb,orb2,orb2,:,orb] += dm1
             pyscf_dm3[:,orb,orb2,orb,orb2,:] += dm1
+    pyscf_end = time.time()
 
     #############################
     #   PyCheMPS2 Hamiltonian   #
@@ -113,9 +116,11 @@ for geval in range(2):
     GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
     EnergyFCI = theFCI.GSDavidson(GSvector)
     print "PyCheMPS2 FCI energy =", EnergyFCI
+    start2    = time.time()
     ThreeRDM  = np.zeros([ L**6 ], dtype=ctypes.c_double)
     theFCI.Fill3RDM( GSvector, ThreeRDM )
     ThreeRDM  = ThreeRDM.reshape(L,L,L,L,L,L)
+    end2      = time.time()
 
     ##############################
     #   Compare the two 3-RDMs   #
@@ -130,6 +135,7 @@ for geval in range(2):
                             if abs( temp ) > 1e-5:
                                 print "3-RDM[",orb1,",",orb2,",",orb3,",",orb4,",",orb5,",",orb6,"] diff =", temp
     print "RMS difference PySCF and PyCheMPS2 3-RDM =", np.linalg.norm( ThreeRDM - pyscf_dm3 )
-
+    print "Time 3-RDM PySCF     =", pyscf_end - pyscf_start, "seconds."
+    print "Time 3-RDM PyCheMPS2 =", end2      - start2,      "seconds."
 
 
