@@ -27,7 +27,6 @@
 #include "TensorS0.h"
 #include "TensorS1.h"
 #include "SyBookkeeper.h"
-#include "TwoDMstorage.h"
 
 namespace CheMPS2{
 /** TwoDM class.
@@ -130,18 +129,12 @@ namespace CheMPS2{
          int L;
          
          //Two 2DM^{A,B} objects
-         TwoDMstorage * TwoDMA;
-         TwoDMstorage * TwoDMB;
-         
-         //number of orbitals per irrep
-         int * irrep2num_orb;
-         
-         //index of an orbital within irrep block
-         int * orb2IndexSy;
+         double * two_rdm_A;
+         double * two_rdm_B;
          
          // Set 2DM terms, using the DMRG indices
-         void setTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
-         void setTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
+         void set_2rdm_A_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
+         void set_2rdm_B_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
          
          //Helper functions
          static int trianglefunction(const int k, const int glob);

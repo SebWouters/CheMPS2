@@ -22,10 +22,12 @@
 #include <iostream>
 #include <math.h>
 #include <algorithm>
+#include <assert.h>
 #include <gsl/gsl_sf_coupling.h>
 
 #include "TwoDM.h"
 #include "Lapack.h"
+#include "MyHDF5.h"
 #include "Options.h"
 #include "MPIchemps2.h"
 
@@ -39,70 +41,56 @@ CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
    Prob = ProbIn;
    L = denBK->gL();
    
-   orb2IndexSy = new int[L];
-   irrep2num_orb = new int[denBK->getNumberOfIrreps()];
-   for (int cnt=0; cnt<denBK->getNumberOfIrreps(); cnt++){ irrep2num_orb[cnt] = 0; }
-   for (int orb=0; orb<L; orb++){
-      const int irrep = Prob->gIrrep( orb ); //Prob assumes you use DMRG orbs...
-      orb2IndexSy[ orb ] = irrep2num_orb[ irrep ];
-      irrep2num_orb[ irrep ] += 1;
-   }
-   TwoDMA = new TwoDMstorage( Prob->gSy() , irrep2num_orb );
-   TwoDMB = new TwoDMstorage( Prob->gSy() , irrep2num_orb );
+   const int max_integer = INT_MAX;
+   const long long size  = L*L*L*L;
+   assert( max_integer >= size );
+   two_rdm_A = new double[ size ];
+   two_rdm_B = new double[ size ];
    
-   #ifdef CHEMPS2_MPI_COMPILATION
-   TwoDMA->Clear(); //Clear the storage so that an allreduce can be performed in the end
-   TwoDMB->Clear();
-   #endif
+   //Clear the storage so that an allreduce can be performed in the end
+   for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ cnt ] = 0.0; }
+   for (int cnt = 0; cnt < size; cnt++){ two_rdm_B[ cnt ] = 0.0; }
 
 }
 
 CheMPS2::TwoDM::~TwoDM(){
 
-   delete TwoDMA;
-   delete TwoDMB;
-   delete [] orb2IndexSy;
-   delete [] irrep2num_orb;
+   delete [] two_rdm_A;
+   delete [] two_rdm_B;
 
 }
 
 #ifdef CHEMPS2_MPI_COMPILATION
 void CheMPS2::TwoDM::mpi_allreduce(){
 
-   TwoDMA->mpi_allreduce();
-   TwoDMB->mpi_allreduce();
+   const int size = L*L*L*L; // Tested OK in creator TwoDM
+   double * temp = new double[ size ];
+   MPIchemps2::allreduce_array_double( two_rdm_A, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ ct ] = temp[ cnt ]; }
+   MPIchemps2::allreduce_array_double( two_rdm_B, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_B[ ct ] = temp[ cnt ]; }
+   delete [] temp;
 
 }
 #endif
 
-void CheMPS2::TwoDM::setTwoDMA_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
+void CheMPS2::TwoDM::set_2rdm_A_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
 
    //Prob assumes you use DMRG orbs...
    //Irrep sanity checks are performed in TwoDM::FillSite
-   TwoDMA->set( Prob->gIrrep(cnt1), Prob->gIrrep(cnt2), Prob->gIrrep(cnt3), Prob->gIrrep(cnt4),
-                orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  value );
-   TwoDMA->set( Prob->gIrrep(cnt2), Prob->gIrrep(cnt1), Prob->gIrrep(cnt4), Prob->gIrrep(cnt3),
-                orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  value );
-   TwoDMA->set( Prob->gIrrep(cnt3), Prob->gIrrep(cnt4), Prob->gIrrep(cnt1), Prob->gIrrep(cnt2),
-                orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  value );
-   TwoDMA->set( Prob->gIrrep(cnt4), Prob->gIrrep(cnt3), Prob->gIrrep(cnt2), Prob->gIrrep(cnt1),
-                orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  value );
-
+   two_rdm_A[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * cnt4 ) ) ] = value;
+   two_rdm_A[ cnt2 + L * ( cnt1 + L * ( cnt4 + L * cnt3 ) ) ] = value;
+   two_rdm_A[ cnt3 + L * ( cnt4 + L * ( cnt1 + L * cnt2 ) ) ] = value;
+   two_rdm_A[ cnt4 + L * ( cnt3 + L * ( cnt2 + L * cnt1 ) ) ] = value;
 
 }
 
-void CheMPS2::TwoDM::setTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
+void CheMPS2::TwoDM::set_2rdm_B_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value){
 
    //Prob assumes you use DMRG orbs...
    //Irrep sanity checks are performed in TwoDM::FillSite
-   TwoDMB->set( Prob->gIrrep(cnt1), Prob->gIrrep(cnt2), Prob->gIrrep(cnt3), Prob->gIrrep(cnt4),
-                orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  value );
-   TwoDMB->set( Prob->gIrrep(cnt2), Prob->gIrrep(cnt1), Prob->gIrrep(cnt4), Prob->gIrrep(cnt3),
-                orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  value );
-   TwoDMB->set( Prob->gIrrep(cnt3), Prob->gIrrep(cnt4), Prob->gIrrep(cnt1), Prob->gIrrep(cnt2),
-                orb2IndexSy[cnt3],  orb2IndexSy[cnt4],  orb2IndexSy[cnt1],  orb2IndexSy[cnt2],  value );
-   TwoDMB->set( Prob->gIrrep(cnt4), Prob->gIrrep(cnt3), Prob->gIrrep(cnt2), Prob->gIrrep(cnt1),
-                orb2IndexSy[cnt4],  orb2IndexSy[cnt3],  orb2IndexSy[cnt2],  orb2IndexSy[cnt1],  value );
+   two_rdm_B[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * cnt4 ) ) ] = value;
+   two_rdm_B[ cnt2 + L * ( cnt1 + L * ( cnt4 + L * cnt3 ) ) ] = value;
+   two_rdm_B[ cnt3 + L * ( cnt4 + L * ( cnt1 + L * cnt2 ) ) ] = value;
+   two_rdm_B[ cnt4 + L * ( cnt3 + L * ( cnt2 + L * cnt1 ) ) ] = value;
 
 }
 
@@ -114,7 +102,7 @@ double CheMPS2::TwoDM::getTwoDMA_DMRG(const int cnt1, const int cnt2, const int 
    const int irrep3 = Prob->gIrrep(cnt3);
    const int irrep4 = Prob->gIrrep(cnt4);
    if ( Irreps::directProd(irrep1, irrep2) == Irreps::directProd(irrep3, irrep4) ){
-      return TwoDMA->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
+      return two_rdm_A[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * cnt4 ) ) ];
    }
    
    return 0.0;
@@ -129,7 +117,7 @@ double CheMPS2::TwoDM::getTwoDMB_DMRG(const int cnt1, const int cnt2, const int 
    const int irrep3 = Prob->gIrrep(cnt3);
    const int irrep4 = Prob->gIrrep(cnt4);
    if ( Irreps::directProd(irrep1, irrep2) == Irreps::directProd(irrep3, irrep4) ){
-      return TwoDMB->get( irrep1, irrep2, irrep3, irrep4, orb2IndexSy[cnt1], orb2IndexSy[cnt2], orb2IndexSy[cnt3], orb2IndexSy[cnt4] );
+      return two_rdm_B[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * cnt4 ) ) ];
    }
    
    return 0.0;
@@ -232,15 +220,63 @@ void CheMPS2::TwoDM::printNOON() const{
 
 void CheMPS2::TwoDM::save(){
 
-   TwoDMA->save(CheMPS2::TWODM_2DM_A_storagename);
-   TwoDMB->save(CheMPS2::TWODM_2DM_B_storagename);
+   hsize_t dimarray = L*L*L*L;
+   {
+      hid_t file_id = H5Fcreate(CheMPS2::TWODM_2DM_A_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+         hid_t group_id = H5Gcreate(file_id, "two_rdm_A", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+            hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
+            hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+            H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
+
+            H5Dclose(dataset_id);
+            H5Sclose(dataspace_id);
+
+         H5Gclose(group_id);
+      H5Fclose(file_id);
+   }
+   {
+      hid_t file_id = H5Fcreate(CheMPS2::TWODM_2DM_B_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+         hid_t group_id = H5Gcreate(file_id, "two_rdm_B", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+            hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
+            hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+            H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
+            H5Dclose(dataset_id);
+            H5Sclose(dataspace_id);
+
+         H5Gclose(group_id);
+      H5Fclose(file_id);
+   }
 
 }
 
 void CheMPS2::TwoDM::read(){
 
-   TwoDMA->read(CheMPS2::TWODM_2DM_A_storagename);
-   TwoDMB->read(CheMPS2::TWODM_2DM_B_storagename);
+   {
+      hid_t file_id = H5Fopen(CheMPS2::TWODM_2DM_A_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+         hid_t group_id = H5Gopen(file_id, "two_rdm_A", H5P_DEFAULT);
+
+            hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
+            H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
+            H5Dclose(dataset_id);
+
+         H5Gclose(group_id);
+      H5Fclose(file_id);
+   }
+   {
+      hid_t file_id = H5Fopen(CheMPS2::TWODM_2DM_B_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+         hid_t group_id = H5Gopen(file_id, "two_rdm_B", H5P_DEFAULT);
+
+            hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
+            H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
+            H5Dclose(dataset_id);
+
+         H5Gclose(group_id);
+      H5Fclose(file_id);
+   }
+   
+   std::cout << "TwoDM::read : Everything loaded!" << std::endl;
 
 }
 
@@ -340,8 +376,8 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
    {
       //Diagram 1
       const double d1 = doD1(denT) * prefactorSpin;
-      setTwoDMA_DMRG(theindex,theindex,theindex,theindex, 2*d1);
-      setTwoDMB_DMRG(theindex,theindex,theindex,theindex,-2*d1);
+      set_2rdm_A_DMRG(theindex,theindex,theindex,theindex, 2*d1);
+      set_2rdm_B_DMRG(theindex,theindex,theindex,theindex,-2*d1);
    }
    
    #pragma omp parallel
@@ -359,8 +395,8 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             {
                //Diagram 2
                const double d2 = doD2(denT, Ltens[theindex][j_index-theindex-1], workmem) * prefactorSpin;
-               setTwoDMA_DMRG(theindex,j_index,theindex,theindex, 2*d2);
-               setTwoDMB_DMRG(theindex,j_index,theindex,theindex,-2*d2);
+               set_2rdm_A_DMRG(theindex,j_index,theindex,theindex, 2*d2);
+               set_2rdm_B_DMRG(theindex,j_index,theindex,theindex,-2*d2);
             }
          }
       }
@@ -383,8 +419,8 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             {
                //Diagram 3
                const double d3 = doD3(denT, S0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
-               setTwoDMA_DMRG(theindex,theindex,j_index,k_index, 2*d3);
-               setTwoDMB_DMRG(theindex,theindex,j_index,k_index,-2*d3);
+               set_2rdm_A_DMRG(theindex,theindex,j_index,k_index, 2*d3);
+               set_2rdm_B_DMRG(theindex,theindex,j_index,k_index,-2*d3);
             }
             
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -395,10 +431,10 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                const double d4 = doD4(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
                const double d5 = doD5(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
                const double d6 = doD6(denT, F1tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
-               setTwoDMA_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 - 3*d6);
-               setTwoDMB_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 +   d6);
-               setTwoDMA_DMRG(theindex,j_index,theindex,k_index,  4*d4 + 4*d5);
-               setTwoDMB_DMRG(theindex,j_index,theindex,k_index,  2*d6);
+               set_2rdm_A_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 - 3*d6);
+               set_2rdm_B_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 +   d6);
+               set_2rdm_A_DMRG(theindex,j_index,theindex,k_index,  4*d4 + 4*d5);
+               set_2rdm_B_DMRG(theindex,j_index,theindex,k_index,  2*d6);
             }
          }
       }
@@ -412,8 +448,8 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             {
                //Diagram 7
                const double d7 = doD7(denT, Ltens[theindex-1][theindex-g_index-1], workmem) * prefactorSpin;
-               setTwoDMA_DMRG(g_index,theindex,theindex,theindex, 2*d7);
-               setTwoDMB_DMRG(g_index,theindex,theindex,theindex,-2*d7);
+               set_2rdm_A_DMRG(g_index,theindex,theindex,theindex, 2*d7);
+               set_2rdm_B_DMRG(g_index,theindex,theindex,theindex,-2*d7);
             }
          }
       }
@@ -438,15 +474,15 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                d9 *= prefactorSpin;
                d10 *= prefactorSpin;
                d11 *= prefactorSpin;
-               setTwoDMA_DMRG(g_index,theindex,j_index,theindex, -4*d8-d9);
-               setTwoDMA_DMRG(g_index,theindex,theindex,j_index, 2*d8 + d11);
-               setTwoDMB_DMRG(g_index,theindex,j_index,theindex, d9 - 2*d10);
-               setTwoDMB_DMRG(g_index,theindex,theindex,j_index, 2*d8 + 2*d10 - d11);
+               set_2rdm_A_DMRG(g_index,theindex,j_index,theindex, -4*d8-d9);
+               set_2rdm_A_DMRG(g_index,theindex,theindex,j_index, 2*d8 + d11);
+               set_2rdm_B_DMRG(g_index,theindex,j_index,theindex, d9 - 2*d10);
+               set_2rdm_B_DMRG(g_index,theindex,theindex,j_index, 2*d8 + 2*d10 - d11);
                
                //Diagram 12
                const double d12 = doD12(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
-               setTwoDMA_DMRG(g_index,j_index,theindex,theindex, 2*d12);
-               setTwoDMB_DMRG(g_index,j_index,theindex,theindex,-2*d12);
+               set_2rdm_A_DMRG(g_index,j_index,theindex,theindex, 2*d12);
+               set_2rdm_B_DMRG(g_index,j_index,theindex,theindex,-2*d12);
             }
          }
       }
@@ -481,10 +517,10 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                   d15 = doD15(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][k_index-j_index][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
                   d16 = doD16(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][k_index-j_index][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
                }
-               setTwoDMA_DMRG(g_index,theindex,j_index,k_index, 2*d13 + 2*d14 + 3*d15 + 3*d16);
-               setTwoDMA_DMRG(g_index,theindex,k_index,j_index, 2*d13 + 2*d14 - 3*d15 - 3*d16);
-               setTwoDMB_DMRG(g_index,theindex,j_index,k_index,-2*d13 - 2*d14 +   d15 +   d16);
-               setTwoDMB_DMRG(g_index,theindex,k_index,j_index,-2*d13 - 2*d14 -   d15 -   d16);
+               set_2rdm_A_DMRG(g_index,theindex,j_index,k_index, 2*d13 + 2*d14 + 3*d15 + 3*d16);
+               set_2rdm_A_DMRG(g_index,theindex,k_index,j_index, 2*d13 + 2*d14 - 3*d15 - 3*d16);
+               set_2rdm_B_DMRG(g_index,theindex,j_index,k_index,-2*d13 - 2*d14 +   d15 +   d16);
+               set_2rdm_B_DMRG(g_index,theindex,k_index,j_index,-2*d13 - 2*d14 -   d15 -   d16);
             }
             
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -500,10 +536,10 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                                              workmem, workmem2, I_g, true) * prefactorSpin;
                const double d20 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
                                              workmem, workmem2, I_g, true) * prefactorSpin;
-               setTwoDMA_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 - 3*d19 - 3*d20);
-               setTwoDMA_DMRG(g_index,j_index,theindex,k_index,  4*d17 + 4*d18                );
-               setTwoDMB_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 +   d19 +   d20);
-               setTwoDMB_DMRG(g_index,j_index,theindex,k_index,                  2*d19 + 2*d20);
+               set_2rdm_A_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 - 3*d19 - 3*d20);
+               set_2rdm_A_DMRG(g_index,j_index,theindex,k_index,  4*d17 + 4*d18                );
+               set_2rdm_B_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 +   d19 +   d20);
+               set_2rdm_B_DMRG(g_index,j_index,theindex,k_index,                  2*d19 + 2*d20);
                
                //Diagrams 21,22,23 & 24
                const double d21 = doD17orD21(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][k_index-j_index][j_index-theindex-1],
@@ -514,10 +550,10 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                                              workmem, workmem2, I_g, false) * prefactorSpin;
                const double d24 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
                                              workmem, workmem2, I_g, false) * prefactorSpin;
-               setTwoDMA_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 - 3*d23 - 3*d24);
-               setTwoDMA_DMRG(g_index,k_index,theindex,j_index,  4*d21 + 4*d22                );
-               setTwoDMB_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 +   d23 +   d24);
-               setTwoDMB_DMRG(g_index,k_index,theindex,j_index,                  2*d23 + 2*d24);
+               set_2rdm_A_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 - 3*d23 - 3*d24);
+               set_2rdm_A_DMRG(g_index,k_index,theindex,j_index,  4*d21 + 4*d22                );
+               set_2rdm_B_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 +   d23 +   d24);
+               set_2rdm_B_DMRG(g_index,k_index,theindex,j_index,                  2*d23 + 2*d24);
             }
          }
       }
