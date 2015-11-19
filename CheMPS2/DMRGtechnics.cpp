@@ -200,7 +200,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
        *   Calculate the leftmost site contribution to the 3-RDM   *
        *************************************************************/
       gettimeofday(&start_part, NULL);
-      the3DM->fill_site( MPS[0], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors );
+      the3DM->fill_site( MPS[0], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors,
+                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
       gettimeofday(&end_part, NULL);
       timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
    }
@@ -240,7 +241,11 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
        **********************************************************************************************/
       gettimeofday(&start_part, NULL);
       if ( am_i_master ){ theCorr->FillSite(MPS[siteindex], Gtensors, Ytensors, Ztensors, Ktensors, Mtensors); }
-      if ( do_3rdm ){ the3DM->fill_site( MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors ); }
+      if ( do_3rdm ){ the3DM->fill_site( MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors,
+                                         tensor_3rdm_a_J0_doublet[siteindex-1], tensor_3rdm_a_J1_doublet[siteindex-1], tensor_3rdm_a_J1_quartet[siteindex-1],
+                                         tensor_3rdm_b_J0_doublet[siteindex-1], tensor_3rdm_b_J1_doublet[siteindex-1], tensor_3rdm_b_J1_quartet[siteindex-1],
+                                         tensor_3rdm_c_J0_doublet[siteindex-1], tensor_3rdm_c_J1_doublet[siteindex-1], tensor_3rdm_c_J1_quartet[siteindex-1],
+                                         tensor_3rdm_d_J0_doublet[siteindex-1], tensor_3rdm_d_J1_doublet[siteindex-1], tensor_3rdm_d_J1_quartet[siteindex-1] ); }
       gettimeofday(&end_part, NULL);
       timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
       

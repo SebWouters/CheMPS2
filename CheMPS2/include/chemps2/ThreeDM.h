@@ -26,6 +26,7 @@
 #include "TensorF1.h"
 #include "TensorS0.h"
 #include "TensorS1.h"
+#include "Tensor3RDM.h"
 #include "SyBookkeeper.h"
 
 namespace CheMPS2{
@@ -75,8 +76,24 @@ namespace CheMPS2{
              \param F0tens F0tensors
              \param F1tens F1tensors
              \param S0tens S0tensors
-             \param S1tens S1tensors*/
-         void fill_site(TensorT * denT, TensorL *** Ltens, TensorF0 **** F0tens, TensorF1 **** F1tens, TensorS0 **** S0tens, TensorS1 **** S1tens);
+             \param S1tens S1tensors
+             \param dm3_a_J0_doublet Renormalized operator of three second quantized operators: annihilator, annihilator, annihilator
+             \param dm3_a_J1_doublet Renormalized operator of three second quantized operators: annihilator, annihilator, annihilator
+             \param dm3_a_J1_quartet Renormalized operator of three second quantized operators: annihilator, annihilator, annihilator
+             \param dm3_b_J0_doublet Renormalized operator of three second quantized operators: annihilator, annihilator, creator
+             \param dm3_b_J1_doublet Renormalized operator of three second quantized operators: annihilator, annihilator, creator
+             \param dm3_b_J1_quartet Renormalized operator of three second quantized operators: annihilator, annihilator, creator
+             \param dm3_c_J0_doublet Renormalized operator of three second quantized operators: annihilator, creator, annihilator
+             \param dm3_c_J1_doublet Renormalized operator of three second quantized operators: annihilator, creator, annihilator
+             \param dm3_c_J1_quartet Renormalized operator of three second quantized operators: annihilator, creator, annihilator
+             \param dm3_d_J0_doublet Renormalized operator of three second quantized operators: creator, annihilator, annihilator
+             \param dm3_d_J1_doublet Renormalized operator of three second quantized operators: creator, annihilator, annihilator
+             \param dm3_d_J1_quartet Renormalized operator of three second quantized operators: creator, annihilator, annihilator */
+         void fill_site( TensorT * denT, TensorL *** Ltens, TensorF0 **** F0tens, TensorF1 **** F1tens, TensorS0 **** S0tens, TensorS1 **** S1tens,
+                         Tensor3RDM **** dm3_a_J0_doublet, Tensor3RDM **** dm3_a_J1_doublet, Tensor3RDM **** dm3_a_J1_quartet,
+                         Tensor3RDM **** dm3_b_J0_doublet, Tensor3RDM **** dm3_b_J1_doublet, Tensor3RDM **** dm3_b_J1_quartet,
+                         Tensor3RDM **** dm3_c_J0_doublet, Tensor3RDM **** dm3_c_J1_doublet, Tensor3RDM **** dm3_c_J1_quartet,
+                         Tensor3RDM **** dm3_d_J0_doublet, Tensor3RDM **** dm3_d_J1_doublet, Tensor3RDM **** dm3_d_J1_quartet );
              
          //! Return the trace (should be N(N-1)(N-2))
          /** \return Trace of the 3-RDM */
@@ -110,6 +127,7 @@ namespace CheMPS2{
          
          //Helper functions
          static int trianglefunction(const int k, const int glob);
+         static void tripletrianglefunction(const int global, int * jkl);
          static int phase(const int two_times_power){ return ((((two_times_power/2)%2)!=0)?-1:1); }
          
          //Partitioning 2-4-0
@@ -118,7 +136,8 @@ namespace CheMPS2{
          //Partitioning 0-4-2
          double diagram3(TensorT * denT, TensorF0 * denF0, double * workmem) const;
          
-         //Partitioning 3-3-0 (d4 --> d9)
+         //Partitioning 3-3-0
+         double diagram4_5_6_7_8_9(TensorT * denT, Tensor3RDM * d3tens, double * workmem, const char type) const;
          
          //Partitioning 2-3-1
          double diagram10(TensorT * denT, TensorS0 * denS0, TensorL * denL, double * workmem, double * workmem2) const;
@@ -149,7 +168,12 @@ namespace CheMPS2{
          double diagram45_46_47_48(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const;
          double diagram49_50_51_52(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const;
          
-         //Partitioning 3-2-1 (d53 --> d89)
+         //Partitioning 3-2-1
+         void              diagram53_54(TensorT * denT, Tensor3RDM * left1, Tensor3RDM * left2, TensorL * right, double * workmem, double * workmem2) const;
+         void             diagram55to60(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
+         void  diagram61_62_70_71_80_81(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
+         void       diagramJ2half_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
+         void diagramJ2oneandhalf_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
          
          //Partitioning 3-1-2 (d90 --> d189)
          

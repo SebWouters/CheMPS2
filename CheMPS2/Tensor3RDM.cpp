@@ -42,6 +42,10 @@ TensorOperator(boundary,
 
 CheMPS2::Tensor3RDM::~Tensor3RDM(){ }
 
+int CheMPS2::Tensor3RDM::get_two_j1() const{ return two_j1; }
+
+int CheMPS2::Tensor3RDM::get_two_j2() const{ return get_2j(); }
+
 void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * workmem){
 
    clear();

@@ -1,0 +1,394 @@
+/*
+   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+   Copyright (C) 2013-2015 Sebastian Wouters
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include <iostream>
+#include <math.h>
+#include <string.h>
+
+#include "Initialize.h"
+#include "DMRG.h"
+#include "FCI.h"
+#include "MPIchemps2.h"
+
+using namespace std;
+
+int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
+
+   CheMPS2::Initialize::Init();
+   
+   //The path to the matrix elements
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4.STO3G.FCIDUMP";
+   
+   //The Hamiltonian
+   const int psi4groupnumber = 5; // c2v -- see Irreps.h and CH4.sto3g.out
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
+   cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
+   
+   //The targeted state
+   int TwoS = 0;
+   int N = 10;
+   int Irrep = 0;
+   CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
+   
+   //The convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
+   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0,   30, 1e-10,  3, 0.1);
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0);
+   
+   //Run ground state calculation
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+   const double EnergyDMRG = theDMRG->Solve();
+   const bool do_3rdm = true;
+   theDMRG->calc_rdms_and_correlations(do_3rdm);
+   
+   //Calculate FCI reference energy and compare the DMRG and FCI 2-RDMs
+   double EnergyFCI = 0.0;
+   double RMSerror2DM = 0.0;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      const int Nel_up   = ( N + TwoS ) / 2;
+      const int Nel_down = ( N - TwoS ) / 2;
+      const double maxMemWorkMB = 10.0;
+      const int FCIverbose = 1;
+      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
+      double * inoutput = new double[theFCI->getVecLength(0)];
+      theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
+      inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+      EnergyFCI = theFCI->GSDavidson(inoutput);
+      theFCI->CalcSpinSquared(inoutput);
+      const int L = Ham->getL();
+      double *   TwoDMspace = new double[ L*L*L*L ];
+      double * ThreeDMspace = new double[ L*L*L*L*L*L ];
+      theFCI->Fill2RDM(inoutput,   TwoDMspace);
+      theFCI->Fill3RDM(inoutput, ThreeDMspace);
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  const double difference = TwoDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
+                                          - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
+                  RMSerror2DM += difference * difference;
+               }
+            }
+         }
+      }
+      double RMS_3RDM  = 0.0;
+      double NORM_3RDM = 0.0;
+      for (int i=0; i<L; i++){
+         for (int j=0; j<=i; j++){
+            for (int k=0; k<=i; k++){
+               for (int m=i; m<L; m++){
+                  for (int n=i; n<L; n++){
+                     double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(n + L*i))))];
+                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,n,i);
+                     double difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(i + L*n))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,i,n);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(m + L*n))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,m,n);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(k + L*(n + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,k,n,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(n + L*(k + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,n,k,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(k + L*(i + L*n))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,k,i,n);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(n + L*(i + L*k))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,n,i,k);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(i + L*(k + L*n))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,i,k,n);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(i + L*(n + L*k))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,i,n,k);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                  }
+               }
+            }
+         }
+      }
+      RMS_3RDM  = sqrt(  RMS_3RDM );
+      NORM_3RDM = sqrt( NORM_3RDM );
+      cout << "3-RDM difference 1 = " << RMS_3RDM  << endl;
+      cout << "3-RDM norm       1 = " << NORM_3RDM << endl;
+      RMS_3RDM  = 0.0;
+      NORM_3RDM = 0.0;
+      for (int i=0; i<L; i++){
+         for (int j=0; j<i; j++){
+            for (int k=0; k<i; k++){
+               for (int m=i+1; m<L; m++){
+                  for (int n=i+1; n<L; n++){
+                     double value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(n + L*(i + L*i))))];
+                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,n,i,i);
+                     double difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(n + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,n,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(i + L*n))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,i,n);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(k + L*(i + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,k,i,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(i + L*(k + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,i,k,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(i + L*(i + L*k))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,i,i,k);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                  }
+               }
+            }
+         }
+      }
+      RMS_3RDM  = sqrt(  RMS_3RDM );
+      NORM_3RDM = sqrt( NORM_3RDM );
+      cout << "3-RDM difference 2 = " << RMS_3RDM  << endl;
+      cout << "3-RDM norm       2 = " << NORM_3RDM << endl;
+      RMS_3RDM  = 0.0;
+      NORM_3RDM = 0.0;
+      for (int i=0; i<L; i++){
+         for (int j=0; j<i; j++){
+            for (int k=0; k<i; k++){
+               for (int l=0; l<i; l++){
+                  double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(i + L*i))))];
+                  double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,i,i);
+                  double difference = value_fci - value_dmrg;
+                  RMS_3RDM  += difference * difference;
+                  NORM_3RDM += value_fci * value_fci;
+                  
+                  value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(l + L*i))))];
+                  value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,l,i);
+                  difference = value_fci - value_dmrg;
+                  RMS_3RDM  += difference * difference;
+                  NORM_3RDM += value_fci * value_fci;
+                  
+                  value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(i + L*l))))];
+                  value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,i,l);
+                  difference = value_fci - value_dmrg;
+                  RMS_3RDM  += difference * difference;
+                  NORM_3RDM += value_fci * value_fci;
+               }
+            }
+         }
+      }
+      RMS_3RDM  = sqrt(  RMS_3RDM );
+      NORM_3RDM = sqrt( NORM_3RDM );
+      cout << "3-RDM difference 3 = " << RMS_3RDM  << endl;
+      cout << "3-RDM norm       3 = " << NORM_3RDM << endl;
+      RMS_3RDM  = 0.0;
+      NORM_3RDM = 0.0;
+      for (int i=0; i<L; i++){
+         for (int j=0; j<i; j++){
+            for (int k=0; k<i; k++){
+               for (int l=0; l<i; l++){
+                  for (int m=i+1; m<L; m++){
+                     double value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(m + L*(i + L*i))))];
+                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,m,i,i);
+                     double difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(i + L*(m + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,i,m,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(i + L*(i + L*m))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,i,i,m);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(l + L*(i + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,l,i,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(l + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,l,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(i + L*l))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,i,l);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                  }
+               }
+            }
+         }
+      }
+      RMS_3RDM  = sqrt(  RMS_3RDM );
+      NORM_3RDM = sqrt( NORM_3RDM );
+      cout << "3-RDM difference 4 = " << RMS_3RDM  << endl;
+      cout << "3-RDM norm       4 = " << NORM_3RDM << endl;
+      RMS_3RDM  = 0.0;
+      NORM_3RDM = 0.0;
+      for (int i=0; i<L; i++){
+         for (int j=0; j<i; j++){
+            for (int k=0; k<i; k++){
+               for (int l=0; l<i; l++){
+                  for (int m=i+1; m<L; m++){
+                     double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(m + L*i))))];
+                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,m,i);
+                     double difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(l + L*i))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,l,i);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(i + L*m))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,i,m);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(i + L*l))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,i,l);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(m + L*l))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,m,l);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                     
+                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(l + L*m))))];
+                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,l,m);
+                     difference = value_fci - value_dmrg;
+                     RMS_3RDM  += difference * difference;
+                     NORM_3RDM += value_fci * value_fci;
+                  }
+               }
+            }
+         }
+      }
+      RMS_3RDM  = sqrt(  RMS_3RDM );
+      NORM_3RDM = sqrt( NORM_3RDM );
+      cout << "3-RDM difference 5 = " << RMS_3RDM  << endl;
+      cout << "3-RDM norm       5 = " << NORM_3RDM << endl;
+      delete [] TwoDMspace;
+      delete [] ThreeDMspace;
+      delete [] inoutput;
+      delete theFCI;
+      RMSerror2DM = sqrt(RMSerror2DM);
+      cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDMs = " << RMSerror2DM << endl;
+      cout << "******************************************************************" << endl;
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI,   1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror2DM, 1, MPI_CHEMPS2_MASTER );
+   #endif
+   
+   OptScheme->setInstruction(0, 1500, 1e-10,  3, 0.0);
+   OptScheme->setInstruction(1, 2000, 1e-10, 10, 0.0);
+   theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
+   
+   //Clean up DMRG
+   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+   delete theDMRG;
+   delete OptScheme;
+   delete Prob;
+   delete Ham;
+
+   //Check success
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 )) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
+   cout << "================> Did test 11 succeed : ";
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
+
+}
+
+

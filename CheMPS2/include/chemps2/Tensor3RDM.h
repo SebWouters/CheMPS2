@@ -48,6 +48,14 @@ namespace CheMPS2{
          //! Destructor
          virtual ~Tensor3RDM();
          
+         //! Get the intermediary spin coupling value of the Tensor3RDM
+         /** \return Twice J1, the intermediary spin coupling value of the Tensor3RDM */
+         int get_two_j1() const;
+         
+         //! Get the spin value of the Tensor3RDM
+         /** \return Twice J2, the spin value of the Tensor3RDM */
+         int get_two_j2() const;
+         
          //! Make diagram a1
          /** \param Sigma   The TensorS0 or TensorS1 to make diagram a1
              \param denT    The TensorT to make diagram a1

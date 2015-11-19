@@ -169,14 +169,32 @@ int CheMPS2::ThreeDM::trianglefunction(const int k, const int glob){
    
 }
 
-void CheMPS2::ThreeDM::fill_site(TensorT * denT, TensorL *** Ltensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors){
+void CheMPS2::ThreeDM::tripletrianglefunction(const int global, int * jkl){
+
+   int cnt3 = 0;
+   while ( ((cnt3+1)*(cnt3+2)*(cnt3+3))/6 <= global ){ cnt3++; }
+   const int globalmin = global - (cnt3*(cnt3+1)*(cnt3+2))/6;
+   int cnt2 = 0;
+   while ( ((cnt2+1)*(cnt2+2))/2 <= globalmin ){ cnt2++; }
+   int cnt1 = globalmin - (cnt2*(cnt2+1))/2;
+   jkl[0] = cnt1;
+   jkl[1] = cnt2;
+   jkl[2] = cnt3;
+   
+}
+
+void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors,
+                                  Tensor3RDM **** dm3_a_J0_doublet, Tensor3RDM **** dm3_a_J1_doublet, Tensor3RDM **** dm3_a_J1_quartet,
+                                  Tensor3RDM **** dm3_b_J0_doublet, Tensor3RDM **** dm3_b_J1_doublet, Tensor3RDM **** dm3_b_J1_quartet,
+                                  Tensor3RDM **** dm3_c_J0_doublet, Tensor3RDM **** dm3_c_J1_doublet, Tensor3RDM **** dm3_c_J1_quartet,
+                                  Tensor3RDM **** dm3_d_J0_doublet, Tensor3RDM **** dm3_d_J1_doublet, Tensor3RDM **** dm3_d_J1_quartet ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
    const int MPIRANK = MPIchemps2::mpi_rank();
    #endif
 
    const int orb_i = denT->gIndex();
-   const int DIM = max(book->gMaxDimAtBound( orb_i ), book->gMaxDimAtBound( orb_i + 1 ));
+   const int DIM = max(book->gMaxDimAtBound( orb_i ), book->gMaxDimAtBound( orb_i+1 ));
    const double prefactor_spin = 1.0/(prob->gTwoS() + 1.0);
    
    #pragma omp parallel
@@ -253,6 +271,53 @@ void CheMPS2::ThreeDM::fill_site(TensorT * denT, TensorL *** Ltensors, TensorF0 
                const double d3 = diagram3( denT, F0tensors[orb_i][orb_k-orb_j][orb_j-1-orb_i], workmem ) * prefactor_spin;
                set_dmrg_index( orb_j, orb_i, orb_i, orb_k, orb_i, orb_i,  4 * d3 );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_k, orb_i, -2 * d3 );
+            }
+         }
+      }
+      
+      const int upperbound4 = ( orb_i * ( orb_i+1 ) * ( orb_i + 2 ) ) / 6;
+      int jkl[] = { 0, 0, 0 };
+      #ifdef CHEMPS2_MPI_COMPILATION
+         #pragma omp for schedule(dynamic)
+      #else
+         #pragma omp for schedule(static) nowait
+      #endif
+      for (int global = 0; global < upperbound4; global++){
+         tripletrianglefunction( global, jkl );
+         const int orb_j = jkl[0];
+         const int orb_k = jkl[1];
+         const int orb_l = jkl[2];
+         const int recalculate_global = orb_j + (orb_k*(orb_k+1))/2 + (orb_l*(orb_l+1)*(orb_l+2))/6;
+         assert( global == recalculate_global );
+         if ( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ) == Irreps::directProd( book->gIrrep( orb_l ), book->gIrrep( orb_i ) ) ){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )
+            #endif
+            {
+               const int cnt1 = orb_k - orb_j;
+               const int cnt2 = orb_l - orb_k;
+               const int cnt3 = orb_i - 1 - orb_l;
+               if ( cnt2 > 0 ){
+                  const double d4 =                        diagram4_5_6_7_8_9( denT, dm3_b_J0_doublet[cnt1][cnt2][cnt3], workmem, 'B' );
+                  const double d5 = (( cnt1 == 0 ) ? 0.0 : diagram4_5_6_7_8_9( denT, dm3_b_J1_doublet[cnt1][cnt2][cnt3], workmem, 'B' ));
+                  set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_i, d4 + d5 );
+                  set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_i, d4 - d5 );
+                  set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_i, orb_l, -2 * d4 );
+               }
+               if ( cnt1 + cnt2 > 0 ){
+                  const double d6 = diagram4_5_6_7_8_9( denT, dm3_c_J0_doublet[cnt1][cnt2][cnt3], workmem, 'C' );
+                  const double d7 = diagram4_5_6_7_8_9( denT, dm3_c_J1_doublet[cnt1][cnt2][cnt3], workmem, 'C' );
+                  set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_i, -2 * d6 );
+                  set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_i, d6 - d7 );
+                  set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_i, orb_k, d6 + d7 );
+               }
+               {
+                  const double d8 = diagram4_5_6_7_8_9( denT, dm3_d_J0_doublet[cnt1][cnt2][cnt3], workmem, 'D' );
+                  const double d9 = diagram4_5_6_7_8_9( denT, dm3_d_J1_doublet[cnt1][cnt2][cnt3], workmem, 'D' );
+                  set_dmrg_index( orb_k, orb_l, orb_i, orb_j, orb_i, orb_i, -2 * d8 );
+                  set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_j, orb_i, d8 + d9 );
+                  set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_i, orb_j, d8 - d9 );
+               }
             }
          }
       }
@@ -536,6 +601,130 @@ void CheMPS2::ThreeDM::fill_site(TensorT * denT, TensorL *** Ltensors, TensorF0 
             
          }
       }
+      
+      const int upperbound53 = upperbound4 * ( L - orb_i - 1 );
+      #ifdef CHEMPS2_MPI_COMPILATION
+         #pragma omp for schedule(dynamic)
+      #else
+         #pragma omp for schedule(static) nowait
+      #endif
+      for (int combined = 0; combined < upperbound53; combined++){
+         const int global = combined % upperbound4;
+         const int orb_m  = orb_i + 1 + ( combined / upperbound4 );
+         tripletrianglefunction( global, jkl );
+         const int orb_j = jkl[0];
+         const int orb_k = jkl[1];
+         const int orb_l = jkl[2];
+         if ( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ) == Irreps::directProd( book->gIrrep( orb_l ), book->gIrrep( orb_m ) ) ){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )
+            #endif
+            {
+               const int cnt1 = orb_k - orb_j;
+               const int cnt2 = orb_l - orb_k;
+               const int cnt3 = orb_i - 1 - orb_l;
+               if ( cnt1 + cnt2 > 0 ){
+                  diagram53_54( denT, dm3_a_J0_doublet[cnt1][cnt2][cnt3], dm3_a_J1_doublet[cnt1][cnt2][cnt3], Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2 );
+                  const double d53 =  workmem[0] * prefactor_spin;
+                  const double d54 = workmem2[0] * prefactor_spin;
+                  set_dmrg_index( orb_j, orb_k, orb_l, orb_m, orb_i, orb_i, d53 - d54 );
+                  set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_m, orb_i, d53 + d54 );
+                  set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_i, orb_m, - 2 * d53 );
+               }
+               Tensor3RDM * left[6];
+               double results[18];
+               left[0] = dm3_b_J0_doublet[cnt1][cnt2][cnt3];
+               left[1] = dm3_b_J1_doublet[cnt1][cnt2][cnt3];
+               left[2] = dm3_c_J0_doublet[cnt1][cnt2][cnt3];
+               left[3] = dm3_c_J1_doublet[cnt1][cnt2][cnt3];
+               left[4] = dm3_d_J0_doublet[cnt1][cnt2][cnt3];
+               left[5] = dm3_d_J1_doublet[cnt1][cnt2][cnt3];
+               {
+                  diagram55to60( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
+                  const double d55 = results[0] * prefactor_spin;
+                  const double d56 = results[1] * prefactor_spin;
+                  const double d57 = results[2] * prefactor_spin;
+                  const double d58 = results[3] * prefactor_spin;
+                  const double d59 = results[4] * prefactor_spin;
+                  const double d60 = results[5] * prefactor_spin;
+                  if ( cnt2 > 0 ){
+                     set_dmrg_index( orb_j, orb_k, orb_m, orb_l, orb_i, orb_i, d55 + d56 );
+                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_l, orb_i, d55 - d56 );
+                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_l, - 2 * d55 );
+                  }
+                  if ( cnt1 + cnt2 > 0 ){
+                     set_dmrg_index( orb_j, orb_l, orb_m, orb_k, orb_i, orb_i, - 2 * d57 );
+                     set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_k, orb_i, d57 - d58 );
+                     set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_i, orb_k, d57 + d58 );
+                  }
+                  set_dmrg_index( orb_k, orb_l, orb_m, orb_j, orb_i, orb_i, - 2 * d59 );
+                  set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_j, orb_i, d59 + d60 );
+                  set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_i, orb_j, d59 - d60 );
+               }
+               {
+                  diagram61_62_70_71_80_81( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
+                  const double d61 = results[0]  * prefactor_spin;
+                  const double d62 = results[1]  * prefactor_spin;
+                  const double d70 = results[2]  * prefactor_spin;
+                  const double d71 = results[3]  * prefactor_spin;
+                  const double d80 = results[4]  * prefactor_spin;
+                  const double d81 = results[5]  * prefactor_spin;
+                  diagramJ2half_3_2_1( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
+                  const double d63 = results[0]  * prefactor_spin;
+                  const double d64 = results[1]  * prefactor_spin;
+                  const double d65 = results[2]  * prefactor_spin;
+                  const double d66 = results[3]  * prefactor_spin;
+                  const double d67 = results[4]  * prefactor_spin;
+                  const double d68 = results[5]  * prefactor_spin;
+                  const double d72 = results[6]  * prefactor_spin;
+                  const double d73 = results[7]  * prefactor_spin;
+                  const double d74 = results[8]  * prefactor_spin;
+                  const double d75 = results[9]  * prefactor_spin;
+                  const double d76 = results[10] * prefactor_spin;
+                  const double d77 = results[11] * prefactor_spin;
+                  const double d82 = results[12] * prefactor_spin;
+                  const double d83 = results[13] * prefactor_spin;
+                  const double d84 = results[14] * prefactor_spin;
+                  const double d85 = results[15] * prefactor_spin;
+                  const double d86 = results[16] * prefactor_spin;
+                  const double d87 = results[17] * prefactor_spin;
+                  left[0] = dm3_b_J1_quartet[cnt1][cnt2][cnt3];
+                  left[1] = dm3_c_J1_quartet[cnt1][cnt2][cnt3];
+                  left[2] = dm3_d_J1_quartet[cnt1][cnt2][cnt3];
+                  diagramJ2oneandhalf_3_2_1( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
+                  const double d69 = results[0];
+                  const double d78 = results[1];
+                  const double d79 = results[2];
+                  const double d88 = results[3];
+                  const double d89 = results[4];
+                  if ( cnt2 > 0 ){
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_m, orb_i, -2*d61 - 2*d62 + d63 + d64 );
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_l, orb_i, -2*d61 + 2*d62 + d63 - d64 );
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_m, d61 + d62 + d65 + d66 );
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_l, d61 - d62 + d67 + d68 + d69 );
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_m, orb_l, d61 + d62 + d67 - d68 - d69 );
+                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_m, d61 - d62 + d65 - d66 );
+                  }
+                  if ( cnt1 + cnt2 > 0 ){
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_m, orb_i, 4*d70 + 2*d72 );
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_k, orb_i, -2*d70 + 2*d71 - d72 + d73 );
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_m, -2*d70 + 2*d74 );
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_i, orb_k, d70 - d71 - d74 + d76 + d78 );
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_m, d70 - d71 - d74 + d75 );
+                     set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_m, orb_k, -2*d70 - d72 + d77 + d79 );
+                  }
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_l, orb_i, 4*d80 + 2*d82 );
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_k, orb_i, -2*d80 - 2*d81 - d82 - d83 );
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_i, orb_l, -2*d80 + 2*d84 );
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_i, orb_k, d80 + d81 - d84 - d85 );
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_k, orb_l, d80 + d81 - d84 + d86 + d88 );
+                  set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_l, orb_k, -2*d80 - d82 + d87 + d89 );
+               }
+               
+            }
+         }
+      }
+      
       delete [] workmem;
       delete [] workmem2;
    
@@ -615,6 +804,58 @@ double CheMPS2::ThreeDM::diagram3(TensorT * denT, TensorF0 * denF0, double * wor
    }
    
    total *= sqrt( 0.5 );
+   return total;
+
+}
+
+double CheMPS2::ThreeDM::diagram4_5_6_7_8_9(TensorT * denT, Tensor3RDM * d3tens, double * workmem, const char type) const{
+
+   const int orb_i = denT->gIndex();
+   assert( d3tens->get_irrep()  == book->gIrrep( orb_i ) );
+   assert( d3tens->get_two_j2() == 1 );
+   
+   double total = 0.0;
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+               
+            int dimLup = book->gCurrentDim( orb_i, NL, TwoSL, IL );
+            
+            if ( dimLup > 0 ){
+            
+               const int ILdown = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            
+               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
+            
+                  int dimR     = book->gCurrentDim( orb_i+1, NL+1, TwoSLprime, ILdown );
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILdown );
+                  
+                  if (( dimLdown > 0 ) && ( dimR > 0 )){
+                     
+                     double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,     NL+1, TwoSLprime, ILdown );
+                     double * Tdown =   denT->gStorage( NL-1, TwoSLprime, ILdown, NL+1, TwoSLprime, ILdown );
+                     double * block = d3tens->gStorage( NL-1, TwoSLprime, ILdown, NL,   TwoSL,      IL     );
+                     
+                     char notrans = 'N';
+                     double alpha = 1.0;
+                     double beta  = 0.0; //set
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimR, &dimLup, &alpha, block, &dimLdown, Tup, &dimLup, &beta, workmem, &dimLdown );
+                     
+                     int length = dimLdown * dimR;
+                     int inc = 1;
+                     const double factor = ((type =='D') ? ( sqrt( 0.5 * ( d3tens->get_two_j1() + 1 ) ) * ( TwoSLprime + 1 ) )
+                                                         : ( phase( TwoSL + 1 - TwoSLprime )
+                                                           * sqrt( 0.5 * ( d3tens->get_two_j1() + 1 ) * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) ));
+                     total += factor * ddot_( &length, workmem, &inc, Tdown, &inc );
+
+                  }
+               }
+            }
+         }
+      }
+   }
+   
    return total;
 
 }
@@ -2095,6 +2336,413 @@ double CheMPS2::ThreeDM::diagram49_50_51_52(TensorT * denT, TensorOperator * lef
    
    workmem[0] = total_51_52;
    return total_49_50;
+
+}
+
+void CheMPS2::ThreeDM::diagram53_54(TensorT * denT, Tensor3RDM * left1, Tensor3RDM * left2, TensorL * right, double * workmem, double * workmem2) const{
+
+   assert( left1->get_irrep()  == right->get_irrep() );
+   assert( left1->get_two_j2() == 1                  );
+   assert( left1->get_nelec()  == 3                  );
+   if ( left2 != NULL ){
+      assert( left2->get_irrep()  == right->get_irrep() );
+      assert( left2->get_two_j2() == 1                  );
+      assert( left2->get_nelec()  == 3                  );
+   }
+   const int orb_i = denT->gIndex();
+   
+   double total1 = 0.0;
+   double total2 = 0.0;
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               const int Idown = Irreps::directProd( IL, right->get_irrep() );
+               
+               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
+                  
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-3, TwoSLdown, Idown );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSLdown, Idown );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup     =  denT->gStorage( NL,   TwoSL,     IL,    NL,   TwoSL,     IL    );
+                     double * Tdown   =  denT->gStorage( NL-3, TwoSLdown, Idown, NL-1, TwoSLdown, Idown );
+                     double * Rblock  = right->gStorage( NL-1, TwoSLdown, Idown, NL,   TwoSL,     IL    );
+                     
+                     char notrans = 'N';
+                     char trans   = 'T';
+                     double alpha = 1.0;
+                     double beta  = 0.0; //set
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
+                     
+                     int length = dimLup * dimLdown;
+                     int inc    = 1;
+                     double * Lblock1 = left1->gStorage( NL-3, TwoSLdown, Idown, NL, TwoSL, IL );
+                     total1 -= ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Lblock1, &inc );
+                     if ( left2 != NULL ){
+                        double * Lblock2 = left2->gStorage( NL-3, TwoSLdown, Idown, NL, TwoSL, IL );
+                        total2 -= ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Lblock2, &inc );
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+                         total1 *= sqrt( 0.5 * ( left1->get_two_j1() + 1 ) );
+   if ( left2 != NULL ){ total2 *= sqrt( 0.5 * ( left2->get_two_j1() + 1 ) ); }
+   workmem[0]  = total1;
+   workmem2[0] = total2;
+
+}
+
+void CheMPS2::ThreeDM::diagram55to60(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
+
+   for ( int cnt = 0; cnt < 6; cnt++ ){
+      if ( left[ cnt ] != NULL ){
+         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
+         assert( left[ cnt ]->get_two_j2() == 1 );
+         assert( left[ cnt ]->get_nelec()  == 1 );
+      }
+      results[ cnt ] = 0.0;
+   }
+   const int orb_i = denT->gIndex();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               const int Idown = Irreps::directProd( IL, right->get_irrep() );
+               
+               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
+                  
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLdown, Idown );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLdown, Idown );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup    =  denT->gStorage( NL,   TwoSL,     IL,    NL,   TwoSL,     IL    );
+                     double * Tdown  =  denT->gStorage( NL-1, TwoSLdown, Idown, NL+1, TwoSLdown, Idown );
+                     double * Rblock = right->gStorage( NL,   TwoSL,     IL,    NL+1, TwoSLdown, Idown );
+                     
+                     char trans   = 'T';
+                     char notrans = 'N';
+                     double alpha = 1.0;
+                     double beta  = 0.0; //set
+                     dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRup, &beta, workmem,  &dimLdown );
+                     dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup, &beta, workmem2, &dimLdown );
+                     
+                     int size = dimLup * dimLdown;
+                     int inc  = 1;
+                     const double factorBC = phase( TwoSL + 1 - TwoSLdown ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) );
+                     const double factorD  = ( TwoSLdown + 1 );
+                     for ( int cnt = 0; cnt < 6; cnt++ ){
+                        if ( left[ cnt ] != NULL ){
+                           results[ cnt ] += (( cnt < 4 ) ? factorBC : factorD )
+                                           * ddot_( &size, workmem2, &inc, left[ cnt ]->gStorage( NL-1, TwoSLdown, Idown, NL, TwoSL, IL ), &inc );
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+   const double factorJ0 = sqrt( 0.5 );
+   const double factorJ1 = sqrt( 1.5 );
+   for ( int cnt = 0; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ0; } }
+   for ( int cnt = 1; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ1; } }
+
+}
+
+void CheMPS2::ThreeDM::diagram61_62_70_71_80_81(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
+
+   for ( int cnt = 0; cnt < 6; cnt++ ){
+      if ( left[ cnt ] != NULL ){
+         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
+         assert( left[ cnt ]->get_two_j2() == 1 );
+         assert( left[ cnt ]->get_nelec()  == 1 );
+      }
+      results[ cnt ] = 0.0;
+   }
+   const int orb_i = denT->gIndex();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL+2, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               const int Idown = Irreps::directProd( IL, right->get_irrep() );
+               
+               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
+                  
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLdown, Idown );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLdown, Idown );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup     =  denT->gStorage( NL,   TwoSL,     IL,    NL+2, TwoSL,     IL    );
+                     double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, Idown, NL+1, TwoSLdown, Idown );
+                     double * Rblock  = right->gStorage( NL+1, TwoSLdown, Idown, NL+2, TwoSL,     IL    );
+                     
+                     char notrans = 'N';
+                     char trans   = 'T';
+                     double alpha = 1.0;
+                     double beta  = 0.0; //set
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
+                     
+                     int size = dimLup * dimLdown;
+                     int inc  = 1;
+                     const double factorBC = ( TwoSL + 1 );
+                     const double factorD  = phase( TwoSL + 1 - TwoSLdown ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) );
+                     for ( int cnt = 0; cnt < 6; cnt++ ){
+                        if ( left[ cnt ] != NULL ){
+                           results[ cnt ] += (( cnt < 4 ) ? factorBC : factorD )
+                                           * ddot_( &size, workmem2, &inc, left[ cnt ]->gStorage( NL-1, TwoSLdown, Idown, NL, TwoSL, IL ), &inc );
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+   const double factorJ0 = sqrt( 0.5 );
+   const double factorJ1 = sqrt( 1.5 );
+   for ( int cnt = 0; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ0; } }
+   for ( int cnt = 1; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ1; } }
+
+}
+
+void CheMPS2::ThreeDM::diagramJ2half_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
+
+   for ( int cnt = 0; cnt < 6; cnt++ ){
+      if ( left[ cnt ] != NULL ){
+         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
+         assert( left[ cnt ]->get_two_j2() == 1 );
+         assert( left[ cnt ]->get_nelec()  == 1 );
+      }
+   }
+   for ( int cnt = 0; cnt < 18; cnt++ ){ results[ cnt ] = 0.0; }
+   const int orb_i = denT->gIndex();
+   const double sqrt_half      = sqrt(0.5);
+   const double sqrt_anderhalf = sqrt(1.5);
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
+         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
+         
+            const int IRup   = Irreps::directProd( ILup, book->gIrrep( orb_i ) );
+            const int ILdown = Irreps::directProd( ILup, right->get_irrep() );
+            const int IRdown = Irreps::directProd( IRup, right->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
+            
+            if ( dimLup > 0 ){
+            
+               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
+            
+                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
+                  
+                  if ( dimRup > 0 ){
+                     
+                     for ( int TwoSLdown = TwoSLup-1; TwoSLdown <= TwoSLup+1; TwoSLdown+=2 ){
+                        
+                        int dimLdown = book->gCurrentDim( orb_i, NL-1, TwoSLdown, ILdown );
+                        
+                        if ( dimLdown > 0 ){
+                        
+                           for ( int TwoSRdown = TwoSRup-1; TwoSRdown <= TwoSRup+1; TwoSRdown+=2 ){
+                        
+                              int dimRdown = book->gCurrentDim( orb_i+1, NL, TwoSRdown, IRdown );
+                              
+                              if (( dimRdown > 0 ) && ( abs( TwoSLdown - TwoSRdown ) <= 1 )){
+                              
+                                 double * Tup     =  denT->gStorage( NL,   TwoSLup,   ILup,   NL+1, TwoSRup,   IRup   );
+                                 double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, ILdown, NL,   TwoSRdown, IRdown );
+                                 double * Rblock  = right->gStorage( NL,   TwoSRdown, IRdown, NL+1, TwoSRup,   IRup   );
+                                 
+                                 char notrans = 'N';
+                                 char trans   = 'T';
+                                 double alpha = 1.0;
+                                 double beta  = 0.0; //set
+                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
+                                 dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
+                                 
+                                 int size = dimLup * dimLdown;
+                                 int inc  = 1;
+                                 const double dm3_b_J0 = ((left[0] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[0]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_b_J1 = ((left[1] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[1]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_c_J0 = ((left[2] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[2]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_c_J1 = ((left[3] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[3]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_d_J0 = ((left[4] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[4]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_d_J1 = ((left[5] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[5]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 
+                                 const double acommon = sqrt( 1.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
+                                 const double wign_6j = gsl_sf_coupling_6j( TwoSLup, TwoSRup, 1, TwoSRdown, TwoSLdown, 1 );
+                                 const double factor1 = phase( TwoSLup + TwoSRdown + 2 ) * acommon * wign_6j;
+                                 const double factor2 = sqrt( 1.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * phase( TwoSLup - TwoSRdown );
+                                 const double factor3 = 2 * acommon
+                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSRdown )
+                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSLup   );
+                                 const double wigprod = gsl_sf_coupling_6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSRup   )
+                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSLdown );
+                                 const double factor4 = 2 * acommon * wigprod
+                                                      * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown );
+                                 const double wign_9j = gsl_sf_coupling_9j( 1, 1, 2, TwoSLdown, TwoSLup, 1, TwoSRdown, TwoSRup, 1 );
+                                 const double factor5 = ( -2 ) * acommon * wign_9j;
+                                 
+                                 const double dcommon = sqrt( 1.0 * ( TwoSLdown + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
+                                 const double factor6 = dcommon * phase( TwoSLdown + TwoSRdown + 3 ) * wign_6j;
+                                 const double factor7 = sqrt( ( TwoSLdown + 1.0 ) / ( TwoSLup + 1.0 ) ) * ( TwoSRup + 1.0 ) * phase( TwoSLup + 1 - TwoSLdown );
+                                 const double factor8 = 2 * dcommon * wigprod * phase( TwoSRdown + 1 - TwoSRup );
+                                 const double factor9 = 2 * dcommon * wign_9j * phase( TwoSRdown + 1 - TwoSRup )
+                                                      * phase( TwoSLup + TwoSLdown + TwoSRup + TwoSRdown + 2 ); //Last phase for column swap wigner 9j
+                                 
+                                 
+                                 results[0]  += sqrt_half      * factor1         * dm3_b_J0;   // d63
+                                 results[1]  += sqrt_anderhalf * factor1         * dm3_b_J1;   // d64
+    if ( TwoSRdown == TwoSLup ){ results[2]  -= sqrt_half      * ( TwoSRup + 1 ) * dm3_b_J0;   // d65
+                                 results[3]  -= sqrt_anderhalf * ( TwoSRup + 1 ) * dm3_b_J1; } // d66
+    if ( TwoSRup == TwoSLdown ){ results[4]  += sqrt_half      * factor2         * dm3_b_J0; } // d67
+                                 results[5]  += sqrt_anderhalf * factor3         * dm3_b_J1;   // d68
+                                 
+                                 results[6]  -= sqrt_half      * factor1         * dm3_c_J0;   // d72
+                                 results[7]  -= sqrt_anderhalf * factor1         * dm3_c_J1;   // d73
+    if ( TwoSRdown == TwoSLup ){ results[8]  += sqrt_half      * ( TwoSRup + 1 ) * dm3_c_J0;   // d74
+                                 results[9]  += sqrt_anderhalf * ( TwoSRup + 1 ) * dm3_c_J1; } // d75
+                                 results[10] += sqrt_anderhalf * factor4         * dm3_c_J1;   // d76
+                                 results[11] += sqrt_anderhalf * factor5         * dm3_c_J1;   // d77
+                                 
+                                 results[12] += sqrt_half      * factor6         * dm3_d_J0;   // d82
+                                 results[13] += sqrt_anderhalf * factor6         * dm3_d_J1;   // d83
+    if ( TwoSRdown == TwoSLup ){ results[14] += sqrt_half      * factor7         * dm3_d_J0;   // d84
+                                 results[15] += sqrt_anderhalf * factor7         * dm3_d_J1; } // d85
+                                 results[16] += sqrt_anderhalf * factor8         * dm3_d_J1;   // d86
+                                 results[17] += sqrt_anderhalf * factor9         * dm3_d_J1;   // d87
+                                 
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::diagramJ2oneandhalf_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
+
+   for ( int cnt = 0; cnt < 3; cnt++ ){
+      if ( left[ cnt ] != NULL ){
+         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
+         assert( left[ cnt ]->get_two_j2() == 3 );
+         assert( left[ cnt ]->get_nelec()  == 1 );
+      }
+   }
+   for ( int cnt = 0; cnt < 5; cnt++ ){ results[ cnt ] = 0.0; }
+   const int orb_i = denT->gIndex();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
+         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
+         
+            const int IRup   = Irreps::directProd( ILup, book->gIrrep( orb_i ) );
+            const int ILdown = Irreps::directProd( ILup, right->get_irrep() );
+            const int IRdown = Irreps::directProd( IRup, right->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
+            
+            if ( dimLup > 0 ){
+            
+               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
+            
+                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
+                  
+                  if ( dimRup > 0 ){
+                     
+                     for ( int TwoSLdown = TwoSLup-3; TwoSLdown <= TwoSLup+3; TwoSLdown+=2 ){
+                        
+                        int dimLdown = book->gCurrentDim( orb_i, NL-1, TwoSLdown, ILdown );
+                        
+                        if ( dimLdown > 0 ){
+                        
+                           for ( int TwoSRdown = TwoSRup-1; TwoSRdown <= TwoSRup+1; TwoSRdown+=2 ){
+                        
+                              int dimRdown = book->gCurrentDim( orb_i+1, NL, TwoSRdown, IRdown );
+                              
+                              if (( dimRdown > 0 ) && ( abs( TwoSLdown - TwoSRdown ) <= 1 )){
+                              
+                                 double * Tup     =  denT->gStorage( NL,   TwoSLup,   ILup,   NL+1, TwoSRup,   IRup   );
+                                 double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, ILdown, NL,   TwoSRdown, IRdown );
+                                 double * Rblock  = right->gStorage( NL,   TwoSRdown, IRdown, NL+1, TwoSRup,   IRup   );
+                                 
+                                 char notrans = 'N';
+                                 char trans   = 'T';
+                                 double alpha = 1.0;
+                                 double beta  = 0.0; //set
+                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
+                                 dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
+
+                                 int size = dimLup * dimLdown;
+                                 int inc  = 1;
+                                 const double dm3_b = ((left[0] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[0]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_c = ((left[1] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[1]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+                                 const double dm3_d = ((left[2] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[2]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
+
+                                 const double acommon = 2 * sqrt( 3.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
+                                 const double wign_9j = gsl_sf_coupling_9j( 1, 1, 2, TwoSLdown, TwoSLup, 3, TwoSRdown, TwoSRup, 1 );
+                                 const double factor1 = acommon * gsl_sf_coupling_6j( 1, 2, 1, TwoSLdown, TwoSRdown, TwoSRup )
+                                                                * gsl_sf_coupling_6j( 1, 2, 3, TwoSLdown, TwoSLup,   TwoSRup );
+                                 const double wigprod = gsl_sf_coupling_6j( 1, 2, 1, TwoSLup, TwoSRup,   TwoSRdown )
+                                                      * gsl_sf_coupling_6j( 1, 2, 3, TwoSLup, TwoSLdown, TwoSRdown );
+                                 const double factor2 = acommon * wigprod * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown + 2 );
+                                 const double factor3 = acommon * ( -1 ) * wign_9j;
+                                 const double dcommon = 2 * sqrt( 3.0 * ( TwoSLdown + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
+                                 const double factor4 = dcommon * wigprod * phase( TwoSRdown + 1 - TwoSRup );
+                                 const double factor5 = dcommon * wign_9j * phase( TwoSRdown + 1 - TwoSRup )
+                                                      * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown ); //Last phase for column swap wigner 9j
+
+                                 results[0] += factor1 * dm3_b; // d69
+                                 results[1] += factor2 * dm3_c; // d78
+                                 results[2] += factor3 * dm3_c; // d79
+                                 results[3] += factor4 * dm3_d; // d88
+                                 results[4] += factor5 * dm3_d; // d89
+                                 
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
 
 }
 
