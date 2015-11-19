@@ -192,6 +192,20 @@ namespace CheMPS2{
          #endif
          
          #ifdef CHEMPS2_MPI_COMPILATION
+         //! Get the owner of a certain 3-index tensor for the 3-RDM
+         /** \param L The number of active space orbitals
+             \param index1 The first  DMRG lattice index of the tensor
+             \param index2 The second DMRG lattice index of the tensor
+             \param index3 The third  DMRG lattice index of the tensor
+             \return The owner rank */
+         static int owner_3rdm_diagram(const int L, const int index1, const int index2, const int index3){ // 1 + L*(L+1) <= proc < 1 + L*(L+1) + L*(L+1)*(L+2)/6
+            assert( index1 <= index2 );
+            assert( index2 <= index3 );
+            return ( 1 + L*(L+1) + index1 + (index2*(index2+1))/2 + (index3*(index3+1)*(index3+2))/6 ) % mpi_size();
+         }
+         #endif
+         
+         #ifdef CHEMPS2_MPI_COMPILATION
          //! Get the owner of the 1c, 1d, 2d, 3e, and 3h diagrams of the effective Hamiltonian
          /** \return The owner rank */
          static int owner_1cd2d3eh(){ return MPI_CHEMPS2_MASTER; }

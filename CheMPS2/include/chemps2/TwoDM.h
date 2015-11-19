@@ -95,17 +95,17 @@ namespace CheMPS2{
              
          //! Return the double trace of 2DM-A (should be N(N-1))
          /** \return Double trace of 2DM-A */
-         double doubletrace2DMA();
+         double trace() const;
          
          //! Calculate the energy based on the 2DM-A
          /** \return The energy calculated as 0.5*trace(2DM-A * Ham) */
-         double calcEnergy();
+         double energy() const;
          
          //! Print the natural orbital occupation numbers
-         void printNOON() const;
+         void print_noon() const;
          
          //! Save the TwoDMs to disk
-         void save();
+         void save() const;
          
          //! Load the TwoDMs from disk
          void read();

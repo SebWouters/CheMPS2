@@ -35,7 +35,11 @@
 #include "TensorOperator.h"
 #include "TensorQ.h"
 #include "TensorO.h"
+#include "Tensor3RDM.h"
+#include "TensorGYZ.h"
+#include "TensorKM.h"
 #include "TwoDM.h"
+#include "ThreeDM.h"
 #include "Correlations.h"
 #include "Heff.h"
 #include "Sobject.h"
@@ -93,12 +97,20 @@ namespace CheMPS2{
          /** \return The min. energy encountered so far during the sweeps. */
          double Solve();
          
-         //! Calculate the 2DM. Note that the DMRG class cannot be used for further updates anymore !!!
-         void calc2DMandCorrelations();
+         //! Calculate the 2-RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge.
+         void calc2DMandCorrelations(){ calc_rdms_and_correlations(false); }
          
-         //! Get the pointer to the 2DM
-         /** \return The 2DM. Returns a NULL pointer if not yet calculated. */
+         //! Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gauge.
+         /** \param do_3rdm Whether or not to calculate the 3-RDM */
+         void calc_rdms_and_correlations(const bool do_3rdm);
+         
+         //! Get the pointer to the 2-RDM
+         /** \return The 2-RDM. Returns a NULL pointer if not yet calculated. */
          TwoDM * get2DM(){ return the2DM; }
+         
+         //! Get the pointer to the 3-RDM
+         /** \return The 3-RDM. Returns a NULL pointer if not yet calculated. */
+         ThreeDM * get3DM(){ return the3DM; }
          
          //! Get the pointer to the Correlations
          /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
@@ -174,14 +186,11 @@ namespace CheMPS2{
          //The TwoDM
          TwoDM * the2DM;
          
-         //Whether the2DM is allocated
-         bool the2DMallocated;
+         //The ThreeDM
+         ThreeDM * the3DM;
          
          //The Correlations
          Correlations * theCorr;
-         
-         //Whether the Correlations is allocated
-         bool theCorrAllocated;
          
          //Whether or not allocated
          int * isAllocated;
@@ -204,20 +213,35 @@ namespace CheMPS2{
          //TensorS1's
          TensorS1 **** S1tensors;
          
-         //A-tensors
+         //ABCD-tensors
          TensorOperator **** Atensors;
-         
-         //B-tensors
          TensorOperator **** Btensors;
-         
-         //C-tensors
          TensorOperator **** Ctensors;
-         
-         //D-tensors
          TensorOperator **** Dtensors;
          
          //TensorQ's
          TensorQ *** Qtensors;
+         
+         //Tensors required for the 3-RDM calculation
+         Tensor3RDM ***** tensor_3rdm_a_J0_doublet;
+         Tensor3RDM ***** tensor_3rdm_a_J1_doublet;
+         Tensor3RDM ***** tensor_3rdm_a_J1_quartet;
+         Tensor3RDM ***** tensor_3rdm_b_J0_doublet;
+         Tensor3RDM ***** tensor_3rdm_b_J1_doublet;
+         Tensor3RDM ***** tensor_3rdm_b_J1_quartet;
+         Tensor3RDM ***** tensor_3rdm_c_J0_doublet;
+         Tensor3RDM ***** tensor_3rdm_c_J1_doublet;
+         Tensor3RDM ***** tensor_3rdm_c_J1_quartet;
+         Tensor3RDM ***** tensor_3rdm_d_J0_doublet;
+         Tensor3RDM ***** tensor_3rdm_d_J1_doublet;
+         Tensor3RDM ***** tensor_3rdm_d_J1_quartet;
+         
+         //Tensors required for the Correlations calculation
+         TensorGYZ ** Gtensors;
+         TensorGYZ ** Ytensors;
+         TensorGYZ ** Ztensors;
+         TensorKM  ** Ktensors;
+         TensorKM  ** Mtensors;
          
          //Sets everything up for the first solve
          void PreSolve();
@@ -246,10 +270,21 @@ namespace CheMPS2{
          void allocateTensors(const int index, const bool movingRight);
          void updateMovingRightSafe(const int cnt);
          void updateMovingRightSafeFirstTime(const int cnt);
+         void updateMovingRightSafe2DM(const int cnt);
          void updateMovingLeftSafe(const int cnt);
          void updateMovingLeftSafe2DM(const int cnt);
          void deleteAllBoundaryOperators();
          static int trianglefunction(const int k, const int glob);
+         
+         //Helper functions for making the 3-RDM boundary operators
+         void update_safe_3rdm_operators(const int boundary);
+         void allocate_3rdm_operators(const int boundary);
+         void update_3rdm_operators(const int boundary);
+         void delete_3rdm_operators(const int boundary);
+         void tripletrianglefunction(const int global, int * jkl);
+         
+         //Helper functions for making the Correlations boundary operators
+         void update_correlations_tensors(const int siteindex);
          
          //The storage and functions to handle excited states
          int nStates;
@@ -268,6 +303,7 @@ namespace CheMPS2{
          double timings[ CHEMPS2_TIME_VECLENGTH ];
          long long num_double_write_disk;
          long long num_double_read_disk;
+         void print_tensor_update_performance() const;
          
    };
 }

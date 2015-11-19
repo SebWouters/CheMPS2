@@ -1,0 +1,536 @@
+/*
+   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+   Copyright (C) 2013-2015 Sebastian Wouters
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include <stdlib.h>
+#include <assert.h>
+#include <math.h>
+#include <gsl/gsl_sf_coupling.h>
+
+#include "Tensor3RDM.h"
+#include "Heff.h"
+#include "Lapack.h"
+
+CheMPS2::Tensor3RDM::Tensor3RDM(const int boundary, const int two_j1_in, const int two_j2, const int nelec, const int irrep, const bool prime_last, const SyBookkeeper * book):
+TensorOperator(boundary,
+               two_j2,
+               nelec,
+               irrep,
+               true, // moving_right
+               prime_last,
+               true, // jw_phase
+               book){
+               
+   two_j1 = two_j1_in;
+
+}
+
+CheMPS2::Tensor3RDM::~Tensor3RDM(){ }
+
+void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * workmem){
+
+   clear();
+   assert( two_j1 == Sigma->get_2j() );
+   assert( n_elec == 3 );
+   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   const int two_j2 = two_j;
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index, nr_up+3, two_jr_down, ir_down );
+      
+      { // Contribution 1
+         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up+2, two_jl_down, il_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
+            
+               double * Sblock = Sigma->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up+2, two_jl_down, il_down );
+               double * Tup    =  denT->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  =  denT->gStorage( nr_up+2, two_jl_down, il_down, nr_up+3, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Sblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }        
+         }
+      }
+      { // Contribution 2
+         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
+            
+               double * Sblock = Sigma->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up+1, two_jr_down, ir_down );
+               double * Tup    =  denT->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  =  denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+3, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Sblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }
+         }
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * workmem){
+
+   clear();
+   assert( two_j1 == Sigma->get_2j() );
+   assert( n_elec == 1 );
+   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   const int two_j2 = two_j;
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      
+      { // Contribution 1
+         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
+            
+               double * Sblock = Sigma->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up+1, two_jr_down, ir_down );
+               double * Tup    =  denT->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  =  denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 3 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Sblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }
+         }
+      }
+      { // Contribution 2
+         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
+            
+               double * Sblock = Sigma->gStorage( nr_up-2, two_jr_up,   ir_up,   nr_up,   two_jl_down, il_down );
+               double * Tup    =  denT->gStorage( nr_up-2, two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  =  denT->gStorage( nr_up,   two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Sblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }        
+         }
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * workmem){
+
+   clear();
+   assert( two_j1 == denF->get_2j() );
+   assert( n_elec == 1 );
+   assert( n_irrep == Irreps::directProd( denF->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   const int two_j2 = two_j;
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      
+      { // Contribution 1
+         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
+            
+               double * Fblock = denF->gStorage( nr_up, two_jr_up,   ir_up,   nr_up,   two_jl_down, il_down );
+               double * Tup    = denT->gStorage( nr_up, two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  = denT->gStorage( nr_up, two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Fblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }        
+         }
+      }
+      { // Contribution 2
+         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
+            
+               double * Fblock = denF->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up-1, two_jr_down, ir_down );
+               double * Tup    = denT->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Fblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }
+         }
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * workmem){
+
+   clear();
+   assert( two_j1 == denF->get_2j() );
+   assert( n_elec == 1 );
+   assert( n_irrep == Irreps::directProd( denF->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   const int two_j2 = two_j;
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      
+      { // Contribution 1
+         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
+            
+               double * Fblock = denF->gStorage( nr_up, two_jl_down, il_down, nr_up,   two_jr_up,   ir_up   );
+               double * Tup    = denT->gStorage( nr_up, two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  = denT->gStorage( nr_up, two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_down + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Heff::phase( two_jr_up + two_jl_down + two_j2 + 3 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &trans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Fblock, &dimLdown, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }        
+         }
+      }
+      { // Contribution 2
+         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
+         
+            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
+            
+               double * Fblock = denF->gStorage( nr_up-1, two_jr_down, ir_down, nr_up-1, two_jl_up,   il_up   );
+               double * Tup    = denT->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jr_up,   ir_up   );
+               double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+               
+               double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_up + 1 ) )
+                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+               double beta  = 0.0; //set
+               char trans   = 'T';
+               char notrans = 'N';
+               dgemm_( &trans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Fblock, &dimLdown, Tdown, &dimLdown, &beta, workmem, &dimLup );
+               alpha = 1.0;
+               beta  = 1.0; //add
+               dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+            
+            }
+         }
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::extra1(TensorT * denT){
+
+   clear();
+   assert( n_elec == 1 );
+   assert( n_irrep == denBK->gIrrep( index-1 ) );
+   const int two_j2 = two_j;
+   assert( two_j2 == 1 );
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      int dimL     = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+      
+      if ( dimL > 0 ){
+      
+         double * Tup   = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up,   two_jr_up,   ir_up   );
+         double * Tdown = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+         
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 );
+         double beta  = 0.0; //set --> only contribution to this symmetry sector
+         char trans   = 'T';
+         char notrans = 'N';
+         dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimL, &alpha, Tup, &dimL, Tdown, &dimL, &beta, storage + kappa2index[ikappa], &dimRup );
+      
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::extra2(TensorL * denL, TensorT * denT, double * workmem){
+
+   clear();
+   assert( n_elec == 3 );
+   assert( n_irrep == denL->get_irrep() );
+   const int two_j2 = two_j;
+   assert( two_j2 == 1 );
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index,   nr_up+3, two_jr_down, ir_down );
+      int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+      int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+      
+      if (( dimLup > 0 ) && ( dimLdown > 0 )){
+      
+         double * Tup    = denT->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+         double * Tdown  = denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+3, two_jr_down, ir_down );
+         double * Lblock = denL->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up+1, two_jr_down, ir_down );
+         
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 + 2 );
+         double beta  = 0.0; //set
+         char trans   = 'T';
+         char notrans = 'N';
+         dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Lblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+         alpha = 1.0;
+         dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+      
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::extra3(TensorL * denL, TensorT * denT, double * workmem){
+
+   clear();
+   assert( n_elec == 1 );
+   assert( n_irrep == denL->get_irrep() );
+   const int two_j2 = two_j;
+   assert( two_j2 == 1 );
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+      int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+      
+      if (( dimLup > 0 ) && ( dimLdown > 0 )){
+      
+         double * Tup    = denT->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+         double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+         double * Lblock = denL->gStorage( nr_up-1, two_jr_down, ir_down, nr_up,   two_jr_up,   ir_up   );
+         
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 );
+         double beta  = 0.0; //set
+         char trans   = 'T';
+         char notrans = 'N';
+         dgemm_( &trans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Lblock, &dimLdown, Tdown, &dimLdown, &beta, workmem, &dimLup );
+         alpha = 1.0;
+         dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+      
+      }
+   }
+}
+
+void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workmem){
+
+   clear();
+   assert( n_elec == 1 );
+   assert( n_irrep == denL->get_irrep() );
+   const int two_j2 = two_j;
+
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+       
+      const int two_jr_up   = sectorTwoS1[ ikappa ];
+      const int nr_up       = sectorN1[ ikappa ];
+      const int ir_up       = sectorI1[ ikappa ];
+      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int ir_down     = Irreps::directProd( ir_up, n_irrep );
+      
+      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      
+      if ( two_j2 == 1 ){ // Contribution 2
+      
+         int dimLup   = denBK->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
+         int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+         
+         if (( dimLup > 0 ) && ( dimLdown > 0 )){
+         
+            double * Tup    = denT->gStorage( nr_up-2, two_jr_up,   ir_up,   nr_up,   two_jr_up,   ir_up   );
+            double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
+            double * Lblock = denL->gStorage( nr_up-2, two_jr_up,   ir_up,   nr_up-1, two_jr_down, ir_down );
+            
+            double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 + 2 );
+            double beta  = 0.0; //set
+            char trans   = 'T';
+            char notrans = 'N';
+            dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Lblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+            alpha = 1.0;
+            beta  = 1.0; // add
+            dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+         
+         }
+      }
+      { // Contribution 1
+         const int il_up   = Irreps::directProd( ir_up,   denBK->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
+            for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
+      
+               int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+               int dimLdown = denBK->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
+               
+               if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jl_up - two_jl_down ) <= 1 )){
+               
+                  double * Tup    = denT->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jr_up,   ir_up   );
+                  double * Tdown  = denT->gStorage( nr_up,   two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
+                  double * Lblock = denL->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jl_down, il_down );
+                  
+                  double alpha = sqrt( 1.0 * ( two_j1 + 1 ) * ( two_j2 + 1 ) * ( two_jr_up + 1 ) * ( two_jl_down + 1 ) )
+                               * Heff::phase( two_jr_up + two_jr_down - two_jl_up - two_jl_down )
+                               * gsl_sf_coupling_6j( 1, 1, two_j1, two_jl_down, two_jr_up, two_jl_up )
+                               * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down );
+                  double beta  = 0.0; //set
+                  char trans   = 'T';
+                  char notrans = 'N';
+                  dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimLdown, &alpha, Lblock, &dimLup, Tdown, &dimLdown, &beta, workmem, &dimLup );
+                  alpha = 1.0;
+                  beta  = 1.0; // add
+                  dgemm_( &trans, &notrans, &dimRup, &dimRdown, &dimLup, &alpha, Tup, &dimLup, workmem, &dimLup, &beta, storage + kappa2index[ikappa], &dimRup );
+               
+               }
+            }
+         }
+      }
+   }
+}
+
+

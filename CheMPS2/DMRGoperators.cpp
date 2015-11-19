@@ -135,6 +135,41 @@ void CheMPS2::DMRG::updateMovingLeftSafe(const int cnt){
 
 }
 
+void CheMPS2::DMRG::updateMovingRightSafe2DM(const int cnt){
+
+   if (isAllocated[cnt]==2){
+      deleteTensors(cnt, false);
+      isAllocated[cnt]=0;
+   }
+   if (isAllocated[cnt]==0){
+      allocateTensors(cnt, true);
+      isAllocated[cnt]=1;
+   }
+   updateMovingRight(cnt);
+   
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){
+      if (cnt>0){
+         if (isAllocated[cnt-1]==1){
+            OperatorsOnDisk(cnt-1, true, true);
+            deleteTensors(cnt-1, true);
+            isAllocated[cnt-1]=0;
+         }
+      }
+      if (cnt+1<L-1){
+         if (isAllocated[cnt+1]==1){
+            deleteTensors(cnt+1, true);
+            isAllocated[cnt+1]=0;
+         }
+         if (isAllocated[cnt+1]==0){
+            allocateTensors(cnt+1, false);
+            isAllocated[cnt+1]=2;
+         }
+         OperatorsOnDisk(cnt+1, false, false);
+      }
+   }
+
+}
+
 void CheMPS2::DMRG::updateMovingLeftSafe2DM(const int cnt){
 
    if (isAllocated[cnt]==1){
@@ -150,6 +185,7 @@ void CheMPS2::DMRG::updateMovingLeftSafe2DM(const int cnt){
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){
       if (cnt+1<L-1){
          if (isAllocated[cnt+1]==2){
+            OperatorsOnDisk(cnt+1, false, true);
             deleteTensors(cnt+1, false);
             isAllocated[cnt+1]=0;
          }

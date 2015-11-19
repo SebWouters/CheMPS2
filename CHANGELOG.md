@@ -1,6 +1,8 @@
 #### Current HEAD
 * Break API: bump up SO version (psi4 interface does NOT need to change!)
 * Class TensorOperator: replaces TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD
+* Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)
+* Further optimization allowed after RDM calculation
 * 3-RDM in FCI class & two comparisons with pyscf in integrals/pyscf/debug_3rdm.py
 
 #### Version 1.6 (2015-08-26):

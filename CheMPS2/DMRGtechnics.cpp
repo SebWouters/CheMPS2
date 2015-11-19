@@ -25,29 +25,40 @@
 #include <math.h>
 #include <assert.h>
 #include <gsl/gsl_sf_coupling.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "DMRG.h"
 #include "Lapack.h"
-#include "TensorKM.h"
-#include "TensorGYZ.h"
 #include "Heff.h"
 #include "MPIchemps2.h"
 
 using std::cout;
 using std::endl;
 
-void CheMPS2::DMRG::calc2DMandCorrelations(){
+void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
    #endif
+   
+   /**************************
+    *   Timing information   *
+    **************************/
+   for ( int timecnt = 0; timecnt < CHEMPS2_TIME_VECLENGTH; timecnt++ ){ timings[ timecnt ] = 0.0; }
+   num_double_write_disk = 0;
+   num_double_read_disk  = 0;
+   struct timeval start_global, end_global, start_part, end_part;
+   gettimeofday(&start_global, NULL);
 
-   //First get the whole MPS into left-canonical form
-   int index = L-2;
-   Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
-   denS->Join(MPS[index],MPS[index+1]); //Each MPI process performs this task.
+   /**************************************************
+    *   Get the whole MPS into left-canonical form   *
+    **************************************************/
+   const int edgeindex = L-2;
+   Sobject * denS = new Sobject(edgeindex,denBK->gIrrep(edgeindex),denBK->gIrrep(edgeindex+1),denBK);
+   denS->Join(MPS[edgeindex],MPS[edgeindex+1]); //Each MPI process performs this task.
    Heff Solver(denBK, Prob);
    double Energy = 0.0;
    double ** VeffTilde = NULL;
@@ -58,16 +69,9 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    Energy += Prob->gEconst();
    if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
    //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-   denS->Split(MPS[index],MPS[index+1],OptScheme->getD(OptScheme->getNInstructions()-1),true,true);
+   denS->Split(MPS[edgeindex],MPS[edgeindex+1],OptScheme->getD(OptScheme->getNInstructions()-1),true,true);
    delete denS;
-   
-   if ( am_i_master ){
-      cout << "**************************************" << endl;
-      cout << "** 2DM and Correlations calculation **" << endl;
-      cout << "**************************************" << endl;
-   }
-   updateMovingRightSafe(index);
-   
+   gettimeofday(&start_part, NULL);
    if ( am_i_master ){
       TensorOperator * norm = new TensorOperator(L, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
       MPS[L-1]->QR(norm);
@@ -76,20 +80,52 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
    #ifdef CHEMPS2_MPI_COMPILATION
    MPIchemps2::broadcast_tensor(MPS[L-1], MPI_CHEMPS2_MASTER);
    #endif
+   gettimeofday(&end_part, NULL);
+   timings[ CHEMPS2_TIME_S_SPLIT ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
    
-   //Allocate space for the 2DM
-   if (the2DMallocated){
-      delete the2DM;
-      the2DMallocated = false;
+   if ( am_i_master ){
+      if ( do_3rdm ){
+         cout << "****************************************************" << endl;
+         cout << "***  2-RDM, 3-RDM, and Correlations calculation  ***" << endl;
+         cout << "****************************************************" << endl;
+      } else {
+         cout << "********************************************" << endl;
+         cout << "***  2-RDM and Correlations calculation  ***" << endl;
+         cout << "********************************************" << endl;
+      }
    }
-   the2DM = new TwoDM(denBK, Prob);
-   the2DMallocated = true;
    
-   //Then calculate step by step the 2DM
+   /******************************************************************
+    *   Make the renormalized operators one site further (one-dot)   *
+    ******************************************************************/
+   gettimeofday(&start_part, NULL);
+   updateMovingRightSafe(edgeindex);
+   gettimeofday(&end_part, NULL);
+   timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+   
+   /*************************
+    *   Calculate the 2DM   *
+    *************************/
+   if ( the2DM != NULL ){ delete the2DM; the2DM = NULL; }
+   the2DM = new TwoDM(denBK, Prob);
+   
    for (int siteindex=L-1; siteindex>=0; siteindex--){
-      //Specific 2-RDM entries are internally added per MPI processes; after which an allreduce is called
+   
+      /*********************************************************************************************************
+       *   Calculate the diagrams corresponding to the current siteindex                                       *
+       *   Specific 2-RDM entries are internally added per MPI processes; after which an allreduce is called   *
+       *********************************************************************************************************/
+      gettimeofday(&start_part, NULL);
       the2DM->FillSite(MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors);
+      gettimeofday(&end_part, NULL);
+      timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+      
       if (siteindex>0){
+      
+         /************************
+          *   Change MPS gauge   *
+          ************************/
+         gettimeofday(&start_part, NULL);
          if ( am_i_master ){
             TensorOperator * left = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
             MPS[siteindex]->LQ(left);
@@ -100,44 +136,81 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
          MPIchemps2::broadcast_tensor(MPS[siteindex],   MPI_CHEMPS2_MASTER);
          MPIchemps2::broadcast_tensor(MPS[siteindex-1], MPI_CHEMPS2_MASTER);
          #endif
+         gettimeofday(&end_part, NULL);
+         timings[ CHEMPS2_TIME_S_SPLIT ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+         
+         /**********************
+          *   Update tensors   *
+          **********************/
+         gettimeofday(&start_part, NULL);
          updateMovingLeftSafe2DM(siteindex-1);
+         gettimeofday(&end_part, NULL);
+         timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+         
       }
    }
    
    #ifdef CHEMPS2_MPI_COMPILATION
+   gettimeofday(&start_part, NULL);
    the2DM->mpi_allreduce();
+   gettimeofday(&end_part, NULL);
+   timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
    #endif
    
-   //Then perform two checks: double trace & energy
+   /************************************************************
+    *   Three pieces of information: trace, energy, and NOON   *
+    ***********************************************************/
    if ( am_i_master ){
-      const double NtimesNminus1 = the2DM->doubletrace2DMA();
+      const double NtimesNminus1 = the2DM->trace();
       cout << "   N(N-1) = " << denBK->gN() * (denBK->gN() - 1) << " and calculated by double trace of the 2DM-A = " << NtimesNminus1 << endl;
-      const double Energy2DMA = the2DM->calcEnergy();
+      const double Energy2DMA = the2DM->energy();
       cout << "   Energy obtained by Heffective at edge = " << Energy << " and as Econst + 0.5*trace(2DM-A*Ham) = " << Energy2DMA << endl;
-      the2DM->printNOON();
+      the2DM->print_noon();
    }
    
-   //Now the MPS has the gauge form CRRRRRRRRR
-   //Allocate space for the Correlations
-   if (theCorrAllocated){
-      delete theCorr;
-      theCorrAllocated = false;
-   }
+   /******************************************
+    *   Calculate the 3DM and Correlations   *
+    ******************************************/
+   if ( the3DM  != NULL ){ delete the3DM;  the3DM  = NULL; }
+   if ( theCorr != NULL ){ delete theCorr; theCorr = NULL; }
+   if ( do_3rdm ){ the3DM = new ThreeDM(denBK, Prob); }
    theCorr = new Correlations(denBK, Prob, the2DM);
-   theCorrAllocated = true;
+   if ( am_i_master ){
+      Gtensors = new TensorGYZ*[L-1];
+      Ytensors = new TensorGYZ*[L-1];
+      Ztensors = new TensorGYZ*[L-1];
+      Ktensors = new TensorKM *[L-1];
+      Mtensors = new TensorKM *[L-1];
+   }
+   if ( do_3rdm ){
+      tensor_3rdm_a_J0_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_a_J1_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_a_J1_quartet = new Tensor3RDM****[L-1];
+      tensor_3rdm_b_J0_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_b_J1_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_b_J1_quartet = new Tensor3RDM****[L-1];
+      tensor_3rdm_c_J0_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_c_J1_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_c_J1_quartet = new Tensor3RDM****[L-1];
+      tensor_3rdm_d_J0_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_d_J1_doublet = new Tensor3RDM****[L-1];
+      tensor_3rdm_d_J1_quartet = new Tensor3RDM****[L-1];
+      
+      /*************************************************************
+       *   Calculate the leftmost site contribution to the 3-RDM   *
+       *************************************************************/
+      gettimeofday(&start_part, NULL);
+      the3DM->fill_site( MPS[0], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors );
+      gettimeofday(&end_part, NULL);
+      timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+   }
    
-   //Then calculate step by step the mutual information.
-   //Define the following tensor arrays thereto. The native DMRG ones are at the edge and are hence small.
-   TensorGYZ ** Gtensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
-   TensorGYZ ** Ytensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
-   TensorGYZ ** Ztensors = ( am_i_master ) ? new TensorGYZ*[L-1] : NULL;
-   TensorKM  ** Ktensors = ( am_i_master ) ? new TensorKM *[L-1] : NULL;
-   TensorKM  ** Mtensors = ( am_i_master ) ? new TensorKM *[L-1] : NULL;
+   for ( int siteindex = 1; siteindex < L; siteindex++ ){
    
-   //Do the actual work
-   for (int siteindex=1; siteindex<L; siteindex++){
-   
-      //Switch MPS gauge
+      /************************
+       *   Change MPS gauge   *
+       ************************/
+      gettimeofday(&start_part, NULL);
       if ( am_i_master ){
          TensorOperator * right = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
          MPS[siteindex-1]->QR(right);
@@ -148,66 +221,68 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
       MPIchemps2::broadcast_tensor(MPS[siteindex-1], MPI_CHEMPS2_MASTER);
       MPIchemps2::broadcast_tensor(MPS[siteindex],   MPI_CHEMPS2_MASTER);
       #endif
+      gettimeofday(&end_part, NULL);
+      timings[ CHEMPS2_TIME_S_SPLIT ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
       
-      if ( am_i_master ){
+      /*****************************************************
+       *   Update 2-RDM, 3-RDM, and Correlations tensors   *
+       *****************************************************/
+      gettimeofday(&start_part, NULL);
+      if ( do_3rdm ){ update_safe_3rdm_operators(siteindex); }
+      updateMovingRightSafe2DM(siteindex-1);
+      if ( am_i_master ){ update_correlations_tensors(siteindex); }
+      gettimeofday(&end_part, NULL);
+      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
       
-         //Update the tensors
-         const int dimL = denBK->gMaxDimAtBound(siteindex-1);
-         const int dimR = denBK->gMaxDimAtBound(siteindex);
-         double * workmemLR = new double[dimL*dimR];
-         for (int previousindex=0; previousindex<siteindex-1; previousindex++){
-            TensorGYZ * newG = new TensorGYZ(siteindex, 'G', denBK);
-            TensorGYZ * newY = new TensorGYZ(siteindex, 'Y', denBK);
-            TensorGYZ * newZ = new TensorGYZ(siteindex, 'Z', denBK);
-            TensorKM  * newK = new TensorKM( siteindex, 'K', denBK->gIrrep(previousindex), denBK );
-            TensorKM  * newM = new TensorKM( siteindex, 'M', denBK->gIrrep(previousindex), denBK );
-
-            newG->update(Gtensors[previousindex], MPS[siteindex-1], workmemLR);
-            newY->update(Ytensors[previousindex], MPS[siteindex-1], workmemLR);
-            newZ->update(Ztensors[previousindex], MPS[siteindex-1], workmemLR);
-            newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR);
-            newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR);
-            
-            delete Gtensors[previousindex];
-            delete Ytensors[previousindex];
-            delete Ztensors[previousindex];
-            delete Ktensors[previousindex];
-            delete Mtensors[previousindex];
-            
-            Gtensors[previousindex] = newG;
-            Ytensors[previousindex] = newY;
-            Ztensors[previousindex] = newZ;
-            Ktensors[previousindex] = newK;
-            Mtensors[previousindex] = newM;
-         }
-         delete [] workmemLR;
-         
-         //Construct the new tensors
-         Gtensors[siteindex-1] = new TensorGYZ(siteindex, 'G', denBK);
-         Ytensors[siteindex-1] = new TensorGYZ(siteindex, 'Y', denBK);
-         Ztensors[siteindex-1] = new TensorGYZ(siteindex, 'Z', denBK);
-         Ktensors[siteindex-1] = new TensorKM( siteindex, 'K', denBK->gIrrep(siteindex-1), denBK );
-         Mtensors[siteindex-1] = new TensorKM( siteindex, 'M', denBK->gIrrep(siteindex-1), denBK );
-         
-         Gtensors[siteindex-1]->construct(MPS[siteindex-1]);
-         Ytensors[siteindex-1]->construct(MPS[siteindex-1]);
-         Ztensors[siteindex-1]->construct(MPS[siteindex-1]);
-         Ktensors[siteindex-1]->construct(MPS[siteindex-1]);
-         Mtensors[siteindex-1]->construct(MPS[siteindex-1]);
-         
-         //Process MPI_CHEMPS2_MASTER actually fills the sites; and broadcasts the results to the MPI_COMM_WORLD
-         theCorr->FillSite(MPS[siteindex], Gtensors, Ytensors, Ztensors, Ktensors, Mtensors);
+      /**********************************************************************************************
+       *   Calculate Correlation and 3-RDM diagrams                                                 *
+       *   Specific contributions per MPI process. Afterwards an MPI allreduce/bcast is required.   *
+       **********************************************************************************************/
+      gettimeofday(&start_part, NULL);
+      if ( am_i_master ){ theCorr->FillSite(MPS[siteindex], Gtensors, Ytensors, Ztensors, Ktensors, Mtensors); }
+      if ( do_3rdm ){ the3DM->fill_site( MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors ); }
+      gettimeofday(&end_part, NULL);
+      timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
       
-      }
    }
    
+   /***********************************************************************************************
+    *   Delete the renormalized operators from boundary L-2 and load the ones from boundary L-3   *
+    ***********************************************************************************************/
+   gettimeofday(&start_part, NULL);
+   assert( isAllocated[L-2] == 1 );                 // Renormalized operators exist on the last boundary (L-2) and are moving to the right.
+   assert( isAllocated[L-3] == 0 );                 // Renormalized operators do not exist on boundary L-3.
+     deleteTensors(L-2, true ); isAllocated[L-2]=0; // Delete the renormalized operators on the last boundary (L-2).
+   allocateTensors(L-3, true ); isAllocated[L-3]=1; // Create the renormalized operators on boundary L-3.
+   OperatorsOnDisk(L-3, true, false);               //   Load the renormalized operators on boundary L-3.
+   gettimeofday(&end_part, NULL);
+   timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
+   
    #ifdef CHEMPS2_MPI_COMPILATION
+   gettimeofday(&start_part, NULL);
    theCorr->mpi_broadcast();
+   if (do_3rdm){ the3DM->mpi_allreduce(); }
+   gettimeofday(&end_part, NULL);
+   timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
    #endif
    
-   if ( am_i_master ){
+   if (do_3rdm){
+      delete_3rdm_operators(L-1);
+      delete [] tensor_3rdm_a_J0_doublet;
+      delete [] tensor_3rdm_a_J1_doublet;
+      delete [] tensor_3rdm_a_J1_quartet;
+      delete [] tensor_3rdm_b_J0_doublet;
+      delete [] tensor_3rdm_b_J1_doublet;
+      delete [] tensor_3rdm_b_J1_quartet;
+      delete [] tensor_3rdm_c_J0_doublet;
+      delete [] tensor_3rdm_c_J1_doublet;
+      delete [] tensor_3rdm_c_J1_quartet;
+      delete [] tensor_3rdm_d_J0_doublet;
+      delete [] tensor_3rdm_d_J1_doublet;
+      delete [] tensor_3rdm_d_J1_quartet;
+   }
    
-      //Clean-up
+   if ( am_i_master ){
       for (int previousindex=0; previousindex<L-1; previousindex++){
          delete Gtensors[previousindex];
          delete Ytensors[previousindex];
@@ -215,23 +290,49 @@ void CheMPS2::DMRG::calc2DMandCorrelations(){
          delete Ktensors[previousindex];
          delete Mtensors[previousindex];
       }
-   
       delete [] Gtensors;
       delete [] Ytensors;
       delete [] Ztensors;
       delete [] Ktensors;
       delete [] Mtensors;
+   }
    
+   gettimeofday(&end_global, NULL);
+   const double elapsed_global = (end_global.tv_sec - start_global.tv_sec) + 1e-6 * (end_global.tv_usec - start_global.tv_usec);
+   
+   if ( am_i_master ){
       cout << "   Single-orbital entropies (Hamiltonian index order is used!) = [ ";
       for (int index=0; index < L-1; index++){ cout << theCorr->SingleOrbitalEntropy_HAM(index) << " , "; }
       cout << theCorr->SingleOrbitalEntropy_HAM(L-1) << " ]." << endl;
-   
       for (int power=0; power<=2; power++){
          cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
       }
-      cout << "**************************************" << endl;
-      
+      if (do_3rdm){ cout << "***********************************************************" << endl;
+                    cout << "***  Timing information 2-RDM, 3-RDM, and Correlations  ***" << endl;
+                    cout << "***********************************************************" << endl; }
+             else { cout << "***************************************************" << endl;
+                    cout << "***  Timing information 2-RDM and Correlations  ***"  << endl;
+                    cout << "***************************************************" << endl; }
+                    cout << "***     Elapsed wall time        = " << elapsed_global << " seconds" << endl;
+                    cout << "***       |--> MPS gauge change  = " << timings[ CHEMPS2_TIME_S_SPLIT     ] << " seconds" << endl;
+                    cout << "***       |--> Diagram calc      = " << timings[ CHEMPS2_TIME_S_SOLVE     ] << " seconds" << endl;
+                    print_tensor_update_performance();
+      if (do_3rdm){ cout << "***********************************************************" << endl; }
+             else { cout << "***************************************************" << endl; }
    }
+
+}
+
+void CheMPS2::DMRG::print_tensor_update_performance() const{
+
+    cout << "***       |--> Tensor update     = " << timings[ CHEMPS2_TIME_TENS_TOTAL ] << " seconds" << endl;
+    cout << "***              |--> create     = " << timings[ CHEMPS2_TIME_TENS_ALLOC ] << " seconds" << endl;
+    cout << "***              |--> destroy    = " << timings[ CHEMPS2_TIME_TENS_FREE  ] << " seconds" << endl;
+    cout << "***              |--> disk write = " << timings[ CHEMPS2_TIME_DISK_WRITE ] << " seconds" << endl;
+    cout << "***              |--> disk read  = " << timings[ CHEMPS2_TIME_DISK_READ  ] << " seconds" << endl;
+    cout << "***              |--> calc       = " << timings[ CHEMPS2_TIME_TENS_CALC  ] << " seconds" << endl;
+    cout << "***     Disk write bandwidth     = " << num_double_write_disk * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_WRITE ] * 1048576 ) << " MB/s" << endl;
+    cout << "***     Disk read  bandwidth     = " << num_double_read_disk  * sizeof(double) / ( timings[ CHEMPS2_TIME_DISK_READ  ] * 1048576 ) << " MB/s" << endl;
 
 }
 

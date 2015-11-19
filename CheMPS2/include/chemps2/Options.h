@@ -57,8 +57,8 @@ namespace CheMPS2{
    const string HAMILTONIAN_VmatStorageName   = "CheMPS2_Ham_Vmat.h5";
    const string HAMILTONIAN_ParentStorageName = "CheMPS2_Ham_parent.h5";
    
-   const string TWODM_2DM_A_storagename       = "CheMPS2_2DM-A.h5";
-   const string TWODM_2DM_B_storagename       = "CheMPS2_2DM-B.h5";
+   const string TWO_RDM_storagename           = "CheMPS2_2DM.h5";
+   const string THREE_RDM_storagename         = "CheMPS2_3DM.h5";
    
    const bool   HEFF_debugPrint               = true;
    const int    HEFF_DAVIDSON_NUM_VEC         = 32;

@@ -65,8 +65,8 @@ void CheMPS2::TwoDM::mpi_allreduce(){
 
    const int size = L*L*L*L; // Tested OK in creator TwoDM
    double * temp = new double[ size ];
-   MPIchemps2::allreduce_array_double( two_rdm_A, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ ct ] = temp[ cnt ]; }
-   MPIchemps2::allreduce_array_double( two_rdm_B, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_B[ ct ] = temp[ cnt ]; }
+   MPIchemps2::allreduce_array_double( two_rdm_A, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ cnt ] = temp[ cnt ]; }
+   MPIchemps2::allreduce_array_double( two_rdm_B, temp, size ); for (int cnt = 0; cnt < size; cnt++){ two_rdm_B[ cnt ] = temp[ cnt ]; }
    delete [] temp;
 
 }
@@ -144,7 +144,7 @@ double CheMPS2::TwoDM::getTwoDMB_HAM(const int cnt1, const int cnt2, const int c
 
 }
 
-double CheMPS2::TwoDM::doubletrace2DMA(){
+double CheMPS2::TwoDM::trace() const{
 
    double val = 0.0;
    for (int cnt1=0; cnt1<L; cnt1++){
@@ -156,7 +156,7 @@ double CheMPS2::TwoDM::doubletrace2DMA(){
 
 }
 
-double CheMPS2::TwoDM::calcEnergy(){
+double CheMPS2::TwoDM::energy() const{
 
    double val = 0.0;
    for (int cnt1=0; cnt1<L; cnt1++){
@@ -173,7 +173,7 @@ double CheMPS2::TwoDM::calcEnergy(){
 
 }
 
-void CheMPS2::TwoDM::printNOON() const{
+void CheMPS2::TwoDM::print_noon() const{
 
    const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
    int lwork = 3 * L;
@@ -218,63 +218,59 @@ void CheMPS2::TwoDM::printNOON() const{
 
 }
 
-void CheMPS2::TwoDM::save(){
+void CheMPS2::TwoDM::save() const{
 
+   hid_t   file_id  = H5Fcreate(CheMPS2::TWO_RDM_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
    hsize_t dimarray = L*L*L*L;
    {
-      hid_t file_id = H5Fcreate(CheMPS2::TWODM_2DM_A_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-         hid_t group_id = H5Gcreate(file_id, "two_rdm_A", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      hid_t group_id = H5Gcreate(file_id, "two_rdm_A", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-            hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
-            hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-            H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
+         hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
+         hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+         H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
 
-            H5Dclose(dataset_id);
-            H5Sclose(dataspace_id);
+         H5Dclose(dataset_id);
+         H5Sclose(dataspace_id);
 
-         H5Gclose(group_id);
-      H5Fclose(file_id);
+      H5Gclose(group_id);
    }
    {
-      hid_t file_id = H5Fcreate(CheMPS2::TWODM_2DM_B_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-         hid_t group_id = H5Gcreate(file_id, "two_rdm_B", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      hid_t group_id = H5Gcreate(file_id, "two_rdm_B", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-            hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
-            hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-            H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
-            H5Dclose(dataset_id);
-            H5Sclose(dataspace_id);
+         hid_t dataspace_id     = H5Screate_simple(1, &dimarray, NULL);
+         hid_t dataset_id       = H5Dcreate(group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+         H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
+         H5Dclose(dataset_id);
+         H5Sclose(dataspace_id);
 
-         H5Gclose(group_id);
-      H5Fclose(file_id);
+      H5Gclose(group_id);
    }
+   H5Fclose(file_id);
 
 }
 
 void CheMPS2::TwoDM::read(){
 
+   hid_t file_id = H5Fopen(CheMPS2::TWO_RDM_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
    {
-      hid_t file_id = H5Fopen(CheMPS2::TWODM_2DM_A_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-         hid_t group_id = H5Gopen(file_id, "two_rdm_A", H5P_DEFAULT);
+      hid_t group_id = H5Gopen(file_id, "two_rdm_A", H5P_DEFAULT);
 
-            hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
-            H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
-            H5Dclose(dataset_id);
+         hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
+         H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_A);
+         H5Dclose(dataset_id);
 
-         H5Gclose(group_id);
-      H5Fclose(file_id);
+      H5Gclose(group_id);
    }
    {
-      hid_t file_id = H5Fopen(CheMPS2::TWODM_2DM_B_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-         hid_t group_id = H5Gopen(file_id, "two_rdm_B", H5P_DEFAULT);
+      hid_t group_id = H5Gopen(file_id, "two_rdm_B", H5P_DEFAULT);
 
-            hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
-            H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
-            H5Dclose(dataset_id);
+         hid_t dataset_id = H5Dopen(group_id, "elements", H5P_DEFAULT);
+         H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, two_rdm_B);
+         H5Dclose(dataset_id);
 
-         H5Gclose(group_id);
-      H5Fclose(file_id);
+      H5Gclose(group_id);
    }
+   H5Fclose(file_id);
    
    std::cout << "TwoDM::read : Everything loaded!" << std::endl;
 

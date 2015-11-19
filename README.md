@@ -397,6 +397,10 @@ destructor of the DMRG class, as well as the top-level sweep functions.
 [CheMPS2/DMRGmpsio.cpp](CheMPS2/DMRGmpsio.cpp) contains the store and
 load functions for the DMRG checkpoint file (the MPS).
 
+[CheMPS2/DMRGoperators3RDM.cpp](CheMPS2/DMRGoperators3RDM.cpp) contains all
+update functions for the renormalized operators specific for the ThreeDM and the
+Correlations.
+
 [CheMPS2/DMRGoperators.cpp](CheMPS2/DMRGoperators.cpp) contains all
 functions related to the DMRG renormalized operators: saving to disk, loading
 from disk, and updating.
@@ -493,6 +497,9 @@ object.
 SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual
 dimensions of all symmetry sectors at all boundaries.
 
+[CheMPS2/Tensor3RDM.cpp](CheMPS2/Tensor3RDM.cpp) contains all initialization functions
+for the spin-reduced renormalized operators of three second quantized operators.
+
 [CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class
 stores and handles the reduced spin-0 part of two sandwiched second
 quantized operators, of which the particle symmetry sectors are equal.
@@ -539,6 +546,9 @@ stores and handles the reduced part of an MPS site-tensor.
 stores and handles the complementary reduced spin-0 part of four sandwiched
 second quantized operators, which is of course diagonal in the symmetry
 sectors.
+
+[CheMPS2/ThreeDM.cpp](CheMPS2/ThreeDM.cpp) contains all functions to calculate and store the
+3-RDM from the DMRG-optimized MPS.
 
 [CheMPS2/TwoDM.cpp](CheMPS2/TwoDM.cpp) contains all functions to calculate and store the
 2-RDM from the DMRG-optimized MPS.
@@ -624,6 +634,8 @@ as parameters related to memory usage and convergence.
 [CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
 
+[CheMPS2/include/chemps2/Tensor3RDM.h](CheMPS2/include/chemps2/Tensor3RDM.h) contains the definitions of the Tensor3RDM class.
+
 [CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.
 
 [CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.
@@ -651,6 +663,8 @@ class.
 [CheMPS2/include/chemps2/TensorT.h](CheMPS2/include/chemps2/TensorT.h) contains the definitions of the TensorT class.
 
 [CheMPS2/include/chemps2/TensorX.h](CheMPS2/include/chemps2/TensorX.h) contains the definitions of the TensorX class.
+
+[CheMPS2/include/chemps2/ThreeDM.h](CheMPS2/include/chemps2/ThreeDM.h) contains the definitions of the ThreeDM class.
 
 [CheMPS2/include/chemps2/TwoDM.h](CheMPS2/include/chemps2/TwoDM.h) contains the definitions of the TwoDM class.
 
