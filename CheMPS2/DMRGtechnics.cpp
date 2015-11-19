@@ -161,10 +161,10 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
     *   Three pieces of information: trace, energy, and NOON   *
     ***********************************************************/
    if ( am_i_master ){
-      const double NtimesNminus1 = the2DM->trace();
-      cout << "   N(N-1) = " << denBK->gN() * (denBK->gN() - 1) << " and calculated by double trace of the 2DM-A = " << NtimesNminus1 << endl;
-      const double Energy2DMA = the2DM->energy();
-      cout << "   Energy obtained by Heffective at edge = " << Energy << " and as Econst + 0.5*trace(2DM-A*Ham) = " << Energy2DMA << endl;
+      cout << "   N(N-1)                     = " << denBK->gN() * (denBK->gN() - 1) << endl;
+      cout << "   Double trace of DMRG 2-RDM = " << the2DM->trace() << endl;
+      cout << "   Energy obtained by Heff at edge   = " << Energy << endl;
+      cout << "   Econst + 0.5 * trace(2DM-A * Ham) = " << the2DM->energy() << endl;
       the2DM->print_noon();
    }
    
@@ -312,7 +312,9 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
       for (int power=0; power<=2; power++){
          cout << "   Idistance(" << power << ") = " << theCorr->MutualInformationDistance((double)power) << endl;
       }
-      if (do_3rdm){ cout << "***********************************************************" << endl;
+      if (do_3rdm){ cout << "   N(N-1)(N-2)                = " << denBK->gN() * (denBK->gN() - 1) * (denBK->gN() - 2) << endl;
+                    cout << "   Triple trace of DMRG 3-RDM = " << the3DM->trace() << endl;
+                    cout << "***********************************************************" << endl;
                     cout << "***  Timing information 2-RDM, 3-RDM, and Correlations  ***" << endl;
                     cout << "***********************************************************" << endl; }
              else { cout << "***************************************************" << endl;
