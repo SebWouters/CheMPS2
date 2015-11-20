@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/usr/lib/python2.7/site-packages')
 import PyCheMPS2
 from pyscf import gto, scf, ao2mo, symm, fci
 import numpy as np
@@ -33,7 +35,7 @@ mol2.charge = 0
 mol2.spin = 0 #2*S; multiplicity-1
 mol2.build()
 
-for geval in range(2):
+for geval in range(1):
 
     if ( geval == 0 ):
         mol = mol1
@@ -71,19 +73,13 @@ for geval in range(2):
     print "PySCF     FCI energy =", fci_energy + CONST
     pyscf_start = time.time()
     dm1, dm2, dm3 = fci.rdm.make_dm123('FCI3pdm_kern_spin0', fci_vector, fci_vector, L, N)
+    dm1, dm2, dm3 = fci.rdm.reorder_dm123(dm1, dm2, dm3, inplace=True)
     pyscf_trace = np.einsum( 'ii->', np.einsum( 'jjkl->kl', np.einsum( 'iijklm->jklm', dm3 ) ) )
     #dm3[p,q,r,s,t,u] is the matrix element of <p^+ r^+ t^+ u s q>
     pyscf_dm3 = np.array( dm3, copy=True )
     pyscf_dm3 = pyscf_dm3.swapaxes( 1, 2 ) # dm3[ orb1, orb4, orb2, orb5, orb3, orb6 ] -> dm3[ orb1, orb2, orb4, orb5, orb3, orb6 ]
     pyscf_dm3 = pyscf_dm3.swapaxes( 2, 4 ) # dm3[ orb1, orb2, orb4, orb5, orb3, orb6 ] -> dm3[ orb1, orb2, orb3, orb5, orb4, orb6 ]
     pyscf_dm3 = pyscf_dm3.swapaxes( 3, 4 ) # dm3[ orb1, orb2, orb3, orb5, orb4, orb6 ] -> dm3[ orb1, orb2, orb3, orb4, orb5, orb6 ]
-    for orb in range(L):
-        pyscf_dm3[:,:,orb,orb,:,:] -= dm2.swapaxes(1, 2).swapaxes(2, 3)
-        pyscf_dm3[:,orb,:,orb,:,:] -= dm2.swapaxes(1, 2)
-        pyscf_dm3[:,:,orb,:,orb,:] -= dm2.swapaxes(1, 2)
-        for orb2 in range(L):
-            pyscf_dm3[:,orb,orb2,orb2,:,orb] += dm1
-            pyscf_dm3[:,orb,orb2,orb,orb2,:] += dm1
     pyscf_end = time.time()
 
     #############################

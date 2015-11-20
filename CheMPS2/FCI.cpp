@@ -1037,6 +1037,13 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
       }
    }
    
+   for ( unsigned int anni = 0; anni < L; anni++ ){
+      for ( unsigned int combo = 0; combo < L*L*L; combo++ ){
+         three_rdm[ combo + L * L * L * anni * ( 1 + L + L * L ) ] = 0.0;
+         three_rdm[ anni * ( 1 + L + L * L ) + L * L * L * combo ] = 0.0;
+      }
+   }
+   
    gettimeofday(&end, NULL);
    const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
    if ( FCIverbose > 0 ){ cout << "FCI::Fill3RDM : Wall time = " << elapsed << " seconds" << endl; }

@@ -21,8 +21,8 @@ cdef extern from "chemps2/TwoDM.h" namespace "CheMPS2":
     cdef cppclass TwoDM:
         double getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4)
         double getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4)
-        double doubletrace2DMA()
-        double calcEnergy()
+        double trace()
+        double energy()
         void save()
         void read()
 

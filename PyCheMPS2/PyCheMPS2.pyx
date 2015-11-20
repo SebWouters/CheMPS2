@@ -163,9 +163,9 @@ cdef class PyDMRG:
     def get2DMB(self, int i1, int i2, int i3, int i4):
         return self.thisptr.get2DM().getTwoDMB_HAM(i1, i2, i3, i4)
     def get2DMenergy(self):
-        return self.thisptr.get2DM().calcEnergy()
+        return self.thisptr.get2DM().energy()
     def getDoubleTrace2DMA(self):
-        return self.thisptr.get2DM().doubletrace2DMA()
+        return self.thisptr.get2DM().trace()
     def save(self):
         self.thisptr.get2DM().save()
     def read(self):

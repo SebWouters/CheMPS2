@@ -28,6 +28,21 @@
 
 using namespace std;
 
+void difference_checker( bool print, double * rms, double * norm, CheMPS2::ThreeDM * dm3, double * rdm3, const int L, const int i, const int j, const int k, const int l, const int m, const int n ){
+
+   const double value_fci  = rdm3[i + L*(j + L*(k + L*(l + L*(m + L*n))))];
+   const double value_dmrg = dm3->get_ham_index(i,j,k,l,m,n);
+   const double difference = value_fci - value_dmrg;
+   rms[0] += difference * difference;
+   norm[0] += value_fci * value_fci;
+   if ( print ){
+      if ( fabs( difference ) > 1e-5 ){
+         cout << "Difference Gamma(" << i << "," << j << "," << k << "," << l << "," << m << "," << n << ") = " << difference << endl;
+         cout << "Value      Gamma(" << i << "," << j << "," << k << "," << l << "," << m << "," << n << ") = " << value_fci << endl;
+      }
+   }
+}
+
 int main(void){
 
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -102,59 +117,17 @@ int main(void){
             for (int k=0; k<=i; k++){
                for (int m=i; m<L; m++){
                   for (int n=i; n<L; n++){
-                     double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(n + L*i))))];
-                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,n,i);
-                     double difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(i + L*n))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,i,n);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(m + L*n))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,m,n);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(k + L*(n + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,k,n,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(n + L*(k + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,n,k,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(k + L*(i + L*n))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,k,i,n);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(n + L*(i + L*k))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,n,i,k);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(i + L*(k + L*n))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,i,k,n);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(i + L*(i + L*(n + L*k))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,i,i,n,k);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
+                     /* Diagrams 22 - 28 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, m, n, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, m, i, n );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, i, m, n );
+                     /* Diagrams 29 - 44 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, k, n, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, n, k, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, k, i, n );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, n, i, k );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, i, k, n );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, i, i, n, k );
                   }
                }
             }
@@ -171,41 +144,14 @@ int main(void){
             for (int k=0; k<i; k++){
                for (int m=i+1; m<L; m++){
                   for (int n=i+1; n<L; n++){
-                     double value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(n + L*(i + L*i))))];
-                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,n,i,i);
-                     double difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(n + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,n,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(i + L*n))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,i,n);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(k + L*(i + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,k,i,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(i + L*(k + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,i,k,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(m + L*(n + L*(i + L*(i + L*k))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,m,n,i,i,k);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
+                     /* Diagrams 45 - 48 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, n, i, i);
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, i, n, i);
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, i, i, n);
+                     /* Daigrams 49 - 52 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, k, i, i);
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, i, k, i);
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, i, i, k);
                   }
                }
             }
@@ -221,23 +167,10 @@ int main(void){
          for (int j=0; j<i; j++){
             for (int k=0; k<i; k++){
                for (int l=0; l<i; l++){
-                  double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(i + L*i))))];
-                  double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,i,i);
-                  double difference = value_fci - value_dmrg;
-                  RMS_3RDM  += difference * difference;
-                  NORM_3RDM += value_fci * value_fci;
-                  
-                  value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(l + L*i))))];
-                  value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,l,i);
-                  difference = value_fci - value_dmrg;
-                  RMS_3RDM  += difference * difference;
-                  NORM_3RDM += value_fci * value_fci;
-                  
-                  value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(i + L*l))))];
-                  value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,i,l);
-                  difference = value_fci - value_dmrg;
-                  RMS_3RDM  += difference * difference;
-                  NORM_3RDM += value_fci * value_fci;
+                  /* Diagrams 4 - 9 */
+                  difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, l, i, i );
+                  difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, i, l, i );
+                  difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, i, i, l );
                }
             }
          }
@@ -253,41 +186,21 @@ int main(void){
             for (int k=0; k<i; k++){
                for (int l=0; l<i; l++){
                   for (int m=i+1; m<L; m++){
-                     double value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(m + L*(i + L*i))))];
-                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,m,i,i);
-                     double difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(i + L*(m + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,i,m,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(l + L*(i + L*(i + L*m))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,l,i,i,m);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(l + L*(i + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,l,i,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(l + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,l,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(m + L*(i + L*(i + L*l))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,m,i,i,l);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
+                     /* Diagrams 53 - 54 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, m, i, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, i, m, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, i, i, m );
+                     /* Diagrams 55 - 60 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, l, i, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, i, l, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, m, i, i, l );
+                     /* Diagrams 61 - 89 */
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, l, m, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, m, l, i );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, l, i, m );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, m, i, l );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, i, m, l );
+                     difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, i, i, l, m );
                   }
                }
             }
@@ -304,41 +217,23 @@ int main(void){
             for (int k=0; k<i; k++){
                for (int l=0; l<i; l++){
                   for (int m=i+1; m<L; m++){
-                     double value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(m + L*i))))];
-                     double value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,m,i);
-                     double difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(l + L*i))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,l,i);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(l + L*(i + L*m))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,l,i,m);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(m + L*(i + L*l))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,m,i,l);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(m + L*l))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,m,l);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
-                     
-                     value_fci  = ThreeDMspace[j + L*(k + L*(i + L*(i + L*(l + L*m))))];
-                     value_dmrg = theDMRG->get3DM()->get_ham_index(j,k,i,i,l,m);
-                     difference = value_fci - value_dmrg;
-                     RMS_3RDM  += difference * difference;
-                     NORM_3RDM += value_fci * value_fci;
+                     for (int n=i+1; n<L; n++){
+                        /* Diagrams 90 - 99 */
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, m, n, i );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, n, m, i );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, m, i, n );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, n, i, m );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, i, m, n );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, k, l, i, n, m );
+                        /* Diagrams 100 - 129 */
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, k, l, i );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, l, k, i );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, k, i, l );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, l, i, k );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, i, k, l );
+                        difference_checker( true, &RMS_3RDM, &NORM_3RDM, theDMRG->get3DM(), ThreeDMspace, L, j, m, n, i, l, k );
+                        
+                     }
                   }
                }
             }
