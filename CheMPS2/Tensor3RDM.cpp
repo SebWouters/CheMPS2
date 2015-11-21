@@ -46,6 +46,8 @@ int CheMPS2::Tensor3RDM::get_two_j1() const{ return two_j1; }
 
 int CheMPS2::Tensor3RDM::get_two_j2() const{ return get_2j(); }
 
+bool CheMPS2::Tensor3RDM::get_prime_last() const{ return prime_last; }
+
 void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * workmem){
 
    clear();
@@ -535,6 +537,46 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
          }
       }
    }
+}
+
+double CheMPS2::Tensor3RDM::contract( Tensor3RDM * buddy ) const{
+
+   if ( buddy == NULL ){ return 0.0; }
+
+   const int orb_i  = gIndex();
+   const int two_j2 = get_two_j2();
+   assert( two_j2  == buddy->get_two_j2() );
+   assert( n_elec  == buddy->get_nelec()  );
+   assert( n_irrep == buddy->get_irrep()  );
+   
+   double value = 0.0;
+
+   if ( buddy->get_prime_last() ){ // Tensor abc
+   
+      int length = kappa2index[ nKappa ];
+      int inc    = 1;
+      value = ddot_( &length, storage, &inc, buddy->gStorage(), &inc );
+      return value;
+         
+   } else { // Tensor d
+   
+      for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+      
+         int offset = kappa2index[ ikappa ];
+         int length = kappa2index[ ikappa + 1 ] - offset;
+         int inc    = 1;
+         double prefactor = sqrt( ( sectorTwoS1[ ikappa ] + 1.0 ) / ( sector_2S_down[ ikappa ] + 1.0 ) )
+                          * Heff::phase( sectorTwoS1[ ikappa ] + 1 - sector_2S_down[ ikappa ] );
+         value += prefactor * ddot_( &length, storage + offset, &inc, buddy->gStorage() + offset, &inc );
+      
+      }
+
+      return value;
+
+   }
+
+   return value;
+
 }
 
 

@@ -180,10 +180,8 @@ namespace CheMPS2{
          void     diagram91_92_94(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
          void        diagram95_98(TensorT * denT, Tensor3RDM ** left, TensorS0 * denS0, double * workmem, double * workmem2) const;
          void     diagram96_97_99(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
-         void diagramS0_3_1_2_one(TensorT * denT, Tensor3RDM ** left, TensorS0 * denS0, double * workmem, double * workmem2, double * results) const;
-         void diagramS1_3_1_2_one(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
-         void diagramS0_3_1_2_two(TensorT * denT, Tensor3RDM ** left, TensorS0 * denS0, double * workmem, double * workmem2, double * results) const;
-         void diagramS1_3_1_2_two(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
+         void         fill_bcd_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem ) const;
+         void         fill_bcd_S1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorS1 * denS1, double * workmem, double * workmem2 ) const;
          
    };
 }

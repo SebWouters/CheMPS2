@@ -102,6 +102,15 @@ namespace CheMPS2{
              \param workmem Work memory */
          void extra4(TensorL * denL, TensorT * denT, double * workmem);
          
+         //! Make the in-product of two Tensor3RDMs
+         /** \param buddy The second tensor
+             \return The in-product */
+         double contract( Tensor3RDM * buddy ) const;
+         
+         //! Get whether the tensor convention is prime last
+         /** \return Whether the tensor convention is prime last */
+         bool get_prime_last() const;
+         
       private:
       
          int two_j1;

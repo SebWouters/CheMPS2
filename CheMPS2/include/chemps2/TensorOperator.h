@@ -155,14 +155,14 @@ namespace CheMPS2{
              \param mps_tensor The MPS tensor needed for the update
              \param workmem Work memory */
          void update_moving_left(const int ikappa, TensorOperator * previous, TensorT * mps_tensor, double * workmem);
-         
-      private:
       
          //! Convention in which the tensor operator is stored (see class information)
          bool prime_last;
          
          //! Whether or not to include a Jordan-Wigner phase due to the fermion anti-commutation relations
          bool jw_phase;
+         
+      private:
 
    };
 }
