@@ -36,7 +36,7 @@ void difference_checker( bool print, double * rms, double * norm, CheMPS2::Three
    rms[0] += difference * difference;
    norm[0] += value_fci * value_fci;
    if ( print ){
-      if ( fabs( difference ) > 1e-5 ){
+      if ( fabs( difference ) > 1e-6 ){
          cout << "Difference Gamma(" << i << "," << j << "," << k << "," << l << "," << m << "," << n << ") = " << difference << endl;
          cout << "Value      Gamma(" << i << "," << j << "," << k << "," << l << "," << m << "," << n << ") = " << value_fci << endl;
       }

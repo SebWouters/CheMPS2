@@ -921,8 +921,7 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
    
    for ( unsigned int irrep_center1 = 0; irrep_center1 < NumIrreps; irrep_center1++ ){
    
-      const unsigned long long length1 = getVecLength( irrep_center1 );
-      const int target_irrep1          = getIrrepProduct( TargetIrrep , irrep_center1 );
+      const int target_irrep1 = getIrrepProduct( TargetIrrep , irrep_center1 );
       
       for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = n
          for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){ // crea1 = k >= n
@@ -934,7 +933,7 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
                
                if ( irrep_prod1 == 0 ){
                
-                  const double value = FCIddot( length1, workspace1, vector ); // < E_{crea1,anni1} >
+                  const double value = FCIddot( length3, workspace1, vector ); // < E_{crea1,anni1} >
                   for ( unsigned int m = anni1; m < L; m++ ){
                      for ( unsigned int l = anni1; l < L; l++ ){
                         three_rdm[ m + L * ( crea1 + L * ( l + L * ( l + L * ( m + L * anni1 ) ) ) ) ] += value; // + delta_kl delta_im < E_jn >
@@ -946,9 +945,8 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
                
                for ( unsigned int irrep_center2 = 0; irrep_center2 < NumIrreps; irrep_center2++ ){
                
-                  const unsigned long long length2 = getVecLength( irrep_center2 );
-                  const int target_irrep2          = getIrrepProduct( target_irrep1 , irrep_center2 );
-                  const int irrep_center3          = getIrrepProduct( irrep_center1 , irrep_center2 );
+                  const int target_irrep2 = getIrrepProduct( target_irrep1 , irrep_center2 );
+                  const int irrep_center3 = getIrrepProduct( irrep_center1 , irrep_center2 );
                
                   for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){ // crea2 = j >= n
                      for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = m >= n
@@ -960,7 +958,7 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
                            
                            if ( irrep_prod1 == irrep_prod2 ){
                            
-                              const double value = FCIddot( length2, workspace2, vector ); // < E_{crea2,anni2} E_{crea1,anni1} >
+                              const double value = FCIddot( length3, workspace2, vector ); // < E_{crea2,anni2} E_{crea1,anni1} >
                               for ( unsigned int orb = anni1; orb < L; orb++ ){
                                  three_rdm[ crea1 + L * ( crea2 + L * ( orb   + L * ( orb   + L * ( anni2 + L * anni1 ) ) ) ) ] -= value; // - delta_kl < E_jm E_in >
                                  three_rdm[ crea2 + L * ( orb   + L * ( crea1 + L * ( orb   + L * ( anni2 + L * anni1 ) ) ) ) ] -= value; // - delta_jl < E_im E_kn >
@@ -969,8 +967,8 @@ void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
                            
                            }
                            
-                           for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){ // crea3 = i >= j = crea2 >= n = anni1
-                              for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){ // anni3 = l >= n
+                           for ( unsigned int crea3 = (( crea2 == crea1 ) ? crea1 + 1 : crea2 ); crea3 < L; crea3++ ){ // crea3 = i >= j = crea2 >= n = anni1
+                              for ( unsigned int anni3 = (( anni2 == anni1 ) ? anni1 + 1 : anni1 ); anni3 < L; anni3++ ){ // anni3 = l >= n
                               
                                  const int irrep_prod3 = getIrrepProduct( getOrb2Irrep( crea3 ) , getOrb2Irrep( anni3 ) );
                                  if ( irrep_prod3 == irrep_center3 ){
