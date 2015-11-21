@@ -614,6 +614,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                if ( orb_m != orb_n ){ fill_bcd_S1( denT, bcd_S1_doublet, bcd_S1_quartet, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ); }
             }
             
+            #ifdef CHEMPS2_MPI_COMPILATION
+               #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+            #else
+               #pragma omp for schedule(static) nowait
+            #endif
             for (int global = 0; global < upperbound4; global++){
                tripletrianglefunction( global, jkl );
                const int orb_j     = jkl[0];
