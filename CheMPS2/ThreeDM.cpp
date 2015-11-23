@@ -241,7 +241,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) ) //Everyone owns the L-tensors --> task division based on ABSigma-tensor ownership
             #endif
             {
-               const double d2 = diagram2_22_23( denT, Ltensors[orb_i-1][orb_i-1-orb_j], Ltensors[orb_i][orb_k-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+               const double d2 = diagram2( denT, Ltensors[orb_i-1][orb_i-1-orb_j], Ltensors[orb_i][orb_k-1-orb_i], workmem, workmem2 ) * prefactor_spin;
                set_dmrg_index( orb_j, orb_i, orb_i, orb_k, orb_i, orb_i, 2 * d2 );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_k, orb_i,   - d2 );
             }
@@ -586,68 +586,113 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             
             }
             
-            /*****************************************
-             *  2-2-2 : contributions Sigma-F/Sigma  *
-             *****************************************/
-            #ifdef CHEMPS2_MPI_COMPILATION
-               #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
-            #else
-               #pragma omp for schedule(static) nowait
-            #endif
-            for (int global = 0; global < upperbound1; global++){
-               const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-               const int orb_j    = global - (orb_k*(orb_k+1))/2;
-               const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
-               if ( irrep_jk == irrep_mn ){
-                  #ifdef CHEMPS2_MPI_COMPILATION
-                  if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) )
-                  #endif
-                  {
-                     const double d22 = diagram2_22_23(denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                             S0tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2) * prefactor_spin;
-                     const double d23 = ((( orb_j == orb_k ) || ( orb_m == orb_n )) ? 0.0 :
-                                        diagram2_22_23(denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                             S1tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2) * prefactor_spin );
-                     const double d24 = diagram24_27_28(denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                              S0tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2) * prefactor_spin;
-                     if (( orb_j != orb_k ) && ( orb_m != orb_n )){
-                        diagram25_26(denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2);
-                     }
-                     const double d25 = ((( orb_j == orb_k ) || ( orb_m == orb_n )) ? 0.0 : workmem[0]  * prefactor_spin );
-                     const double d26 = ((( orb_j == orb_k ) || ( orb_m == orb_n )) ? 0.0 : workmem2[0] * prefactor_spin );
-                     const double d27 = (( orb_m == orb_n ) ? 0.0 :
-                                        diagram24_27_28(denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                              S1tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2) * prefactor_spin );
-                     const double d28 = (( orb_j == orb_k ) ? 0.0 :
-                                        diagram24_27_28(denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                              S0tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2) * prefactor_spin );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_n, orb_i,  2*d22 + 2*d23 - 2*d24 + d25                   );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_n, orb_m, orb_i,  2*d22 - 2*d23 - 2*d24 - d25                   );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_n,   -d22 -   d23 +   d24       + d26 + d27 + d28 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_n, orb_i, orb_m,   -d22 +   d23 +   d24       - d26 - d27 + d28 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_m, orb_n,   -d22 +   d23 +   d24       - d26 + d27 - d28 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_n, orb_m,   -d22 -   d23 +   d24       + d26 - d27 - d28 );
-                  
-                     const double d45 = diagram45_46_47_48(denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                                 F0tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2, orb_m < orb_n) * prefactor_spin;
-                     const double d47 = (( orb_m == orb_n ) ? d45 : workmem[0] * prefactor_spin );
-                     
-                     const double d46 = (( orb_j == orb_k ) ? 0.0 :
-                                        diagram45_46_47_48(denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k],
-                                                                 F1tensors[orb_i  ][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2, orb_m < orb_n) * prefactor_spin );
-                     const double d48 = (( orb_j == orb_k ) ? 0.0 : (( orb_m == orb_n ) ? d46 : workmem[0] * prefactor_spin ));
-                     
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_n, orb_i, orb_i, d45 + d46 );
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_n, orb_i, d45 - d46 );
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_n, - 2 * d45 );
-                     
-                     if ( orb_m < orb_n ){
-                        set_dmrg_index( orb_j, orb_k, orb_n, orb_m, orb_i, orb_i, d47 + d48 );
-                        set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_m, orb_i, d47 - d48 );
-                        set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_i, orb_m, - 2 * d47 );
+            /***************************************
+             *  2-2-2 : contributions Sigma-Sigma  *
+             ***************************************/
+            if ( counter_Sjk > 0 ){
+            
+               TensorS0 * tens_22 =                              new TensorS0( orb_i, irrep_mn, true, book );
+               TensorS1 * tens_23 = (( orb_m == orb_n ) ? NULL : new TensorS1( orb_i, irrep_mn, true, book ));
+               TensorS1 * tens_25 = (( orb_m == orb_n ) ? NULL : new TensorS1( orb_i, irrep_mn, true, book ));
+               TensorS1 * tens_26 = (( orb_m == orb_n ) ? NULL : new TensorS1( orb_i, irrep_mn, true, book ));
+               TensorS0 * tens_27 = (( orb_m == orb_n ) ? NULL : new TensorS0( orb_i, irrep_mn, true, book ));
+               TensorS1 * tens_28 =                              new TensorS1( orb_i, irrep_mn, true, book );
+               fill_tens_22_24( denT, tens_22, S0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem );
+                  fill_tens_28( denT, tens_28, S0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem );
+               if ( orb_m != orb_n ){ fill_tens_23( denT, tens_23,                   S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem );
+                                fill_tens_25_26_27( denT, tens_25, tens_26, tens_27, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ); }
+            
+               #ifdef CHEMPS2_MPI_COMPILATION
+                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+               #else
+                  #pragma omp for schedule(static) nowait
+               #endif
+               for (int global = 0; global < upperbound1; global++){
+                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
+                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+                  const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
+                  if ( irrep_jk == irrep_mn ){
+                     #ifdef CHEMPS2_MPI_COMPILATION
+                     if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) )
+                     #endif
+                     {
+                        const int cnt1   = orb_k - orb_j;
+                        const double d22 =                                   tens_22->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
+                        const double d23 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_23->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d25 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_25->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d26 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_26->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d27 = (            (orb_m==orb_n) ?0.0: tens_27->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d28 = ( (cnt1==0)                 ?0.0: tens_28->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_n, orb_i,  2*d22 + 2*d23 + d25             );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_n, orb_m, orb_i,  2*d22 - 2*d23 - d25             );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_n,   -d22 -   d23 + d26 + d27 + d28 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_n, orb_i, orb_m,   -d22 +   d23 - d26 - d27 + d28 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_m, orb_n,   -d22 +   d23 - d26 + d27 - d28 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_n, orb_m,   -d22 -   d23 + d26 - d27 - d28 );
                      }
                   }
                }
+               
+                                      delete tens_22;
+               if ( orb_m != orb_n ){ delete tens_23;
+                                      delete tens_25;
+                                      delete tens_26;
+                                      delete tens_27; }
+                                      delete tens_28;
+            
+            }
+            
+            /***********************************
+             *  2-2-2 : contributions Sigma-F  *
+             ***********************************/
+            if ( counter_Sjk > 0 ){
+            
+               TensorS0 * tens_45 =                              new TensorS0( orb_i, irrep_mn, true, book );
+               TensorS1 * tens_46 =                              new TensorS1( orb_i, irrep_mn, true, book );
+               TensorS0 * tens_47 = (( orb_m == orb_n ) ? NULL : new TensorS0( orb_i, irrep_mn, true, book ));
+               TensorS1 * tens_48 = (( orb_m == orb_n ) ? NULL : new TensorS1( orb_i, irrep_mn, true, book ));
+                                      fill_tens_45_47( denT, tens_45, F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, true  );
+                                      fill_tens_46_48( denT, tens_46, F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, true  );
+               if ( orb_m != orb_n ){ fill_tens_45_47( denT, tens_47, F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, false );
+                                      fill_tens_46_48( denT, tens_48, F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, false ); }
+               
+            
+               #ifdef CHEMPS2_MPI_COMPILATION
+                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+               #else
+                  #pragma omp for schedule(static) nowait
+               #endif
+               for (int global = 0; global < upperbound1; global++){
+                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
+                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+                  const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
+                  if ( irrep_jk == irrep_mn ){
+                     #ifdef CHEMPS2_MPI_COMPILATION
+                     if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) )
+                     #endif
+                     {
+                        const int cnt1 = orb_k - orb_j;
+                        if ( orb_m < orb_n ){
+                           const double d47 =                        tens_47->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
+                           const double d48 = (( cnt1 == 0 ) ? 0.0 : tens_48->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                           set_dmrg_index( orb_j, orb_k, orb_n, orb_m, orb_i, orb_i, d47 + d48 );
+                           set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_m, orb_i, d47 - d48 );
+                           set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_i, orb_m,  -2 * d47 );
+                        }
+                        const double d45 =                       tens_45->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
+                        const double d46 = (( cnt1 == 0 ) ? 0.0: tens_46->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_n, orb_i, orb_i, d45 + d46 );
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_n, orb_i, d45 - d46 );
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_n,  -2 * d45 );
+                     }
+                  }
+               }
+               
+                                      delete tens_45;
+                                      delete tens_46;
+               if ( orb_m != orb_n ){ delete tens_47;
+                                      delete tens_48; }
+            
             }
             
             /**************************************************************
@@ -1947,14 +1992,10 @@ double CheMPS2::ThreeDM::diagram21(TensorT * denT, TensorL * denL, TensorF1 * de
 
 }
 
-double CheMPS2::ThreeDM::diagram2_22_23(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2) const{
+double CheMPS2::ThreeDM::diagram2(TensorT * denT, TensorL * left, TensorL * right, double * workmem, double * workmem2) const{
 
    assert( left->get_irrep() == right->get_irrep() );
-   assert( left->get_2j()    == right->get_2j()    );
-   assert( left->get_nelec() == right->get_nelec() );
    const int orb_i = denT->gIndex();
-   const int two_j = left->get_2j();
-   const int nelec = left->get_nelec();
    
    double total = 0.0;
 
@@ -1969,17 +2010,17 @@ double CheMPS2::ThreeDM::diagram2_22_23(TensorT * denT, TensorOperator * left, T
             
                const int ILxIjxIk = Irreps::directProd( IL, left->get_irrep() );
                
-               for ( int TwoSLprime = TwoSL-two_j; TwoSLprime <= TwoSL+two_j; TwoSLprime+=2 ){
+               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
                   
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-nelec,   TwoSLprime, ILxIjxIk );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL-nelec+2, TwoSLprime, ILxIjxIk );
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIjxIk );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLprime, ILxIjxIk );
                   
                   if (( dimLdown > 0 ) && ( dimRdown > 0 )){
                      
-                     double * Tup    =  denT->gStorage( NL,         TwoSL,      IL,       NL+2,       TwoSL,      IL       );
-                     double * Tdown  =  denT->gStorage( NL-nelec,   TwoSLprime, ILxIjxIk, NL-nelec+2, TwoSLprime, ILxIjxIk );
-                     double * Lblock =  left->gStorage( NL-nelec,   TwoSLprime, ILxIjxIk, NL,         TwoSL,      IL       );
-                     double * Rblock = right->gStorage( NL-nelec+2, TwoSLprime, ILxIjxIk, NL+2,       TwoSL,      IL       );
+                     double * Tup    =  denT->gStorage( NL,   TwoSL,      IL,       NL+2, TwoSL,      IL       );
+                     double * Tdown  =  denT->gStorage( NL-1, TwoSLprime, ILxIjxIk, NL+1, TwoSLprime, ILxIjxIk );
+                     double * Lblock =  left->gStorage( NL-1, TwoSLprime, ILxIjxIk, NL,   TwoSL,      IL       );
+                     double * Rblock = right->gStorage( NL+1, TwoSLprime, ILxIjxIk, NL+2, TwoSL,      IL       );
                      
                      char trans   = 'T';
                      char notrans = 'N';
@@ -2000,288 +2041,6 @@ double CheMPS2::ThreeDM::diagram2_22_23(TensorT * denT, TensorOperator * left, T
    }
    
    return total;
-
-}
-
-void CheMPS2::ThreeDM::diagram25_26(TensorT * denT, TensorS1 * left, TensorS1 * right, double * workmem, double * workmem2) const{
-
-   assert( left->get_irrep() == right->get_irrep() );
-   const int orb_i = denT->gIndex();
-   
-   double total_d25 = 0.0;
-   double total_d26 = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
-         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
-            
-            if ( dimLup > 0 ){
-            
-               const int IRup   = Irreps::directProd( ILup,   book->gIrrep( orb_i ) ); // IL x Ii
-               const int ILdown = Irreps::directProd( ILup,   left->get_irrep()     ); // IL x Ij x Ik
-               const int IRdown = Irreps::directProd( ILdown, book->gIrrep( orb_i ) ); // IL x Ii x Ij x Ik = IL x Ii x Im x In
-               
-               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
-               
-                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
-                  
-                  if ( dimRup > 0 ){
-               
-                     for ( int TwoSLdown = TwoSLup-2; TwoSLdown <= TwoSLup+2; TwoSLdown+=2 ){
-                        
-                        int dimLdown = book->gCurrentDim( orb_i, NL-2, TwoSLdown, ILdown );
-                        
-                        if ( dimLdown > 0 ){
-                        
-                           for ( int TwoSRdown = TwoSLdown-1; TwoSRdown <= TwoSLdown+1; TwoSRdown+=2 ){
-                        
-                              int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSRdown, IRdown );
-                              
-                              if (( dimRdown > 0 ) && ( abs( TwoSRup - TwoSRdown ) <= 2 )){
-                                 
-                                 double * Tup    =  denT->gStorage( NL,   TwoSLup,   ILup,   NL+1, TwoSRup,   IRup   );
-                                 double * Tdown  =  denT->gStorage( NL-2, TwoSLdown, ILdown, NL-1, TwoSRdown, IRdown );
-                                 double * Lblock =  left->gStorage( NL-2, TwoSLdown, ILdown, NL,   TwoSLup,   ILup   );
-                                 double * Rblock = right->gStorage( NL-1, TwoSRdown, IRdown, NL+1, TwoSRup,   IRup   );
-                                 
-                                 char trans   = 'T';
-                                 char notrans = 'N';
-                                 double alpha = 1.0;
-                                 double beta  = 0.0; //set
-                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup,   &dimLup, &alpha, Lblock,  &dimLdown, Tup,    &dimLup,   &beta, workmem,  &dimLdown );
-                                 dgemm_( &notrans,   &trans, &dimLdown, &dimRdown, &dimRup, &alpha, workmem, &dimLdown, Rblock, &dimRdown, &beta, workmem2, &dimLdown );
-                                 
-                                 int length = dimLdown * dimRdown;
-                                 int inc = 1;
-                                 const double contracted = sqrt( 1.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 ) 
-                                                         * ddot_( &length, workmem2, &inc, Tdown, &inc );
-                                 total_d25 += phase( TwoSLup + TwoSRdown + 3 )
-                                            * gsl_sf_coupling_6j( TwoSLup, TwoSRup, 1, TwoSRdown, TwoSLdown, 2 )
-                                            * contracted;
-                                 total_d26 += 3 * phase( 2 + TwoSRup + TwoSRdown + TwoSLup + TwoSLdown )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSLup, TwoSLdown, TwoSRdown )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSRup, TwoSRdown, TwoSLup   )
-                                            * contracted;
-
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   workmem[0]  = total_d25;
-   workmem2[0] = total_d26;
-
-}
-
-double CheMPS2::ThreeDM::diagram24_27_28(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2) const{
-
-   assert( left->get_irrep() == right->get_irrep() );
-   assert( left->get_nelec() == right->get_nelec() );
-   const int orb_i = denT->gIndex();
-   const int twoJ1 =  left->get_2j();
-   const int twoJ2 = right->get_2j();
-   const int nelec = left->get_nelec();
-   
-   double total = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
-         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
-            
-            if ( dimLup > 0 ){
-            
-               const int IRup   = Irreps::directProd( ILup,   book->gIrrep( orb_i ) ); // IL x Ii
-               const int ILdown = Irreps::directProd( ILup,   left->get_irrep()     ); // IL x Ij x Ik
-               const int IRdown = Irreps::directProd( ILdown, book->gIrrep( orb_i ) ); // IL x Ii x Ij x Ik = IL x Ii x Im x In
-               
-               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
-               
-                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
-                  
-                  if ( dimRup > 0 ){
-               
-                     for ( int TwoSLdown = TwoSLup-twoJ1; TwoSLdown <= TwoSLup+twoJ1; TwoSLdown+=2 ){
-                        
-                        int dimLdown = book->gCurrentDim( orb_i, NL-nelec, TwoSLdown, ILdown );
-                        
-                        if ( dimLdown > 0 ){
-                        
-                           for ( int TwoSRdown = TwoSLdown-1; TwoSRdown <= TwoSLdown+1; TwoSRdown+=2 ){
-                        
-                              int dimRdown = book->gCurrentDim( orb_i+1, NL-nelec+1, TwoSRdown, IRdown );
-                              
-                              if (( dimRdown > 0 ) && ( abs( TwoSRup - TwoSRdown ) <= twoJ2 )){
-                                 
-                                 double * Tup    =  denT->gStorage( NL,         TwoSLup,   ILup,   NL+1,       TwoSRup,   IRup   );
-                                 double * Tdown  =  denT->gStorage( NL-nelec,   TwoSLdown, ILdown, NL-nelec+1, TwoSRdown, IRdown );
-                                 double * Lblock =  left->gStorage( NL-nelec,   TwoSLdown, ILdown, NL,         TwoSLup,   ILup   );
-                                 double * Rblock = right->gStorage( NL-nelec+1, TwoSRdown, IRdown, NL+1,       TwoSRup,   IRup   );
-                                 
-                                 char trans   = 'T';
-                                 char notrans = 'N';
-                                 double alpha = 1.0;
-                                 double beta  = 0.0; //set
-                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup,   &dimLup, &alpha, Lblock,  &dimLdown, Tup,    &dimLup,   &beta, workmem,  &dimLdown );
-                                 dgemm_( &notrans,   &trans, &dimLdown, &dimRdown, &dimRup, &alpha, workmem, &dimLdown, Rblock, &dimRdown, &beta, workmem2, &dimLdown );
-                                 
-                                 int length = dimLdown * dimRdown;
-                                 int inc = 1;
-                                 total += sqrt( 1.0 * ( twoJ1 + 1 ) * ( twoJ2 + 1 ) * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 )
-                                        * phase( twoJ1 + TwoSRup + TwoSRdown + TwoSLup + TwoSLdown )
-                                        * gsl_sf_coupling_6j( 1, 1, twoJ1, TwoSLup, TwoSLdown, TwoSRdown )
-                                        * gsl_sf_coupling_6j( 1, 1, twoJ2, TwoSRup, TwoSRdown, TwoSLup   )
-                                        * ddot_( &length, workmem2, &inc, Tdown, &inc );
-
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   return total;
-
-}
-
-double CheMPS2::ThreeDM::diagram45_46_47_48(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const{
-
-   assert(  left->get_irrep() == right->get_irrep() );
-   assert(  left->get_2j()    == right->get_2j()    ); // Spin of left and right equal
-   assert(  left->get_nelec() == 2 ); //  left is Sigma
-   assert( right->get_nelec() == 0 ); // right is F
-   const int two_j = left->get_2j();
-   const int orb_i = denT->gIndex();
-   
-   double total_45_46 = 0.0;
-   double total_47_48 = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int Idown = Irreps::directProd( IL, left->get_irrep() );
-               
-               for ( int TwoSLdown = TwoSL-two_j; TwoSLdown <= TwoSL+two_j; TwoSLdown+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-2, TwoSLdown, Idown );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSLdown, Idown );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                  
-                     double * Tup    =  denT->gStorage( NL,   TwoSL,     IL,    NL, TwoSL,     IL    );
-                     double * Tdown  =  denT->gStorage( NL-2, TwoSLdown, Idown, NL, TwoSLdown, Idown );
-                     double * Lblock =  left->gStorage( NL-2, TwoSLdown, Idown, NL, TwoSL,     IL    );
-                     double * Rblock = right->gStorage( NL,   TwoSLdown, Idown, NL, TwoSL,     IL    );
-                     
-                     char trans   = 'T';
-                     char notrans = 'N';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     int length   = dimLdown * dimRdown;
-                     int inc      = 1;
-                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup,   &dimLup, &alpha, Lblock,  &dimLdown, Tup,    &dimLup,   &beta, workmem,  &dimLdown );
-                     dgemm_( &notrans,   &trans, &dimLdown, &dimRdown, &dimRup, &alpha, workmem, &dimLdown, Rblock, &dimRdown, &beta, workmem2, &dimLdown );
-                     total_45_46 += phase( TwoSL - TwoSLdown + 2 )
-                                  * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) )
-                                  * ddot_( &length, workmem2, &inc, Tdown, &inc );
-                     
-                     if ( doTR ){
-                        double * Rblock2 = right->gStorage( NL, TwoSL, IL, NL, TwoSLdown, Idown );
-                        dgemm_( &notrans, &notrans, &dimLdown, &dimRdown, &dimRup, &alpha, workmem, &dimLdown, Rblock2, &dimRup, &beta, workmem2, &dimLdown );
-                        total_47_48 += ( -1 ) * ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Tdown, &inc );
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   workmem[0] = total_47_48;
-   return total_45_46;
-
-}
-
-double CheMPS2::ThreeDM::diagram49_50_51_52(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const{
-
-   assert(  left->get_irrep() == right->get_irrep() );
-   assert(  left->get_2j()    == right->get_2j()    ); // Spin of left and right equal
-   assert(  left->get_nelec() == 0 ); //  left is F
-   assert( right->get_nelec() == 2 ); // right is Sigma
-   const int two_j = left->get_2j();
-   const int orb_i = denT->gIndex();
-   
-   double total_49_50 = 0.0;
-   double total_51_52 = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int Idown = Irreps::directProd( IL, left->get_irrep() );
-               
-               for ( int TwoSLdown = TwoSL-two_j; TwoSLdown <= TwoSL+two_j; TwoSLdown+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL,   TwoSLdown, Idown );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL+2, TwoSLdown, Idown );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                  
-                     double * Tup    =  denT->gStorage( NL, TwoSL,     IL,    NL,   TwoSL,     IL    );
-                     double * Tdown  =  denT->gStorage( NL, TwoSLdown, Idown, NL+2, TwoSLdown, Idown );
-                     double * Lblock =  left->gStorage( NL, TwoSLdown, Idown, NL,   TwoSL,     IL    );
-                     double * Rblock = right->gStorage( NL, TwoSL,     IL,    NL+2, TwoSLdown, Idown );
-                     
-                     char notrans = 'N';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     int length   = dimLdown * dimRdown;
-                     int inc      = 1;
-                     dgemm_( &notrans, &notrans, &dimLup,   &dimRdown, &dimRup, &alpha, Tup,    &dimLup,   Rblock,  &dimRup, &beta, workmem,  &dimLup   );
-                     dgemm_( &notrans, &notrans, &dimLdown, &dimRdown, &dimLup, &alpha, Lblock, &dimLdown, workmem, &dimLup, &beta, workmem2, &dimLdown );
-                     total_49_50 += phase( TwoSL - TwoSLdown + 2 )
-                                  * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) )
-                                  * ddot_( &length, workmem2, &inc, Tdown, &inc );
-                     
-                     if ( doTR ){
-                        double * Lblock2 = left->gStorage( NL, TwoSL, IL, NL, TwoSLdown, Idown );
-                        char trans = 'T';
-                        dgemm_( &trans, &notrans, &dimLdown, &dimRdown, &dimLup, &alpha, Lblock2, &dimLup, workmem, &dimLup, &beta, workmem2, &dimLdown );
-                        total_51_52 += ( -1 ) * ( TwoSLdown + 1 ) * ddot_( &length, workmem2, &inc, Tdown, &inc );
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   workmem[0] = total_51_52;
-   return total_49_50;
 
 }
 
@@ -3793,6 +3552,347 @@ void CheMPS2::ThreeDM::fill_tens_50_52(TensorT * denT, TensorF1 * tofill, Tensor
                   dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
                   dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,     &dimLdown );
                   
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_22_24(TensorT * denT, TensorS0 * tofill, TensorS0 * denS0, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   assert( tofill->get_irrep() == denS0->get_irrep() );
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn    = Irreps::directProd( IL, denS0->get_irrep()    );
+            const int ILxIi       = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            const int ILxImxInxIi = Irreps::directProd( ILxIi, denS0->get_irrep() );
+            
+            int dimLup   = book->gCurrentDim( orb_i, NL,   TwoSL, IL       );
+            int dimLdown = book->gCurrentDim( orb_i, NL-2, TwoSL, ILxImxIn );
+            
+            if (( dimLup > 0 ) && ( dimLdown > 0 )){
+            
+               {
+                  int dimRup   = book->gCurrentDim( orb_i+1, NL+2, TwoSL, IL       );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSL, ILxImxIn );
+                  
+                  if (( dimRup > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL, IL,       NL+2, TwoSL, IL       );
+                     double * Tdown =   denT->gStorage( NL-2, TwoSL, ILxImxIn, NL,   TwoSL, ILxImxIn );
+                     double * right =  denS0->gStorage( NL,   TwoSL, ILxImxIn, NL+2, TwoSL, IL       );
+                     double * left  = tofill->gStorage( NL-2, TwoSL, ILxImxIn, NL,   TwoSL, IL       );
+                  
+                     double factor = TwoSL + 1.0;
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,     &dimLdown );
+                     
+                  }
+               }
+            
+               for ( int TwoSR = TwoSL-1; TwoSR <= TwoSL+1; TwoSR+=2 ){
+               
+                  int dimRup   = book->gCurrentDim( orb_i+1, NL+1, TwoSR, ILxIi       );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSR, ILxImxInxIi );
+                  
+                  if (( dimRup > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL, IL,          NL+1, TwoSR, ILxIi       );
+                     double * Tdown =   denT->gStorage( NL-2, TwoSL, ILxImxIn,    NL-1, TwoSR, ILxImxInxIi );
+                     double * right =  denS0->gStorage( NL-1, TwoSR, ILxImxInxIi, NL+1, TwoSR, ILxIi       );
+                     double * left  = tofill->gStorage( NL-2, TwoSL, ILxImxIn,    NL,   TwoSL, IL          );
+                  
+                     double factor = 0.5 * ( TwoSR + 1 );
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,     &dimLdown );
+
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_28(TensorT * denT, TensorS1 * tofill, TensorS0 * denS0, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   assert( tofill->get_irrep() == denS0->get_irrep() );
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn    = Irreps::directProd( IL, denS0->get_irrep()    );
+            const int ILxIi       = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            const int ILxImxInxIi = Irreps::directProd( ILxIi, denS0->get_irrep() );
+            
+            for ( int TwoSLprime = TwoSL-2; TwoSLprime <= TwoSL+2; TwoSLprime+=2 ){
+            
+               int dimLup   = book->gCurrentDim( orb_i, NL,   TwoSL,      IL       );
+               int dimLdown = book->gCurrentDim( orb_i, NL-2, TwoSLprime, ILxImxIn );
+               
+               if (( dimLup > 0 ) && ( dimLdown > 0 )){
+               
+                  for ( int TwoSR = TwoSL-1; TwoSR <= TwoSL+1; TwoSR+=2 ){
+                  
+                     int dimRup   = book->gCurrentDim( orb_i+1, NL+1, TwoSR, ILxIi       );
+                     int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSR, ILxImxInxIi );
+                     
+                     if (( dimRup > 0 ) && ( dimRdown > 0 ) && ( abs( TwoSLprime - TwoSR ) == 1 )){
+                     
+                        double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,          NL+1, TwoSR, ILxIi       );
+                        double * Tdown =   denT->gStorage( NL-2, TwoSLprime, ILxImxIn,    NL-1, TwoSR, ILxImxInxIi );
+                        double * right =  denS0->gStorage( NL-1, TwoSR,      ILxImxInxIi, NL+1, TwoSR, ILxIi       );
+                        double * left  = tofill->gStorage( NL-2, TwoSLprime, ILxImxIn,    NL,   TwoSL, IL          );
+                     
+                        double factor = sqrt( 1.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
+                                      * phase( TwoSLprime + TwoSR + 1 )
+                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
+                        char notrans  = 'N';
+                        char trans    = 'T';
+                        double zero   = 0.0;
+                        double one    = 1.0;
+                        dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                        dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,     &dimLdown );
+
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_23(TensorT * denT, TensorS1 * tofill, TensorS1 * denS1, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   assert( tofill->get_irrep() == denS1->get_irrep() );
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn = Irreps::directProd( IL, denS1->get_irrep() );
+            
+            for ( int TwoSLprime = TwoSL-2; TwoSLprime <= TwoSL+2; TwoSLprime+=2 ){
+            
+               int dimLup   = book->gCurrentDim( orb_i,   NL,   TwoSL,      IL       );
+               int dimLdown = book->gCurrentDim( orb_i,   NL-2, TwoSLprime, ILxImxIn );
+               int dimRup   = book->gCurrentDim( orb_i+1, NL+2, TwoSL,      IL       );
+               int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSLprime, ILxImxIn );
+               
+               if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( dimRup > 0 ) && ( dimRdown > 0 )){
+               
+                  double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,       NL+2, TwoSL,      IL       );
+                  double * Tdown =   denT->gStorage( NL-2, TwoSLprime, ILxImxIn, NL,   TwoSLprime, ILxImxIn );
+                  double * right =  denS1->gStorage( NL,   TwoSLprime, ILxImxIn, NL+2, TwoSL,      IL       );
+                  double * left  = tofill->gStorage( NL-2, TwoSLprime, ILxImxIn, NL,   TwoSL,      IL       );
+               
+                  double factor = TwoSL + 1.0;
+                  char notrans  = 'N';
+                  char trans    = 'T';
+                  double zero   = 0.0;
+                  double one    = 1.0;
+                  dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                  dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,     &dimLdown );
+                        
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, TensorS1 * fill26, TensorS0 * fill27, TensorS1 * denS1, double * workmem, double * workmem2) const{
+
+   const int orb_i = denT->gIndex();
+   fill25->clear();
+   fill26->clear();
+   fill27->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn    = Irreps::directProd( IL, denS1->get_irrep()    );
+            const int ILxIi       = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            const int ILxImxInxIi = Irreps::directProd( ILxIi, denS1->get_irrep() );
+            
+            for ( int TwoSLprime = TwoSL-2; TwoSLprime <= TwoSL+2; TwoSLprime+=2 ){
+            
+               int dimLup   = book->gCurrentDim( orb_i, NL,   TwoSL,      IL       );
+               int dimLdown = book->gCurrentDim( orb_i, NL-2, TwoSLprime, ILxImxIn );
+               
+               if (( dimLup > 0 ) && ( dimLdown > 0 )){
+               
+                  for ( int TwoSR = TwoSL-1; TwoSR <= TwoSL+1; TwoSR+=2 ){
+                     for ( int TwoSRprime = TwoSLprime-1; TwoSRprime <= TwoSLprime+1; TwoSRprime+=2 ){
+                  
+                        int dimRup   = book->gCurrentDim( orb_i+1, NL+1, TwoSR,      ILxIi       );
+                        int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSRprime, ILxImxInxIi );
+                        
+                        if (( dimRup > 0 ) && ( dimRdown > 0 ) && ( abs( TwoSRprime - TwoSR ) <= 2 )){
+                        
+                           double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,          NL+1, TwoSR,      ILxIi       );
+                           double * Tdown =   denT->gStorage( NL-2, TwoSLprime, ILxImxIn,    NL-1, TwoSRprime, ILxImxInxIi );
+                           double * right =  denS1->gStorage( NL-1, TwoSRprime, ILxImxInxIi, NL+1, TwoSR,      ILxIi       );
+                           
+                           char notrans  = 'N';
+                           char trans    = 'T';
+                           double zero   = 0.0;
+                           double one    = 1.0;
+                           dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &one, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                           dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one, workmem, &dimLdown, Tup,   &dimLup,   &zero, workmem2, &dimLdown );
+                           
+                           {
+                              double * left = fill25->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
+                              double factor = ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
+                                            * phase( TwoSL + TwoSRprime + 3 )
+                                            * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
+                              int length = dimLup * dimLdown;
+                              int inc    = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double * left = fill26->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
+                              double factor = 3 * ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
+                                            * phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 )
+                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      )
+                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime );
+                              int length = dimLup * dimLdown;
+                              int inc    = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           if ( TwoSLprime == TwoSL ){
+                              double * left = fill27->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
+                              double factor = ( TwoSR + 1 ) * sqrt( 1.5 * ( TwoSRprime + 1 ) )
+                                            * phase( TwoSL + TwoSR + 3 )
+                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
+                              int length = dimLup * dimLdown;
+                              int inc    = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_45_47(TensorT * denT, TensorS0 * tofill, TensorF0 * denF0, double * workmem, const bool first) const{
+
+   const int orb_i = denT->gIndex();
+   assert( tofill->get_irrep() == denF0->get_irrep() );
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn = Irreps::directProd( IL, denF0->get_irrep() );
+            
+            int dimLup   = book->gCurrentDim( orb_i,   NL,   TwoSL, IL       );
+            int dimLdown = book->gCurrentDim( orb_i,   NL-2, TwoSL, ILxImxIn );
+            int dimRup   = book->gCurrentDim( orb_i+1, NL,   TwoSL, IL       );
+            int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSL, ILxImxIn );
+                  
+            if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( dimRup > 0 ) && ( dimRdown > 0 )){
+            
+               double * Tup   =   denT->gStorage( NL,   TwoSL, IL,       NL,   TwoSL, IL       );
+               double * Tdown =   denT->gStorage( NL-2, TwoSL, ILxImxIn, NL,   TwoSL, ILxImxIn );
+               double * left  = tofill->gStorage( NL-2, TwoSL, ILxImxIn, NL,   TwoSL, IL       );
+            
+               double factor = -( TwoSL + 1.0 );
+               char notrans  = 'N';
+               char trans    = 'T';
+               double zero   = 0.0;
+               double one    = 1.0;
+               if ( first ){
+                  double * right =  denF0->gStorage( NL, TwoSL, ILxImxIn, NL, TwoSL, IL );
+                  dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem, &dimLdown );
+                  dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,    &dimLdown );
+               } else {
+                  double * right =  denF0->gStorage( NL, TwoSL, IL, NL, TwoSL, ILxImxIn );
+                  dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRup, &zero, workmem, &dimLdown );
+                  dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup, &one,  left,    &dimLdown );
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_tens_46_48(TensorT * denT, TensorS1 * tofill, TensorF1 * denF1, double * workmem, const bool first) const{
+
+   const int orb_i = denT->gIndex();
+   assert( tofill->get_irrep() == denF1->get_irrep() );
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxImxIn = Irreps::directProd( IL, denF1->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               for ( int TwoSLprime = TwoSL-2; TwoSLprime <= TwoSL+2; TwoSLprime+=2 ){
+               
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-2, TwoSLprime, ILxImxIn );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSLprime, ILxImxIn );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,       NL,   TwoSL,      IL       );
+                     double * Tdown =   denT->gStorage( NL-2, TwoSLprime, ILxImxIn, NL,   TwoSLprime, ILxImxIn );
+                     double * left  = tofill->gStorage( NL-2, TwoSLprime, ILxImxIn, NL,   TwoSL,      IL       );
+                  
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     if ( first ){
+                        double factor  = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL - TwoSLprime + 2 );
+                        double * right =  denF1->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
+                        dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem, &dimLdown );
+                        dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,    &dimLdown );
+                     } else {
+                        double factor  = - ( TwoSL + 1.0 );
+                        double * right =  denF1->gStorage( NL, TwoSL, IL, NL, TwoSLprime, ILxImxIn );
+                        dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRup, &zero, workmem, &dimLdown );
+                        dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup, &one,  left,    &dimLdown );
+                     }
+                  }
                }
             }
          }
