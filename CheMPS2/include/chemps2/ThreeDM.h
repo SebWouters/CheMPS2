@@ -159,14 +159,14 @@ namespace CheMPS2{
          double     diagram2_22_23(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2) const;
          double    diagram24_27_28(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2) const;
          void         diagram25_26(TensorT * denT, TensorS1       * left, TensorS1       * right, double * workmem, double * workmem2) const;
-         double diagram29_30_31_32(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const;
-         double       diagram33_39(TensorT * denT, TensorF0       * left, TensorF0       * right, double * workmem, double * workmem2, const bool do39) const;
-         double    diagram34_37_38(TensorT * denT, TensorF1       * left, TensorF1       * right, double * workmem, double * workmem2) const;
-         double       diagram35_41(TensorT * denT, TensorF0       * left, TensorF1       * right, double * workmem, double * workmem2, const bool do41) const;
-         double       diagram36_42(TensorT * denT, TensorF1       * left, TensorF0       * right, double * workmem, double * workmem2, const bool do42) const;
-         double    diagram40_43_44(TensorT * denT, TensorF1       * left, TensorF1       * right, double * workmem, double * workmem2) const;
          double diagram45_46_47_48(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const;
          double diagram49_50_51_52(TensorT * denT, TensorOperator * left, TensorOperator * right, double * workmem, double * workmem2, const bool doTR) const;
+         void       fill_tens_29_33(TensorT * denT, TensorF0 * tofill, TensorF0 * denF0, double * workmem) const;
+         void       fill_tens_30_32(TensorT * denT, TensorF1 * tofill, TensorF1 * denF1, double * workmem) const;
+         void       fill_tens_36_42(TensorT * denT, TensorF1 * tofill, TensorF0 * denF0, double * workmem) const;
+         void fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, TensorF0 * fill35, TensorF1 * fill37, TensorF1 * fill38, TensorF1 * denF1, double * workmem, double * workmem2) const;
+         void       fill_tens_49_51(TensorT * denT, TensorF0 * tofill, TensorS0 * denS0, double * workmem) const;
+         void       fill_tens_50_52(TensorT * denT, TensorF1 * tofill, TensorS1 * denS1, double * workmem) const;
          
          //Partitioning 3-2-1
          void              diagram53_54(TensorT * denT, Tensor3RDM * left1, Tensor3RDM * left2, TensorL * right, double * workmem, double * workmem2) const;

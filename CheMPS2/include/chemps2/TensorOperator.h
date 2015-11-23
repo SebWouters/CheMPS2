@@ -125,6 +125,12 @@ namespace CheMPS2{
          //! Set all storage variables to 0.0
          void clear();
          
+         //! Make the in-product of two TensorOperator
+         /** \param buddy The second tensor
+             \param trans If trans == 'N' a regular ddot is taken. If trans == 'T' and n_elec==0, the in-product with buddy's transpose is made.
+             \return The in-product */
+         double inproduct( TensorOperator * buddy, const char trans ) const;
+         
       protected:
       
          //! Get twice the spin of the tensor operator

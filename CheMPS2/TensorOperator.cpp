@@ -444,4 +444,58 @@ void CheMPS2::TensorOperator::daxpy_transpose_tensorCD(const double alpha, Tenso
 
 }
 
+double CheMPS2::TensorOperator::inproduct( TensorOperator * buddy, const char trans ) const{
+
+   if ( buddy == NULL ){ return 0.0; }
+
+   const int orb_i = gIndex();
+   assert( get_2j() == buddy->get_2j()    );
+   assert( n_elec   == buddy->get_nelec() );
+   assert( n_irrep  == buddy->get_irrep() );
+
+   double value = 0.0;
+
+   if ( trans == 'N' ){
+
+      int length = kappa2index[ nKappa ];
+      int inc    = 1;
+      value = ddot_( &length, storage, &inc, buddy->gStorage(), &inc );
+      return value;
+
+   } else {
+
+      assert( n_elec == 0 );
+      for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+
+         const int n_updown   = sectorN1[ ikappa ];
+         const int two_j_up   = sectorTwoS1[ ikappa ];
+         const int two_j_down = sector_2S_down[ ikappa ];
+         const int irrep_up   = sectorI1[ ikappa ];
+         const int irrep_down = Irreps::directProd( sectorI1[ ikappa ], n_irrep );
+
+         double * my_block    = storage + kappa2index[ ikappa ];
+         double * buddy_block = buddy->gStorage( n_updown, two_j_down, irrep_down, n_updown, two_j_up, irrep_up );
+         const int dim_up     = denBK->gCurrentDim( index, n_updown, two_j_up,   irrep_up   );
+         const int dim_down   = denBK->gCurrentDim( index, n_updown, two_j_down, irrep_down );
+         
+         double temp = 0.0;
+         for ( int row = 0; row < dim_up; row++ ){
+            for ( int col = 0; col < dim_down; col++ ){
+               temp += my_block[ row + dim_up * col ] * buddy_block[ col + dim_down * row ];
+            }
+         }
+         
+         const double prefactor = (( get_2j() == 0 ) ? 1.0 : ( sqrt( ( two_j_up + 1.0 ) / ( two_j_down + 1.0 ) ) * Heff::phase( two_j_up - two_j_down ) ));
+         value += prefactor * temp;
+      
+      }
+
+      return value;
+
+   }
+
+   return value;
+
+}
+
 

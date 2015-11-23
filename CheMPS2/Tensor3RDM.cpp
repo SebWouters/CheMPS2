@@ -543,11 +543,9 @@ double CheMPS2::Tensor3RDM::contract( Tensor3RDM * buddy ) const{
 
    if ( buddy == NULL ){ return 0.0; }
 
-   const int orb_i  = gIndex();
-   const int two_j2 = get_two_j2();
-   assert( two_j2  == buddy->get_two_j2() );
-   assert( n_elec  == buddy->get_nelec()  );
-   assert( n_irrep == buddy->get_irrep()  );
+   assert( get_two_j2() == buddy->get_two_j2() );
+   assert( n_elec       == buddy->get_nelec()  );
+   assert( n_irrep      == buddy->get_irrep()  );
    
    double value = 0.0;
 
