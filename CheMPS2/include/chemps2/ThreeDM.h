@@ -176,14 +176,14 @@ namespace CheMPS2{
          void diagramJ2oneandhalf_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
          
          //Partitioning 3-1-2 (d90 --> d189)
-         void        diagram90_93(TensorT * denT, Tensor3RDM ** left, TensorS0 * denS0, double * workmem, double * workmem2) const;
-         void     diagram91_92_94(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
-         void        diagram95_98(TensorT * denT, Tensor3RDM ** left, TensorS0 * denS0, double * workmem, double * workmem2) const;
-         void     diagram96_97_99(TensorT * denT, Tensor3RDM ** left, TensorS1 * denS1, double * workmem, double * workmem2, double * results) const;
-         void           fill_a_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem ) const;
-         void         fill_bcd_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem ) const;
-         void           fill_a_S1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorS1 * denS1, double * workmem, double * workmem2 ) const;
-         void         fill_bcd_S1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorS1 * denS1, double * workmem, double * workmem2 ) const;
+         void           fill_a_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem) const;
+         void         fill_bcd_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem) const;
+         void             fill_F0(TensorT * denT, Tensor3RDM * tofill,                        TensorF0 * denF0, double * workmem) const;
+         void           fill_F0_T(TensorT * denT, Tensor3RDM * tofill,                        TensorF0 * denF0, double * workmem) const;
+         void           fill_a_S1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorS1 * denS1, double * workmem, double * workmem2) const;
+         void         fill_bcd_S1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorS1 * denS1, double * workmem, double * workmem2) const;
+         void             fill_F1(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorF1 * denF1, double * workmem, double * workmem2) const;
+         void           fill_F1_T(TensorT * denT, Tensor3RDM * doublet, Tensor3RDM * quartet, TensorF1 * denF1, double * workmem, double * workmem2) const;
          
    };
 }
