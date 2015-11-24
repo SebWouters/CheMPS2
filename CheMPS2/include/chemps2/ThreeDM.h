@@ -94,6 +94,9 @@ namespace CheMPS2{
                          Tensor3RDM **** dm3_b_J0_doublet, Tensor3RDM **** dm3_b_J1_doublet, Tensor3RDM **** dm3_b_J1_quartet,
                          Tensor3RDM **** dm3_c_J0_doublet, Tensor3RDM **** dm3_c_J1_doublet, Tensor3RDM **** dm3_c_J1_quartet,
                          Tensor3RDM **** dm3_d_J0_doublet, Tensor3RDM **** dm3_d_J1_doublet, Tensor3RDM **** dm3_d_J1_quartet );
+         
+         //! After the whole 3-RDM is filled, a prefactor for higher multiplicities should be applied
+         void correct_higher_multiplicities();
              
          //! Return the trace (should be N(N-1)(N-2))
          /** \return Trace of the 3-RDM */
@@ -133,9 +136,6 @@ namespace CheMPS2{
          //Partitioning 2-4-0
          double diagram1(TensorT * denT, TensorF0 * denF0, double * workmem) const;
          
-         //Partitioning 1-4-1
-         double diagram2(TensorT * denT, TensorL * left, TensorL * right, double * workmem, double * workmem2) const;
-         
          //Partitioning 0-4-2
          double diagram3(TensorT * denT, TensorF0 * denF0, double * workmem) const;
          
@@ -172,12 +172,13 @@ namespace CheMPS2{
          void       fill_tens_45_47(TensorT * denT, TensorS0 * tofill, TensorF0 * denF0, double * workmem, const bool first) const;
          void       fill_tens_46_48(TensorT * denT, TensorS1 * tofill, TensorF1 * denF1, double * workmem, const bool first) const;
          
-         //Partitioning 3-2-1
-         void              diagram53_54(TensorT * denT, Tensor3RDM * left1, Tensor3RDM * left2, TensorL * right, double * workmem, double * workmem2) const;
-         void             diagram55to60(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
-         void  diagram61_62_70_71_80_81(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
-         void       diagramJ2half_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
-         void diagramJ2oneandhalf_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const;
+         //Partitioning 3-2-1 and 1-4-1
+         void    fill_53_54(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const;
+         void fill_55_to_60(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const;
+         void       fill_61(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const;
+         void    fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RDM * fill65, Tensor3RDM * fill67, Tensor3RDM * fill68,
+                                            Tensor3RDM * fill76, Tensor3RDM * fill77, TensorL * denL, double * workmem, double * workmem2) const;
+         void fill_69_78_79(TensorT * denT, Tensor3RDM * fill69, Tensor3RDM * fill78, Tensor3RDM * fill79, TensorL * denL, double * workmem, double * workmem2) const;
          
          //Partitioning 3-1-2 (d90 --> d189)
          void           fill_a_S0(TensorT * denT, Tensor3RDM * tofill,                        TensorS0 * denS0, double * workmem) const;

@@ -92,6 +92,9 @@ namespace CheMPS2{
              \param S0tens S0tensors
              \param S1tens S1tensors*/
          void FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F0tens, TensorF1 **** F1tens, TensorS0 **** S0tens, TensorS1 **** S1tens);
+         
+         //! After the whole 2-RDM is filled, a prefactor for higher multiplicities should be applied
+         void correct_higher_multiplicities();
              
          //! Return the double trace of 2DM-A (should be N(N-1))
          /** \return Double trace of 2DM-A */

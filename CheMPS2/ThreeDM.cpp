@@ -195,7 +195,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
 
    const int orb_i = denT->gIndex();
    const int DIM = max(book->gMaxDimAtBound( orb_i ), book->gMaxDimAtBound( orb_i+1 ));
-   const double prefactor_spin = 1.0/(prob->gTwoS() + 1.0);
+   const double sq3 = sqrt( 3.0 );
    
    #pragma omp parallel
    {
@@ -203,57 +203,31 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       double * workmem  = new double[DIM*DIM];
       double * workmem2 = new double[DIM*DIM];
       
-      /*for (int orb_j = 0; orb_j < orb_i; orb_j++){
-         for (int orb_k = orb_j; orb_k < orb_i; orb_k++){*/
       const int upperbound1 = ( orb_i * ( orb_i+1 )) / 2;
       #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
       for (int global = 0; global < upperbound1; global++){
          const int orb_k = orb_i - trianglefunction( orb_i, global ) - 1; // cnt2tilde - 1
          const int orb_j = global - (orb_k*(orb_k+1))/2;
-         //cout << orb_j << " <= " << orb_k << " < " << orb_i << endl;
          if ( book->gIrrep( orb_j ) == book->gIrrep( orb_k )){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_cdf( L, orb_j, orb_k ) )
             #endif
             {
-               const double d1 = diagram1( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], workmem ) * prefactor_spin;
+               const double d1 = diagram1( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], workmem );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_k, orb_i, orb_i,  4 * d1 );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_k, orb_i, -2 * d1 );
             }
          }
       }
       
-      const int upperbound2 = orb_i * ( L - 1 - orb_i );
-      #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
-      #else
-         #pragma omp for schedule(static) nowait
-      #endif
-      for (int global = 0; global < upperbound2; global++){
-         const int orb_j = global % orb_i;
-         const int orb_k = orb_i + 1 + ( global / orb_i );
-         if ( book->gIrrep( orb_j ) == book->gIrrep( orb_k )){
-            #ifdef CHEMPS2_MPI_COMPILATION
-            if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) ) //Everyone owns the L-tensors --> task division based on ABSigma-tensor ownership
-            #endif
-            {
-               const double d2 = diagram2( denT, Ltensors[orb_i-1][orb_i-1-orb_j], Ltensors[orb_i][orb_k-1-orb_i], workmem, workmem2 ) * prefactor_spin;
-               set_dmrg_index( orb_j, orb_i, orb_i, orb_k, orb_i, orb_i, 2 * d2 );
-               set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_k, orb_i,   - d2 );
-            }
-         }
-      }
-      
-      /*for (int j_index=theindex+1; j_index<L; j_index++){
-         for (int k_index=j_index; k_index<L; k_index++){*/
       const int triangle3   = L - orb_i - 1;
       const int upperbound3 = (triangle3*(triangle3+1))/2;
       #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
@@ -262,13 +236,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
          const int col = global - ((triangle3-row)*(triangle3-1-row))/2;
          const int orb_j = orb_i + 1 + row;
          const int orb_k = orb_j + col;
-         //cout << orb_i << " <  " << orb_j << " <= " << orb_k << endl;
          if ( book->gIrrep( orb_j ) == book->gIrrep( orb_k )){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_cdf( L, orb_j, orb_k ) )
             #endif
             {
-               const double d3 = diagram3( denT, F0tensors[orb_i][orb_k-orb_j][orb_j-1-orb_i], workmem ) * prefactor_spin;
+               const double d3 = diagram3( denT, F0tensors[orb_i][orb_k-orb_j][orb_j-1-orb_i], workmem );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_k, orb_i, orb_i,  4 * d3 );
                set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_k, orb_i, -2 * d3 );
             }
@@ -278,7 +251,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       const int upperbound4 = ( orb_i * ( orb_i+1 ) * ( orb_i + 2 ) ) / 6;
       int jkl[] = { 0, 0, 0 };
       #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
@@ -298,22 +271,22 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                const int cnt2 = orb_l - orb_k;
                const int cnt3 = orb_i - 1 - orb_l;
                if ( cnt2 > 0 ){
-                  const double d4 =                        diagram4_5_6_7_8_9( denT, dm3_b_J0_doublet[cnt1][cnt2][cnt3], workmem, 'B' ) * prefactor_spin;
-                  const double d5 = (( cnt1 == 0 ) ? 0.0 : diagram4_5_6_7_8_9( denT, dm3_b_J1_doublet[cnt1][cnt2][cnt3], workmem, 'B' ) * prefactor_spin);
+                  const double d4 =                        diagram4_5_6_7_8_9( denT, dm3_b_J0_doublet[cnt1][cnt2][cnt3], workmem, 'B' );
+                  const double d5 = (( cnt1 == 0 ) ? 0.0 : diagram4_5_6_7_8_9( denT, dm3_b_J1_doublet[cnt1][cnt2][cnt3], workmem, 'B' ));
                   set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_i, d4 + d5 );
                   set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_i, d4 - d5 );
                   set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_i, orb_l, -2 * d4 );
                }
                if ( cnt1 + cnt2 > 0 ){
-                  const double d6 = diagram4_5_6_7_8_9( denT, dm3_c_J0_doublet[cnt1][cnt2][cnt3], workmem, 'C' ) * prefactor_spin;
-                  const double d7 = diagram4_5_6_7_8_9( denT, dm3_c_J1_doublet[cnt1][cnt2][cnt3], workmem, 'C' ) * prefactor_spin;
+                  const double d6 = diagram4_5_6_7_8_9( denT, dm3_c_J0_doublet[cnt1][cnt2][cnt3], workmem, 'C' );
+                  const double d7 = diagram4_5_6_7_8_9( denT, dm3_c_J1_doublet[cnt1][cnt2][cnt3], workmem, 'C' );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_i, -2 * d6 );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_i, d6 - d7 );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_i, orb_k, d6 + d7 );
                }
                {
-                  const double d8 = diagram4_5_6_7_8_9( denT, dm3_d_J0_doublet[cnt1][cnt2][cnt3], workmem, 'D' ) * prefactor_spin;
-                  const double d9 = diagram4_5_6_7_8_9( denT, dm3_d_J1_doublet[cnt1][cnt2][cnt3], workmem, 'D' ) * prefactor_spin;
+                  const double d8 = diagram4_5_6_7_8_9( denT, dm3_d_J0_doublet[cnt1][cnt2][cnt3], workmem, 'D' );
+                  const double d9 = diagram4_5_6_7_8_9( denT, dm3_d_J1_doublet[cnt1][cnt2][cnt3], workmem, 'D' );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_j, orb_i, orb_i, -2 * d8 );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_j, orb_i, d8 + d9 );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_i, orb_j, d8 - d9 );
@@ -324,7 +297,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       
       const int upperbound10 = upperbound1 * ( L - orb_i - 1 );
       #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
@@ -338,9 +311,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) )
             #endif
             {
-               const double d10 = diagram10( denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+               const double d10 = diagram10( denT, S0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 );
                const double d11 = (( orb_j == orb_k ) ? 0.0 :
-                                  diagram11( denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin );
+                                  diagram11( denT, S1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ));
                set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_i, d10 + d11 );
                set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_i, d10 - d11 );
                set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_i, orb_l, - 2 * d10 );
@@ -351,15 +324,15 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             #endif
             {
                {
-                  const double d12 = diagram12( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin;
-                  const double d13 = diagram13( denT, F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+                  const double d12 = diagram12( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 );
+                  const double d13 = diagram13( denT, F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_i, - 2 * d12 );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_i, d12 - d13 );
                   set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_i, orb_k, d12 + d13 );
                }
                if ( orb_j < orb_k ){
-                  const double d14 = diagram14( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin;
-                  const double d15 = diagram15( denT, F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+                  const double d14 = diagram14( denT, F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 );
+                  const double d15 = diagram15( denT, F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], Ltensors[orb_i][orb_l-1-orb_i], workmem, workmem2 );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_j, orb_i, orb_i, - 2 * d14 );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_j, orb_i, d14 - d15 );
                   set_dmrg_index( orb_k, orb_l, orb_i, orb_i, orb_i, orb_j, d14 + d15 );
@@ -370,7 +343,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       
       const int upperbound16 = upperbound3 * orb_i;
       #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
+         #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
@@ -386,9 +359,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             if ( MPIRANK == MPIchemps2::owner_absigma( orb_m, orb_n ) )
             #endif
             {
-               const double d16 = diagram16( denT, Ltensors[orb_i-1][orb_i-1-orb_j], S0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+               const double d16 = diagram16( denT, Ltensors[orb_i-1][orb_i-1-orb_j], S0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
                const double d17 = (( orb_m == orb_n ) ? 0.0 :
-                                  diagram17( denT, Ltensors[orb_i-1][orb_i-1-orb_j], S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin );
+                                  diagram17( denT, Ltensors[orb_i-1][orb_i-1-orb_j], S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ));
                set_dmrg_index( orb_m, orb_n, orb_i, orb_j, orb_i, orb_i, d16 - d17 );
                set_dmrg_index( orb_m, orb_n, orb_i, orb_i, orb_j, orb_i, d16 + d17 );
                set_dmrg_index( orb_m, orb_n, orb_i, orb_i, orb_i, orb_j, - 2 * d16 );
@@ -399,15 +372,15 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             #endif
             {
                {
-                  const double d18 = diagram18( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin;
-                  const double d19 = diagram19( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+                  const double d18 = diagram18( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
+                  const double d19 = diagram19( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
                   set_dmrg_index( orb_j, orb_m, orb_i, orb_n, orb_i, orb_i, d18 + d19 );
                   set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_n, orb_i, - 2 * d18 );
                   set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_i, orb_n, d18 - d19 );
                }
                if ( orb_m < orb_n ){
-                  const double d20 = diagram20( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin;
-                  const double d21 = diagram21( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ) * prefactor_spin;
+                  const double d20 = diagram20( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F0tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
+                  const double d21 = diagram21( denT, Ltensors[orb_i-1][orb_i-1-orb_j], F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
                   set_dmrg_index( orb_j, orb_n, orb_i, orb_m, orb_i, orb_i, d20 + d21 );
                   set_dmrg_index( orb_j, orb_n, orb_i, orb_i, orb_m, orb_i, - 2 * d20 );
                   set_dmrg_index( orb_j, orb_n, orb_i, orb_i, orb_i, orb_m, d20 - d21 );
@@ -433,6 +406,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
              *  Make sure every process has the relevant S_mn and F_mn  *
              ************************************************************/
             #ifdef CHEMPS2_MPI_COMPILATION
+            #pragma omp barrier // Everyone needs to be done before tensors are created and communicated
             #pragma omp single
             if ( orb_m > orb_i + 1 ){ // All processes own Fx/Sx[ index ][ n - m ][ m - i - 1 == 0 ]
                const int own_S_mn = MPIchemps2::owner_absigma( orb_m, orb_n );
@@ -486,7 +460,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                fill_tens_34_35_37_38( denT, tens_34_40, tens_35_41, tens_37_44, tens_38_43, F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
          
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -500,13 +474,13 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                      #endif
                      {
                         if ( orb_m < orb_n ){
-                           const double d31 = tens_29_33->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d32 = tens_30_32->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d42 = tens_36_42->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d40 = tens_34_40->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d41 = tens_35_41->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d44 = tens_37_44->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                           const double d43 = tens_38_43->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
+                           const double d31 = tens_29_33->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d32 = tens_30_32->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d42 = tens_36_42->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d40 = tens_34_40->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d41 = tens_35_41->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d44 = tens_37_44->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                           const double d43 = tens_38_43->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
                            set_dmrg_index( orb_j, orb_n, orb_i, orb_k, orb_m, orb_i,   4*d31 );
                            set_dmrg_index( orb_j, orb_n, orb_i, orb_m, orb_k, orb_i, -2*(d31 + d32 + d40) );
                            set_dmrg_index( orb_j, orb_n, orb_i, orb_k, orb_i, orb_m, -2*(d31 + d41) );
@@ -514,13 +488,13 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_j, orb_n, orb_i, orb_i, orb_k, orb_m,     d31 + d32 + d41 + d42 + d44 );
                            set_dmrg_index( orb_j, orb_n, orb_i, orb_i, orb_m, orb_k, -2*(d31 + d42) );
                         }
-                        const double d29 = tens_29_33->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d30 = tens_30_32->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d36 = tens_36_42->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d34 = tens_34_40->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d35 = tens_35_41->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d37 = tens_37_44->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                        const double d38 = tens_38_43->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
+                        const double d29 = tens_29_33->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d30 = tens_30_32->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d36 = tens_36_42->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d34 = tens_34_40->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d35 = tens_35_41->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d37 = tens_37_44->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                        const double d38 = tens_38_43->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
                         set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_n, orb_i,   4*d29 );
                         set_dmrg_index( orb_j, orb_m, orb_i, orb_n, orb_k, orb_i, -2*(d29 + d30 + d34) );
                         set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_i, orb_n, -2*(d29 + d35) );
@@ -552,7 +526,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                if ( orb_m != orb_n ){ fill_tens_50_52( denT, tens_50_52, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem ); }
             
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -566,14 +540,14 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                      #endif
                      {
                         if ( orb_j < orb_k ){
-                           const double d51 =                       tens_49_51->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin;
-                           const double d52 = ((orb_m==orb_n)?0.0 : tens_50_52->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ) * prefactor_spin);
+                           const double d51 =                       tens_49_51->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' );
+                           const double d52 = ((orb_m==orb_n)?0.0 : tens_50_52->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'N' ));
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_j, orb_i, orb_i, - 2 * d51 );
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_i, orb_j, orb_i, d51 + d52 );
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_i, orb_i, orb_j, d51 - d52 );
                         }
-                        const double d49 =                       tens_49_51->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin;
-                        const double d50 = ((orb_m==orb_n)?0.0 : tens_50_52->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ) * prefactor_spin);
+                        const double d49 =                       tens_49_51->inproduct( F0tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' );
+                        const double d50 = ((orb_m==orb_n)?0.0 : tens_50_52->inproduct( F1tensors[orb_i-1][orb_k-orb_j][orb_i-1-orb_k], 'T' ));
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_k, orb_i, orb_i, - 2 * d49 );
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_i, orb_k, orb_i, d49 + d50 );
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_i, orb_i, orb_k, d49 - d50 );
@@ -603,7 +577,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                                 fill_tens_25_26_27( denT, tens_25, tens_26, tens_27, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ); }
             
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -617,12 +591,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                      #endif
                      {
                         const int cnt1   = orb_k - orb_j;
-                        const double d22 =                                   tens_22->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
-                        const double d23 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_23->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
-                        const double d25 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_25->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
-                        const double d26 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_26->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
-                        const double d27 = (            (orb_m==orb_n) ?0.0: tens_27->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
-                        const double d28 = ( (cnt1==0)                 ?0.0: tens_28->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d22 =                                   tens_22->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N');
+                        const double d23 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_23->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
+                        const double d25 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_25->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
+                        const double d26 = (((cnt1==0)||(orb_m==orb_n))?0.0: tens_26->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
+                        const double d27 = (            (orb_m==orb_n) ?0.0: tens_27->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
+                        const double d28 = ( (cnt1==0)                 ?0.0: tens_28->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
                         set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_n, orb_i,  2*d22 + 2*d23 + d25             );
                         set_dmrg_index( orb_j, orb_k, orb_i, orb_n, orb_m, orb_i,  2*d22 - 2*d23 - d25             );
                         set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_n,   -d22 -   d23 + d26 + d27 + d28 );
@@ -658,7 +632,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                
             
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -673,14 +647,14 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                      {
                         const int cnt1 = orb_k - orb_j;
                         if ( orb_m < orb_n ){
-                           const double d47 =                        tens_47->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
-                           const double d48 = (( cnt1 == 0 ) ? 0.0 : tens_48->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                           const double d47 =                        tens_47->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N');
+                           const double d48 = (( cnt1 == 0 ) ? 0.0 : tens_48->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_m, orb_i, orb_i, d47 + d48 );
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_m, orb_i, d47 - d48 );
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_i, orb_m,  -2 * d47 );
                         }
-                        const double d45 =                       tens_45->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin;
-                        const double d46 = (( cnt1 == 0 ) ? 0.0: tens_46->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N')*prefactor_spin);
+                        const double d45 =                       tens_45->inproduct(S0tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N');
+                        const double d46 = (( cnt1 == 0 ) ? 0.0: tens_46->inproduct(S1tensors[orb_i-1][cnt1][orb_i-1-orb_k],'N'));
                         set_dmrg_index( orb_j, orb_k, orb_m, orb_n, orb_i, orb_i, d45 + d46 );
                         set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_n, orb_i, d45 - d46 );
                         set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_n,  -2 * d45 );
@@ -726,7 +700,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                if ( orb_m != orb_n ){ fill_a_S1( denT, a_S1_doublet, a_S1_quartet, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ); }
                
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -744,13 +718,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                         const int cnt1 = orb_k - orb_j;
                         const int cnt2 = orb_l - orb_k;
                         const int cnt3 = orb_i - 1 - orb_l;
-                        const double sq3 = sqrt(3.0);
                         if ( cnt1 + cnt2 > 0 ){
-                           const double d90_95 =                                        a_S0_doublet->contract(dm3_a_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d93_98 = (                 (cnt1==0) ?0.0:  sq3*a_S0_doublet->contract(dm3_a_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d91_96 = (((orb_n==orb_m)||(cnt1==0))?0.0:      a_S1_doublet->contract(dm3_a_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d94_99 = ( (orb_n==orb_m)            ?0.0: -sq3*a_S1_doublet->contract(dm3_a_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d92_97 = (((orb_n==orb_m)||(cnt1==0))?0.0:      a_S1_quartet->contract(dm3_a_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                           const double d90_95 =                                        a_S0_doublet->contract(dm3_a_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d93_98 = (                 (cnt1==0) ?0.0:  sq3*a_S0_doublet->contract(dm3_a_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d91_96 = (((orb_n==orb_m)||(cnt1==0))?0.0:      a_S1_doublet->contract(dm3_a_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d94_99 = ( (orb_n==orb_m)            ?0.0: -sq3*a_S1_doublet->contract(dm3_a_J0_doublet[cnt1][cnt2][cnt3]));
+                           const double d92_97 = (((orb_n==orb_m)||(cnt1==0))?0.0:      a_S1_quartet->contract(dm3_a_J1_quartet[cnt1][cnt2][cnt3]));
                            set_dmrg_index( orb_j, orb_k, orb_l, orb_m, orb_n, orb_i, -2*d90_95 + 2*d91_96 + d92_97 );
                            set_dmrg_index( orb_j, orb_k, orb_l, orb_n, orb_m, orb_i, -2*d90_95 - 2*d91_96 - d92_97 );
                            set_dmrg_index( orb_j, orb_k, orb_l, orb_m, orb_i, orb_n,    d90_95 +   d91_96 - d92_97 + d93_98 + d94_99 );
@@ -780,7 +753,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                if ( orb_m != orb_n ){ fill_bcd_S1( denT, bcd_S1_doublet, bcd_S1_quartet, S1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 ); }
                
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -798,13 +771,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                         const int cnt1 = orb_k - orb_j;
                         const int cnt2 = orb_l - orb_k;
                         const int cnt3 = orb_i - 1 - orb_l;
-                        const double sq3 = sqrt(3.0);
                         if ( cnt2 > 0 ){ // dm3_b if NOT k==l
-                           const double d120_125 =                                        bcd_S0_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d124_129 = (                 (cnt1==0) ?0.0:  sq3*bcd_S0_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d123_128 = ( (orb_n==orb_m)            ?0.0:  sq3*bcd_S1_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d121_126 = (((orb_n==orb_m)||(cnt1==0))?0.0:      bcd_S1_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d122_127 = (((orb_n==orb_m)||(cnt1==0))?0.0:      bcd_S1_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                           const double d120_125 =                                        bcd_S0_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d124_129 = (                 (cnt1==0) ?0.0:  sq3*bcd_S0_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d123_128 = ( (orb_n==orb_m)            ?0.0:  sq3*bcd_S1_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]));
+                           const double d121_126 = (((orb_n==orb_m)||(cnt1==0))?0.0:      bcd_S1_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d122_127 = (((orb_n==orb_m)||(cnt1==0))?0.0:      bcd_S1_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3]));
                            set_dmrg_index( orb_l, orb_m, orb_n, orb_j, orb_k, orb_i,  -d120_125 + 3*d121_126 +   d123_128 - d124_129 );
                            set_dmrg_index( orb_l, orb_m, orb_n, orb_k, orb_j, orb_i,  -d120_125 - 3*d121_126 +   d123_128 + d124_129 );
                            set_dmrg_index( orb_l, orb_m, orb_n, orb_j, orb_i, orb_k,  -d120_125 - 3*d121_126 -   d123_128 - d124_129 );
@@ -813,11 +785,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_l, orb_m, orb_n, orb_i, orb_k, orb_j, 2*d120_125 - 2*d121_126 - 2*d122_127 );
                         }
                         if ( cnt1 + cnt2 > 0 ){ // dm3_c if NOT j==k==l
-                           const double d110_115 =                           bcd_S0_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d112_117 =                      -sq3*bcd_S0_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d111_116 = ((orb_n==orb_m)?0.0: -sq3*bcd_S1_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d113_118 = ((orb_n==orb_m)?0.0:      bcd_S1_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d114_119 = ((orb_n==orb_m)?0.0:   -2*bcd_S1_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                           const double d110_115 =                           bcd_S0_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d112_117 =                      -sq3*bcd_S0_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]);
+                           const double d111_116 = ((orb_n==orb_m)?0.0: -sq3*bcd_S1_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]));
+                           const double d113_118 = ((orb_n==orb_m)?0.0:      bcd_S1_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d114_119 = ((orb_n==orb_m)?0.0:   -2*bcd_S1_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3]));
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_j, orb_l, orb_i, 2*d110_115 + 2*d111_116 );
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_l, orb_j, orb_i,  -d110_115 -   d111_116 - d112_117 - 3*d113_118 );
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_j, orb_i, orb_l, 2*d110_115 - 2*d111_116 );
@@ -826,11 +798,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_k, orb_m, orb_n, orb_i, orb_l, orb_j,  -d110_115 -   d111_116 + d112_117 -   d113_118 - d114_119 );
                         }
                         // dm3_d for all j <= k <= l
-                        const double d100_105 =                                       -bcd_S0_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d102_107 =                                   -sq3*bcd_S0_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d101_106 = ( (orb_n==orb_m)            ?0.0:  sq3*bcd_S1_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                        const double d103_108 = ( (orb_n==orb_m)            ?0.0:      bcd_S1_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                        const double d104_109 = (((orb_n==orb_m)||(cnt2==0))?0.0:    2*bcd_S1_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                        const double d100_105 =                                       -bcd_S0_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]);
+                        const double d102_107 =                                   -sq3*bcd_S0_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]);
+                        const double d101_106 = ( (orb_n==orb_m)            ?0.0:  sq3*bcd_S1_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]));
+                        const double d103_108 = ( (orb_n==orb_m)            ?0.0:      bcd_S1_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]));
+                        const double d104_109 = (((orb_n==orb_m)||(cnt2==0))?0.0:    2*bcd_S1_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3]));
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_k, orb_l, orb_i, 2*d100_105 + 2*d101_106 );
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_l, orb_k, orb_i,  -d100_105 -   d101_106 - d102_107 - 3*d103_108 );
                         set_dmrg_index( orb_j, orb_m, orb_n, orb_k, orb_i, orb_l, 2*d100_105 - 2*d101_106 );
@@ -847,9 +819,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             
             }
             
-            /****************************************
-             *  3-1-2 : contributions F0 transpose  *
-             ****************************************/
+            /***************************************
+             *  3-1-2 : contributions F transpose  *
+             ***************************************/
             if ( counter_jkl > 0 ){
             
                Tensor3RDM * F0_T_doublet = new Tensor3RDM( orb_i, -2, 1, 1, irrep_imn, true, book );
@@ -859,7 +831,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                fill_F1_T( denT, F1_T_doublet, F1_T_quartet, F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
                
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -877,13 +849,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                         const int cnt1 = orb_k - orb_j;
                         const int cnt2 = orb_l - orb_k;
                         const int cnt3 = orb_i - 1 - orb_l;
-                        const double sq3 = sqrt(3.0);
                         if ( cnt2 > 0 ){ // dm3_b if NOT k==l
-                           const double d130_135 =                      F0_T_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d131_136 = ((cnt1==0)?0.0:  sq3*F0_T_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d132_137 =                  sq3*F1_T_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d133_138 = ((cnt1==0)?0.0:      F1_T_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d134_139 = ((cnt1==0)?0.0:      F1_T_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                           const double d130_135 =                      F0_T_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d131_136 = ((cnt1==0)?0.0:  sq3*F0_T_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d132_137 =                  sq3*F1_T_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d133_138 = ((cnt1==0)?0.0:      F1_T_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d134_139 = ((cnt1==0)?0.0:      F1_T_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3]));
                            set_dmrg_index( orb_j, orb_k, orb_m, orb_l, orb_n, orb_i,    d130_135 +   d131_136 + d132_137 + 3*d133_138 );
                            set_dmrg_index( orb_j, orb_k, orb_m, orb_n, orb_l, orb_i,    d130_135 -   d131_136 + d132_137 - 3*d133_138 );
                            set_dmrg_index( orb_j, orb_k, orb_m, orb_l, orb_i, orb_n, -2*d130_135 - 2*d131_136 );
@@ -892,11 +863,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_n, orb_l,    d130_135 -   d131_136 - d132_137 -   d133_138 - 2*d134_139 );
                         }
                         if ( cnt1 + cnt2 > 0 ){ // dm3_c if NOT j==k==l
-                           const double d150_155 =      F0_T_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d151_156 = -sq3*F0_T_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d152_157 =  sq3*F1_T_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d153_158 =      F1_T_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d154_159 =     -F1_T_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin;
+                           const double d150_155 =      F0_T_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d151_156 = -sq3*F0_T_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]);
+                           const double d152_157 =  sq3*F1_T_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d153_158 =      F1_T_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]);
+                           const double d154_159 =     -F1_T_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3]);
                            set_dmrg_index( orb_j, orb_l, orb_m, orb_k, orb_n, orb_i, -2*d150_155 - 2*d152_157 );
                            set_dmrg_index( orb_j, orb_l, orb_m, orb_n, orb_k, orb_i,    d150_155 + d151_156 + d152_157 - 3*d153_158 );
                            set_dmrg_index( orb_j, orb_l, orb_m, orb_k, orb_i, orb_n,  4*d150_155 );
@@ -905,11 +876,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_n, orb_k,    d150_155 + d151_156 + d152_157 + d153_158 - 2*d154_159 );
                         }
                         // dm3_d for all j <= k <= l
-                        const double d170_175 =                 -F0_T_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d171_176 =             -sq3*F0_T_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d172_177 =             -sq3*F1_T_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d173_178 =                  F1_T_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d174_179 = ((cnt2==0)?0.0:  F1_T_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                        const double d170_175 =                -F0_T_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]);
+                        const double d171_176 =            -sq3*F0_T_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]);
+                        const double d172_177 =            -sq3*F1_T_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]);
+                        const double d173_178 =                 F1_T_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]);
+                        const double d174_179 = ((cnt2==0)?0.0: F1_T_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3]));
                         set_dmrg_index( orb_k, orb_l, orb_m, orb_j, orb_n, orb_i, -2*d170_175 - 2*d172_177 );
                         set_dmrg_index( orb_k, orb_l, orb_m, orb_n, orb_j, orb_i,    d170_175 + d171_176 + d172_177 - 3*d173_178 );
                         set_dmrg_index( orb_k, orb_l, orb_m, orb_j, orb_i, orb_n,  4*d170_175 );
@@ -926,9 +897,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             
             }
             
-            /**************************************
-             *  3-1-2 : contributions F0 regular  *
-             **************************************/
+            /*************************************
+             *  3-1-2 : contributions F regular  *
+             *************************************/
             if (( orb_m != orb_n ) && ( counter_jkl > 0 )){
             
                Tensor3RDM * F0_doublet = new Tensor3RDM( orb_i, -2, 1, 1, irrep_imn, true, book );
@@ -938,7 +909,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                fill_F1( denT, F1_doublet, F1_quartet, F1tensors[orb_i][orb_n-orb_m][orb_m-1-orb_i], workmem, workmem2 );
                
                #ifdef CHEMPS2_MPI_COMPILATION
-                  #pragma omp for schedule(dynamic) // Wait after this for loop --> with MPI certain terms will be deleted
+                  #pragma omp for schedule(dynamic) nowait
                #else
                   #pragma omp for schedule(static) nowait
                #endif
@@ -956,13 +927,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                         const int cnt1 = orb_k - orb_j;
                         const int cnt2 = orb_l - orb_k;
                         const int cnt3 = orb_i - 1 - orb_l;
-                        const double sq3 = sqrt(3.0);
                         if ( cnt2 > 0 ){ // dm3_b if NOT k==l
-                           const double d140_145 =                      F0_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d141_146 = ((cnt1==0)?0.0:  sq3*F0_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d142_147 =                  sq3*F1_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d143_148 = ((cnt1==0)?0.0:      F1_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin);
-                           const double d144_149 = ((cnt1==0)?0.0:      F1_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                           const double d140_145 =                      F0_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d141_146 = ((cnt1==0)?0.0:  sq3*F0_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d142_147 =                  sq3*F1_doublet->contract(dm3_b_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d143_148 = ((cnt1==0)?0.0:      F1_doublet->contract(dm3_b_J1_doublet[cnt1][cnt2][cnt3]));
+                           const double d144_149 = ((cnt1==0)?0.0:      F1_quartet->contract(dm3_b_J1_quartet[cnt1][cnt2][cnt3]));
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_l, orb_m, orb_i,    d140_145 +   d141_146 + d142_147 + 3*d143_148 );
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_m, orb_l, orb_i,    d140_145 -   d141_146 + d142_147 - 3*d143_148 );
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_l, orb_i, orb_m, -2*d140_145 - 2*d141_146 );
@@ -971,11 +941,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_j, orb_k, orb_n, orb_i, orb_m, orb_l,    d140_145 -   d141_146 - d142_147 -   d143_148 - 2*d144_149 );
                         }
                         if ( cnt1 + cnt2 > 0 ){ // dm3_c if NOT j==k==l
-                           const double d160_165 =      F0_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d161_166 = -sq3*F0_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d162_167 =  sq3*F1_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d163_168 =      F1_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                           const double d164_169 =     -F1_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin;
+                           const double d160_165 =      F0_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d161_166 = -sq3*F0_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]);
+                           const double d162_167 =  sq3*F1_doublet->contract(dm3_c_J0_doublet[cnt1][cnt2][cnt3]);
+                           const double d163_168 =      F1_doublet->contract(dm3_c_J1_doublet[cnt1][cnt2][cnt3]);
+                           const double d164_169 =     -F1_quartet->contract(dm3_c_J1_quartet[cnt1][cnt2][cnt3]);
                            set_dmrg_index( orb_j, orb_l, orb_n, orb_k, orb_m, orb_i, -2*d160_165 - 2*d162_167 );
                            set_dmrg_index( orb_j, orb_l, orb_n, orb_m, orb_k, orb_i,    d160_165 + d161_166 + d162_167 - 3*d163_168 );
                            set_dmrg_index( orb_j, orb_l, orb_n, orb_k, orb_i, orb_m,  4*d160_165 );
@@ -984,11 +954,11 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                            set_dmrg_index( orb_j, orb_l, orb_n, orb_i, orb_m, orb_k,    d160_165 + d161_166 + d162_167 + d163_168 - 2*d164_169 );
                         }
                         // dm3_d for all j <= k <= l
-                        const double d180_185 =                 -F0_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d181_186 =             -sq3*F0_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d182_187 =             -sq3*F1_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d183_188 =                  F1_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3])*prefactor_spin;
-                        const double d184_189 = ((cnt2==0)?0.0:  F1_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3])*prefactor_spin);
+                        const double d180_185 =                 -F0_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]);
+                        const double d181_186 =             -sq3*F0_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]);
+                        const double d182_187 =             -sq3*F1_doublet->contract(dm3_d_J0_doublet[cnt1][cnt2][cnt3]);
+                        const double d183_188 =                  F1_doublet->contract(dm3_d_J1_doublet[cnt1][cnt2][cnt3]);
+                        const double d184_189 = ((cnt2==0)?0.0:  F1_quartet->contract(dm3_d_J1_quartet[cnt1][cnt2][cnt3]));
                         set_dmrg_index( orb_k, orb_l, orb_n, orb_j, orb_m, orb_i, -2*d180_185 - 2*d182_187 );
                         set_dmrg_index( orb_k, orb_l, orb_n, orb_m, orb_j, orb_i,    d180_185 + d181_186 + d182_187 - 3*d183_188 );
                         set_dmrg_index( orb_k, orb_l, orb_n, orb_j, orb_i, orb_m,  4*d180_185 );
@@ -1009,6 +979,7 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
              *  Clean up the double S_mn and F_mn  *
              ***************************************/
             #ifdef CHEMPS2_MPI_COMPILATION
+            #pragma omp barrier // Everyone needs to be done before tensors are deleted
             #pragma omp single
             if ( orb_m > orb_i + 1 ){ // All processes own Fx/Sx[ index ][ n - m ][ m - i - 1 == 0 ]
                const int own_S_mn = MPIchemps2::owner_absigma( orb_m, orb_n );
@@ -1023,127 +994,233 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
          }
       }
       
-      const int upperbound53 = upperbound4 * ( L - orb_i - 1 );
-      #ifdef CHEMPS2_MPI_COMPILATION
-         #pragma omp for schedule(dynamic)
-      #else
-         #pragma omp for schedule(static) nowait
-      #endif
-      for (int combined = 0; combined < upperbound53; combined++){
-         const int global = combined % upperbound4;
-         const int orb_m  = orb_i + 1 + ( combined / upperbound4 );
-         tripletrianglefunction( global, jkl );
-         const int orb_j = jkl[0];
-         const int orb_k = jkl[1];
-         const int orb_l = jkl[2];
-         if ( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ) == Irreps::directProd( book->gIrrep( orb_l ), book->gIrrep( orb_m ) ) ){
-            #ifdef CHEMPS2_MPI_COMPILATION
-            if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )
-            #endif
-            {
-               const int cnt1 = orb_k - orb_j;
-               const int cnt2 = orb_l - orb_k;
-               const int cnt3 = orb_i - 1 - orb_l;
-               if ( cnt1 + cnt2 > 0 ){
-                  diagram53_54( denT, dm3_a_J0_doublet[cnt1][cnt2][cnt3], dm3_a_J1_doublet[cnt1][cnt2][cnt3], Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2 );
-                  const double d53 =  workmem[0] * prefactor_spin;
-                  const double d54 = workmem2[0] * prefactor_spin;
-                  set_dmrg_index( orb_j, orb_k, orb_l, orb_m, orb_i, orb_i, d53 - d54 );
-                  set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_m, orb_i, d53 + d54 );
-                  set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_i, orb_m, - 2 * d53 );
-               }
-               Tensor3RDM * left[6];
-               double results[18];
-               left[0] = dm3_b_J0_doublet[cnt1][cnt2][cnt3];
-               left[1] = dm3_b_J1_doublet[cnt1][cnt2][cnt3];
-               left[2] = dm3_c_J0_doublet[cnt1][cnt2][cnt3];
-               left[3] = dm3_c_J1_doublet[cnt1][cnt2][cnt3];
-               left[4] = dm3_d_J0_doublet[cnt1][cnt2][cnt3];
-               left[5] = dm3_d_J1_doublet[cnt1][cnt2][cnt3];
-               {
-                  diagram55to60( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
-                  const double d55 = results[0] * prefactor_spin;
-                  const double d56 = results[1] * prefactor_spin;
-                  const double d57 = results[2] * prefactor_spin;
-                  const double d58 = results[3] * prefactor_spin;
-                  const double d59 = results[4] * prefactor_spin;
-                  const double d60 = results[5] * prefactor_spin;
-                  if ( cnt2 > 0 ){
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_l, orb_i, orb_i, d55 + d56 );
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_l, orb_i, d55 - d56 );
-                     set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_l, - 2 * d55 );
-                  }
-                  if ( cnt1 + cnt2 > 0 ){
-                     set_dmrg_index( orb_j, orb_l, orb_m, orb_k, orb_i, orb_i, - 2 * d57 );
-                     set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_k, orb_i, d57 - d58 );
-                     set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_i, orb_k, d57 + d58 );
-                  }
-                  set_dmrg_index( orb_k, orb_l, orb_m, orb_j, orb_i, orb_i, - 2 * d59 );
-                  set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_j, orb_i, d59 + d60 );
-                  set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_i, orb_j, d59 - d60 );
-               }
-               {
-                  diagram61_62_70_71_80_81( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
-                  const double d61 = results[0]  * prefactor_spin;
-                  const double d62 = results[1]  * prefactor_spin;
-                  const double d70 = results[2]  * prefactor_spin;
-                  const double d71 = results[3]  * prefactor_spin;
-                  const double d80 = results[4]  * prefactor_spin;
-                  const double d81 = results[5]  * prefactor_spin;
-                  diagramJ2half_3_2_1( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
-                  const double d63 = results[0]  * prefactor_spin;
-                  const double d64 = results[1]  * prefactor_spin;
-                  const double d65 = results[2]  * prefactor_spin;
-                  const double d66 = results[3]  * prefactor_spin;
-                  const double d67 = results[4]  * prefactor_spin;
-                  const double d68 = results[5]  * prefactor_spin;
-                  const double d72 = results[6]  * prefactor_spin;
-                  const double d73 = results[7]  * prefactor_spin;
-                  const double d74 = results[8]  * prefactor_spin;
-                  const double d75 = results[9]  * prefactor_spin;
-                  const double d76 = results[10] * prefactor_spin;
-                  const double d77 = results[11] * prefactor_spin;
-                  const double d82 = results[12] * prefactor_spin;
-                  const double d83 = results[13] * prefactor_spin;
-                  const double d84 = results[14] * prefactor_spin;
-                  const double d85 = results[15] * prefactor_spin;
-                  const double d86 = results[16] * prefactor_spin;
-                  const double d87 = results[17] * prefactor_spin;
-                  left[0] = dm3_b_J1_quartet[cnt1][cnt2][cnt3];
-                  left[1] = dm3_c_J1_quartet[cnt1][cnt2][cnt3];
-                  left[2] = dm3_d_J1_quartet[cnt1][cnt2][cnt3];
-                  diagramJ2oneandhalf_3_2_1( denT, left, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2, results );
-                  const double d69 = results[0] * prefactor_spin;
-                  const double d78 = results[1] * prefactor_spin;
-                  const double d79 = results[2] * prefactor_spin;
-                  const double d88 = results[3] * prefactor_spin;
-                  const double d89 = results[4] * prefactor_spin;
-                  if ( cnt2 > 0 ){
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_m, orb_i, -2*d61 - 2*d62 + d63 + d64 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_l, orb_i, -2*d61 + 2*d62 + d63 - d64 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_m, d61 + d62 + d65 + d66 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_l, d61 - d62 + d67 + d68 + d69 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_m, orb_l, d61 + d62 + d67 - d68 - d69 );
-                     set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_m, d61 - d62 + d65 - d66 );
-                  }
-                  if ( cnt1 + cnt2 > 0 ){
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_m, orb_i, 4*d70 + 2*d72 );
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_k, orb_i, -2*d70 + 2*d71 - d72 + d73 );
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_m, -2*d70 + 2*d74 );
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_i, orb_k, d70 - d71 - d74 + d76 + d78 );
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_m, d70 - d71 - d74 + d75 );
-                     set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_m, orb_k, -2*d70 - d72 + d77 + d79 );
-                  }
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_l, orb_i, 4*d80 + 2*d82 );
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_k, orb_i, -2*d80 - 2*d81 - d82 - d83 );
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_i, orb_l, -2*d80 + 2*d84 );
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_i, orb_k, d80 + d81 - d84 - d85 );
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_k, orb_l, d80 + d81 - d84 + d86 + d88 );
-                  set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_l, orb_k, -2*d80 - d82 + d87 + d89 );
-               }
-               
+      for ( int orb_m = orb_i+1; orb_m < L; orb_m++ ){
+      
+         const int irrep_m = book->gIrrep( orb_m );
+      
+         /**************************************************************
+          *  3-2-1 : Find out how many contributions each process has  *
+          **************************************************************/
+         int counter_jkl = 0;
+         for (int global = 0; global < upperbound4; global++){
+            tripletrianglefunction( global, jkl );
+            const int orb_j     = jkl[0];
+            const int orb_k     = jkl[1];
+            const int orb_l     = jkl[2];
+            const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
+            if ( irrep_jkl == irrep_m ){
+               #ifdef CHEMPS2_MPI_COMPILATION
+               if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK ){ counter_jkl++; }
+               #else
+               counter_jkl++;
+               #endif
             }
          }
+         
+         /********************
+          *  3-2-1 : part 1  *
+          ********************/
+         if ( counter_jkl > 0 ){
+         
+            Tensor3RDM *   A_T_doublet = new Tensor3RDM( orb_i, -2, 1, 3, irrep_m, true, book );
+            Tensor3RDM * BCD_T_doublet = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+               fill_53_54( denT,   A_T_doublet, Ltensors[orb_i][orb_m-1-orb_i], workmem );
+            fill_55_to_60( denT, BCD_T_doublet, Ltensors[orb_i][orb_m-1-orb_i], workmem );
+         
+            #ifdef CHEMPS2_MPI_COMPILATION
+               #pragma omp for schedule(dynamic) nowait
+            #else
+               #pragma omp for schedule(static) nowait
+            #endif
+            for ( int global = 0; global < upperbound4; global++ ){
+               tripletrianglefunction( global, jkl );
+               const int orb_j     = jkl[0];
+               const int orb_k     = jkl[1];
+               const int orb_l     = jkl[2];
+               const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
+               if ( irrep_jkl == irrep_m ){
+                  #ifdef CHEMPS2_MPI_COMPILATION
+                  if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )
+                  #endif
+                  {
+                     const int cnt1 = orb_k - orb_j;
+                     const int cnt2 = orb_l - orb_k;
+                     const int cnt3 = orb_i - 1 - orb_l;
+                     if ( cnt1 + cnt2 > 0 ){
+                        const double d53 =     A_T_doublet->contract( dm3_a_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d54 = sq3*A_T_doublet->contract( dm3_a_J1_doublet[cnt1][cnt2][cnt3] );
+                        set_dmrg_index( orb_j, orb_k, orb_l, orb_m, orb_i, orb_i, d53 - d54 );
+                        set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_m, orb_i, d53 + d54 );
+                        set_dmrg_index( orb_j, orb_k, orb_l, orb_i, orb_i, orb_m, - 2 * d53 );
+                     }
+                     if ( cnt2 > 0 ){
+                        const double d55 =     BCD_T_doublet->contract( dm3_b_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d56 = sq3*BCD_T_doublet->contract( dm3_b_J1_doublet[cnt1][cnt2][cnt3] );
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_l, orb_i, orb_i, d55 + d56 );
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_l, orb_i, d55 - d56 );
+                        set_dmrg_index( orb_j, orb_k, orb_m, orb_i, orb_i, orb_l, - 2 * d55 );
+                     }
+                     if ( cnt1 + cnt2 > 0 ){
+                        const double d57 =     BCD_T_doublet->contract( dm3_c_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d58 = sq3*BCD_T_doublet->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        set_dmrg_index( orb_j, orb_l, orb_m, orb_k, orb_i, orb_i, - 2 * d57 );
+                        set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_k, orb_i, d57 - d58 );
+                        set_dmrg_index( orb_j, orb_l, orb_m, orb_i, orb_i, orb_k, d57 + d58 );
+                     }
+                     const double d59 =     -BCD_T_doublet->contract( dm3_d_J0_doublet[cnt1][cnt2][cnt3] );
+                     const double d60 = -sq3*BCD_T_doublet->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     set_dmrg_index( orb_k, orb_l, orb_m, orb_j, orb_i, orb_i, - 2 * d59 );
+                     set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_j, orb_i, d59 + d60 );
+                     set_dmrg_index( orb_k, orb_l, orb_m, orb_i, orb_i, orb_j, d59 - d60 );
+                  }
+               }
+            }
+            
+            delete   A_T_doublet;
+            delete BCD_T_doublet;
+         
+         }
+         
+         /**************************************************************
+          *  1-4-1 : Find out how many contributions each process has  *
+          **************************************************************/
+         int counter_j = 0;
+         for ( int orb_j = 0; orb_j < orb_i; orb_j++ ){
+            const int irrep_j = book->gIrrep( orb_j );
+            if ( irrep_j == irrep_m ){
+               #ifdef CHEMPS2_MPI_COMPILATION
+               if ( MPIRANK == MPIchemps2::owner_q( L, orb_j ) ){ counter_j++; }
+               #else
+               counter_j++;
+               #endif
+            }
+         }
+         
+         /***********************
+          *  3-2-1 : part 2     *
+          *  1-4-1 : L^T - L^T  *
+          ***********************/
+         if (( counter_jkl > 0 ) || ( counter_j > 0 )){
+         
+            Tensor3RDM * tens_61 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_63 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_65 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_67 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_68 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_76 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_77 = new Tensor3RDM( orb_i, -2, 1, 1, irrep_m, true, book );
+            Tensor3RDM * tens_69 = new Tensor3RDM( orb_i, -2, 3, 1, irrep_m, true, book );
+            Tensor3RDM * tens_78 = new Tensor3RDM( orb_i, -2, 3, 1, irrep_m, true, book );
+            Tensor3RDM * tens_79 = new Tensor3RDM( orb_i, -2, 3, 1, irrep_m, true, book );
+            fill_61( denT, tens_61, Ltensors[orb_i][orb_m-1-orb_i], workmem );
+            fill_63_65( denT, tens_63, tens_65, tens_67, tens_68, tens_76, tens_77, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2 );
+            fill_69_78_79( denT, tens_69, tens_78, tens_79, Ltensors[orb_i][orb_m-1-orb_i], workmem, workmem2 );
+            
+            #ifdef CHEMPS2_MPI_COMPILATION
+               #pragma omp for schedule(dynamic) nowait
+            #else
+               #pragma omp for schedule(static) nowait
+            #endif
+            for ( int orb_j = 0; orb_j < orb_i; orb_j++ ){
+               const int irrep_j = book->gIrrep( orb_j );
+               if ( irrep_j == irrep_m ){
+                  #ifdef CHEMPS2_MPI_COMPILATION
+                  if ( MPIRANK == MPIchemps2::owner_q( L, orb_j ) ) //Everyone owns the L-tensors --> task division based on Q-tensor ownership
+                  #endif
+                  {
+                     const double d2 = sqrt( 2.0 ) * tens_61->inproduct( Ltensors[orb_i-1][orb_i-1-orb_j], 'N' );
+                     set_dmrg_index( orb_j, orb_i, orb_i, orb_m, orb_i, orb_i, 2 * d2 );
+                     set_dmrg_index( orb_j, orb_i, orb_i, orb_i, orb_m, orb_i,   - d2 );
+                  }
+               }
+            }
+      
+            #ifdef CHEMPS2_MPI_COMPILATION
+               #pragma omp for schedule(dynamic) nowait
+            #else
+               #pragma omp for schedule(static) nowait
+            #endif
+            for ( int global = 0; global < upperbound4; global++ ){
+               tripletrianglefunction( global, jkl );
+               const int orb_j     = jkl[0];
+               const int orb_k     = jkl[1];
+               const int orb_l     = jkl[2];
+               const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
+               if ( irrep_jkl == irrep_m ){
+                  #ifdef CHEMPS2_MPI_COMPILATION
+                  if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )
+                  #endif
+                  {
+                     const int cnt1 = orb_k - orb_j;
+                     const int cnt2 = orb_l - orb_k;
+                     const int cnt3 = orb_i - 1 - orb_l;
+                     if ( cnt2 > 0 ){
+                        const double d61 =     tens_61->contract( dm3_b_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d62 = sq3*tens_61->contract( dm3_b_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d63 =     tens_63->contract( dm3_b_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d64 = sq3*tens_63->contract( dm3_b_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d65 =     tens_65->contract( dm3_b_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d66 = sq3*tens_65->contract( dm3_b_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d67 =     tens_67->contract( dm3_b_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d68 =     tens_68->contract( dm3_b_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d69 =     tens_69->contract( dm3_b_J1_quartet[cnt1][cnt2][cnt3] );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_m, orb_i, -2*d61 - 2*d62 + d63 + d64 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_l, orb_i, -2*d61 + 2*d62 + d63 - d64 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_l, orb_i, orb_m, d61 + d62 + d65 + d66 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_m, orb_i, orb_l, d61 - d62 + d67 + d68 + d69 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_m, orb_l, d61 + d62 + d67 - d68 - d69 );
+                        set_dmrg_index( orb_j, orb_k, orb_i, orb_i, orb_l, orb_m, d61 - d62 + d65 - d66 );
+                     }
+                     if ( cnt1 + cnt2 > 0 ){
+                        const double d70 =      tens_61->contract( dm3_c_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d71 =  sq3*tens_61->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d72 =     -tens_63->contract( dm3_c_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d73 = -sq3*tens_63->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d74 =     -tens_65->contract( dm3_c_J0_doublet[cnt1][cnt2][cnt3] );
+                        const double d75 = -sq3*tens_65->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d76 =      tens_76->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d77 =      tens_77->contract( dm3_c_J1_doublet[cnt1][cnt2][cnt3] );
+                        const double d78 =      tens_78->contract( dm3_c_J1_quartet[cnt1][cnt2][cnt3] );
+                        const double d79 =      tens_79->contract( dm3_c_J1_quartet[cnt1][cnt2][cnt3] );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_m, orb_i, 4*d70 + 2*d72 );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_k, orb_i, -2*d70 + 2*d71 - d72 + d73 );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_k, orb_i, orb_m, -2*d70 + 2*d74 );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_m, orb_i, orb_k, d70 - d71 - d74 + d76 + d78 );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_k, orb_m, d70 - d71 - d74 + d75 );
+                        set_dmrg_index( orb_j, orb_l, orb_i, orb_i, orb_m, orb_k, -2*d70 - d72 + d77 + d79 );
+                     }
+                     const double d80 =     -tens_61->contract( dm3_d_J0_doublet[cnt1][cnt2][cnt3] );
+                     const double d81 = -sq3*tens_61->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     const double d82 =      tens_63->contract( dm3_d_J0_doublet[cnt1][cnt2][cnt3] );
+                     const double d83 =  sq3*tens_63->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     const double d84 =      tens_65->contract( dm3_d_J0_doublet[cnt1][cnt2][cnt3] );
+                     const double d85 =  sq3*tens_65->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     const double d86 =      tens_76->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     const double d87 =      tens_77->contract( dm3_d_J1_doublet[cnt1][cnt2][cnt3] );
+                     const double d88 =     -tens_78->contract( dm3_d_J1_quartet[cnt1][cnt2][cnt3] );
+                     const double d89 =     -tens_79->contract( dm3_d_J1_quartet[cnt1][cnt2][cnt3] );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_l, orb_i, 4*d80 + 2*d82 );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_k, orb_i, -2*d80 - 2*d81 - d82 - d83 );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_k, orb_i, orb_l, -2*d80 + 2*d84 );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_l, orb_i, orb_k, d80 + d81 - d84 - d85 );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_k, orb_l, d80 + d81 - d84 + d86 + d88 );
+                     set_dmrg_index( orb_j, orb_m, orb_i, orb_i, orb_l, orb_k, -2*d80 - d82 + d87 + d89 );
+                  }
+               }
+            }
+            
+            delete tens_61;
+            delete tens_63;
+            delete tens_65;
+            delete tens_67;
+            delete tens_68;
+            delete tens_69;
+            delete tens_76;
+            delete tens_77;
+            delete tens_78;
+            delete tens_79;
+         }
+      
       }
       
       delete [] workmem;
@@ -1151,6 +1228,17 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
    
    }
 
+}
+
+void CheMPS2::ThreeDM::correct_higher_multiplicities(){
+
+   if ( prob->gTwoS() != 0 ){
+      double alpha = 1.0 / ( prob->gTwoS() + 1.0 );
+      int length   = L*L*L*L*L*L;
+      int inc      = 1;
+      dscal_( &length, &alpha, elements, &inc );
+   }
+   
 }
 
 double CheMPS2::ThreeDM::diagram1(TensorT * denT, TensorF0 * denF0, double * workmem) const{
@@ -1989,465 +2077,6 @@ double CheMPS2::ThreeDM::diagram21(TensorT * denT, TensorL * denL, TensorF1 * de
    }
    
    return total;
-
-}
-
-double CheMPS2::ThreeDM::diagram2(TensorT * denT, TensorL * left, TensorL * right, double * workmem, double * workmem2) const{
-
-   assert( left->get_irrep() == right->get_irrep() );
-   const int orb_i = denT->gIndex();
-   
-   double total = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL+2, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int ILxIjxIk = Irreps::directProd( IL, left->get_irrep() );
-               
-               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIjxIk );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLprime, ILxIjxIk );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                     
-                     double * Tup    =  denT->gStorage( NL,   TwoSL,      IL,       NL+2, TwoSL,      IL       );
-                     double * Tdown  =  denT->gStorage( NL-1, TwoSLprime, ILxIjxIk, NL+1, TwoSLprime, ILxIjxIk );
-                     double * Lblock =  left->gStorage( NL-1, TwoSLprime, ILxIjxIk, NL,   TwoSL,      IL       );
-                     double * Rblock = right->gStorage( NL+1, TwoSLprime, ILxIjxIk, NL+2, TwoSL,      IL       );
-                     
-                     char trans   = 'T';
-                     char notrans = 'N';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup,   &dimLup, &alpha, Lblock,  &dimLdown, Tup,    &dimLup,   &beta, workmem,  &dimLdown );
-                     dgemm_( &notrans,   &trans, &dimLdown, &dimRdown, &dimRup, &alpha, workmem, &dimLdown, Rblock, &dimRdown, &beta, workmem2, &dimLdown );
-                     
-                     int length = dimLdown * dimRdown;
-                     int inc = 1;
-                     total += ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Tdown, &inc );
-
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   return total;
-
-}
-
-void CheMPS2::ThreeDM::diagram53_54(TensorT * denT, Tensor3RDM * left1, Tensor3RDM * left2, TensorL * right, double * workmem, double * workmem2) const{
-
-   assert( left1->get_irrep()  == right->get_irrep() );
-   assert( left1->get_two_j2() == 1                  );
-   assert( left1->get_nelec()  == 3                  );
-   if ( left2 != NULL ){
-      assert( left2->get_irrep()  == right->get_irrep() );
-      assert( left2->get_two_j2() == 1                  );
-      assert( left2->get_nelec()  == 3                  );
-   }
-   const int orb_i = denT->gIndex();
-   
-   double total1 = 0.0;
-   double total2 = 0.0;
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int Idown = Irreps::directProd( IL, right->get_irrep() );
-               
-               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-3, TwoSLdown, Idown );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSLdown, Idown );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                  
-                     double * Tup     =  denT->gStorage( NL,   TwoSL,     IL,    NL,   TwoSL,     IL    );
-                     double * Tdown   =  denT->gStorage( NL-3, TwoSLdown, Idown, NL-1, TwoSLdown, Idown );
-                     double * Rblock  = right->gStorage( NL-1, TwoSLdown, Idown, NL,   TwoSL,     IL    );
-                     
-                     char notrans = 'N';
-                     char trans   = 'T';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
-                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
-                     
-                     int length = dimLup * dimLdown;
-                     int inc    = 1;
-                     double * Lblock1 = left1->gStorage( NL-3, TwoSLdown, Idown, NL, TwoSL, IL );
-                     total1 -= ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Lblock1, &inc );
-                     if ( left2 != NULL ){
-                        double * Lblock2 = left2->gStorage( NL-3, TwoSLdown, Idown, NL, TwoSL, IL );
-                        total2 -= ( TwoSL + 1 ) * ddot_( &length, workmem2, &inc, Lblock2, &inc );
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-                         total1 *= sqrt( 0.5 * ( left1->get_two_j1() + 1 ) );
-   if ( left2 != NULL ){ total2 *= sqrt( 0.5 * ( left2->get_two_j1() + 1 ) ); }
-   workmem[0]  = total1;
-   workmem2[0] = total2;
-
-}
-
-void CheMPS2::ThreeDM::diagram55to60(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
-
-   for ( int cnt = 0; cnt < 6; cnt++ ){
-      if ( left[ cnt ] != NULL ){
-         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
-         assert( left[ cnt ]->get_two_j2() == 1 );
-         assert( left[ cnt ]->get_nelec()  == 1 );
-      }
-      results[ cnt ] = 0.0;
-   }
-   const int orb_i = denT->gIndex();
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int Idown = Irreps::directProd( IL, right->get_irrep() );
-               
-               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLdown, Idown );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLdown, Idown );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                  
-                     double * Tup    =  denT->gStorage( NL,   TwoSL,     IL,    NL,   TwoSL,     IL    );
-                     double * Tdown  =  denT->gStorage( NL-1, TwoSLdown, Idown, NL+1, TwoSLdown, Idown );
-                     double * Rblock = right->gStorage( NL,   TwoSL,     IL,    NL+1, TwoSLdown, Idown );
-                     
-                     char trans   = 'T';
-                     char notrans = 'N';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRup, &beta, workmem,  &dimLdown );
-                     dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup, &beta, workmem2, &dimLdown );
-                     
-                     int size = dimLup * dimLdown;
-                     int inc  = 1;
-                     const double factorBC = phase( TwoSL + 1 - TwoSLdown ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) );
-                     const double factorD  = ( TwoSLdown + 1 );
-                     for ( int cnt = 0; cnt < 6; cnt++ ){
-                        if ( left[ cnt ] != NULL ){
-                           results[ cnt ] += (( cnt < 4 ) ? factorBC : factorD )
-                                           * ddot_( &size, workmem2, &inc, left[ cnt ]->gStorage( NL-1, TwoSLdown, Idown, NL, TwoSL, IL ), &inc );
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   const double factorJ0 = sqrt( 0.5 );
-   const double factorJ1 = sqrt( 1.5 );
-   for ( int cnt = 0; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ0; } }
-   for ( int cnt = 1; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ1; } }
-
-}
-
-void CheMPS2::ThreeDM::diagram61_62_70_71_80_81(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
-
-   for ( int cnt = 0; cnt < 6; cnt++ ){
-      if ( left[ cnt ] != NULL ){
-         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
-         assert( left[ cnt ]->get_two_j2() == 1 );
-         assert( left[ cnt ]->get_nelec()  == 1 );
-      }
-      results[ cnt ] = 0.0;
-   }
-   const int orb_i = denT->gIndex();
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
-         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
-         
-            int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL );
-            int dimRup = book->gCurrentDim( orb_i+1, NL+2, TwoSL, IL );
-            
-            if (( dimLup > 0 ) && ( dimRup > 0 )){
-            
-               const int Idown = Irreps::directProd( IL, right->get_irrep() );
-               
-               for ( int TwoSLdown = TwoSL-1; TwoSLdown <= TwoSL+1; TwoSLdown+=2 ){
-                  
-                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLdown, Idown );
-                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLdown, Idown );
-                  
-                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
-                  
-                     double * Tup     =  denT->gStorage( NL,   TwoSL,     IL,    NL+2, TwoSL,     IL    );
-                     double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, Idown, NL+1, TwoSLdown, Idown );
-                     double * Rblock  = right->gStorage( NL+1, TwoSLdown, Idown, NL+2, TwoSL,     IL    );
-                     
-                     char notrans = 'N';
-                     char trans   = 'T';
-                     double alpha = 1.0;
-                     double beta  = 0.0; //set
-                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
-                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
-                     
-                     int size = dimLup * dimLdown;
-                     int inc  = 1;
-                     const double factorBC = ( TwoSL + 1 );
-                     const double factorD  = phase( TwoSL + 1 - TwoSLdown ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLdown + 1 ) );
-                     for ( int cnt = 0; cnt < 6; cnt++ ){
-                        if ( left[ cnt ] != NULL ){
-                           results[ cnt ] += (( cnt < 4 ) ? factorBC : factorD )
-                                           * ddot_( &size, workmem2, &inc, left[ cnt ]->gStorage( NL-1, TwoSLdown, Idown, NL, TwoSL, IL ), &inc );
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   const double factorJ0 = sqrt( 0.5 );
-   const double factorJ1 = sqrt( 1.5 );
-   for ( int cnt = 0; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ0; } }
-   for ( int cnt = 1; cnt < 6; cnt+=2 ){ if ( left[ cnt ] != NULL ){ results[ cnt ] *= factorJ1; } }
-
-}
-
-void CheMPS2::ThreeDM::diagramJ2half_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
-
-   for ( int cnt = 0; cnt < 6; cnt++ ){
-      if ( left[ cnt ] != NULL ){
-         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
-         assert( left[ cnt ]->get_two_j2() == 1 );
-         assert( left[ cnt ]->get_nelec()  == 1 );
-      }
-   }
-   for ( int cnt = 0; cnt < 18; cnt++ ){ results[ cnt ] = 0.0; }
-   const int orb_i = denT->gIndex();
-   const double sqrt_half      = sqrt(0.5);
-   const double sqrt_anderhalf = sqrt(1.5);
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
-         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
-         
-            const int IRup   = Irreps::directProd( ILup, book->gIrrep( orb_i ) );
-            const int ILdown = Irreps::directProd( ILup, right->get_irrep() );
-            const int IRdown = Irreps::directProd( IRup, right->get_irrep() );
-            
-            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
-            
-            if ( dimLup > 0 ){
-            
-               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
-            
-                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
-                  
-                  if ( dimRup > 0 ){
-                     
-                     for ( int TwoSLdown = TwoSLup-1; TwoSLdown <= TwoSLup+1; TwoSLdown+=2 ){
-                        
-                        int dimLdown = book->gCurrentDim( orb_i, NL-1, TwoSLdown, ILdown );
-                        
-                        if ( dimLdown > 0 ){
-                        
-                           for ( int TwoSRdown = TwoSRup-1; TwoSRdown <= TwoSRup+1; TwoSRdown+=2 ){
-                        
-                              int dimRdown = book->gCurrentDim( orb_i+1, NL, TwoSRdown, IRdown );
-                              
-                              if (( dimRdown > 0 ) && ( abs( TwoSLdown - TwoSRdown ) <= 1 )){
-                              
-                                 double * Tup     =  denT->gStorage( NL,   TwoSLup,   ILup,   NL+1, TwoSRup,   IRup   );
-                                 double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, ILdown, NL,   TwoSRdown, IRdown );
-                                 double * Rblock  = right->gStorage( NL,   TwoSRdown, IRdown, NL+1, TwoSRup,   IRup   );
-                                 
-                                 char notrans = 'N';
-                                 char trans   = 'T';
-                                 double alpha = 1.0;
-                                 double beta  = 0.0; //set
-                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
-                                 dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
-                                 
-                                 int size = dimLup * dimLdown;
-                                 int inc  = 1;
-                                 const double dm3_b_J0 = ((left[0] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[0]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_b_J1 = ((left[1] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[1]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_c_J0 = ((left[2] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[2]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_c_J1 = ((left[3] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[3]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_d_J0 = ((left[4] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[4]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_d_J1 = ((left[5] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[5]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 
-                                 const double acommon = sqrt( 1.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
-                                 const double wign_6j = gsl_sf_coupling_6j( TwoSLup, TwoSRup, 1, TwoSRdown, TwoSLdown, 1 );
-                                 const double factor1 = phase( TwoSLup + TwoSRdown + 2 ) * acommon * wign_6j;
-                                 const double factor2 = sqrt( 1.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * phase( TwoSLup - TwoSRdown );
-                                 const double factor3 = 2 * acommon
-                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSRdown )
-                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSLup   );
-                                 const double wigprod = gsl_sf_coupling_6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSRup   )
-                                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSLdown );
-                                 const double factor4 = 2 * acommon * wigprod
-                                                      * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown );
-                                 const double wign_9j = gsl_sf_coupling_9j( 1, 1, 2, TwoSLdown, TwoSLup, 1, TwoSRdown, TwoSRup, 1 );
-                                 const double factor5 = ( -2 ) * acommon * wign_9j;
-                                 
-                                 const double dcommon = sqrt( 1.0 * ( TwoSLdown + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
-                                 const double factor6 = dcommon * phase( TwoSLdown + TwoSRdown + 3 ) * wign_6j;
-                                 const double factor7 = sqrt( ( TwoSLdown + 1.0 ) / ( TwoSLup + 1.0 ) ) * ( TwoSRup + 1.0 ) * phase( TwoSLup + 1 - TwoSLdown );
-                                 const double factor8 = 2 * dcommon * wigprod * phase( TwoSRdown + 1 - TwoSRup );
-                                 const double factor9 = 2 * dcommon * wign_9j * phase( TwoSRdown + 1 - TwoSRup )
-                                                      * phase( TwoSLup + TwoSLdown + TwoSRup + TwoSRdown + 2 ); //Last phase for column swap wigner 9j
-                                 
-                                 
-                                 results[0]  += sqrt_half      * factor1         * dm3_b_J0;   // d63
-                                 results[1]  += sqrt_anderhalf * factor1         * dm3_b_J1;   // d64
-    if ( TwoSRdown == TwoSLup ){ results[2]  -= sqrt_half      * ( TwoSRup + 1 ) * dm3_b_J0;   // d65
-                                 results[3]  -= sqrt_anderhalf * ( TwoSRup + 1 ) * dm3_b_J1; } // d66
-    if ( TwoSRup == TwoSLdown ){ results[4]  += sqrt_half      * factor2         * dm3_b_J0; } // d67
-                                 results[5]  += sqrt_anderhalf * factor3         * dm3_b_J1;   // d68
-                                 
-                                 results[6]  -= sqrt_half      * factor1         * dm3_c_J0;   // d72
-                                 results[7]  -= sqrt_anderhalf * factor1         * dm3_c_J1;   // d73
-    if ( TwoSRdown == TwoSLup ){ results[8]  += sqrt_half      * ( TwoSRup + 1 ) * dm3_c_J0;   // d74
-                                 results[9]  += sqrt_anderhalf * ( TwoSRup + 1 ) * dm3_c_J1; } // d75
-                                 results[10] += sqrt_anderhalf * factor4         * dm3_c_J1;   // d76
-                                 results[11] += sqrt_anderhalf * factor5         * dm3_c_J1;   // d77
-                                 
-                                 results[12] += sqrt_half      * factor6         * dm3_d_J0;   // d82
-                                 results[13] += sqrt_anderhalf * factor6         * dm3_d_J1;   // d83
-    if ( TwoSRdown == TwoSLup ){ results[14] += sqrt_half      * factor7         * dm3_d_J0;   // d84
-                                 results[15] += sqrt_anderhalf * factor7         * dm3_d_J1; } // d85
-                                 results[16] += sqrt_anderhalf * factor8         * dm3_d_J1;   // d86
-                                 results[17] += sqrt_anderhalf * factor9         * dm3_d_J1;   // d87
-                                 
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-}
-
-void CheMPS2::ThreeDM::diagramJ2oneandhalf_3_2_1(TensorT * denT, Tensor3RDM ** left, TensorL * right, double * workmem, double * workmem2, double * results) const{
-
-   for ( int cnt = 0; cnt < 3; cnt++ ){
-      if ( left[ cnt ] != NULL ){
-         assert( left[ cnt ]->get_irrep()  == right->get_irrep() );
-         assert( left[ cnt ]->get_two_j2() == 3 );
-         assert( left[ cnt ]->get_nelec()  == 1 );
-      }
-   }
-   for ( int cnt = 0; cnt < 5; cnt++ ){ results[ cnt ] = 0.0; }
-   const int orb_i = denT->gIndex();
-
-   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
-      for ( int TwoSLup = book->gTwoSmin( orb_i, NL ); TwoSLup <= book->gTwoSmax( orb_i, NL ); TwoSLup+=2 ){
-         for ( int ILup = 0; ILup < book->getNumberOfIrreps(); ILup++ ){
-         
-            const int IRup   = Irreps::directProd( ILup, book->gIrrep( orb_i ) );
-            const int ILdown = Irreps::directProd( ILup, right->get_irrep() );
-            const int IRdown = Irreps::directProd( IRup, right->get_irrep() );
-            
-            int dimLup = book->gCurrentDim( orb_i, NL, TwoSLup, ILup );
-            
-            if ( dimLup > 0 ){
-            
-               for ( int TwoSRup = TwoSLup-1; TwoSRup <= TwoSLup+1; TwoSRup+=2 ){
-            
-                  int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSRup, IRup );
-                  
-                  if ( dimRup > 0 ){
-                     
-                     for ( int TwoSLdown = TwoSLup-3; TwoSLdown <= TwoSLup+3; TwoSLdown+=2 ){
-                        
-                        int dimLdown = book->gCurrentDim( orb_i, NL-1, TwoSLdown, ILdown );
-                        
-                        if ( dimLdown > 0 ){
-                        
-                           for ( int TwoSRdown = TwoSRup-1; TwoSRdown <= TwoSRup+1; TwoSRdown+=2 ){
-                        
-                              int dimRdown = book->gCurrentDim( orb_i+1, NL, TwoSRdown, IRdown );
-                              
-                              if (( dimRdown > 0 ) && ( abs( TwoSLdown - TwoSRdown ) <= 1 )){
-                              
-                                 double * Tup     =  denT->gStorage( NL,   TwoSLup,   ILup,   NL+1, TwoSRup,   IRup   );
-                                 double * Tdown   =  denT->gStorage( NL-1, TwoSLdown, ILdown, NL,   TwoSRdown, IRdown );
-                                 double * Rblock  = right->gStorage( NL,   TwoSRdown, IRdown, NL+1, TwoSRup,   IRup   );
-                                 
-                                 char notrans = 'N';
-                                 char trans   = 'T';
-                                 double alpha = 1.0;
-                                 double beta  = 0.0; //set
-                                 dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown,   &dimLdown, Rblock, &dimRdown, &beta, workmem,  &dimLdown );
-                                 dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &alpha, workmem, &dimLdown, Tup,    &dimLup,   &beta, workmem2, &dimLdown );
-
-                                 int size = dimLup * dimLdown;
-                                 int inc  = 1;
-                                 const double dm3_b = ((left[0] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[0]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_c = ((left[1] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[1]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-                                 const double dm3_d = ((left[2] == NULL) ? 0.0 : ddot_(&size, workmem2, &inc, left[2]->gStorage(NL-1, TwoSLdown, ILdown, NL, TwoSLup, ILup), &inc));
-
-                                 const double acommon = 2 * sqrt( 3.0 * ( TwoSLup + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
-                                 const double wign_9j = gsl_sf_coupling_9j( 1, 1, 2, TwoSLdown, TwoSLup, 3, TwoSRdown, TwoSRup, 1 );
-                                 const double factor1 = acommon * gsl_sf_coupling_6j( 1, 2, 1, TwoSLdown, TwoSRdown, TwoSRup )
-                                                                * gsl_sf_coupling_6j( 1, 2, 3, TwoSLdown, TwoSLup,   TwoSRup );
-                                 const double wigprod = gsl_sf_coupling_6j( 1, 2, 1, TwoSLup, TwoSRup,   TwoSRdown )
-                                                      * gsl_sf_coupling_6j( 1, 2, 3, TwoSLup, TwoSLdown, TwoSRdown );
-                                 const double factor2 = acommon * wigprod * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown + 2 );
-                                 const double factor3 = acommon * ( -1 ) * wign_9j;
-                                 const double dcommon = 2 * sqrt( 3.0 * ( TwoSLdown + 1 ) * ( TwoSRdown + 1 ) ) * ( TwoSRup + 1 );
-                                 const double factor4 = dcommon * wigprod * phase( TwoSRdown + 1 - TwoSRup );
-                                 const double factor5 = dcommon * wign_9j * phase( TwoSRdown + 1 - TwoSRup )
-                                                      * phase( TwoSRup + TwoSRdown + TwoSLup + TwoSLdown ); //Last phase for column swap wigner 9j
-
-                                 results[0] += factor1 * dm3_b; // d69
-                                 results[1] += factor2 * dm3_c; // d78
-                                 results[2] += factor3 * dm3_c; // d79
-                                 results[3] += factor4 * dm3_d; // d88
-                                 results[4] += factor5 * dm3_d; // d89
-                                 
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
 
 }
 
@@ -3891,6 +3520,328 @@ void CheMPS2::ThreeDM::fill_tens_46_48(TensorT * denT, TensorS1 * tofill, Tensor
                         double * right =  denF1->gStorage( NL, TwoSL, IL, NL, TwoSLprime, ILxImxIn );
                         dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRup, &zero, workmem, &dimLdown );
                         dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup, &one,  left,    &dimLdown );
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_53_54(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxIm = Irreps::directProd( IL, denL->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
+               
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-3, TwoSLprime, ILxIm );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL-1, TwoSLprime, ILxIm );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,    NL,   TwoSL,      IL    );
+                     double * Tdown =   denT->gStorage( NL-3, TwoSLprime, ILxIm, NL-1, TwoSLprime, ILxIm );
+                     double * left  = tofill->gStorage( NL-3, TwoSLprime, ILxIm, NL,   TwoSL,      IL    );
+                     double * right =   denL->gStorage( NL-1, TwoSLprime, ILxIm, NL,   TwoSL,      IL    );
+                  
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     double factor = - sqrt( 0.5 ) * ( TwoSL + 1 );
+                     
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem, &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,    &dimLdown );
+
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_55_to_60(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxIm = Irreps::directProd( IL, denL->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i,   NL, TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
+               
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIm );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLprime, ILxIm );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,    NL,   TwoSL,      IL    );
+                     double * Tdown =   denT->gStorage( NL-1, TwoSLprime, ILxIm, NL+1, TwoSLprime, ILxIm );
+                     double * left  = tofill->gStorage( NL-1, TwoSLprime, ILxIm, NL,   TwoSL,      IL    );
+                     double * right =   denL->gStorage( NL,   TwoSL,      IL,    NL+1, TwoSLprime, ILxIm );
+                  
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     double factor = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL + 1 - TwoSLprime );
+                     
+                     dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRup, &zero, workmem, &dimLdown );
+                     dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup, &one,  left,    &dimLdown );
+
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_61(TensorT * denT, Tensor3RDM * tofill, TensorL * denL, double * workmem) const{
+
+   const int orb_i = denT->gIndex();
+   tofill->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxIm = Irreps::directProd( IL, denL->get_irrep() );
+            
+            int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL );
+            int dimRup = book->gCurrentDim( orb_i+1, NL+2, TwoSL, IL );
+            
+            if (( dimLup > 0 ) && ( dimRup > 0 )){
+            
+               for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
+               
+                  int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIm );
+                  int dimRdown = book->gCurrentDim( orb_i+1, NL+1, TwoSLprime, ILxIm );
+                  
+                  if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                  
+                     double * Tup   =   denT->gStorage( NL,   TwoSL,      IL,    NL+2, TwoSL,      IL    );
+                     double * Tdown =   denT->gStorage( NL-1, TwoSLprime, ILxIm, NL+1, TwoSLprime, ILxIm );
+                     double * left  = tofill->gStorage( NL-1, TwoSLprime, ILxIm, NL,   TwoSL,      IL    );
+                     double * right =   denL->gStorage( NL+1, TwoSLprime, ILxIm, NL+2, TwoSL,      IL    );
+                  
+                     char notrans  = 'N';
+                     char trans    = 'T';
+                     double zero   = 0.0;
+                     double one    = 1.0;
+                     double factor = sqrt( 0.5 ) * ( TwoSL + 1 );
+                     
+                     dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem, &dimLdown );
+                     dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,    &dimLdown );
+
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RDM * fill65, Tensor3RDM * fill67, Tensor3RDM * fill68, Tensor3RDM * fill76, Tensor3RDM * fill77, TensorL * denL, double * workmem, double * workmem2) const{
+
+   const int orb_i = denT->gIndex();
+   fill63->clear();
+   fill65->clear();
+   fill67->clear();
+   fill68->clear();
+   fill76->clear();
+   fill77->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxIm    = Irreps::directProd( IL, denL->get_irrep()     );
+            const int ILxIi    = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            const int ILxImxIi = Irreps::directProd( ILxIi, denL->get_irrep()  );
+            
+            for ( int TwoSR = TwoSL-1; TwoSR <= TwoSL+1; TwoSR+=2 ){
+            
+               int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL    );
+               int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSR, ILxIi );
+               
+               if (( dimLup > 0 ) && ( dimRup > 0 )){
+               
+                  for ( int TwoSLprime = TwoSL-1; TwoSLprime <= TwoSL+1; TwoSLprime+=2 ){
+                     for ( int TwoSRprime = TwoSLprime-1; TwoSRprime <= TwoSLprime+1; TwoSRprime+=2 ){
+                  
+                        int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIm    );
+                        int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSRprime, ILxImxIi );
+                        
+                        if (( dimLdown > 0 ) && ( dimRdown > 0 ) && ( abs( TwoSR - TwoSRprime ) == 1 )){
+                        
+                           double * Tup   = denT->gStorage( NL,   TwoSL,      IL,       NL+1, TwoSR,      ILxIi    );
+                           double * Tdown = denT->gStorage( NL-1, TwoSLprime, ILxIm,    NL,   TwoSRprime, ILxImxIi );
+                           double * right = denL->gStorage( NL,   TwoSRprime, ILxImxIi, NL+1, TwoSR,      ILxIi    );
+                        
+                           char notrans  = 'N';
+                           char trans    = 'T';
+                           double zero   = 0.0;
+                           double one    = 1.0;
+                           dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &one, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                           dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one, workmem, &dimLdown, Tup,   &dimLup,   &zero, workmem2, &dimLdown );
+                           
+                           {
+                              double factor  = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
+                                             * phase( TwoSL + TwoSRprime + 2 )
+                                             * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 1 );
+                              double * left  = fill63->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           if ( TwoSRprime == TwoSL ){
+                              double factor  = - sqrt( 0.5 ) * ( TwoSR + 1 );
+                              double * left  = fill65->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           if ( TwoSR == TwoSLprime ){
+                              double factor  = sqrt( 0.5 * ( TwoSRprime + 1 ) * ( TwoSL + 1 ) ) * phase( TwoSL - TwoSRprime );
+                              double * left  = fill67->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double factor  = sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
+                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
+                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSL      );
+                              double * left  = fill68->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double factor  = sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
+                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime )
+                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR      )
+                                             * phase( TwoSLprime + TwoSRprime + 2 - TwoSL - TwoSR );
+                              double * left  = fill76->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double factor  = - sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
+                                             * gsl_sf_coupling_9j( 1, 1, 2, TwoSLprime, TwoSL, 1, TwoSRprime, TwoSR, 1 );
+                              double * left  = fill77->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+}
+
+void CheMPS2::ThreeDM::fill_69_78_79(TensorT * denT, Tensor3RDM * fill69, Tensor3RDM * fill78, Tensor3RDM * fill79, TensorL * denL, double * workmem, double * workmem2) const{
+
+   const int orb_i = denT->gIndex();
+   fill69->clear();
+   fill78->clear();
+   fill79->clear();
+
+   for ( int NL = book->gNmin( orb_i ); NL <= book->gNmax( orb_i ); NL++ ){
+      for ( int TwoSL = book->gTwoSmin( orb_i, NL ); TwoSL <= book->gTwoSmax( orb_i, NL ); TwoSL+=2 ){
+         for ( int IL = 0; IL < book->getNumberOfIrreps(); IL++ ){
+         
+            const int ILxIm    = Irreps::directProd( IL, denL->get_irrep()     );
+            const int ILxIi    = Irreps::directProd( IL, book->gIrrep( orb_i ) );
+            const int ILxImxIi = Irreps::directProd( ILxIi, denL->get_irrep()  );
+            
+            for ( int TwoSR = TwoSL-1; TwoSR <= TwoSL+1; TwoSR+=2 ){
+            
+               int dimLup = book->gCurrentDim( orb_i,   NL,   TwoSL, IL    );
+               int dimRup = book->gCurrentDim( orb_i+1, NL+1, TwoSR, ILxIi );
+               
+               if (( dimLup > 0 ) && ( dimRup > 0 )){
+               
+                  for ( int TwoSRprime = TwoSR-1; TwoSRprime <= TwoSR+1; TwoSRprime+=2 ){
+                     for ( int TwoSLprime = TwoSRprime-1; TwoSLprime <= TwoSRprime+1; TwoSLprime+=2 ){
+                  
+                        int dimLdown = book->gCurrentDim( orb_i,   NL-1, TwoSLprime, ILxIm    );
+                        int dimRdown = book->gCurrentDim( orb_i+1, NL,   TwoSRprime, ILxImxIi );
+                        
+                        if (( dimLdown > 0 ) && ( dimRdown > 0 )){
+                        
+                           double * Tup   = denT->gStorage( NL,   TwoSL,      IL,       NL+1, TwoSR,      ILxIi    );
+                           double * Tdown = denT->gStorage( NL-1, TwoSLprime, ILxIm,    NL,   TwoSRprime, ILxImxIi );
+                           double * right = denL->gStorage( NL,   TwoSRprime, ILxImxIi, NL+1, TwoSR,      ILxIi    );
+                        
+                           char notrans  = 'N';
+                           char trans    = 'T';
+                           double zero   = 0.0;
+                           double one    = 1.0;
+                           dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &one, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem,  &dimLdown );
+                           dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one, workmem, &dimLdown, Tup,   &dimLup,   &zero, workmem2, &dimLdown );
+                           
+                           const double prefactor = 2 * sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 );
+                           {
+                              double factor  = prefactor * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
+                                                         * gsl_sf_coupling_6j( 1, 2, 3, TwoSLprime, TwoSL, TwoSR );
+                              double * left  = fill69->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double factor  = prefactor * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR )
+                                                         * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime )
+                                                         * phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 );
+                              double * left  = fill78->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+                           {
+                              double factor  = - prefactor * gsl_sf_coupling_9j( 1, 1, 2, TwoSLprime, TwoSL, 3, TwoSRprime, TwoSR, 1 );
+                              double * left  = fill79->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
+                              int length     = dimLup * dimLdown;
+                              int inc        = 1;
+                              daxpy_( &length, &factor, workmem2, &inc, left, &inc );
+                           }
+
+                        }
                      }
                   }
                }

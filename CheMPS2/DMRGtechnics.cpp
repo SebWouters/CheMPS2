@@ -157,6 +157,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    timings[ CHEMPS2_TIME_S_SOLVE ] += (end_part.tv_sec - start_part.tv_sec) + 1e-6 * (end_part.tv_usec - start_part.tv_usec);
    #endif
    
+   the2DM->correct_higher_multiplicities();
+   
    /************************************************************
     *   Three pieces of information: trace, energy, and NOON   *
     ***********************************************************/
@@ -272,6 +274,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    #endif
    
    if (do_3rdm){
+      the3DM->correct_higher_multiplicities();
       delete_3rdm_operators(L-1);
       delete [] tensor_3rdm_a_J0_doublet;
       delete [] tensor_3rdm_a_J1_doublet;

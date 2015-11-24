@@ -364,14 +364,13 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
 
    const int theindex = denT->gIndex();
    const int DIM = max(denBK->gMaxDimAtBound(theindex), denBK->gMaxDimAtBound(theindex+1));
-   const double prefactorSpin = 1.0/(Prob->gTwoS() + 1.0);
    
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( MPIRANK == MPI_CHEMPS2_MASTER )
    #endif
    {
       //Diagram 1
-      const double d1 = doD1(denT) * prefactorSpin;
+      const double d1 = doD1(denT);
       set_2rdm_A_DMRG(theindex,theindex,theindex,theindex, 2*d1);
       set_2rdm_B_DMRG(theindex,theindex,theindex,theindex,-2*d1);
    }
@@ -379,7 +378,7 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
    #pragma omp parallel
    {
    
-      double * workmem = new double[DIM*DIM];
+      double * workmem  = new double[DIM*DIM];
       double * workmem2 = new double[DIM*DIM];
       
       #pragma omp for schedule(static) nowait
@@ -390,15 +389,13 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagram 2
-               const double d2 = doD2(denT, Ltens[theindex][j_index-theindex-1], workmem) * prefactorSpin;
+               const double d2 = doD2(denT, Ltens[theindex][j_index-theindex-1], workmem);
                set_2rdm_A_DMRG(theindex,j_index,theindex,theindex, 2*d2);
                set_2rdm_B_DMRG(theindex,j_index,theindex,theindex,-2*d2);
             }
          }
       }
-
-      /*for (int j_index=theindex+1; j_index<L; j_index++){
-         for (int k_index=j_index; k_index<L; k_index++){*/
+      
       const int dimTriangle = L - theindex - 1;
       const int upperboundTriangle = dimTriangle*(dimTriangle+1)/2;
       #pragma omp for schedule(static) nowait
@@ -414,7 +411,7 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagram 3
-               const double d3 = doD3(denT, S0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
+               const double d3 = doD3(denT, S0tens[theindex][k_index-j_index][j_index-theindex-1], workmem);
                set_2rdm_A_DMRG(theindex,theindex,j_index,k_index, 2*d3);
                set_2rdm_B_DMRG(theindex,theindex,j_index,k_index,-2*d3);
             }
@@ -424,9 +421,9 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagrams 4,5 & 6
-               const double d4 = doD4(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
-               const double d5 = doD5(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
-               const double d6 = doD6(denT, F1tens[theindex][k_index-j_index][j_index-theindex-1], workmem) * prefactorSpin;
+               const double d4 = doD4(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem);
+               const double d5 = doD5(denT, F0tens[theindex][k_index-j_index][j_index-theindex-1], workmem);
+               const double d6 = doD6(denT, F1tens[theindex][k_index-j_index][j_index-theindex-1], workmem);
                set_2rdm_A_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 - 3*d6);
                set_2rdm_B_DMRG(theindex,j_index,k_index,theindex, -2*d4 - 2*d5 +   d6);
                set_2rdm_A_DMRG(theindex,j_index,theindex,k_index,  4*d4 + 4*d5);
@@ -443,15 +440,13 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagram 7
-               const double d7 = doD7(denT, Ltens[theindex-1][theindex-g_index-1], workmem) * prefactorSpin;
+               const double d7 = doD7(denT, Ltens[theindex-1][theindex-g_index-1], workmem);
                set_2rdm_A_DMRG(g_index,theindex,theindex,theindex, 2*d7);
                set_2rdm_B_DMRG(g_index,theindex,theindex,theindex,-2*d7);
             }
          }
       }
 
-      /*for (int g_index=0; g_index<theindex; g_index++){
-         for (int j_index=theindex+1; j_index<L; j_index++){*/
       const int globalsize8to12 = theindex * ( L - 1 - theindex );
       #pragma omp for schedule(static) nowait
       for (int gj_index=0; gj_index<globalsize8to12; gj_index++){
@@ -464,28 +459,22 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagrams 8,9,10 & 11
-               const double d8 = doD8(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
+               const double d8 = doD8(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, I_g);
                double d9, d10, d11;
                doD9andD10andD11(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, &d9, &d10, &d11, I_g);
-               d9 *= prefactorSpin;
-               d10 *= prefactorSpin;
-               d11 *= prefactorSpin;
                set_2rdm_A_DMRG(g_index,theindex,j_index,theindex, -4*d8-d9);
                set_2rdm_A_DMRG(g_index,theindex,theindex,j_index, 2*d8 + d11);
                set_2rdm_B_DMRG(g_index,theindex,j_index,theindex, d9 - 2*d10);
                set_2rdm_B_DMRG(g_index,theindex,theindex,j_index, 2*d8 + 2*d10 - d11);
                
                //Diagram 12
-               const double d12 = doD12(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
+               const double d12 = doD12(denT, Ltens[theindex-1][theindex-g_index-1], Ltens[theindex][j_index-theindex-1], workmem, workmem2, I_g);
                set_2rdm_A_DMRG(g_index,j_index,theindex,theindex, 2*d12);
                set_2rdm_B_DMRG(g_index,j_index,theindex,theindex,-2*d12);
             }
          }
       }
 
-      /*for (int g_index=0; g_index<theindex; g_index++){
-         for (int j_index=theindex+1; j_index<L; j_index++){
-            for (int k_index=j_index; k_index<L; k_index++){*/
       const int globalsize = theindex * upperboundTriangle;
       #pragma omp for schedule(static) nowait
       for (int gjk_index=0; gjk_index<globalsize; gjk_index++){
@@ -496,6 +485,8 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
          const int j_index = theindex + 1 + row;
          const int k_index = j_index + col;
          const int I_g = denBK->gIrrep(g_index);
+         const int cnt1 = k_index-j_index;
+         const int cnt2 = j_index-theindex-1;
 
          if (Irreps::directProd(I_g, denBK->gIrrep(theindex)) == Irreps::directProd(denBK->gIrrep(j_index), denBK->gIrrep(k_index))){
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -503,15 +494,13 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagrams 13,14,15 & 16
-               const double d13 = doD13(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                        workmem, workmem2, I_g) * prefactorSpin;
-               const double d14 = doD14(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                        workmem, workmem2, I_g) * prefactorSpin;
+               const double d13 = doD13(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g);
+               const double d14 = doD14(denT, Ltens[theindex-1][theindex-g_index-1], S0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g);
                double d15 = 0.0;
                double d16 = 0.0;
                if (k_index>j_index){
-                  d15 = doD15(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][k_index-j_index][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
-                  d16 = doD16(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][k_index-j_index][j_index-theindex-1], workmem, workmem2, I_g) * prefactorSpin;
+                  d15 = doD15(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g);
+                  d16 = doD16(denT, Ltens[theindex-1][theindex-g_index-1], S1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g);
                }
                set_2rdm_A_DMRG(g_index,theindex,j_index,k_index, 2*d13 + 2*d14 + 3*d15 + 3*d16);
                set_2rdm_A_DMRG(g_index,theindex,k_index,j_index, 2*d13 + 2*d14 - 3*d15 - 3*d16);
@@ -524,28 +513,20 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
             #endif
             {
                //Diagrams 17,18,19 & 20
-               const double d17 = doD17orD21(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, true) * prefactorSpin;
-               const double d18 = doD18orD22(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, true) * prefactorSpin;
-               const double d19 = doD19orD23(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, true) * prefactorSpin;
-               const double d20 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, true) * prefactorSpin;
+               const double d17 = doD17orD21(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, true);
+               const double d18 = doD18orD22(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, true);
+               const double d19 = doD19orD23(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, true);
+               const double d20 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, true);
                set_2rdm_A_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 - 3*d19 - 3*d20);
                set_2rdm_A_DMRG(g_index,j_index,theindex,k_index,  4*d17 + 4*d18                );
                set_2rdm_B_DMRG(g_index,j_index,k_index,theindex, -2*d17 - 2*d18 +   d19 +   d20);
                set_2rdm_B_DMRG(g_index,j_index,theindex,k_index,                  2*d19 + 2*d20);
                
                //Diagrams 21,22,23 & 24
-               const double d21 = doD17orD21(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, false) * prefactorSpin;
-               const double d22 = doD18orD22(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, false) * prefactorSpin;
-               const double d23 = doD19orD23(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, false) * prefactorSpin;
-               const double d24 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][k_index-j_index][j_index-theindex-1],
-                                             workmem, workmem2, I_g, false) * prefactorSpin;
+               const double d21 = doD17orD21(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, false);
+               const double d22 = doD18orD22(denT, Ltens[theindex-1][theindex-g_index-1], F0tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, false);
+               const double d23 = doD19orD23(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, false);
+               const double d24 = doD20orD24(denT, Ltens[theindex-1][theindex-g_index-1], F1tens[theindex][cnt1][cnt2], workmem, workmem2, I_g, false);
                set_2rdm_A_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 - 3*d23 - 3*d24);
                set_2rdm_A_DMRG(g_index,k_index,theindex,j_index,  4*d21 + 4*d22                );
                set_2rdm_B_DMRG(g_index,k_index,j_index,theindex, -2*d21 - 2*d22 +   d23 +   d24);
@@ -557,6 +538,18 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
       delete [] workmem;
       delete [] workmem2;
    
+   }
+
+}
+
+void CheMPS2::TwoDM::correct_higher_multiplicities(){
+
+   if ( Prob->gTwoS() != 0 ){
+      double alpha = 1.0 / ( Prob->gTwoS() + 1.0 );
+      int length   = L*L*L*L;
+      int inc      = 1;
+      dscal_( &length, &alpha, two_rdm_A, &inc );
+      dscal_( &length, &alpha, two_rdm_B, &inc );
    }
 
 }
