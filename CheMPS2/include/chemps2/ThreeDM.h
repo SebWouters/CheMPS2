@@ -43,8 +43,8 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param denBKIn Symmetry sector bookkeeper
-             \param ProbIn The problem to be solved */
+         /** \param book_in Symmetry sector bookkeeper
+             \param prob_in The problem to be solved */
          ThreeDM(const SyBookkeeper * book_in, const Problem * prob_in);
          
          //! Destructor

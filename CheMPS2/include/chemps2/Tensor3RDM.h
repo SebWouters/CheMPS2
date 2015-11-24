@@ -69,13 +69,13 @@ namespace CheMPS2{
          void b1(TensorOperator * Sigma, TensorT * denT, double * workmem);
          
          //! Make diagram c1
-         /** \param Sigma   The TensorF0 or TensorF1 to make diagram c1
+         /** \param denF    The TensorF0 or TensorF1 to make diagram c1
              \param denT    The TensorT to make diagram c1
              \param workmem Work memory */
          void c1(TensorOperator * denF, TensorT * denT, double * workmem);
          
          //! Make diagram d1
-         /** \param Sigma   The TensorF0 or TensorF1 to make diagram d1
+         /** \param denF    The TensorF0 or TensorF1 to make diagram d1
              \param denT    The TensorT to make diagram d1
              \param workmem Work memory */
          void d1(TensorOperator * denF, TensorT * denT, double * workmem);
