@@ -1,0 +1,7 @@
+<map id="CheMPS2::Tensor3RDM::extra3" name="CheMPS2::Tensor3RDM::extra3">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285" title="Get the (real&#45;valued abelian) point group irrep difference between the symmetry sectors of the lower ..." alt="" coords="231,5,411,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="225,71,416,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="221,122,420,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="231,173,411,215"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="241,239,400,266"/>
+</map>

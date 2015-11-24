@@ -1,4 +1,4 @@
 <map id="CheMPS2::FCI::getVecLength" name="CheMPS2::FCI::getVecLength">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a490f73f0901972ed913a47119b5e0f23" title="Calculate the addition Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a^+_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="254,5,429,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#ad940e823b2f18ce3d85ff2f3a0e94889" title="Calculate the removal Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a^+_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="254,70,429,111"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a490f73f0901972ed913a47119b5e0f23" title="Calculate the addition Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a^+_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="253,5,428,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#ad940e823b2f18ce3d85ff2f3a0e94889" title="Calculate the removal Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a^+_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="253,71,428,112"/>
 </map>

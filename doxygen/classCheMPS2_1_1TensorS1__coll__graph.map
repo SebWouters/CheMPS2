@@ -1,5 +1,5 @@
 <map id="CheMPS2::TensorS1" name="CheMPS2::TensorS1">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorS1Bbase.html" title="CheMPS2::TensorS1Bbase" alt="" coords="5,173,187,200"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor.html" title="CheMPS2::Tensor" alt="" coords="31,96,160,123"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html" title="CheMPS2::SyBookkeeper" alt="" coords="9,5,183,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorOperator.html" title="CheMPS2::TensorOperator" alt="" coords="5,171,185,197"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor.html" title="CheMPS2::Tensor" alt="" coords="30,95,161,121"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html" title="CheMPS2::SyBookkeeper" alt="" coords="8,5,183,32"/>
 </map>

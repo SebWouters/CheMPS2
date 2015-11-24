@@ -1,6 +1,6 @@
 <map id="CheMPS2::EdmistonRuedenberg::FiedlerExchange" name="CheMPS2::EdmistonRuedenberg::FiedlerExchange">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="269,57,515,98"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="566,5,757,32"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="563,57,760,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="574,123,749,149"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="268,57,513,98"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="565,5,755,32"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="561,57,759,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="573,123,747,149"/>
 </map>

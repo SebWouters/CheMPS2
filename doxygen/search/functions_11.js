@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['save',['save',['../classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d',1,'CheMPS2::FourIndex::save()'],['../classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074',1,'CheMPS2::Hamiltonian::save()'],['../classCheMPS2_1_1TwoDM.html#a46d24ed5f6ce42c1453475d77c60e143',1,'CheMPS2::TwoDM::save()'],['../classCheMPS2_1_1TwoDMstorage.html#ada1dcc9a9e78132a0d33a47e5a290ba5',1,'CheMPS2::TwoDMstorage::save()'],['../classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12',1,'CheMPS2::TwoIndex::save()']]],
+  ['save',['save',['../classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d',1,'CheMPS2::FourIndex::save()'],['../classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074',1,'CheMPS2::Hamiltonian::save()'],['../classCheMPS2_1_1ThreeDM.html#a850ac9af1b274943f05617b4af5cbe02',1,'CheMPS2::ThreeDM::save()'],['../classCheMPS2_1_1TwoDM.html#aaa4b369e9ee67833388601cc80989caf',1,'CheMPS2::TwoDM::save()'],['../classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12',1,'CheMPS2::TwoIndex::save()']]],
   ['savediis',['saveDIIS',['../classCheMPS2_1_1DIIS.html#aa7e7da7574b2936c681e6f652f14ae37',1,'CheMPS2::DIIS']]],
   ['saveu',['saveU',['../classCheMPS2_1_1DMRGSCFunitary.html#a11ad63632a4a368db38a383366847c06',1,'CheMPS2::DMRGSCFunitary']]],
-  ['set',['set',['../classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24',1,'CheMPS2::DMRGSCFmatrix::set()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a80468137491080bec2c3cf6c3fd68da0',1,'CheMPS2::DMRGSCFwtilde::set()'],['../classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f',1,'CheMPS2::FourIndex::set()'],['../classCheMPS2_1_1TwoDMstorage.html#a2eb0495511d151e372b77edb3f9d5d36',1,'CheMPS2::TwoDMstorage::set()'],['../classCheMPS2_1_1TwoIndex.html#a4385881853e910bb1ce7d5ea911b75c4',1,'CheMPS2::TwoIndex::set()']]],
+  ['set',['set',['../classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24',1,'CheMPS2::DMRGSCFmatrix::set()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a80468137491080bec2c3cf6c3fd68da0',1,'CheMPS2::DMRGSCFwtilde::set()'],['../classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f',1,'CheMPS2::FourIndex::set()'],['../classCheMPS2_1_1TwoIndex.html#a4385881853e910bb1ce7d5ea911b75c4',1,'CheMPS2::TwoIndex::set()']]],
   ['set_5fcoulomb',['set_coulomb',['../classCheMPS2_1_1DMRGSCFintegrals.html#ac9c1b2d0d67b2beb246ce3c59b193177',1,'CheMPS2::DMRGSCFintegrals']]],
   ['set_5fexchange',['set_exchange',['../classCheMPS2_1_1DMRGSCFintegrals.html#af910b76a44cdbde6cdffc1750705fdb9',1,'CheMPS2::DMRGSCFintegrals']]],
   ['setdiisgradientbranch',['setDIISGradientBranch',['../classCheMPS2_1_1DMRGSCFoptions.html#af4e0750d68513bf84350128edbbd5775',1,'CheMPS2::DMRGSCFoptions']]],
@@ -36,7 +36,7 @@ var searchData=
   ['singleorbitalentropy_5fham',['SingleOrbitalEntropy_HAM',['../classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e',1,'CheMPS2::Correlations']]],
   ['sobject',['Sobject',['../classCheMPS2_1_1Sobject.html#a6fd85753dc9048918065a424c42846d2',1,'CheMPS2::Sobject']]],
   ['solve',['Solve',['../classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2',1,'CheMPS2::DMRG']]],
-  ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#ab8ccd23cc035ed40e13705c3f2e581a3',1,'CheMPS2::Heff']]],
+  ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4',1,'CheMPS2::Heff']]],
   ['split',['Split',['../classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df',1,'CheMPS2::Sobject']]],
   ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e',1,'CheMPS2::FCI']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a',1,'CheMPS2::SyBookkeeper']]],

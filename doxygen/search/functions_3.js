@@ -1,6 +1,9 @@
 var searchData=
 [
+  ['d1',['d1',['../classCheMPS2_1_1Tensor3RDM.html#a0b6d523776c4b779999f75d54e043a3b',1,'CheMPS2::Tensor3RDM']]],
   ['davidson',['Davidson',['../classCheMPS2_1_1Davidson.html#abef20668c9bca9634116c525f9ab0627',1,'CheMPS2::Davidson']]],
+  ['daxpy',['daxpy',['../classCheMPS2_1_1TensorOperator.html#a7df2ccd2704f234765152ec1dab915cb',1,'CheMPS2::TensorOperator']]],
+  ['daxpy_5ftranspose_5ftensorcd',['daxpy_transpose_tensorCD',['../classCheMPS2_1_1TensorOperator.html#a494f2e4e8c7052389eb2194ef05cc578',1,'CheMPS2::TensorOperator']]],
   ['debugcheck',['debugcheck',['../classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343',1,'CheMPS2::Hamiltonian']]],
   ['deletestoreddiis',['deleteStoredDIIS',['../classCheMPS2_1_1CASSCF.html#abd8799e175329933a246dfee97e5dfb7',1,'CheMPS2::CASSCF::deleteStoredDIIS()'],['../classCheMPS2_1_1DIIS.html#a057c39a90dea9bb70d93d82154bccbba',1,'CheMPS2::DIIS::deleteStoredDIIS()']]],
   ['deletestoredmps',['deleteStoredMPS',['../classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c',1,'CheMPS2::DMRG']]],
@@ -21,6 +24,5 @@ var searchData=
   ['dmrgscfunitary',['DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36',1,'CheMPS2::DMRGSCFunitary']]],
   ['dmrgscfvmatrotations',['DMRGSCFVmatRotations',['../classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036',1,'CheMPS2::DMRGSCFVmatRotations']]],
   ['dmrgscfwtilde',['DMRGSCFwtilde',['../classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0',1,'CheMPS2::DMRGSCFwtilde']]],
-  ['docasscfnewtonraphson',['doCASSCFnewtonraphson',['../classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1',1,'CheMPS2::CASSCF']]],
-  ['doubletrace2dma',['doubletrace2DMA',['../classCheMPS2_1_1TwoDM.html#a3970c2fccf52e6e653e2866fabcd3d04',1,'CheMPS2::TwoDM']]]
+  ['docasscfnewtonraphson',['doCASSCFnewtonraphson',['../classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1',1,'CheMPS2::CASSCF']]]
 ];

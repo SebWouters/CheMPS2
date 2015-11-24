@@ -1,6 +1,6 @@
 <map id="CheMPS2::Sobject::Split" name="CheMPS2::Sobject::Split">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="238,5,405,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="226,71,417,97"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="231,121,412,148"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="222,172,421,199"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="237,5,404,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="225,71,416,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="230,122,411,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="221,173,420,199"/>
 </map>

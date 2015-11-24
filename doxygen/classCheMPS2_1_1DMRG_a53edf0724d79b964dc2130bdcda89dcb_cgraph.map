@@ -1,6 +1,6 @@
 <map id="CheMPS2::DMRG::DMRG" name="CheMPS2::DMRG::DMRG">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="279,5,446,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="257,71,468,97"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="235,121,490,148"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="539,114,733,155"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="277,5,444,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="255,71,466,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="233,122,488,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="536,115,731,156"/>
 </map>

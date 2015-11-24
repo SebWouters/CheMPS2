@@ -1,8 +1,7 @@
 <map id="CheMPS2::Hamiltonian::getNGroup" name="CheMPS2::Hamiltonian::getNGroup">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="232,5,440,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036" title="Constructor. " alt="" coords="213,57,459,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="229,122,443,163"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="265,188,407,215"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="251,239,421,265"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#adafda7081d8bb8670482ef8d79485961" title="Constructor. " alt="" coords="507,239,698,265"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="231,5,439,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036" title="Constructor. " alt="" coords="212,57,457,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="227,122,442,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="263,188,406,215"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="250,239,419,265"/>
 </map>

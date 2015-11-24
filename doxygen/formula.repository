@@ -170,8 +170,13 @@
 \form#169:$V_{index1,index2,index3,index4}$
 \form#170:$I_{\alpha} \otimes I_{\alpha} = I_{trivial}$
 \form#171:$ h_{\alpha \beta ; \gamma \delta} = \left(\alpha \beta \mid V \mid \gamma \delta \right) + \frac{1}{N-1} \left( \left( \alpha \mid T \mid \gamma \right) \delta_{\beta \delta} + \delta_{\alpha \gamma} \left( \beta \mid T \mid \delta \right) \right) $
-\form#172:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
-\form#173:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
-\form#174:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
-\form#175:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
-\form#176:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
+\form#172:$ \braket{ j m J M | j' m' } \braket{ j ( N, I ) || J ( n\_elec, n\_irrep ) || j' ( N + n\_elec, I \times n\_irrep ) } $
+\form#173:$ \braket{ j' m' J M | j m } \braket{ j ( N, I ) || J ( n\_elec, n\_irrep ) || j' ( N + n\_elec, I \times n\_irrep ) } $
+\form#174:$ \Gamma_{ijk;lmn} = \sum_{\sigma \tau s} \braket{ a^{\dagger}_{i \sigma} a^{\dagger}_{j \tau} a^{\dagger}_{k s} a_{n s} a_{m \tau} a_{l \sigma}} $
+\form#175:$ I_{i} \otimes I_{j} \otimes I_{k} = I_{l} \otimes I_{m} \otimes I_{n} $
+\form#176:$ \Gamma_{ijk;lmn} $
+\form#177:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
+\form#178:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
+\form#179:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
+\form#180:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
+\form#181:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $

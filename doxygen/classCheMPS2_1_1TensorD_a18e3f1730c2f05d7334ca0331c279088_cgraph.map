@@ -1,4 +1,0 @@
-<map id="CheMPS2::TensorD::AddATermTranspose" name="CheMPS2::TensorD::AddATermTranspose">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="265,5,455,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorF1Dbase.html#a582ce4d560b296a38029dbff7766345d" title="Get the pointer to the storage. " alt="" coords="269,57,451,98"/>
-</map>

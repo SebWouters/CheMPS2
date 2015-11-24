@@ -1,0 +1,8 @@
+<map id="CheMPS2::Tensor3RDM::contract" name="CheMPS2::Tensor3RDM::contract">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor3RDM.html#a119e63036c8e52a6f77123798586af1e" title="Get the spin value of the Tensor3RDM. " alt="" coords="227,5,395,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorOperator.html#a7438680d389551c7c3d38075f83240ce" title="Get how many electrons there are more in the symmetry sector of the lower leg compared to the upper l..." alt="" coords="221,71,401,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285" title="Get the (real&#45;valued abelian) point group irrep difference between the symmetry sectors of the lower ..." alt="" coords="221,136,401,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor3RDM.html#a98adc5adc004f729db92bf6c5a853311" title="Get whether the tensor convention is prime last. " alt="" coords="227,201,395,243"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="221,267,401,308"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="232,333,391,359"/>
+</map>

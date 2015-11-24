@@ -1,0 +1,7 @@
+<map id="CheMPS2::TensorOperator::daxpy_transpose_tensorCD" name="CheMPS2::TensorOperator::daxpy_transpose_tensorCD">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorOperator.html#af503e805f0ba8e8435c467bd586a95ae" title="Get the storage jump corresponding to a certain tensor block. " alt="" coords="251,5,431,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorOperator.html#ada6b15656add8eba2066b38a6195af22" title="Get the number of symmetry blocks. " alt="" coords="251,71,431,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="245,137,436,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="261,187,420,214"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="251,239,431,280"/>
+</map>

@@ -1,5 +1,5 @@
 <map id="CheMPS2::CASSCF::augmentedHessianNR" name="CheMPS2::CASSCF::augmentedHessianNR">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="272,5,469,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="294,70,447,111"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="293,135,448,177"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="271,5,468,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="293,71,446,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="292,136,447,177"/>
 </map>

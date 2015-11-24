@@ -1,4 +1,8 @@
 <map id="CheMPS2::Tensor::gStorage" name="CheMPS2::Tensor::gStorage">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorDiag.html#a47170a08cf4c82a89b688e12a8b89275" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving right. " alt="" coords="245,5,403,46"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorDiag.html#aee82a1881caecda56a2c41ea40450070" title="Update the previous TensorDiag with a TensorT and add the result to this TensorDiag, when moving left. " alt="" coords="245,70,403,111"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a1ee5bb57153170fc200acea0859a5ef9" title="Left&#45;normalization. " alt="" coords="272,5,439,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorT.html#abc507af3cebe59f0800c12db47bd9752" title="Right&#45;normalization. " alt="" coords="274,56,437,83"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorT.html#a88c0e7491c53ff6ba5a737a380df188b" title="Multiply at the left with a diagonal TensorOperator. " alt="" coords="249,107,462,133"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TensorT.html#a06f61e76a7a6d46c1899141c75678aa8" title="Multiply at the right with a diagonal TensorOperator. " alt="" coords="244,157,467,184"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="515,74,677,115"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="725,74,937,115"/>
 </map>
