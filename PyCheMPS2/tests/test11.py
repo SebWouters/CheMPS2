@@ -87,11 +87,16 @@ RMSerror2DM = np.sqrt(RMSerror2DM)
 RMSerror3DM = np.sqrt(RMSerror3DM)
 print "Frobenius norm of the difference of the DMRG and FCI 2-RDM =", RMSerror2DM
 print "Frobenius norm of the difference of the DMRG and FCI 3-RDM =", RMSerror3DM
+del theFCI
+
+OptScheme.setInstruction(0, 1500, 1e-10,  3, 0.0)
+OptScheme.setInstruction(1, 2000, 1e-10, 10, 0.0)
+EnergyDMRG = theDMRG.Solve()
+theDMRG.calc2DMandCorrelations()
 
 # Clean-up
 # theDMRG.deleteStoredMPS()
 theDMRG.deleteStoredOperators()
-del theFCI
 del theDMRG
 del OptScheme
 del Prob
