@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>9. DMRG-SCF calculations &mdash; CheMPS2 1.5 documentation</title>
+    <title>9. DMRG-SCF calculations &mdash; CheMPS2 1.7 documentation</title>
     
-    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,13 +23,13 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7 documentation" href="index.html" />
     <link rel="next" title="10. Interfaces to psi4 and pyscf" href="interfaces.html" />
     <link rel="prev" title="8. DMRG-SCF" href="dmrgscf.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,20 +41,20 @@
         <li class="right" >
           <a href="dmrgscf.html" title="8. DMRG-SCF"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="dmrg-scf-calculations">
 <h1>9. DMRG-SCF calculations<a class="headerlink" href="#dmrg-scf-calculations" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="chemps2-dmrgscfoptions">
-<h2>9.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code><a class="headerlink" href="#chemps2-dmrgscfoptions" title="Permalink to this headline">¶</a></h2>
-<p>An instance of the <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code> class is required to perform DMRG-SCF calculations. It allows to overwrite the default algorithmic choices.</p>
+<h2>9.1. <tt class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></tt><a class="headerlink" href="#chemps2-dmrgscfoptions" title="Permalink to this headline">¶</a></h2>
+<p>An instance of the <tt class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></tt> class is required to perform DMRG-SCF calculations. It allows to overwrite the default algorithmic choices.</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="p">()</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="o">::</span><span class="n">setDoDIIS</span><span class="p">(</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">DoDIIS_in</span><span class="o">=</span><span class="nb">false</span> <span class="p">)</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span><span class="o">::</span><span class="n">setDIISGradientBranch</span><span class="p">(</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">DIISGradientBranch_in</span><span class="o">=</span><span class="mf">1e-2</span> <span class="p">)</span>
@@ -72,53 +72,53 @@
 </pre></div>
 </div>
 <ul>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">DoDIIS_in</span></code> allows to switch on the DIIS acceleration for DMRG-SCF calculations.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">DoDIIS_in</span></tt> allows to switch on the DIIS acceleration for DMRG-SCF calculations.</p>
 </li>
-<li><p class="first">If <code class="docutils literal"><span class="pre">DoDIIS_in==true</span></code>, the DIIS acceleration starts when the update norm <span class="math">\(\|\vec{x}\|_2\)</span> is smaller than <code class="docutils literal"><span class="pre">DIISGradientBranch_in</span></code>.</p>
+<li><p class="first">If <tt class="docutils literal"><span class="pre">DoDIIS_in==true</span></tt>, the DIIS acceleration starts when the update norm <span class="math">\(\|\vec{x}\|_2\)</span> is smaller than <tt class="docutils literal"><span class="pre">DIISGradientBranch_in</span></tt>.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">NumDIISVecs_in</span></code> allows to set the size of the DIIS list.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">NumDIISVecs_in</span></tt> allows to set the size of the DIIS list.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">StoreDIIS_in</span></code> allows to switch off storing the DIIS checkpoint file to disk.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">StoreDIIS_in</span></tt> allows to switch off storing the DIIS checkpoint file to disk.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">DIISStorageName_in</span></code> contains the filename of the DIIS checkpoint.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">DIISStorageName_in</span></tt> contains the filename of the DIIS checkpoint.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">MaxIterations_in</span></code> contains the maximum number of DMRG-SCF iterations to be performed.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">MaxIterations_in</span></tt> contains the maximum number of DMRG-SCF iterations to be performed.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">GradientThreshold_in</span></code> specifies the convergence threshold for the norm of the orbital rotation gradient <span class="math">\(\|\vec{g}\|_2\)</span>.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">GradientThreshold_in</span></tt> specifies the convergence threshold for the norm of the orbital rotation gradient <span class="math">\(\|\vec{g}\|_2\)</span>.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">StoreUnitary_in</span></code> allows to switch off storing the orbital rotation checkpoint file to disk.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">StoreUnitary_in</span></tt> allows to switch off storing the orbital rotation checkpoint file to disk.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">UnitaryStorageName_in</span></code> contains the filename of the orbital rotation checkpoint.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">UnitaryStorageName_in</span></tt> contains the filename of the orbital rotation checkpoint.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">StateAveraging_in</span></code> allows to switch off state-averaged DMRG-SCF calculations (to perform state-specific DMRG-SCF calculations).</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">StateAveraging_in</span></tt> allows to switch off state-averaged DMRG-SCF calculations (to perform state-specific DMRG-SCF calculations).</p>
 </li>
 <li><dl class="first docutils">
-<dt>The variable <code class="docutils literal"><span class="pre">WhichActiveSpace_in</span></code> allows to switch between active space orbital choices (please remember the remark in the section <a class="reference internal" href="inoutput.html#chemps2-orbitalchoiceordering"><span>Orbital choice and ordering</span></a>):</dt>
+<dt>The variable <tt class="docutils literal"><span class="pre">WhichActiveSpace_in</span></tt> allows to switch between active space orbital choices (please remember the remark in the section <a class="reference internal" href="inoutput.html#chemps2-orbitalchoiceordering"><em>Orbital choice and ordering</em></a>):</dt>
 <dd><ul class="first last simple">
-<li>input orbitals (<code class="docutils literal"><span class="pre">0</span></code>)</li>
-<li>natural orbitals (<code class="docutils literal"><span class="pre">1</span></code>)</li>
-<li>localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (<code class="docutils literal"><span class="pre">2</span></code>)</li>
+<li>input orbitals (<tt class="docutils literal"><span class="pre">0</span></tt>)</li>
+<li>natural orbitals (<tt class="docutils literal"><span class="pre">1</span></tt>)</li>
+<li>localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (<tt class="docutils literal"><span class="pre">2</span></tt>)</li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">DumpCorrelations_in</span></code> allows to switch on printing the correlation functions defined in the section <a class="reference internal" href="inoutput.html#chemps2-dmrg-object"><span>CheMPS2::DMRG</span></a> after each DMRG calculation during the DMRG-SCF iterations.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">DumpCorrelations_in</span></tt> allows to switch on printing the correlation functions defined in the section <a class="reference internal" href="inoutput.html#chemps2-dmrg-object"><em>CheMPS2::DMRG</em></a> after each DMRG calculation during the DMRG-SCF iterations.</p>
 </li>
-<li><p class="first">The variable <code class="docutils literal"><span class="pre">StartLocRandom_in</span></code> allows to start the localization of the orbitals (if <code class="docutils literal"><span class="pre">WhichActiveSpace_in==2</span></code>) from a random orbital rotation. To study the <span class="math">\(\pi\)</span>-orbitals of polyenes, for example, the matrix elements should be generated in the <span class="math">\(\mathsf{Cs}\)</span> subgroup of the molecule&#8217;s point group in order to be able to localize them. In order to break the symmetry of the R(O)HF orbitals during localization, it is important to start from a random orbital rotation.</p>
+<li><p class="first">The variable <tt class="docutils literal"><span class="pre">StartLocRandom_in</span></tt> allows to start the localization of the orbitals (if <tt class="docutils literal"><span class="pre">WhichActiveSpace_in==2</span></tt>) from a random orbital rotation. To study the <span class="math">\(\pi\)</span>-orbitals of polyenes, for example, the matrix elements should be generated in the <span class="math">\(\mathsf{Cs}\)</span> subgroup of the molecule&#8217;s point group in order to be able to localize them. In order to break the symmetry of the R(O)HF orbitals during localization, it is important to start from a random orbital rotation.</p>
 </li>
 </ul>
 </div>
 <div class="section" id="chemps2-casscf">
-<h2>9.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code><a class="headerlink" href="#chemps2-casscf" title="Permalink to this headline">¶</a></h2>
-<p>Augmented Hessian Newton-Raphson DMRG-SCF calculations can be performed with the <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code> class:</p>
+<h2>9.2. <tt class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></tt><a class="headerlink" href="#chemps2-casscf" title="Permalink to this headline">¶</a></h2>
+<p>Augmented Hessian Newton-Raphson DMRG-SCF calculations can be performed with the <tt class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></tt> class:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">CASSCF</span><span class="p">(</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span> <span class="o">*</span> <span class="n">HamIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">DOCCin</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">SOCCin</span> <span class="p">)</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">setupStart</span><span class="p">(</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NoccIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NDMRGIn</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">NvirtIn</span> <span class="p">)</span>
 <span class="kt">double</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">doCASSCFnewtonraphson</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Nelectrons</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">TwoS</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Irrep</span><span class="p">,</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span> <span class="o">*</span> <span class="n">OptScheme</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">rootNum</span><span class="p">,</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRGSCFoptions</span> <span class="o">*</span> <span class="n">theDMRGSCFoptions</span> <span class="p">)</span>
 </pre></div>
 </div>
-<p>The variables <code class="docutils literal"><span class="pre">DOCCin</span></code>, <code class="docutils literal"><span class="pre">SOCCin</span></code>, <code class="docutils literal"><span class="pre">NoccIn</span></code>, <code class="docutils literal"><span class="pre">NDMRGIn</span></code>, <code class="docutils literal"><span class="pre">NvirtIn</span></code> are arrays which have as length the number of irreps of the point group of the Hamiltonian (see the section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><span>Custom matrix elements</span></a>). The first two arrays contain the number of doubly and singly occupied orbitals per irrep of the initial R(O)HF calculation. The last three arrays define for each of the irreps the number of occupied, active, and virtual orbitals, respectively.</p>
-<p>The three functions above should be called in the order they are displayed. The augmented Hessian Newton-Raphson DMRG-SCF calculation is started by calling the function <code class="docutils literal"><span class="pre">doCASSCFnewtonraphson</span></code>. The variables <code class="docutils literal"><span class="pre">Nelectrons</span></code>, <code class="docutils literal"><span class="pre">TwoS</span></code>, and <code class="docutils literal"><span class="pre">Irrep</span></code> define the active space symmetry sector. Note that <code class="docutils literal"><span class="pre">TwoS</span></code> is twice the targeted spin (multiplicity minus one). The numbering convention for the irreps can be found in the section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><span>Custom matrix elements</span></a>. The variable <code class="docutils literal"><span class="pre">rootNum</span></code> defines how many states should be calculated during each DMRG calculation: <code class="docutils literal"><span class="pre">rootNum==1</span></code> means ground state only, <code class="docutils literal"><span class="pre">rootNum==2</span></code> means ground state and first excited state, etc. The DMRG instructions are passed in the <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> object and the DMRG-SCF algorithmic choices in the <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code> object. After completion, the function <code class="docutils literal"><span class="pre">doCASSCFnewtonraphson</span></code> returns the DMRG-SCF energy.</p>
-<p>For DMRG-SCF calculations, the number of reduced virtual basis states should not be descreased in the <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> object. It is however advised to perform a few sweeps without noise at the largest value of <span class="math">\(D_{\mathsf{SU(2)}}\)</span>. When you want to extrapolate the energy in the converged active space, it is better to create an orbital rotation checkpoint, and restart the DMRG-SCF calculation for one iteration (<code class="docutils literal"><span class="pre">MaxIterations_in==1</span></code>).</p>
+<p>The variables <tt class="docutils literal"><span class="pre">DOCCin</span></tt>, <tt class="docutils literal"><span class="pre">SOCCin</span></tt>, <tt class="docutils literal"><span class="pre">NoccIn</span></tt>, <tt class="docutils literal"><span class="pre">NDMRGIn</span></tt>, <tt class="docutils literal"><span class="pre">NvirtIn</span></tt> are arrays which have as length the number of irreps of the point group of the Hamiltonian (see the section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><em>Custom matrix elements</em></a>). The first two arrays contain the number of doubly and singly occupied orbitals per irrep of the initial R(O)HF calculation. The last three arrays define for each of the irreps the number of occupied, active, and virtual orbitals, respectively.</p>
+<p>The three functions above should be called in the order they are displayed. The augmented Hessian Newton-Raphson DMRG-SCF calculation is started by calling the function <tt class="docutils literal"><span class="pre">doCASSCFnewtonraphson</span></tt>. The variables <tt class="docutils literal"><span class="pre">Nelectrons</span></tt>, <tt class="docutils literal"><span class="pre">TwoS</span></tt>, and <tt class="docutils literal"><span class="pre">Irrep</span></tt> define the active space symmetry sector. Note that <tt class="docutils literal"><span class="pre">TwoS</span></tt> is twice the targeted spin (multiplicity minus one). The numbering convention for the irreps can be found in the section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><em>Custom matrix elements</em></a>. The variable <tt class="docutils literal"><span class="pre">rootNum</span></tt> defines how many states should be calculated during each DMRG calculation: <tt class="docutils literal"><span class="pre">rootNum==1</span></tt> means ground state only, <tt class="docutils literal"><span class="pre">rootNum==2</span></tt> means ground state and first excited state, etc. The DMRG instructions are passed in the <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> object and the DMRG-SCF algorithmic choices in the <tt class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></tt> object. After completion, the function <tt class="docutils literal"><span class="pre">doCASSCFnewtonraphson</span></tt> returns the DMRG-SCF energy.</p>
+<p>For DMRG-SCF calculations, the number of reduced virtual basis states should not be descreased in the <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> object. It is however advised to perform a few sweeps without noise at the largest value of <span class="math">\(D_{\mathsf{SU(2)}}\)</span>. When you want to extrapolate the energy in the converged active space, it is better to create an orbital rotation checkpoint, and restart the DMRG-SCF calculation for one iteration (<tt class="docutils literal"><span class="pre">MaxIterations_in==1</span></tt>).</p>
 </div>
 </div>
 
@@ -126,7 +126,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
               <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
@@ -134,8 +134,8 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">9. DMRG-SCF calculations</a><ul>
-<li><a class="reference internal" href="#chemps2-dmrgscfoptions">9.1. <code class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></code></a></li>
-<li><a class="reference internal" href="#chemps2-casscf">9.2. <code class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></code></a></li>
+<li><a class="reference internal" href="#chemps2-dmrgscfoptions">9.1. <tt class="docutils literal"><span class="pre">CheMPS2::DMRGSCFoptions</span></tt></a></li>
+<li><a class="reference internal" href="#chemps2-casscf">9.2. <tt class="docutils literal"><span class="pre">CheMPS2::CASSCF</span></tt></a></li>
 </ul>
 </li>
 </ul>
@@ -146,14 +146,12 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="interfaces.html"
                         title="next chapter">10. Interfaces to psi4 and pyscf</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="sources/dmrgscfcalcs.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/dmrgscfcalcs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -170,7 +168,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -182,12 +180,12 @@
         <li class="right" >
           <a href="dmrgscf.html" title="8. DMRG-SCF"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2013-2015, Sebastian Wouters.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. Installation &mdash; CheMPS2 1.5 documentation</title>
+    <title>1. Installation &mdash; CheMPS2 1.7 documentation</title>
     
-    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5',
+        VERSION:     '1.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,13 +23,13 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.5 documentation" href="index.html" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7 documentation" href="index.html" />
     <link rel="next" title="2. Publications" href="publications.html" />
     <link rel="prev" title="CheMPS2 documentation" href="index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,14 +41,14 @@
         <li class="right" >
           <a href="index.html" title="CheMPS2 documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <span class="target" id="index-0"></span><span class="target" id="index-1"></span><span class="target" id="index-2"></span><span class="target" id="index-3"></span><span class="target" id="index-4"></span><div class="section" id="installation">
 <span id="index-5"></span><h1>1. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
@@ -97,10 +97,10 @@
 </pre></div>
 </div>
 <ol class="arabic simple">
-<li>Option1 is the <code class="docutils literal"><span class="pre">c++</span></code> compiler; typically <code class="docutils literal"><span class="pre">g++</span></code>, <code class="docutils literal"><span class="pre">icpc</span></code>, or <code class="docutils literal"><span class="pre">clang++</span></code> on Linux. It is advised to use the intel compiler if available.</li>
-<li>Option2 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the intel math kernel library.</li>
-<li>/option3 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/option3/lib/x86_64-linux-gnu</span></code>, the headers in <code class="docutils literal"><span class="pre">/option3/include/chemps2</span></code>, and the binary in <code class="docutils literal"><span class="pre">/option3/bin/chemps2</span></code>.</li>
-<li>Option4 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide <code class="docutils literal"><span class="pre">mpi.h</span></code>. Option1 should hence be the <code class="docutils literal"><span class="pre">mpic++</span></code> compiler; typically <code class="docutils literal"><span class="pre">mpic++</span></code> or <code class="docutils literal"><span class="pre">mpiicpc</span></code> on Linux. It is advised to use the intel compiler if available.</li>
+<li>Option1 is the <tt class="docutils literal"><span class="pre">c++</span></tt> compiler; typically <tt class="docutils literal"><span class="pre">g++</span></tt>, <tt class="docutils literal"><span class="pre">icpc</span></tt>, or <tt class="docutils literal"><span class="pre">clang++</span></tt> on Linux. It is advised to use the intel compiler if available.</li>
+<li>Option2 can be <tt class="docutils literal"><span class="pre">ON</span></tt> or <tt class="docutils literal"><span class="pre">OFF</span></tt> and is used to switch on the intel math kernel library.</li>
+<li>/option3 is the prefix of the installation directory; typically <tt class="docutils literal"><span class="pre">/usr</span></tt> or <tt class="docutils literal"><span class="pre">/usr/local</span></tt> on Linux. On my computer, libchemps2 is then installed in <tt class="docutils literal"><span class="pre">/option3/lib/x86_64-linux-gnu</span></tt>, the headers in <tt class="docutils literal"><span class="pre">/option3/include/chemps2</span></tt>, and the binary in <tt class="docutils literal"><span class="pre">/option3/bin/chemps2</span></tt>.</li>
+<li>Option4 can be <tt class="docutils literal"><span class="pre">ON</span></tt> or <tt class="docutils literal"><span class="pre">OFF</span></tt> and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide <tt class="docutils literal"><span class="pre">mpi.h</span></tt>. Option1 should hence be the <tt class="docutils literal"><span class="pre">mpic++</span></tt> compiler; typically <tt class="docutils literal"><span class="pre">mpic++</span></tt> or <tt class="docutils literal"><span class="pre">mpiicpc</span></tt> on Linux. It is advised to use the intel compiler if available.</li>
 </ol>
 <p>If one or more of the required libraries are not found, use the command</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ CMAKE_INCLUDE_PATH</span><span class="o">=</span>option5 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>option6 <span class="nv">CXX</span><span class="o">=</span>option1 cmake .. -DMKL<span class="o">=</span>option2 -DCMAKE_INSTALL_PREFIX<span class="o">=</span>/option3 -DWITH_MPI<span class="o">=</span>option4
@@ -111,7 +111,7 @@
 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre></div>
 </div>
-<p>For debian/sid, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. If CMake complains about the HDF5 headers, try to pass it with the option <code class="docutils literal"><span class="pre">-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial</span></code>.</p>
+<p>For debian/sid, the HDF5 headers are located in the folder <tt class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></tt>. If CMake complains about the HDF5 headers, try to pass it with the option <tt class="docutils literal"><span class="pre">-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial</span></tt>.</p>
 <p>To compile, run:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make
 </pre></div>
@@ -120,7 +120,7 @@
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make install
 </pre></div>
 </div>
-<p>For non-standard installation directories, please remember to append the library path to <code class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></code> in your <code class="docutils literal"><span class="pre">.bashrc</span></code>.</p>
+<p>For non-standard installation directories, please remember to append the library path to <tt class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></tt> in your <tt class="docutils literal"><span class="pre">.bashrc</span></tt>.</p>
 </div>
 <div class="section" id="test-libchemps2">
 <h2>1.4. Test libchemps2<a class="headerlink" href="#test-libchemps2" title="Permalink to this headline">¶</a></h2>
@@ -133,19 +133,17 @@
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /sourcefolder/chemps2/build/tests
 <span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test1
 <span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test2
-<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test3
-<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test4
-<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test5
-<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test7
-<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test10
+...
+<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test11
+<span class="nv">$ OMP_NUM_THREADS</span><span class="o">=</span>YYY mpirun -np ZZZ ./test12
 </pre></div>
 </div>
-<p><code class="docutils literal"><span class="pre">YYY</span></code> specifies the number of threads per process and <code class="docutils literal"><span class="pre">ZZZ</span></code> the number of processes. The tests only require a very limited amount of memory (order 100 MB). Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.</p>
+<p><tt class="docutils literal"><span class="pre">YYY</span></tt> specifies the number of threads per process and <tt class="docutils literal"><span class="pre">ZZZ</span></tt> the number of processes. Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.</p>
 </div>
 <div class="section" id="test-the-chemps2-binary">
 <h2>1.5. Test the chemps2 binary<a class="headerlink" href="#test-the-chemps2-binary" title="Permalink to this headline">¶</a></h2>
 <p>To test the chemps2 binary for compilation <strong>without MPI</strong>, run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>man /sourcefolder/chemps2/manpage.1
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>man /sourcefolder/chemps2/chemps2.1
 <span class="nv">$ </span><span class="nb">cd</span> /sourcefolder/chemps2/build/CheMPS2
 <span class="nv">$ </span>./chemps2 --help
 <span class="nv">$ </span>./chemps2 --fcidump<span class="o">=</span>/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP <span class="se">\</span>
@@ -166,11 +164,11 @@
 </div>
 <div class="section" id="build-pychemps2">
 <h2>1.6. Build PyCheMPS2<a class="headerlink" href="#build-pychemps2" title="Permalink to this headline">¶</a></h2>
-<p>PyCheMPS2 is a python interface to libchemps2, for compilation <strong>without MPI</strong>. It can be built with <a class="reference external" href="http://cython.org/">Cython</a>. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with <code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code>. For non-standard installation directories of CheMPS2, please remember to append the library path to <code class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></code> in your <code class="docutils literal"><span class="pre">.bashrc</span></code>. In addition, the include path should be appended to <code class="docutils literal"><span class="pre">CPATH</span></code>:</p>
+<p>PyCheMPS2 is a python interface to libchemps2, for compilation <strong>without MPI</strong>. It can be built with <a class="reference external" href="http://cython.org/">Cython</a>. The installation is independent of CMake and assumes that you have installed the CheMPS2 library with <tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt>. For non-standard installation directories of CheMPS2, please remember to append the library path to <tt class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></tt> in your <tt class="docutils literal"><span class="pre">.bashrc</span></tt>. In addition, the include path should be appended to <tt class="docutils literal"><span class="pre">CPATH</span></tt>:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">CPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CPATH</span><span class="si">}</span>:/option3/include
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">/option3</span></code> is the option provided to CMake with <code class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX=/option3</span></code> above. For debian/sid, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. If it was explicitly passed to CMake, it should also be appended to <code class="docutils literal"><span class="pre">CPATH</span></code>:</p>
+<p>where <tt class="docutils literal"><span class="pre">/option3</span></tt> is the option provided to CMake with <tt class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX=/option3</span></tt> above. For debian/sid, the HDF5 headers are located in the folder <tt class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></tt>. If it was explicitly passed to CMake, it should also be appended to <tt class="docutils literal"><span class="pre">CPATH</span></tt>:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">CPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CPATH</span><span class="si">}</span>:/option3/include:/usr/include/hdf5/serial
 </pre></div>
 </div>
@@ -180,8 +178,8 @@
 <span class="nv">$ </span>python setup.py install --prefix<span class="o">=</span>/option3
 </pre></div>
 </div>
-<p>On my machine, the python wrapper is installed to the folder <code class="docutils literal"><span class="pre">/option3/lib/python2.7/site-packages</span></code>, but the folder <code class="docutils literal"><span class="pre">lib</span></code> and the distribution of python can vary.</p>
-<p>Compilation of PyCheMPS2 occurs by linking to the <code class="docutils literal"><span class="pre">c++</span></code> library in the installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to reinstall the <code class="docutils literal"><span class="pre">c++</span></code> library first, before reinstalling PyCheMPS2!</p>
+<p>On my machine, the python wrapper is installed to the folder <tt class="docutils literal"><span class="pre">/option3/lib/python2.7/site-packages</span></tt>, but the folder <tt class="docutils literal"><span class="pre">lib</span></tt> and the distribution of python can vary.</p>
+<p>Compilation of PyCheMPS2 occurs by linking to the <tt class="docutils literal"><span class="pre">c++</span></tt> library in the installation directory. The installation of PyCheMPS2 will fail if that library is not properly installed. If you have pulled a newer version of CheMPS2, please remember to reinstall the <tt class="docutils literal"><span class="pre">c++</span></tt> library first, before reinstalling PyCheMPS2!</p>
 </div>
 <div class="section" id="test-pychemps2">
 <h2>1.7. Test PyCheMPS2<a class="headerlink" href="#test-pychemps2" title="Permalink to this headline">¶</a></h2>
@@ -190,25 +188,20 @@
 <span class="nv">$ </span><span class="nb">export </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="si">}</span>:/option3/lib/python2.7/site-packages
 <span class="nv">$ </span>python test1.py
 <span class="nv">$ </span>python test2.py
-<span class="nv">$ </span>python test3.py
-<span class="nv">$ </span>python test4.py
-<span class="nv">$ </span>python test5.py
-<span class="nv">$ </span>python test6.py
-<span class="nv">$ </span>python test7.py
-<span class="nv">$ </span>python test8.py
-<span class="nv">$ </span>python test9.py
-<span class="nv">$ </span>python test10.py
+...
+<span class="nv">$ </span>python test11.py
+<span class="nv">$ </span>python test12.py
 </pre></div>
 </div>
-<p>If you compiled the <code class="docutils literal"><span class="pre">c++</span></code> library with <code class="docutils literal"><span class="pre">-DMKL=ON</span></code>, you might get the error</p>
+<p>If you compiled the <tt class="docutils literal"><span class="pre">c++</span></tt> library with <tt class="docutils literal"><span class="pre">-DMKL=ON</span></tt>, you might get the error</p>
 <div class="highlight-bash"><div class="highlight"><pre>Intel MKL FATAL ERROR: Cannot load libmkl_avx.so or libmkl_def.so.
 </pre></div>
 </div>
-<p>This issue of using Intel&#8217;s MKL inside python is known and reported. To get the python tests to run, you can set the variable <code class="docutils literal"><span class="pre">LD_PRELOAD</span></code> in order to preload libmkl_rt.so. On my system, this is done with</p>
+<p>This issue of using Intel&#8217;s MKL inside python is known and reported. To get the python tests to run, you can set the variable <tt class="docutils literal"><span class="pre">LD_PRELOAD</span></tt> in order to preload libmkl_rt.so. On my system, this is done with</p>
 <div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">LD_PRELOAD</span><span class="o">=</span>/opt/intel/mkl/lib/intel64/libmkl_rt.so
 </pre></div>
 </div>
-<p>The python tests do exactly the same thing as the <code class="docutils literal"><span class="pre">c++</span></code> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 100 MB). Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.</p>
+<p>The python tests do exactly the same thing as the <tt class="docutils literal"><span class="pre">c++</span></tt> tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.</p>
 </div>
 </div>
 
@@ -216,7 +209,7 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
               <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
@@ -241,14 +234,12 @@
   <h4>Next topic</h4>
   <p class="topless"><a href="publications.html"
                         title="next chapter">2. Publications</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="sources/sourcecode.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/sourcecode.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -265,7 +256,7 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -277,12 +268,12 @@
         <li class="right" >
           <a href="index.html" title="CheMPS2 documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2013-2015, Sebastian Wouters.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

@@ -115,13 +115,11 @@ To test libchemps2 for compilation **with MPI**, run:
     $ cd /sourcefolder/chemps2/build/tests
     $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test1
     $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test2
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test3
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test4
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test5
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test7
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test10
+    ...
+    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test11
+    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test12
 
-``YYY`` specifies the number of threads per process and ``ZZZ`` the number of processes. The tests only require a very limited amount of memory (order 100 MB). Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.
+``YYY`` specifies the number of threads per process and ``ZZZ`` the number of processes. Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.
 
 Test the chemps2 binary
 -----------------------
@@ -130,13 +128,11 @@ To test the chemps2 binary for compilation **without MPI**, run:
 
 .. code-block:: bash
 
+    $ man /sourcefolder/chemps2/chemps2.1
     $ cd /sourcefolder/chemps2/build/CheMPS2
     $ ./chemps2 --help
     $ ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \
                 --group=5 \
-                --multiplicity=1 \
-                --nelectrons=10 \
-                --irrep=0 \
                 --sweep_d=200,1000 \
                 --sweep_econv=1e-8,1e-8 \
                 --sweep_maxit=2,10 \
@@ -189,14 +185,9 @@ When libchemps2 has been compiled **without MPI**, PyCheMPS2 can be tested by ru
     $ export PYTHONPATH=${PYTHONPATH}:/option3/lib/python2.7/site-packages
     $ python test1.py
     $ python test2.py
-    $ python test3.py
-    $ python test4.py
-    $ python test5.py
-    $ python test6.py
-    $ python test7.py
-    $ python test8.py
-    $ python test9.py
-    $ python test10.py
+    ...
+    $ python test11.py
+    $ python test12.py
 
 
 If you compiled the ``c++`` library with ``-DMKL=ON``, you might get the error
@@ -211,6 +202,6 @@ This issue of using Intel's MKL inside python is known and reported. To get the 
 
     $ export LD_PRELOAD=/opt/intel/mkl/lib/intel64/libmkl_rt.so
 
-The python tests do exactly the same thing as the ``c++`` tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. They only require a very limited amount of memory (order 100 MB). Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.
+The python tests do exactly the same thing as the ``c++`` tests above, and illustrate the usage of the python interface to libchemps2. The tests should end with a line stating whether or not they succeeded. Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.
 
 
