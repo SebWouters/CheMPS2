@@ -62,11 +62,8 @@ int main(void){
    
    //Setup convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(1);
-   int D = 1000;
-   double Econv = 1e-8;
-   int maxSweeps = 20;
-   double noisePrefactor = 0.0;
-   OptScheme->setInstruction(0,D,Econv,maxSweeps,noisePrefactor);
+   //OptScheme->setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0, 1000, 1e-8, 20, 0.0);
 
    //Run CASSCF
    int rootNum = 2; //Do the first excited state

@@ -32,7 +32,7 @@ filename  = '../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
 orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 DOCC = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see O2.ccpvdz.out
-SOCC = np.zeros([ 8 ], dtype=ctypes.c_int)
+SOCC = np.array([ 0, 0, 0, 0, 0, 0, 0, 0 ], dtype=ctypes.c_int)
 L = Ham.getL()
 
 # Define the symmetry sector
@@ -44,16 +44,9 @@ Irrep = 0    # The targeted irrep
 theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC)
 
 # Define the active space
-Nocc  = np.zeros([L], dtype=ctypes.c_int)
-NDMRG = np.zeros([L], dtype=ctypes.c_int)
-Nvirt = np.zeros([L], dtype=ctypes.c_int)
-Nocc[0] = Nocc[5] = 1
-Nocc[1] = Nocc[2] = Nocc[3] = Nocc[4] = Nocc[6] = Nocc[7] = 0
-NDMRG[0] = NDMRG[5] = 2
-NDMRG[1] = NDMRG[4] = 0
-NDMRG[2] = NDMRG[3] = NDMRG[6] = NDMRG[7] = 2
-Nvirt[0] = Nvirt[5] = 4
-Nvirt[1] = Nvirt[2] = Nvirt[3] = Nvirt[4] = Nvirt[6] = Nvirt[7] = 1
+Nocc  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
+NDMRG = np.array([ 2, 0, 2, 2, 0, 2, 2, 2 ], dtype=ctypes.c_int)
+Nvirt = np.array([ 4, 1, 1, 1, 1, 4, 1, 1 ], dtype=ctypes.c_int)
 theDMRGSCF.setupStart(Nocc,NDMRG,Nvirt)
 
 # Setting up the ConvergenceScheme
