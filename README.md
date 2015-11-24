@@ -32,23 +32,25 @@ beyond the capabilities of full configuration interaction (FCI):
 
 In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. 
 The method is therefore ideal to replace the FCI solver in the complete active 
-space configuration interaction (CASCI) and complete active space self 
-consistent field (CASSCF) methods, when the active space sizes become 
-prohibitively expensive for FCI. The corresponding methods are called DMRG-CI 
-and DMRG-SCF, respectively. Because DMRG can handle the abovementioned active 
-space sizes, it allows to obtain FCI energies for small systems such as dimers, 
-while for larger systems it is ideal to treat the static/strong correlation in 
-a large active space.
+space self consistent field (CASSCF) method, when the active space size becomes 
+prohibitively expensive for FCI. The corresponding method is called DMRG-SCF. 
+Because DMRG can handle the abovementioned active space sizes, it allows to
+obtain FCI energies for small systems such as dimers, while for larger systems
+it is ideal to treat the static/strong correlation in a large active space.
 
-The design philosophy for CheMPS2 is to be a lightweight, efficient, and 
-stable library. For an input Hamiltonian and targeted symmetry sector, the 
-library performs successive DMRG sweeps according to a user-defined 
-convergence scheme. As output, the library returns the minimal encountered 
-energy as well as the 2-RDM of the active space. With the latter, various 
-molecular properties can be calculated, as well as the gradient and Hessian 
-for orbital rotations or nuclear displacements. In addition, several 
-correlation functions can be obtained to investigate the electronic structure 
-in the active space.
+CheMPS2 is designed to be a high-performance library. For an input
+Hamiltonian and targeted symmetry sector, the library performs successive
+DMRG sweeps according to a user-defined convergence scheme. As output,
+the library returns the minimal encountered energy as well as the 2-RDM,
+3-RDM and various orbital correlation functions in the active space. With 
+the 2-RDM, various molecular properties can be calculated, as well as the 
+gradient and Hessian for orbital rotations or nuclear displacements.
+
+CheMPS2 is parallelized for shared memory architectures with the Open
+Multi-Processing ([OpenMP](http://openmp.org/wp/)) API and for distributed 
+memory architectures with the Message Passing Interface
+([MPI](http://www.mpi-forum.org/)). A hybrid combination of both
+parallelization strategies is supported.
 
 To gain a better understanding of how to perform DMRG calculations for
 large active spaces, you are encouraged to read the
@@ -66,14 +68,6 @@ library is illustrated in
 The interfaces to [psi4](http://www.psicode.org)
 and [pyscf](https://github.com/sunqm/pyscf) are described in the
 [user manual](http://sebwouters.github.io/CheMPS2/index.html).
-
-CheMPS2 is parallelized for shared memory architectures with the Open
-Multi-Processing ([OpenMP](http://openmp.org/wp/)) API and for
-distributed memory architectures with the Message Passing Interface
-([MPI](http://www.mpi-forum.org/)). A hybrid combination of both
-parallelization strategies is supported. In the future,
-the calculation of the 2-RDM of the active space will be extended
-to the 3-RDM.
 
 
 How to acknowledge CheMPS2
@@ -235,15 +229,12 @@ To test libchemps2 for compilation **with MPI**, run:
     > cd /sourcefolder/chemps2/build/tests
     > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test1
     > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test2
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test3
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test4
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test5
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test7
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test10
+    ...
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test11
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test12
 
 `YYY` specifies the number of threads per process and `ZZZ` the number of
-processes. The tests only require a very limited amount of memory (order
-100 MB). Note that the tests are too small to see (near) linear scaling
+processes. Note that the tests are too small to see (near) linear scaling
 with the number of cores, although improvement should still be noticeable.
 
 ### 5. Test the chemps2 binary
@@ -313,14 +304,9 @@ by running (remember that the python site-packages folder can vary):
     > export PYTHONPATH=${PYTHONPATH}:/option3/lib/python2.7/site-packages
     > python test1.py
     > python test2.py
-    > python test3.py
-    > python test4.py
-    > python test5.py
-    > python test6.py
-    > python test7.py
-    > python test8.py
-    > python test9.py
-    > python test10.py
+    ...
+    > python test11.py
+    > python test12.py
 
 If you compiled the `c++` library with `-DMKL=ON`, you might get the error
 
@@ -334,8 +320,7 @@ order to preload libmkl\_rt.so. On my system, this is done with
 
 The python tests do exactly the same thing as the `c++` tests above, and
 illustrate the usage of the python interface to libchemps2. The tests
-should end with a line stating whether or not they succeeded. They only
-require a very limited amount of memory (order 100 MB). Note that the
+should end with a line stating whether or not they succeeded. Note that the
 tests are too small to see (near) linear scaling with the number of cores,
 although improvement should still be noticeable.
 
@@ -772,8 +757,7 @@ contains the matrix elements for test8 and test9.
 [PyCheMPS2/tests/test10.py](PyCheMPS2/tests/test10.py) is the python version of
 [tests/test10.cpp.in](tests/test10.cpp.in)
 
-These test files illustrate how to use libchemps2. The tests only
-require a very limited amount of memory (order 100 MB). Note that the
+These test files illustrate how to use libchemps2. Note that the
 tests are too small to see (near) linear scaling with the number of cores,
 although improvement should still be noticeable.
 
