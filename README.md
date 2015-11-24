@@ -712,8 +712,17 @@ calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site
 basis and in the momentum basis. For the latter, the matrix elements only have
 fourfold permutation symmetry.
 
+[tests/test11.cpp.in](tests/test11.cpp.in) is a copy of
+[tests/test3.cpp.in](tests/test3.cpp.in), in which the FCI and DMRG
+2- and 3-RDM are compared. This test also shows that after calculating the
+2- and/or 3-RDM, it is possible to continue sweeping.
+
+[tests/test12.cpp.in](tests/test12.cpp.in) is a copy of
+[tests/test4.cpp.in](tests/test4.cpp.in), in which the FCI and DMRG
+2- and 3-RDM are compared for a wavefunction with higher multiplicity.
+
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
-contains the matrix elements for test3.
+contains the matrix elements for test3 and test11.
 
 [tests/matrixelements/H2O.631G.FCIDUMP](tests/matrixelements/H2O.631G.FCIDUMP)
 contains the matrix elements for test2.
@@ -727,35 +736,8 @@ contains the matrix elements for test6 and test7.
 [tests/matrixelements/N2.CCPVDZ.FCIDUMP](tests/matrixelements/N2.CCPVDZ.FCIDUMP)
 contains the matrix elements for test8 and test9.
 
-[PyCheMPS2/tests/test1.py](PyCheMPS2/tests/test1.py) is the python version of
-[tests/test1.cpp.in](tests/test1.cpp.in)
-
-[PyCheMPS2/tests/test2.py](PyCheMPS2/tests/test2.py) is the python version of
-[tests/test2.cpp.in](tests/test2.cpp.in)
-
-[PyCheMPS2/tests/test3.py](PyCheMPS2/tests/test3.py) is the python version of
-[tests/test3.cpp.in](tests/test3.cpp.in)
-
-[PyCheMPS2/tests/test4.py](PyCheMPS2/tests/test4.py) is the python version of
-[tests/test4.cpp.in](tests/test4.cpp.in)
-
-[PyCheMPS2/tests/test5.py](PyCheMPS2/tests/test5.py) is the python version of
-[tests/test5.cpp.in](tests/test5.cpp.in)
-
-[PyCheMPS2/tests/test6.py](PyCheMPS2/tests/test6.py) is the python version of
-[tests/test6.cpp.in](tests/test6.cpp.in)
-
-[PyCheMPS2/tests/test7.py](PyCheMPS2/tests/test7.py) is the python version of
-[tests/test7.cpp.in](tests/test7.cpp.in)
-
-[PyCheMPS2/tests/test8.py](PyCheMPS2/tests/test8.py) is the python version of
-[tests/test8.cpp.in](tests/test8.cpp.in)
-
-[PyCheMPS2/tests/test9.py](PyCheMPS2/tests/test9.py) is the python version of
-[tests/test9.cpp.in](tests/test9.cpp.in)
-
-[PyCheMPS2/tests/test10.py](PyCheMPS2/tests/test10.py) is the python version of
-[tests/test10.cpp.in](tests/test10.cpp.in)
+The python tests in [PyCheMPS2/tests/](PyCheMPS2/tests/) are an identical
+conversion of the c++ tests.
 
 These test files illustrate how to use libchemps2. Note that the
 tests are too small to see (near) linear scaling with the number of cores,
