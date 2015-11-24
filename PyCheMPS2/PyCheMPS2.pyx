@@ -28,6 +28,7 @@ cimport Ham
 cimport Prob
 cimport Corr
 cimport TwoRDM
+cimport ThreeRDM
 cimport DMRGsolver
 cimport DMRGSCFopt
 cimport DMRGSCF
@@ -132,6 +133,8 @@ cdef class PyDMRG:
         return self.thisptr.Solve()
     def calc2DMandCorrelations(self):
         self.thisptr.calc2DMandCorrelations()
+    def calc_rdms_and_correlations(self, bint do_3rdm):
+        self.thisptr.calc_rdms_and_correlations( do_3rdm )
     def deleteStoredMPS(self):
         self.thisptr.deleteStoredMPS()
     def deleteStoredOperators(self):
@@ -157,7 +160,7 @@ cdef class PyDMRG:
         return self.thisptr.getCorrelations().MutualInformationDistance(power)
     def printCorrelations(self):
         self.thisptr.getCorrelations().Print()
-    #Access functions of the TwoRDM.TwoDM class
+    #Access functions of the TwoDM class
     def get2DMA(self, int i1, int i2, int i3, int i4):
         return self.thisptr.get2DM().getTwoDMA_HAM(i1, i2, i3, i4)
     def get2DMB(self, int i1, int i2, int i3, int i4):
@@ -166,10 +169,9 @@ cdef class PyDMRG:
         return self.thisptr.get2DM().energy()
     def getDoubleTrace2DMA(self):
         return self.thisptr.get2DM().trace()
-    def save(self):
-        self.thisptr.get2DM().save()
-    def read(self):
-        self.thisptr.get2DM().read()
+    #Access functions of the ThreeDM class
+    def get3DM(self, int i1, int i2, int i3, int i4, int i5, int i6):
+        return self.thisptr.get3DM().get_ham_index(i1, i2, i3, i4, i5, i6)
     def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None):
         assert alpha.flags['C_CONTIGUOUS']
         assert  beta.flags['C_CONTIGUOUS']

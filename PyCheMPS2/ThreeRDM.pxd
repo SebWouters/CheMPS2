@@ -17,25 +17,10 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cimport ConvScheme
-cimport Prob
-cimport Corr
-cimport TwoRDM
-cimport ThreeRDM
-from libcpp.string cimport string
-
-cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
-    cdef cppclass DMRG:
-        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bint makechkpt, const string tmpfolder) except +
-        double Solve()
-        void calc2DMandCorrelations()
-        void calc_rdms_and_correlations(const bint do_3rdm)
-        TwoRDM.TwoDM * get2DM()
-        ThreeRDM.ThreeDM * get3DM()
-        Corr.Correlations * getCorrelations()
-        void deleteStoredMPS()
-        void deleteStoredOperators()
-        void activateExcitations(const int)
-        void newExcitation(const double)
-        double getFCIcoefficient(int *, int *)
+cdef extern from "chemps2/ThreeDM.h" namespace "CheMPS2":
+    cdef cppclass ThreeDM:
+        double get_ham_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6)
+        double trace()
+        void save()
+        void read()
 
