@@ -4,7 +4,7 @@
 * Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)
 * Further optimization allowed after RDM calculation
 * FCI 3-RDM in FCI::Fill3RDM
-* DMRG 3-RDM in ThreeDM class in O(L^4 D^3 + L^6 D^2) [Kurashige, JCP 141, 174111 (2014)](http://dx.doi.org/10.1063/1.4900878)
+* DMRG 3-RDM in ThreeDM class in O(L^4 D^3 + L^6 D^2) ([Kurashige, JCP 141, 174111 (2014)](http://dx.doi.org/10.1063/1.4900878))
 
 #### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab
