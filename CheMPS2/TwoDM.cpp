@@ -46,6 +46,7 @@ CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
    assert( max_integer >= size );
    two_rdm_A = new double[ size ];
    two_rdm_B = new double[ size ];
+   one_rdm   = new double[ L*L  ];
    
    //Clear the storage so that an allreduce can be performed in the end
    for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ cnt ] = 0.0; }
@@ -57,6 +58,7 @@ CheMPS2::TwoDM::~TwoDM(){
 
    delete [] two_rdm_A;
    delete [] two_rdm_B;
+   delete [] one_rdm;
 
 }
 
@@ -124,6 +126,19 @@ double CheMPS2::TwoDM::getTwoDMB_DMRG(const int cnt1, const int cnt2, const int 
 
 }
 
+double CheMPS2::TwoDM::get1RDM_DMRG(const int cnt1, const int cnt2) const{
+
+   //Prob assumes you use DMRG orbs...
+   const int irrep1 = Prob->gIrrep(cnt1);
+   const int irrep2 = Prob->gIrrep(cnt2);
+   if ( irrep1 == irrep2 ){
+      return one_rdm[ cnt1 + L * cnt2 ];
+   }
+   
+   return 0.0;
+
+}
+
 double CheMPS2::TwoDM::getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
@@ -141,6 +156,16 @@ double CheMPS2::TwoDM::getTwoDMB_HAM(const int cnt1, const int cnt2, const int c
       return getTwoDMB_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2), Prob->gf1(cnt3), Prob->gf1(cnt4) );
    }
    return getTwoDMB_DMRG( cnt1, cnt2, cnt3, cnt4 );
+
+}
+
+double CheMPS2::TwoDM::get1RDM_HAM(const int cnt1, const int cnt2) const{
+
+   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
+   if ( Prob->gReorderD2h() ){
+      return get1RDM_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2) );
+   }
+   return get1RDM_DMRG( cnt1, cnt2 );
 
 }
 
@@ -173,9 +198,26 @@ double CheMPS2::TwoDM::energy() const{
 
 }
 
-void CheMPS2::TwoDM::print_noon() const{
+void CheMPS2::TwoDM::construct_one_rdm(){
 
    const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
+   
+   for ( int row = 0; row < L; row++ ){
+      for ( int col = row; col < L; col++ ){
+         double value = 0.0;
+         if ( Prob->gIrrep( row ) == Prob->gIrrep( col ) ){ // DMRG orb order assumed in Problem
+            for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( row, orbsum, col, orbsum ); }
+            value *= prefactor;
+         }
+         one_rdm[ row + L * col ] = value;
+         one_rdm[ col + L * row ] = value;
+      }
+   }
+
+}
+
+void CheMPS2::TwoDM::print_noon() const{
+
    int lwork = 3 * L;
    double * OneRDM = new double[ L * L ];
    double * work   = new double[ lwork ];
@@ -188,9 +230,7 @@ void CheMPS2::TwoDM::print_noon() const{
             int jump2 = jump1;
             for ( int orb2 = orb1; orb2 < L; orb2++ ){
                if ( Prob->gIrrep( orb2 ) == irrep ){
-                  double value = 0.0;
-                  for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( orb1, orbsum, orb2, orbsum ); }
-                  value *= prefactor;
+                  const double value = one_rdm[ orb1 + L * orb2 ];
                   OneRDM[ jump1 + L * jump2 ] = value;
                   OneRDM[ jump2 + L * jump1 ] = value;
                   jump2 += 1;

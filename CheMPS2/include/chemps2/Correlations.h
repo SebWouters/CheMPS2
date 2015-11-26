@@ -214,9 +214,6 @@ namespace CheMPS2{
          //The number of active space orbitals
          int L;
          
-         //The one-body RDM
-         double * OneRDM;
-         
          //The spin correlation function
          double * Cspin;
          
@@ -232,8 +229,8 @@ namespace CheMPS2{
          //The two-orbital mutual information
          double * MutInfo;
          
-         //Helper function: fills OneRDM, Cspin, Cdens, Cspinflip, and Cdirad (the latter only partially)
-         void FillOneRDMSpinDensSpinflip();
+         //Helper function: fills Cspin, Cdens, Cspinflip, and Cdirad (the latter only partially)
+         void FillSpinDensSpinflip();
          
          //Helper functions for FillSite
          double diagram1(TensorT * denT, TensorGYZ * denY, double * workmem) const;

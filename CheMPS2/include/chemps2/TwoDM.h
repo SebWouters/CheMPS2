@@ -68,6 +68,12 @@ namespace CheMPS2{
              \return the desired value */
          double getTwoDMB_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const;
          
+         //! Get a 1-RDM term, using the DMRG indices
+         /** \param cnt1 the first index
+             \param cnt2 the second index
+             \return the desired value */
+         double get1RDM_DMRG(const int cnt1, const int cnt2) const;
+         
          //! Get a 2DM_A term, using the HAM indices
          /** \param cnt1 the first index
              \param cnt2 the second index
@@ -83,6 +89,12 @@ namespace CheMPS2{
              \param cnt4 the fourth index
              \return the desired value */
          double getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const;
+         
+         //! Get a 1-RDM term, using the HAM indices
+         /** \param cnt1 the first index
+             \param cnt2 the second index
+             \return the desired value */
+         double get1RDM_HAM(const int cnt1, const int cnt2) const;
          
          //! Fill the 2DM terms with as second site index denT->gIndex()
          /** \param denT DMRG site-matrices
@@ -103,6 +115,9 @@ namespace CheMPS2{
          //! Calculate the energy based on the 2DM-A
          /** \return The energy calculated as 0.5*trace(2DM-A * Ham) */
          double energy() const;
+         
+         //! Construct the DMRG 1-RDM
+         void construct_one_rdm();
          
          //! Print the natural orbital occupation numbers
          void print_noon() const;
@@ -134,6 +149,9 @@ namespace CheMPS2{
          //Two 2DM^{A,B} objects
          double * two_rdm_A;
          double * two_rdm_B;
+         
+         //1-RDM
+         double * one_rdm;
          
          // Set 2DM terms, using the DMRG indices
          void set_2rdm_A_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);

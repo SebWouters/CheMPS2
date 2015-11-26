@@ -158,6 +158,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    #endif
    
    the2DM->correct_higher_multiplicities();
+   the2DM->construct_one_rdm();
    
    /************************************************************
     *   Three pieces of information: trace, energy, and NOON   *
