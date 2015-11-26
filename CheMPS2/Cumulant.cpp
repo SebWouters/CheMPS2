@@ -25,7 +25,7 @@ CheMPS2::Cumulant::Cumulant(){ }
 
 CheMPS2::Cumulant::~Cumulant(){ }
 
-double lambda2_ham(const TwoDM * the2DM, const int i, const int j, const int p, const int q){
+double CheMPS2::Cumulant::lambda2_ham(const TwoDM * the2DM, const int i, const int j, const int p, const int q){
 
    const double value = the2DM->getTwoDMA_HAM( i, j, p, q )
                       - the2DM->get1RDM_HAM( i, p ) * the2DM->get1RDM_HAM( j, q )
@@ -34,8 +34,8 @@ double lambda2_ham(const TwoDM * the2DM, const int i, const int j, const int p, 
 
 }
 
-double gamma4_ham(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, const int i, const int j, const int k, const int l,
-                                                                                      const int p, const int q, const int r, const int s){
+double CheMPS2::Cumulant::gamma4_ham(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, const int i, const int j, const int k, const int l,
+                                                                                                         const int p, const int q, const int r, const int s){
    
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
    const int irrep_i = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( i ) : i );
