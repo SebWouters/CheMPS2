@@ -137,12 +137,12 @@ namespace CheMPS2{
              \param r index 7 of \f$ \Gamma^4_{ijklpqrs} \f$
              \param s index 8 of \f$ \Gamma^4_{ijklpqrs} \f$
              \return the desired value */
-         static double gamma4_ham(Problem * prob, ThreeDM * the3DM, TwoDM * the2DM, const int i, const int j, const int k, const int l, const int p, const int q, const int r, const int s);
+         static double gamma4_ham(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, const int i, const int j, const int k, const int l, const int p, const int q, const int r, const int s);
          
       private:
       
-         //! Get the second order cumulant \f$ \Lambda^2_{ijpq} \f$, using DMRG indices
-         static double lambda2_dmrg(Problem * prob, TwoDM * the2DM, const int i, const int j, const int p, const int q);
+         // Get the second order cumulant \f$ \Lambda^2_{ijpq} \f$, using HAM indices
+         static double lambda2_ham(const TwoDM * the2DM, const int i, const int j, const int p, const int q);
          
    };
 }
