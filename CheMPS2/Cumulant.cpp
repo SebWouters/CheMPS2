@@ -18,12 +18,81 @@
 */
 
 #include <stdlib.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <iostream>
 
 #include "Cumulant.h"
 
 CheMPS2::Cumulant::Cumulant(){ }
 
 CheMPS2::Cumulant::~Cumulant(){ }
+
+void CheMPS2::Cumulant::gamma4_fock_contract_ham_slow(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, double * fock, double * result){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
+   const int L = prob->gL();
+   
+   /*
+   for ( int i = 0; i < L; i++ ){
+      for ( int j = 0; j < L; j++ ){
+         for ( int k = 0; k < L; k++ ){
+            for ( int p = 0; p < L; p++ ){
+               for ( int q = 0; q < L; q++ ){
+                  for ( int r = 0; r < L; r++ ){
+                     double value = 0.0;
+                     for ( int l = 0; l < L; l++ ){
+                        for ( int s = 0; s < L; s++ ){
+                           value += fock[ l + L * s ] * gamma4_ham(prob, the3DM, the2DM, i, j, k, l, p, q, r, s);
+                        }
+                     }
+                     result[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ] = value;
+                  }
+               }
+            }
+         }
+      }
+   }
+   */
+   
+   for ( int i = 0; i < L; i++ ){
+      for ( int j = i; j < L; j++ ){
+         for ( int k = i; k < L; k++ ){
+            for ( int p = i; p < L; p++ ){
+               for ( int q = i; q < L; q++ ){
+                  for ( int r = q; r < L; r++ ){
+                     double value = 0.0;
+                     #pragma omp parallel for schedule(static) reduction(+:value)
+                     for ( int ls = 0; ls < L*L; ls++ ){
+                        const int l_val = ls % L;
+                        const int s_val = ls / L;
+                           value += fock[ ls ] * gamma4_ham(prob, the3DM, the2DM, i, j, k, l_val, p, q, r, s_val);
+                     }
+                     result[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ] = value;
+                     result[ i + L * ( k + L * ( j + L * ( p + L * ( r + L * q ) ) ) ) ] = value;
+                     result[ j + L * ( i + L * ( k + L * ( q + L * ( p + L * r ) ) ) ) ] = value;
+                     result[ k + L * ( i + L * ( j + L * ( r + L * ( p + L * q ) ) ) ) ] = value;
+                     result[ j + L * ( k + L * ( i + L * ( q + L * ( r + L * p ) ) ) ) ] = value;
+                     result[ k + L * ( j + L * ( i + L * ( r + L * ( q + L * p ) ) ) ) ] = value;
+                     result[ p + L * ( q + L * ( r + L * ( i + L * ( j + L * k ) ) ) ) ] = value;
+                     result[ p + L * ( r + L * ( q + L * ( i + L * ( k + L * j ) ) ) ) ] = value;
+                     result[ q + L * ( p + L * ( r + L * ( j + L * ( i + L * k ) ) ) ) ] = value;
+                     result[ r + L * ( p + L * ( q + L * ( k + L * ( i + L * j ) ) ) ) ] = value;
+                     result[ q + L * ( r + L * ( p + L * ( j + L * ( k + L * i ) ) ) ) ] = value;
+                     result[ r + L * ( q + L * ( p + L * ( k + L * ( j + L * i ) ) ) ) ] = value;
+                  }
+               }
+            }
+         }
+      }
+   }
+   
+   gettimeofday(&end, NULL);
+   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+   std::cout << "Cumulant :: Contraction of cu(4)-4RDM with CASPT2 Fock operator took " << elapsed << " seconds." << std::endl;
+
+}
 
 double CheMPS2::Cumulant::lambda2_ham(const TwoDM * the2DM, const int i, const int j, const int p, const int q){
 
