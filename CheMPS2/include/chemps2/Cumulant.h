@@ -139,13 +139,13 @@ namespace CheMPS2{
              \return the desired value */
          static double gamma4_ham(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, const int i, const int j, const int k, const int l, const int p, const int q, const int r, const int s);
          
-         //! Contract the CASPT2 Fock operator with the cumulant approximation of \f$ \Gamma^4 \f$, using HAM indices
+         //! Contract the CASPT2 Fock operator with the cumulant approximation of \f$ \Gamma^4 \f$ in \f$ \mathcal{O}(L^7) \f$ time, using HAM indices
          /** \param prob Pointer to the DMRG problem
              \param the3DM Pointer to the DMRG 3-RDM
              \param the2DM Pointer to the DMRG 2-RDM
              \param fock Contains the SYMMETRIC fock operator \f$ F_{ls} \f$ = fock[l+L*s] = fock[s+L*l]
              \param result Contains the contraction: result[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = \f$ \sum\limits_{ls} F_{ls} \Gamma^4_{ijklpqrs} \f$ */
-         static void gamma4_fock_contract_ham_slow(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, double * fock, double * result);
+         static void gamma4_fock_contract_ham(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, double * fock, double * result);
          
       private:
       
