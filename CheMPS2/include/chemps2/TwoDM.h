@@ -116,9 +116,6 @@ namespace CheMPS2{
          /** \return The energy calculated as 0.5*trace(2DM-A * Ham) */
          double energy() const;
          
-         //! Construct the DMRG 1-RDM
-         void construct_one_rdm();
-         
          //! Print the natural orbital occupation numbers
          void print_noon() const;
          
@@ -149,9 +146,6 @@ namespace CheMPS2{
          //Two 2DM^{A,B} objects
          double * two_rdm_A;
          double * two_rdm_B;
-         
-         //1-RDM
-         double * one_rdm;
          
          // Set 2DM terms, using the DMRG indices
          void set_2rdm_A_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);

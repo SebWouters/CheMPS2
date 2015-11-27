@@ -46,7 +46,6 @@ CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
    assert( max_integer >= size );
    two_rdm_A = new double[ size ];
    two_rdm_B = new double[ size ];
-   one_rdm   = new double[ L*L  ];
    
    //Clear the storage so that an allreduce can be performed in the end
    for (int cnt = 0; cnt < size; cnt++){ two_rdm_A[ cnt ] = 0.0; }
@@ -58,7 +57,6 @@ CheMPS2::TwoDM::~TwoDM(){
 
    delete [] two_rdm_A;
    delete [] two_rdm_B;
-   delete [] one_rdm;
 
 }
 
@@ -132,7 +130,10 @@ double CheMPS2::TwoDM::get1RDM_DMRG(const int cnt1, const int cnt2) const{
    const int irrep1 = Prob->gIrrep(cnt1);
    const int irrep2 = Prob->gIrrep(cnt2);
    if ( irrep1 == irrep2 ){
-      return one_rdm[ cnt1 + L * cnt2 ];
+      double value = 0.0;
+      for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( cnt1, orbsum, cnt2, orbsum ); }
+      value = value / ( Prob->gN() - 1.0 );
+      return value;
    }
    
    return 0.0;
@@ -198,30 +199,13 @@ double CheMPS2::TwoDM::energy() const{
 
 }
 
-void CheMPS2::TwoDM::construct_one_rdm(){
-
-   const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
-   
-   for ( int row = 0; row < L; row++ ){
-      for ( int col = row; col < L; col++ ){
-         double value = 0.0;
-         if ( Prob->gIrrep( row ) == Prob->gIrrep( col ) ){ // DMRG orb order assumed in Problem
-            for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( row, orbsum, col, orbsum ); }
-            value *= prefactor;
-         }
-         one_rdm[ row + L * col ] = value;
-         one_rdm[ col + L * row ] = value;
-      }
-   }
-
-}
-
 void CheMPS2::TwoDM::print_noon() const{
 
    int lwork = 3 * L;
    double * OneRDM = new double[ L * L ];
    double * work   = new double[ lwork ];
    double * eigs   = new double[ L ];
+   
    for ( int irrep = 0; irrep < denBK->getNumberOfIrreps(); irrep++ ){
    
       int jump1 = 0;
@@ -230,7 +214,7 @@ void CheMPS2::TwoDM::print_noon() const{
             int jump2 = jump1;
             for ( int orb2 = orb1; orb2 < L; orb2++ ){
                if ( Prob->gIrrep( orb2 ) == irrep ){
-                  const double value = one_rdm[ orb1 + L * orb2 ];
+                  const double value = get1RDM_DMRG( orb1, orb2 );
                   OneRDM[ jump1 + L * jump2 ] = value;
                   OneRDM[ jump2 + L * jump1 ] = value;
                   jump2 += 1;

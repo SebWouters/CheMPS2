@@ -98,6 +98,7 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
    double * lambda2 = new double[ L*L*L*L ];
    double * G2multF = new double[ L*L*L*L ];
    double * L2multF = new double[ L*L*L*L ];
+   double * gamma1  = new double[ L*L ];
    double * G1multF = new double[ L*L ];
    double * G2dotF  = new double[ L*L ];
    double * L2dotF  = new double[ L*L ];
@@ -105,10 +106,20 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
    for ( int cnt = 0; cnt < L*L*L*L; cnt++ ){ lambda2[ cnt ] = 0.0; }
    for ( int cnt = 0; cnt < L*L*L*L; cnt++ ){ G2multF[ cnt ] = 0.0; }
    for ( int cnt = 0; cnt < L*L*L*L; cnt++ ){ L2multF[ cnt ] = 0.0; }
+   for ( int cnt = 0; cnt < L*L;     cnt++ ){  gamma1[ cnt ] = 0.0; }
    for ( int cnt = 0; cnt < L*L;     cnt++ ){ G1multF[ cnt ] = 0.0; }
    for ( int cnt = 0; cnt < L*L;     cnt++ ){  G2dotF[ cnt ] = 0.0; }
    for ( int cnt = 0; cnt < L*L;     cnt++ ){  L2dotF[ cnt ] = 0.0; }
    double G1dotF = 0.0;
+   
+   /* Fill gamma1 */
+   for ( int i = 0; i < L; i++ ){
+      for ( int j = i; j < L; j++ ){
+         const double value = the2DM->get1RDM_HAM( i, j );
+         gamma1[ i + L * j ] = value;
+         gamma1[ j + L * i ] = value;
+      }
+   }
    
    /* Build  G3dotF[i,j,p,q] = sum_[l,s] Gamma3[i,j,l,p,q,s] F[l,s]
       Build lambda2[i,j,p,q] = Lambda2[i,j,p,q]                     */
@@ -135,8 +146,8 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
                   }
                   { // Lambda2[i,j,p,q]
                      const double val_lambda = the2DM->getTwoDMA_HAM( i, j, p, q )
-                                             - the2DM->get1RDM_HAM( i, p ) * the2DM->get1RDM_HAM( j, q )
-                                             + the2DM->get1RDM_HAM( i, q ) * the2DM->get1RDM_HAM( j, p ) * 0.5;
+                                             - gamma1[ i + L * p ] * gamma1[ j + L * q ]
+                                             + gamma1[ i + L * q ] * gamma1[ j + L * p ] * 0.5;
                      lambda2[ i + L * ( j + L * ( p + L * q )) ] = val_lambda;
                      lambda2[ j + L * ( i + L * ( q + L * p )) ] = val_lambda;
                      lambda2[ p + L * ( q + L * ( i + L * j )) ] = val_lambda;
@@ -156,7 +167,7 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
             double value = 0.0;
             for ( int p = 0; p < L; p++ ){
                if ( irreps[ j ] == irreps[ p ] ){
-                  value += the2DM->get1RDM_HAM( i, p ) * fock[ p + L * j ];
+                  value += gamma1[ i + L * p ] * fock[ p + L * j ];
                }
             }
             G1multF[ i + L * j ] = value;
@@ -285,15 +296,15 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
                      
                         const double contracted_value = ( the3DM->get_ham_index( i, j, k, p, q, r ) * G1dotF
 
-                                                  +       G3dotF[ i + L * ( j + L * ( p + L * q )) ] * the2DM->get1RDM_HAM( k, r )
-                                                  - 0.5 * G3dotF[ i + L * ( j + L * ( r + L * q )) ] * the2DM->get1RDM_HAM( k, p )
-                                                  - 0.5 * G3dotF[ i + L * ( j + L * ( p + L * r )) ] * the2DM->get1RDM_HAM( k, q )
-                                                  +       G3dotF[ i + L * ( k + L * ( p + L * r )) ] * the2DM->get1RDM_HAM( j, q )
-                                                  - 0.5 * G3dotF[ i + L * ( k + L * ( q + L * r )) ] * the2DM->get1RDM_HAM( j, p )
-                                                  - 0.5 * G3dotF[ i + L * ( k + L * ( p + L * q )) ] * the2DM->get1RDM_HAM( j, r )
-                                                  +       G3dotF[ j + L * ( k + L * ( q + L * r )) ] * the2DM->get1RDM_HAM( i, p )
-                                                  - 0.5 * G3dotF[ j + L * ( k + L * ( p + L * r )) ] * the2DM->get1RDM_HAM( i, q )
-                                                  - 0.5 * G3dotF[ j + L * ( k + L * ( q + L * p )) ] * the2DM->get1RDM_HAM( i, r )
+                                                  +       G3dotF[ i + L * ( j + L * ( p + L * q )) ] * gamma1[ k + L * r ]
+                                                  - 0.5 * G3dotF[ i + L * ( j + L * ( r + L * q )) ] * gamma1[ k + L * p ]
+                                                  - 0.5 * G3dotF[ i + L * ( j + L * ( p + L * r )) ] * gamma1[ k + L * q ]
+                                                  +       G3dotF[ i + L * ( k + L * ( p + L * r )) ] * gamma1[ j + L * q ]
+                                                  - 0.5 * G3dotF[ i + L * ( k + L * ( q + L * r )) ] * gamma1[ j + L * p ]
+                                                  - 0.5 * G3dotF[ i + L * ( k + L * ( p + L * q )) ] * gamma1[ j + L * r ]
+                                                  +       G3dotF[ j + L * ( k + L * ( q + L * r )) ] * gamma1[ i + L * p ]
+                                                  - 0.5 * G3dotF[ j + L * ( k + L * ( p + L * r )) ] * gamma1[ i + L * q ]
+                                                  - 0.5 * G3dotF[ j + L * ( k + L * ( q + L * p )) ] * gamma1[ i + L * r ]
 
                                                   - 0.5 * dm3_contribution
 
@@ -347,6 +358,7 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
    delete [] lambda2;
    delete [] G2multF;
    delete [] L2multF;
+   delete [] gamma1;
    delete [] G1multF;
    delete [] G2dotF;
    delete [] L2dotF;
