@@ -4,6 +4,7 @@ var annotated =
       [ "CASSCF", "classCheMPS2_1_1CASSCF.html", "classCheMPS2_1_1CASSCF" ],
       [ "ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", "classCheMPS2_1_1ConvergenceScheme" ],
       [ "Correlations", "classCheMPS2_1_1Correlations.html", "classCheMPS2_1_1Correlations" ],
+      [ "Cumulant", "classCheMPS2_1_1Cumulant.html", "classCheMPS2_1_1Cumulant" ],
       [ "Davidson", "classCheMPS2_1_1Davidson.html", "classCheMPS2_1_1Davidson" ],
       [ "DIIS", "classCheMPS2_1_1DIIS.html", "classCheMPS2_1_1DIIS" ],
       [ "DMRG", "classCheMPS2_1_1DMRG.html", "classCheMPS2_1_1DMRG" ],

@@ -1,4 +1,6 @@
 <map id="CheMPS2::TwoDM::getTwoDMA_HAM" name="CheMPS2::TwoDM::getTwoDMA_HAM">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#ae8305d7f87c340f9001e497aaf7ba93f" title="Copy over the DMRG 2&#45;RDM. " alt="" coords="308,5,543,32"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Cumulant.html#a71af6ca25a81326cac7f772bd9723ab7" title="Contract the CASPT2 Fock operator with the cumulant approximation of &#160;in &#160;time, using HAM indices..." alt="" coords="330,57,521,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71" title="Get the cumulant approximation of , using HAM indices. " alt="" coords="348,122,503,163"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="591,5,901,32"/>
 </map>

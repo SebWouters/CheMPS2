@@ -5,6 +5,8 @@ var classCheMPS2_1_1TwoDM =
     [ "correct_higher_multiplicities", "classCheMPS2_1_1TwoDM.html#a09eb9e2471fe7fb19659b611e3e4550b", null ],
     [ "energy", "classCheMPS2_1_1TwoDM.html#ab35662dd77d8ae32f5b28bbe04239e79", null ],
     [ "FillSite", "classCheMPS2_1_1TwoDM.html#a5c5bf12b31aa9cb4b0b31bd53dad1ed3", null ],
+    [ "get1RDM_DMRG", "classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922", null ],
+    [ "get1RDM_HAM", "classCheMPS2_1_1TwoDM.html#a4eb81922bf21b38ed8fb8c4696da3a19", null ],
     [ "getTwoDMA_DMRG", "classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005", null ],
     [ "getTwoDMA_HAM", "classCheMPS2_1_1TwoDM.html#a40c2181006aaf66b8dad2e545e3d8186", null ],
     [ "getTwoDMB_DMRG", "classCheMPS2_1_1TwoDM.html#ad7615a0d2458408de29de4b8b88868f1", null ],

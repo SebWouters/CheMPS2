@@ -26,7 +26,9 @@ var searchData=
   ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#a8aa20cc325aa2c2332bec394bb05823c',1,'CheMPS2::ConvergenceScheme']]],
   ['copy2dmover',['copy2DMover',['../classCheMPS2_1_1CASSCF.html#ae8305d7f87c340f9001e497aaf7ba93f',1,'CheMPS2::CASSCF']]],
   ['correct_5fhigher_5fmultiplicities',['correct_higher_multiplicities',['../classCheMPS2_1_1ThreeDM.html#a0a3de81e9881218690e26094be30b749',1,'CheMPS2::ThreeDM::correct_higher_multiplicities()'],['../classCheMPS2_1_1TwoDM.html#a09eb9e2471fe7fb19659b611e3e4550b',1,'CheMPS2::TwoDM::correct_higher_multiplicities()']]],
-  ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html',1,'CheMPS2']]],
   ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html#aeb2b17926e78c7735821a13c1faf6867',1,'CheMPS2::Correlations']]],
+  ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html',1,'CheMPS2']]],
+  ['cumulant',['Cumulant',['../classCheMPS2_1_1Cumulant.html',1,'CheMPS2']]],
+  ['cumulant',['Cumulant',['../classCheMPS2_1_1Cumulant.html#a16b3ca8d56440090fe3532e21c252049',1,'CheMPS2::Cumulant']]],
   ['current_20head',['Current HEAD',['../md__home_seba_Desktop_CheMPS2_github_CHANGELOG.html',1,'']]]
 ];

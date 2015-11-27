@@ -8,6 +8,8 @@ var files =
     [ "ConvergenceScheme.h", "ConvergenceScheme_8h_source.html", null ],
     [ "Correlations.cpp", "Correlations_8cpp_source.html", null ],
     [ "Correlations.h", "Correlations_8h_source.html", null ],
+    [ "Cumulant.cpp", "Cumulant_8cpp_source.html", null ],
+    [ "Cumulant.h", "Cumulant_8h_source.html", null ],
     [ "Davidson.cpp", "Davidson_8cpp_source.html", null ],
     [ "Davidson.h", "Davidson_8h_source.html", null ],
     [ "DIIS.cpp", "DIIS_8cpp_source.html", null ],

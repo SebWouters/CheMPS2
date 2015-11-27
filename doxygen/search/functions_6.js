@@ -1,9 +1,13 @@
 var searchData=
 [
+  ['gamma4_5ffock_5fcontract_5fham',['gamma4_fock_contract_ham',['../classCheMPS2_1_1Cumulant.html#a71af6ca25a81326cac7f772bd9723ab7',1,'CheMPS2::Cumulant']]],
+  ['gamma4_5fham',['gamma4_ham',['../classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71',1,'CheMPS2::Cumulant']]],
   ['gcurrentdim',['gCurrentDim',['../classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82',1,'CheMPS2::SyBookkeeper']]],
   ['gd',['gD',['../classCheMPS2_1_1SyBookkeeper.html#a44ff8a4f047febaab0674a239c982715',1,'CheMPS2::SyBookkeeper']]],
   ['geconst',['gEconst',['../classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1',1,'CheMPS2::Problem']]],
   ['get',['get',['../classCheMPS2_1_1DMRGSCFmatrix.html#a2ef8f82defc36267771d5b8c69d36bd9',1,'CheMPS2::DMRGSCFmatrix::get()'],['../classCheMPS2_1_1DMRGSCFwtilde.html#a39a6ec517f0bbd6129dce43473bfbc89',1,'CheMPS2::DMRGSCFwtilde::get()'],['../classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1',1,'CheMPS2::FourIndex::get()'],['../classCheMPS2_1_1TwoIndex.html#a49c7065a18ca6b82e7a63a56cdf2687c',1,'CheMPS2::TwoIndex::get()']]],
+  ['get1rdm_5fdmrg',['get1RDM_DMRG',['../classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922',1,'CheMPS2::TwoDM']]],
+  ['get1rdm_5fham',['get1RDM_HAM',['../classCheMPS2_1_1TwoDM.html#a4eb81922bf21b38ed8fb8c4696da3a19',1,'CheMPS2::TwoDM']]],
   ['get2dm',['get2DM',['../classCheMPS2_1_1DMRG.html#a0b471ea7ea19f7a49e6e1412f443d5ac',1,'CheMPS2::DMRG']]],
   ['get3dm',['get3DM',['../classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4',1,'CheMPS2::DMRG']]],
   ['get_5f2j',['get_2j',['../classCheMPS2_1_1TensorOperator.html#a374c949f32263391f2f8d49532e47f9d',1,'CheMPS2::TensorOperator']]],
