@@ -183,7 +183,7 @@ namespace CheMPS2{
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
              \param TwoS Twice the targeted spin
              \param Irrep Desired wave-function irrep
-             \param OptScheme The optimization scheme to run the inner DMRG loop
+             \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
              \param theDMRGSCFoptions Contains the DMRGSCF options
              \return The converged DMRGSCF energy */

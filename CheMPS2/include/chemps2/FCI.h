@@ -124,6 +124,11 @@ namespace CheMPS2{
              \param ThreeRDM To store the 3-RDM; needs to be of size getL()^6; point group symmetry shows in 3-RDM elements being zero */
          void Fill3RDM(double * vector, double * ThreeRDM) const;
          
+         //! Construct the (spin-summed) 4-RDM of a FCI vector: Gamma^4(i,j,k,l,p,q,r,t) = sum_sigma,tau,s,z < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > = FourRDM[ i + L * ( j + L * ( k + L * ( l + L * ( p + L * ( q + L * ( r + L * t ) ) ) ) ) ) ]
+         /** \param vector The FCI vector of length getVecLength(0)
+             \param FourRDM To store the 4-RDM; needs to be of size getL()^8; point group symmetry shows in 4-RDM elements being zero */
+         void Fill4RDM(double * vector, double * FourRDM) const;
+         
          //! Measure S(S+1) (spin squared)
          /** \param vector The FCI vector of length getVecLength(0)
              \return Measured value of S(S+1) */

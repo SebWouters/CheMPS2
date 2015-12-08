@@ -30,6 +30,7 @@
 #include "DMRGSCFVmatRotations.h"
 #include "EdmistonRuedenberg.h"
 #include "Davidson.h"
+#include "FCI.h"
 
 using std::string;
 using std::ifstream;
@@ -127,10 +128,10 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          
          if ((theDMRGSCFoptions->getDoDIIS()) && (updateNorm <= theDMRGSCFoptions->getDIISGradientBranch())){
             if (theDMRGSCFoptions->getWhichActiveSpace()==1){
-               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl;
+               cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to NOs anymore!" << endl;
             }
             if (theDMRGSCFoptions->getWhichActiveSpace()==2){
-               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
+               cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
             if (theDIIS == NULL){
                theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
@@ -165,32 +166,50 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          fillConstAndTmatDMRG(HamDMRG);
          if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
          else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
-         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+         cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
       
-      //Do the DMRG sweeps, and calculate the 2DM
-      for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
-      DMRG * theDMRG = new DMRG(Prob, OptScheme);
-      for (int state = 0; state < rootNum; state++){
-         if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
-         Energy = theDMRG->Solve();
-         if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+      if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM
+      
+         const int nalpha = ( N + TwoS ) / 2;
+         const int nbeta  = ( N - TwoS ) / 2;
+         const double workmem = 1000.0; // 1GB
+         const int verbose = 2;
+         CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamDMRG, nalpha, nbeta, Irrep, workmem, verbose );
+         double * inoutput = new double[ theFCI->getVecLength(0) ];
+         theFCI->ClearVector( theFCI->getVecLength(0), inoutput );
+         inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+         Energy = theFCI->GSDavidson( inoutput );
+         theFCI->Fill2RDM( inoutput, DMRG2DM );
+         delete theFCI;
+         delete [] inoutput;
+         
+      } else { //Do the DMRG sweeps, and calculate the 2DM
+      
+         for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
+         DMRG * theDMRG = new DMRG(Prob, OptScheme);
+         for (int state = 0; state < rootNum; state++){
+            if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
+            Energy = theDMRG->Solve();
+            if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+               theDMRG->calc2DMandCorrelations();
+               copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
+            }
+            if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
+         }
+         if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
             theDMRG->calc2DMandCorrelations();
             copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
-         if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
-      }
-      if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
-         theDMRG->calc2DMandCorrelations();
-         copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
-      }
-      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
-      if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-      delete theDMRG;
-      if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
-         const double averagingfactor = 1.0 / rootNum;
-         for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
+         if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
+         if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
+         if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+         delete theDMRG;
+         if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
+            const double averagingfactor = 1.0 / rootNum;
+            for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
+         }
+         
       }
       setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
       
@@ -201,7 +220,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
          buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildTmatrix();
-         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
+         cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
       
       //Calculate the matrix elements needed to calculate the gradient and hessian
