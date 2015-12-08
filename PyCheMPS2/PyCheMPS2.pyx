@@ -235,8 +235,8 @@ cdef class PyCASSCF:
         self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &DOCC[0], &SOCC[0], &NOCC[0], &NDMRG[0], &NVIRT[0])
     def __dealloc__(self):
         del self.thisptr
-    def doCASSCFnewtonraphson(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
-        return self.thisptr.doCASSCFnewtonraphson(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
+    def solve(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
+        return self.thisptr.solve(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
     def deleteStoredUnitary(self):
         self.thisptr.deleteStoredUnitary()
     def deleteStoredDIIS(self):

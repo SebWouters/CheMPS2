@@ -37,7 +37,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
+double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
 
    //Convergence variables
    double gradNorm = 1.0;
@@ -51,14 +51,14 @@ double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int Tw
    //The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
    int N = Nelectrons;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){ N -= 2*iHandler->getNOCC(irrep); }
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ N -= 2*iHandler->getNOCC(irrep); }
    Problem * Prob = new Problem(HamDMRG, TwoS, N, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
    
    //Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
    int maxlinsize   = 0;
    int maxlinsizeOK = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int linsize_irrep = iHandler->getNORB(irrep);
       theDIISvectorParamSize += linsize_irrep*(linsize_irrep-1)/2;
       if  (linsize_irrep > maxlinsize  )                                                         {  maxlinsize  = linsize_irrep; }

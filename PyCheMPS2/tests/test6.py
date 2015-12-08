@@ -57,7 +57,7 @@ theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
 theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
 theDMRGSCFoptions.setStateAveraging(True)
-Energy = theDMRGSCF.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
+Energy = theDMRGSCF.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
 
 # Clean-up
 if theDMRGSCFoptions.getStoreUnitary():

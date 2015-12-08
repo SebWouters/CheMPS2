@@ -37,22 +37,22 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int 
    
    L = HamOrig->getL();
    SymmInfo.setGroup(HamOrig->getNGroup());
-   numberOfIrreps = SymmInfo.getNumberOfIrreps();
+   num_irreps = SymmInfo.getNumberOfIrreps();
    
-   DOCC = new int[numberOfIrreps];
-   SOCC = new int[numberOfIrreps];
+   DOCC = new int[ num_irreps ];
+   SOCC = new int[ num_irreps ];
    
-   for ( int irrep = 0; irrep < numberOfIrreps; irrep++ ){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       DOCC[ irrep ] = docc_in[ irrep ];
       SOCC[ irrep ] = socc_in[ irrep ];
    }
    
    cout << "DOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << DOCC[cnt] << " , "; }
-   cout << DOCC[numberOfIrreps-1] << " ]" << endl;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ cout << DOCC[ irrep ] << " , "; }
+   cout << DOCC[ num_irreps - 1 ] << " ]" << endl;
    cout << "SOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << SOCC[cnt] << " , "; }
-   cout << SOCC[numberOfIrreps-1] << " ]" << endl;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ cout << SOCC[ irrep ] << " , "; }
+   cout << SOCC[ num_irreps - 1 ] << " ]" << endl;
    
    iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc_in, ndmrg_in, nvirt_in );
    unitary  = new DMRGSCFunitary( iHandler );
@@ -60,7 +60,7 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int 
    theRotatedTEI = new DMRGSCFintegrals( iHandler );
    
    //Allocate space for the DMRG 1DM and 2DM
-   nOrbDMRG = iHandler->getDMRGcumulative(numberOfIrreps);
+   nOrbDMRG = iHandler->getDMRGcumulative( num_irreps );
    DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
    DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
    
@@ -108,7 +108,7 @@ CheMPS2::CASSCF::~CASSCF(){
 
 }
 
-int CheMPS2::CASSCF::getNumberOfIrreps(){ return numberOfIrreps; }
+int CheMPS2::CASSCF::get_num_irreps(){ return num_irreps; }
 
 void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM){
 
@@ -237,7 +237,7 @@ void CheMPS2::CASSCF::rotate2DMand1DM(const int nDMRGelectrons, int totOrbDMRG, 
 
 void CheMPS2::CASSCF::rotateOldToNew(DMRGSCFmatrix * myMatrix){
 
-   for (int irrep = 0; irrep < numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
    
       int linsize = iHandler->getNORB(irrep);
       double * Umat = unitary->getBlock(irrep);
@@ -256,7 +256,7 @@ void CheMPS2::CASSCF::rotateOldToNew(DMRGSCFmatrix * myMatrix){
 
 void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix){
 
-  for (int irrepQ = 0; irrepQ < numberOfIrreps; irrepQ++){
+  for ( int irrepQ = 0; irrepQ < num_irreps; irrepQ++ ){
    
       const int linearsizeQ = iHandler->getNORB(irrepQ);
       const int numberOfUniqueIndices = (linearsizeQ * (linearsizeQ + 1))/2;
@@ -274,7 +274,7 @@ void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatr
          
          double theValue = 0.0;
          
-         for (int irrepN = 0; irrepN < numberOfIrreps; irrepN++){
+         for ( int irrepN = 0; irrepN < num_irreps; irrepN++ ){
             const int linearsizeN = iHandler->getNORB( irrepN );
             for (int rowN = 0; rowN < linearsizeN; rowN++){
             
@@ -303,7 +303,7 @@ void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatr
 
 void CheMPS2::CASSCF::buildQmatOCC(){
 
-   for (int irrep = 0; irrep < numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
    
       int linsize = iHandler->getNORB(irrep);
       int NOCC    = iHandler->getNOCC(irrep);
@@ -324,7 +324,7 @@ void CheMPS2::CASSCF::buildQmatOCC(){
 
 void CheMPS2::CASSCF::buildQmatACT(){
 
-   for (int irrep = 0; irrep < numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
    
       int linsize = iHandler->getNORB(irrep);
       int NDMRG   = iHandler->getNDMRG(irrep);
@@ -348,7 +348,7 @@ void CheMPS2::CASSCF::buildQmatACT(){
 
 void CheMPS2::CASSCF::buildTmatrix(){
 
-   for (int irrep = 0; irrep < numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NumORB = iHandler->getNORB(irrep);
       for (int row = 0; row < NumORB; row++){
          const int HamIndexRow = iHandler->getOrigNOCCstart(irrep) + row;
@@ -367,7 +367,7 @@ void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
 
    //Constant part of the energy
    double value = HamOrig->getEconst();
-   for (int irrep = 0; irrep < numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       for (int orb = 0; orb < iHandler->getNOCC(irrep); orb++){
          value += 2 * theTmatrix->get(irrep, orb, orb) + theQmatOCC->get(irrep, orb, orb);
       }
@@ -375,7 +375,7 @@ void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
    HamDMRG->setEconst(value);
    
    //One-body terms: diagonal in the irreps
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
       const int linsizeDMRG = iHandler->getNDMRG(irrep);
       const int NumOCC      = iHandler->getNOCC(irrep);

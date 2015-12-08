@@ -74,7 +74,7 @@ void CheMPS2::CASSCF::checkHF(){
       
       cout << "   Orb " << cnt << " : "<< cnt-passed+1 << SymmInfo.getIrrepName(irrep) << " = " << SPenergy << endl;
          
-      if ((cnt-passed == iHandler->getNORB(irrep)-1) && (irrep<numberOfIrreps-1)){
+      if ((cnt-passed == iHandler->getNORB(irrep)-1) && (irrep<num_irreps-1)){
          passed += iHandler->getNORB(irrep);
          irrep++;
       }
@@ -97,7 +97,7 @@ void CheMPS2::CASSCF::PrintCoeff_C2(DMRG * theDMRG){
    
    for (int cnt=0; cnt<nOrbDMRG; cnt++){ coeff1[cnt] = coeff2[cnt] = 0; } //No particles at all
    int passed = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       if (irrep==0){ //Ag
          for (int orb=iHandler->getNOCC(irrep); orb<3; orb++){ //1-3 Ag : double
             coeff1[passed+orb] = coeff2[passed+orb] = 2;
@@ -126,7 +126,7 @@ void CheMPS2::CASSCF::PrintCoeff_C2(DMRG * theDMRG){
    
    for (int cnt=0; cnt<nOrbDMRG; cnt++){ coeff3[cnt] = coeff4[cnt] = 0; } //No particles at all
    passed = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       if (irrep==0){ //Ag
          for (int orb=iHandler->getNOCC(irrep); orb<3; orb++){ //1-3 Ag : double
             coeff3[passed+orb] = coeff4[passed+orb] = 2;

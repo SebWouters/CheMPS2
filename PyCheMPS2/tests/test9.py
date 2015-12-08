@@ -56,7 +56,7 @@ rootNum = 1 # Ground state only
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
 theDMRGSCFoptions.setWhichActiveSpace(2) # 2 means localized orbitals
-Energy = theDMRGSCF.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
+Energy = theDMRGSCF.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
 
 # Clean-up
 if theDMRGSCFoptions.getStoreUnitary():

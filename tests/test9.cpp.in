@@ -68,7 +68,7 @@ int main(void){
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
    theDMRGSCFoptions->setDoDIIS(true);
    theDMRGSCFoptions->setWhichActiveSpace(2); //2 means localized orbitals
-   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
+   double Energy = koekoek.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
    if (theDMRGSCFoptions->getStoreUnitary()){ koekoek.deleteStoredUnitary( theDMRGSCFoptions->getUnitaryStorageName() ); }

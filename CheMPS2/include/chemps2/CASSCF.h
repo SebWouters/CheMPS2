@@ -177,9 +177,9 @@ namespace CheMPS2{
          
          //! Get the number of irreps
          /** \return The number of irreps */
-         int getNumberOfIrreps();
+         int get_num_irreps();
          
-         //! Does the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method
+         //! Do the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
              \param TwoS Twice the targeted spin
              \param Irrep Desired wave-function irrep
@@ -187,7 +187,7 @@ namespace CheMPS2{
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
              \param theDMRGSCFoptions Contains the DMRGSCF options
              \return The converged DMRGSCF energy */
-         double doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
+         double solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
          
          //! CASSCF unitary rotation remove call
          void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
@@ -285,8 +285,8 @@ namespace CheMPS2{
          //The number of orbitals
          int L;
          
-         //The numberOfIrreps;
-         int numberOfIrreps;
+         //The number of irreps
+         int num_irreps;
          
          //Double occupations
          int * DOCC;

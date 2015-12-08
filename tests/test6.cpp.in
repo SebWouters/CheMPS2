@@ -69,7 +69,7 @@ int main(void){
    theDMRGSCFoptions->setDoDIIS(true);
    theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
    theDMRGSCFoptions->setStateAveraging(true);
-   double Energy = koekoek.doCASSCFnewtonraphson(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
+   double Energy = koekoek.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
    
    //Clean up
    if (theDMRGSCFoptions->getStoreUnitary()){ koekoek.deleteStoredUnitary( theDMRGSCFoptions->getUnitaryStorageName() ); }
