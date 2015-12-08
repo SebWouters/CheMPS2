@@ -269,6 +269,10 @@ cdef class PyFCI:
         assert GSvector.flags['C_CONTIGUOUS']
         assert ThreeRDM.flags['C_CONTIGUOUS']
         self.thisptr.Fill3RDM(&GSvector[0], &ThreeRDM[0])
+    def Fill4RDM(self, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] FourRDM not None):
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert  FourRDM.flags['C_CONTIGUOUS']
+        self.thisptr.Fill4RDM(&GSvector[0], &FourRDM[0])
     def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
         self.thisptr.FillRandom(vecLength, &vector[0])

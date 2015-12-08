@@ -30,6 +30,7 @@ cdef extern from "chemps2/FCI.h" namespace "CheMPS2":
         double GSDavidson(double *)
         double Fill2RDM(double *, double *)
         void Fill3RDM(double *, double *)
+        void Fill4RDM(double *, double *)
         double CalcSpinSquared(double *)
         double getFCIcoeff(int *, int *, double *)
         void RetardedGF(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *)
