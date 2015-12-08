@@ -41,13 +41,10 @@ N = 14       # The number of electrons
 Irrep = 0    # The targeted irrep
 
 # Define the CASSCF
-theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC)
-
-# Define the active space
-Nocc  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
+NOCC  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
 NDMRG = np.array([ 4, 0, 1, 1, 0, 4, 1, 1 ], dtype=ctypes.c_int)
-Nvirt = np.array([ 2, 1, 2, 2, 1, 2, 2, 2 ], dtype=ctypes.c_int)
-theDMRGSCF.setupStart(Nocc,NDMRG,Nvirt)
+NVIRT = np.array([ 2, 1, 2, 2, 1, 2, 2, 2 ], dtype=ctypes.c_int)
+theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT)
 
 # Setting up the ConvergenceScheme
 # setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)

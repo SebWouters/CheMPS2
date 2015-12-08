@@ -164,14 +164,13 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param filename The file containing the Psi4 Hamiltonian text dump (mointegrals.so_PRINT) output to start the DMRGSCF calculations. */
-         CASSCF(const string filename);
-         
-         //! Constructor
-         /** \param HamIn Hamiltonian containing the matrix elements of the Hamiltonian for which a CASSCF calculation is desired
-             \param DOCCin Array containing the number of doubly occupied HF orbitals per irrep
-             \param SOCCin Array containing the number of singly occupied HF orbitals per irrep */
-         CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin);
+         /** \param ham_in Hamiltonian containing the matrix elements of the Hamiltonian for which a CASSCF calculation is desired
+             \param docc_in Array containing the number of doubly occupied HF orbitals per irrep
+             \param socc_in Array containing the number of singly occupied HF orbitals per irrep
+             \param nocc_in Array containing the number of doubly occupied (inactive) orbitals per irrep
+             \param ndmrg_in Array containing the number of active orbitals per irrep
+             \param nvirt_in Array containing the number of virtual (secondary) orbitals per irrep */
+         CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int * nocc_in, int * ndmrg_in, int * nvirt_in);
          
          //! Destructor
          virtual ~CASSCF();
@@ -179,12 +178,6 @@ namespace CheMPS2{
          //! Get the number of irreps
          /** \return The number of irreps */
          int getNumberOfIrreps();
-         
-         //! Set the start of the CASSCF calculation
-         /** \param NoccIn Array of length numberOfIrreps containing the number of double occupied HF orbitals per irrep for the CASSCF loop.
-             \param NDMRGIn Array of length numberOfIrreps containing the number of active orbitals per irrep for the CASSCF loop.
-             \param NvirtIn Array of length numberOfIrreps containing the number of empty orbitals per irrep for the CASSCF loop. */
-         void setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn);
          
          //! Does the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
@@ -282,7 +275,6 @@ namespace CheMPS2{
       
          //The original Hamiltonian
          Hamiltonian * HamOrig;
-         bool shouldHamOrigBeDeleted;
          
          //The rotated 2-body matrix elements with at most two virtual indices
          DMRGSCFintegrals * theRotatedTEI;
@@ -302,9 +294,6 @@ namespace CheMPS2{
          //Single occupations
          int * SOCC;
          
-         //Boolean whether or not setupStart has been called
-         bool setupStartCalled;
-         
          //Number of DMRG orbitals
          int nOrbDMRG;
          
@@ -313,12 +302,6 @@ namespace CheMPS2{
 
          //Space for the DMRG 2DM
          double * DMRG2DM;
-         
-         //Helper function to fetch DOCC and SOCC from filename
-         void allocateAndFillOCC(const string filename);
-         
-         //Helper function to copy the DOCC and SOCC arrays
-         void allocateAndFillOCC(int * DOCCin, int * SOCCin);
          
          //Helper function to check HF
          void checkHF();

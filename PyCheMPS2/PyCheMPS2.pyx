@@ -226,17 +226,15 @@ cdef class PyDMRGSCFoptions:
         
 cdef class PyCASSCF:
     cdef DMRGSCF.CASSCF * thisptr
-    def __cinit__(self, PyHamiltonian theHam, np.ndarray[int, ndim=1, mode="c"] DOCC not None, np.ndarray[int, ndim=1, mode="c"] SOCC not None):
-        assert DOCC.flags['C_CONTIGUOUS']
-        assert SOCC.flags['C_CONTIGUOUS']
-        self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &DOCC[0], &SOCC[0])
+    def __cinit__(self, PyHamiltonian theHam, np.ndarray[int, ndim=1, mode="c"] DOCC not None, np.ndarray[int, ndim=1, mode="c"] SOCC not None, np.ndarray[int, ndim=1, mode="c"] NOCC not None, np.ndarray[int, ndim=1, mode="c"] NDMRG not None, np.ndarray[int, ndim=1, mode="c"] NVIRT not None):
+        assert  DOCC.flags['C_CONTIGUOUS']
+        assert  SOCC.flags['C_CONTIGUOUS']
+        assert  NOCC.flags['C_CONTIGUOUS']
+        assert NDMRG.flags['C_CONTIGUOUS']
+        assert NVIRT.flags['C_CONTIGUOUS']
+        self.thisptr = new DMRGSCF.CASSCF(theHam.thisptr, &DOCC[0], &SOCC[0], &NOCC[0], &NDMRG[0], &NVIRT[0])
     def __dealloc__(self):
         del self.thisptr
-    def setupStart(self, np.ndarray[int, ndim=1, mode="c"] Nocc not None, np.ndarray[int, ndim=1, mode="c"] NDMRG not None, np.ndarray[int, ndim=1, mode="c"] Nvirt not None):
-        assert  Nocc.flags['C_CONTIGUOUS']
-        assert NDMRG.flags['C_CONTIGUOUS']
-        assert Nvirt.flags['C_CONTIGUOUS']
-        self.thisptr.setupStart(&Nocc[0], &NDMRG[0], &Nvirt[0])
     def doCASSCFnewtonraphson(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
         return self.thisptr.doCASSCFnewtonraphson(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
     def deleteStoredUnitary(self):

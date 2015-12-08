@@ -46,14 +46,12 @@ int main(void){
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
    
    //Setup CASSCF --> number of irreps = 8
-   int DOCC[] = { 3, 0, 0, 0, 0, 2, 1, 1 }; // see N2.ccpvdz.out
-   int SOCC[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-   CheMPS2::CASSCF koekoek( Ham, DOCC, SOCC );
-   
-   int Nocc[]  = { 1, 0, 0, 0, 0, 1, 0, 0 };
+   int DOCC[]  = { 3, 0, 0, 0, 0, 2, 1, 1 }; // see N2.ccpvdz.out
+   int SOCC[]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
+   int NOCC[]  = { 1, 0, 0, 0, 0, 1, 0, 0 };
    int NDMRG[] = { 2, 0, 1, 1, 0, 2, 1, 1 };
-   int Nvirt[] = { 4, 1, 2, 2, 1, 4, 2, 2 };
-   koekoek.setupStart(Nocc,NDMRG,Nvirt);
+   int NVIRT[] = { 4, 1, 2, 2, 1, 4, 2, 2 };
+   CheMPS2::CASSCF koekoek( Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT );
    
    //Setup symmetry sector
    int N = 14;

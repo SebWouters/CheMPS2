@@ -23,8 +23,7 @@ cimport DMRGSCFopt
 
 cdef extern from "chemps2/CASSCF.h" namespace "CheMPS2":
     cdef cppclass CASSCF:
-        CASSCF(Ham.Hamiltonian *, int *, int *) except +
-        void setupStart(int *, int *, int *)
+        CASSCF(Ham.Hamiltonian *, int *, int *, int *, int *, int *) except +
         double doCASSCFnewtonraphson(const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions *)
         void deleteStoredUnitary()
         void deleteStoredDIIS()

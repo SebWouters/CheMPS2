@@ -31,61 +31,80 @@ using std::ifstream;
 using std::cout;
 using std::endl;
 
-CheMPS2::CASSCF::CASSCF(const string filename){
+CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int * nocc_in, int * ndmrg_in, int * nvirt_in){
 
-   HamOrig = new Hamiltonian(filename);
-   shouldHamOrigBeDeleted = true;
+   HamOrig = ham_in;
    
    L = HamOrig->getL();
    SymmInfo.setGroup(HamOrig->getNGroup());
    numberOfIrreps = SymmInfo.getNumberOfIrreps();
    
-   allocateAndFillOCC(filename);
-   setupStartCalled = false;
-
-}
-
-CheMPS2::CASSCF::CASSCF(Hamiltonian * HamIn, int * DOCCin, int * SOCCin){
-
-   HamOrig = HamIn;
-   shouldHamOrigBeDeleted = false;
+   DOCC = new int[numberOfIrreps];
+   SOCC = new int[numberOfIrreps];
    
-   L = HamOrig->getL();
-   SymmInfo.setGroup(HamOrig->getNGroup());
-   numberOfIrreps = SymmInfo.getNumberOfIrreps();
+   for ( int irrep = 0; irrep < numberOfIrreps; irrep++ ){
+      DOCC[ irrep ] = docc_in[ irrep ];
+      SOCC[ irrep ] = socc_in[ irrep ];
+   }
    
-   allocateAndFillOCC(DOCCin, SOCCin);
-   setupStartCalled = false;
+   cout << "DOCC = [ ";
+   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << DOCC[cnt] << " , "; }
+   cout << DOCC[numberOfIrreps-1] << " ]" << endl;
+   cout << "SOCC = [ ";
+   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << SOCC[cnt] << " , "; }
+   cout << SOCC[numberOfIrreps-1] << " ]" << endl;
+   
+   iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc_in, ndmrg_in, nvirt_in );
+   unitary  = new DMRGSCFunitary( iHandler );
+   theDIIS = NULL;
+   theRotatedTEI = new DMRGSCFintegrals( iHandler );
+   
+   //Allocate space for the DMRG 1DM and 2DM
+   nOrbDMRG = iHandler->getDMRGcumulative(numberOfIrreps);
+   DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
+   DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
+   
+   //To calculate the F-matrix and Q-matrix(occ,act) elements only once, and to store them for future access
+   theFmatrix = new DMRGSCFmatrix( iHandler );  theFmatrix->clear();
+   theQmatOCC = new DMRGSCFmatrix( iHandler );  theQmatOCC->clear();
+   theQmatACT = new DMRGSCFmatrix( iHandler );  theQmatACT->clear();
+   theQmatWORK= new DMRGSCFmatrix( iHandler ); theQmatWORK->clear();
+   theTmatrix = new DMRGSCFmatrix( iHandler );  theTmatrix->clear();
+   
+   //To calculate the w_tilde elements only once, and store them for future access
+   wmattilde = new DMRGSCFwtilde( iHandler );
+   
+   //Print the MO info. This requires the indexHandler to be created...
+   checkHF();
+   
+   //Print what we have just set up.
+   iHandler->Print();
+   
+   cout << "DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
 
 }
 
 CheMPS2::CASSCF::~CASSCF(){
-
-   if (shouldHamOrigBeDeleted){ delete HamOrig; }
    
    delete [] DOCC;
    delete [] SOCC;
    
-   if (setupStartCalled){
-   
-      delete theRotatedTEI;
+   delete theRotatedTEI;
 
-      delete [] DMRG1DM;
-      delete [] DMRG2DM;
-      
-      //The following objects depend on iHandler: delete them first
-      delete theFmatrix;
-      delete theQmatOCC;
-      delete theQmatACT;
-      delete theQmatWORK;
-      delete theTmatrix;
-      delete wmattilde;
-      delete unitary;
-      
-      delete iHandler;
-      if (theDIIS!=NULL){ delete theDIIS; }
-      
-   }
+   delete [] DMRG1DM;
+   delete [] DMRG2DM;
+   
+   //The following objects depend on iHandler: delete them first
+   delete theFmatrix;
+   delete theQmatOCC;
+   delete theQmatACT;
+   delete theQmatWORK;
+   delete theTmatrix;
+   delete wmattilde;
+   delete unitary;
+   
+   delete iHandler;
+   if (theDIIS!=NULL){ delete theDIIS; }
 
 }
 
@@ -369,123 +388,4 @@ void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
 
 }
 
-void CheMPS2::CASSCF::allocateAndFillOCC(int * DOCCin, int * SOCCin){
-   
-   DOCC = new int[numberOfIrreps];
-   SOCC = new int[numberOfIrreps];
-   
-   for (int cnt=0; cnt<numberOfIrreps; cnt++){
-      DOCC[cnt] = DOCCin[cnt];
-      SOCC[cnt] = SOCCin[cnt];
-   }
-   
-   cout << "DOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << DOCC[cnt] << " , "; }
-   cout << DOCC[numberOfIrreps-1] << " ]" << endl;
-   cout << "SOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << SOCC[cnt] << " , "; }
-   cout << SOCC[numberOfIrreps-1] << " ]" << endl;
-   
-}
-
-void CheMPS2::CASSCF::allocateAndFillOCC(const string filename){
-
-   string line, part;
-   int pos, pos2;
-   
-   ifstream inputfile(filename.c_str());
-   
-   //First go to the start of the integral dump.
-   bool stop = false;
-   string start = "****  Molecular Integrals For CheMPS Start Here";
-   do{
-      getline(inputfile,line);
-      pos = line.find(start);
-      if (pos==0) stop = true;
-   } while (!stop);
-   
-   //Get the group name and convert it to the group number
-   getline(inputfile,line);
-   getline(inputfile,line);
-   getline(inputfile,line);
-   getline(inputfile,line);
-   getline(inputfile,line);
-   getline(inputfile,line);
-   DOCC = new int[numberOfIrreps];
-   SOCC = new int[numberOfIrreps];
-   
-   //Doubly occupied orbitals
-   getline(inputfile,line);
-   
-   pos = line.find("=") + 3;
-   pos2 = line.find(" ",pos);
-   part = line.substr(pos, pos2-pos);
-   
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){
-      DOCC[cnt] = atoi(part.c_str());
-      pos = pos2 + 2;
-      pos2 = line.find(" ",pos);
-      part = line.substr(pos,pos2-pos);
-   }
-   DOCC[numberOfIrreps-1] = atoi(part.c_str());
-   
-   //Singly occupied orbitals
-   getline(inputfile,line);
-   
-   pos = line.find("=") + 3;
-   pos2 = line.find(" ",pos);
-   part = line.substr(pos, pos2-pos);
-   
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){
-      SOCC[cnt] = atoi(part.c_str());
-      pos = pos2 + 2;
-      pos2 = line.find(" ",pos);
-      part = line.substr(pos,pos2-pos);
-   }
-   SOCC[numberOfIrreps-1] = atoi(part.c_str());
-   
-   cout << "DOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << DOCC[cnt] << " , "; }
-   cout << DOCC[numberOfIrreps-1] << " ]" << endl;
-   cout << "SOCC = [ ";
-   for (int cnt=0; cnt<numberOfIrreps-1; cnt++){ cout << SOCC[cnt] << " , "; }
-   cout << SOCC[numberOfIrreps-1] << " ]" << endl;
-   
-   inputfile.close();
-   
-}
-
-void CheMPS2::CASSCF::setupStart(int * NoccIn, int * NDMRGIn, int * NvirtIn){
-
-   setupStartCalled = true;
-   
-   iHandler = new DMRGSCFindices(L, SymmInfo.getGroupNumber(), NoccIn, NDMRGIn, NvirtIn);
-   unitary  = new DMRGSCFunitary(iHandler);
-   theDIIS = NULL;
-   theRotatedTEI = new DMRGSCFintegrals( iHandler );
-   
-   //Allocate space for the DMRG 1DM and 2DM
-   nOrbDMRG = iHandler->getDMRGcumulative(numberOfIrreps);
-   DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
-   DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
-   
-   //To calculate the F-matrix and Q-matrix(occ,act) elements only once, and to store them for future access
-   theFmatrix = new DMRGSCFmatrix( iHandler ); theFmatrix->clear();
-   theQmatOCC = new DMRGSCFmatrix( iHandler ); theQmatOCC->clear();
-   theQmatACT = new DMRGSCFmatrix( iHandler ); theQmatACT->clear();
-   theQmatWORK= new DMRGSCFmatrix( iHandler );theQmatWORK->clear();
-   theTmatrix = new DMRGSCFmatrix( iHandler ); theTmatrix->clear();
-   
-   //To calculate the w_tilde elements only once, and store them for future access
-   wmattilde = new DMRGSCFwtilde( iHandler );
-   
-   //Print the MO info. This requires the indexHandler to be created...
-   checkHF();
-   
-   //Print what we have just set up.
-   iHandler->Print();
-   
-   cout << "DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
-
-}
 

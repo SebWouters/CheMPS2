@@ -39,7 +39,7 @@ namespace CheMPS2{
     \f{eqnarray*}{
      \Lambda^2_{ijpq} & = & \Gamma^2_{ijpq} - \Gamma^1_{ip} \Gamma^1_{jq} + \frac{1}{2} \Gamma^1_{iq} \Gamma^1_{jp}
     \f}
-    the spinfree 4-RDM can be written as:
+    the spinfree 4-RDM can be written as [CUM1]:
     \f{eqnarray*}{
  \Gamma^4_{ijklpqrs} & = &  \Lambda^4_{ijklpqrs} \\
                      & + &  \Gamma^3_{ijkpqr} \Gamma^1_{ls}
@@ -113,7 +113,9 @@ namespace CheMPS2{
                                  + \frac{1}{3} \Lambda^2_{ilrq} \Lambda^2_{kjsp}
                                  + \frac{2}{3} \Lambda^2_{ilqr} \Lambda^2_{kjsp}
     \f}
-    By neglecting \f$ \Lambda^4 \f$, the cumulant approximation of the 4-RDM \f$ \Gamma^4 \f$ is obtained. */
+    By neglecting \f$ \Lambda^4 \f$, the cumulant approximation of the 4-RDM \f$ \Gamma^4 \f$ is obtained. \n
+    \n
+    [CUM1] M. Saitow, Y. Kurashige and T. Yanai, Journal of Chemical Physics 139, 044118 (2013). http://dx.doi.org/10.1063/1.4816627 \n*/
    class Cumulant{
 
       public:
