@@ -41,7 +41,8 @@ namespace CheMPS2{
     \f}
     the spinfree 4-RDM can be written as [CUM1]:
     \f{eqnarray*}{
- \Gamma^4_{ijklpqrs} & = &  \Lambda^4_{ijklpqrs} \\
+                     &   &  \Gamma^4_{ijklpqrs} \\
+                     & = &  \Lambda^4_{ijklpqrs} \\
                      & + &  \Gamma^3_{ijkpqr} \Gamma^1_{ls}
                                  - \frac{1}{2} \Gamma^3_{ijksqr} \Gamma^1_{lp}
                                  - \frac{1}{2} \Gamma^3_{ijkpsr} \Gamma^1_{lq}
