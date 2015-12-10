@@ -129,6 +129,13 @@ namespace CheMPS2{
              \param FourRDM To store the 4-RDM; needs to be of size getL()^8; point group symmetry shows in 4-RDM elements being zero */
          void Fill4RDM(double * vector, double * FourRDM) const;
          
+         //! Construct the (spin-summed) contraction of the 4-RDM with the Fock operator: output(i,j,k,p,q,r) = sum_{l,t} Fock(l,t) * Gamma^4(i,j,k,l,p,q,r,t)
+         /** \param vector The FCI vector of length getVecLength(0)
+             \param ThreeRDM The spin-summed 3-RDM as calculated by Fill3RDM
+             \param Fock The symmetric Fock operator Fock(i,j) = Fock[ i + L * j ] = Fock[ j + L * i ]
+             \param output To store the contraction output(i,j,k,p,q,r) = output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ]; needs to be of size getL()^6; point group symmetry shows in elements being zero; has 12-fold permutation symmetry just like 3-RDM */
+         void Fock4RDM(double * vector, double * ThreeRDM, double * Fock, double * output) const;
+         
          //! Measure S(S+1) (spin squared)
          /** \param vector The FCI vector of length getVecLength(0)
              \return Measured value of S(S+1) */
