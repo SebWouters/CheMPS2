@@ -20,13 +20,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <algorithm>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "Sobject.h"
 #include "TensorT.h"
 #include "SyBookkeeper.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
+#include "Gsl.h"
 
 using std::min;
 using std::max;

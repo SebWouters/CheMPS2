@@ -588,6 +588,8 @@ EdmistonRuedenberg class.
 [CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex
 class.
 
+[CheMPS2/include/chemps2/Gsl.h](CheMPS2/include/chemps2/Gsl.h) contains the definitions of the external GSL routines.
+
 [CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian
 class.
 

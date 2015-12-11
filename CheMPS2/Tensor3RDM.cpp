@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "Tensor3RDM.h"
 #include "Heff.h"
 #include "Lapack.h"
+#include "Gsl.h"
 
 CheMPS2::Tensor3RDM::Tensor3RDM(const int boundary, const int two_j1_in, const int two_j2, const int nelec, const int irrep, const bool prime_last, const SyBookkeeper * book):
 TensorOperator(boundary,

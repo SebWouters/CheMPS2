@@ -23,13 +23,13 @@
 #include <math.h>
 #include <algorithm>
 #include <assert.h>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "ThreeDM.h"
 #include "Lapack.h"
 #include "MyHDF5.h"
 #include "Options.h"
 #include "MPIchemps2.h"
+#include "Gsl.h"
 
 using std::max;
 using std::cout;

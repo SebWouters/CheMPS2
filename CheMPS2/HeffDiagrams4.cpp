@@ -19,11 +19,11 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "Heff.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
+#include "Gsl.h"
 
 void CheMPS2::Heff::addDiagram4A1and4A2spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator * Atens) const{
 

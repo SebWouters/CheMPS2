@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "TensorOperator.h"
 #include "Lapack.h"
 #include "Heff.h"
+#include "Gsl.h"
 
 CheMPS2::TensorOperator::TensorOperator(const int index_in, const int two_j_in, const int n_elec_in, const int n_irrep_in, const bool moving_right_in, const bool prime_last_in, const bool jw_phase_in, const SyBookkeeper * denBK_in) : Tensor(){
 

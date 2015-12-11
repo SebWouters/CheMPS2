@@ -19,10 +19,10 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <gsl/gsl_sf_coupling.h>
 
 #include "TensorF1.h"
 #include "Lapack.h"
+#include "Gsl.h"
 
 CheMPS2::TensorF1::TensorF1(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn) :
 TensorOperator(indexIn,

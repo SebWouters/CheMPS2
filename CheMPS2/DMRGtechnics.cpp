@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <math.h>
 #include <assert.h>
-#include <gsl/gsl_sf_coupling.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -32,6 +31,7 @@
 #include "Lapack.h"
 #include "Heff.h"
 #include "MPIchemps2.h"
+#include "Gsl.h"
 
 using std::cout;
 using std::endl;
