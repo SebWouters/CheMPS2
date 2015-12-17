@@ -119,6 +119,9 @@ namespace CheMPS2{
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
          
+         // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
+         void construct_rhs();
+         
          // Variables for the partitioning of the vector in blocks
          int * jump;
          int * size_AC;
@@ -127,7 +130,7 @@ namespace CheMPS2{
          int * size_BF_triplet;
          
          // The RHS of the linear problem
-         double * minus_v;
+         double * vector_rhs;
          
          // Variables for the overlap
          double ** SAA;

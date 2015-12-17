@@ -21,12 +21,14 @@
 #include <iostream>
 #include <math.h>
 #include <assert.h>
+#include <algorithm>
 
 #include "CASPT2.h"
 #include "Lapack.h"
 
 using std::cout;
 using std::endl;
+using std::max;
 
 CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei_in, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract){
 
@@ -41,13 +43,15 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    num_irreps = indices->getNirreps();
    E_FOCK     = calc_fock_expectation(); // Uses indices, num_irreps, fock, one_rdm
    
-   vector_helper();
+   vector_helper(); // Needs to be called BEFORE make_S**()!
    
    make_SAA_SCC();
    make_SDD();
    make_SEE_SGG();
    make_SBB_SFF_singlet();
    make_SBB_SFF_triplet();
+   
+   construct_rhs(); // Needs to be called AFTER make_S**()!
 
 }
 
@@ -80,7 +84,7 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] size_BF_singlet;
    delete [] size_BF_triplet;
    delete [] jump;
-   delete [] minus_v;
+   delete [] vector_rhs;
 
 }
 
@@ -148,8 +152,8 @@ int CheMPS2::CASPT2::vector_helper(){
    /*** Type D1 : c1_aitu E_ai E_tu | 0 >
         Type D2 : c2_tiau E_ti E_au | 0 >
 
-                  c1_aitu = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tu +          size_D[ irrep ] * count_ai ]
-                  c2_tiau = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tu + D2JUMP + size_D[ irrep ] * count_ai ]
+                  c1_aitu = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu +          size_D[ irrep ] * count_ai ]
+                  c2_tiau = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu + D2JUMP + size_D[ irrep ] * count_ai ]
 
                   D2JUMP = size_D[ irrep ] / 2
 
@@ -474,7 +478,7 @@ int CheMPS2::CASPT2::vector_helper(){
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
    cout << "CASPT2::vector_helper : Total size of the V_SD space = " << total_size << endl;
    
-   int check = 0;
+   /*int check = 0;
    for ( int i1 = 0; i1 < num_irreps; i1++ ){
       for ( int i2 = 0; i2 < num_irreps; i2++ ){
          for ( int i3 = 0; i3 < num_irreps; i3++ ){
@@ -503,7 +507,7 @@ int CheMPS2::CASPT2::vector_helper(){
          }
       }
    }
-   assert( check == total_size );
+   assert( check == total_size );*/
 
    return total_size;
 
@@ -511,11 +515,9 @@ int CheMPS2::CASPT2::vector_helper(){
 
 void CheMPS2::CASPT2::construct_rhs(){
 
-   minus_v = new double[ jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] ];
-
    /*
       VA:  < H E_ti E_uv > = sum_w ( t_iw + sum_k [ 2 (iw|kk) - (ik|kw) ] ) [ 2 delta_tw Gamma_uv - Gamma_tuwv - delta_wu Gamma_tv ]
-                           + sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]  -----------> OK
+                           + sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]
 
       VB:  < H E_ti E_uj >
            < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]  -----------> OK
@@ -524,13 +526,13 @@ void CheMPS2::CASPT2::construct_rhs(){
       VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] ) < E_wt E_uv >
                            + sum_wxy (xy|wa) < E_xy E_wt E_uv >
            < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] ) [ Gamma_wutv + delta_ut Gamma_wv ]
-                           + sum_zxy (zy|wa) SCC[ It x Iu x Iv ][ xyztuv ]  -----------> OK
+                           + sum_zxy (zy|xa) SCC[ It x Iu x Iv ][ xyztuv ]
 
       VD1: < H E_ai E_tu > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ 2 Gamma_tu ]
                            + sum_xy [ (ia|yx) - 0.5 * (ix|ya) ] SD1D1[ It x Iu ][ xytu ]
            < H E_ai E_tu > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ 2 Gamma_tu ]
                            + sum_xy (ia|yx) SD1D1[ It x Iu ][ xytu ]
-                           + sum_xy (ix|ya) SD2D1[ It x Iu ][ xytu ]  -----------> OK
+                           + sum_xy (ix|ya) SD2D1[ It x Iu ][ xytu ]
 
       VD2: < H E_ti E_au > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ - Gamma_tu ]
                            + sum_xy (ia|xy) [ - Gamma_xtyu ]
@@ -538,7 +540,7 @@ void CheMPS2::CASPT2::construct_rhs(){
                            + sum_y [ 2 (it|ya) - (ia|yt) ] Gamma_yu
            < H E_ti E_au > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ - Gamma_tu ]
                            + sum_xy (ia|yx) SD1D2[ It x Iu ][ xytu ]
-                           + sum_xy (ix|ya) SD2D2[ It x Iu ][ xytu ]  -----------> OK
+                           + sum_xy (ix|ya) SD2D2[ It x Iu ][ xytu ]
 
       VE:  < H E_ti E_aj >
            < S_tiaj | H > = sum_w [ (aj|wi) + (ai|wj) ] * 1 * SEE[ It ][ wt ]  -----------> OK
@@ -556,6 +558,283 @@ void CheMPS2::CASPT2::construct_rhs(){
            < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]  -----------> OK
            < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]  -----------> OK
    */
+   
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+
+   // First construct MAT[p,q] = ( t_pq + sum_k [ 2 (pq|kk) - (pk|kq) ] )
+   DMRGSCFmatrix * MAT = new DMRGSCFmatrix( indices );
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NORB = indices->getNORB( irrep );
+      for ( int row = 0; row < NORB; row++ ){
+         for ( int col = 0; col < NORB; col++ ){
+            double value = oei->get( irrep, row, col );
+            for ( int irrep_occ = 0; irrep_occ < num_irreps; irrep_occ++ ){
+               const int NOCC = indices->getNOCC( irrep_occ );
+               for ( int occ = 0; occ < NOCC; occ++ ){
+                  value += ( 2 * integrals->FourIndexAPI( irrep, irrep_occ, irrep, irrep_occ, row, occ, col, occ )
+                               - integrals->FourIndexAPI( irrep, irrep_occ, irrep_occ, irrep, row, occ, occ, col ) ); // Physics notation at 4-index
+               }
+            }
+            MAT->set( irrep, row, col, value );
+         }
+      }
+   }
+
+   vector_rhs = new double[ jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] ];
+
+   int max_size = 0;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      max_size = max( max( max( max( size_AC[ irrep ], size_D[ irrep ] ), size_BF_singlet[ irrep ] ), size_BF_triplet[ irrep ] ), max_size );
+   }
+   double * workspace = new double[ max_size ];
+
+   // VA: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + count_tuv + size_AC[ irrep ] * count_i ]
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NOCC = indices->getNOCC( irrep );
+      const int NACT = indices->getNDMRG( irrep );
+      const int d_w  = indices->getDMRGcumulative( irrep );
+      for ( int count_i = 0; count_i < NOCC; count_i++ ){
+
+         double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + size_AC[ irrep ] * count_i;
+
+         // Fill workspace[ xyz ] with (ix|zy)
+         // Fill target[ tuv ] with sum_w MAT[i,w] [ 2 delta_tw Gamma_uv - Gamma_tuwv - delta_wu Gamma_tv ]
+         //                           = 2 MAT[i,t] Gamma_uv - MAT[i,u] Gamma_tv - sum_w MAT[i,w] Gamma_tuwv
+         int jump_xyz = 0;
+         for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+            const int occ_x = indices->getNOCC( irrep_x );
+            const int num_x = indices->getNDMRG( irrep_x );
+            const int d_x   = indices->getDMRGcumulative( irrep_x );
+            for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
+               const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
+               const int occ_y = indices->getNOCC( irrep_y );
+               const int occ_z = indices->getNOCC( irrep_z );
+               const int num_y = indices->getNDMRG( irrep_y );
+               const int num_z = indices->getNDMRG( irrep_z );
+               const int d_y   = indices->getDMRGcumulative( irrep_y );
+               const int d_z   = indices->getDMRGcumulative( irrep_z );
+
+               // workspace[ xyz ] = (ix|zy)
+               for ( int x = 0; x < num_x; x++ ){
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int z = 0; z < num_z; z++ ){
+                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
+                           = integrals->get_coulomb( irrep, irrep_x, irrep_z, irrep_y, count_i, occ_x + x, occ_z + z, occ_y + y );
+                     }
+                  }
+               }
+
+               // target[ tuv ] = - sum_w MAT[i,w] Gamma_tuwv
+               for ( int x = 0; x < num_x; x++ ){
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int z = 0; z < num_z; z++ ){
+                        double value = 0.0;
+                        for ( int w = 0; w < NACT; w++ ){
+                           value += MAT->get( irrep, count_i, NOCC + w ) * two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_w + w + LAS * ( d_z + z ) ) ) ];
+                        }
+                        target[ jump_xyz + x + num_x * ( y + num_y * z ) ] = - value;
+                     }
+                  }
+               }
+
+               // target[ tuv ] += 2 MAT[i,t] Gamma_uv
+               if ( irrep_x == irrep ){
+                  for ( int x = 0; x < num_x; x++ ){
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int z = 0; z < num_z; z++ ){
+                           target[ jump_xyz + x + num_x * ( y + num_y * z ) ] += 2 * MAT->get( irrep, count_i, occ_x + x ) * one_rdm[ d_y + y + LAS * ( d_z + z ) ];
+                        }
+                     }
+                  }
+               }
+
+               // target[ tuv ] -= MAT[i,u] Gamma_tv
+               if ( irrep_y == irrep ){
+                  for ( int x = 0; x < num_x; x++ ){
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int z = 0; z < num_z; z++ ){
+                           target[ jump_xyz + x + num_x * ( y + num_y * z ) ] -= MAT->get( irrep, count_i, occ_y + y ) * one_rdm[ d_x + x + LAS * ( d_z + z ) ];
+                        }
+                     }
+                  }
+               }
+
+               jump_xyz += num_x * num_y * num_z;
+            }
+         }
+         assert( jump_xyz == size_AC[ irrep ] );
+
+         // Perform target[ tuv ] += sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]
+         char notrans = 'N';
+         int int1 = 1;
+         double alpha = 1.0;
+         double beta = 1.0; //ADD
+         dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SAA[ irrep ], &jump_xyz, &beta, target, &int1 );
+      }
+   }
+   
+   // VC: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tuv + size_AC[ irrep ] * count_a ]
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NOCC  = indices->getNOCC( irrep );
+      const int NVIR  = indices->getNVIRT( irrep );
+      const int NACT  = indices->getNDMRG( irrep );
+      const int N_OA  = NOCC + NACT;
+      const int d_w   = indices->getDMRGcumulative( irrep );
+      for ( int count_a = 0; count_a < NVIR; count_a++ ){
+
+         double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + size_AC[ irrep ] * count_a;
+
+         // Fill workspace[ xyz ] with (zy|xa)
+         // Fill target[ tuv ] with sum_w MAT[w,a] [ Gamma_wutv + delta_ut Gamma_wv ]
+         //                       = sum_w MAT[w,a] Gamma_wutv + sum_w MAT[w,a] delta_ut Gamma_wv
+         int jump_xyz = 0;
+         for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+            const int occ_x = indices->getNOCC( irrep_x );
+            const int num_x = indices->getNDMRG( irrep_x );
+            const int d_x   = indices->getDMRGcumulative( irrep_x );
+            for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
+               const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
+               const int occ_y = indices->getNOCC( irrep_y );
+               const int occ_z = indices->getNOCC( irrep_z );
+               const int num_y = indices->getNDMRG( irrep_y );
+               const int num_z = indices->getNDMRG( irrep_z );
+               const int d_y   = indices->getDMRGcumulative( irrep_y );
+               const int d_z   = indices->getDMRGcumulative( irrep_z );
+
+               // workspace[ xyz ] = (zy|xa)
+               for ( int x = 0; x < num_x; x++ ){
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int z = 0; z < num_z; z++ ){
+                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
+                           = integrals->get_coulomb( irrep_z, irrep_y, irrep_x, irrep, occ_z + z, occ_y + y, occ_x + x, N_OA + count_a );
+                     }
+                  }
+               }
+
+               // target[ tuv ] = sum_w MAT[w,a] Gamma_wutv
+               for ( int x = 0; x < num_x; x++ ){
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int z = 0; z < num_z; z++ ){
+                        double value = 0.0;
+                        for ( int w = 0; w < NACT; w++ ){
+                           value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * two_rdm[ d_w + w + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_z + z ) ) ) ];
+                        }
+                        target[ jump_xyz + x + num_x * ( y + num_y * z ) ] = value;
+                     }
+                  }
+               }
+
+               // target[ tuv ] += sum_w MAT[w,a] delta_ut Gamma_wv
+               if (( irrep_z == irrep ) && ( irrep_x == irrep_y )){
+                  for ( int z = 0; z < num_z; z++ ){ // v
+                     double value = 0.0;
+                     for ( int w = 0; w < NACT; w++ ){
+                        value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * one_rdm[ d_w + w + LAS * ( d_z + z ) ];
+                     }
+                     for ( int xy = 0; xy < num_x; xy++ ){ // tu
+                        target[ jump_xyz + xy + num_x * ( xy + num_y * z ) ] += value;
+                     }
+                  }
+               }
+
+               jump_xyz += num_x * num_y * num_z;
+            }
+         }
+         assert( jump_xyz == size_AC[ irrep ] );
+
+         // Perform target[ tuv ] += sum_zxy (zy|xa) SCC[ It x Iu x Iv ][ xyztuv ]
+         char notrans = 'N';
+         int int1 = 1;
+         double alpha = 1.0;
+         double beta = 1.0; //ADD
+         dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SCC[ irrep ], &jump_xyz, &beta, target, &int1 );
+      }
+   }
+
+   // VD1: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu +          size_D[ irrep ] * count_ai ]
+   // VD2: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu + D2JUMP + size_D[ irrep ] * count_ai ]
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int jump_ai = 0;
+      const int D2JUMP = size_D[ irrep ] / 2;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int irrep_a = Irreps::directProd( irrep_i, irrep );
+         const int NOCC_i  = indices->getNOCC( irrep_i );
+         const int N_OA_a  = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+         const int NVIR_a  = indices->getNVIRT( irrep_a );
+         for ( int count_i = 0; count_i < NOCC_i; count_i++ ){
+            for ( int count_a = 0; count_a < NVIR_a; count_a++ ){
+
+               double * target = ( vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ]
+                                 + size_D[ irrep ] * ( jump_ai + count_i + NOCC_i * count_a ) );
+               const double MAT_ia = ( ( irrep == 0 ) ? MAT->get( irrep, count_i, N_OA_a + count_a ) : 0.0 );
+
+               /* Fill workspace[          xy ] with (ia|yx)
+                  Fill workspace[ D2JUMP + xy ] with (ix|ya)
+                       then ( workspace * SDD )_D1 = sum_xy (ia|yx) SD1D1[ It x Iu ][ xytu ]
+                                                   + sum_xy (ix|ya) SD2D1[ It x Iu ][ xytu ]
+                        and ( workspace * SDD )_D2 = sum_xy (ia|yx) SD1D2[ It x Iu ][ xytu ]
+                                                   + sum_xy (ix|ya) SD2D2[ It x Iu ][ xytu ]
+                  Fill target[          tu ] = 2 MAT[i,a] Gamma_tu
+                  Fill target[ D2JUMP + tu ] = - MAT[i,a] Gamma_tu */
+               int jump_xy = 0;
+               for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+                  const int irrep_y = Irreps::directProd( irrep, irrep_x );
+                  const int occ_x   = indices->getNOCC( irrep_x );
+                  const int occ_y   = indices->getNOCC( irrep_y );
+                  const int num_x   = indices->getNDMRG( irrep_x );
+                  const int num_y   = indices->getNDMRG( irrep_y );
+
+                  // workspace[          xy ] = (ia|yx)
+                  // workspace[ D2JUMP + xy ] = (ix|ya)
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int x = 0; x < num_x; x++ ){
+                        workspace[          jump_xy + x + num_x * y ] =
+                           integrals->get_coulomb( irrep_y, irrep_x, irrep_i, irrep_a, occ_y + y, occ_x + x, count_i, N_OA_a + count_a ); // (ia|yx)
+                        workspace[ D2JUMP + jump_xy + x + num_x * y ] =
+                           integrals->get_coulomb( irrep_i, irrep_x, irrep_y, irrep_a, count_i, occ_x + x, occ_y + y, N_OA_a + count_a ); // (ix|ya)
+                     }
+                  }
+
+                  // target[ tu          ] = 2 MAT[i,a] Gamma_tu
+                  // target[ D2JUMP + tu ] = - MAT[i,a] Gamma_tu
+                  if ( irrep == 0 ){
+                     const int d_xy = indices->getDMRGcumulative( irrep_x );
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int x = 0; x < num_x; x++ ){
+                           const double value = MAT_ia * one_rdm[ d_xy + x + LAS * ( d_xy + y ) ];
+                           target[          jump_xy + x + num_x * y ] = 2 * value;
+                           target[ D2JUMP + jump_xy + x + num_x * y ] =   - value;
+                        }
+                     }
+                  } else {
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int x = 0; x < num_x; x++ ){
+                           target[          jump_xy + x + num_x * y ] = 0.0;
+                           target[ D2JUMP + jump_xy + x + num_x * y ] = 0.0;
+                        }
+                     }
+                  }
+
+                  jump_xy += num_x * num_y;
+               }
+               jump_xy = 2 * jump_xy;
+               assert( jump_xy == size_D[ irrep ] );
+
+               // Perform target += workspace * SDD[ irrep ]
+               char notrans = 'N';
+               int int1 = 1;
+               double alpha = 1.0;
+               double beta = 1.0; //ADD
+               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SDD[ irrep ], &jump_xy, &beta, target, &int1 );
+
+            }
+         }
+         jump_ai += NOCC_i * NVIR_a;
+      }
+   }
+
+   delete [] workspace;
+   delete MAT;
 
 }
 
@@ -586,10 +865,11 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
    SAA = new double*[ num_irreps ];
    SCC = new double*[ num_irreps ];
    
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
       const int SIZE = size_AC[ irrep ];
-      const int LAS = indices->getDMRGcumulative( num_irreps );
       SAA[ irrep ] = new double[ SIZE * SIZE ];
       SCC[ irrep ] = new double[ SIZE * SIZE ];
       
@@ -822,11 +1102,12 @@ void CheMPS2::CASPT2::make_SDD(){
    
    SDD = new double*[ num_irreps ];
    
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
    for ( int irrep_ai = 0; irrep_ai < num_irreps; irrep_ai++ ){
 
       const int SIZE   = size_D[ irrep_ai ];
       const int D2JUMP = SIZE / 2;
-      const int LAS    = indices->getDMRGcumulative( num_irreps );
       SDD[ irrep_ai ] = new double[ SIZE * SIZE ];
       
       int jump_col = 0;
@@ -909,11 +1190,12 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
    SBB_singlet = new double*[ num_irreps ];
    SFF_singlet = new double*[ num_irreps ];
    
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
       const int irrep = 0;
 
       const int SIZE = size_BF_singlet[ irrep ];
-      const int LAS  = indices->getDMRGcumulative( num_irreps );
       SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
       SFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
       
@@ -1000,7 +1282,6 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
    for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
 
       const int SIZE = size_BF_singlet[ irrep ];
-      const int LAS = indices->getDMRGcumulative( num_irreps );
       SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
       SFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
       
@@ -1108,11 +1389,12 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
    SBB_triplet = new double*[ num_irreps ];
    SFF_triplet = new double*[ num_irreps ];
    
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
       const int irrep = 0;
 
       const int SIZE = size_BF_triplet[ irrep ];
-      const int LAS  = indices->getDMRGcumulative( num_irreps );
       SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
       SFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
       
@@ -1202,7 +1484,6 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
       // Fill the triplet overlap matrix
       {
          const int SIZE = size_BF_triplet[ irrep ];
-         const int LAS  = indices->getDMRGcumulative( num_irreps );
          SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
          SFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
          
@@ -1306,13 +1587,13 @@ void CheMPS2::CASPT2::make_SEE_SGG(){
    SEE = new double*[ num_irreps ];
    SGG = new double*[ num_irreps ];
    
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
    for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
 
       const int SIZE = indices->getNDMRG( irrep_ut );
-      const int LAS = indices->getDMRGcumulative( num_irreps );
       SEE[ irrep_ut ] = new double[ SIZE * SIZE ];
       SGG[ irrep_ut ] = new double[ SIZE * SIZE ];
-      
       const int d_ut   = indices->getDMRGcumulative( irrep_ut );
       const int num_ut = indices->getNDMRG( irrep_ut );
       
