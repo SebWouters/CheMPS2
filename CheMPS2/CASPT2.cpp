@@ -216,7 +216,7 @@ int CheMPS2::CASPT2::vector_helper(){
            if irrep == 0:
               irrep_ij = 0 .. num_irreps
                  (SINGLET) ---> count_ij = jump_ij + i + j(j+1)/2
-                 (SIGNLET) jump_ij += NOCC[ irrep_ij ] * ( NOCC[ irrep_ij ] + 1 ) / 2
+                 (SINGLET) jump_ij += NOCC[ irrep_ij ] * ( NOCC[ irrep_ij ] + 1 ) / 2
                  (TRIPLET) ---> count_ij = jump_ij + i + j(j-1)/2
                  (TRIPLET) jump_ij += NOCC[ irrep_ij ] * ( NOCC[ irrep_ij ] - 1 ) / 2
            else:
@@ -520,8 +520,8 @@ void CheMPS2::CASPT2::construct_rhs(){
                            + sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]
 
       VB:  < H E_ti E_uj >
-           < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]  -----------> OK
-           < T_tiuj | H > = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]  -----------> OK
+           < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+           < T_tiuj | H > = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
 
       VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] ) < E_wt E_uv >
                            + sum_wxy (xy|wa) < E_xy E_wt E_uv >
@@ -547,8 +547,8 @@ void CheMPS2::CASPT2::construct_rhs(){
            < T_tiaj | H > = sum_w [ (aj|wi) - (ai|wj) ] * 3 * SEE[ It ][ wt ]  -----------> OK
 
       VF:  < H E_at E_bu >
-           < S_atbu | H > = sum_vw (av|bw) SFF_singlet[ It x Iu ][ xytu ]  -----------> OK
-           < T_atbu | H > = sum_vw (av|bw) SFF_triplet[ It x Iu ][ xytu ]  -----------> OK
+           < S_atbu | H > = sum_xy (ax|by) SFF_singlet[ It x Iu ][ xytu ]
+           < T_atbu | H > = sum_xy (ax|by) SFF_triplet[ It x Iu ][ xytu ]
 
       VG:  < H E_ai E_bt >
            < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]  -----------> OK
@@ -566,7 +566,7 @@ void CheMPS2::CASPT2::construct_rhs(){
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NORB = indices->getNORB( irrep );
       for ( int row = 0; row < NORB; row++ ){
-         for ( int col = 0; col < NORB; col++ ){
+         for ( int col = row; col < NORB; col++ ){
             double value = oei->get( irrep, row, col );
             for ( int irrep_occ = 0; irrep_occ < num_irreps; irrep_occ++ ){
                const int NOCC = indices->getNOCC( irrep_occ );
@@ -576,6 +576,7 @@ void CheMPS2::CASPT2::construct_rhs(){
                }
             }
             MAT->set( irrep, row, col, value );
+            MAT->set( irrep, col, row, value );
          }
       }
    }
@@ -615,9 +616,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                const int d_z   = indices->getDMRGcumulative( irrep_z );
 
                // workspace[ xyz ] = (ix|zy)
-               for ( int x = 0; x < num_x; x++ ){
+               for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
-                     for ( int z = 0; z < num_z; z++ ){
+                     for ( int x = 0; x < num_x; x++ ){
                         workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
                            = integrals->get_coulomb( irrep, irrep_x, irrep_z, irrep_y, count_i, occ_x + x, occ_z + z, occ_y + y );
                      }
@@ -625,9 +626,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                }
 
                // target[ tuv ] = - sum_w MAT[i,w] Gamma_tuwv
-               for ( int x = 0; x < num_x; x++ ){
+               for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
-                     for ( int z = 0; z < num_z; z++ ){
+                     for ( int x = 0; x < num_x; x++ ){
                         double value = 0.0;
                         for ( int w = 0; w < NACT; w++ ){
                            value += MAT->get( irrep, count_i, NOCC + w ) * two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_w + w + LAS * ( d_z + z ) ) ) ];
@@ -639,9 +640,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                // target[ tuv ] += 2 MAT[i,t] Gamma_uv
                if ( irrep_x == irrep ){
-                  for ( int x = 0; x < num_x; x++ ){
+                  for ( int z = 0; z < num_z; z++ ){
                      for ( int y = 0; y < num_y; y++ ){
-                        for ( int z = 0; z < num_z; z++ ){
+                        for ( int x = 0; x < num_x; x++ ){
                            target[ jump_xyz + x + num_x * ( y + num_y * z ) ] += 2 * MAT->get( irrep, count_i, occ_x + x ) * one_rdm[ d_y + y + LAS * ( d_z + z ) ];
                         }
                      }
@@ -650,9 +651,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                // target[ tuv ] -= MAT[i,u] Gamma_tv
                if ( irrep_y == irrep ){
-                  for ( int x = 0; x < num_x; x++ ){
+                  for ( int z = 0; z < num_z; z++ ){
                      for ( int y = 0; y < num_y; y++ ){
-                        for ( int z = 0; z < num_z; z++ ){
+                        for ( int x = 0; x < num_x; x++ ){
                            target[ jump_xyz + x + num_x * ( y + num_y * z ) ] -= MAT->get( irrep, count_i, occ_y + y ) * one_rdm[ d_x + x + LAS * ( d_z + z ) ];
                         }
                      }
@@ -671,6 +672,7 @@ void CheMPS2::CASPT2::construct_rhs(){
          double beta = 1.0; //ADD
          dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SAA[ irrep ], &jump_xyz, &beta, target, &int1 );
       }
+      assert( NOCC * size_AC[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_A ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] );
    }
    
    // VC: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tuv + size_AC[ irrep ] * count_a ]
@@ -702,9 +704,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                const int d_z   = indices->getDMRGcumulative( irrep_z );
 
                // workspace[ xyz ] = (zy|xa)
-               for ( int x = 0; x < num_x; x++ ){
+               for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
-                     for ( int z = 0; z < num_z; z++ ){
+                     for ( int x = 0; x < num_x; x++ ){
                         workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
                            = integrals->get_coulomb( irrep_z, irrep_y, irrep_x, irrep, occ_z + z, occ_y + y, occ_x + x, N_OA + count_a );
                      }
@@ -712,9 +714,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                }
 
                // target[ tuv ] = sum_w MAT[w,a] Gamma_wutv
-               for ( int x = 0; x < num_x; x++ ){
+               for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
-                     for ( int z = 0; z < num_z; z++ ){
+                     for ( int x = 0; x < num_x; x++ ){
                         double value = 0.0;
                         for ( int w = 0; w < NACT; w++ ){
                            value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * two_rdm[ d_w + w + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_z + z ) ) ) ];
@@ -749,6 +751,7 @@ void CheMPS2::CASPT2::construct_rhs(){
          double beta = 1.0; //ADD
          dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SCC[ irrep ], &jump_xyz, &beta, target, &int1 );
       }
+      assert( NVIR * size_AC[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_C ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] );
    }
 
    // VD1: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu +          size_D[ irrep ] * count_ai ]
@@ -764,8 +767,7 @@ void CheMPS2::CASPT2::construct_rhs(){
          for ( int count_i = 0; count_i < NOCC_i; count_i++ ){
             for ( int count_a = 0; count_a < NVIR_a; count_a++ ){
 
-               double * target = ( vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ]
-                                 + size_D[ irrep ] * ( jump_ai + count_i + NOCC_i * count_a ) );
+               double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + size_D[ irrep ] * ( jump_ai + count_i + NOCC_i * count_a );
                const double MAT_ia = ( ( irrep == 0 ) ? MAT->get( irrep, count_i, N_OA_a + count_a ) : 0.0 );
 
                /* Fill workspace[          xy ] with (ia|yx)
@@ -831,6 +833,287 @@ void CheMPS2::CASPT2::construct_rhs(){
          }
          jump_ai += NOCC_i * NVIR_a;
       }
+      assert( jump_ai * size_D[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_D ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] );
+   }
+
+   // VB_singlet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + count_tu + size_BF_singlet[ irrep ] * count_ij ]
+   // VB_triplet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + count_tu + size_BF_triplet[ irrep ] * count_ij ]
+   { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
+      const int irrep = 0;
+
+      int jump_ij = 0; // First do SINGLET
+      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+         const int NOCC_ij = indices->getNOCC( irrep_ij );
+         for ( int i = 0; i < NOCC_ij; i++ ){
+            for ( int j = i; j < NOCC_ij; j++ ){
+
+               // Fill workspace[ xy ] with (ix|jy)
+               int jump_xy = 0;
+               for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
+                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
+                  const int occ_xy = indices->getNOCC( irrep_xy );
+                  const int num_xy = indices->getNDMRG( irrep_xy );
+
+                  for ( int x = 0; x < num_xy; x++ ){
+                     for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] =
+                           integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y ); // (ix|jy)
+                     }
+                  }
+
+                  jump_xy += ( num_xy * ( num_xy + 1 ) ) / 2;
+               }
+               assert( jump_xy == size_BF_singlet[ irrep ] );
+
+               // Perform target[ tu ] = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+               char notrans = 'N';
+               int int1 = 1;
+               double alpha = 1.0;
+               double beta = 0.0; //SET
+               double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_BF_singlet[ irrep ] * ( jump_ij + i + (j*(j+1))/2 );
+               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+            }
+         }
+         jump_ij += ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+      }
+      assert( jump_ij * size_BF_singlet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] );
+
+      jump_ij = 0; // Then do TRIPLET
+      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+         const int NOCC_ij = indices->getNOCC( irrep_ij );
+         for ( int i = 0; i < NOCC_ij; i++ ){
+            for ( int j = i+1; j < NOCC_ij; j++ ){
+
+               // Fill workspace[ xy ] with (ix|jy)
+               int jump_xy = 0;
+               for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
+                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
+                  const int occ_xy = indices->getNOCC( irrep_xy );
+                  const int num_xy = indices->getNDMRG( irrep_xy );
+
+                  for ( int x = 0; x < num_xy; x++ ){
+                     for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] =
+                           integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y ); // (ix|jy)
+                     }
+                  }
+
+                  jump_xy += ( num_xy * ( num_xy - 1 ) ) / 2;
+               }
+               assert( jump_xy == size_BF_triplet[ irrep ] );
+
+               // Perform target[ tu ] = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
+               char notrans = 'N';
+               int int1 = 1;
+               double alpha = 1.0;
+               double beta = 0.0; //SET
+               double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_BF_triplet[ irrep ] * ( jump_ij + i + (j*(j-1))/2 );
+               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+            }
+         }
+         jump_ij += ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
+      }
+      assert( jump_ij * size_BF_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] );
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+
+      int jump_ij = 0;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int irrep_j = Irreps::directProd( irrep, irrep_i );
+         if ( irrep_i < irrep_j ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int NOCC_j = indices->getNOCC( irrep_j );
+            for ( int i = 0; i < NOCC_i; i++ ){
+               for ( int j = 0; j < NOCC_j; j++ ){
+
+                  // Fill workspace[ xy ] with (ix|jy)
+                  int jump_xy = 0;
+                  for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+                     const int irrep_y = Irreps::directProd( irrep, irrep_x );
+                     if ( irrep_x < irrep_y ){
+                        const int d_x   = indices->getDMRGcumulative( irrep_x );
+                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int occ_x = indices->getNOCC( irrep_x );
+                        const int occ_y = indices->getNOCC( irrep_y );
+                        const int num_x = indices->getNDMRG( irrep_x );
+                        const int num_y = indices->getNDMRG( irrep_y );
+
+                        for ( int y = 0; y < num_y; y++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              workspace[ jump_xy + x + num_x * y ] =
+                                 integrals->get_coulomb( irrep_i, irrep_x, irrep_j, irrep_y, i, occ_x + x, j, occ_y + y ); // (ix|jy)
+                           }
+                        }
+
+                        jump_xy += num_x * num_y;
+                     }
+                  }
+                  assert( jump_xy == size_BF_singlet[ irrep ] );
+                  assert( jump_xy == size_BF_triplet[ irrep ] );
+
+                  // Perform target[ tu ] = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+                  char notrans = 'N';
+                  int int1 = 1;
+                  double alpha = 1.0;
+                  double beta = 0.0; //SET
+                  double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_BF_singlet[ irrep ] * ( jump_ij + i + NOCC_i * j );
+                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+                  // Perform target[ tu ] = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
+                  target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_BF_triplet[ irrep ] * ( jump_ij + i + NOCC_i * j );
+                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+               }
+            }
+            jump_ij += NOCC_i * NOCC_j;
+         }
+      }
+      assert( jump_ij * size_BF_singlet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] );
+      assert( jump_ij * size_BF_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] );
+   }
+
+   // VF_singlet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + count_tu + size_BF_singlet[ irrep ] * count_ab ]
+   // VF_triplet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + count_tu + size_BF_triplet[ irrep ] * count_ab ]
+   { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
+      const int irrep = 0;
+
+      int jump_ab = 0; // First do SINGLET
+      for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+         const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+         const int NVIR_ab = indices->getNVIRT( irrep_ab );
+         for ( int a = 0; a < NVIR_ab; a++ ){
+            for ( int b = a; b < NVIR_ab; b++ ){
+
+               // Fill workspace[ xy ] with (ax|by)
+               int jump_xy = 0;
+               for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
+                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
+                  const int occ_xy = indices->getNOCC( irrep_xy );
+                  const int num_xy = indices->getNDMRG( irrep_xy );
+
+                  for ( int x = 0; x < num_xy; x++ ){
+                     for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] =
+                           integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b ); // (ax|by)
+                     }
+                  }
+
+                  jump_xy += ( num_xy * ( num_xy + 1 ) ) / 2;
+               }
+               assert( jump_xy == size_BF_singlet[ irrep ] );
+
+               // Perform target[ tu ] = sum_xy (ax|by) SFF_singlet[ It x Iu ][ xytu ]
+               char notrans = 'N';
+               int int1 = 1;
+               double alpha = 1.0;
+               double beta = 0.0; //SET
+               double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + size_BF_singlet[ irrep ] * ( jump_ab + a + (b*(b+1))/2 );
+               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+            }
+         }
+         jump_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+      }
+      assert( jump_ab * size_BF_singlet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] );
+
+      jump_ab = 0; // Then do TRIPLET
+      for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+         const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+         const int NVIR_ab = indices->getNVIRT( irrep_ab );
+         for ( int a = 0; a < NVIR_ab; a++ ){
+            for ( int b = a+1; b < NVIR_ab; b++ ){
+
+               // Fill workspace[ xy ] with (ax|by)
+               int jump_xy = 0;
+               for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
+                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
+                  const int occ_xy = indices->getNOCC( irrep_xy );
+                  const int num_xy = indices->getNDMRG( irrep_xy );
+
+                  for ( int x = 0; x < num_xy; x++ ){
+                     for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] =
+                           integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b ); // (ax|by)
+                     }
+                  }
+
+                  jump_xy += ( num_xy * ( num_xy - 1 ) ) / 2;
+               }
+               assert( jump_xy == size_BF_triplet[ irrep ] );
+
+               // Perform target[ tu ] = sum_xy (ax|by) SFF_triplet[ It x Iu ][ xytu ]
+               char notrans = 'N';
+               int int1 = 1;
+               double alpha = 1.0;
+               double beta = 0.0; //SET
+               double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + size_BF_triplet[ irrep ] * ( jump_ab + a + (b*(b-1))/2 );
+               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+            }
+         }
+         jump_ab += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+      }
+      assert( jump_ab * size_BF_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] );
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+
+      int jump_ab = 0;
+      for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+         const int irrep_b = Irreps::directProd( irrep, irrep_a );
+         if ( irrep_a < irrep_b ){
+            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+            const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int NVIR_b = indices->getNVIRT( irrep_b );
+            for ( int a = 0; a < NVIR_a; a++ ){
+               for ( int b = 0; b < NVIR_b; b++ ){
+
+                  // Fill workspace[ xy ] with (ax|by)
+                  int jump_xy = 0;
+                  for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+                     const int irrep_y = Irreps::directProd( irrep, irrep_x );
+                     if ( irrep_x < irrep_y ){
+                        const int d_x   = indices->getDMRGcumulative( irrep_x );
+                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int occ_x = indices->getNOCC( irrep_x );
+                        const int occ_y = indices->getNOCC( irrep_y );
+                        const int num_x = indices->getNDMRG( irrep_x );
+                        const int num_y = indices->getNDMRG( irrep_y );
+
+                        for ( int y = 0; y < num_y; y++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              workspace[ jump_xy + x + num_x * y ] =
+                                 integrals->get_exchange( irrep_x, irrep_y, irrep_a, irrep_b, occ_x + x, occ_y + y, N_OA_a + a, N_OA_b + b ); // (ax|by)
+                           }
+                        }
+
+                        jump_xy += num_x * num_y;
+                     }
+                  }
+                  assert( jump_xy == size_BF_singlet[ irrep ] );
+                  assert( jump_xy == size_BF_triplet[ irrep ] );
+
+                  // Perform target[ tu ] = sum_xy (ix|jy) SFF_singlet[ It x Iu ][ xytu ]
+                  char notrans = 'N';
+                  int int1 = 1;
+                  double alpha = 1.0;
+                  double beta = 0.0; //SET
+                  double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + size_BF_singlet[ irrep ] * ( jump_ab + a + NVIR_a * b );
+                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+                  // Perform target[ tu ] = sum_xy (ix|jy) SFF_triplet[ It x Iu ][ xytu ]
+                  target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + size_BF_triplet[ irrep ] * ( jump_ab + a + NVIR_a * b );
+                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
+
+               }
+            }
+            jump_ab += NVIR_a * NVIR_b;
+         }
+      }
+      assert( jump_ab * size_BF_singlet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] );
+      assert( jump_ab * size_BF_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] );
    }
 
    delete [] workspace;
