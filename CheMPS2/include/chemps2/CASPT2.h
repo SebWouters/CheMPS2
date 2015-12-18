@@ -86,9 +86,6 @@ namespace CheMPS2{
          // The number of occupied, active and virtual orbitals per irrep (externally allocated and deleted)
          const DMRGSCFindices * indices;
          
-         // The relevant two-electron integrals (externally allocated and deleted)
-         const DMRGSCFintegrals * integrals;
-         
          // The one-electron integrals (externally allocated and deleted)
          const DMRGSCFmatrix * oei;
          
@@ -118,9 +115,10 @@ namespace CheMPS2{
          
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
+         long long total_vector_length() const; // For debugging purposes
          
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
-         void construct_rhs();
+         void construct_rhs( const DMRGSCFintegrals * integrals );
          
          // Variables for the partitioning of the vector in blocks
          int * jump;

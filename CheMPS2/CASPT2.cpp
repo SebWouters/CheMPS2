@@ -33,7 +33,6 @@ using std::max;
 CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei_in, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract){
 
    indices    = idx;
-   integrals  = ints;
    oei        = oei_in;
    fock       = fock_in;
    one_rdm    = one_dm;
@@ -51,7 +50,7 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    make_SBB_SFF_singlet();
    make_SBB_SFF_triplet();
    
-   construct_rhs(); // Needs to be called AFTER make_S**()!
+   construct_rhs( ints ); // Needs to be called AFTER make_S**()!
 
 }
 
@@ -240,7 +239,6 @@ int CheMPS2::CASPT2::vector_helper(){
                     ---> count_tu = jump_tu + t + NDMRG[ irrep_t ] * u
                     jump_tu += NDMRG[ irrep_t ] * NDMRG[ irrep_u ]
    */
-   
    
    size_BF_singlet = new int[ num_irreps ];
    size_BF_triplet = new int[ num_irreps ];
@@ -478,42 +476,50 @@ int CheMPS2::CASPT2::vector_helper(){
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
    cout << "CASPT2::vector_helper : Total size of the V_SD space = " << total_size << endl;
    
-   /*int check = 0;
-   for ( int i1 = 0; i1 < num_irreps; i1++ ){
-      for ( int i2 = 0; i2 < num_irreps; i2++ ){
-         for ( int i3 = 0; i3 < num_irreps; i3++ ){
-            const int i4 = Irreps::directProd( Irreps::directProd( i1, i2 ), i3 ); // V_SD: E_12 E_34 | 0 >
-            check +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNDMRG( i4 ); // A:  E_ti E_uv | 0 >
-            check +=     indices->getNDMRG( i1 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // C:  E_at E_uv | 0 >
-            check += 2 * indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // D:  E_ai E_tu | 0 >  and  E_ti E_au | 0 >
-            check +=     indices->getNOCC( i1 )  * indices->getNOCC( i2 )  * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // E:  E_ti E_aj | 0 >
-            check +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNVIRT( i3 ) * indices->getNVIRT( i4 ); // G:  E_ai E_bt | 0 >
-            if ( i2 < i4 ){
-               // 2 < 4 and irrep_2 < irrep_4
-               check += indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // B:  E_ti E_uj | 0 >
-               check += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // H:  E_ai E_bj | 0 >
-               check += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i4 ); // F:  E_at E_bu | 0 >
-            }
-            if ( i2 == i4 ){ // i2 == i4 implies i1 == i3
-               // 2 < 4 and irrep_2 == irrep_4
-               check += ( indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // B:  E_ti E_uj | 0 >
-               check += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // H:  E_ai E_bj | 0 >
-               check += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * ( indices->getNDMRG( i2 ) - 1 ) ) / 2; // F:  E_at E_bu | 0 >
-               // 2 == 4 and 1 <= 3
-               check += ( indices->getNDMRG( i1 ) * ( indices->getNDMRG( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // B:  E_ti E_uj | 0 >
-               check += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNDMRG( i2 ) ) / 2; // F:  E_at E_bu | 0 >
-               check += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // H:  E_ai E_bj | 0 >
-            }
-         }
-      }
-   }
-   assert( check == total_size );*/
+   const long long check = total_vector_length();
+   assert( check == total_size );
 
    return total_size;
 
 }
 
-void CheMPS2::CASPT2::construct_rhs(){
+long long CheMPS2::CASPT2::total_vector_length() const{
+
+   long long length = 0;
+   for ( int i1 = 0; i1 < num_irreps; i1++ ){
+      for ( int i2 = 0; i2 < num_irreps; i2++ ){
+         for ( int i3 = 0; i3 < num_irreps; i3++ ){
+            const int i4 = Irreps::directProd( Irreps::directProd( i1, i2 ), i3 );
+            length +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNDMRG( i4 ); // A:  E_ti E_uv | 0 >
+            length +=     indices->getNDMRG( i1 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // C:  E_at E_uv | 0 >
+            length += 2 * indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // D:  E_ai E_tu | 0 >  and  E_ti E_au | 0 >
+            length +=     indices->getNOCC( i1 )  * indices->getNOCC( i2 )  * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // E:  E_ti E_aj | 0 >
+            length +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNVIRT( i3 ) * indices->getNVIRT( i4 ); // G:  E_ai E_bt | 0 >
+            if ( i2 < i4 ){
+               // 2 < 4 and irrep_2 < irrep_4
+               length += indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // B:  E_ti E_uj | 0 >
+               length += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // H:  E_ai E_bj | 0 >
+               length += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i4 ); // F:  E_at E_bu | 0 >
+            }
+            if ( i2 == i4 ){ // i2 == i4 implies i1 == i3
+               // 2 < 4 and irrep_2 == irrep_4
+               length += ( indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // B:  E_ti E_uj | 0 >
+               length += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // H:  E_ai E_bj | 0 >
+               length += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * ( indices->getNDMRG( i2 ) - 1 ) ) / 2; // F:  E_at E_bu | 0 >
+               // 2 == 4 and 1 <= 3
+               length += ( indices->getNDMRG( i1 ) * ( indices->getNDMRG( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // B:  E_ti E_uj | 0 >
+               length += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNDMRG( i2 ) ) / 2; // F:  E_at E_bu | 0 >
+               length += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // H:  E_ai E_bj | 0 >
+            }
+         }
+      }
+   }
+
+   return length;
+
+}
+
+void CheMPS2::CASPT2::construct_rhs( const DMRGSCFintegrals * integrals ){
 
    /*
       VA:  < H E_ti E_uv > = sum_w ( t_iw + sum_k [ 2 (iw|kk) - (ik|kw) ] ) [ 2 delta_tw Gamma_uv - Gamma_tuwv - delta_wu Gamma_tv ]
@@ -543,20 +549,20 @@ void CheMPS2::CASPT2::construct_rhs(){
                            + sum_xy (ix|ya) SD2D2[ It x Iu ][ xytu ]
 
       VE:  < H E_ti E_aj >
-           < S_tiaj | H > = sum_w [ (aj|wi) + (ai|wj) ] * 1 * SEE[ It ][ wt ]  -----------> OK
-           < T_tiaj | H > = sum_w [ (aj|wi) - (ai|wj) ] * 3 * SEE[ It ][ wt ]  -----------> OK
+           < S_tiaj | H > = sum_w [ (aj|wi) + (ai|wj) ] * 1 * SEE[ It ][ wt ]
+           < T_tiaj | H > = sum_w [ (aj|wi) - (ai|wj) ] * 3 * SEE[ It ][ wt ]
 
       VF:  < H E_at E_bu >
            < S_atbu | H > = sum_xy (ax|by) SFF_singlet[ It x Iu ][ xytu ]
            < T_atbu | H > = sum_xy (ax|by) SFF_triplet[ It x Iu ][ xytu ]
 
       VG:  < H E_ai E_bt >
-           < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]  -----------> OK
-           < T_aibt | H > = sum_u [ (ai|bu) - (bi|au) ] * 3 * SGG[ It ][ ut ]  -----------> OK
+           < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]
+           < T_aibt | H > = sum_u [ (ai|bu) - (bi|au) ] * 3 * SGG[ It ][ ut ]
 
       VH:  < H E_ai E_bj >
-           < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]  -----------> OK
-           < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]  -----------> OK
+           < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]
+           < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]
    */
    
    const int LAS = indices->getDMRGcumulative( num_irreps );
@@ -589,7 +595,7 @@ void CheMPS2::CASPT2::construct_rhs(){
    }
    double * workspace = new double[ max_size ];
 
-   // VA: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + count_tuv + size_AC[ irrep ] * count_i ]
+   // VA
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NOCC = indices->getNOCC( irrep );
       const int NACT = indices->getNDMRG( irrep );
@@ -619,8 +625,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
                      for ( int x = 0; x < num_x; x++ ){
-                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
-                           = integrals->get_coulomb( irrep, irrep_x, irrep_z, irrep_y, count_i, occ_x + x, occ_z + z, occ_y + y );
+                        const double ix_zy = integrals->get_coulomb( irrep, irrep_x, irrep_z, irrep_y, count_i, occ_x + x, occ_z + z, occ_y + y );
+                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ] = ix_zy;
+                        //assert( fabs( ix_zy - integrals->FourIndexAPI( irrep, irrep_z, irrep_x, irrep_y, count_i, occ_z + z, occ_x + x, occ_y + y ) ) < 1e-30 );
                      }
                   }
                }
@@ -674,8 +681,8 @@ void CheMPS2::CASPT2::construct_rhs(){
       }
       assert( NOCC * size_AC[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_A ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] );
    }
-   
-   // VC: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tuv + size_AC[ irrep ] * count_a ]
+
+   // VC
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NOCC  = indices->getNOCC( irrep );
       const int NVIR  = indices->getNVIRT( irrep );
@@ -707,8 +714,9 @@ void CheMPS2::CASPT2::construct_rhs(){
                for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
                      for ( int x = 0; x < num_x; x++ ){
-                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ]
-                           = integrals->get_coulomb( irrep_z, irrep_y, irrep_x, irrep, occ_z + z, occ_y + y, occ_x + x, N_OA + count_a );
+                        const double zy_xa = integrals->get_coulomb( irrep_z, irrep_y, irrep_x, irrep, occ_z + z, occ_y + y, occ_x + x, N_OA + count_a );
+                        workspace[ jump_xyz + x + num_x * ( y + num_y * z ) ] = zy_xa;
+                        //assert( fabs( zy_xa - integrals->FourIndexAPI( irrep_z, irrep_x, irrep_y, irrep, occ_z + z, occ_x + x, occ_y + y, N_OA + count_a ) ) < 1e-30 );
                      }
                   }
                }
@@ -754,8 +762,7 @@ void CheMPS2::CASPT2::construct_rhs(){
       assert( NVIR * size_AC[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_C ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] );
    }
 
-   // VD1: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu +          size_D[ irrep ] * count_ai ]
-   // VD2: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + count_tu + D2JUMP + size_D[ irrep ] * count_ai ]
+   // VD1 and VD2
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       int jump_ai = 0;
       const int D2JUMP = size_D[ irrep ] / 2;
@@ -781,19 +788,26 @@ void CheMPS2::CASPT2::construct_rhs(){
                int jump_xy = 0;
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                   const int irrep_y = Irreps::directProd( irrep, irrep_x );
-                  const int occ_x   = indices->getNOCC( irrep_x );
-                  const int occ_y   = indices->getNOCC( irrep_y );
-                  const int num_x   = indices->getNDMRG( irrep_x );
-                  const int num_y   = indices->getNDMRG( irrep_y );
+                  const int occ_x = indices->getNOCC( irrep_x );
+                  const int occ_y = indices->getNOCC( irrep_y );
+                  const int num_x = indices->getNDMRG( irrep_x );
+                  const int num_y = indices->getNDMRG( irrep_y );
 
-                  // workspace[          xy ] = (ia|yx)
+                  // workspace[ xy ] = (ia|yx)
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int x = 0; x < num_x; x++ ){
+                        const double ia_yx = integrals->get_coulomb( irrep_y, irrep_x, irrep_i, irrep_a, occ_y + y, occ_x + x, count_i, N_OA_a + count_a );
+                        workspace[ jump_xy + x + num_x * y ] = ia_yx;
+                        //assert( fabs( ia_yx - integrals->FourIndexAPI( irrep_i, irrep_y, irrep_a, irrep_x, count_i, occ_y + y, N_OA_a + count_a, occ_x + x ) ) < 1e-30 );
+                     }
+                  }
+
                   // workspace[ D2JUMP + xy ] = (ix|ya)
                   for ( int y = 0; y < num_y; y++ ){
                      for ( int x = 0; x < num_x; x++ ){
-                        workspace[          jump_xy + x + num_x * y ] =
-                           integrals->get_coulomb( irrep_y, irrep_x, irrep_i, irrep_a, occ_y + y, occ_x + x, count_i, N_OA_a + count_a ); // (ia|yx)
-                        workspace[ D2JUMP + jump_xy + x + num_x * y ] =
-                           integrals->get_coulomb( irrep_i, irrep_x, irrep_y, irrep_a, count_i, occ_x + x, occ_y + y, N_OA_a + count_a ); // (ix|ya)
+                        const double ix_ya = integrals->get_coulomb( irrep_i, irrep_x, irrep_y, irrep_a, count_i, occ_x + x, occ_y + y, N_OA_a + count_a );
+                        workspace[ D2JUMP + jump_xy + x + num_x * y ] = ix_ya;
+                        //assert( fabs( ix_ya - integrals->FourIndexAPI( irrep_i, irrep_y, irrep_x, irrep_a, count_i, occ_y + y, occ_x + x, N_OA_a + count_a ) ) < 1e-30 );
                      }
                   }
 
@@ -836,8 +850,9 @@ void CheMPS2::CASPT2::construct_rhs(){
       assert( jump_ai * size_D[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_D ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] );
    }
 
-   // VB_singlet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + count_tu + size_BF_singlet[ irrep ] * count_ij ]
-   // VB_triplet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + count_tu + size_BF_triplet[ irrep ] * count_ij ]
+   delete MAT;
+
+   // VB singlet and triplet
    { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
       const int irrep = 0;
 
@@ -856,8 +871,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-                        workspace[ jump_xy + x + (y*(y+1))/2 ] =
-                           integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y ); // (ix|jy)
+                        const double ix_jy = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y );
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ix_jy;
+                        //assert( fabs( ix_jy - integrals->FourIndexAPI( irrep_ij, irrep_ij, irrep_xy, irrep_xy, i, j, occ_xy + x, occ_xy + y ) ) < 1e-30 );
                      }
                   }
 
@@ -894,8 +910,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-                        workspace[ jump_xy + x + (y*(y-1))/2 ] =
-                           integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y ); // (ix|jy)
+                        const double ix_jy = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y );
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ix_jy;
+                        //assert( fabs( ix_jy - integrals->FourIndexAPI( irrep_ij, irrep_ij, irrep_xy, irrep_xy, i, j, occ_xy + x, occ_xy + y ) ) < 1e-30 );
                      }
                   }
 
@@ -942,8 +959,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                         for ( int y = 0; y < num_y; y++ ){
                            for ( int x = 0; x < num_x; x++ ){
-                              workspace[ jump_xy + x + num_x * y ] =
-                                 integrals->get_coulomb( irrep_i, irrep_x, irrep_j, irrep_y, i, occ_x + x, j, occ_y + y ); // (ix|jy)
+                              const double ix_jy = integrals->get_coulomb( irrep_i, irrep_x, irrep_j, irrep_y, i, occ_x + x, j, occ_y + y );
+                              workspace[ jump_xy + x + num_x * y ] = ix_jy;
+                              //assert( fabs( ix_jy - integrals->FourIndexAPI( irrep_i, irrep_j, irrep_x, irrep_y, i, j, occ_x + x, occ_y + y ) ) < 1e-30 );
                            }
                         }
 
@@ -974,8 +992,7 @@ void CheMPS2::CASPT2::construct_rhs(){
       assert( jump_ij * size_BF_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] );
    }
 
-   // VF_singlet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + count_tu + size_BF_singlet[ irrep ] * count_ab ]
-   // VF_triplet: vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + count_tu + size_BF_triplet[ irrep ] * count_ab ]
+   // VF singlet and triplet
    { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
       const int irrep = 0;
 
@@ -995,8 +1012,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-                        workspace[ jump_xy + x + (y*(y+1))/2 ] =
-                           integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b ); // (ax|by)
+                        const double ax_by = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b );
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ax_by;
+                        //assert( fabs( ax_by - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_xy, irrep_xy, N_OA_ab + a, N_OA_ab + b, occ_xy + x, occ_xy + y ) ) < 1e-30 );
                      }
                   }
 
@@ -1034,8 +1052,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-                        workspace[ jump_xy + x + (y*(y-1))/2 ] =
-                           integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b ); // (ax|by)
+                        const double ax_by = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b );
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ax_by;
+                        //assert( fabs( ax_by - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_xy, irrep_xy, N_OA_ab + a, N_OA_ab + b, occ_xy + x, occ_xy + y ) ) < 1e-30 );
                      }
                   }
 
@@ -1075,8 +1094,8 @@ void CheMPS2::CASPT2::construct_rhs(){
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
                      if ( irrep_x < irrep_y ){
-                        const int d_x   = indices->getDMRGcumulative( irrep_x );
-                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int d_x = indices->getDMRGcumulative( irrep_x );
+                        const int d_y = indices->getDMRGcumulative( irrep_y );
                         const int occ_x = indices->getNOCC( irrep_x );
                         const int occ_y = indices->getNOCC( irrep_y );
                         const int num_x = indices->getNDMRG( irrep_x );
@@ -1084,8 +1103,9 @@ void CheMPS2::CASPT2::construct_rhs(){
 
                         for ( int y = 0; y < num_y; y++ ){
                            for ( int x = 0; x < num_x; x++ ){
-                              workspace[ jump_xy + x + num_x * y ] =
-                                 integrals->get_exchange( irrep_x, irrep_y, irrep_a, irrep_b, occ_x + x, occ_y + y, N_OA_a + a, N_OA_b + b ); // (ax|by)
+                              const double ax_by = integrals->get_exchange( irrep_x, irrep_y, irrep_a, irrep_b, occ_x + x, occ_y + y, N_OA_a + a, N_OA_b + b );
+                              workspace[ jump_xy + x + num_x * y ] = ax_by;
+                              //assert( fabs( ax_by - integrals->FourIndexAPI( irrep_a, irrep_b, irrep_x, irrep_y, N_OA_a + a, N_OA_b + b, occ_x + x, occ_y + y ) ) < 1e-30 );
                            }
                         }
 
@@ -1117,7 +1137,254 @@ void CheMPS2::CASPT2::construct_rhs(){
    }
 
    delete [] workspace;
-   delete MAT;
+
+   // VE singlet and triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int occ_t = indices->getNOCC( irrep );
+      const int num_t = indices->getNDMRG( irrep );
+      double * target_singlet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ];
+      double * target_triplet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ];
+      int jump_aij_singlet = 0;
+      int jump_aij_triplet = 0;
+      for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+         const int NVIR_a = indices->getNVIRT( irrep_a );
+         const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+         const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+         if ( irrep_occ == 0 ){
+            for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+               const int NOCC_ij = indices->getNOCC( irrep_ij );
+               for ( int i = 0; i < NOCC_ij; i++ ){
+                  for ( int j = i; j < NOCC_ij; j++ ){
+                     for ( int a = 0; a < NVIR_a; a++ ){
+                        const int count_aij_singlet = jump_aij_singlet + a + NVIR_a * ( i + (j*(j+1))/2 );
+                        const int count_aij_triplet = jump_aij_triplet + a + NVIR_a * ( i + (j*(j-1))/2 );
+                        for ( int t = 0; t < num_t; t++ ){
+                           double value_singlet = 0.0;
+                           double value_triplet = 0.0;
+                           for ( int w = 0; w < num_t; w++ ){
+                              // < S_tiaj | H > = sum_w [ (aj|wi) + (ai|wj) ] * 1 * SEE[ It ][ wt ]
+                              // < T_tiaj | H > = sum_w [ (aj|wi) - (ai|wj) ] * 3 * SEE[ It ][ wt ]
+                              const double SEE_wt = SEE[ irrep ][ w + num_t * t ];
+                              const double aj_wi  = integrals->get_coulomb( irrep_ij, irrep, irrep_ij, irrep_a, i, occ_t + w, j, N_OA_a + a );
+                              const double ai_wj  = integrals->get_coulomb( irrep_ij, irrep, irrep_ij, irrep_a, j, occ_t + w, i, N_OA_a + a );
+                              value_singlet +=     SEE_wt * ( aj_wi + ai_wj );
+                              value_triplet += 3 * SEE_wt * ( aj_wi - ai_wj );
+                              //assert( fabs( aj_wi - integrals->FourIndexAPI( irrep_a, irrep, irrep_ij, irrep_ij, N_OA_a + a, occ_t + w, j, i ) ) < 1e-30 );
+                              //assert( fabs( ai_wj - integrals->FourIndexAPI( irrep_a, irrep, irrep_ij, irrep_ij, N_OA_a + a, occ_t + w, i, j ) ) < 1e-30 );
+                           }
+                           target_singlet[ t + num_t * count_aij_singlet ] = value_singlet;
+             if ( j > i ){ target_triplet[ t + num_t * count_aij_triplet ] = value_triplet; }
+                        }
+                     }
+                  }
+               }
+               jump_aij_singlet += ( NVIR_a * NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+               jump_aij_triplet += ( NVIR_a * NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
+            }
+         } else {
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep_i, irrep_occ );
+               if ( irrep_i < irrep_j ){
+                  const int NOCC_i = indices->getNOCC( irrep_i );
+                  const int NOCC_j = indices->getNOCC( irrep_j );
+                  for ( int i = 0; i < NOCC_i; i++ ){
+                     for ( int j = 0; j < NOCC_j; j++ ){
+                        for ( int a = 0; a < NVIR_a; a++ ){
+                           const int count_aij_singlet = jump_aij_singlet + a + NVIR_a * ( i + NOCC_i * j );
+                           const int count_aij_triplet = jump_aij_triplet + a + NVIR_a * ( i + NOCC_i * j );
+                           for ( int t = 0; t < num_t; t++ ){
+                              double value_singlet = 0.0;
+                              double value_triplet = 0.0;
+                              for ( int w = 0; w < num_t; w++ ){
+                                 // < S_tiaj | H > = sum_w [ (aj|wi) + (ai|wj) ] * 1 * SEE[ It ][ wt ]
+                                 // < T_tiaj | H > = sum_w [ (aj|wi) - (ai|wj) ] * 3 * SEE[ It ][ wt ]
+                                 const double SEE_wt = SEE[ irrep ][ w + num_t * t ];
+                                 const double aj_wi  = integrals->get_coulomb( irrep_i, irrep, irrep_j, irrep_a, i, occ_t + w, j, N_OA_a + a );
+                                 const double ai_wj  = integrals->get_coulomb( irrep_j, irrep, irrep_i, irrep_a, j, occ_t + w, i, N_OA_a + a );
+                                 value_singlet +=     SEE_wt * ( aj_wi + ai_wj );
+                                 value_triplet += 3 * SEE_wt * ( aj_wi - ai_wj );
+                                 //assert( fabs( aj_wi - integrals->FourIndexAPI( irrep_a, irrep, irrep_j, irrep_i, N_OA_a + a, occ_t + w, j, i ) ) < 1e-30 );
+                                 //assert( fabs( ai_wj - integrals->FourIndexAPI( irrep_a, irrep, irrep_i, irrep_j, N_OA_a + a, occ_t + w, i, j ) ) < 1e-30 );
+                              }
+                              target_singlet[ t + num_t * count_aij_singlet ] = value_singlet;
+                              target_triplet[ t + num_t * count_aij_triplet ] = value_triplet;
+                           }
+                        }
+                     }
+                  }
+                  jump_aij_singlet += NVIR_a * NOCC_i * NOCC_j;
+                  jump_aij_triplet += NVIR_a * NOCC_i * NOCC_j;
+               }
+            }
+         }
+      }
+      assert( jump_aij_singlet * num_t == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] );
+      assert( jump_aij_triplet * num_t == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] );
+   }
+
+   // VG singlet and triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int occ_t = indices->getNOCC( irrep );
+      const int num_t = indices->getNDMRG( irrep );
+      double * target_singlet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ];
+      double * target_triplet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ];
+      int jump_abi_singlet = 0;
+      int jump_abi_triplet = 0;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int NOCC_i = indices->getNOCC( irrep_i );
+         const int irrep_virt = Irreps::directProd( irrep_i, irrep );
+         if ( irrep_virt == 0 ){
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               const int NVIR_ab = indices->getNVIRT( irrep_ab );
+               for ( int i = 0; i < NOCC_i; i++ ){
+                  for ( int a = 0; a < NVIR_ab; a++ ){
+                     for ( int b = a; b < NVIR_ab; b++ ){
+                        const int count_abi_singlet = jump_abi_singlet + i + NOCC_i * ( a + (b*(b+1))/2 );
+                        const int count_abi_triplet = jump_abi_triplet + i + NOCC_i * ( a + (b*(b-1))/2 );
+                        for ( int t = 0; t < num_t; t++ ){
+                           double value_singlet = 0.0;
+                           double value_triplet = 0.0;
+                           for ( int u = 0; u < num_t; u++ ){
+                              // < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]
+                              // < T_aibt | H > = sum_u [ (ai|bu) - (bi|au) ] * 3 * SGG[ It ][ ut ]
+                              const double SGG_ut = SGG[ irrep ][ u + num_t * t ];
+                              const double ai_bu  = integrals->get_exchange( irrep_i, irrep, irrep_ab, irrep_ab, i, occ_t + u, N_OA_ab + a, N_OA_ab + b );
+                              const double bi_au  = integrals->get_exchange( irrep_i, irrep, irrep_ab, irrep_ab, i, occ_t + u, N_OA_ab + b, N_OA_ab + a );
+                              value_singlet +=     SGG_ut * ( ai_bu + bi_au );
+                              value_triplet += 3 * SGG_ut * ( ai_bu - bi_au );
+                              //assert( fabs( ai_bu - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_i, irrep, N_OA_ab + a, N_OA_ab + b, i, occ_t + u ) ) < 1e-30 );
+                              //assert( fabs( bi_au - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_i, irrep, N_OA_ab + b, N_OA_ab + a, i, occ_t + u ) ) < 1e-30 );
+                           }
+                           target_singlet[ t + num_t * count_abi_singlet ] = value_singlet;
+             if ( b > a ){ target_triplet[ t + num_t * count_abi_triplet ] = value_triplet; }
+                        }
+                     }
+                  }
+               }
+               jump_abi_singlet += ( NOCC_i * NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+               jump_abi_triplet += ( NOCC_i * NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+            }
+         } else {
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep_a, irrep_virt );
+               if ( irrep_a < irrep_b ){
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int NVIR_b = indices->getNVIRT( irrep_b );
+                  for ( int i = 0; i < NOCC_i; i++ ){
+                     for ( int a = 0; a < NVIR_a; a++ ){
+                        for ( int b = 0; b < NVIR_b; b++ ){
+                           const int count_abi_singlet = jump_abi_singlet + i + NOCC_i * ( a + NVIR_a * b );
+                           const int count_abi_triplet = jump_abi_triplet + i + NOCC_i * ( a + NVIR_a * b );
+                           for ( int t = 0; t < num_t; t++ ){
+                              double value_singlet = 0.0;
+                              double value_triplet = 0.0;
+                              for ( int u = 0; u < num_t; u++ ){
+                                 // < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]
+                                 // < T_aibt | H > = sum_u [ (ai|bu) - (bi|au) ] * 3 * SGG[ It ][ ut ]
+                                 const double SGG_ut = SGG[ irrep ][ u + num_t * t ];
+                                 const double ai_bu  = integrals->get_exchange( irrep_i, irrep, irrep_a, irrep_b, i, occ_t + u, N_OA_a + a, N_OA_b + b );
+                                 const double bi_au  = integrals->get_exchange( irrep_i, irrep, irrep_b, irrep_a, i, occ_t + u, N_OA_b + b, N_OA_a + a );
+                                 value_singlet +=     SGG_ut * ( ai_bu + bi_au );
+                                 value_triplet += 3 * SGG_ut * ( ai_bu - bi_au );
+                                 //assert( fabs( ai_bu - integrals->FourIndexAPI( irrep_a, irrep_b, irrep_i, irrep, N_OA_a + a, N_OA_b + b, i, occ_t + u ) ) < 1e-30 );
+                                 //assert( fabs( bi_au - integrals->FourIndexAPI( irrep_b, irrep_a, irrep_i, irrep, N_OA_b + b, N_OA_a + a, i, occ_t + u ) ) < 1e-30 );
+                              }
+                              target_singlet[ t + num_t * count_abi_singlet ] = value_singlet;
+                              target_triplet[ t + num_t * count_abi_triplet ] = value_triplet;
+                           }
+                        }
+                     }
+                  }
+                  jump_abi_singlet += NOCC_i * NVIR_a * NVIR_b;
+                  jump_abi_triplet += NOCC_i * NVIR_a * NVIR_b;
+               }
+            }
+         }
+      }
+      assert( jump_abi_singlet * num_t == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] );
+      assert( jump_abi_triplet * num_t == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] );
+   }
+
+   // VH singlet and triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int jump_aibj_singlet = 0;
+      int jump_aibj_triplet = 0;
+      double * target_singlet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ];
+      double * target_triplet = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ];
+      if ( irrep == 0 ){ // irrep_i == irrep_j  and  irrep_a == irrep_b
+         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+            const int nocc_ij = indices->getNOCC( irrep_ij );
+            const int linsize_singlet = ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
+            const int linsize_triplet = ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int nvirt_ab = indices->getNVIRT( irrep_ab );
+               const int noa_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               for ( int a = 0; a < nvirt_ab; a++ ){
+                  for ( int b = a; b < nvirt_ab; b++ ){
+                     for ( int i = 0; i < nocc_ij; i++ ){
+                        for ( int j = i; j < nocc_ij; j++){
+                           const int count_singlet = jump_aibj_singlet + i + (j*(j+1))/2 + linsize_singlet * ( a + (b*(b+1))/2 );
+                           const int count_triplet = jump_aibj_triplet + i + (j*(j-1))/2 + linsize_triplet * ( a + (b*(b-1))/2 );
+                           // < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]
+                           // < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]
+                           const double ai_bj = integrals->get_exchange( irrep_ij, irrep_ij, irrep_ab, irrep_ab, i, j, noa_ab + a, noa_ab + b );
+                           const double aj_bi = integrals->get_exchange( irrep_ij, irrep_ij, irrep_ab, irrep_ab, j, i, noa_ab + a, noa_ab + b );
+                                target_singlet[ count_singlet ] = 2 * ( ai_bj + aj_bi );
+   if (( b > a ) && ( j > i )){ target_triplet[ count_triplet ] = 6 * ( ai_bj - aj_bi ); }
+                           //assert( fabs( ai_bj - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_ij, irrep_ij, noa_ab + a, noa_ab + b, i, j ) ) < 1e-30 );
+                           //assert( fabs( aj_bi - integrals->FourIndexAPI( irrep_ab, irrep_ab, irrep_ij, irrep_ij, noa_ab + a, noa_ab + b, j, i ) ) < 1e-30 );
+                        }
+                     }
+                  }
+               }
+               jump_aibj_singlet += ( nocc_ij * ( nocc_ij + 1 ) * nvirt_ab * ( nvirt_ab + 1 )) / 4;
+               jump_aibj_triplet += ( nocc_ij * ( nocc_ij - 1 ) * nvirt_ab * ( nvirt_ab - 1 )) / 4;
+            }
+         }
+      } else { // irrep_i < irrep_j = irrep_i x irrep   and   irrep_a < irrep_b = irrep_a x irrep
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i < irrep_j ){
+               const int nocc_i = indices->getNOCC( irrep_i );
+               const int nocc_j = indices->getNOCC( irrep_j );
+               for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+                  const int irrep_b = Irreps::directProd( irrep, irrep_a );
+                  if ( irrep_a < irrep_b ){
+                     const int nvir_a = indices->getNVIRT( irrep_a );
+                     const int nvir_b = indices->getNVIRT( irrep_b );
+                     const int noa_a  = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                     const int noa_b  = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                     for ( int a = 0; a < nvir_a; a++ ){
+                        for ( int b = 0; b < nvir_b; b++ ){
+                           for ( int i = 0; i < nocc_i; i++ ){
+                              for ( int j = 0; j < nocc_j; j++){
+                                 const int count_singlet = jump_aibj_singlet + i + nocc_i * ( j + nocc_j * ( a + nvir_a * b ) );
+                                 const int count_triplet = jump_aibj_triplet + i + nocc_i * ( j + nocc_j * ( a + nvir_a * b ) );
+                                 // < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]
+                                 // < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]
+                                 const double ai_bj = integrals->get_exchange( irrep_i, irrep_j, irrep_a, irrep_b, i, j, noa_a + a, noa_b + b );
+                                 const double aj_bi = integrals->get_exchange( irrep_j, irrep_i, irrep_a, irrep_b, j, i, noa_a + a, noa_b + b );
+                                 target_singlet[ count_singlet ] = 2 * ( ai_bj + aj_bi );
+                                 target_triplet[ count_triplet ] = 6 * ( ai_bj - aj_bi );
+                                 //assert( fabs( ai_bj - integrals->FourIndexAPI( irrep_a, irrep_b, irrep_i, irrep_j, noa_a + a, noa_b + b, i, j ) ) < 1e-30 );
+                                 //assert( fabs( aj_bi - integrals->FourIndexAPI( irrep_a, irrep_b, irrep_j, irrep_i, noa_a + a, noa_b + b, j, i ) ) < 1e-30 );
+                              }
+                           }
+                        }
+                     }
+                     jump_aibj_singlet += nocc_i * nocc_j * nvir_a * nvir_b;
+                     jump_aibj_triplet += nocc_i * nocc_j * nvir_a * nvir_b;
+                  }
+               }
+            }
+         }
+      }
+      assert( jump_aibj_singlet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] );
+      assert( jump_aibj_triplet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] );
+   }
 
 }
 
