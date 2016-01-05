@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -75,11 +75,6 @@ namespace CheMPS2{
          //! Destructor
          virtual ~CASPT2();
          
-         //! Get the number of irreps
-         /** \return The number of irreps */
-         int get_num_irreps();
-         
-         
          
       private:
       
@@ -120,6 +115,9 @@ namespace CheMPS2{
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFintegrals * integrals );
          
+         // Calculate overlap matrix times vector
+         void apply_overlap( double * vector, double * result );
+         
          // Variables for the partitioning of the vector in blocks
          int * jump;
          int * size_AC;
@@ -140,6 +138,8 @@ namespace CheMPS2{
          double ** SBB_triplet;
          double ** SFF_singlet;
          double ** SFF_triplet;
+         int * occ_ovlp_helper;
+         int * vir_ovlp_helper;
          
          // Fill some helper variables for the overlap
          void make_SAA_SCC();
@@ -147,6 +147,7 @@ namespace CheMPS2{
          void make_SBB_SFF_singlet();
          void make_SBB_SFF_triplet();
          void make_SEE_SGG();
+         void create_overlap_helpers();
          
    };
 }

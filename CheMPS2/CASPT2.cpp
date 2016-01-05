@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,6 +51,22 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    make_SBB_SFF_triplet();
    
    construct_rhs( ints ); // Needs to be called AFTER make_S**()!
+   
+   create_overlap_helpers();
+   
+   {
+      
+      int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+      int inc = 1;
+      double inprod = ddot_( &total_size, vector_rhs, &inc, vector_rhs, &inc );
+      cout << "v^T * v = " << inprod << endl;
+      
+      double * dummy = new double[ total_size ];
+      apply_overlap( vector_rhs, dummy );
+      double inprod2 = ddot_( &total_size, dummy, &inc, dummy, &inc );
+      cout << "v^T * S * S * v = " << inprod2 << endl;
+      delete [] dummy;
+   }
 
 }
 
@@ -84,6 +100,8 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] size_BF_triplet;
    delete [] jump;
    delete [] vector_rhs;
+   delete [] occ_ovlp_helper;
+   delete [] vir_ovlp_helper;
 
 }
 
@@ -516,6 +534,350 @@ long long CheMPS2::CASPT2::total_vector_length() const{
    }
 
    return length;
+
+}
+
+void CheMPS2::CASPT2::apply_overlap( double * vector, double * result ){
+
+   char notrans = 'N';
+   int one      = 1;
+   double set   = 0.0; // SET!
+
+   // SAA
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_AC[ irrep ];
+      if ( SIZE > 0 ){
+         const int NOCC = indices->getNOCC( irrep );
+         for ( int count = 0; count < NOCC; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            double alpha = 1.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SAA[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SCC
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_AC[ irrep ];
+      if ( SIZE > 0 ){
+         const int NVIR = indices->getNVIRT( irrep );
+         for ( int count = 0; count < NVIR; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            double alpha = 1.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SCC[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SDD
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_D[ irrep ];
+      if ( SIZE > 0 ){
+         int total_ai = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_a = Irreps::directProd( irrep_i, irrep );
+            total_ai += indices->getNOCC( irrep_i ) * indices->getNVIRT( irrep_a );
+         }
+         for ( int count = 0; count < total_ai; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
+            double alpha = 1.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SDD[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SBB singlet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_BF_singlet[ irrep ];
+      if ( SIZE > 0 ){
+         int total_ij = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i == irrep_j ){ total_ij += ( indices->getNOCC( irrep_i ) * ( indices->getNOCC( irrep_i ) + 1 ) ) / 2; }
+            if ( irrep_i <  irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+         }
+         for ( int count = 0; count < total_ij; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+            double alpha = 2.0 * (( irrep == 0 ) ? occ_ovlp_helper[ count ] : 1 );
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SBB_singlet[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SBB triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_BF_triplet[ irrep ];
+      if ( SIZE > 0 ){
+         int total_ij = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i == irrep_j ){ total_ij += ( indices->getNOCC( irrep_i ) * ( indices->getNOCC( irrep_i ) - 1 ) ) / 2; }
+            if ( irrep_i <  irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+         }
+         for ( int count = 0; count < total_ij; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+            double alpha = 2.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SBB_triplet[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+   
+   // SFF singlet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_BF_singlet[ irrep ];
+      if ( SIZE > 0 ){
+         int total_ab = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int irrep_b = Irreps::directProd( irrep, irrep_a );
+            if ( irrep_a == irrep_b ){ total_ab += ( indices->getNVIRT( irrep_a ) * ( indices->getNVIRT( irrep_a ) + 1 ) ) / 2; }
+            if ( irrep_a <  irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+         }
+         for ( int count = 0; count < total_ab; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+            double alpha = 2.0 * (( irrep == 0 ) ? vir_ovlp_helper[ count ] : 1 );
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SFF_singlet[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SFF triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_BF_triplet[ irrep ];
+      if ( SIZE > 0 ){
+         int total_ab = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int irrep_b = Irreps::directProd( irrep, irrep_a );
+            if ( irrep_a == irrep_b ){ total_ab += ( indices->getNVIRT( irrep_a ) * ( indices->getNVIRT( irrep_a ) - 1 ) ) / 2; }
+            if ( irrep_a <  irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+         }
+         for ( int count = 0; count < total_ab; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+            double alpha = 2.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SFF_triplet[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+         }
+      }
+   }
+
+   // SEE singlet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = indices->getNDMRG( irrep );
+      if ( SIZE > 0 ){
+         int jump_aij = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+            int total_ij = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+               if ( irrep_i == irrep_j ){ total_ij += ( indices->getNOCC( irrep_i ) * ( indices->getNOCC( irrep_i ) + 1 ) ) / 2; }
+               if ( irrep_i <  irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+            }
+            for ( int count = 0; count < total_ij; count++ ){
+               for ( int a = 0; a < NVIR_a; a++ ){
+                  double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                  double alpha = 2.0 * (( irrep_occ == 0 ) ? occ_ovlp_helper[ count ] : 1 );
+                  dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SEE[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+               }
+            }
+            jump_aij += NVIR_a * total_ij;
+         }
+      }
+   }
+   
+   // SEE triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = indices->getNDMRG( irrep );
+      if ( SIZE > 0 ){
+         int jump_aij = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+            int total_ij = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+               if ( irrep_i == irrep_j ){ total_ij += ( indices->getNOCC( irrep_i ) * ( indices->getNOCC( irrep_i ) - 1 ) ) / 2; }
+               if ( irrep_i <  irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+            }
+            for ( int count = 0; count < total_ij; count++ ){
+               for ( int a = 0; a < NVIR_a; a++ ){
+                  double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                  double alpha = 6.0;
+                  dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SEE[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+               }
+            }
+            jump_aij += NVIR_a * total_ij;
+         }
+      }
+   }
+   
+   // SGG singlet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = indices->getNDMRG( irrep );
+      if ( SIZE > 0 ){
+         int jump_abi = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+            int total_ab = 0;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+               if ( irrep_a == irrep_b ){ total_ab += ( indices->getNVIRT( irrep_a ) * ( indices->getNVIRT( irrep_a ) + 1 ) ) / 2; }
+               if ( irrep_a <  irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+            }
+            for ( int count = 0; count < total_ab; count++ ){
+               for ( int i = 0; i < NOCC_i; i++ ){
+                  double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                  double alpha = 2.0 * (( irrep_vir == 0 ) ? vir_ovlp_helper[ count ] : 1 );
+                  dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SGG[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+               }
+            }
+            jump_abi += NOCC_i * total_ab;
+         }
+      }
+   }
+   
+   // SGG triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = indices->getNDMRG( irrep );
+      if ( SIZE > 0 ){
+         int jump_abi = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+            int total_ab = 0;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+               if ( irrep_a == irrep_b ){ total_ab += ( indices->getNVIRT( irrep_a ) * ( indices->getNVIRT( irrep_a ) - 1 ) ) / 2; }
+               if ( irrep_a <  irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+            }
+            for ( int count = 0; count < total_ab; count++ ){
+               for ( int i = 0; i < NOCC_i; i++ ){
+                  double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                  double alpha = 6.0;
+                  dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SGG[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+               }
+            }
+            jump_abi += NOCC_i * total_ab;
+         }
+      }
+   }
+
+   // SHH singlet
+   { // First do irrep == 0
+      int jump_aibj = 0;
+      int jump_ij = 0;
+      int jump_ab = 0;
+      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+         const int linsize_occ = ( indices->getNOCC( irrep_ij ) * ( indices->getNOCC( irrep_ij ) + 1 ) ) / 2;
+         jump_ab = 0;
+         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+            const int linsize_vir = ( indices->getNVIRT( irrep_ab ) * ( indices->getNVIRT( irrep_ab ) + 1 ) ) / 2;
+            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj; // irrep = 0
+            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj; // irrep = 0
+            for ( int ab = 0; ab < linsize_vir; ab++ ){
+               for ( int ij = 0; ij < linsize_occ; ij++ ){
+                  target[ ij + linsize_occ * ab ] = 4 * occ_ovlp_helper[ jump_ij + ij ] * vir_ovlp_helper[ jump_ab + ab ] * origin[ ij + linsize_occ * ab ];
+               }
+            }
+            jump_aibj += linsize_occ * linsize_vir;
+            jump_ab += linsize_vir;
+         }
+         jump_ij += linsize_occ;
+      }
+      assert( jump_aibj == jump_ij * jump_ab );
+      assert( jump_aibj == jump[ 1 + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] ); // irrep = 0
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      int total_ij = 0;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int irrep_j = Irreps::directProd( irrep, irrep_i );
+         if ( irrep_i < irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+      }
+      int total_ab = 0;
+      for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+         const int irrep_b = Irreps::directProd( irrep, irrep_a );
+         if ( irrep_a < irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+      }
+      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ];
+      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ];
+      const int size = total_ij * total_ab;
+      for ( int count = 0; count < size; count++ ){
+         target[ count ] = 4 * origin[ count ];
+      }
+      assert( size == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] );
+   }
+   
+   // SHH triplet
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int total_ij = 0;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int irrep_j = Irreps::directProd( irrep, irrep_i );
+         if ( irrep_i == irrep_j ){ total_ij += ( indices->getNOCC( irrep_i ) * ( indices->getNOCC( irrep_i ) - 1 ) ) / 2; }
+         if ( irrep_i <  irrep_j ){ total_ij += indices->getNOCC( irrep_i ) * indices->getNOCC( irrep_j ); }
+      }
+      int total_ab = 0;
+      for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+         const int irrep_b = Irreps::directProd( irrep, irrep_a );
+         if ( irrep_a == irrep_b ){ total_ab += ( indices->getNVIRT( irrep_a ) * ( indices->getNVIRT( irrep_a ) - 1 ) ) / 2; }
+         if ( irrep_a <  irrep_b ){ total_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
+      }
+      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ];
+      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ];
+      const int size = total_ij * total_ab;
+      for ( int count = 0; count < size; count++ ){
+         target[ count ] = 12 * origin[ count ];
+      }
+      assert( size == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] );
+   }
+
+}
+
+void CheMPS2::CASPT2::create_overlap_helpers(){
+
+   int total_ij = 0;
+   for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+      const int NOCC_ij = indices->getNOCC( irrep_ij );
+      total_ij += ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+   }
+   occ_ovlp_helper = new int[ total_ij ];
+   total_ij = 0;
+   for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+      const int NOCC_ij = indices->getNOCC( irrep_ij );
+      for ( int i = 0; i < NOCC_ij; i++ ){
+         for ( int j = i; j < NOCC_ij; j++ ){
+            occ_ovlp_helper[ total_ij + i + ( j * ( j + 1 ) ) / 2 ] = (( i == j ) ? 2 : 1 );
+         }
+      }
+      total_ij += ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+   }
+   
+   int total_ab = 0;
+   for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+      const int NVIR_ab = indices->getNVIRT( irrep_ab );
+      total_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+   }
+   vir_ovlp_helper = new int[ total_ab ];
+   total_ab = 0;
+   for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+      const int NVIR_ab = indices->getNVIRT( irrep_ab );
+      for ( int a = 0; a < NVIR_ab; a++ ){
+         for ( int b = a; b < NVIR_ab; b++ ){
+            vir_ovlp_helper[ total_ab + a + ( b * ( b + 1 ) ) / 2 ] = (( a == b ) ? 2 : 1 );
+         }
+      }
+      total_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+   }
 
 }
 
