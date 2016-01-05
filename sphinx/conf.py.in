@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'CheMPS2'
-copyright = u'2013-2015, ${CheMPS2_AUTHORS}'
+copyright = u'2013-2016, ${CheMPS2_AUTHORS}'
 author = u'${CheMPS2_AUTHORS}'
 
 # The version info for the project you're documenting, acts as replacement for
