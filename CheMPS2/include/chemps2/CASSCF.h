@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "Hamiltonian.h"
 #include "Irreps.h"
 #include "TwoDM.h"
+#include "ThreeDM.h"
 #include "DMRG.h"
 #include "Problem.h"
 #include "Options.h"
@@ -179,7 +180,7 @@ namespace CheMPS2{
          /** \return The number of irreps */
          int get_num_irreps();
          
-         //! Do the state-specific CASSCF cycle with the augmented Hessian Newton-Raphson method
+         //! Do the CASSCF cycles with the augmented Hessian Newton-Raphson method
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
              \param TwoS Twice the targeted spin
              \param Irrep Desired wave-function irrep
@@ -233,12 +234,18 @@ namespace CheMPS2{
              \param localDMRG2DM The CASSCF 2-RDM */
          static void copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM);
          
+         //! Copy over the DMRG 3-RDM
+         /** \param theDMRG3DM The 3-RDM from the DMRG object
+             \param numL The total number of DMRG orbitals
+             \param three_dm The CASSCF 3-RDM */
+         static void copy3DMover(ThreeDM * theDMRG3DM, const int numL, double * three_dm);
+         
          //! Construct the 1-RDM from the 2-RDM
-         /** \param nDMRGelectrons The number of DMRG active space electrons
-             \param totOrbDMRG The total number of DMRG orbitals
+         /** \param num_elec The number of DMRG active space electrons
+             \param numL The total number of DMRG orbitals
              \param localDMRG1DM The CASSCF 1-RDM
              \param localDMRG2DM The CASSCF 2-RDM */
-         static void setDMRG1DM(const int nDMRGelectrons, const int totOrbDMRG, double * localDMRG1DM, double * localDMRG2DM);
+         static void setDMRG1DM(const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM);
          
          //! Calculate the natural orbitals and their occupation numbers
          /** \param localIdx Object which handles the index conventions for CASSCF

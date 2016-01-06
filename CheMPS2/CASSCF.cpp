@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -125,16 +125,34 @@ void CheMPS2::CASSCF::copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, doub
 
 }
 
-void CheMPS2::CASSCF::setDMRG1DM(const int nDMRGelectrons, const int totOrbDMRG, double * localDMRG1DM, double * localDMRG2DM){
+void CheMPS2::CASSCF::copy3DMover(ThreeDM * theDMRG3DM, const int numL, double * three_dm){
 
-   const double prefactor = 1.0/(nDMRGelectrons-1.0);
+   for ( int i = 0; i < numL; i++ ){
+      for ( int j = 0; j < numL; j++ ){
+         for ( int k = 0; k < numL; k++ ){
+            for ( int l = 0; l < numL; l++ ){
+               for ( int m = 0; m < numL; m++ ){
+                  for ( int n = 0; n < numL; n++ ){
+                     three_dm[ i + numL * ( j + numL * ( k + numL * ( l + numL * ( m + numL * n ) ) ) ) ] = theDMRG3DM->get_ham_index(i, j, k, l, m, n);
+                  }
+               }
+            }
+         }
+      }
+   }
 
-   for (int cnt1=0; cnt1<totOrbDMRG; cnt1++){
-      for (int cnt2=cnt1; cnt2<totOrbDMRG; cnt2++){
-         localDMRG1DM[cnt1 + totOrbDMRG*cnt2] = 0.0;
-         for (int cnt3=0; cnt3<totOrbDMRG; cnt3++){ localDMRG1DM[cnt1 + totOrbDMRG*cnt2] += localDMRG2DM[cnt1 + totOrbDMRG * (cnt3 + totOrbDMRG * (cnt2 + totOrbDMRG * cnt3 ) ) ]; }
-         localDMRG1DM[cnt1 + totOrbDMRG*cnt2] *= prefactor;
-         localDMRG1DM[cnt2 + totOrbDMRG*cnt1] = localDMRG1DM[cnt1 + totOrbDMRG*cnt2];
+}
+
+void CheMPS2::CASSCF::setDMRG1DM(const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM){
+
+   const double prefactor = 1.0/( num_elec - 1.0 );
+
+   for ( int cnt1 = 0; cnt1 < numL; cnt1++ ){
+      for ( int cnt2 = cnt1; cnt2 < numL; cnt2++ ){
+         double value = 0.0;
+         for ( int sum = 0; sum < numL; sum++ ){ value += localDMRG2DM[ cnt1 + numL * ( sum + numL * ( cnt2 + numL * sum ) ) ]; }
+         localDMRG1DM[ cnt1 + numL * cnt2 ] = prefactor * value;
+         localDMRG1DM[ cnt2 + numL * cnt1 ] = localDMRG1DM[ cnt1 + numL * cnt2 ];
       }
    }
 

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param iHandler_in The DMRGSCFindices which contain information on the occupied, active, and virtual spaces */
-         DMRGSCFmatrix(DMRGSCFindices * iHandler_in);
+         DMRGSCFmatrix(const DMRGSCFindices * iHandler_in);
          
          //! Destructor
          virtual ~DMRGSCFmatrix();
@@ -65,7 +65,7 @@ namespace CheMPS2{
       private:
       
          // The information on the occupied, active, and virtual spaces
-         DMRGSCFindices * iHandler;
+         const DMRGSCFindices * iHandler;
          
          // The matrix entries
          double ** entries;
