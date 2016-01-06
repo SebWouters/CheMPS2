@@ -669,7 +669,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, const double ovl
       }
    }
 
-   // FCC: < E_zy E_xb ( f_pq E_pq ) E_at E_uv > = delta_ba * ( FCC[ Ia ][ xyztuv ] - f_ba SCC[ Ia ][ xyztuv ] )
+   // FCC: < E_zy E_xb ( f_pq E_pq ) E_at E_uv > = delta_ba * ( FCC[ Ia ][ xyztuv ] + f_ba SCC[ Ia ][ xyztuv ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       int SIZE = size_AC[ irrep ];
       if ( SIZE > 0 ){
@@ -680,7 +680,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, const double ovl
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
             double alpha = 1.0;
             dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, FCC[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
-            alpha = ovlp_prefactor - fock->get( irrep, N_OA + count, N_OA + count );
+            alpha = ovlp_prefactor + fock->get( irrep, N_OA + count, N_OA + count );
             dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SCC[irrep], &SIZE, origin, &SIZE, &add, target, &SIZE );
          }
       }
