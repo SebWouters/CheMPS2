@@ -30,7 +30,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei_in, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract){
+CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei_in, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm){
 
    indices    = idx;
    oei        = oei_in;
@@ -38,9 +38,9 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    one_rdm    = one_dm;
    two_rdm    = two_dm;
    three_rdm  = three_dm;
-   contracted = contract;
+   f_dot_4dm  = contract_4dm;
    num_irreps = indices->getNirreps();
-   E_FOCK     = calc_fock_expectation(); // Uses indices, num_irreps, fock, one_rdm
+   E_FOCK     = create_f_dots();
    
    vector_helper(); // Needs to be called BEFORE make_S**()!
    
@@ -51,9 +51,10 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    make_SBB_SFF_triplet();
    
    construct_rhs( ints ); // Needs to be called AFTER make_S**()!
-   
    create_overlap_helpers();
    
+   make_FAA_FCC();
+
    {
       
       int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
@@ -62,9 +63,15 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       cout << "v^T * v = " << inprod << endl;
       
       double * dummy = new double[ total_size ];
+      
       apply_overlap( vector_rhs, dummy );
       double inprod2 = ddot_( &total_size, dummy, &inc, dummy, &inc );
       cout << "v^T * S * S * v = " << inprod2 << endl;
+      
+      matvec( vector_rhs, dummy, -E_FOCK );
+      double inprod3 = ddot_( &total_size, dummy, &inc, dummy, &inc );
+      cout << "v^T * F * F * v = " << inprod3 << endl;
+      
       delete [] dummy;
    }
 
@@ -82,6 +89,8 @@ CheMPS2::CASPT2::~CASPT2(){
       delete [] SBB_triplet[ irrep ];
       delete [] SFF_singlet[ irrep ];
       delete [] SFF_triplet[ irrep ];
+      delete [] FAA[ irrep ];
+      delete [] FCC[ irrep ];
    }
 
    delete [] SAA;
@@ -93,6 +102,8 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] SBB_triplet;
    delete [] SFF_singlet;
    delete [] SFF_triplet;
+   delete [] FAA;
+   delete [] FCC;
    
    delete [] size_AC;
    delete [] size_D;
@@ -102,34 +113,109 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] vector_rhs;
    delete [] occ_ovlp_helper;
    delete [] vir_ovlp_helper;
+   delete [] f_dot_3dm;
+   delete [] f_dot_2dm;
 
 }
 
-double CheMPS2::CASPT2::calc_fock_expectation() const{
+double CheMPS2::CASPT2::create_f_dots(){
 
-   double value = 0.0;
-   int passed = 0;
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-   
-      const int NOCC  = indices->getNOCC(  irrep );
-      const int NDMRG = indices->getNDMRG( irrep );
-      
-      for ( int orb = 0; orb < NOCC; orb++ ){ value += 2 * fock->get( irrep, orb, orb ); }
-      for ( int row = 0; row < NDMRG; row++ ){
-         for ( int col = 0; col < NDMRG; col++){
-            value += one_rdm[ passed + row + LAS * ( passed + col ) ] * fock->get( irrep, row, col );
+   f_dot_3dm = new double[ LAS * LAS * LAS * LAS ];
+   f_dot_2dm = new double[ LAS * LAS ];
+
+   int passed1 = 0;
+   for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
+
+      const int NDMRG1 = indices->getNDMRG( irrep1 );
+
+      for ( int row1 = 0; row1 < NDMRG1; row1++ ){
+         for ( int col1 = 0; col1 < NDMRG1; col1++ ){
+
+            double value = 0.0;
+            int passed2 = 0;
+            for ( int irrep2 = 0; irrep2 < num_irreps; irrep2++ ){
+
+               const int NOCC2  = indices->getNOCC(  irrep2 );
+               const int NDMRG2 = indices->getNDMRG( irrep2 );
+
+               for ( int row2 = 0; row2 < NDMRG2; row2++ ){
+                  for ( int col2 = 0; col2 < NDMRG2; col2++ ){
+                     value += ( fock->get( irrep2, NOCC2 + row2, NOCC2 + col2 )
+                              * two_rdm[ passed1 + row1 + LAS * ( passed2 + row2 + LAS * ( passed1 + col1 + LAS * ( passed2 + col2 ) ) ) ] );
+                  }
+               }
+               passed2 += NDMRG2;
+            }
+            f_dot_2dm[ passed1 + row1 + LAS * ( passed1 + col1 ) ] = value;
          }
       }
-      
-      passed += NDMRG;
-      
+      passed1 += NDMRG1;
    }
-   
-   cout << "CASPT2::calc_fock_expectation : E_FOCK = " << value << endl;
-   
-   return value;
+
+   for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
+      const int jump1  = indices->getDMRGcumulative( irrep1 );
+      const int NDMRG1 = indices->getNDMRG( irrep1 );
+      for ( int irrep2 = 0; irrep2 < num_irreps; irrep2++ ){
+         const int jump2  = indices->getDMRGcumulative( irrep2 );
+         const int NDMRG2 = indices->getNDMRG( irrep2 );
+         const int irr_12 = Irreps::directProd( irrep1, irrep2 );
+         for ( int irrep3 = 0; irrep3 < num_irreps; irrep3++ ){
+            const int irrep4 = Irreps::directProd( irr_12, irrep3 );
+            const int jump3  = indices->getDMRGcumulative( irrep3 );
+            const int jump4  = indices->getDMRGcumulative( irrep4 );
+            const int NDMRG3 = indices->getNDMRG( irrep3 );
+            const int NDMRG4 = indices->getNDMRG( irrep4 );
+
+            for ( int i1 = 0; i1 < NDMRG1; i1++ ){
+               for ( int i2 = 0; i2 < NDMRG2; i2++ ){
+                  for ( int i3 = 0; i3 < NDMRG3; i3++ ){
+                     for ( int i4 = 0; i4 < NDMRG4; i4++ ){
+
+                        double value = 0.0;
+                        int jumpx = 0;
+                        for ( int irrepx = 0; irrepx < num_irreps; irrepx++ ){
+
+                           const int NOCCx  = indices->getNOCC(  irrepx );
+                           const int NDMRGx = indices->getNDMRG( irrepx );
+
+                           for ( int rowx = 0; rowx < NDMRGx; rowx++ ){
+                              for ( int colx = 0; colx < NDMRGx; colx++ ){
+                                 value += ( fock->get( irrepx, NOCCx + rowx, NOCCx + colx )
+                                          * three_rdm[ jump1 + i1 + LAS*( jump2 + i2 + LAS*( jumpx + rowx + LAS*( jump3 + i3 + LAS*( jump4 + i4 + LAS*( jumpx + colx ))))) ] );
+                              }
+                           }
+                           jumpx += NDMRGx;
+                        }
+                        f_dot_3dm[ jump1 + i1 + LAS * ( jump2 + i2 + LAS * ( jump3 + i3 + LAS * ( jump4 + i4 ) ) ) ] = value;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   double expectation_value = 0.0;
+   int passed = 0;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+
+      const int NOCC  = indices->getNOCC(  irrep );
+      const int NDMRG = indices->getNDMRG( irrep );
+
+      for ( int orb = 0; orb < NOCC; orb++ ){ expectation_value += 2 * fock->get( irrep, orb, orb ); }
+      for ( int row = 0; row < NDMRG; row++ ){
+         for ( int col = 0; col < NDMRG; col++){
+            expectation_value += one_rdm[ passed + row + LAS * ( passed + col ) ] * fock->get( irrep, NOCC + row, NOCC + col );
+         }
+      }
+      passed += NDMRG;
+   }
+
+   cout << "CASPT2::create_f_dots : < F > = " << expectation_value << endl;
+
+   return expectation_value;
 
 }
 
@@ -537,7 +623,72 @@ long long CheMPS2::CASPT2::total_vector_length() const{
 
 }
 
-void CheMPS2::CASPT2::apply_overlap( double * vector, double * result ){
+void CheMPS2::CASPT2::matvec( double * vector, double * result, const double ovlp_prefactor ) const{
+
+   /*
+         TODO  | A  Bsinglet  Btriplet  C     D1     D2    Esinglet  Etriplet  Fsinglet  Ftriplet  Gsinglet  Gtriplet  Hsinglet  Htriplet
+      ---------+-------------------------------------------------------------------------------------------------------------------------
+      A        | OK    x       x        0     x      x     GRAD      GRAD      0         0         0         0         0         0
+      Bsinglet | x     x       x        0     0      0     x         x         0         0         0         0         0         0
+      Btriplet | x     x       x        0     0      0     x         x         0         0         0         0         0         0
+      C        | 0     0       0        OK    x      x     0         0         x         x         GRAD      GRAD      0         0
+      D1       | x     0       0        x     x      x     x         x         0         0         x         x         GRAD      GRAD
+      D2       | x     0       0        x     x      x     x         x         0         0         x         x         GRAD      GRAD
+      Esinglet | GRAD  x       x        0     x      x     x         x         0         0         0         0         x         x
+      Etriplet | GRAD  x       x        0     x      x     x         x         0         0         0         0         x         x
+      Fsinglet | 0     0       0        x     0      0     0         0         x         x         x         x         0         0
+      Ftriplet | 0     0       0        x     0      0     0         0         x         x         x         x         0         0
+      Gsinglet | 0     0       0        GRAD  x      x     0         0         x         x         x         x         x         x
+      Gtriplet | 0     0       0        GRAD  x      x     0         0         x         x         x         x         x         x
+      Hsinglet | 0     0       0        0     GRAD   GRAD  x         x         0         0         x         x         x         x
+      Htriplet | 0     0       0        0     GRAD   GRAD  x         x         0         0         x         x         x         x
+      
+   */
+   
+   const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   for ( int counter = 0; counter < total_size; counter++ ){ result[ counter ] = 0.0; }
+   
+   char notrans = 'N';
+   int one      = 1;
+   double set   = 0.0;
+   double add   = 1.0;
+
+   // FAA: < E_zy E_jx ( f_pq E_pq ) E_ti E_uv > = delta_ji * ( FAA[ Ii ][ xyztuv ] - f_ji SAA[ Ii ][ xyztuv ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_AC[ irrep ];
+      if ( SIZE > 0 ){
+         const int NOCC = indices->getNOCC( irrep );
+         for ( int count = 0; count < NOCC; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            double alpha = 1.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, FAA[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+            alpha = ovlp_prefactor - fock->get( irrep, count, count );
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SAA[irrep], &SIZE, origin, &SIZE, &add, target, &SIZE );
+         }
+      }
+   }
+
+   // FCC: < E_zy E_xb ( f_pq E_pq ) E_at E_uv > = delta_ba * ( FCC[ Ia ][ xyztuv ] - f_ba SCC[ Ia ][ xyztuv ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      int SIZE = size_AC[ irrep ];
+      if ( SIZE > 0 ){
+         const int NVIR = indices->getNVIRT( irrep );
+         const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
+         for ( int count = 0; count < NVIR; count++ ){
+            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            double alpha = 1.0;
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, FCC[irrep], &SIZE, origin, &SIZE, &set, target, &SIZE );
+            alpha = ovlp_prefactor - fock->get( irrep, N_OA + count, N_OA + count );
+            dgemm_( &notrans, &notrans, &SIZE, &one, &SIZE, &alpha, SCC[irrep], &SIZE, origin, &SIZE, &add, target, &SIZE );
+         }
+      }
+   }
+
+}
+
+void CheMPS2::CASPT2::apply_overlap( double * vector, double * result ) const{
 
    char notrans = 'N';
    int one      = 1;
@@ -1746,6 +1897,549 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFintegrals * integrals ){
       }
       assert( jump_aibj_singlet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] );
       assert( jump_aibj_triplet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] );
+   }
+
+}
+
+void CheMPS2::CASPT2::make_FAA_FCC(){
+
+   /*
+      FAA: sum_cd f_cd < E_zy E_jx E_cd E_ti E_uv > = 0
+      
+           sum_kl f_kl < E_zy E_jx E_kl E_ti E_uv > = delta_ji ( 2 * ( sum_k f_kk ) - f_ij ) SAA[ Ii ][ xyztuv ]
+                                                      ( because in the occupied-occupied block the fock operator is diagonal! )
+           
+           sum_rs f_rs < E_zy E_jx E_rs E_ti E_uv > ( with rs active indices )
+           
+              = delta_ji [ - f_dot_4dm[ ztuyxv ]
+                           + 2 delta_tx f_dot_3dm[ zuyv ]
+                           - delta_uy f_dot_3dm[ ztvx ]
+                           - delta_ux f_dot_3dm[ ztyv ]
+                           - delta_ty f_dot_3dm[ zuxv ]
+                           + ( 2 delta_tx delta_uy - delta_ux delta_ty ) f_dot_2dm[ zv ]
+                           + sum_r SAA[ Ii ][ xyzruv ] f_rt
+                           + sum_r SAA[ Ii ][ xyztrv ] f_ru
+                           + sum_s SAA[ Ii ][ syztuv ] f_xs
+                           + sum_s SAA[ Ii ][ xsztuv ] f_ys
+                           - f_xt ( 2 * Gamma_{zuyv} + 2 * delta_yu Gamma_{zv} )
+                           - f_yu (   - Gamma_{ztvx} + 2 * delta_xt Gamma_{zv} )
+                           - f_yt (   - Gamma_{zuxv} -     delta_xu Gamma_{zv} )
+                           - f_xu (   - Gamma_{ztyv} -     delta_yt Gamma_{zv} )
+                         ]
+                         
+      FCC: sum_cd f_cd < E_zy E_xb E_cd E_at E_uv > = delta_ba f_ba SCC[ Ia ][ xyztuv ]
+                                                      ( because in the virtual-virtual block the fock operator is diagonal! )
+           
+           sum_kl f_kl < E_zy E_xb E_kl E_at E_uv > = delta_ba ( 2 sum_k f_kk ) SCC[ Ia ][ xyztuv ]
+           
+           sum_rs f_rs < E_zy E_xb E_rs E_at E_uv > ( with rs active indices )
+           
+              = delta_ba [ + f_dot_4dm[ zxuytv ]
+                           + delta_uy f_dot_3dm[ xztv ]
+                           + delta_xy f_dot_3dm[ zutv ]
+                           + delta_ut f_dot_3dm[ zxyv ]
+                           + delta_ut delta_xy f_dot_2dm[ zv ]
+                           + sum_s f_ys SCC[ Ia ] [ xsztuv ]
+                           + sum_r f_ru SCC[ Ia ] [ xyztrv ]
+                           + f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
+                           + f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
+                           - f_yu Gamma_{zxvt}
+                         ]
+      
+      FAA contains everything except - f_ij SAA[ Ii ][ xyztuv ]
+      FCC contains everything except + f_ba SCC[ Ia ][ xyztuv ]
+   */
+   
+   FAA = new double*[ num_irreps ];
+   FCC = new double*[ num_irreps ];
+   
+   double sum_f_kk = 0.0;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NOCC = indices->getNOCC( irrep );
+      for ( int orb = 0; orb < NOCC; orb++ ){
+         sum_f_kk += 2 * fock->get( irrep, orb, orb );
+      }
+   }
+   
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+   
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+
+      const int SIZE = size_AC[ irrep ];
+      FAA[ irrep ] = new double[ SIZE * SIZE ];
+      FCC[ irrep ] = new double[ SIZE * SIZE ];
+
+      int jump_col = 0;
+      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
+         const int d_t    = indices->getDMRGcumulative( irrep_t );
+         const int num_t  = indices->getNDMRG( irrep_t );
+         const int nocc_t = indices->getNOCC( irrep_t );
+         for ( int irrep_u = 0; irrep_u < num_irreps; irrep_u++ ){
+            const int d_u     = indices->getDMRGcumulative( irrep_u );
+            const int num_u   = indices->getNDMRG( irrep_u );
+            const int nocc_u  = indices->getNOCC( irrep_u );
+            const int irrep_v = Irreps::directProd( Irreps::directProd( irrep, irrep_t ), irrep_u );
+            const int d_v     = indices->getDMRGcumulative( irrep_v );
+            const int num_v   = indices->getNDMRG( irrep_v );
+            int jump_row = 0;
+            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+               const int d_x    = indices->getDMRGcumulative( irrep_x );
+               const int num_x  = indices->getNDMRG( irrep_x );
+               const int nocc_x = indices->getNOCC( irrep_x );
+               for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
+                  const int d_y     = indices->getDMRGcumulative( irrep_y );
+                  const int num_y   = indices->getNDMRG( irrep_y );
+                  const int nocc_y  = indices->getNOCC( irrep_y );
+                  const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
+                  const int d_z     = indices->getDMRGcumulative( irrep_z );
+                  const int num_z   = indices->getNDMRG( irrep_z );
+
+                  for ( int t = 0; t < num_t; t++ ){
+                     for ( int u = 0; u < num_u; u++ ){
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+
+                                    // FAA: - f_dot_4dm[ ztuyxv ] + sum_k f_kk SAA[ Ii ][ xyztuv ]
+                                    double val = ( - f_dot_4dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ]
+                                                 + sum_f_kk * SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
+
+                                    // FAA: + sum_r SAA[ Ii ][ xyzruv ] f_rt
+                                    for ( int r = 0; r < num_t; r++ ){
+                                       val += ( fock->get( irrep_t, nocc_t + r, nocc_t + t )
+                                              * SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + r + num_t * ( u + num_u * v ) ) ] );
+                                    }
+
+                                    // FAA: + sum_r SAA[ Ii ][ xyztrv ] f_ru
+                                    for ( int r = 0; r < num_u; r++ ){
+                                       val += ( fock->get( irrep_u, nocc_u + r, nocc_u + u )
+                                              * SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( r + num_u * v ) ) ] );
+                                    }
+
+                                    // FAA: + sum_s SAA[ Ii ][ syztuv ] f_xs
+                                    for ( int s = 0; s < num_x; s++ ){
+                                       val += ( fock->get( irrep_x, nocc_x + x, nocc_x + s )
+                                              * SAA[ irrep ][ jump_row + s + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
+                                    }
+
+                                    // FAA: + sum_s SAA[ Ii ][ xsztuv ] f_ys
+                                    for ( int s = 0; s < num_y; s++ ){
+                                       val += ( fock->get( irrep_y, nocc_y + y, nocc_y + s )
+                                              * SAA[ irrep ][ jump_row + x + num_x * ( s + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
+                                    }
+
+                                    FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] = val;
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  for ( int t = 0; t < num_t; t++ ){ // FCC: + f_dot_4dm[ zxuytv ]
+                     for ( int u = 0; u < num_u; u++ ){
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+
+                                    // FCC: + f_dot_4dm[ zxuytv ]
+                                    double val = ( f_dot_4dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ]
+                                                 + sum_f_kk * SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
+
+                                    // FCC: + sum_s f_ys SCC[ Ia ] [ xsztuv ]
+                                    for ( int s = 0; s < num_y; s++ ){
+                                       val += ( fock->get( irrep_y, nocc_y + y, nocc_y + s )
+                                              * SCC[ irrep ][ jump_row + x + num_x * ( s + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
+                                    }
+
+                                    // FCC: + sum_r f_ru SCC[ Ia ] [ xyztrv ]
+                                    for ( int r = 0; r < num_u; r++ ){
+                                       val += ( fock->get( irrep_u, nocc_u + r, nocc_u + u )
+                                              * SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( r + num_u * v ) ) ] );
+                                    }
+
+                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] = val;
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_t == irrep_x ){ // FAA: + 2 delta_tx f_dot_3dm[ zuyv ]
+                     for ( int xt = 0; xt < num_t; xt++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( u + num_u * v ) ) ]
+                                       += 2 * f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_u == irrep_y ){ // FAA: - delta_uy f_dot_3dm[ tzxv ]
+                     for ( int uy = 0; uy < num_u; uy++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                       -= f_dot_3dm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_t == irrep_y ){ // FAA: - delta_ty f_dot_3dm[ zuxv ]
+                     for ( int ty = 0; ty < num_t; ty++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
+                                       -= f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_u == irrep_x ){ // FAA: - delta_ux f_dot_3dm[ ztyv ]
+                     for ( int ux = 0; ux < num_u; ux++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
+                                       -= f_dot_3dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_u == irrep_y ){ // FCC: + delta_uy f_dot_3dm[ xztv ]
+                     for ( int uy = 0; uy < num_u; uy++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                       += f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_x == irrep_y ){ // FCC: + delta_xy f_dot_3dm[ zutv ]
+                     for ( int xy = 0; xy < num_x; xy++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                       += f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_u == irrep_t ){ // FCC: + delta_ut f_dot_3dm[ zxyv ]
+                     for ( int ut = 0; ut < num_u; ut++ ){
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_t * ( ut + num_u * v ) ) ]
+                                       += f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_x == irrep_t ){ // FAA: - 2 * f_xt * Gamma_{zuyv}
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           const double f_xt = fock->get( irrep_t, nocc_t + x, nocc_t + t );
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          -= 2 * f_xt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_y == irrep_u ){ // FAA: + f_yu * Gamma_{ztvx}
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_yu = fock->get( irrep_u, nocc_u + y, nocc_u + u );
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          += f_yu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_v + v + LAS * ( d_x + x ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_y == irrep_t ){ // FAA: + f_yt * Gamma_{zuxv}
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           const double f_yt = fock->get( irrep_t, nocc_t + y, nocc_t + t );
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          += f_yt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_x == irrep_u ){ // FAA: + f_xu * Gamma_{ztyv}
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_xu = fock->get( irrep_u, nocc_u + x, nocc_u + u );
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          += f_xu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_x == irrep_y ){ // FCC: - f_yx Gamma_{zutv}
+                    for ( int x = 0; x < num_x; x++ ){
+                        for ( int y = 0; y < num_y; y++ ){
+                           const double f_yx = fock->get( irrep_x, nocc_x + y, nocc_x + x );
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int u = 0; u < num_u; u++ ){
+                                 for ( int t = 0; t < num_t; t++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          -= f_yx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_t == irrep_u ){ // FCC: - f_tu Gamma_{zxyv}
+                     for ( int t = 0; t < num_t; t++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_tu = fock->get( irrep_t, nocc_t + t, nocc_t + u );
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int z = 0; z < num_z; z++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          -= f_tu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if ( irrep_y == irrep_u ){ // FCC: - f_yu Gamma_{zxvt}
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_yu = fock->get( irrep_y, nocc_y + y, nocc_y + u );
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          -= f_yu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_v + v + LAS * ( d_t + t ) ) ) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){
+
+                     // FAA: + 2 delta_tx delta_uy f_dot_2dm[ zv ]
+                     for ( int xt = 0; xt < num_t; xt++ ){
+                        for ( int uy = 0; uy < num_u; uy++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int z = 0; z < num_z; z++ ){
+                                 FAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
+                                    += 2 * f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
+                              }
+                           }
+                        }
+                     }
+
+                     // FAA: - 2 * f_xt * delta_yu Gamma_{zv}
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           const double f_xt = fock->get( irrep_t, nocc_t + x, nocc_t + t );
+                           for ( int uy = 0; uy < num_y; uy++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
+                                       -= 2 * f_xt * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+
+                     // FAA: - 2 * f_yu * delta_xt Gamma_{zv}
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_yu = fock->get( irrep_u, nocc_u + y, nocc_u + u );
+                           for ( int xt = 0; xt < num_x; xt++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_x * ( u + num_u * v ) ) ]
+                                       -= 2 * f_yu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+                  
+                  if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
+
+                     // FAA: - delta_ux delta_ty f_dot_2dm[ zv ]
+                     for ( int ty = 0; ty < num_t; ty++ ){
+                        for ( int ux = 0; ux < num_u; ux++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int z = 0; z < num_z; z++ ){
+                                 FAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
+                                    -= f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
+                              }
+                           }
+                        }
+                     }
+
+                     // FAA: + f_xu * delta_yt * Gamma_{zv}
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_xu = fock->get( irrep_u, nocc_u + x, nocc_u + u );
+                           for ( int yt = 0; yt < num_y; yt++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + x + num_x * ( yt + num_y * z ) + SIZE * ( jump_col + yt + num_y * ( u + num_u * v ) ) ]
+                                       += f_xu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+
+                     // FAA: + f_yt * delta_xu * Gamma_{zv}
+                     for ( int y = 0; y < num_y; y++ ){
+                        for ( int t = 0; t < num_t; t++ ){
+                           const double f_yt = fock->get( irrep_t, nocc_t + y, nocc_t + t );
+                           for ( int xu = 0; xu < num_x; xu++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + xu + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( xu + num_x * v ) ) ]
+                                       += f_yt * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){
+
+                     // FCC: + delta_ut delta_xy f_dot_2dm[ zv ]
+                     for ( int xy = 0; xy < num_x; xy++ ){
+                        for ( int tu = 0; tu < num_t; tu++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int z = 0; z < num_z; z++ ){
+                                 FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
+                                    += f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
+                              }
+                           }
+                        }
+                     }
+
+                     // FCC: - f_tu delta_yx Gamma_{zv}
+                     for ( int t = 0; t < num_t; t++ ){
+                        for ( int u = 0; u < num_t; u++ ){
+                           const double f_tu = fock->get( irrep_t, nocc_t + t, nocc_t + u );
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int z = 0; z < num_z; z++ ){
+                                 for ( int xy = 0; xy < num_x; xy++ ){
+                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_t * v ) ) ]
+                                       -= f_tu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+
+                     // FCC: - f_yx delta_ut Gamma_{zv}
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int y = 0; y < num_x; y++ ){
+                           const double f_yx = fock->get( irrep_x, nocc_x + y, nocc_x + x );
+                           for ( int ut = 0; ut < num_u; ut++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_x * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
+                                       -= f_yx * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  jump_row += num_x * num_y * num_z;
+               }
+            }
+            jump_col += num_t * num_u * num_v;
+         }
+      }
    }
 
 }

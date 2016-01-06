@@ -64,17 +64,18 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param ham_in Hamiltonian containing the matrix elements of the Hamiltonian for which a CASSCF calculation is desired
-             \param docc_in Array containing the number of doubly occupied HF orbitals per irrep
-             \param socc_in Array containing the number of singly occupied HF orbitals per irrep
-             \param nocc_in Array containing the number of doubly occupied (inactive) orbitals per irrep
-             \param ndmrg_in Array containing the number of active orbitals per irrep
-             \param nvirt_in Array containing the number of virtual (secondary) orbitals per irrep */
+         /** \param idx      DMRGSCFindices which contain the partitioning into occupied, active, and virtual orbitals per irrep
+             \param ints     The two-electron integrals needed for CASSCF and CASPT2
+             \param oei      The one-electron integrals
+             \param fock     The fock matrix of CASPT2 with the occupied-occupied block and the virtual-virtual block diagonal!
+             \param one_dm   The spin-summed one-particle density matrix one_dm[i+L*j] = sum_sigma < a^+_i,sigma a_j,sigma > (with L the number DMRG orbitals)
+             \param two_dm   The spin-summed two-particle density matrix two_dm[i+L*(j+L*(k+L*l))] = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > (with L the number DMRG orbitals)
+             \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals)
+             \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals) */
          CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract);
          
          //! Destructor
          virtual ~CASPT2();
-         
          
       private:
       
@@ -97,7 +98,13 @@ namespace CheMPS2{
          double * three_rdm;
          
          // The active space 4-RDM contracted with the Fock operator (externally allocated and deleted)
-         double * contracted;
+         double * f_dot_4dm;
+         
+         // The active space 3-RDM contracted with the Fock operator (allocated and deleted in this class)
+         double * f_dot_3dm;
+         
+         // The active space 2-RDM contracted with the Fock operator (allocated and deleted in this class)
+         double * f_dot_2dm;
          
          // The number of irreps
          int num_irreps;
@@ -106,7 +113,7 @@ namespace CheMPS2{
          double E_FOCK;
          
          // Calculate the expectation value of the Fock operator
-         double calc_fock_expectation() const;
+         double create_f_dots();
          
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
@@ -116,7 +123,10 @@ namespace CheMPS2{
          void construct_rhs( const DMRGSCFintegrals * integrals );
          
          // Calculate overlap matrix times vector
-         void apply_overlap( double * vector, double * result );
+         void apply_overlap( double * vector, double * result ) const;
+         
+         // Calculate result = [ F + ovlp_prefactor * S ] x vector
+         void matvec( double * vector, double * result, const double ovlp_prefactor ) const;
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
@@ -148,6 +158,13 @@ namespace CheMPS2{
          void make_SBB_SFF_triplet();
          void make_SEE_SGG();
          void create_overlap_helpers();
+         
+         // Variables for the Fock operator
+         double ** FAA;
+         double ** FCC;
+         
+         // Fill helper variables for the Fock operator
+         void make_FAA_FCC();
          
    };
 }
