@@ -106,6 +106,9 @@ namespace CheMPS2{
          // The active space 2-RDM contracted with the Fock operator (allocated and deleted in this class)
          double * f_dot_2dm;
          
+         // The active space 1-RDM contracted with the Fock operator
+         double f_dot_1dm;
+         
          // The number of irreps
          int num_irreps;
          
@@ -114,6 +117,9 @@ namespace CheMPS2{
          
          // Calculate the expectation value of the Fock operator
          double create_f_dots();
+         
+         // Calculate sum_k f_kk
+         double sum_f_kk() const;
          
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
@@ -125,8 +131,8 @@ namespace CheMPS2{
          // Calculate overlap matrix times vector
          void apply_overlap( double * vector, double * result ) const;
          
-         // Calculate result = [ F + ovlp_prefactor * S ] x vector
-         void matvec( double * vector, double * result, const double ovlp_prefactor ) const;
+         // Calculate result = [ fock_prefactor * F + ovlp_prefactor * S ] x vector
+         void matvec( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
@@ -162,9 +168,14 @@ namespace CheMPS2{
          // Variables for the Fock operator
          double ** FAA;
          double ** FCC;
+         double ** FDD;
+         double ** FEE;
+         double ** FGG;
          
          // Fill helper variables for the Fock operator
          void make_FAA_FCC();
+         void make_FDD();
+         void make_FEE_FGG();
          
    };
 }
