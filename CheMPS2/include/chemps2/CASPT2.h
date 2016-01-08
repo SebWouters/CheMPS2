@@ -128,11 +128,11 @@ namespace CheMPS2{
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFintegrals * integrals );
          
-         // Calculate overlap matrix times vector
-         void apply_overlap( double * vector, double * result ) const;
+         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ] x vector
+         void matvec_blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
          
-         // Calculate result = [ fock_prefactor * F + ovlp_prefactor * S ] x vector
-         void matvec( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
+         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{-1} x vector
+         void inverse_blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
@@ -154,8 +154,6 @@ namespace CheMPS2{
          double ** SBB_triplet;
          double ** SFF_singlet;
          double ** SFF_triplet;
-         int * occ_ovlp_helper;
-         int * vir_ovlp_helper;
          
          // Fill some helper variables for the overlap
          void make_SAA_SCC();
@@ -171,10 +169,16 @@ namespace CheMPS2{
          double ** FDD;
          double ** FEE;
          double ** FGG;
+         double ** FBB_singlet;
+         double ** FBB_triplet;
+         double ** FFF_singlet;
+         double ** FFF_triplet;
          
          // Fill helper variables for the Fock operator
          void make_FAA_FCC();
          void make_FDD();
+         void make_FBB_FFF_singlet();
+         void make_FBB_FFF_triplet();
          void make_FEE_FGG();
          
    };
