@@ -86,7 +86,52 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       // Calculate E(CASPT2-D) = - < Psi0 | H P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 >
       int inc = 1;
       const double energy_caspt2d = - ddot_( &total_size, dummy, &inc, vector_rhs, &inc );
+      
+      /*{
+         double temp0 = 0.0;
+         for ( int cnt = jump[ num_irreps * 0 ]; cnt < jump[ num_irreps * 1 ]; cnt++ ){ temp0 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ A         ] = " << temp0 << endl;
+         double temp1 = 0.0;
+         for ( int cnt = jump[ num_irreps * 1 ]; cnt < jump[ num_irreps * 2 ]; cnt++ ){ temp1 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ B singlet ] = " << temp1 << endl;
+         double temp2 = 0.0;
+         for ( int cnt = jump[ num_irreps * 2 ]; cnt < jump[ num_irreps * 3 ]; cnt++ ){ temp2 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ B triplet ] = " << temp2 << endl;
+         double temp3 = 0.0;
+         for ( int cnt = jump[ num_irreps * 3 ]; cnt < jump[ num_irreps * 4 ]; cnt++ ){ temp3 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ C         ] = " << temp3 << endl;
+         double temp4 = 0.0;
+         for ( int cnt = jump[ num_irreps * 4 ]; cnt < jump[ num_irreps * 5 ]; cnt++ ){ temp4 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ D         ] = " << temp4 << endl;
+         double temp5 = 0.0;
+         for ( int cnt = jump[ num_irreps * 5 ]; cnt < jump[ num_irreps * 6 ]; cnt++ ){ temp5 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ E singlet ] = " << temp5 << endl;
+         double temp6 = 0.0;
+         for ( int cnt = jump[ num_irreps * 6 ]; cnt < jump[ num_irreps * 7 ]; cnt++ ){ temp6 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ E triplet ] = " << temp6 << endl;
+         double temp7 = 0.0;
+         for ( int cnt = jump[ num_irreps * 7 ]; cnt < jump[ num_irreps * 8 ]; cnt++ ){ temp7 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ F singlet ] = " << temp7 << endl;
+         double temp8 = 0.0;
+         for ( int cnt = jump[ num_irreps * 8 ]; cnt < jump[ num_irreps * 9 ]; cnt++ ){ temp8 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ F triplet ] = " << temp8 << endl;
+         double temp9 = 0.0;
+         for ( int cnt = jump[ num_irreps * 9 ]; cnt < jump[ num_irreps * 10 ]; cnt++ ){ temp9 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ G singlet ] = " << temp9 << endl;
+         double temp10 = 0.0;
+         for ( int cnt = jump[ num_irreps * 10 ]; cnt < jump[ num_irreps * 11 ]; cnt++ ){ temp10 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ G triplet ] = " << temp10 << endl;
+         double temp11 = 0.0;
+         for ( int cnt = jump[ num_irreps * 11 ]; cnt < jump[ num_irreps * 12 ]; cnt++ ){ temp11 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ H singlet ] = " << temp11 << endl;
+         double temp12 = 0.0;
+         for ( int cnt = jump[ num_irreps * 12 ]; cnt < jump[ num_irreps * 13 ]; cnt++ ){ temp12 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+         cout << "E(CASPT2-D)[ H triplet ] = " << temp12 << endl;
+      }*/
+      
       cout << "E(CASPT2-D) = " << energy_caspt2d << endl;
+      /*cout << "E(CASPT2-D) without C = " << energy_caspt2d - temp3 << endl;
+      cout << "Test 8 according to molpro = " << -0.15999382 << endl;*/
       
       // Calculate P_SD [ blockdiag(F) - E_FOCK * S ] P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 > which should equal P_SD H | Psi0 >
       matvec_blockdiag( dummy, dummy2, 1.0, -E_FOCK );
@@ -1405,7 +1450,7 @@ void CheMPS2::CASPT2::inverse_blockdiag( double * vector, double * result, const
    char jobz    = 'V';
    int one      = 1;
    double set   = 0.0;
-   
+
    int maxsize = 0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       maxsize = max( max( max( max( max( size_AC[irrep],
@@ -2586,7 +2631,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFintegrals * integrals ){
                         value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * one_rdm[ d_w + w + LAS * ( d_z + z ) ];
                      }
                      for ( int xy = 0; xy < num_x; xy++ ){ // tu
-                        target[ jump_xyz + xy + num_x * ( xy + num_y * z ) ] += value;
+                        target[ jump_xyz + xy + num_x * ( xy + num_x * z ) ] += value;
                      }
                   }
                }
@@ -3370,7 +3415,7 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                      }
                   }
 
-                  for ( int t = 0; t < num_t; t++ ){ // FCC: + f_dot_4dm[ zxuytv ]
+                  for ( int t = 0; t < num_t; t++ ){
                      for ( int u = 0; u < num_u; u++ ){
                         for ( int v = 0; v < num_v; v++ ){
                            for ( int x = 0; x < num_x; x++ ){
@@ -3461,12 +3506,12 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                   }
 
                   if ( irrep_u == irrep_y ){ // FCC: + delta_uy f_dot_3dm[ xztv ]
-                     for ( int uy = 0; uy < num_u; uy++ ){
+                     for ( int uy = 0; uy < num_y; uy++ ){
                         for ( int t = 0; t < num_t; t++ ){
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                    FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
                                        += f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
                                  }
                               }
