@@ -82,9 +82,6 @@ namespace CheMPS2{
          // The number of occupied, active and virtual orbitals per irrep (externally allocated and deleted)
          const DMRGSCFindices * indices;
          
-         // The one-electron integrals (externally allocated and deleted)
-         const DMRGSCFmatrix * oei;
-         
          // The Fock matrix (externally allocated and deleted)
          const DMRGSCFmatrix * fock;
          
@@ -126,7 +123,7 @@ namespace CheMPS2{
          long long initial_total_vector_length() const; // For debugging purposes
          
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
-         void construct_rhs( const DMRGSCFintegrals * integrals );
+         void construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals );
          
          // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{ INVERSE==true ? -1 : 1 } x vector
          void blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor, const bool INVERSE ) const;
@@ -167,7 +164,6 @@ namespace CheMPS2{
          void make_SBB_SFF_singlet();
          void make_SBB_SFF_triplet();
          void make_SEE_SGG();
-         void create_overlap_helpers();
          
          // Variables for the Fock operator
          double ** FAA;

@@ -32,10 +32,9 @@ using std::cout;
 using std::endl;
 using std::max;
 
-CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei_in, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm){
+CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm){
 
    indices    = idx;
-   oei        = oei_in;
    fock       = fock_in;
    one_rdm    = one_dm;
    two_rdm    = two_dm;
@@ -52,7 +51,7 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    make_SBB_SFF_singlet();
    make_SBB_SFF_triplet();
    
-   construct_rhs( ints ); // Needs to be called AFTER make_S**()!
+   construct_rhs( oei, ints ); // Needs to be called AFTER make_S**()!
    
    make_FAA_FCC(); // Needs to be called AFTER make_S**()!
    make_FDD(); // Needs to be called AFTER make_S**()!
@@ -252,9 +251,9 @@ double CheMPS2::CASPT2::create_f_dots(){
                      for ( int i4 = 0; i4 < NDMRG4; i4++ ){
 
                         double value = 0.0;
-                        int jumpx = 0;
                         for ( int irrepx = 0; irrepx < num_irreps; irrepx++ ){
 
+                           const int jumpx  = indices->getDMRGcumulative( irrepx );
                            const int NOCCx  = indices->getNOCC(  irrepx );
                            const int NDMRGx = indices->getNDMRG( irrepx );
 
@@ -264,7 +263,6 @@ double CheMPS2::CASPT2::create_f_dots(){
                                           * three_rdm[ jump1 + i1 + LAS*( jump2 + i2 + LAS*( jumpx + rowx + LAS*( jump3 + i3 + LAS*( jump4 + i4 + LAS*( jumpx + colx ))))) ] );
                               }
                            }
-                           jumpx += NDMRGx;
                         }
                         f_dot_3dm[ jump1 + i1 + LAS * ( jump2 + i2 + LAS * ( jump3 + i3 + LAS * ( jump4 + i4 ) ) ) ] = value;
                      }
@@ -1113,9 +1111,6 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const double alpha2 = shifted_prefactor + fock_prefactor * fock->get( irrep, N_OA + count, N_OA + count );
             double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
-            if ( INVERSE ){
-               cout << "min eig( alpha * FCC[ " << irrep << " ] + beta ) = " << alpha1 * eigs[ 0 ] + alpha2 << endl;
-            }
             if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
             else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FCC[ irrep ],     origin, target ); }
          }
@@ -1812,7 +1807,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
 
 }
 
-void CheMPS2::CASPT2::construct_rhs( const DMRGSCFintegrals * integrals ){
+void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals ){
 
    /*
       VA:  < H E_ti E_uv > = sum_w ( t_iw + sum_k [ 2 (iw|kk) - (ik|kw) ] ) [ 2 delta_tw Gamma_uv - Gamma_tuwv - delta_wu Gamma_tv ]
@@ -2731,8 +2726,8 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                            + delta_ut delta_xy f_dot_2dm[ zv ]
                            + sum_s f_ys SCC[ Ia ] [ xsztuv ]
                            + sum_r f_ru SCC[ Ia ] [ xyztrv ]
-                           + f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
-                           + f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
+                           - f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
+                           - f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
                            - f_yu Gamma_{zxvt}
                          ]
 
@@ -2928,7 +2923,7 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                            for ( int u = 0; u < num_u; u++ ){
                               for ( int v = 0; v < num_v; v++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
                                        += f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
                                  }
                               }
@@ -2943,7 +2938,7 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_t * ( ut + num_u * v ) ) ]
+                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
                                        += f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
                                  }
                               }
@@ -3026,13 +3021,13 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
 
                   if ( irrep_x == irrep_y ){ // FCC: - f_yx Gamma_{zutv}
                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int y = 0; y < num_y; y++ ){
+                        for ( int y = 0; y < num_x; y++ ){
                            const double f_yx = fock->get( irrep_x, nocc_x + y, nocc_x + x );
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int u = 0; u < num_u; u++ ){
                                  for ( int t = 0; t < num_t; t++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
                                           -= f_yx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ) ) ) ];
                                     }
                                  }
@@ -3044,13 +3039,13 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
 
                   if ( irrep_t == irrep_u ){ // FCC: - f_tu Gamma_{zxyv}
                      for ( int t = 0; t < num_t; t++ ){
-                        for ( int u = 0; u < num_u; u++ ){
+                        for ( int u = 0; u < num_t; u++ ){
                            const double f_tu = fock->get( irrep_t, nocc_t + t, nocc_t + u );
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int x = 0; x < num_x; x++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_t * v ) ) ]
                                           -= f_tu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
                                     }
                                  }
@@ -3062,13 +3057,13 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
 
                   if ( irrep_y == irrep_u ){ // FCC: - f_yu Gamma_{zxvt}
                      for ( int y = 0; y < num_y; y++ ){
-                        for ( int u = 0; u < num_u; u++ ){
+                        for ( int u = 0; u < num_y; u++ ){
                            const double f_yu = fock->get( irrep_y, nocc_y + y, nocc_y + u );
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int t = 0; t < num_t; t++ ){
                                  for ( int z = 0; z < num_z; z++ ){
                                     for ( int x = 0; x < num_x; x++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_y * v ) ) ]
                                           -= f_yu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_v + v + LAS * ( d_t + t ) ) ) ];
                                     }
                                  }
@@ -3212,7 +3207,6 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                         }
                      }
                   }
-
                   jump_row += num_x * num_y * num_z;
                }
             }
@@ -3444,7 +3438,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                   if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){ // SCC: + delta_ut delta_xy Gamma_{zv}
                      for ( int xy = 0; xy < num_x; xy++ ){
                         for ( int tu = 0; tu < num_t; tu++ ){
-                           for ( int v = 0; v < num_v; v++ ){
+                           for ( int v = 0; v < num_z; v++ ){
                               for ( int z = 0; z < num_z; z++ ){
                                  SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
                                     += one_rdm[ d_z + z + LAS * ( d_v + v ) ];
@@ -3453,7 +3447,6 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
                   jump_row += num_x * num_y * num_z;
                }
             }
