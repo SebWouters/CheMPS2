@@ -123,23 +123,27 @@ namespace CheMPS2{
          
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
-         long long total_vector_length() const; // For debugging purposes
+         long long initial_total_vector_length() const; // For debugging purposes
          
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFintegrals * integrals );
          
-         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ] x vector
-         void matvec_blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
-         
-         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{-1} x vector
-         void inverse_blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
+         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{ INVERSE==true ? -1 : 1 } x vector
+         void blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor, const bool INVERSE ) const;
+         static void blockdiaghelper( const bool INVERSE, int SIZE, double * matrix, double * work, double * eigs, int lwork, double * origin, double * target );
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
-         int * size_AC;
+         int * size_A;
+         int * size_C;
          int * size_D;
-         int * size_BF_singlet;
-         int * size_BF_triplet;
+         int * size_E;
+         int * size_G;
+         int * size_B_singlet;
+         int * size_B_triplet;
+         int * size_F_singlet;
+         int * size_F_triplet;
+         int get_maxsize() const;
          
          // The RHS of the linear problem
          double * vector_rhs;
