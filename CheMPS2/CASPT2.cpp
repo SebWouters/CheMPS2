@@ -123,7 +123,33 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       //}
       
       cout << "E(CASPT2-D) = " << energy_caspt2d << endl;
-      cout << "Test 8 according to molpro = " << -0.15999382 << endl;
+      cout << "Test 8 according to molpro = " << -0.15978719 << endl;
+      /*
+ memory,500,m
+ gprint,orbitals=5,basis,civector
+ gthresh,energy=1.0d-12,orbital=1.0d-10
+ gthresh,ONEINT=1d-14,TWOINT=1d-14
+ 
+ BOHR
+ 
+ geometry={
+ N
+ N,1,2.118
+ }
+ 
+ basis,cc-pvdz
+ 
+ {rhf;orbital,2100.2}
+ {multi,maxit=50;start,2100.2
+ !Ag  +   B3u +   B2u +   B1g +   B1u +   B2g +   B3g +   Au
+ closed, 1, 0, 0, 0, 1, 0, 0, 0
+ occ   , 3, 1, 1, 0, 3, 1, 1, 0
+ CANONICAL,2140.2,CI
+ }
+ !{fci,dump='cr2_1.5_mc_fcidump';core}
+ {rs2,shift=0;core,0;option,IFDIA=2}
+ !{rs2,IFDIA=2}
+      */
       
       // Calculate P_SD [ blockdiag(F) - E_FOCK * S ] P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 > which should equal P_SD H | Psi0 >
       INVERSE = false;
