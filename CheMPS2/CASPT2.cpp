@@ -1639,8 +1639,8 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             const int size_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj; // irrep = 0
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj; // irrep = 0
+            double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
+            double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
             for ( int a = 0; a < NVIR_ab; a++ ){
                const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a; b < NVIR_ab; b++ ){
@@ -1719,8 +1719,8 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             const int size_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj; // irrep = 0
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj; // irrep = 0
+            double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
+            double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
             for ( int a = 0; a < NVIR_ab; a++ ){
                const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a+1; b < NVIR_ab; b++ ){
@@ -4238,7 +4238,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                         
                         double sbb_value = fdotdiff;
 
-                        // FBB: + sum_v f_vu SBB_triplet[ xytv ] = + sum_(v>=t) f_vu SBB_triplet[ xytv ] + sum_(v<t) f_vu SBB_triplet[ xyvt ]
+                        // FBB: + sum_v f_vu SBB_triplet[ xytv ] = + sum_(v>=t) f_vu SBB_triplet[ xytv ] - sum_(v<t) f_vu SBB_triplet[ xyvt ]
                         for ( int v = 0; v < t; v++ ){ // Swap ( t <--> u ) --> minus sign
                            sbb_value -= ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
                                         * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( t * ( t - 1 ) ) / 2 ) ] );
@@ -4248,7 +4248,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                                         * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( v * ( v - 1 ) ) / 2 ) ] );
                         }
 
-                        // FBB: + sum_v f_vt SBB_triplet[ xyvu ] = + sum_(v<u) f_vt SBB_triplet[ xyvu ] + sum_(v>=u) f_vt SBB_triplet[ xyuv ]
+                        // FBB: + sum_v f_vt SBB_triplet[ xyvu ] = + sum_(v<u) f_vt SBB_triplet[ xyvu ] - sum_(v>=u) f_vt SBB_triplet[ xyuv ]
                         for ( int v = 0; v < u; v++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
                                         * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( u * ( u - 1 ) ) / 2 ) ] );
@@ -4258,7 +4258,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                                         * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( u + ( v * ( v - 1 ) ) / 2 ) ] );
                         }
 
-                        // FBB: + sum_w f_yw SBB_triplet[ xwtu ] = + sum_(w>=x) f_yw SBB_triplet[ xwtu ] + sum_(w<x) f_yw SBB_triplet[ wxtu ]
+                        // FBB: + sum_w f_yw SBB_triplet[ xwtu ] = + sum_(w>=x) f_yw SBB_triplet[ xwtu ] - sum_(w<x) f_yw SBB_triplet[ wxtu ]
                         for ( int w = 0; w < x; w++ ){ // Swap ( x <--> y ) --> minus sign
                            sbb_value -= ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
                                         * SBB_triplet[ irrep ][ shift + w + ( x * ( x - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
@@ -4268,7 +4268,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                                         * SBB_triplet[ irrep ][ shift + x + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
 
-                        // FBB: + sum_w f_xw SBB_triplet[ wytu ] = + sum_(w<y) f_xw SBB_triplet[ wytu ] + sum_(w>=y) f_xw SBB_triplet[ ywtu ]
+                        // FBB: + sum_w f_xw SBB_triplet[ wytu ] = + sum_(w<y) f_xw SBB_triplet[ wytu ] - sum_(w>=y) f_xw SBB_triplet[ ywtu ]
                         for ( int w = 0; w < y; w++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
                                         * SBB_triplet[ irrep ][ shift + w + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
@@ -4398,11 +4398,11 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                         for ( int x = 0; x < num_x; x++ ){
                            for ( int y = 0; y < num_y; y++ ){
 
-                              // + f_dot_3dm_{utyx} + f_dot_3dm_{utxy}
-                              const double fdotsum = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                     + f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
+                              // + f_dot_3dm_{utyx} - f_dot_3dm_{utxy}
+                              const double fdotdiff = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
+                                                      - f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
 
-                              double sbb_value = fdotsum;
+                              double sbb_value = fdotdiff;
 
                               // FBB: + sum_v f_vu SBB_triplet[ xytv ]
                               for ( int v = 0; v < num_u; v++ ){
@@ -4425,7 +4425,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                               }
 
                               FBB_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = sbb_value;
-                              FFF_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = fdotsum;
+                              FFF_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = fdotdiff;
                            }
                         }
                      }
