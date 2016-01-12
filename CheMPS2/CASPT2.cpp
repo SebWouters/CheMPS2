@@ -53,11 +53,11 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    
    construct_rhs( oei, ints ); // Needs to be called AFTER make_S**()!
    
-   make_FAA_FCC(); // Needs to be called AFTER make_S**()!
-   make_FDD(); // Needs to be called AFTER make_S**()!
-   make_FEE_FGG(); // Needs to be called AFTER make_S**()!
-   make_FBB_FFF_singlet(); // Needs to be called AFTER make_S**()!
-   make_FBB_FFF_triplet(); // Needs to be called AFTER make_S**()!
+   make_FAA_FCC(); // Needs to be called AFTER make_SAA_SCC()!
+   make_FDD(); // Needs to be called AFTER make_SDD()!
+   make_FEE_FGG(); // Needs to be called AFTER make_SEE_SGG()!
+   make_FBB_FFF_singlet(); // Needs to be called AFTER make_SBB_SFF_singlet()!
+   make_FBB_FFF_triplet(); // Needs to be called AFTER make_SBB_SFF_triplet()!
    
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
@@ -122,7 +122,6 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       //}
       
       cout << "E(CASPT2-D) = " << energy_caspt2d << endl;
-      cout << "E(CASPT2-D) without C = " << energy_caspt2d - temp3 << endl;
       cout << "Test 8 according to molpro = " << -0.15999382 << endl;
       
       // Calculate P_SD [ blockdiag(F) - E_FOCK * S ] P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 > which should equal P_SD H | Psi0 >
@@ -1817,9 +1816,9 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
            < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
            < T_tiuj | H > = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
 
-      VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] ) < E_wt E_uv >
+      VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] - sum_y (wy|ya) ) < E_wt E_uv >
                            + sum_wxy (xy|wa) < E_xy E_wt E_uv >
-           < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] ) [ Gamma_wutv + delta_ut Gamma_wv ]
+           < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] - sum_y (wy|ya) ) [ Gamma_wutv + delta_ut Gamma_wv ]
                            + sum_zxy (zy|xa) SCC[ It x Iu x Iv ][ xyztuv ]
 
       VD1: < H E_ai E_tu > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ 2 Gamma_tu ]
@@ -1871,6 +1870,26 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
             }
             MAT->set( irrep, row, col, value );
             MAT->set( irrep, col, row, value );
+         }
+      }
+   }
+   
+   // First construct MAT2[p,q] = sum_y (py|yq)
+   DMRGSCFmatrix * MAT2 = new DMRGSCFmatrix( indices );
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NORB = indices->getNORB( irrep );
+      for ( int row = 0; row < NORB; row++ ){
+         for ( int col = row; col < NORB; col++ ){
+            double value = 0.0;
+            for ( int irrep_act = 0; irrep_act < num_irreps; irrep_act++ ){
+               const int NOCC = indices->getNOCC( irrep_act );
+               const int NACT = indices->getNDMRG( irrep_act );
+               for ( int act = 0; act < NACT; act++ ){
+                  value += integrals->FourIndexAPI( irrep, irrep_act, irrep_act, irrep, row, NOCC + act, NOCC + act, col ); // Physics notation at 4-index
+               }
+            }
+            MAT2->set( irrep, row, col, value );
+            MAT2->set( irrep, col, row, value );
          }
       }
    }
@@ -1979,8 +1998,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + size_C[ irrep ] * count_a;
 
          // Fill workspace[ xyz ] with (zy|xa)
-         // Fill target[ tuv ] with sum_w MAT[w,a] [ Gamma_wutv + delta_ut Gamma_wv ]
-         //                       = sum_w MAT[w,a] Gamma_wutv + sum_w MAT[w,a] delta_ut Gamma_wv
+         // Fill target[ tuv ] with sum_w (MAT[w,a] - MAT2[w,a]) [ Gamma_wutv + delta_ut Gamma_wv ]
          int jump_xyz = 0;
          for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
             const int occ_x = indices->getNOCC( irrep_x );
@@ -2006,25 +2024,27 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   }
                }
 
-               // target[ tuv ] = sum_w MAT[w,a] Gamma_wutv
+               // target[ tuv ] = sum_w ( MAT[w,a] - MAT2[w,a] ) Gamma_wutv
                for ( int z = 0; z < num_z; z++ ){
                   for ( int y = 0; y < num_y; y++ ){
                      for ( int x = 0; x < num_x; x++ ){
                         double value = 0.0;
                         for ( int w = 0; w < NACT; w++ ){
-                           value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * two_rdm[ d_w + w + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_z + z ) ) ) ];
+                           value += ( ( MAT->get( irrep, NOCC + w, N_OA + count_a ) - MAT2->get( irrep, NOCC + w, N_OA + count_a ) )
+                                    * two_rdm[ d_w + w + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_z + z ) ) ) ] );
                         }
                         target[ jump_xyz + x + num_x * ( y + num_y * z ) ] = value;
                      }
                   }
                }
 
-               // target[ tuv ] += sum_w MAT[w,a] delta_ut Gamma_wv
+               // target[ tuv ] += sum_w ( MAT[w,a] - MAT2[w,a] ) delta_ut Gamma_wv
                if (( irrep_z == irrep ) && ( irrep_x == irrep_y )){
                   for ( int z = 0; z < num_z; z++ ){ // v
                      double value = 0.0;
                      for ( int w = 0; w < NACT; w++ ){
-                        value += MAT->get( irrep, NOCC + w, N_OA + count_a ) * one_rdm[ d_w + w + LAS * ( d_z + z ) ];
+                        value += ( ( MAT->get( irrep, NOCC + w, N_OA + count_a ) - MAT2->get( irrep, NOCC + w, N_OA + count_a ) )
+                                 * one_rdm[ d_w + w + LAS * ( d_z + z ) ] );
                      }
                      for ( int xy = 0; xy < num_x; xy++ ){ // tu
                         target[ jump_xyz + xy + num_x * ( xy + num_x * z ) ] += value;
@@ -2136,6 +2156,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
    }
 
    delete MAT;
+   delete MAT2;
 
    // VB singlet and triplet
    { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
