@@ -30,6 +30,7 @@
 
 using std::cout;
 using std::endl;
+using std::min;
 using std::max;
 
 CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm){
@@ -1072,6 +1073,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
    }
 
    const double shifted_prefactor = ovlp_prefactor + 2 * fock_prefactor * sum_f_kk();
+   double min_eig = 1e18;
 
    double timings[ CHEMPS2_CASPT2_NUM_CASES ];
    for ( int cnt = 0; cnt < CHEMPS2_CASPT2_NUM_CASES; cnt++ ){ timings[ cnt ] = 0.0; }
@@ -1089,6 +1091,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const double alpha2 = shifted_prefactor - fock_prefactor * fock->get( irrep, count, count );
             double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
             if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
             else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FAA[ irrep ],     origin, target ); }
          }
@@ -1110,6 +1113,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const double alpha2 = shifted_prefactor + fock_prefactor * fock->get( irrep, N_OA + count, N_OA + count );
             double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
             if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
             else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FCC[ irrep ],     origin, target ); }
          }
@@ -1137,6 +1141,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ai + i + NOCC_i * a;
                   double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
                   double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                   if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                   else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FDD[ irrep ],     origin, target ); }
                }
@@ -1165,6 +1170,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ij + i + ( j * ( j + 1 ) ) / 2;
                   double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
                   double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                   if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                   else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ 0 ], origin, target ); }
                }
@@ -1190,6 +1196,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ij + i + nocc_i * j;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                      if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
                      else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ irrep ], origin, target ); }
                   }
@@ -1218,6 +1225,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ij + i + ( j * ( j - 1 ) ) / 2;
                   double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
                   double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                   if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                   else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ 0 ], origin, target ); }
                }
@@ -1243,6 +1251,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ij + i + nocc_i * j;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                      if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
                      else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ irrep ], origin, target ); }
                   }
@@ -1274,6 +1283,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ab + a + ( b * ( b + 1 ) ) / 2;
                   double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
                   double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                   if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                   else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ 0 ], origin, target ); }
                }
@@ -1302,6 +1312,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ab + a + NVIR_a * b;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                      if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
                      else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ irrep ], origin, target ); }
                   }
@@ -1332,6 +1343,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ab + a + ( b * ( b - 1 ) ) / 2;
                   double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
                   double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                   if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                   else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ 0 ], origin, target ); }
                }
@@ -1360,6 +1372,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ab + a + NVIR_a * b;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                      if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
                      else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ irrep ], origin, target ); }
                   }
@@ -1399,6 +1412,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                                         - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
@@ -1419,6 +1433,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
@@ -1460,6 +1475,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
@@ -1480,6 +1496,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
@@ -1522,6 +1539,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                                         - fock->get( irrep_i,           i,           i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
@@ -1544,6 +1562,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,          i,          i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
@@ -1585,6 +1604,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,           i,           i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
@@ -1607,6 +1627,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,          i,          i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
                            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
                            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
@@ -1654,6 +1675,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                         const int ij_factor = (( i == j ) ? 2 : 1 );
                         const double f_jj = fock->get( irrep_ij, j, j );
                         const double alpha = 4 * ij_factor * ab_factor * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
+                        if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
                         if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
                         else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                      }
@@ -1693,6 +1715,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
                               const double alpha = 4 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
+                              if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
                               if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
                               else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                            }
@@ -1732,6 +1755,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                         const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
                         const double f_jj = fock->get( irrep_ij, j, j );
                         const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
+                        if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
                         if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
                         else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                      }
@@ -1771,6 +1795,7 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
                               const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
+                              if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
                               if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
                               else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                            }
@@ -1788,8 +1813,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
 
    double total = 0.0;
    for ( int cnt = 0; cnt < CHEMPS2_CASPT2_NUM_CASES; cnt++ ){ total += timings[ cnt ]; }
-   if ( INVERSE ){ cout << "Application of [ blockdiag(F) - E ]^{-1} : Wall time = " << total << " seconds" << endl; }
-   else {          cout << "Application of [ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
+   if ( INVERSE ){ cout << "CASPT2::blockdiag : Minimum eig [ blockdiag(F) - E ] = " << min_eig << endl; }
+   if ( INVERSE ){ cout << "CASPT2::blockdiag : Applying inv[ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
+   else {          cout << "CASPT2::blockdiag : Application [ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
    /*cout << "      A         : " << timings[ CHEMPS2_CASPT2_A         ] << endl;
    cout << "      B singlet : " << timings[ CHEMPS2_CASPT2_B_SINGLET ] << endl;
    cout << "      B triplet : " << timings[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
@@ -4645,7 +4671,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
 
                   if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // --> num_t == num_x   and   num_u == num_y
 
-                     // 6 delta_uy delta_tx
+                     // + 6 delta_uy delta_tx
                      for ( int xt = 0; xt < num_x; xt++ ){
                         for ( int yu = 0; yu < num_y; yu++ ){
                            SBB_triplet[ irrep ][ jump_row + xt + num_x * yu + SIZE * ( jump_col + xt + num_x * yu ) ] += 6.0;
