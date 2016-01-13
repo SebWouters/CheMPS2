@@ -43,26 +43,26 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
    f_dot_4dm  = contract_4dm;
    num_irreps = indices->getNirreps();
    E_FOCK     = create_f_dots();
-   
+
    vector_helper(); // Needs to be called BEFORE make_S**()!
-   
+
    make_SAA_SCC();
    make_SDD();
    make_SEE_SGG();
    make_SBB_SFF_singlet();
    make_SBB_SFF_triplet();
-   
+
    construct_rhs( oei, ints ); // Needs to be called AFTER make_S**()!
-   
-   make_FAA_FCC(); // Needs to be called AFTER make_SAA_SCC()!
-   make_FDD(); // Needs to be called AFTER make_SDD()!
-   make_FEE_FGG(); // Needs to be called AFTER make_SEE_SGG()!
-   make_FBB_FFF_singlet(); // Needs to be called AFTER make_SBB_SFF_singlet()!
-   make_FBB_FFF_triplet(); // Needs to be called AFTER make_SBB_SFF_triplet()!
-   
+
+   make_FAA_FCC(); // Needs to be called AFTER make_S**()!
+   make_FDD(); // Needs to be called AFTER make_S**()!
+   make_FEE_FGG(); // Needs to be called AFTER make_S**()!
+   make_FBB_FFF_singlet(); // Needs to be called AFTER make_S**()!
+   make_FBB_FFF_triplet(); // Needs to be called AFTER make_S**()!
+
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
-   
+
    recreate(); // Remove the overlap matrices
 
    {
@@ -80,53 +80,51 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       int inc = 1;
       const double energy_caspt2d = - ddot_( &total_size, dummy, &inc, vector_rhs, &inc );
       
-      //{
-         double temp0 = 0.0;
-         for ( int cnt = jump[ num_irreps * 0 ]; cnt < jump[ num_irreps * 1 ]; cnt++ ){ temp0 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ A         ] = " << temp0 << endl;
-         double temp1 = 0.0;
-         for ( int cnt = jump[ num_irreps * 1 ]; cnt < jump[ num_irreps * 2 ]; cnt++ ){ temp1 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ B singlet ] = " << temp1 << endl;
-         double temp2 = 0.0;
-         for ( int cnt = jump[ num_irreps * 2 ]; cnt < jump[ num_irreps * 3 ]; cnt++ ){ temp2 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ B triplet ] = " << temp2 << endl;
-         double temp3 = 0.0;
-         for ( int cnt = jump[ num_irreps * 3 ]; cnt < jump[ num_irreps * 4 ]; cnt++ ){ temp3 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ C         ] = " << temp3 << endl;
-         double temp4 = 0.0;
-         for ( int cnt = jump[ num_irreps * 4 ]; cnt < jump[ num_irreps * 5 ]; cnt++ ){ temp4 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ D         ] = " << temp4 << endl;
-         double temp5 = 0.0;
-         for ( int cnt = jump[ num_irreps * 5 ]; cnt < jump[ num_irreps * 6 ]; cnt++ ){ temp5 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ E singlet ] = " << temp5 << endl;
-         double temp6 = 0.0;
-         for ( int cnt = jump[ num_irreps * 6 ]; cnt < jump[ num_irreps * 7 ]; cnt++ ){ temp6 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ E triplet ] = " << temp6 << endl;
-         double temp7 = 0.0;
-         for ( int cnt = jump[ num_irreps * 7 ]; cnt < jump[ num_irreps * 8 ]; cnt++ ){ temp7 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ F singlet ] = " << temp7 << endl;
-         double temp8 = 0.0;
-         for ( int cnt = jump[ num_irreps * 8 ]; cnt < jump[ num_irreps * 9 ]; cnt++ ){ temp8 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ F triplet ] = " << temp8 << endl;
-         double temp9 = 0.0;
-         for ( int cnt = jump[ num_irreps * 9 ]; cnt < jump[ num_irreps * 10 ]; cnt++ ){ temp9 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ G singlet ] = " << temp9 << endl;
-         double temp10 = 0.0;
-         for ( int cnt = jump[ num_irreps * 10 ]; cnt < jump[ num_irreps * 11 ]; cnt++ ){ temp10 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ G triplet ] = " << temp10 << endl;
-         double temp11 = 0.0;
-         for ( int cnt = jump[ num_irreps * 11 ]; cnt < jump[ num_irreps * 12 ]; cnt++ ){ temp11 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ H singlet ] = " << temp11 << endl;
-         double temp12 = 0.0;
-         for ( int cnt = jump[ num_irreps * 12 ]; cnt < jump[ num_irreps * 13 ]; cnt++ ){ temp12 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
-         cout << "E(CASPT2-D)[ H triplet ] = " << temp12 << endl;
-      //}
+  /*  double temp0 = 0.0;
+      for ( int cnt = jump[ num_irreps * 0 ]; cnt < jump[ num_irreps * 1 ]; cnt++ ){ temp0 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ A         ] = " << temp0 << endl;
+      double temp1 = 0.0;
+      for ( int cnt = jump[ num_irreps * 1 ]; cnt < jump[ num_irreps * 2 ]; cnt++ ){ temp1 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ B singlet ] = " << temp1 << endl;
+      double temp2 = 0.0;
+      for ( int cnt = jump[ num_irreps * 2 ]; cnt < jump[ num_irreps * 3 ]; cnt++ ){ temp2 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ B triplet ] = " << temp2 << endl;
+      double temp3 = 0.0;
+      for ( int cnt = jump[ num_irreps * 3 ]; cnt < jump[ num_irreps * 4 ]; cnt++ ){ temp3 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ C         ] = " << temp3 << endl;
+      double temp4 = 0.0;
+      for ( int cnt = jump[ num_irreps * 4 ]; cnt < jump[ num_irreps * 5 ]; cnt++ ){ temp4 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ D         ] = " << temp4 << endl;
+      double temp5 = 0.0;
+      for ( int cnt = jump[ num_irreps * 5 ]; cnt < jump[ num_irreps * 6 ]; cnt++ ){ temp5 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ E singlet ] = " << temp5 << endl;
+      double temp6 = 0.0;
+      for ( int cnt = jump[ num_irreps * 6 ]; cnt < jump[ num_irreps * 7 ]; cnt++ ){ temp6 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ E triplet ] = " << temp6 << endl;
+      double temp7 = 0.0;
+      for ( int cnt = jump[ num_irreps * 7 ]; cnt < jump[ num_irreps * 8 ]; cnt++ ){ temp7 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ F singlet ] = " << temp7 << endl;
+      double temp8 = 0.0;
+      for ( int cnt = jump[ num_irreps * 8 ]; cnt < jump[ num_irreps * 9 ]; cnt++ ){ temp8 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ F triplet ] = " << temp8 << endl;
+      double temp9 = 0.0;
+      for ( int cnt = jump[ num_irreps * 9 ]; cnt < jump[ num_irreps * 10 ]; cnt++ ){ temp9 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ G singlet ] = " << temp9 << endl;
+      double temp10 = 0.0;
+      for ( int cnt = jump[ num_irreps * 10 ]; cnt < jump[ num_irreps * 11 ]; cnt++ ){ temp10 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ G triplet ] = " << temp10 << endl;
+      double temp11 = 0.0;
+      for ( int cnt = jump[ num_irreps * 11 ]; cnt < jump[ num_irreps * 12 ]; cnt++ ){ temp11 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ H singlet ] = " << temp11 << endl;
+      double temp12 = 0.0;
+      for ( int cnt = jump[ num_irreps * 12 ]; cnt < jump[ num_irreps * 13 ]; cnt++ ){ temp12 -= dummy[ cnt ] * vector_rhs[ cnt ]; }
+      cout << "E(CASPT2-D)[ H triplet ] = " << temp12 << endl; */
       
       cout.precision(8);
       cout << std::fixed;
       cout << "E(CASPT2-D)                = " << energy_caspt2d << endl;
-      //cout << "Test 8 according to molpro = " << -0.15978719 << endl;
-      cout << "Test 8 according to bagel  = " << -0.15963018 << endl;
+      cout << "Test 8 according to molcas = " << -0.1596306078 << endl;
+      /*cout << "Test 8 according to bagel  = " << -0.15963018 << endl;
       cout << "   bagel CXXX: -0.00006498 and chemps2 A: " << temp0 << endl;
       cout << "   bagel CCXX: -0.00017700 and chemps2 B: " << temp1 + temp2 << endl;
       cout << "   bagel XXXA: -0.06749706 and chemps2 C: " << temp3 << " <=====" << endl;
@@ -134,7 +132,7 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
       cout << "   bagel CCXA: -0.00035423 and chemps2 E: " << temp5 + temp6 << endl;
       cout << "   bagel XXAA: -0.08833262 and chemps2 F: " << temp7 + temp8 << " <=====" << endl;
       cout << "   bagel CXAA: -0.00134620 and chemps2 G: " << temp9 + temp10 << endl;
-      cout << "   bagel CCAA: -0.00032381 and chemps2 H: " << temp11 + temp12 << endl;
+      cout << "   bagel CCAA: -0.00032381 and chemps2 H: " << temp11 + temp12 << endl;*/
       cout.unsetf( std::ios::floatfield );
       cout.precision(15);
       
@@ -179,7 +177,7 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] FBB_triplet;
    delete [] FFF_singlet;
    delete [] FFF_triplet;
-   
+
    delete [] size_A;
    delete [] size_C;
    delete [] size_D;
@@ -197,13 +195,11 @@ CheMPS2::CASPT2::~CASPT2(){
 double CheMPS2::CASPT2::create_f_dots(){
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
-
    f_dot_3dm = new double[ LAS * LAS * LAS * LAS ];
    f_dot_2dm = new double[ LAS * LAS ];
    f_dot_1dm = 0.0;
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
       const int NDMRG = indices->getNDMRG( irrep );
       const int NOCC  = indices->getNOCC( irrep );
       const int jumpx = indices->getDMRGcumulative( irrep );
@@ -218,66 +214,63 @@ double CheMPS2::CASPT2::create_f_dots(){
    }
 
    for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
+      const int lower1 = indices->getDMRGcumulative( irrep1 );
+      const int upper1 = lower1 + indices->getNDMRG( irrep1 );
 
-      const int NDMRG1 = indices->getNDMRG( irrep1 );
-      const int jump1  = indices->getDMRGcumulative( irrep1 );
-
-      for ( int row1 = 0; row1 < NDMRG1; row1++ ){
-         for ( int col1 = 0; col1 < NDMRG1; col1++ ){
+      for ( int i1 = lower1; i1 < upper1; i1++ ){
+         for ( int i2 = lower1; i2 < upper1; i2++ ){
 
             double value = 0.0;
-            for ( int irrep2 = 0; irrep2 < num_irreps; irrep2++ ){
+            for ( int irrepx = 0; irrepx < num_irreps; irrepx++ ){
+               const int NOCCx  = indices->getNOCC( irrepx );
+               const int NDMRGx = indices->getNDMRG( irrepx );
+               const int jumpx  = indices->getDMRGcumulative( irrepx );
 
-               const int NOCC2  = indices->getNOCC(  irrep2 );
-               const int NDMRG2 = indices->getNDMRG( irrep2 );
-               const int jump2  = indices->getDMRGcumulative( irrep2 );
-
-               for ( int row2 = 0; row2 < NDMRG2; row2++ ){
-                  for ( int col2 = 0; col2 < NDMRG2; col2++ ){
-                     value += ( fock->get( irrep2, NOCC2 + row2, NOCC2 + col2 )
-                              * two_rdm[ jump1 + row1 + LAS * ( jump2 + row2 + LAS * ( jump1 + col1 + LAS * ( jump2 + col2 ) ) ) ] );
+               for ( int rowx = 0; rowx < NDMRGx; rowx++ ){
+                  for ( int colx = 0; colx < NDMRGx; colx++ ){
+                     value += ( fock->get( irrepx, NOCCx + rowx, NOCCx + colx )
+                              * two_rdm[ i1 + LAS * ( jumpx + rowx + LAS * ( i2 + LAS * ( jumpx + colx ))) ] );
                   }
                }
             }
-            f_dot_2dm[ jump1 + row1 + LAS * ( jump1 + col1 ) ] = value;
+            f_dot_2dm[ i1 + LAS * i2 ] = value;
          }
       }
    }
 
    for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
-      const int jump1  = indices->getDMRGcumulative( irrep1 );
-      const int NDMRG1 = indices->getNDMRG( irrep1 );
+      const int lower1 = indices->getDMRGcumulative( irrep1 );
+      const int upper1 = lower1 + indices->getNDMRG( irrep1 );
       for ( int irrep2 = 0; irrep2 < num_irreps; irrep2++ ){
-         const int jump2  = indices->getDMRGcumulative( irrep2 );
-         const int NDMRG2 = indices->getNDMRG( irrep2 );
+         const int lower2 = indices->getDMRGcumulative( irrep2 );
+         const int upper2 = lower2 + indices->getNDMRG( irrep2 );
          const int irr_12 = Irreps::directProd( irrep1, irrep2 );
          for ( int irrep3 = 0; irrep3 < num_irreps; irrep3++ ){
             const int irrep4 = Irreps::directProd( irr_12, irrep3 );
-            const int jump3  = indices->getDMRGcumulative( irrep3 );
-            const int jump4  = indices->getDMRGcumulative( irrep4 );
-            const int NDMRG3 = indices->getNDMRG( irrep3 );
-            const int NDMRG4 = indices->getNDMRG( irrep4 );
+            const int lower3 = indices->getDMRGcumulative( irrep3 );
+            const int lower4 = indices->getDMRGcumulative( irrep4 );
+            const int upper3 = lower3 + indices->getNDMRG( irrep3 );
+            const int upper4 = lower4 + indices->getNDMRG( irrep4 );
 
-            for ( int i1 = 0; i1 < NDMRG1; i1++ ){
-               for ( int i2 = 0; i2 < NDMRG2; i2++ ){
-                  for ( int i3 = 0; i3 < NDMRG3; i3++ ){
-                     for ( int i4 = 0; i4 < NDMRG4; i4++ ){
+            for ( int i1 = lower1; i1 < upper1; i1++ ){
+               for ( int i2 = lower2; i2 < upper2; i2++ ){
+                  for ( int i3 = lower3; i3 < upper3; i3++ ){
+                     for ( int i4 = lower4; i4 < upper4; i4++ ){
 
                         double value = 0.0;
                         for ( int irrepx = 0; irrepx < num_irreps; irrepx++ ){
-
                            const int jumpx  = indices->getDMRGcumulative( irrepx );
-                           const int NOCCx  = indices->getNOCC(  irrepx );
+                           const int NOCCx  = indices->getNOCC( irrepx );
                            const int NDMRGx = indices->getNDMRG( irrepx );
 
                            for ( int rowx = 0; rowx < NDMRGx; rowx++ ){
                               for ( int colx = 0; colx < NDMRGx; colx++ ){
                                  value += ( fock->get( irrepx, NOCCx + rowx, NOCCx + colx )
-                                          * three_rdm[ jump1 + i1 + LAS*( jump2 + i2 + LAS*( jumpx + rowx + LAS*( jump3 + i3 + LAS*( jump4 + i4 + LAS*( jumpx + colx ))))) ] );
+                                          * three_rdm[ i1 + LAS*( i2 + LAS*( jumpx + rowx + LAS*( i3 + LAS*( i4 + LAS*( jumpx + colx ))))) ] );
                               }
                            }
                         }
-                        f_dot_3dm[ jump1 + i1 + LAS * ( jump2 + i2 + LAS * ( jump3 + i3 + LAS * ( jump4 + i4 ) ) ) ] = value;
+                        f_dot_3dm[ i1 + LAS * ( i2 + LAS * ( i3 + LAS * i4 )) ] = value;
                      }
                   }
                }
@@ -285,8 +278,16 @@ double CheMPS2::CASPT2::create_f_dots(){
          }
       }
    }
+   
+   sum_f_kk = 0.0;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int NOCC = indices->getNOCC( irrep );
+      for ( int orb = 0; orb < NOCC; orb++ ){
+         sum_f_kk += fock->get( irrep, orb, orb );
+      }
+   }
 
-   const double expectation_value = 2 * sum_f_kk() + f_dot_1dm;
+   const double expectation_value = 2 * sum_f_kk + f_dot_1dm;
    cout << "CASPT2::create_f_dots : < F > = " << expectation_value << endl;
    return expectation_value;
 
@@ -301,7 +302,7 @@ int CheMPS2::CASPT2::vector_helper(){
         Type C : c_atuv E_at E_uv | 0 >
                  c_atuv = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + count_tuv + size_C[ irrep ] * count_a ]
 
-        1/ (TYPE A) count_i = 0 .. NOCC[  irrep ]
+        1/ (TYPE A) count_i = 0 .. NOCC[ irrep ]
            (TYPE C) count_a = 0 .. NVIRT[ irrep ]
         2/ jump_tuv = 0
            irrep_t = 0 .. num_irreps
@@ -323,8 +324,8 @@ int CheMPS2::CASPT2::vector_helper(){
       }
       size_A[ irrep ] = linsize_AC;
       size_C[ irrep ] = linsize_AC;
-      helper[ irrep + num_irreps * CHEMPS2_CASPT2_A ] = indices->getNOCC(  irrep ) * size_A[ irrep ];
-      helper[ irrep + num_irreps * CHEMPS2_CASPT2_C ] = indices->getNVIRT( irrep ) * size_C[ irrep ];
+      helper[ irrep + num_irreps * CHEMPS2_CASPT2_A ] = size_A[ irrep ] * indices->getNOCC( irrep );
+      helper[ irrep + num_irreps * CHEMPS2_CASPT2_C ] = size_C[ irrep ] * indices->getNVIRT( irrep );
    }
 
    /*** Type D1 : c1_aitu E_ai E_tu | 0 >
@@ -360,7 +361,7 @@ int CheMPS2::CASPT2::vector_helper(){
       int jump_ai = 0;
       for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
          const int irrep_a = Irreps::directProd( irrep_i, irrep );
-         const int nocc_i  = indices->getNOCC(  irrep_i );
+         const int nocc_i  = indices->getNOCC( irrep_i );
          const int nvirt_a = indices->getNVIRT( irrep_a );
          jump_ai += nocc_i * nvirt_a;
       }
@@ -418,7 +419,7 @@ int CheMPS2::CASPT2::vector_helper(){
                     ---> count_tu = jump_tu + t + NDMRG[ irrep_t ] * u
                     jump_tu += NDMRG[ irrep_t ] * NDMRG[ irrep_u ]
    */
-   
+
    size_B_singlet = new int[ num_irreps ];
    size_B_triplet = new int[ num_irreps ];
    size_F_singlet = new int[ num_irreps ];
@@ -429,8 +430,8 @@ int CheMPS2::CASPT2::vector_helper(){
       if ( irrep == 0 ){
          for ( int irrep_tu = 0; irrep_tu < num_irreps; irrep_tu++ ){ // irrep_u == irrep_t
             const int nact_tu = indices->getNDMRG( irrep_tu );
-            jump_tu_singlet += ( nact_tu * ( nact_tu + 1 ) ) / 2;
-            jump_tu_triplet += ( nact_tu * ( nact_tu - 1 ) ) / 2;
+            jump_tu_singlet += ( nact_tu * ( nact_tu + 1 )) / 2;
+            jump_tu_triplet += ( nact_tu * ( nact_tu - 1 )) / 2;
          }
       } else {
          for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
@@ -447,7 +448,7 @@ int CheMPS2::CASPT2::vector_helper(){
       size_B_triplet[ irrep ] = jump_tu_triplet;
       size_F_singlet[ irrep ] = jump_tu_singlet;
       size_F_triplet[ irrep ] = jump_tu_triplet;
-   
+
       int linsize_B_singlet = 0;
       int linsize_B_triplet = 0;
       int linsize_F_singlet = 0;
@@ -481,7 +482,7 @@ int CheMPS2::CASPT2::vector_helper(){
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] = linsize_F_singlet * size_F_singlet[ irrep ];
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] = linsize_F_triplet * size_F_triplet[ irrep ];
    }
-   
+
    /*** Type E singlet : c_tiaj ( E_ti E_aj + E_tj E_ai ) | 0 > with i <= j
                          c_tiaj = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + count_t + size_E[ irrep ] * count_aij ]
         Type E triplet : c_tiaj ( E_ti E_aj - E_tj E_ai ) | 0 > with i <  j
@@ -504,7 +505,7 @@ int CheMPS2::CASPT2::vector_helper(){
                           jump_aij += NVIRT[ irrep_a ] * NOCC[ irrep_i ] * NOCC[ irrep_j ]
         2/ count_t = 0 .. NDMRG[ irrep ]
    */
-   
+
    size_E = new int[ num_irreps ];
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       size_E[ irrep ] = indices->getNDMRG( irrep );
@@ -516,8 +517,8 @@ int CheMPS2::CASPT2::vector_helper(){
          if ( irrep_occ == 0 ){ // irrep_i == irrep_j
             for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
                const int nocc_ij = indices->getNOCC( irrep_ij );
-               linsize_E_singlet += ( nvirt_a * nocc_ij * ( nocc_ij + 1 ))/2;
-               linsize_E_triplet += ( nvirt_a * nocc_ij * ( nocc_ij - 1 ))/2;
+               linsize_E_singlet += ( nvirt_a * nocc_ij * ( nocc_ij + 1 )) / 2;
+               linsize_E_triplet += ( nvirt_a * nocc_ij * ( nocc_ij - 1 )) / 2;
             }
          } else { // irrep_i < irrep_j = irrep_i x irrep_occ
             for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
@@ -534,7 +535,7 @@ int CheMPS2::CASPT2::vector_helper(){
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] = linsize_E_singlet * size_E[ irrep ];
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] = linsize_E_triplet * size_E[ irrep ];
    }
-   
+
    /*** Type G singlet : c_aibt ( E_ai E_bt + E_bi E_at ) | 0 > with a <= b
                          c_aibt = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + count_t + size_G[ irrep ] * count_abi ]
         Type G triplet : c_aibt ( E_ai E_bt - E_bi E_at ) | 0 > with a <  b
@@ -557,7 +558,7 @@ int CheMPS2::CASPT2::vector_helper(){
                           jump_abi += NOCC[ irrep_i ] * NVIRT[ irrep_a ] * NVIRT[ irrep_b ]
         2/ count_t = 0 .. NDMRG[ irrep ]
    */
-   
+
    size_G = new int[ num_irreps ];
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       size_G[ irrep ] = indices->getNDMRG( irrep );
@@ -569,8 +570,8 @@ int CheMPS2::CASPT2::vector_helper(){
          if ( irrep_virt == 0 ){ // irrep_a == irrep_b
             for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
                const int nvirt_ab = indices->getNVIRT( irrep_ab );
-               linsize_G_singlet += ( nocc_i * nvirt_ab * ( nvirt_ab + 1 ))/2;
-               linsize_G_triplet += ( nocc_i * nvirt_ab * ( nvirt_ab - 1 ))/2;
+               linsize_G_singlet += ( nocc_i * nvirt_ab * ( nvirt_ab + 1 )) / 2;
+               linsize_G_triplet += ( nocc_i * nvirt_ab * ( nvirt_ab - 1 )) / 2;
             }
          } else { // irrep_a < irrep_b = irrep_a x irrep_virt
             for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
@@ -587,7 +588,7 @@ int CheMPS2::CASPT2::vector_helper(){
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] = linsize_G_singlet * size_G[ irrep ];
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] = linsize_G_triplet * size_G[ irrep ];
    }
-   
+
    /*** Type H singlet : c_aibj ( E_ai E_bj + E_bi E_aj ) | 0 > with a <= b and i <= j
                          c_aibj = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + count_aibj ]
         Type H triplet : c_aibj ( E_ai E_bj - E_bi E_aj ) | 0 > with a <  b and i <  j
@@ -616,7 +617,7 @@ int CheMPS2::CASPT2::vector_helper(){
                              ---> count_aibj = jump_aibj + i + NOCC[ irrep_i ] * ( j + NOCC[ irrep_j ] * ( a + NVIRT[ irrep_a ] * b ) )
                              jump_aibj += NOCC[ irrep_i ] * NOCC[ irrep_j ] * NVIRT[ irrep_a ] * NVIRT[ irrep_b ]
    */
-   
+
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       int linsize_H_singlet = 0;
       int linsize_H_triplet = 0;
@@ -649,89 +650,62 @@ int CheMPS2::CASPT2::vector_helper(){
             if ( irrep_a < irrep_b ){ linsize_ab += indices->getNVIRT( irrep_a ) * indices->getNVIRT( irrep_b ); }
          }
          linsize_H_singlet = linsize_ij * linsize_ab;
-         linsize_H_triplet = linsize_H_singlet;
+         linsize_H_triplet = linsize_ij * linsize_ab;
       }
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] = linsize_H_singlet;
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] = linsize_H_triplet;
    }
-   
+
    jump = new int[ CHEMPS2_CASPT2_NUM_CASES * num_irreps + 1 ];
    jump[ 0 ] = 0;
    for ( int cnt = 0; cnt < CHEMPS2_CASPT2_NUM_CASES * num_irreps; cnt++ ){ jump[ cnt+1 ] = jump[ cnt ] + helper[ cnt ]; }
    delete [] helper;
-   
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   cout << "CASPT2::vector_helper : Total size of the V_SD space = " << total_size << endl;
-   
-   const long long check = initial_total_vector_length();
-   assert( check == total_size );
-
+   assert( total_size == debug_total_length() );
+   cout << "CASPT2::vector_helper : Original size of the V_SD space = " << total_size << endl;
    return total_size;
 
 }
 
-/*void CheMPS2::CASPT2::print_info() const{
-
-   cout << "Vector spaces:" << endl;
-   cout << "   Start A :         " << jump[ num_irreps * CHEMPS2_CASPT2_A ] << endl;
-   cout << "   Start B singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] << endl;
-   cout << "   Start B triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] << endl;
-   cout << "   Start C :         " << jump[ num_irreps * CHEMPS2_CASPT2_C ] << endl;
-   cout << "   Start D :         " << jump[ num_irreps * CHEMPS2_CASPT2_D ] << endl;
-   cout << "   Start E singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_E_SINGLET ] << endl;
-   cout << "   Start E triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] << endl;
-   cout << "   Start F singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] << endl;
-   cout << "   Start F triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] << endl;
-   cout << "   Start G singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_G_SINGLET ] << endl;
-   cout << "   Start G triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] << endl;
-   cout << "   Start H singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] << endl;
-   cout << "   Start H triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] << endl;
-   cout << "   End :             " << jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] << endl;
-   
-   cout << "Vector spaces:" << endl;
-   cout << "   Size A :         " << jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_A ] << endl;
-   cout << "   Size B singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] << endl;
-   cout << "   Size B triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_C ]         - jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] << endl;
-   cout << "   Size C :         " << jump[ num_irreps * CHEMPS2_CASPT2_D ]         - jump[ num_irreps * CHEMPS2_CASPT2_C ] << endl;
-   cout << "   Size D :         " << jump[ num_irreps * CHEMPS2_CASPT2_E_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_D ] << endl;
-   cout << "   Size E singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_E_SINGLET ] << endl;
-   cout << "   Size E triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] << endl;
-   cout << "   Size F singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] << endl;
-   cout << "   Size F triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_G_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] << endl;
-   cout << "   Size G singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_G_SINGLET ] << endl;
-   cout << "   Size G triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] << endl;
-   cout << "   Size H singlet : " << jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] << endl;
-   cout << "   Size H triplet : " << jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] - jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] << endl;
-
-}*/
-
-long long CheMPS2::CASPT2::initial_total_vector_length() const{
+long long CheMPS2::CASPT2::debug_total_length() const{
 
    long long length = 0;
    for ( int i1 = 0; i1 < num_irreps; i1++ ){
+      const long long nocc1 = indices->getNOCC( i1 );
+      const long long nact1 = indices->getNDMRG( i1 );
+      const long long nvir1 = indices->getNVIRT( i1 );
       for ( int i2 = 0; i2 < num_irreps; i2++ ){
+         const long long nocc2 = indices->getNOCC( i2 );
+         const long long nact2 = indices->getNDMRG( i2 );
+         const long long nvir2 = indices->getNVIRT( i2 );
          for ( int i3 = 0; i3 < num_irreps; i3++ ){
             const int i4 = Irreps::directProd( Irreps::directProd( i1, i2 ), i3 );
-            length +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNDMRG( i4 ); // A:  E_ti E_uv | 0 >
-            length +=     indices->getNDMRG( i1 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // C:  E_at E_uv | 0 >
-            length += 2 * indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // D:  E_ai E_tu | 0 >  and  E_ti E_au | 0 >
-            length +=     indices->getNOCC( i1 )  * indices->getNOCC( i2 )  * indices->getNDMRG( i3 ) * indices->getNVIRT( i4 ); // E:  E_ti E_aj | 0 >
-            length +=     indices->getNOCC( i1 )  * indices->getNDMRG( i2 ) * indices->getNVIRT( i3 ) * indices->getNVIRT( i4 ); // G:  E_ai E_bt | 0 >
-            if ( i2 < i4 ){
-               // 2 < 4 and irrep_2 < irrep_4
-               length += indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // B:  E_ti E_uj | 0 >
-               length += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * indices->getNOCC( i4 );  // H:  E_ai E_bj | 0 >
-               length += indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * indices->getNDMRG( i4 ); // F:  E_at E_bu | 0 >
+            const long long nocc3 = indices->getNOCC( i3 );
+            const long long nact3 = indices->getNDMRG( i3 );
+            const long long nvir3 = indices->getNVIRT( i3 );
+            const long long nocc4 = indices->getNOCC( i4 );
+            const long long nact4 = indices->getNDMRG( i4 );
+            const long long nvir4 = indices->getNVIRT( i4 );
+
+            length +=     nocc1 * nact2 * nact3 * nact4; // A:  E_ti E_uv | 0 >
+            length +=     nact1 * nact2 * nact3 * nvir4; // C:  E_at E_uv | 0 >
+            length += 2 * nocc1 * nact2 * nact3 * nvir4; // D:  E_ai E_tu | 0 >  and  E_ti E_au | 0 >
+            length +=     nocc1 * nocc2 * nact3 * nvir4; // E:  E_ti E_aj | 0 >
+            length +=     nocc1 * nact2 * nvir3 * nvir4; // G:  E_ai E_bt | 0 >
+            if ( i2 < i4 ){ // 2 < 4 and irrep_2 < irrep_4
+               length += nact1 * nact3 * nocc2 * nocc4;  // B:  E_ti E_uj | 0 >
+               length += nvir1 * nvir3 * nact2 * nact4;  // F:  E_at E_bu | 0 >
+               length += nvir1 * nvir3 * nocc2 * nocc4;  // H:  E_ai E_bj | 0 >
             }
             if ( i2 == i4 ){ // i2 == i4 implies i1 == i3
                // 2 < 4 and irrep_2 == irrep_4
-               length += ( indices->getNDMRG( i1 ) * indices->getNDMRG( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // B:  E_ti E_uj | 0 >
-               length += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNOCC( i2 )  * ( indices->getNOCC( i2 )  - 1 ) ) / 2; // H:  E_ai E_bj | 0 >
-               length += ( indices->getNVIRT( i1 ) * indices->getNVIRT( i3 ) * indices->getNDMRG( i2 ) * ( indices->getNDMRG( i2 ) - 1 ) ) / 2; // F:  E_at E_bu | 0 >
+               length += ( nact1 * nact3 * nocc2 * ( nocc2 - 1 ) ) / 2; // B:  E_ti E_uj | 0 >
+               length += ( nvir1 * nvir3 * nact2 * ( nact2 - 1 ) ) / 2; // F:  E_at E_bu | 0 >
+               length += ( nvir1 * nvir3 * nocc2 * ( nocc2 - 1 ) ) / 2; // H:  E_ai E_bj | 0 >
                // 2 == 4 and 1 <= 3
-               length += ( indices->getNDMRG( i1 ) * ( indices->getNDMRG( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // B:  E_ti E_uj | 0 >
-               length += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNDMRG( i2 ) ) / 2; // F:  E_at E_bu | 0 >
-               length += ( indices->getNVIRT( i1 ) * ( indices->getNVIRT( i3 ) + 1 ) * indices->getNOCC( i2 )  ) / 2; // H:  E_ai E_bj | 0 >
+               length += ( nact1 * ( nact3 + 1 ) * nocc2 ) / 2; // B:  E_ti E_uj | 0 >
+               length += ( nvir1 * ( nvir3 + 1 ) * nact2 ) / 2; // F:  E_at E_bu | 0 >
+               length += ( nvir1 * ( nvir3 + 1 ) * nocc2 ) / 2; // H:  E_ai E_bj | 0 >
             }
          }
       }
@@ -799,11 +773,10 @@ void CheMPS2::CASPT2::recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, 
 
 void CheMPS2::CASPT2::recreate(){
 
-   int maxsize = get_maxsize();
-   if ( maxsize <= 2 ){ maxsize = 3; }
+   const int maxsize = get_maxsize(); // Minimum 3
    const int lwork = maxsize * maxsize;
-   double * work   = new double[ lwork ];
-   double * eigs   = new double[ maxsize ];
+   double * work = new double[ lwork ];
+   double * eigs = new double[ maxsize ];
 
    int * newsize_A = new int[ num_irreps ];
    int * newsize_C = new int[ num_irreps ];
@@ -829,107 +802,102 @@ void CheMPS2::CASPT2::recreate(){
 
    delete [] work;
    delete [] eigs;
+
    double * tempvector_rhs = new double[ jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] ];
    int * helper = new int[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ];
-   for ( int cnt = 0; cnt < num_irreps * CHEMPS2_CASPT2_NUM_CASES; cnt++ ){ helper[ cnt ] = 0.0; }
+   for ( int ptr = 0; ptr < num_irreps * CHEMPS2_CASPT2_NUM_CASES; ptr++ ){ helper[ ptr ] = 0; }
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
       if ( newsize_A[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_A;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_A[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_A;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_A[ irrep ];
          assert( num_rhs * size_A[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_A[ irrep ];
          recreatehelper2( SAA[ irrep ], size_A[ irrep ], newsize_A[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_B_singlet[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_B_singlet[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_B_singlet[ irrep ];
          assert( num_rhs * size_B_singlet[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_B_singlet[ irrep ];
          recreatehelper2( SBB_singlet[ irrep ], size_B_singlet[ irrep ], newsize_B_singlet[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_B_triplet[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_B_triplet[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_B_triplet[ irrep ];
          assert( num_rhs * size_B_triplet[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_B_triplet[ irrep ];
          recreatehelper2( SBB_triplet[ irrep ], size_B_triplet[ irrep ], newsize_B_triplet[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_C[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_C;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_C[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_C;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_C[ irrep ];
          assert( num_rhs * size_C[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_C[ irrep ];
          recreatehelper2( SCC[ irrep ], size_C[ irrep ], newsize_C[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_D[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_D;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_D[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_D;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_D[ irrep ];
          assert( num_rhs * size_D[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_D[ irrep ];
          recreatehelper2( SDD[ irrep ], size_D[ irrep ], newsize_D[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_E[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_E[ irrep ];
-         assert( num_rhs * size_E[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
-         helper[ ptr ] = num_rhs * newsize_E[ irrep ];
-         recreatehelper2( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
-      }
-
-      if ( newsize_E[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_E[ irrep ];
-         assert( num_rhs * size_E[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
-         helper[ ptr ] = num_rhs * newsize_E[ irrep ];
-         recreatehelper2( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
+         const int ptr1 = irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET;
+         const int num_rhs1 = ( jump[ ptr1 + 1 ] - jump[ ptr1 ] ) / size_E[ irrep ];
+         assert( num_rhs1 * size_E[ irrep ] == jump[ ptr1 + 1 ] - jump[ ptr1 ] );
+         helper[ ptr1 ] = num_rhs1 * newsize_E[ irrep ];
+         recreatehelper2( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], vector_rhs + jump[ ptr1 ], tempvector_rhs + jump[ ptr1 ], num_rhs1 );
+         const int ptr2 = irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET;
+         const int num_rhs2 = ( jump[ ptr2 + 1 ] - jump[ ptr2 ] ) / size_E[ irrep ];
+         assert( num_rhs2 * size_E[ irrep ] == jump[ ptr2 + 1 ] - jump[ ptr2 ] );
+         helper[ ptr2 ] = num_rhs2 * newsize_E[ irrep ];
+         recreatehelper2( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], vector_rhs + jump[ ptr2 ], tempvector_rhs + jump[ ptr2 ], num_rhs2 );
       }
 
       if ( newsize_F_singlet[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_F_singlet[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_F_singlet[ irrep ];
          assert( num_rhs * size_F_singlet[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_F_singlet[ irrep ];
          recreatehelper2( SFF_singlet[ irrep ], size_F_singlet[ irrep ], newsize_F_singlet[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_F_triplet[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_F_triplet[ irrep ];
+         const int ptr = irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET;
+         const int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_F_triplet[ irrep ];
          assert( num_rhs * size_F_triplet[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
          helper[ ptr ] = num_rhs * newsize_F_triplet[ irrep ];
          recreatehelper2( SFF_triplet[ irrep ], size_F_triplet[ irrep ], newsize_F_triplet[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
       }
 
       if ( newsize_G[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_G[ irrep ];
-         assert( num_rhs * size_G[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
-         helper[ ptr ] = num_rhs * newsize_G[ irrep ];
-         recreatehelper2( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
+         const int ptr1 = irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET;
+         const int num_rhs1 = ( jump[ ptr1 + 1 ] - jump[ ptr1 ] ) / size_G[ irrep ];
+         assert( num_rhs1 * size_G[ irrep ] == jump[ ptr1 + 1 ] - jump[ ptr1 ] );
+         helper[ ptr1 ] = num_rhs1 * newsize_G[ irrep ];
+         recreatehelper2( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], vector_rhs + jump[ ptr1 ], tempvector_rhs + jump[ ptr1 ], num_rhs1 );
+         const int ptr2 = irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET;
+         const int num_rhs2 = ( jump[ ptr2 + 1 ] - jump[ ptr2 ] ) / size_G[ irrep ];
+         assert( num_rhs2 * size_G[ irrep ] == jump[ ptr2 + 1 ] - jump[ ptr2 ] );
+         helper[ ptr2 ] = num_rhs2 * newsize_G[ irrep ];
+         recreatehelper2( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], vector_rhs + jump[ ptr2 ], tempvector_rhs + jump[ ptr2 ], num_rhs2 );
       }
 
-      if ( newsize_G[ irrep ] > 0 ){
-         int ptr = irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET;
-         int num_rhs = ( jump[ ptr + 1 ] - jump[ ptr ] ) / size_G[ irrep ];
-         assert( num_rhs * size_G[ irrep ] == jump[ ptr + 1 ] - jump[ ptr ] );
-         helper[ ptr ] = num_rhs * newsize_G[ irrep ];
-         recreatehelper2( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], vector_rhs + jump[ ptr ], tempvector_rhs + jump[ ptr ], num_rhs );
-      }
-
-      int ptr = irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET;
-      helper[ ptr ] = jump[ ptr + 1 ] - jump[ ptr ];
+      const int ptr1 = irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET;
+      helper[ ptr1 ] = jump[ ptr1 + 1 ] - jump[ ptr1 ];
       int inc1 = 1;
-      dcopy_( helper + ptr, vector_rhs + jump[ ptr ], &inc1, tempvector_rhs + jump[ ptr ], &inc1 );
-      ptr = irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET;
-      helper[ ptr ] = jump[ ptr + 1 ] - jump[ ptr ];
-      dcopy_( helper + ptr, vector_rhs + jump[ ptr ], &inc1, tempvector_rhs + jump[ ptr ], &inc1 );
+      dcopy_( helper + ptr1, vector_rhs + jump[ ptr1 ], &inc1, tempvector_rhs + jump[ ptr1 ], &inc1 );
+      const int ptr2 = irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET;
+      helper[ ptr2 ] = jump[ ptr2 + 1 ] - jump[ ptr2 ];
+      dcopy_( helper + ptr2, vector_rhs + jump[ ptr2 ], &inc1, tempvector_rhs + jump[ ptr2 ], &inc1 );
 
    }
 
@@ -958,7 +926,7 @@ void CheMPS2::CASPT2::recreate(){
    delete [] helper;
    delete [] jump;
    jump = newjump;
-   
+
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       delete [] SAA[ irrep ];
       delete [] SCC[ irrep ];
@@ -979,9 +947,9 @@ void CheMPS2::CASPT2::recreate(){
    delete [] SBB_triplet;
    delete [] SFF_singlet;
    delete [] SFF_triplet;
-   
+
    const int total_size = jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ];
-   cout << "CASPT2::recreate :      Total size of the V_SD space = " << total_size << endl;
+   cout << "CASPT2::recreate :  Nonredundant size of the V_SD space = " << total_size << endl;
 
 }
 
@@ -1000,6 +968,7 @@ int CheMPS2::CASPT2::get_maxsize() const{
                                                              size_F_triplet[irrep] ),
                                                              maxsize );
    }
+   if ( maxsize <= 2 ){ maxsize = 3; }
    return maxsize;
 
 }
@@ -1007,9 +976,9 @@ int CheMPS2::CASPT2::get_maxsize() const{
 void CheMPS2::CASPT2::blockdiaghelper_dgemv( double alpha, double beta, int SIZE, double * matrix, double * origin, double * target ){
 
    // target = alpha * matrix * origin
-   char notrans  = 'N';
-   int inc1      = 1;
-   double set    = 0.0;
+   char notrans = 'N';
+   int inc1 = 1;
+   double set = 0.0;
    dgemv_( &notrans, &SIZE, &SIZE, &alpha, matrix, &SIZE, origin, &inc1, &set, target, &inc1 );
 
    // target += beta * origin
@@ -1020,11 +989,11 @@ void CheMPS2::CASPT2::blockdiaghelper_dgemv( double alpha, double beta, int SIZE
 void CheMPS2::CASPT2::blockdiaghelper_dsyev( int SIZE, double * matrix, double * vecs, double * work, double * eigs, int lwork ){
 
    // vecs = matrix = V * lambda * V^T
-   int inc1   = 1;
+   int inc1 = 1;
    int length = SIZE * SIZE;
    dcopy_( &length, matrix, &inc1, vecs, &inc1 );
 
-   // vecs = V  and  eigs = lambda
+   // vecs = V   and   eigs = lambda
    char jobz = 'V';
    char uplo = 'U';
    int info;
@@ -1036,7 +1005,7 @@ void CheMPS2::CASPT2::blockdiaghelper_inverse( double alpha, double beta, int SI
 
    // work = V^T * origin
    char trans = 'T';
-   int inc1   = 1;
+   int inc1 = 1;
    double one = 1.0;
    double set = 0.0;
    dgemv_( &trans, &SIZE, &SIZE, &one, vecs, &SIZE, origin, &inc1, &set, work, &inc1 );
@@ -1077,15 +1046,14 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
    double * eigs = NULL;
    int lwork = 0;
    if ( INVERSE ){
-      int maxsize = get_maxsize();
-      if ( maxsize <= 2 ){ maxsize = 3; }
+      const int maxsize = get_maxsize(); // Minimum 3
       lwork = maxsize * maxsize;
       vecs = new double[ lwork ];
       work = new double[ lwork ];
       eigs = new double[ maxsize ];
    }
 
-   const double shifted_prefactor = ovlp_prefactor + 2 * fock_prefactor * sum_f_kk();
+   const double shifted_prefactor = ovlp_prefactor + 2 * fock_prefactor * sum_f_kk;
    double min_eig = 1e18;
 
    double timings[ CHEMPS2_CASPT2_NUM_CASES ];
@@ -1104,9 +1072,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const double alpha2 = shifted_prefactor - fock_prefactor * fock->get( irrep, count, count );
             double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
-            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FAA[ irrep ],     origin, target ); }
+            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                   blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+            else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FAA[ irrep ],     origin, target ); }
          }
       }
    }
@@ -1126,9 +1094,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const double alpha2 = shifted_prefactor + fock_prefactor * fock->get( irrep, N_OA + count, N_OA + count );
             double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
-            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-            if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-            else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FCC[ irrep ],     origin, target ); }
+            if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                   blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+            else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FCC[ irrep ],     origin, target ); }
          }
       }
    }
@@ -1154,9 +1122,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const int count = jump_ai + i + NOCC_i * a;
                   double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
                   double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
-                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                  if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                  else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FDD[ irrep ],     origin, target ); }
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                         blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                  else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FDD[ irrep ],     origin, target ); }
                }
             }
             jump_ai += NOCC_i * NVIR_a;
@@ -1181,11 +1149,11 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const double alpha1 = 2 * ij_factor * fock_prefactor;
                   const double alpha2 = 2 * ij_factor * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_ij, i, i ) + fock->get( irrep_ij, j, j ) ) );
                   const int count = jump_ij + i + ( j * ( j + 1 ) ) / 2;
-                  double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
-                  double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
-                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                  if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                  else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ 0 ], origin, target ); }
+                  double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                         blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                  else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ 0 ], origin, target ); }
                }
             }
             jump_ij += ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
@@ -1209,9 +1177,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ij + i + nocc_i * j;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
-                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                     if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
-                     else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ irrep ], origin, target ); }
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                            blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
+                     else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_singlet[ irrep ], origin, target ); }
                   }
                }
                jump_ij += nocc_i * nocc_j;
@@ -1236,11 +1204,11 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const double alpha1 = 2 * fock_prefactor;
                   const double alpha2 = 2 * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_ij, i, i ) + fock->get( irrep_ij, j, j ) ) );
                   const int count = jump_ij + i + ( j * ( j - 1 ) ) / 2;
-                  double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
-                  double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
-                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                  if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                  else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ 0 ], origin, target ); }
+                  double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                         blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                  else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ 0 ], origin, target ); }
                }
             }
             jump_ij += ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
@@ -1264,9 +1232,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ij + i + nocc_i * j;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
-                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                     if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
-                     else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ irrep ], origin, target ); }
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                            blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
+                     else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FBB_triplet[ irrep ], origin, target ); }
                   }
                }
                jump_ij += nocc_i * nocc_j;
@@ -1294,11 +1262,11 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const double alpha2 = 2 * ab_factor * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a )
                                                                                                + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b ) ) );
                   const int count = jump_ab + a + ( b * ( b + 1 ) ) / 2;
-                  double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                  double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                  if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                  else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ 0 ], origin, target ); }
+                  double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                         blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                  else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ 0 ], origin, target ); }
                }
             }
             jump_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
@@ -1325,9 +1293,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ab + a + NVIR_a * b;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                     if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
-                     else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ irrep ], origin, target ); }
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                            blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
+                     else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_singlet[ irrep ], origin, target ); }
                   }
                }
                jump_ab += NVIR_a * NVIR_b;
@@ -1354,11 +1322,11 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                   const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a )
                                                                                    + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b ) ) );
                   const int count = jump_ab + a + ( b * ( b - 1 ) ) / 2;
-                  double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                  double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                  if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                  else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ 0 ], origin, target ); }
+                  double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                  if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                         blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                  else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ 0 ], origin, target ); }
                }
             }
             jump_ab += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
@@ -1385,9 +1353,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                      const int count = jump_ab + a + NVIR_a * b;
                      double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                     if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
-                     else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ irrep ], origin, target ); }
+                     if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                            blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs,     origin, target ); }
+                     else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FFF_triplet[ irrep ], origin, target ); }
                   }
                }
                jump_ab += NVIR_a * NVIR_b;
@@ -1425,9 +1393,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                                         - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1446,9 +1414,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1488,9 +1456,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1509,9 +1477,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_j,          j,          j ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FEE[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1552,9 +1520,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                                         - fock->get( irrep_i,           i,           i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1575,9 +1543,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,          i,          i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1617,9 +1585,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,           i,           i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1640,9 +1608,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                                                                                             - fock->get( irrep_i,          i,          i ) ) );
                            double * origin = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 ); }
-                           if ( INVERSE ){ blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
-                           else {          blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
+                           if ( INVERSE ){ min_eig = min( min_eig, alpha1 * eigs[ 0 ] + alpha2 );
+                                  blockdiaghelper_inverse( alpha1, alpha2, SIZE, vecs, work, eigs, origin, target ); }
+                           else { blockdiaghelper_dgemv(   alpha1, alpha2, SIZE, FGG[ irrep ],     origin, target ); }
                         }
                      }
                   }
@@ -1673,8 +1641,8 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             const int size_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-            double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
-            double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
+            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
+            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
             for ( int a = 0; a < NVIR_ab; a++ ){
                const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a; b < NVIR_ab; b++ ){
@@ -1688,9 +1656,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                         const int ij_factor = (( i == j ) ? 2 : 1 );
                         const double f_jj = fock->get( irrep_ij, j, j );
                         const double alpha = 4 * ij_factor * ab_factor * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                        if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
-                        if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
-                        else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
+                        if ( INVERSE ){ min_eig = min( min_eig, alpha );
+                               target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
+                        else { target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                      }
                   }
                }
@@ -1728,9 +1696,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
                               const double alpha = 4 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                              if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
-                              if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
-                              else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
+                              if ( INVERSE ){ min_eig = min( min_eig, alpha );
+                                     target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
+                              else { target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                            }
                         }
                      }
@@ -1755,8 +1723,8 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             const int size_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-            double * origin = vector + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
-            double * target = result + jump[ 0 + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
+            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
+            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
             for ( int a = 0; a < NVIR_ab; a++ ){
                const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a+1; b < NVIR_ab; b++ ){
@@ -1768,9 +1736,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                         const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
                         const double f_jj = fock->get( irrep_ij, j, j );
                         const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                        if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
-                        if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
-                        else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
+                        if ( INVERSE ){ min_eig = min( min_eig, alpha );
+                               target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
+                        else { target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                      }
                   }
                }
@@ -1808,9 +1776,9 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
                               const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                              if ( INVERSE ){ min_eig = min( min_eig, alpha ); }
-                              if ( INVERSE ){ target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
-                              else {          target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
+                              if ( INVERSE ){ min_eig = min( min_eig, alpha );
+                                     target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] / alpha; }
+                              else { target[ cnt_ij + size_ij * cnt_ab ] = origin[ cnt_ij + size_ij * cnt_ab ] * alpha; }
                            }
                         }
                      }
@@ -1826,10 +1794,11 @@ void CheMPS2::CASPT2::blockdiag( double * vector, double * result, const double 
 
    double total = 0.0;
    for ( int cnt = 0; cnt < CHEMPS2_CASPT2_NUM_CASES; cnt++ ){ total += timings[ cnt ]; }
-   if ( INVERSE ){ cout << "CASPT2::blockdiag : Minimum eig [ blockdiag(F) - E ] = " << min_eig << endl; }
-   if ( INVERSE ){ cout << "CASPT2::blockdiag : Applying inv[ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
-   else {          cout << "CASPT2::blockdiag : Application [ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
-   /*cout << "      A         : " << timings[ CHEMPS2_CASPT2_A         ] << endl;
+   if ( INVERSE ){
+          cout << "CASPT2::blockdiag : Minimum eig [ blockdiag(F) - E ] = " << min_eig << endl;
+          cout << "CASPT2::blockdiag : Applying inv[ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
+   else { cout << "CASPT2::blockdiag : Application [ blockdiag(F) - E ] : Wall time = " << total << " seconds" << endl; }
+ /*cout << "      A         : " << timings[ CHEMPS2_CASPT2_A         ] << endl;
    cout << "      B singlet : " << timings[ CHEMPS2_CASPT2_B_SINGLET ] << endl;
    cout << "      B triplet : " << timings[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
    cout << "      C         : " << timings[ CHEMPS2_CASPT2_C         ] << endl;
@@ -1849,7 +1818,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
    /*
       VA:  < H E_ti E_uv > = sum_w ( t_iw + sum_k [ 2 (iw|kk) - (ik|kw) ] ) [ 2 delta_tw Gamma_uv - Gamma_tuwv - delta_wu Gamma_tv ]
-                           + sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]
+                           + sum_xzy (ix|zy) SAA[ Ii ][ xyztuv ]
 
       VB:  < H E_ti E_uj >
            < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
@@ -1860,7 +1829,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
       VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] - sum_y (wy|ya) ) < E_wt E_uv >
                            + sum_wxy (xy|wa) < E_xy E_wt E_uv >
            < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] - sum_y (wy|ya) ) [ Gamma_wutv + delta_ut Gamma_wv ]
-                           + sum_zxy (zy|xa) SCC[ It x Iu x Iv ][ xyztuv ]
+                           + sum_zxy (zy|xa) SCC[ Ia ][ xyztuv ]
 
       VD1: < H E_ai E_tu > = ( t_ia + sum_k [ 2 (ia|kk) - (ik|ka) ] ) [ 2 Gamma_tu ]
                            + sum_xy [ (ia|yx) - 0.5 * (ix|ya) ] SD1D1[ It x Iu ][ xytu ]
@@ -1887,14 +1856,14 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                           = sum_{x<y}  [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
 
       VG:  < H E_ai E_bt >
-           < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]
-           < T_aibt | H > = sum_u [ (ai|bu) - (bi|au) ] * 3 * SGG[ It ][ ut ]
+           < S_aibt | H > = sum_w [ (ai|bw) + (bi|aw) ] * 1 * SGG[ It ][ wt ]
+           < T_aibt | H > = sum_w [ (ai|bw) - (bi|aw) ] * 3 * SGG[ It ][ wt ]
 
       VH:  < H E_ai E_bj >
            < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ]
            < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]
    */
-   
+
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    // First construct MAT[p,q] = ( t_pq + sum_k [ 2 (pq|kk) - (pk|kq) ] )
@@ -1916,8 +1885,8 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          }
       }
    }
-   
-   // First construct MAT2[p,q] = sum_y (py|yq)
+
+   // and MAT2[p,q] = sum_y (py|yq)
    DMRGSCFmatrix * MAT2 = new DMRGSCFmatrix( indices );
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NORB = indices->getNORB( irrep );
@@ -1939,7 +1908,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
    vector_rhs = new double[ jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] ];
 
-   int max_size = get_maxsize();
+   const int max_size = get_maxsize();
    double * workspace = new double[ max_size ];
 
    // VA
@@ -2012,7 +1981,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                      }
                   }
                }
-
                jump_xyz += num_x * num_y * num_z;
             }
          }
@@ -2020,21 +1988,20 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
          // Perform target[ tuv ] += sum_xzy (ix|zy) SAA[ It x Iu x Iv ][ xyztuv ]
          char notrans = 'N';
-         int int1 = 1;
-         double alpha = 1.0;
-         double beta = 1.0; //ADD
-         dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SAA[ irrep ], &jump_xyz, &beta, target, &int1 );
+         int inc1 = 1;
+         double one = 1.0;
+         dgemv_( &notrans, &jump_xyz, &jump_xyz, &one, SAA[ irrep ], &jump_xyz, workspace, &inc1, &one, target, &inc1 );
       }
       assert( NOCC * size_A[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_A ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] );
    }
 
    // VC
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int NOCC  = indices->getNOCC( irrep );
-      const int NVIR  = indices->getNVIRT( irrep );
-      const int NACT  = indices->getNDMRG( irrep );
-      const int N_OA  = NOCC + NACT;
-      const int d_w   = indices->getDMRGcumulative( irrep );
+      const int NOCC = indices->getNOCC( irrep );
+      const int NVIR = indices->getNVIRT( irrep );
+      const int NACT = indices->getNDMRG( irrep );
+      const int N_OA = NOCC + NACT;
+      const int d_w  = indices->getDMRGcumulative( irrep );
       for ( int count_a = 0; count_a < NVIR; count_a++ ){
 
          double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + size_C[ irrep ] * count_a;
@@ -2092,7 +2059,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                      }
                   }
                }
-
                jump_xyz += num_x * num_y * num_z;
             }
          }
@@ -2100,13 +2066,13 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
          // Perform target[ tuv ] += sum_zxy (zy|xa) SCC[ It x Iu x Iv ][ xyztuv ]
          char notrans = 'N';
-         int int1 = 1;
-         double alpha = 1.0;
-         double beta = 1.0; //ADD
-         dgemm_( &notrans, &notrans, &int1, &jump_xyz, &jump_xyz, &alpha, workspace, &int1, SCC[ irrep ], &jump_xyz, &beta, target, &int1 );
+         int inc1 = 1;
+         double one = 1.0;
+         dgemv_( &notrans, &jump_xyz, &jump_xyz, &one, SCC[ irrep ], &jump_xyz, workspace, &inc1, &one, target, &inc1 );
       }
       assert( NVIR * size_C[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_C ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] );
    }
+   delete MAT2;
 
    // VD1 and VD2
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
@@ -2174,7 +2140,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                         }
                      }
                   }
-
                   jump_xy += num_x * num_y;
                }
                jump_xy = 2 * jump_xy;
@@ -2182,20 +2147,16 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                // Perform target += workspace * SDD[ irrep ]
                char notrans = 'N';
-               int int1 = 1;
-               double alpha = 1.0;
-               double beta = 1.0; //ADD
-               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SDD[ irrep ], &jump_xy, &beta, target, &int1 );
-
+               int inc1 = 1;
+               double one = 1.0;
+               dgemv_( &notrans, &jump_xy, &jump_xy, &one, SDD[ irrep ], &jump_xy, workspace, &inc1, &one, target, &inc1 );
             }
          }
          jump_ai += NOCC_i * NVIR_a;
       }
       assert( jump_ai * size_D[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_D ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] );
    }
-
    delete MAT;
-   delete MAT2;
 
    // VB singlet and triplet
    { // First do irrep == Ii x Ij == Ix x Iy == It x Iu == 0
@@ -2225,17 +2186,16 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                // Perform target[ tu ] = sum_{x<=y} [ (ix|jy) + (iy|jx) ] SBB_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
                char notrans = 'N';
-               int int1 = 1;
+               int inc1 = 1;
                double alpha = 1.0;
-               double beta = 0.0; //SET
-               double * target = vector_rhs + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_B_singlet[ 0 ] * ( jump_ij + i + (j*(j+1))/2 );
-               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_singlet[ 0 ], &jump_xy, &beta, target, &int1 );
-
+               double set = 0.0;
+               double * target = vector_rhs + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_B_singlet[ 0 ] * ( jump_ij + i + (j*(j+1))/2 );
+               dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SBB_singlet[ 0 ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
             }
          }
          jump_ij += ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
       }
-      assert( jump_ij * size_B_singlet[ 0 ] == jump[ 1 + 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] - jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] );
+      assert( jump_ij * size_B_singlet[ 0 ] == jump[ 1 + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] );
 
       jump_ij = 0; // Then do TRIPLET
       for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
@@ -2263,20 +2223,18 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                // Perform target[ tu ] = sum_{x<y} [ (ix|jy) - (iy|jx) ] SBB_triplet[ It x Iu ][ xytu ]
                char notrans = 'N';
-               int int1 = 1;
+               int inc1 = 1;
                double alpha = 1.0;
-               double beta = 0.0; //SET
-               double * target = vector_rhs + jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_B_triplet[ 0 ] * ( jump_ij + i + (j*(j-1))/2 );
-               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_triplet[ 0 ], &jump_xy, &beta, target, &int1 );
-
+               double set = 0.0;
+               double * target = vector_rhs + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_B_triplet[ 0 ] * ( jump_ij + i + (j*(j-1))/2 );
+               dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SBB_triplet[ 0 ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
             }
          }
          jump_ij += ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
       }
-      assert( jump_ij * size_B_triplet[ 0 ] == jump[ 1 + 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ 0 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] );
+      assert( jump_ij * size_B_triplet[ 0 ] == jump[ 1 + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] );
    }
    for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-
       int jump_ij = 0;
       for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
          const int irrep_j = Irreps::directProd( irrep, irrep_i );
@@ -2312,12 +2270,12 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                   // Perform target[ tu ] = sum_{x<y} [ (ix|jy) + (iy|jx) ] SBB_singlet[ It x Iu ][ xytu ]
                   char notrans = 'N';
-                  int int1 = 1;
+                  int inc1 = 1;
                   double alpha = 1.0;
-                  double beta = 0.0; //SET
+                  double set = 0.0;
                   double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_B_singlet[ irrep ] * ( jump_ij + i + NOCC_i * j );
-                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
-                  
+                  dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SBB_singlet[ irrep ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
+
                   // Fill workspace[ xy ] with [ (ix|jy) - (iy|jx) ]
                   jump_xy = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
@@ -2344,8 +2302,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                   // Perform target[ tu ] = sum_{x<y} [ (ix|jy) - (iy|jx) ] SBB_triplet[ It x Iu ][ xytu ]
                   target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_B_triplet[ irrep ] * ( jump_ij + i + NOCC_i * j );
-                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
-
+                  dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SBB_triplet[ irrep ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
                }
             }
             jump_ij += NOCC_i * NOCC_j;
@@ -2384,17 +2341,16 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                // Perform target[ tu ] = sum_{x<=y} [ (ax|by) + (ay|bx) ] SFF_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
                char notrans = 'N';
-               int int1 = 1;
+               int inc1 = 1;
                double alpha = 1.0;
-               double beta = 0.0; //SET
+               double set = 0.0;
                double * target = vector_rhs + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + size_F_singlet[ 0 ] * ( jump_ab + a + (b*(b+1))/2 );
-               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_singlet[ 0 ], &jump_xy, &beta, target, &int1 );
-
+               dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SFF_singlet[ 0 ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
             }
          }
          jump_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
       }
-      assert( jump_ab * size_F_singlet[ 0 ] == jump[ 1 + 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] );
+      assert( jump_ab * size_F_singlet[ 0 ] == jump[ 1 + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] );
 
       jump_ab = 0; // Then do TRIPLET
       for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
@@ -2423,20 +2379,18 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                // Perform target[ tu ] = sum_{x<y} [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
                char notrans = 'N';
-               int int1 = 1;
+               int inc1 = 1;
                double alpha = 1.0;
-               double beta = 0.0; //SET
+               double set = 0.0;
                double * target = vector_rhs + jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + size_F_triplet[ 0 ] * ( jump_ab + a + (b*(b-1))/2 );
-               dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_triplet[ 0 ], &jump_xy, &beta, target, &int1 );
-
+               dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SFF_triplet[ 0 ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
             }
          }
          jump_ab += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
       }
-      assert( jump_ab * size_F_triplet[ 0 ] == jump[ 1 + 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ 0 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] );
+      assert( jump_ab * size_F_triplet[ 0 ] == jump[ 1 + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] );
    }
    for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-
       int jump_ab = 0;
       for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
          const int irrep_b = Irreps::directProd( irrep, irrep_a );
@@ -2474,12 +2428,12 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                   // Perform target[ tu ] = sum_{x<y} [ (ax|by) + (ay|bx) ] SFF_singlet[ It x Iu ][ xytu ]
                   char notrans = 'N';
-                  int int1 = 1;
+                  int inc1 = 1;
                   double alpha = 1.0;
-                  double beta = 0.0; //SET
+                  double set = 0.0;
                   double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + size_F_singlet[ irrep ] * ( jump_ab + a + NVIR_a * b );
-                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
-                  
+                  dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SFF_singlet[ irrep ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
+
                   // Fill workspace[ xy ] with [ (ax|by) - (ay|bx) ]
                   jump_xy = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
@@ -2506,8 +2460,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
                   // Perform target[ tu ] = sum_{x<y} [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
                   target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + size_F_triplet[ irrep ] * ( jump_ab + a + NVIR_a * b );
-                  dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
-
+                  dgemv_( &notrans, &jump_xy, &jump_xy, &alpha, SFF_triplet[ irrep ], &jump_xy, workspace, &inc1, &set, target, &inc1 );
                }
             }
             jump_ab += NVIR_a * NVIR_b;
@@ -2516,7 +2469,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
       assert( jump_ab * size_F_singlet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] );
       assert( jump_ab * size_F_triplet[ irrep ] == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] );
    }
-
    delete [] workspace;
 
    // VE singlet and triplet
@@ -2745,71 +2697,48 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
 }
 
-double CheMPS2::CASPT2::sum_f_kk() const{
-
-   double total = 0.0;
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int NOCC = indices->getNOCC( irrep );
-      for ( int orb = 0; orb < NOCC; orb++ ){
-         total += fock->get( irrep, orb, orb );
-      }
-   }
-   return total;
-
-}
-
 void CheMPS2::CASPT2::make_FAA_FCC(){
 
    /*
-      FAA: sum_cd f_cd < E_zy E_jx E_cd E_ti E_uv > = 0
-      
-           sum_kl f_kl < E_zy E_jx E_kl E_ti E_uv > = delta_ji ( 2 * ( sum_k f_kk ) - f_ij ) SAA[ Ii ][ xyztuv ]
-                                                      ( because in the occupied-occupied block the fock operator is diagonal! )
-           
-           sum_rs f_rs < E_zy E_jx E_rs E_ti E_uv > ( with rs active indices )
-           
-              = delta_ji [ - f_dot_4dm[ ztuyxv ]
-                           + 2 delta_tx f_dot_3dm[ zuyv ]
-                           - delta_uy f_dot_3dm[ ztvx ]
-                           - delta_ux f_dot_3dm[ ztyv ]
-                           - delta_ty f_dot_3dm[ zuxv ]
-                           + ( 2 delta_tx delta_uy - delta_ux delta_ty ) f_dot_2dm[ zv ]
-                           + sum_r SAA[ Ii ][ xyzruv ] f_rt
-                           + sum_r SAA[ Ii ][ xyztrv ] f_ru
-                           + sum_s SAA[ Ii ][ syztuv ] f_xs
-                           + sum_s SAA[ Ii ][ xsztuv ] f_ys
-                           - f_xt ( 2 * Gamma_{zuyv} + 2 * delta_yu Gamma_{zv} )
-                           - f_yu (   - Gamma_{ztvx} + 2 * delta_xt Gamma_{zv} )
-                           - f_yt (   - Gamma_{zuxv} -     delta_xu Gamma_{zv} )
-                           - f_xu (   - Gamma_{ztyv} -     delta_yt Gamma_{zv} )
-                         ]
-                         
-      FCC: sum_cd f_cd < E_zy E_xb E_cd E_at E_uv > = delta_ba f_ba SCC[ Ia ][ xyztuv ]
-                                                      ( because in the virtual-virtual block the fock operator is diagonal! )
-           
-           sum_kl f_kl < E_zy E_xb E_kl E_at E_uv > = delta_ba ( 2 sum_k f_kk ) SCC[ Ia ][ xyztuv ]
-           
-           sum_rs f_rs < E_zy E_xb E_rs E_at E_uv > ( with rs active indices )
-           
-              = delta_ba [ + f_dot_4dm[ zxuytv ]
-                           + delta_uy f_dot_3dm[ xztv ]
-                           + delta_xy f_dot_3dm[ zutv ]
-                           + delta_ut f_dot_3dm[ zxyv ]
-                           + delta_ut delta_xy f_dot_2dm[ zv ]
-                           + sum_s f_ys SCC[ Ia ] [ xsztuv ]
-                           + sum_r f_ru SCC[ Ia ] [ xyztrv ]
-                           - f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
-                           - f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
-                           - f_yu Gamma_{zxvt}
-                         ]
+      FAA: < E_zy E_jx ( f_pq E_pq ) E_ti E_uv > = delta_ji * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
+
+            FAA[ Ii ][ xyztuv ] = ( - f_dot_4dm[ ztuyxv ]
+                                    + 2 delta_tx f_dot_3dm[ zuyv ]
+                                    - delta_uy f_dot_3dm[ ztvx ]
+                                    - delta_ux f_dot_3dm[ ztyv ]
+                                    - delta_ty f_dot_3dm[ zuxv ]
+                                    + ( 2 delta_tx delta_uy - delta_ux delta_ty ) f_dot_2dm[ zv ]
+                                    + sum_r SAA[ Ii ][ xyzruv ] f_rt
+                                    + sum_r SAA[ Ii ][ xyztrv ] f_ru
+                                    + sum_s SAA[ Ii ][ syztuv ] f_xs
+                                    + sum_s SAA[ Ii ][ xsztuv ] f_ys
+                                    - f_xt ( 2 * Gamma_{zuyv} + 2 * delta_yu Gamma_{zv} )
+                                    - f_yu (   - Gamma_{ztvx} + 2 * delta_xt Gamma_{zv} )
+                                    - f_yt (   - Gamma_{zuxv} -     delta_xu Gamma_{zv} )
+                                    - f_xu (   - Gamma_{ztyv} -     delta_yt Gamma_{zv} )
+                                  )
+
+      FCC: < E_zy E_xb ( f_pq E_pq ) E_at E_uv > = delta_ba * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
+
+            FCC[ Ia ][ xyztuv ] = ( + f_dot_4dm[ zxuytv ]
+                                    + delta_uy f_dot_3dm[ xztv ]
+                                    + delta_xy f_dot_3dm[ zutv ]
+                                    + delta_ut f_dot_3dm[ zxyv ]
+                                    + delta_ut delta_xy f_dot_2dm[ zv ]
+                                    + sum_s f_ys SCC[ Ia ] [ xsztuv ]
+                                    + sum_r f_ru SCC[ Ia ] [ xyztrv ]
+                                    - f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
+                                    - f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
+                                    - f_yu Gamma_{zxvt}
+                                  )
 
    */
-   
+
    FAA = new double*[ num_irreps ];
    FCC = new double*[ num_irreps ];
-   
+
    const int LAS = indices->getDMRGcumulative( num_irreps );
-   
+
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
       assert( size_A[ irrep ] == size_C[ irrep ] ); // At construction
@@ -3189,7 +3118,7 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                         }
                      }
                   }
-                  
+
                   if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
 
                      // FAA: - delta_ux delta_ty f_dot_2dm[ zv ]
@@ -3292,39 +3221,39 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
 void CheMPS2::CASPT2::make_SAA_SCC(){
 
    /*
-      SAA: < E_zy E_jx E_ti E_uv >
-           = delta_ji ( 2 delta_tx Gamma_{zuyv}
-                      + 2 delta_tx delta_uy Gamma_{zv}
-                      - Gamma_{ztuyxv}
-                      - delta_uy Gamma_{tzxv}
-                      - delta_ty Gamma_{zuxv}
-                      - delta_ux Gamma_{ztyv}
-                      - delta_ux delta_ty Gamma_{zv} )
+      SAA: < E_zy E_jx E_ti E_uv > = delta_ji SAA[ Ii ][ xyztuv ]
 
-           with It x Ii x Iu x Iv = Iz x Iy x Ij x Ix = Itrivial
+            SAA[ Ii ][ xyztuv ] = ( + 2 delta_tx Gamma_{zuyv}
+                              + 2 delta_tx delta_uy Gamma_{zv}
+                              - Gamma_{ztuyxv}
+                              - delta_uy Gamma_{tzxv}
+                              - delta_ty Gamma_{zuxv}
+                              - delta_ux Gamma_{ztyv}
+                              - delta_ux delta_ty Gamma_{zv}
+                            )
 
-      SCC: < E_zy E_xb E_at E_uv >
-           = delta_ab ( Gamma_{zxuytv}
-                      + delta_uy Gamma_{xztv}
-                      + delta_xy Gamma_{zutv}
-                      + delta_ut Gamma_{zxyv}
-                      + delta_ut delta_xy Gamma_{zv} )
+      SCC: < E_zy E_xb E_at E_uv > = delta_ab SCC[ Ia ][ xyztuv ]
 
-           with It x Ii x Iu x Iv = Iz x Iy x Ij x Ix = Itrivial
+            SCC[ Ia ][ xyztuv ] = ( + Gamma_{zxuytv}
+                                    + delta_uy Gamma_{xztv}
+                                    + delta_xy Gamma_{zutv}
+                                    + delta_ut Gamma_{zxyv}
+                                    + delta_ut delta_xy Gamma_{zv}
+                                  )
    */
-   
+
    SAA = new double*[ num_irreps ];
    SCC = new double*[ num_irreps ];
-   
+
    const int LAS = indices->getDMRGcumulative( num_irreps );
-   
+
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
       assert( size_A[ irrep ] == size_C[ irrep ] ); // At construction
       const int SIZE = size_A[ irrep ];
       SAA[ irrep ] = new double[ SIZE * SIZE ];
       SCC[ irrep ] = new double[ SIZE * SIZE ];
-      
+
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int d_t   = indices->getDMRGcumulative( irrep_t );
@@ -3345,7 +3274,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                   const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
                   const int d_z     = indices->getDMRGcumulative( irrep_z );
                   const int num_z   = indices->getNDMRG( irrep_z );
-                  
+
                   for ( int t = 0; t < num_t; t++ ){ // SAA: - Gamma_{ztuyxv}
                      for ( int u = 0; u < num_u; u++ ){
                         for ( int v = 0; v < num_v; v++ ){
@@ -3360,7 +3289,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   for ( int t = 0; t < num_t; t++ ){ // SCC: + Gamma_{zxuytv}
                      for ( int u = 0; u < num_u; u++ ){
                         for ( int v = 0; v < num_v; v++ ){
@@ -3375,7 +3304,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_t == irrep_x ){ // SAA: + 2 delta_tx Gamma_{zuyv}
                      for ( int xt = 0; xt < num_t; xt++ ){
                         for ( int u = 0; u < num_u; u++ ){
@@ -3390,7 +3319,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_u == irrep_y ){ // SAA: - delta_uy Gamma_{tzxv}
                      for ( int uy = 0; uy < num_u; uy++ ){
                         for ( int t = 0; t < num_t; t++ ){
@@ -3405,7 +3334,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_t == irrep_y ){ // SAA: - delta_ty Gamma_{zuxv}
                      for ( int ty = 0; ty < num_t; ty++ ){
                         for ( int u = 0; u < num_u; u++ ){
@@ -3420,7 +3349,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_u == irrep_x ){ // SAA: - delta_ux Gamma_{ztyv}
                      for ( int ux = 0; ux < num_u; ux++ ){
                         for ( int t = 0; t < num_t; t++ ){
@@ -3435,7 +3364,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_u == irrep_y ){ // SCC: + delta_uy Gamma_{xztv}
                      for ( int uy = 0; uy < num_u; uy++ ){
                         for ( int t = 0; t < num_t; t++ ){
@@ -3450,7 +3379,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_x == irrep_y ){ // SCC: + delta_xy Gamma_{zutv}
                      for ( int xy = 0; xy < num_x; xy++ ){
                         for ( int t = 0; t < num_t; t++ ){
@@ -3465,7 +3394,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if ( irrep_u == irrep_t ){ // SCC: + delta_ut Gamma_{zxyv}
                      for ( int ut = 0; ut < num_u; ut++ ){
                         for ( int v = 0; v < num_v; v++ ){
@@ -3480,7 +3409,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){ // SAA: + 2 delta_tx delta_uy Gamma_{zv}
                      for ( int xt = 0; xt < num_t; xt++ ){
                         for ( int uy = 0; uy < num_u; uy++ ){
@@ -3493,7 +3422,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){ // SAA: - delta_ux delta_ty Gamma_{zv}
                      for ( int ty = 0; ty < num_t; ty++ ){
                         for ( int ux = 0; ux < num_u; ux++ ){
@@ -3506,7 +3435,7 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                         }
                      }
                   }
-                  
+
                   if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){ // SCC: + delta_ut delta_xy Gamma_{zv}
                      for ( int xy = 0; xy < num_x; xy++ ){
                         for ( int tu = 0; tu < num_t; tu++ ){
@@ -3532,31 +3461,31 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
 void CheMPS2::CASPT2::make_FDD(){
 
    /*
-      FD1D1: < E_yx E_jb ( f_pq E_pq) E_ai E_tu > = delta_ab delta_ji ( FD1D1[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SD1D1[ xytu ] )
-      FD2D2: < E_yb E_jx ( f_pq E_pq) E_ti E_au > = delta_ab delta_ji ( FD2D2[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SD2D2[ xytu ] )
-      FD1D2: < E_yx E_jb ( f_pq E_pq) E_ti E_au > = delta_ab delta_ji ( FD1D2[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SD1D2[ xytu ] )
-      FD2D1: < E_yb E_jx ( f_pq E_pq) E_ai E_tu > = delta_ab delta_ji ( FD2D1[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SD2D1[ xytu ] )
+      FDD: < E_yx E_jb ( f_pq E_pq) E_ai E_tu > = delta_ab delta_ji ( FDD[ It x Iu ][ xytu ] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ It x Iu ][ xytu ] )
 
-            FD1D1[ xytu ] = + sum_w f_xw SD1D1[ wytu ]
-                            + sum_v f_vt SD1D1[ xyvu ]
-                            + ( 2 * f_dot_3dm[ ytxu ] + 2 * delta_tx f_dot_2dm[ yu ] )
-                            - 2 f_xt Gamma_{yu}
+            FD1D1[ It x Iu ][ xytu ] = ( + sum_w f_xw SD1D1[ It x Iu ][ wytu ]
+                                         + sum_v f_vt SD1D1[ Ix x Iy ][ xyvu ]
+                                         + ( 2 * f_dot_3dm[ ytxu ] + 2 * delta_tx f_dot_2dm[ yu ] )
+                                         - 2 f_xt Gamma_{yu}
+                                       )
 
-            FD2D2[ xytu ] = + sum_w f_xw SD2D2[ wytu ]
-                            + sum_v f_vt SD2D2[ xyvu ]
-                            + (   - f_dot_3dm[ ytux ] + 2 * delta_tx f_dot_2dm[ yu ] )
-                            - 2 f_xt Gamma_{yu}
-                           
-            FD1D2[ xytu ] = + sum_w f_xw SD1D2[ wytu ]
-                            + sum_v f_vt SD1D2[ xyvu ]
-                            + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
-                            + f_xt Gamma_{yu}
-                           
-            FD2D1[ xytu ] = + sum_w f_xw SD2D1[ wytu ]
-                            + sum_v f_vt SD2D1[ xyvu ]
-                            + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
-                            + f_xt Gamma_{yu}
-      
+            FD2D2[ It x Iu ][ xytu ] = ( + sum_w f_xw SD2D2[ It x Iu ][ wytu ]
+                                         + sum_v f_vt SD2D2[ Ix x Iy ][ xyvu ]
+                                         + (   - f_dot_3dm[ ytux ] + 2 * delta_tx f_dot_2dm[ yu ] )
+                                         - 2 f_xt Gamma_{yu}
+                                       )
+
+            FD1D2[ It x Iu ][ xytu ] = ( + sum_w f_xw SD1D2[ It x Iu ][ wytu ]
+                                         + sum_v f_vt SD1D2[ Ix x Iy ][ xyvu ]
+                                         + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
+                                         + f_xt Gamma_{yu}
+                                       )
+
+            FD2D1[ It x Iu ][ xytu ] = ( + sum_w f_xw SD2D1[ It x Iu ][ wytu ]
+                                         + sum_v f_vt SD2D1[ Ix x Iy ][ xyvu ]
+                                         + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
+                                         + f_xt Gamma_{yu}
+                                       )
    */
 
    FDD = new double*[ num_irreps ];
@@ -3593,7 +3522,6 @@ void CheMPS2::CASPT2::make_FDD(){
 
                         const double f_3dm_ytxu = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
                         const double f_3dm_ytux = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
-
                         const int ptr = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
 
                         double valD1D1 = 2 * f_3dm_ytxu;
@@ -3652,7 +3580,6 @@ void CheMPS2::CASPT2::make_FDD(){
                   }
                }
             }
-
             jump_row += num_x * num_y;
          }
          jump_col += num_t * num_u;
@@ -3664,35 +3591,41 @@ void CheMPS2::CASPT2::make_FDD(){
 void CheMPS2::CASPT2::make_SDD(){
 
    /*
-      SD1D1: < E_yx E_jb E_ai E_tu >
-             = delta_ab delta_ji ( 2 * Gamma_{ytxu}
-                                 + 2 * delta_tx Gamma_{yu} )
-                                 
-      SD2D2: < E_yb E_jx E_ti E_au >
-             = delta_ab delta_ji ( 2 * delta_tx Gamma_{yu}
-                                 - Gamma_{ytux} )
-                                 
-      SD1D2: < E_yx E_jb E_ti E_au >
-             = delta_ab delta_ji ( - Gamma_{ytxu}
-                                   - delta_tx Gamma_{yu} )
-                                 
-      SD2D1: < E_yb E_jx E_ai E_tu >
-             = delta_ab delta_ji ( - Gamma_{ytxu}
-                                   - delta_tx Gamma_{yu} )
-                      
-      with Iu x It x Ii x Ia = Iy x Ix x Ij x Ib = Itrivial
+      SD1D1: < E_yx E_jb E_ai E_tu > = delta_ab delta_ji SD1D1[ It x Iu ][ xytu ]
+
+            SD1D1[ It x Iu ][ xytu ] = ( + 2 * Gamma_{ytxu}
+                                         + 2 * delta_tx Gamma_{yu}
+                                       )
+
+      SD2D2: < E_yb E_jx E_ti E_au > = delta_ab delta_ji SD2D2[ xytu ]
+
+            SD2D2[ It x Iu ][ xytu ] = ( + 2 * delta_tx Gamma_{yu}
+                                         - Gamma_{ytux}
+                                       )
+
+      SD1D2: < E_yx E_jb E_ti E_au > = delta_ab delta_ji SD1D2[ xytu ]
+
+            SD1D2[ It x Iu ][ xytu ] = ( - Gamma_{ytxu}
+                                         - delta_tx Gamma_{yu}
+                                       )
+
+      SD2D1: < E_yb E_jx E_ai E_tu > = delta_ab delta_ji SD2D1[ xytu ]
+
+            SD2D1[ It x Iu ][ xytu ] = ( - Gamma_{ytxu}
+                                         - delta_tx Gamma_{yu}
+                                       )
    */
-   
+
    SDD = new double*[ num_irreps ];
-   
+
    const int LAS = indices->getDMRGcumulative( num_irreps );
-   
+
    for ( int irrep_ai = 0; irrep_ai < num_irreps; irrep_ai++ ){
 
       const int SIZE   = size_D[ irrep_ai ];
       const int D2JUMP = SIZE / 2;
       SDD[ irrep_ai ] = new double[ SIZE * SIZE ];
-      
+
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int d_t     = indices->getDMRGcumulative( irrep_t );
@@ -3707,7 +3640,7 @@ void CheMPS2::CASPT2::make_SDD(){
             const int irrep_y = Irreps::directProd( irrep_ai, irrep_x );
             const int d_y     = indices->getDMRGcumulative( irrep_y );
             const int num_y   = indices->getNDMRG( irrep_y );
-                  
+
             for ( int t = 0; t < num_t; t++ ){
                for ( int u = 0; u < num_u; u++ ){
                   for ( int x = 0; x < num_x; x++ ){
@@ -3722,7 +3655,7 @@ void CheMPS2::CASPT2::make_SDD(){
                   }
                }
             }
-            
+
             if (( irrep_x == irrep_t ) && ( irrep_y == irrep_u )){
                for ( int xt = 0; xt < num_x; xt++ ){
                   for ( int u = 0; u < num_u; u++ ){
@@ -3736,7 +3669,6 @@ void CheMPS2::CASPT2::make_SDD(){
                   }
                }
             }
-                  
             jump_row += num_x * num_y;
          }
          jump_col += num_t * num_u;
@@ -3784,12 +3716,10 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      const int irrep = 0;
-
-      assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
-      const int SIZE = size_B_singlet[ irrep ];
-      FBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
+      assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
+      const int SIZE = size_B_singlet[ 0 ];
+      FBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
+      FFF_singlet[ 0 ] = new double[ SIZE * SIZE ];
 
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
@@ -3807,55 +3737,55 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-                     
+
                         // + f_dot_3dm_{utyx} + f_dot_3dm_{utxy}
                         const double fdotsum = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
                                                + f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-                        
+
                         double sbb_value = fdotsum;
 
                         // FBB: + sum_v f_vu SBB_singlet[ xytv ] = + sum_(v>=t) f_vu SBB_singlet[ xytv ] + sum_(v<t) f_vu SBB_singlet[ xyvt ]
                         for ( int v = 0; v < t; v++ ){
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( t * ( t + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( t * ( t + 1 ) ) / 2 ) ] );
                         }
                         for ( int v = t; v < num_ut; v++ ){
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( v * ( v + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( v * ( v + 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_v f_vt SBB_singlet[ xyvu ] = + sum_(v<u) f_vt SBB_singlet[ xyvu ] + sum_(v>=u) f_vt SBB_singlet[ xyuv ]
                         for ( int v = 0; v < u; v++ ){
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( u * ( u + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( u * ( u + 1 ) ) / 2 ) ] );
                         }
                         for ( int v = u; v < num_ut; v++ ){
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( u + ( v * ( v + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( u + ( v * ( v + 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_w f_yw SBB_singlet[ xwtu ] = + sum_(w>=x) f_yw SBB_singlet[ xwtu ] + sum_(w<x) f_yw SBB_singlet[ wxtu ]
                         for ( int w = 0; w < x; w++ ){
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_singlet[ irrep ][ shift + w + ( x * ( x + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + w + ( x * ( x + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
                         }
                         for ( int w = x; w < num_xy; w++ ){
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_singlet[ irrep ][ shift + x + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + x + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_w f_xw SBB_singlet[ wytu ] = + sum_(w<y) f_xw SBB_singlet[ wytu ] + sum_(w>=y) f_xw SBB_singlet[ ywtu ]
                         for ( int w = 0; w < y; w++ ){
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_singlet[ irrep ][ shift + w + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + w + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
                         }
                         for ( int w = y; w < num_xy; w++ ){
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_singlet[ irrep ][ shift + y + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
+                                        * SBB_singlet[ 0 ][ shift + y + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
                         }
 
-                        FBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = sbb_value;
-                        FFF_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = fdotsum;
+                        FBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = sbb_value;
+                        FFF_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = fdotsum;
                      }
                   }
                }
@@ -3865,9 +3795,9 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
 
                // FBB: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) f_dot_1dm --> last term only if x <= y == t <= u or hence all equal
                for ( int t = 0; t < num_ut; t++ ){
-                  FBB_singlet[ irrep ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * f_dot_1dm;
+                  FBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * f_dot_1dm;
                   for ( int u = t+1; u < num_ut; u++ ){
-                     FBB_singlet[ irrep ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2 * f_dot_1dm;
+                     FBB_singlet[ 0 ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2 * f_dot_1dm;
                   }
                }
 
@@ -3876,7 +3806,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                   for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
                      for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
                         const double val_tx = f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ];
-                        FBB_singlet[ irrep ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= val_tx;
+                        FBB_singlet[ 0 ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= val_tx;
                      }
                   }
                }
@@ -3886,7 +3816,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                   for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
                      for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
                         const double val_uy = f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ];
-                        FBB_singlet[ irrep ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= val_uy;
+                        FBB_singlet[ 0 ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= val_uy;
                      }
                   }
                }
@@ -3896,7 +3826,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                   for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
                      for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
                         const double val_ty = f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ];
-                        FBB_singlet[ irrep ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= val_ty;
+                        FBB_singlet[ 0 ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= val_ty;
                      }
                   }
                }
@@ -3906,7 +3836,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                   for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
                      for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
                         const double val_ux = f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ];
-                        FBB_singlet[ irrep ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= val_ux;
+                        FBB_singlet[ 0 ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= val_ux;
                      }
                   }
                }
@@ -3919,7 +3849,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
                                                 + fock->get( irrep_ut, nocc_ut + y, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * x ]    // - f_yu ( 2 delta_tx - Gamma_{tx} )
                                                 + fock->get( irrep_ut, nocc_ut + x, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * y ]    // - f_xu ( 2 delta_ty - Gamma_{ty} )
                                                 + fock->get( irrep_ut, nocc_ut + y, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * x ] ); // - f_yt ( 2 delta_ux - Gamma_{ux} )
-                           FBB_singlet[ irrep ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] -= value;
+                           FBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] -= value;
                         }
                      }
                   }
@@ -4064,39 +3994,38 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
    /*
       SBB singlet: | S_tiuj > = ( E_ti E_uj + E_tj E_ui ) | 0 >  with  i <= j and t <= u
 
-                   < S_xkyl | S_tiuj > = 2 ( delta_ki delta_lj + delta_kj delta_li ) ( Gamma_{utyx}
-                                                                                     + Gamma_{utxy}
-                                                                                     + 2 delta_uy delta_tx
-                                                                                     + 2 delta_ux delta_ty
-                                                                                     -   delta_uy Gamma_{tx}
-                                                                                     -   delta_tx Gamma_{uy}
-                                                                                     -   delta_ux Gamma_{ty}
-                                                                                     -   delta_ty Gamma_{ux} )
-                                                                                     
+            < S_xkyl | S_tiuj > = 2 ( delta_ki delta_lj + delta_kj delta_li ) SBB_singlet[ It x Iu ][ xytu ]
+
+            SBB_singlet[ It x Iu ][ xytu ] = ( + Gamma_{utyx}
+                                               + Gamma_{utxy}
+                                               + 2 delta_uy delta_tx
+                                               + 2 delta_ux delta_ty
+                                               -   delta_uy Gamma_{tx}
+                                               -   delta_tx Gamma_{uy}
+                                               -   delta_ux Gamma_{ty}
+                                               -   delta_ty Gamma_{ux}
+                                             )
+
       SFF singlet: | S_atbu > = ( E_at E_bu + E_bt E_au ) | 0 >  with  a <= b and t <= u
 
-                   < S_cxdy | S_atbu > = 2 ( delta_ac delta_bd + delta_ad delta_bc ) ( Gamma_{yxut} + Gamma_{yxtu} )
-      
-      with Iia x Ijb x It x Iu = Ikc x Ild x Ix x Iy = Itrivial
-      or hence Iia x Ijb = Ikc x Ild = It x Iu = Ix x Iy
-      therefore:
-         - if ( Iia x Ijb == 0 ) : It == Iu  and  Ix == Iy
-         - if ( Iia x Ijb != 0 ) : It != Iu  and  Ix != Iy
+            < S_cxdy | S_atbu > = 2 ( delta_ac delta_bd + delta_ad delta_bc ) SFF_singlet[ It x Iu ][ xytu ]
+
+            SFF_singlet[ It x Iu ][ xytu ] = ( + Gamma_{yxut}
+                                               + Gamma_{yxtu}
+                                             )
    */
 
    SBB_singlet = new double*[ num_irreps ];
    SFF_singlet = new double*[ num_irreps ];
-   
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-   
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      const int irrep = 0;
 
-      assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
-      const int SIZE = size_B_singlet[ irrep ];
-      SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      SFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+
+   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
+      assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
+      const int SIZE = size_B_singlet[ 0 ];
+      SBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
+      SFF_singlet[ 0 ] = new double[ SIZE * SIZE ];
+
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
          const int d_ut   = indices->getDMRGcumulative( irrep_ut );
@@ -4105,7 +4034,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
          for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
             const int d_xy   = indices->getDMRGcumulative( irrep_xy );
             const int num_xy = indices->getNDMRG( irrep_xy );
-            
+
             // Gamma_{utyx} + Gamma_{utxy}
             for ( int t = 0; t < num_ut; t++ ){
                for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
@@ -4114,59 +4043,59 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                         const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
                                              + two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
                         const int pointer = jump_row + x + (y*(y+1))/2 + SIZE * ( jump_col + t + (u*(u+1))/2 );
-                        SBB_singlet[ irrep ][ pointer ] = value;
-                        SFF_singlet[ irrep ][ pointer ] = value;
+                        SBB_singlet[ 0 ][ pointer ] = value;
+                        SFF_singlet[ 0 ][ pointer ] = value;
                      }
                   }
                }
             }
-            
+
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy
-            
+
                // + 2 ( delta_uy delta_tx + delta_ux delta_ty ) --> last term only if x <= y = t <= u or hence all equal
                for ( int t = 0; t < num_ut; t++ ){
-                  SBB_singlet[ irrep ][ jump_row + t + (t*(t+1))/2 + SIZE * ( jump_col + t + (t*(t+1))/2 ) ] += 4.0;
+                  SBB_singlet[ 0 ][ jump_row + t + (t*(t+1))/2 + SIZE * ( jump_col + t + (t*(t+1))/2 ) ] += 4.0;
                   for ( int u = t+1; u < num_ut; u++ ){
-                     SBB_singlet[ irrep ][ jump_row + t + (u*(u+1))/2 + SIZE * ( jump_col + t + (u*(u+1))/2 ) ] += 2.0;
+                     SBB_singlet[ 0 ][ jump_row + t + (u*(u+1))/2 + SIZE * ( jump_col + t + (u*(u+1))/2 ) ] += 2.0;
                   }
                }
-               
+
                // - delta_uy Gamma_{tx}
                for ( int uy = 0; uy < num_ut; uy++ ){
                   for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
                      for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
                         const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_xy + x ) ];
-                        SBB_singlet[ irrep ][ jump_row + x + (uy*(uy+1))/2 + SIZE * ( jump_col + t + (uy*(uy+1))/2 ) ] -= gamma_tx;
+                        SBB_singlet[ 0 ][ jump_row + x + (uy*(uy+1))/2 + SIZE * ( jump_col + t + (uy*(uy+1))/2 ) ] -= gamma_tx;
                      }
                   }
                }
-               
+
                // - delta_tx Gamma_{uy}
                for ( int tx = 0; tx < num_ut; tx++ ){
                   for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
                      for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
                         const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_xy + y ) ];
-                        SBB_singlet[ irrep ][ jump_row + tx + (y*(y+1))/2 + SIZE * ( jump_col + tx + (u*(u+1))/2 ) ] -= gamma_uy;
+                        SBB_singlet[ 0 ][ jump_row + tx + (y*(y+1))/2 + SIZE * ( jump_col + tx + (u*(u+1))/2 ) ] -= gamma_uy;
                      }
                   }
                }
-               
+
                // - delta_ux Gamma_{ty}
                for ( int ux = 0; ux < num_ut; ux++ ){
                   for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
                      for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
                         const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_xy + y ) ];
-                        SBB_singlet[ irrep ][ jump_row + ux + (y*(y+1))/2 + SIZE * ( jump_col + t + (ux*(ux+1))/2 ) ] -= gamma_ty;
+                        SBB_singlet[ 0 ][ jump_row + ux + (y*(y+1))/2 + SIZE * ( jump_col + t + (ux*(ux+1))/2 ) ] -= gamma_ty;
                      }
                   }
                }
-               
+
                // - delta_ty Gamma_{ux}
                for ( int ty = 0; ty < num_ut; ty++ ){
                   for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
                      for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
                         const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_xy + x ) ];
-                        SBB_singlet[ irrep ][ jump_row + x + (ty*(ty+1))/2 + SIZE * ( jump_col + ty + (u*(u+1))/2 ) ] -= gamma_ux;
+                        SBB_singlet[ 0 ][ jump_row + x + (ty*(ty+1))/2 + SIZE * ( jump_col + ty + (u*(u+1))/2 ) ] -= gamma_ux;
                      }
                   }
                }
@@ -4176,14 +4105,14 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
          jump_col += ( num_ut * ( num_ut + 1 ) ) / 2;
       }
    }
-   
+
    for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
 
       assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
       const int SIZE = size_B_singlet[ irrep ];
       SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
       SFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      
+
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int irrep_u = Irreps::directProd( irrep, irrep_t );
@@ -4290,7 +4219,6 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
          FFF_triplet[ Iab ][ xytu ] = ( + f_dot_3dm[ yxut ]
                                         - f_dot_3dm[ yxtu ]
                                       )
-
    */
 
    FBB_triplet = new double*[ num_irreps ];
@@ -4299,12 +4227,10 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      const int irrep = 0;
-
-      assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
-      const int SIZE = size_B_triplet[ irrep ];
-      FBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
+      assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
+      const int SIZE = size_B_triplet[ 0 ];
+      FBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
+      FFF_triplet[ 0 ] = new double[ SIZE * SIZE ];
 
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
@@ -4322,55 +4248,55 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-                     
+
                         // + f_dot_3dm_{utyx} - f_dot_3dm_{utxy}
                         const double fdotdiff = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
                                                 - f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-                        
+
                         double sbb_value = fdotdiff;
 
                         // FBB: + sum_v f_vu SBB_triplet[ xytv ] = + sum_(v>=t) f_vu SBB_triplet[ xytv ] - sum_(v<t) f_vu SBB_triplet[ xyvt ]
                         for ( int v = 0; v < t; v++ ){ // Swap ( t <--> u ) --> minus sign
                            sbb_value -= ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( t * ( t - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( t * ( t - 1 ) ) / 2 ) ] );
                         }
                         for ( int v = t+1; v < num_ut; v++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( v * ( v - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( v * ( v - 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_v f_vt SBB_triplet[ xyvu ] = + sum_(v<u) f_vt SBB_triplet[ xyvu ] - sum_(v>=u) f_vt SBB_triplet[ xyuv ]
                         for ( int v = 0; v < u; v++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( u * ( u - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
                         for ( int v = u+1; v < num_ut; v++ ){ // Swap ( t <--> u ) --> minus sign
                            sbb_value -= ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( u + ( v * ( v - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( u + ( v * ( v - 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_w f_yw SBB_triplet[ xwtu ] = + sum_(w>=x) f_yw SBB_triplet[ xwtu ] - sum_(w<x) f_yw SBB_triplet[ wxtu ]
                         for ( int w = 0; w < x; w++ ){ // Swap ( x <--> y ) --> minus sign
                            sbb_value -= ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_triplet[ irrep ][ shift + w + ( x * ( x - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + w + ( x * ( x - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
                         for ( int w = x+1; w < num_xy; w++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_triplet[ irrep ][ shift + x + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + x + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
 
                         // FBB: + sum_w f_xw SBB_triplet[ wytu ] = + sum_(w<y) f_xw SBB_triplet[ wytu ] - sum_(w>=y) f_xw SBB_triplet[ ywtu ]
                         for ( int w = 0; w < y; w++ ){ // Natural replacement --> plus sign
                            sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_triplet[ irrep ][ shift + w + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + w + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
                         for ( int w = y+1; w < num_xy; w++ ){ // Swap ( x <--> y ) --> minus sign
                            sbb_value -= ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_triplet[ irrep ][ shift + y + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
+                                        * SBB_triplet[ 0 ][ shift + y + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
                         }
 
-                        FBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = sbb_value;
-                        FFF_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = fdotdiff;
+                        FBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = sbb_value;
+                        FFF_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = fdotdiff;
                      }
                   }
                }
@@ -4381,7 +4307,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                // FBB: + 6 ( delta_uy delta_tx - delta_ux delta_ty ) f_dot_1dm --> last term only if x < y = t < u or NEVER
                for ( int t = 0; t < num_ut; t++ ){
                   for ( int u = t+1; u < num_ut; u++ ){
-                     FBB_triplet[ irrep ][ shift + t + ( u * ( u - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] += 6 * f_dot_1dm;
+                     FBB_triplet[ 0 ][ shift + t + ( u * ( u - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] += 6 * f_dot_1dm;
                   }
                }
 
@@ -4390,7 +4316,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                   for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
                      for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
                         const double val_tx = f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ];
-                        FBB_triplet[ irrep ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * val_tx;
+                        FBB_triplet[ 0 ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * val_tx;
                      }
                   }
                }
@@ -4400,7 +4326,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                   for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
                      for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
                         const double val_uy = f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ];
-                        FBB_triplet[ irrep ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * val_uy;
+                        FBB_triplet[ 0 ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * val_uy;
                      }
                   }
                }
@@ -4410,7 +4336,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                   for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
                      for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
                         const double val_ty = f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ];
-                        FBB_triplet[ irrep ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * val_ty;
+                        FBB_triplet[ 0 ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * val_ty;
                      }
                   }
                }
@@ -4420,7 +4346,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                   for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
                      for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
                         const double val_ux = f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ];
-                        FBB_triplet[ irrep ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * val_ux;
+                        FBB_triplet[ 0 ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * val_ux;
                      }
                   }
                }
@@ -4433,7 +4359,7 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
                                                 + fock->get( irrep_ut, nocc_ut + y, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * x ]    // - 3 f_yu ( 2 delta_tx - Gamma_{tx} )
                                                 - fock->get( irrep_ut, nocc_ut + x, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * y ]    // + 3 f_xu ( 2 delta_ty - Gamma_{ty} )
                                                 - fock->get( irrep_ut, nocc_ut + y, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * x ] ); // + 3 f_yt ( 2 delta_ux - Gamma_{ux} )
-                           FBB_triplet[ irrep ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * value;
+                           FBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * value;
                         }
                      }
                   }
@@ -4578,39 +4504,38 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
    /*
       SBB triplet: | T_tiuj > = ( E_ti E_uj + E_tj E_ui ) | 0 >  with  i < j and t < u
 
-                   < T_xkyl | T_tiuj > = 2 ( delta_ki delta_lj - delta_kj delta_li ) ( Gamma_{utyx}
-                                                                                     - Gamma_{utxy}
-                                                                                     + 6 delta_uy delta_tx
-                                                                                     - 6 delta_ux delta_ty
-                                                                                     - 3 delta_uy Gamma_{tx}
-                                                                                     - 3 delta_tx Gamma_{uy}
-                                                                                     + 3 delta_ux Gamma_{ty}
-                                                                                     + 3 delta_ty Gamma_{ux} )
-                                                                                     
+            < T_xkyl | T_tiuj > = 2 ( delta_ki delta_lj - delta_kj delta_li ) SBB_triplet[ It x Iu ][ xytu ]
+
+            SBB_triplet[ It x Iu ][ xytu ] = ( + Gamma_{utyx}
+                                               - Gamma_{utxy}
+                                               + 6 delta_uy delta_tx
+                                               - 6 delta_ux delta_ty
+                                               - 3 delta_uy Gamma_{tx}
+                                               - 3 delta_tx Gamma_{uy}
+                                               + 3 delta_ux Gamma_{ty}
+                                               + 3 delta_ty Gamma_{ux}
+                                             )
+
       SFF triplet: | T_atbu > = ( E_at E_bu - E_bt E_au ) | 0 >  with  a <= b and t <= u
 
-                   < T_cxdy | T_atbu > = 2 ( delta_ac delta_bd - delta_ad delta_bc ) ( Gamma_{yxut} - Gamma_{yxtu} )
-      
-      with Iia x Ijb x It x Iu = Ikc x Ild x Ix x Iy = Itrivial
-      or hence Iia x Ijb = Ikc x Ild = It x Iu = Ix x Iy
-      therefore:
-         - if ( Iia x Ijb == 0 ) : It == Iu  and  Ix == Iy
-         - if ( Iia x Ijb != 0 ) : It != Iu  and  Ix != Iy
+            < T_cxdy | T_atbu > = 2 ( delta_ac delta_bd - delta_ad delta_bc ) SFF_triplet[ It x Iu ][ xytu ]
+
+            SFF_triplet[ It x Iu ][ xytu ] = ( + Gamma_{yxut}
+                                               - Gamma_{yxtu}
+                                             )
    */
-   
+
    SBB_triplet = new double*[ num_irreps ];
    SFF_triplet = new double*[ num_irreps ];
-   
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-   
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      const int irrep = 0;
 
-      assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
-      const int SIZE = size_B_triplet[ irrep ];
-      SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      SFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+
+   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
+      assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
+      const int SIZE = size_B_triplet[ 0 ];
+      SBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
+      SFF_triplet[ 0 ] = new double[ SIZE * SIZE ];
+
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
          const int d_ut   = indices->getDMRGcumulative( irrep_ut );
@@ -4619,7 +4544,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
          for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
             const int d_xy   = indices->getDMRGcumulative( irrep_xy );
             const int num_xy = indices->getNDMRG( irrep_xy );
-            
+
             // Gamma_{utyx} - Gamma_{utxy}
             for ( int t = 0; t < num_ut; t++ ){
                for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
@@ -4628,58 +4553,58 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
                         const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
                                              - two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
                         const int pointer = jump_row + x + (y*(y-1))/2 + SIZE * ( jump_col + t + (u*(u-1))/2 );
-                        SBB_triplet[ irrep ][ pointer ] = value;
-                        SFF_triplet[ irrep ][ pointer ] = value;
+                        SBB_triplet[ 0 ][ pointer ] = value;
+                        SFF_triplet[ 0 ][ pointer ] = value;
                      }
                   }
                }
             }
-            
+
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal --> num_ut == num_xy
 
                // + 6 ( delta_uy delta_tx - delta_ux delta_ty ) --> last term only if x < y = t < u or NEVER
                for ( int tx = 0; tx < num_ut; tx++ ){
                   for ( int uy = tx+1; uy < num_ut; uy++ ){
-                     SBB_triplet[ irrep ][ jump_row + tx + (uy*(uy-1))/2 + SIZE * ( jump_col + tx + (uy*(uy-1))/2 ) ] += 6.0;
+                     SBB_triplet[ 0 ][ jump_row + tx + (uy*(uy-1))/2 + SIZE * ( jump_col + tx + (uy*(uy-1))/2 ) ] += 6.0;
                   }
                }
-               
+
                // - 3 delta_uy Gamma_{tx}
                for ( int uy = 0; uy < num_ut; uy++ ){
                   for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
                      for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
                         const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_xy + x ) ];
-                        SBB_triplet[ irrep ][ jump_row + x + (uy*(uy-1))/2 + SIZE * ( jump_col + t + (uy*(uy-1))/2 ) ] -= 3 * gamma_tx;
+                        SBB_triplet[ 0 ][ jump_row + x + (uy*(uy-1))/2 + SIZE * ( jump_col + t + (uy*(uy-1))/2 ) ] -= 3 * gamma_tx;
                      }
                   }
                }
-               
+
                // - 3 delta_tx Gamma_{uy}
                for ( int tx = 0; tx < num_ut; tx++ ){
                   for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
                      for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
                         const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_xy + y ) ];
-                        SBB_triplet[ irrep ][ jump_row + tx + (y*(y-1))/2 + SIZE * ( jump_col + tx + (u*(u-1))/2 ) ] -= 3 * gamma_uy;
+                        SBB_triplet[ 0 ][ jump_row + tx + (y*(y-1))/2 + SIZE * ( jump_col + tx + (u*(u-1))/2 ) ] -= 3 * gamma_uy;
                      }
                   }
                }
-               
+
                // + 3 delta_ux Gamma_{ty}
                for ( int ux = 0; ux < num_ut; ux++ ){
                   for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
                      for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
                         const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_xy + y ) ];
-                        SBB_triplet[ irrep ][ jump_row + ux + (y*(y-1))/2 + SIZE * ( jump_col + t + (ux*(ux-1))/2 ) ] += 3 * gamma_ty;
+                        SBB_triplet[ 0 ][ jump_row + ux + (y*(y-1))/2 + SIZE * ( jump_col + t + (ux*(ux-1))/2 ) ] += 3 * gamma_ty;
                      }
                   }
                }
-               
+
                // + 3 delta_ty Gamma_{ux}
                for ( int ty = 0; ty < num_ut; ty++ ){
                   for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
                      for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
                         const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_xy + x ) ];
-                        SBB_triplet[ irrep ][ jump_row + x + (ty*(ty-1))/2 + SIZE * ( jump_col + ty + (u*(u-1))/2 ) ] += 3 * gamma_ux;
+                        SBB_triplet[ 0 ][ jump_row + x + (ty*(ty-1))/2 + SIZE * ( jump_col + ty + (u*(u-1))/2 ) ] += 3 * gamma_ux;
                      }
                   }
                }
@@ -4689,14 +4614,14 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
          jump_col += ( num_ut * ( num_ut - 1 ) ) / 2;
       }
    }
-   
+
    for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
 
       assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
       const int SIZE = size_B_triplet[ irrep ];
       SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
       SFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      
+
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int irrep_u = Irreps::directProd( irrep, irrep_t );
@@ -4777,11 +4702,11 @@ void CheMPS2::CASPT2::make_FEE_FGG(){
 
    /*
 
-      E singlet: | SE_tiaj > = ( E_ti E_aj + E_tj E_ai ) | 0 >  with  i <= j
-      E triplet: | TE_tiaj > = ( E_ti E_aj - E_tj E_ai ) | 0 >  with  i <  j
+      FEE singlet: | SE_tiaj > = ( E_ti E_aj + E_tj E_ai ) | 0 >  with  i <= j
+      FEE triplet: | TE_tiaj > = ( E_ti E_aj - E_tj E_ai ) | 0 >  with  i <  j
 
-         < SE_ukbl | ( sum_pq f_pq E_pq ) | SE_tiaj > = 2 delta_ab ( delta_ki delta_lj + delta_kj delta_li ) ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-         < TE_ukbl | ( sum_pq f_pq E_pq ) | TE_tiaj > = 6 delta_ab ( delta_ki delta_lj - delta_kj delta_li ) ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+         < SE_ukbl | f_pq E_pq | SE_tiaj > = 2 delta_ab ( delta_ki delta_lj + delta_kj delta_li ) ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+         < TE_ukbl | f_pq E_pq | TE_tiaj > = 6 delta_ab ( delta_ki delta_lj - delta_kj delta_li ) ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
 
          FEE[ It ][ ut ] = ( + 2 * delta_ut * f_dot_1dm
                              - f_dot_2dm[ It ][ tu ]
@@ -4790,14 +4715,14 @@ void CheMPS2::CASPT2::make_FEE_FGG(){
                              - sum_w f_uw Gamma_wt
                            )
 
-      G singlet: | SG_aibt > = ( E_ai E_bt + E_bi E_at ) | 0 >  with  a <= b
-      G triplet: | TG_aibt > = ( E_ai E_bt - E_bi E_at ) | 0 >  with  a <  b
+      FGG singlet: | SG_aibt > = ( E_ai E_bt + E_bi E_at ) | 0 >  with  a <= b
+      FGG triplet: | TG_aibt > = ( E_ai E_bt - E_bi E_at ) | 0 >  with  a <  b
 
-         < SG_cjdu | ( sum_pq f_pq E_pq ) | SG_aibt > = 2 delta_ji ( delta_ca delta_db + delta_cb delta_da ) ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-         < TG_cjdu | ( sum_pq f_pq E_pq ) | TG_aibt > = 6 delta_ji ( delta_ca delta_db - delta_cb delta_da ) ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+         < SG_cjdu | f_pq E_pq | SG_aibt > = 2 delta_ji ( delta_ca delta_db + delta_cb delta_da ) ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+         < TG_cjdu | f_pq E_pq | TG_aibt > = 6 delta_ji ( delta_ca delta_db - delta_cb delta_da ) ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
 
-         FGG[ It ][ ut ] = f_dot_2dm[ It ][ ut ]
-
+         FGG[ It ][ ut ] = ( + f_dot_2dm[ It ][ ut ]
+                           )
    */
 
    FEE = new double*[ num_irreps ];
@@ -4825,12 +4750,10 @@ void CheMPS2::CASPT2::make_FEE_FGG(){
          for ( int u = 0; u < SIZE; u++ ){
 
             double value = 2 * fock->get( irrep, NOCC + u, NOCC + t ) - f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
-
             for ( int vw = 0; vw < SIZE; vw++ ){
                value -= ( one_rdm[ jumpx + u + LAS * ( jumpx + vw ) ] * fock->get( irrep, NOCC + vw, NOCC + t )
                         + fock->get( irrep, NOCC + u, NOCC + vw ) * one_rdm[ jumpx + vw + LAS * ( jumpx + t ) ] );
             }
-
             FEE[ irrep ][ u + SIZE * t ] = value;
          }
          FEE[ irrep ][ t + SIZE * t ] += 2 * f_dot_1dm;
@@ -4845,32 +4768,35 @@ void CheMPS2::CASPT2::make_SEE_SGG(){
       SEE singlet: | S_tiaj > = ( E_ti E_aj + E_tj E_ai ) | 0 >  with  i <= j
       SEE triplet: | T_tiaj > = ( E_ti E_aj - E_tj E_ai ) | 0 >  with  i <  j
 
-                   < S_ukbl | S_tiaj > = 2 delta_ab ( 2 delta_tu - Gamma_tu ) ( delta_ki delta_lj + delta_kj delta_li )
-                   < T_ukbl | T_tiaj > = 6 delta_ab ( 2 delta_tu - Gamma_tu ) ( delta_ki delta_lj - delta_kj delta_li )
-                   
-                   with It x Ii x Ia x Ij = Iu x Ik x Ib x Il = Itrivial
-                   
+            < S_ukbl | S_tiaj > = 2 delta_ab ( delta_ki delta_lj + delta_kj delta_li ) SEE[ It ][ ut ]
+            < T_ukbl | T_tiaj > = 6 delta_ab ( delta_ki delta_lj - delta_kj delta_li ) SEE[ It ][ ut ]
+
+            SEE[ It ][ ut ] = ( + 2 delta_tu
+                                - Gamma_tu
+                              )
+
       SGG singlet: | S_aibt > = ( E_ai E_bt + E_bi E_at ) | 0 >  with  a <= b
       SGG triplet: | T_aibt > = ( E_ai E_bt - E_bi E_at ) | 0 >  with  a <  b
 
-                   < S_cjdu | S_aibt > = 2 delta_ji Gamma_ut ( delta_ca delta_db + delta_cb delta_da )
-                   < T_cjdu | T_aibt > = 6 delta_ji Gamma_ut ( delta_ca delta_db - delta_cb delta_da )
-      
-                   with Ia x Ii x Ib x It = Ic x Ij x Id x Iu = Itrivial
+            < S_cjdu | S_aibt > = 2 delta_ji ( delta_ca delta_db + delta_cb delta_da ) SGG[ It ][ ut ]
+            < T_cjdu | T_aibt > = 6 delta_ji ( delta_ca delta_db - delta_cb delta_da ) SGG[ It ][ ut ]
+
+            SGG[ It ][ ut ] = ( + Gamma_ut
+                              )
    */
-   
+
    SEE = new double*[ num_irreps ];
    SGG = new double*[ num_irreps ];
-   
+
    const int LAS = indices->getDMRGcumulative( num_irreps );
-   
+
    for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
 
       const int SIZE = indices->getNDMRG( irrep_ut );
       SEE[ irrep_ut ] = new double[ SIZE * SIZE ];
       SGG[ irrep_ut ] = new double[ SIZE * SIZE ];
       const int d_ut = indices->getDMRGcumulative( irrep_ut );
-      
+
       for ( int t = 0; t < SIZE; t++ ){
          for ( int u = 0; u < SIZE; u++ ){
             const double gamma_ut = one_rdm[ d_ut + u + LAS * ( d_ut + t ) ];

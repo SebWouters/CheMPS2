@@ -106,6 +106,9 @@ namespace CheMPS2{
          // The active space 1-RDM contracted with the Fock operator
          double f_dot_1dm;
          
+         // The sum of the Fock operator corresponding to occupied orbitals
+         double sum_f_kk;
+         
          // The number of irreps
          int num_irreps;
          
@@ -115,12 +118,9 @@ namespace CheMPS2{
          // Calculate the expectation value of the Fock operator
          double create_f_dots();
          
-         // Calculate sum_k f_kk
-         double sum_f_kk() const;
-         
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
-         long long initial_total_vector_length() const; // For debugging purposes
+         long long debug_total_length() const;
          
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals );

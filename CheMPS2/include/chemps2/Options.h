@@ -45,6 +45,8 @@ namespace CheMPS2{
    const bool   DMRGSCF_storeDIIS             = true;
    const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
 
+   const double CASPT2_OVLP_CUTOFF            = 1e-7;
+
    const string defaultTMPpath                = "/tmp";
    const bool   DMRG_printDiscardedWeight     = false;
    const bool   DMRG_storeRenormOptrOnDisk    = true;
