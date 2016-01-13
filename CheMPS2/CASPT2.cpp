@@ -122,34 +122,21 @@ CheMPS2::CASPT2::CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFma
          cout << "E(CASPT2-D)[ H triplet ] = " << temp12 << endl;
       //}
       
-      cout << "E(CASPT2-D) = " << energy_caspt2d << endl;
-      cout << "Test 8 according to molpro = " << -0.15978719 << endl;
-      /*
- memory,500,m
- gprint,orbitals=5,basis,civector
- gthresh,energy=1.0d-12,orbital=1.0d-10
- gthresh,ONEINT=1d-14,TWOINT=1d-14
- 
- BOHR
- 
- geometry={
- N
- N,1,2.118
- }
- 
- basis,cc-pvdz
- 
- {rhf;orbital,2100.2}
- {multi,maxit=50;start,2100.2
- !Ag  +   B3u +   B2u +   B1g +   B1u +   B2g +   B3g +   Au
- closed, 1, 0, 0, 0, 1, 0, 0, 0
- occ   , 3, 1, 1, 0, 3, 1, 1, 0
- CANONICAL,2140.2,CI
- }
- !{fci,dump='cr2_1.5_mc_fcidump';core}
- {rs2,shift=0;core,0;option,IFDIA=2}
- !{rs2,IFDIA=2}
-      */
+      cout.precision(8);
+      cout << std::fixed;
+      cout << "E(CASPT2-D)                = " << energy_caspt2d << endl;
+      //cout << "Test 8 according to molpro = " << -0.15978719 << endl;
+      cout << "Test 8 according to bagel  = " << -0.15963018 << endl;
+      cout << "   bagel CXXX: -0.00006498 and chemps2 A: " << temp0 << endl;
+      cout << "   bagel CCXX: -0.00017700 and chemps2 B: " << temp1 + temp2 << endl;
+      cout << "   bagel XXXA: -0.06749706 and chemps2 C: " << temp3 << " <=====" << endl;
+      cout << "   bagel CXXA: -0.00153428 and chemps2 D: " << temp4 << endl;
+      cout << "   bagel CCXA: -0.00035423 and chemps2 E: " << temp5 + temp6 << endl;
+      cout << "   bagel XXAA: -0.08833262 and chemps2 F: " << temp7 + temp8 << " <=====" << endl;
+      cout << "   bagel CXAA: -0.00134620 and chemps2 G: " << temp9 + temp10 << endl;
+      cout << "   bagel CCAA: -0.00032381 and chemps2 H: " << temp11 + temp12 << endl;
+      cout.unsetf( std::ios::floatfield );
+      cout.precision(15);
       
       // Calculate P_SD [ blockdiag(F) - E_FOCK * S ] P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 > which should equal P_SD H | Psi0 >
       INVERSE = false;
@@ -1866,7 +1853,9 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
       VB:  < H E_ti E_uj >
            < S_tiuj | H > = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+                          = sum_{x<=y} [ (ix|jy) + (iy|jx) ] SBB_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
            < T_tiuj | H > = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
+                          = sum_{x<y}  [ (ix|jy) - (iy|jx) ] SBB_triplet[ It x Iu ][ xytu ]
 
       VC:  < H E_at E_uv > = sum_w ( t_wa + sum_k [ 2 (wa|kk) - (wk|ka) ] - sum_y (wy|ya) ) < E_wt E_uv >
                            + sum_wxy (xy|wa) < E_xy E_wt E_uv >
@@ -1893,7 +1882,9 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 
       VF:  < H E_at E_bu >
            < S_atbu | H > = sum_xy (ax|by) SFF_singlet[ It x Iu ][ xytu ]
+                          = sum_{x<=y} [ (ax|by) + (ay|bx) ] SFF_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
            < T_atbu | H > = sum_xy (ax|by) SFF_triplet[ It x Iu ][ xytu ]
+                          = sum_{x<y}  [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
 
       VG:  < H E_ai E_bt >
            < S_aibt | H > = sum_u [ (ai|bu) + (bi|au) ] * 1 * SGG[ It ][ ut ]
@@ -2214,7 +2205,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          for ( int i = 0; i < NOCC_ij; i++ ){
             for ( int j = i; j < NOCC_ij; j++ ){
 
-               // Fill workspace[ xy ] with (ix|jy)
+               // Fill workspace[ xy ] with [ (ix|jy) + (iy|jx) ] * (( x==y ) ? 0.5 : 1.0 );
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
                   const int d_xy   = indices->getDMRGcumulative( irrep_xy );
@@ -2224,15 +2215,15 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
                         const double ix_jy = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y );
-                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ix_jy;
+                        const double iy_jx = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + y, j, occ_xy + x );
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ( ix_jy + iy_jx ) * (( x==y ) ? 0.5 : 1.0 );
                      }
                   }
-
                   jump_xy += ( num_xy * ( num_xy + 1 ) ) / 2;
                }
                assert( jump_xy == size_B_singlet[ 0 ] );
 
-               // Perform target[ tu ] = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+               // Perform target[ tu ] = sum_{x<=y} [ (ix|jy) + (iy|jx) ] SBB_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
                char notrans = 'N';
                int int1 = 1;
                double alpha = 1.0;
@@ -2252,7 +2243,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          for ( int i = 0; i < NOCC_ij; i++ ){
             for ( int j = i+1; j < NOCC_ij; j++ ){
 
-               // Fill workspace[ xy ] with (ix|jy)
+               // Fill workspace[ xy ] with [ (ix|jy) - (iy|jx) ]
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
                   const int d_xy   = indices->getDMRGcumulative( irrep_xy );
@@ -2262,15 +2253,15 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
                         const double ix_jy = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + x, j, occ_xy + y );
-                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ix_jy;
+                        const double iy_jx = integrals->get_coulomb( irrep_ij, irrep_xy, irrep_ij, irrep_xy, i, occ_xy + y, j, occ_xy + x );
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ix_jy - iy_jx;
                      }
                   }
-
                   jump_xy += ( num_xy * ( num_xy - 1 ) ) / 2;
                }
                assert( jump_xy == size_B_triplet[ 0 ] );
 
-               // Perform target[ tu ] = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
+               // Perform target[ tu ] = sum_{x<y} [ (ix|jy) - (iy|jx) ] SBB_triplet[ It x Iu ][ xytu ]
                char notrans = 'N';
                int int1 = 1;
                double alpha = 1.0;
@@ -2295,7 +2286,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
             for ( int i = 0; i < NOCC_i; i++ ){
                for ( int j = 0; j < NOCC_j; j++ ){
 
-                  // Fill workspace[ xy ] with (ix|jy)
+                  // Fill workspace[ xy ] with [ (ix|jy) + (iy|jx) ]
                   int jump_xy = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
@@ -2310,25 +2301,48 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                         for ( int y = 0; y < num_y; y++ ){
                            for ( int x = 0; x < num_x; x++ ){
                               const double ix_jy = integrals->get_coulomb( irrep_i, irrep_x, irrep_j, irrep_y, i, occ_x + x, j, occ_y + y );
-                              workspace[ jump_xy + x + num_x * y ] = ix_jy;
+                              const double iy_jx = integrals->get_coulomb( irrep_i, irrep_y, irrep_j, irrep_x, i, occ_y + y, j, occ_x + x );
+                              workspace[ jump_xy + x + num_x * y ] = ix_jy + iy_jx;
                            }
                         }
-
                         jump_xy += num_x * num_y;
                      }
                   }
                   assert( jump_xy == size_B_singlet[ irrep ] );
-                  assert( jump_xy == size_B_triplet[ irrep ] );
 
-                  // Perform target[ tu ] = sum_xy (ix|jy) SBB_singlet[ It x Iu ][ xytu ]
+                  // Perform target[ tu ] = sum_{x<y} [ (ix|jy) + (iy|jx) ] SBB_singlet[ It x Iu ][ xytu ]
                   char notrans = 'N';
                   int int1 = 1;
                   double alpha = 1.0;
                   double beta = 0.0; //SET
                   double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + size_B_singlet[ irrep ] * ( jump_ij + i + NOCC_i * j );
                   dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+                  
+                  // Fill workspace[ xy ] with [ (ix|jy) - (iy|jx) ]
+                  jump_xy = 0;
+                  for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+                     const int irrep_y = Irreps::directProd( irrep, irrep_x );
+                     if ( irrep_x < irrep_y ){
+                        const int d_x   = indices->getDMRGcumulative( irrep_x );
+                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int occ_x = indices->getNOCC( irrep_x );
+                        const int occ_y = indices->getNOCC( irrep_y );
+                        const int num_x = indices->getNDMRG( irrep_x );
+                        const int num_y = indices->getNDMRG( irrep_y );
 
-                  // Perform target[ tu ] = sum_xy (ix|jy) SBB_triplet[ It x Iu ][ xytu ]
+                        for ( int y = 0; y < num_y; y++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              const double ix_jy = integrals->get_coulomb( irrep_i, irrep_x, irrep_j, irrep_y, i, occ_x + x, j, occ_y + y );
+                              const double iy_jx = integrals->get_coulomb( irrep_i, irrep_y, irrep_j, irrep_x, i, occ_y + y, j, occ_x + x );
+                              workspace[ jump_xy + x + num_x * y ] = ix_jy - iy_jx;
+                           }
+                        }
+                        jump_xy += num_x * num_y;
+                     }
+                  }
+                  assert( jump_xy == size_B_triplet[ irrep ] );
+
+                  // Perform target[ tu ] = sum_{x<y} [ (ix|jy) - (iy|jx) ] SBB_triplet[ It x Iu ][ xytu ]
                   target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + size_B_triplet[ irrep ] * ( jump_ij + i + NOCC_i * j );
                   dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SBB_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
 
@@ -2350,7 +2364,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          for ( int a = 0; a < NVIR_ab; a++ ){
             for ( int b = a; b < NVIR_ab; b++ ){
 
-               // Fill workspace[ xy ] with (ax|by)
+               // Fill workspace[ xy ] with [ (ax|by) + (ay|bx) ] * (( x==y ) ? 0.5 : 1.0 )
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
                   const int d_xy   = indices->getDMRGcumulative( irrep_xy );
@@ -2360,14 +2374,15 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
                         const double ax_by = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b );
-                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ax_by;
+                        const double ay_bx = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + y, occ_xy + x, N_OA_ab + a, N_OA_ab + b );
+                        workspace[ jump_xy + x + (y*(y+1))/2 ] = ( ax_by + ay_bx ) * (( x==y ) ? 0.5 : 1.0 );
                      }
                   }
                   jump_xy += ( num_xy * ( num_xy + 1 ) ) / 2;
                }
                assert( jump_xy == size_F_singlet[ 0 ] );
 
-               // Perform target[ tu ] = sum_xy (ax|by) SFF_singlet[ It x Iu ][ xytu ]
+               // Perform target[ tu ] = sum_{x<=y} [ (ax|by) + (ay|bx) ] SFF_singlet[ It x Iu ][ xytu ] * (( x==y ) ? 0.5 : 1.0 )
                char notrans = 'N';
                int int1 = 1;
                double alpha = 1.0;
@@ -2388,7 +2403,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
          for ( int a = 0; a < NVIR_ab; a++ ){
             for ( int b = a+1; b < NVIR_ab; b++ ){
 
-               // Fill workspace[ xy ] with (ax|by)
+               // Fill workspace[ xy ] with [ (ax|by) - (ay|bx) ]
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
                   const int d_xy   = indices->getDMRGcumulative( irrep_xy );
@@ -2398,14 +2413,15 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int x = 0; x < num_xy; x++ ){
                      for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
                         const double ax_by = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + x, occ_xy + y, N_OA_ab + a, N_OA_ab + b );
-                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ax_by;
+                        const double ay_bx = integrals->get_exchange( irrep_xy, irrep_xy, irrep_ab, irrep_ab, occ_xy + y, occ_xy + x, N_OA_ab + a, N_OA_ab + b );
+                        workspace[ jump_xy + x + (y*(y-1))/2 ] = ax_by - ay_bx;
                      }
                   }
                   jump_xy += ( num_xy * ( num_xy - 1 ) ) / 2;
                }
                assert( jump_xy == size_F_triplet[ 0 ] );
 
-               // Perform target[ tu ] = sum_xy (ax|by) SFF_triplet[ It x Iu ][ xytu ]
+               // Perform target[ tu ] = sum_{x<y} [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
                char notrans = 'N';
                int int1 = 1;
                double alpha = 1.0;
@@ -2432,7 +2448,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
             for ( int a = 0; a < NVIR_a; a++ ){
                for ( int b = 0; b < NVIR_b; b++ ){
 
-                  // Fill workspace[ xy ] with (ax|by)
+                  // Fill workspace[ xy ] with [ (ax|by) + (ay|bx) ]
                   int jump_xy = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
@@ -2447,25 +2463,48 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                         for ( int y = 0; y < num_y; y++ ){
                            for ( int x = 0; x < num_x; x++ ){
                               const double ax_by = integrals->get_exchange( irrep_x, irrep_y, irrep_a, irrep_b, occ_x + x, occ_y + y, N_OA_a + a, N_OA_b + b );
-                              workspace[ jump_xy + x + num_x * y ] = ax_by;
+                              const double ay_bx = integrals->get_exchange( irrep_y, irrep_x, irrep_a, irrep_b, occ_y + y, occ_x + x, N_OA_a + a, N_OA_b + b );
+                              workspace[ jump_xy + x + num_x * y ] = ax_by + ay_bx;
                            }
                         }
-
                         jump_xy += num_x * num_y;
                      }
                   }
                   assert( jump_xy == size_F_singlet[ irrep ] );
-                  assert( jump_xy == size_F_triplet[ irrep ] );
 
-                  // Perform target[ tu ] = sum_xy (ix|jy) SFF_singlet[ It x Iu ][ xytu ]
+                  // Perform target[ tu ] = sum_{x<y} [ (ax|by) + (ay|bx) ] SFF_singlet[ It x Iu ][ xytu ]
                   char notrans = 'N';
                   int int1 = 1;
                   double alpha = 1.0;
                   double beta = 0.0; //SET
                   double * target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + size_F_singlet[ irrep ] * ( jump_ab + a + NVIR_a * b );
                   dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_singlet[ irrep ], &jump_xy, &beta, target, &int1 );
+                  
+                  // Fill workspace[ xy ] with [ (ax|by) - (ay|bx) ]
+                  jump_xy = 0;
+                  for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+                     const int irrep_y = Irreps::directProd( irrep, irrep_x );
+                     if ( irrep_x < irrep_y ){
+                        const int d_x = indices->getDMRGcumulative( irrep_x );
+                        const int d_y = indices->getDMRGcumulative( irrep_y );
+                        const int occ_x = indices->getNOCC( irrep_x );
+                        const int occ_y = indices->getNOCC( irrep_y );
+                        const int num_x = indices->getNDMRG( irrep_x );
+                        const int num_y = indices->getNDMRG( irrep_y );
 
-                  // Perform target[ tu ] = sum_xy (ix|jy) SFF_triplet[ It x Iu ][ xytu ]
+                        for ( int y = 0; y < num_y; y++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              const double ax_by = integrals->get_exchange( irrep_x, irrep_y, irrep_a, irrep_b, occ_x + x, occ_y + y, N_OA_a + a, N_OA_b + b );
+                              const double ay_bx = integrals->get_exchange( irrep_y, irrep_x, irrep_a, irrep_b, occ_y + y, occ_x + x, N_OA_a + a, N_OA_b + b );
+                              workspace[ jump_xy + x + num_x * y ] = ax_by - ay_bx;
+                           }
+                        }
+                        jump_xy += num_x * num_y;
+                     }
+                  }
+                  assert( jump_xy == size_F_triplet[ irrep ] );
+
+                  // Perform target[ tu ] = sum_{x<y} [ (ax|by) - (ay|bx) ] SFF_triplet[ It x Iu ][ xytu ]
                   target = vector_rhs + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + size_F_triplet[ irrep ] * ( jump_ab + a + NVIR_a * b );
                   dgemm_( &notrans, &notrans, &int1, &jump_xy, &jump_xy, &alpha, workspace, &int1, SFF_triplet[ irrep ], &jump_xy, &beta, target, &int1 );
 
