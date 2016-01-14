@@ -2,9 +2,13 @@
 * Break API: bump up SO version (psi4 interface does NOT need to change!)
 * Class TensorOperator: replaces TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD
 * Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)
-* Further optimization allowed after RDM calculation
+* Further DMRG sweeps allowed after RDM calculation
 * FCI 3- and 4-RDM in FCI::Fill3RDM and FCI::Fill4RDM
 * DMRG 3-RDM in ThreeDM class in O(L^4 D^3 + L^6 D^2) ([Kurashige, JCP 141, 174111 (2014)](http://dx.doi.org/10.1063/1.4900878))
+* Cumulant::gamma4_ham: cu(4) reconstruction of 4-RDM based on DMRG ThreeDM
+* FCI::Fock4RDM: fast contraction of Fock matrix with FCI 4-RDM
+* Cumulant::gamma4_fock_contract_ham: fast contraction of Fock matrix with cu(4) reconstruction of 4-RDM
+* CASPT2-D (CASPT2 follows)
 
 #### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab
