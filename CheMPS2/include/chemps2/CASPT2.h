@@ -127,9 +127,7 @@ namespace CheMPS2{
          
          // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{ INVERSE==true ? -1 : 1 } x vector
          void blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor, const bool INVERSE ) const;
-         static void blockdiaghelper_dgemv( double alpha, double beta, int SIZE, double * matrix, double * origin, double * target );
-         static void blockdiaghelper_dsyev( int SIZE, double * matrix, double * vecs, double * work, double * eigs, int lwork );
-         static void blockdiaghelper_inverse( double alpha, double beta, int SIZE, double * vecs, double * work, double * eigs, double * origin, double * target );
+         static double blockdiaghelper( const double alpha, const double beta, const int SIZE, double * array, double * origin, double * target, const bool INVERSE );
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
@@ -187,6 +185,7 @@ namespace CheMPS2{
          void recreate();
          static int recreatehelper( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
          static void recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
+         static double * recreatehelper3( double * FOCK, int NEWSIZE );
          
          
    };
