@@ -62,7 +62,7 @@ namespace CheMPS2{
    class CASPT2{
 
       public:
-      
+
          //! Constructor
          /** \param idx      DMRGSCFindices which contain the partitioning into occupied, active, and virtual orbitals per irrep
              \param ints     The two-electron integrals needed for CASSCF and CASPT2
@@ -73,10 +73,10 @@ namespace CheMPS2{
              \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals)
              \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals) */
          CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract);
-         
+
          //! Destructor
          virtual ~CASPT2();
-         
+
       private:
       
          // The number of occupied, active and virtual orbitals per irrep (externally allocated and deleted)
@@ -111,13 +111,13 @@ namespace CheMPS2{
          
          // The number of irreps
          int num_irreps;
-         
+
          // The Fock operator expectation value
          double E_FOCK;
-         
+
          // Calculate the expectation value of the Fock operator
-         double create_f_dots();
-         
+         void create_f_dots();
+
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
          long long debug_total_length() const;
@@ -125,9 +125,8 @@ namespace CheMPS2{
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals );
          
-         // Calculate result = [ fock_prefactor * blockdiag(F) + ovlp_prefactor * S ]^{ INVERSE==true ? -1 : 1 } x vector
-         void blockdiag( double * vector, double * result, const double fock_prefactor, const double ovlp_prefactor, const bool INVERSE ) const;
-         static double blockdiaghelper( const double alpha, const double beta, const int SIZE, double * array, double * origin, double * target, const bool INVERSE );
+         // Fill result with the diagonal elements of the Fock operator
+         void diagonal( double * result, const double fock_prefactor, const double ovlp_prefactor ) const;
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
