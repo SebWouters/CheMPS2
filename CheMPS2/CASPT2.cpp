@@ -532,9 +532,9 @@ int CheMPS2::CASPT2::vector_helper(){
       helper[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] = linsize_G_triplet * size_G[ irrep ];
    }
 
-   /*** Type H singlet : c_aibj ( E_ai E_bj + E_bi E_aj ) / sqrt( ( 1 + delta_ij ) * ( 1 + delta_ab ) ) | 0 > with a <= b and i <= j
+   /*** Type H singlet : c_aibj ( E_ai E_bj + E_bi E_aj ) / sqrt( 2 - ( 1 - delta_ij ) * ( 1 - delta_ab ) ) | 0 > with a <= b and i <= j
                          c_aibj = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + count_aibj ]
-        Type H triplet : c_aibj ( E_ai E_bj - E_bi E_aj ) / sqrt( ( 1 + delta_ij ) * ( 1 + delta_ab ) ) | 0 > with a <  b and i <  j
+        Type H triplet : c_aibj ( E_ai E_bj - E_bi E_aj ) / sqrt( 2 - ( 1 - delta_ij ) * ( 1 - delta_ab ) ) | 0 > with a <  b and i <  j
                          c_aibj = vector[ jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + count_aibj ]
 
         1/ irrep = 0 .. num_irreps
@@ -979,10 +979,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
    for ( int elem = 0; elem < total_size; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
 
    /*
-      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
-      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
+      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] )
+      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] )
+      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] )
+      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] )
    */
 
 }
@@ -1018,7 +1018,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FDD: < E_yx E_jb ( f_pq E_pq) E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
+   // FDD: < E_yx E_jb ( f_pq E_pq ) E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int SIZE = size_D[ irrep ];
       if ( SIZE > 0 ){
@@ -1043,7 +1043,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FBB singlet: < S_xkyl | f_pq E_pq | S_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
+   // FBB singlet: < SB_xkyl | f_pq E_pq | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
    {
       const int SIZE = size_B_singlet[ 0 ];
       if ( SIZE > 0 ){
@@ -1089,7 +1089,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FBB triplet: < T_xkyl | f_pq E_pq | T_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
+   // FBB triplet: < TB_xkyl | f_pq E_pq | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
    {
       const int SIZE = size_B_triplet[ 0 ];
       if ( SIZE > 0 ){
@@ -1135,7 +1135,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FFF singlet: < S_cxdy | f_pq E_pq | S_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
+   // FFF singlet: < SF_cxdy | f_pq E_pq | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
    {
       const int SIZE = size_F_singlet[ 0 ];
       if ( SIZE > 0 ){
@@ -1184,7 +1184,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FFF triplet: < T_cxdy | f_pq E_pq | T_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
+   // FFF triplet: < TF_cxdy | f_pq E_pq | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
    {
       const int SIZE = size_F_triplet[ 0 ];
       if ( SIZE > 0 ){
@@ -1233,7 +1233,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FEE singlet: < S_ukbl | f_pq E_pq | S_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+   // FEE singlet: < SE_ukbl | f_pq E_pq | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int SIZE = size_E[ irrep ];
       if ( SIZE > 0 ){
@@ -1286,7 +1286,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FEE triplet: < T_ukbl | f_pq E_pq | T_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+   // FEE triplet: < TE_ukbl | f_pq E_pq | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int SIZE = size_E[ irrep ];
       if ( SIZE > 0 ){
@@ -1339,7 +1339,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
    
-   // FGG singlet: < S_cjdu | f_pq E_pq | S_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+   // FGG singlet: < SG_cjdu | f_pq E_pq | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int SIZE = size_G[ irrep ];
       if ( SIZE > 0 ){
@@ -1394,7 +1394,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
    
-   // FGG triplet: < T_cjdu | f_pq E_pq | T_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+   // FGG triplet: < TG_cjdu | f_pq E_pq | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int SIZE = size_G[ irrep ];
       if ( SIZE > 0 ){
@@ -1449,7 +1449,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
       }
    }
 
-   // FHH singlet
+   // FHH singlet and triplet
    {
       int jump_aibj = 0;
       for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
@@ -1470,8 +1470,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
                      for ( int j = i; j < NOCC_ij; j++ ){
                         const int cnt_ij = i + ( j * ( j + 1 ) ) / 2;
                         const double f_jj = fock->get( irrep_ij, j, j );
-                        const double term = 4 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
-                        target[ cnt_ij + size_ij * cnt_ab ] = term;
+                        const double term = shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj;
+                        target[ cnt_ij + size_ij * cnt_ab ] = ((( a==b ) && ( i==j )) ? 8 : 4 ) * term;
                      }
                   }
                }
@@ -1480,47 +1480,6 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
          }
       }
    }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      int jump_aibj = 0;
-      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-         const int irrep_j = Irreps::directProd( irrep, irrep_i );
-         if ( irrep_i < irrep_j ){
-            const int NOCC_i  = indices->getNOCC( irrep_i );
-            const int NOCC_j  = indices->getNOCC( irrep_j );
-            const int size_ij = NOCC_i * NOCC_j;
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep, irrep_a );
-               if ( irrep_a < irrep_b ){
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  const int size_ab = NVIR_a * NVIR_b;
-                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int cnt_ab = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           for ( int j = 0; j < NOCC_j; j++ ){
-                              const int cnt_ij = i + NOCC_i * j;
-                              const double f_jj = fock->get( irrep_j, j, j );
-                              const double term = 4 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
-                              target[ cnt_ij + size_ij * cnt_ab ] = term;
-                           }
-                        }
-                     }
-                  }
-                  jump_aibj += size_ij * size_ab;
-               }
-            }
-         }
-      }
-   }
-
-   // FHH triplet
    {
       int jump_aibj = 0;
       for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
@@ -1541,8 +1500,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
                      for ( int j = i+1; j < NOCC_ij; j++ ){
                         const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
                         const double f_jj = fock->get( irrep_ij, j, j );
-                        const double term = 12 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
-                        target[ cnt_ij + size_ij * cnt_ab ] = term;
+                        const double term = shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj;
+                        target[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
                      }
                   }
                }
@@ -1567,7 +1526,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
                   const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                   const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
                   const int size_ab = NVIR_a * NVIR_b;
-                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
+                  double * target_singlet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + jump_aibj;
+                  double * target_triplet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + jump_aibj;
                   for ( int a = 0; a < NVIR_a; a++ ){
                      const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                      for ( int b = 0; b < NVIR_b; b++ ){
@@ -1578,8 +1538,9 @@ void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) c
                            for ( int j = 0; j < NOCC_j; j++ ){
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
-                              const double term = 12 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
-                              target[ cnt_ij + size_ij * cnt_ab ] = term;
+                              const double term = shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj;
+                              target_singlet[ cnt_ij + size_ij * cnt_ab ] =  4 * term;
+                              target_triplet[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
                            }
                         }
                      }
@@ -1639,7 +1600,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
            < T_aibt | H > = sum_w [ (ai|bw) - (bi|aw) ] * 3 * SGG[ It ][ wt ]
 
       VH:  < H E_ai E_bj >
-           < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ] / sqrt( ( 1 + delta_ij ) * ( 1 + delta_ab ) )
+           < S_aibj | H > = 2 * [ (ai|bj) + (aj|bi) ] / sqrt( 2 - ( 1 - delta_ij ) * ( 1 - delta_ab ) )
            < T_aibj | H > = 6 * [ (ai|bj) - (aj|bi) ]
    */
 
@@ -2426,7 +2387,7 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                            const int count_triplet = jump_aibj_triplet + i + (j*(j-1))/2 + linsize_triplet * ( a + (b*(b-1))/2 );
                            const double ai_bj = integrals->get_exchange( irrep_ij, irrep_ij, irrep_ab, irrep_ab, i, j, noa_ab + a, noa_ab + b );
                            const double aj_bi = integrals->get_exchange( irrep_ij, irrep_ij, irrep_ab, irrep_ab, j, i, noa_ab + a, noa_ab + b );
-                           target_singlet[ count_singlet ] = 2 * ( ai_bj + aj_bi ) * (( i==j ) ? sqrt( 0.5 ) : 1.0 ) * (( a==b ) ? sqrt( 0.5 ) : 1.0 );
+                           target_singlet[ count_singlet ] = 2 * ( ai_bj + aj_bi ) * ((( i==j ) || ( a==b )) ? sqrt( 0.5 ) : 1.0 ); 
    if ( (b-a)*(j-i) > 0 ){ target_triplet[ count_triplet ] = 6 * ( ai_bj - aj_bi ); }
                         }
                      }
@@ -2479,10 +2440,10 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
 void CheMPS2::CASPT2::make_FEH_FGH(){
 
    /*
-      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
-      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
+      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] )
+      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] )
+      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] )
+      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] )
 
          FEH[ Ix ][ xc ] = sum_w SEE[ Ix ][ xw ] fock[ wc ]
          FGH[ Ix ][ xk ] = sum_w SGG[ Ix ][ xw ] fock[ wk ]
