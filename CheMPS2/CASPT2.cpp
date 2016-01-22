@@ -59,6 +59,8 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    make_FEE_FGG(); // Needs to be called AFTER make_S**()!
    make_FBB_FFF_singlet(); // Needs to be called AFTER make_S**()!
    make_FBB_FFF_triplet(); // Needs to be called AFTER make_S**()!
+   
+   make_FEH_FGH(); // Needs to be called AFTER make_S**()!
 
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
@@ -70,7 +72,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
       int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
 
       double * diag_fock = new double[ total_size ];
-      diagonal( diag_fock, 1.0, -E_FOCK );
+      diagonal( diag_fock, -E_FOCK );
       
       double min_eig = 1e18;
       for ( int elem = 0; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
@@ -101,6 +103,8 @@ CheMPS2::CASPT2::~CASPT2(){
       delete [] FDD[ irrep ];
       delete [] FEE[ irrep ];
       delete [] FGG[ irrep ];
+      delete [] FEH[ irrep ];
+      delete [] FGH[ irrep ];
       delete [] FBB_singlet[ irrep ];
       delete [] FBB_triplet[ irrep ];
       delete [] FFF_singlet[ irrep ];
@@ -111,6 +115,8 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] FDD;
    delete [] FEE;
    delete [] FGG;
+   delete [] FEH;
+   delete [] FGH;
    delete [] FBB_singlet;
    delete [] FBB_triplet;
    delete [] FFF_singlet;
@@ -709,7 +715,6 @@ int CheMPS2::CASPT2::recreatehelper( double * FOCK, double * OVLP, int SIZE, dou
 void CheMPS2::CASPT2::recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs ){
 
    // rhs <-- eigs^{-0.5} V^T rhs
-   const int skip = OLDSIZE - NEWSIZE;
    int inc1 = 1;
    double set = 0.0;
    double one = 1.0;
@@ -720,15 +725,21 @@ void CheMPS2::CASPT2::recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, 
 
 }
 
-double * CheMPS2::CASPT2::recreatehelper3( double * FOCK, int SIZE ){
+void CheMPS2::CASPT2::recreatehelper_left( double * ROT, int OLDSIZE, int NEWSIZE, double * matrix, int RIGHTSIZE, double * work ){
 
-   if ( SIZE == 0 ){ return FOCK; }
+   if ( NEWSIZE * OLDSIZE * RIGHTSIZE == 0 ){ return; }
 
-   double * NEWFOCK = new double[ SIZE ];
+   // work = ROT^T * matrix
+   double set = 0.0;
+   double one = 1.0;
+   char trans   = 'T';
+   char notrans = 'N';
+   dgemm_( &trans, &notrans, &NEWSIZE, &RIGHTSIZE, &OLDSIZE, &one, ROT, &OLDSIZE, matrix, &OLDSIZE, &set, work, &NEWSIZE );
+
+   // matrix = work
+   int size_copy = NEWSIZE * RIGHTSIZE;
    int inc1 = 1;
-   dcopy_( &SIZE, FOCK, &inc1, NEWFOCK, &inc1 );
-   delete [] FOCK;
-   return NEWFOCK;
+   dcopy_( &size_copy, work, &inc1, matrix, &inc1 );
 
 }
 
@@ -759,6 +770,11 @@ void CheMPS2::CASPT2::recreate(){
       newsize_B_triplet[ irrep ] = recreatehelper( FBB_triplet[ irrep ], SBB_triplet[ irrep ], size_B_triplet[ irrep ], work, eigs, lwork );
       newsize_F_singlet[ irrep ] = recreatehelper( FFF_singlet[ irrep ], SFF_singlet[ irrep ], size_F_singlet[ irrep ], work, eigs, lwork );
       newsize_F_triplet[ irrep ] = recreatehelper( FFF_triplet[ irrep ], SFF_triplet[ irrep ], size_F_triplet[ irrep ], work, eigs, lwork );
+   }
+
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      recreatehelper_left( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], FEH[ irrep ], indices->getNVIRT( irrep ), work );
+      recreatehelper_left( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], FGH[ irrep ], indices->getNOCC( irrep ),  work );
    }
 
    delete [] work;
@@ -909,18 +925,6 @@ void CheMPS2::CASPT2::recreate(){
    delete [] SFF_singlet;
    delete [] SFF_triplet;
 
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      FAA[ irrep ] = recreatehelper3( FAA[ irrep ], size_A[ irrep ] );
-      FCC[ irrep ] = recreatehelper3( FCC[ irrep ], size_C[ irrep ] );
-      FDD[ irrep ] = recreatehelper3( FDD[ irrep ], size_D[ irrep ] );
-      FEE[ irrep ] = recreatehelper3( FEE[ irrep ], size_E[ irrep ] );
-      FGG[ irrep ] = recreatehelper3( FGG[ irrep ], size_G[ irrep ] );
-      FBB_singlet[ irrep ] = recreatehelper3( FBB_singlet[ irrep ], size_B_singlet[ irrep ] );
-      FBB_triplet[ irrep ] = recreatehelper3( FBB_triplet[ irrep ], size_B_triplet[ irrep ] );
-      FFF_singlet[ irrep ] = recreatehelper3( FFF_singlet[ irrep ], size_F_singlet[ irrep ] );
-      FFF_triplet[ irrep ] = recreatehelper3( FFF_triplet[ irrep ], size_F_triplet[ irrep ] );
-   }
-
    const int total_size = jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ];
    cout << "CASPT2 : Nonredundant size of the V_SD space = " << total_size << endl;
 
@@ -930,23 +934,26 @@ int CheMPS2::CASPT2::get_maxsize() const{
 
    int maxsize = 0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      maxsize = max( max( max( max( max( max( max( max( max( size_A[irrep],
-                                                             size_C[irrep] ),
-                                                             size_D[irrep] ),
-                                                             size_E[irrep] ),
-                                                             size_G[irrep] ),
-                                                             size_B_singlet[irrep] ),
-                                                             size_B_triplet[irrep] ),
-                                                             size_F_singlet[irrep] ),
-                                                             size_F_triplet[irrep] ),
-                                                             maxsize );
+      maxsize = max( max( max( max( max( max( max( max( max( max( max(
+                                        size_A[irrep],
+                                        size_C[irrep] ),
+                                        size_D[irrep] ),
+                                        size_E[irrep] ),
+                                        size_G[irrep] ),
+                                        size_B_singlet[irrep] ),
+                                        size_B_triplet[irrep] ),
+                                        size_F_singlet[irrep] ),
+                                        size_F_triplet[irrep] ),
+                                        indices->getNOCC( irrep ) ),
+                                        indices->getNVIRT( irrep ) ),
+                                        maxsize );
    }
    if ( maxsize <= 2 ){ maxsize = 3; }
    return maxsize;
 
 }
 
-void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, const double ovlp_prefactor ) const{
+void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fock ) const{
 
    /*
          TODO  | A  Bsinglet  Btriplet  C     D1     D2    Esinglet  Etriplet  Fsinglet  Ftriplet  Gsinglet  Gtriplet  Hsinglet  Htriplet
@@ -968,7 +975,28 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
       
    */
 
-   const double shifted_prefactor = ovlp_prefactor + 2 * fock_prefactor * sum_f_kk;
+   const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   for ( int elem = 0; elem < total_size; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
+
+   /*
+      FEH singlet: < SE_xkcl | F | SH_aibj > = 2 ( delta_ik delta_jl + delta_il delta_kj ) delta_bc FEH[ Ix ][ xa ]
+                                             + 2 ( delta_ik delta_jl + delta_il delta_kj ) delta_ac FEH[ Ix ][ xb ]
+
+      FEH triplet: < TE_xkcl | F | TH_aibj > = 6 ( delta_ik delta_jl - delta_il delta_kj ) delta_bc FEH[ Ix ][ xa ]
+                                             - 6 ( delta_ik delta_jl - delta_il delta_kj ) delta_ac FEH[ Ix ][ xb ]
+
+      FGH singlet: < SG_ckdx | F | SH_aibj > = ( -2 ) ( delta_ac delta_bd + delta_ad delta_bc ) delta_ik FGH[ Ix ][ xj ]
+                                             + ( -2 ) ( delta_ac delta_bd + delta_ad delta_bc ) delta_jk FGH[ Ix ][ xi ]
+
+      FGH triplet: < TG_ckdx | F | TH_aibj > = ( -6 ) ( delta_ac delta_bd - delta_ad delta_bc ) delta_ik FGH[ Ix ][ xj ]
+                                             - ( -6 ) ( delta_ac delta_bd - delta_ad delta_bc ) delta_jk FGH[ Ix ][ xi ]
+   */
+
+}
+
+void CheMPS2::CASPT2::diagonal( double * result, const double ovlp_prefactor ) const{
+
+   const double shifted_prefactor = ovlp_prefactor + 2 * sum_f_kk;
 
    // FAA: < E_zy E_jx ( f_pq E_pq ) E_ti E_uv > = delta_ji * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
@@ -976,10 +1004,9 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
       if ( SIZE > 0 ){
          const int NOCC = indices->getNOCC( irrep );
          for ( int count = 0; count < NOCC; count++ ){
-            const double alpha1 = fock_prefactor;
-            const double alpha2 = shifted_prefactor - fock_prefactor * fock->get( irrep, count, count );
+            const double beta = shifted_prefactor - fock->get( irrep, count, count );
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
-            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FAA[ irrep ][ elem ] + alpha2; }
+            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FAA[ irrep ][ elem ] + beta; }
          }
       }
    }
@@ -991,10 +1018,9 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
          const int NVIR = indices->getNVIRT( irrep );
          const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
          for ( int count = 0; count < NVIR; count++ ){
-            const double alpha1 = fock_prefactor;
-            const double alpha2 = shifted_prefactor + fock_prefactor * fock->get( irrep, N_OA + count, N_OA + count );
+            const double beta = shifted_prefactor + fock->get( irrep, N_OA + count, N_OA + count );
             double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
-            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FCC[ irrep ][ elem ] + alpha2; }
+            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FCC[ irrep ][ elem ] + beta; }
          }
       }
    }
@@ -1010,12 +1036,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
             const int NVIR_a = indices->getNVIRT( irrep_a );
             const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
             for ( int i = 0; i < NOCC_i; i++ ){
+               const double f_ii = fock->get( irrep_i, i, i );
                for ( int a = 0; a < NVIR_a; a++ ){
-                  const double alpha1 = fock_prefactor;
-                  const double alpha2 = shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - fock->get( irrep_i, i, i ) );
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                  const double beta = shifted_prefactor + f_aa - f_ii;
                   const int count = jump_ai + i + NOCC_i * a;
                   double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FDD[ irrep ][ elem ] + alpha2; }
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FDD[ irrep ][ elem ] + beta; }
                }
             }
             jump_ai += NOCC_i * NVIR_a;
@@ -1031,13 +1058,14 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
          for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
             const int nocc_ij = indices->getNOCC( irrep_ij );
             for ( int i = 0; i < nocc_ij; i++ ){
+               const double f_ii = fock->get( irrep_ij, i, i );
                for ( int j = i; j < nocc_ij; j++ ){
-                  const int ij_factor = (( i == j ) ? 2 : 1 );
-                  const double alpha1 = 2 * ij_factor * fock_prefactor;
-                  const double alpha2 = 2 * ij_factor * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_ij, i, i ) + fock->get( irrep_ij, j, j ) ) );
+                  const int alpha = (( i == j ) ? 4 : 2 );
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double beta = shifted_prefactor - f_ii - f_jj;
                   const int count = jump_ij + i + ( j * ( j + 1 ) ) / 2;
                   double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FBB_singlet[ 0 ][ elem ] + alpha2; }
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha * ( FBB_singlet[ 0 ][ elem ] + beta ); }
                }
             }
             jump_ij += ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
@@ -1054,12 +1082,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                const int nocc_i = indices->getNOCC( irrep_i );
                const int nocc_j = indices->getNOCC( irrep_j );
                for ( int i = 0; i < nocc_i; i++ ){
+                  const double f_ii = fock->get( irrep_i, i, i );
                   for ( int j = 0; j < nocc_j; j++ ){
-                     const double alpha1 = 2 * fock_prefactor;
-                     const double alpha2 = 2 * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_i, i, i ) + fock->get( irrep_j, j, j ) ) );
+                     const double f_jj = fock->get( irrep_j, j, j );
+                     const double beta = shifted_prefactor - f_ii - f_jj;
                      const int count = jump_ij + i + nocc_i * j;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FBB_singlet[ irrep ][ elem ] + alpha2; }
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_singlet[ irrep ][ elem ] + beta ); }
                   }
                }
                jump_ij += nocc_i * nocc_j;
@@ -1076,12 +1105,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
          for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
             const int nocc_ij = indices->getNOCC( irrep_ij );
             for ( int i = 0; i < nocc_ij; i++ ){
+               const double f_ii = fock->get( irrep_ij, i, i );
                for ( int j = i+1; j < nocc_ij; j++ ){
-                  const double alpha1 = 2 * fock_prefactor;
-                  const double alpha2 = 2 * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_ij, i, i ) + fock->get( irrep_ij, j, j ) ) );
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double beta = shifted_prefactor - f_ii - f_jj;
                   const int count = jump_ij + i + ( j * ( j - 1 ) ) / 2;
                   double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FBB_triplet[ 0 ][ elem ] + alpha2; }
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ 0 ][ elem ] + beta ); }
                }
             }
             jump_ij += ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
@@ -1098,12 +1128,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                const int nocc_i = indices->getNOCC( irrep_i );
                const int nocc_j = indices->getNOCC( irrep_j );
                for ( int i = 0; i < nocc_i; i++ ){
+                  const double f_ii = fock->get( irrep_i, i, i );
                   for ( int j = 0; j < nocc_j; j++ ){
-                     const double alpha1 = 2 * fock_prefactor;
-                     const double alpha2 = 2 * ( shifted_prefactor - fock_prefactor * ( fock->get( irrep_i, i, i ) + fock->get( irrep_j, j, j ) ) );
+                     const double f_jj = fock->get( irrep_j, j, j );
+                     const double beta = shifted_prefactor - f_ii - f_jj;
                      const int count = jump_ij + i + nocc_i * j;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FBB_triplet[ irrep ][ elem ] + alpha2; }
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ irrep ][ elem ] + beta ); }
                   }
                }
                jump_ij += nocc_i * nocc_j;
@@ -1121,14 +1152,14 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a; b < NVIR_ab; b++ ){
-                  const int ab_factor = (( a == b ) ? 2 : 1 );
-                  const double alpha1 = 2 * ab_factor * fock_prefactor;
-                  const double alpha2 = 2 * ab_factor * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a )
-                                                                                               + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b ) ) );
+                  const int alpha = (( a == b ) ? 4 : 2 );
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double beta = shifted_prefactor + f_aa + f_bb;
                   const int count = jump_ab + a + ( b * ( b + 1 ) ) / 2;
                   double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FFF_singlet[ 0 ][ elem ] + alpha2; }
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha * ( FFF_singlet[ 0 ][ elem ] + beta ); }
                }
             }
             jump_ab += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
@@ -1147,13 +1178,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
                for ( int a = 0; a < NVIR_a; a++ ){
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                   for ( int b = 0; b < NVIR_b; b++ ){
-                     const double alpha1 = 2 * fock_prefactor;
-                     const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                      + fock->get( irrep_b, N_OA_b + b, N_OA_b + b ) ) );
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = shifted_prefactor + f_aa + f_bb;
                      const int count = jump_ab + a + NVIR_a * b;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FFF_singlet[ irrep ][ elem ] + alpha2; }
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ irrep ][ elem ] + beta ); }
                   }
                }
                jump_ab += NVIR_a * NVIR_b;
@@ -1171,13 +1202,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
             const int NVIR_ab = indices->getNVIRT( irrep_ab );
             const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
             for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a+1; b < NVIR_ab; b++ ){
-                  const double alpha1 = 2 * fock_prefactor;
-                  const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a )
-                                                                                   + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b ) ) );
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double beta = shifted_prefactor + f_aa + f_bb;
                   const int count = jump_ab + a + ( b * ( b - 1 ) ) / 2;
                   double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FFF_triplet[ 0 ][ elem ] + alpha2; }
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ 0 ][ elem ] + beta ); }
                }
             }
             jump_ab += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
@@ -1196,13 +1227,13 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
                for ( int a = 0; a < NVIR_a; a++ ){
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                   for ( int b = 0; b < NVIR_b; b++ ){
-                     const double alpha1 = 2 * fock_prefactor;
-                     const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                      + fock->get( irrep_b, N_OA_b + b, N_OA_b + b ) ) );
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = shifted_prefactor + f_aa + f_bb;
                      const int count = jump_ab + a + NVIR_a * b;
                      double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FFF_triplet[ irrep ][ elem ] + alpha2; }
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ irrep ][ elem ] + beta ); }
                   }
                }
                jump_ab += NVIR_a * NVIR_b;
@@ -1226,16 +1257,16 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                if ( irrep_i == irrep_j ){
                   const int NOCC_ij = indices->getNOCC( irrep_i );
                   for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
                      for ( int j = i; j < NOCC_ij; j++ ){
                         const int count = jump_ij + i + ( j * ( j + 1 ) ) / 2;
-                        const int ij_factor = (( i == j ) ? 2 : 1 );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const int alpha = (( i == j ) ? 4 : 2 );
                         for ( int a = 0; a < NVIR_a; a++ ){
-                           const double alpha1 = 2 * ij_factor * fock_prefactor;
-                           const double alpha2 = 2 * ij_factor * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                                        - fock->get( irrep_i,          i,          i )
-                                                                                                        - fock->get( irrep_j,          j,          j ) ) );
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = shifted_prefactor + f_aa - f_ii - f_jj;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FEE[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha * ( FEE[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1245,15 +1276,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int NOCC_i = indices->getNOCC( irrep_i );
                   const int NOCC_j = indices->getNOCC( irrep_j );
                   for ( int i = 0; i < NOCC_i; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
                      for ( int j = 0; j < NOCC_j; j++ ){
                         const int count = jump_ij + i + NOCC_i * j;
+                        const double f_jj = fock->get( irrep_j, j, j );
                         for ( int a = 0; a < NVIR_a; a++ ){
-                           const double alpha1 = 2 * fock_prefactor;
-                           const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                            - fock->get( irrep_i,          i,          i )
-                                                                                            - fock->get( irrep_j,          j,          j ) ) );
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = shifted_prefactor + f_aa - f_ii - f_jj;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FEE[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1280,15 +1311,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                if ( irrep_i == irrep_j ){
                   const int NOCC_ij = indices->getNOCC( irrep_i );
                   for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
                      for ( int j = i+1; j < NOCC_ij; j++ ){
                         const int count = jump_ij + i + ( j * ( j - 1 ) ) / 2;
+                        const double f_jj = fock->get( irrep_j, j, j );
                         for ( int a = 0; a < NVIR_a; a++ ){
-                           const double alpha1 = 6 * fock_prefactor;
-                           const double alpha2 = 6 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                            - fock->get( irrep_i,          i,          i )
-                                                                                            - fock->get( irrep_j,          j,          j ) ) );
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = shifted_prefactor + f_aa - f_ii - f_jj;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FEE[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1298,15 +1329,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int NOCC_i = indices->getNOCC( irrep_i );
                   const int NOCC_j = indices->getNOCC( irrep_j );
                   for ( int i = 0; i < NOCC_i; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
                      for ( int j = 0; j < NOCC_j; j++ ){
                         const int count = jump_ij + i + NOCC_i * j;
+                        const double f_jj = fock->get( irrep_j, j, j );
                         for ( int a = 0; a < NVIR_a; a++ ){
-                           const double alpha1 = 6 * fock_prefactor;
-                           const double alpha2 = 6 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                            - fock->get( irrep_i,          i,          i )
-                                                                                            - fock->get( irrep_j,          j,          j ) ) );
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = shifted_prefactor + f_aa - f_ii - f_jj;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( jump_aij + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FEE[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1333,16 +1364,16 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int NVIR_ab = indices->getNVIRT( irrep_a );
                   const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                   for ( int a = 0; a < NVIR_ab; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
                      for ( int b = a; b < NVIR_ab; b++ ){
                         const int count = jump_ab + a + ( b * ( b + 1 ) ) / 2;
-                        const int ab_factor = (( a == b ) ? 2 : 1 );
+                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
+                        const int alpha = (( a == b ) ? 4 : 2 );
                         for ( int i = 0; i < NOCC_i; i++ ){
-                           const double alpha1 = 2 * ab_factor * fock_prefactor;
-                           const double alpha2 = 2 * ab_factor * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a )
-                                                                                                        + fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b )
-                                                                                                        - fock->get( irrep_i,           i,           i ) ) );
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = shifted_prefactor + f_aa + f_bb - f_ii;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FGG[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha * ( FGG[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1354,15 +1385,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                   const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
                   for ( int a = 0; a < NVIR_a; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                      for ( int b = 0; b < NVIR_b; b++ ){
                         const int count = jump_ab + a + NVIR_a * b;
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
                         for ( int i = 0; i < NOCC_i; i++ ){
-                           const double alpha1 = 2 * fock_prefactor;
-                           const double alpha2 = 2 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                            + fock->get( irrep_b, N_OA_b + b, N_OA_b + b )
-                                                                                            - fock->get( irrep_i,          i,          i ) ) );
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = shifted_prefactor + f_aa + f_bb - f_ii;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FGG[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1389,15 +1420,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int NVIR_ab = indices->getNVIRT( irrep_a );
                   const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                   for ( int a = 0; a < NVIR_ab; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
                      for ( int b = a+1; b < NVIR_ab; b++ ){
                         const int count = jump_ab + a + ( b * ( b - 1 ) ) / 2;
+                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
                         for ( int i = 0; i < NOCC_i; i++ ){
-                           const double alpha1 = 6 * fock_prefactor;
-                           const double alpha2 = 6 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a )
-                                                                                            + fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b )
-                                                                                            - fock->get( irrep_i,           i,           i ) ) );
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = shifted_prefactor + f_aa + f_bb - f_ii;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FGG[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1409,15 +1440,15 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                   const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
                   const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
                   for ( int a = 0; a < NVIR_a; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                      for ( int b = 0; b < NVIR_b; b++ ){
                         const int count = jump_ab + a + NVIR_a * b;
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
                         for ( int i = 0; i < NOCC_i; i++ ){
-                           const double alpha1 = 6 * fock_prefactor;
-                           const double alpha2 = 6 * ( shifted_prefactor + fock_prefactor * ( fock->get( irrep_a, N_OA_a + a, N_OA_a + a )
-                                                                                            + fock->get( irrep_b, N_OA_b + b, N_OA_b + b )
-                                                                                            - fock->get( irrep_i,          i,          i ) ) );
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = shifted_prefactor + f_aa + f_bb - f_ii;
                            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( jump_abi + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = alpha1 * FGG[ irrep ][ elem ] + alpha2; }
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
                         }
                      }
                   }
@@ -1444,16 +1475,16 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                for ( int b = a; b < NVIR_ab; b++ ){
                   const int cnt_ab = a + ( b * ( b + 1 ) ) / 2;
-                  const int ab_factor = (( a == b ) ? 2 : 1 );
+                  const int ab_factor = (( a == b ) ? 4 : 2 );
                   const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
                   for ( int i = 0; i < NOCC_ij; i++ ){
                      const double f_ii = fock->get( irrep_ij, i, i );
                      for ( int j = i; j < NOCC_ij; j++ ){
                         const int cnt_ij = i + ( j * ( j + 1 ) ) / 2;
-                        const int ij_factor = (( i == j ) ? 2 : 1 );
+                        const int ij_factor = (( i == j ) ? 4 : 2 );
                         const double f_jj = fock->get( irrep_ij, j, j );
-                        const double alpha = 4 * ij_factor * ab_factor * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                        target[ cnt_ij + size_ij * cnt_ab ] = alpha;
+                        const double term = ij_factor * ab_factor * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
+                        target[ cnt_ij + size_ij * cnt_ab ] = term;
                      }
                   }
                }
@@ -1489,8 +1520,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                            for ( int j = 0; j < NOCC_j; j++ ){
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
-                              const double alpha = 4 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                              target[ cnt_ij + size_ij * cnt_ab ] = alpha;
+                              const double term = 4 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
+                              target[ cnt_ij + size_ij * cnt_ab ] = term;
                            }
                         }
                      }
@@ -1501,7 +1532,7 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
          }
       }
    }
-   
+
    // FHH triplet
    {
       int jump_aibj = 0;
@@ -1523,8 +1554,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                      for ( int j = i+1; j < NOCC_ij; j++ ){
                         const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
                         const double f_jj = fock->get( irrep_ij, j, j );
-                        const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                        target[ cnt_ij + size_ij * cnt_ab ] = alpha;
+                        const double term = 12 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
+                        target[ cnt_ij + size_ij * cnt_ab ] = term;
                      }
                   }
                }
@@ -1560,8 +1591,8 @@ void CheMPS2::CASPT2::diagonal( double * result, const double fock_prefactor, co
                            for ( int j = 0; j < NOCC_j; j++ ){
                               const int cnt_ij = i + NOCC_i * j;
                               const double f_jj = fock->get( irrep_j, j, j );
-                              const double alpha = 12 * ( shifted_prefactor + fock_prefactor * ( f_dot_1dm + f_aa + f_bb - f_ii - f_jj ) );
-                              target[ cnt_ij + size_ij * cnt_ab ] = alpha;
+                              const double term = 12 * ( shifted_prefactor + f_dot_1dm + f_aa + f_bb - f_ii - f_jj );
+                              target[ cnt_ij + size_ij * cnt_ab ] = term;
                            }
                         }
                      }
@@ -2454,6 +2485,60 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
       }
       assert( jump_aibj_singlet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] );
       assert( jump_aibj_triplet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] );
+   }
+
+}
+
+void CheMPS2::CASPT2::make_FEH_FGH(){
+
+   /*
+      FEH singlet: < SE_xkcl | F | SH_aibj > = 2 ( delta_ik delta_jl + delta_il delta_kj ) delta_bc FEH[ Ix ][ xa ]
+                                             + 2 ( delta_ik delta_jl + delta_il delta_kj ) delta_ac FEH[ Ix ][ xb ]
+
+      FEH triplet: < TE_xkcl | F | TH_aibj > = 6 ( delta_ik delta_jl - delta_il delta_kj ) delta_bc FEH[ Ix ][ xa ]
+                                             - 6 ( delta_ik delta_jl - delta_il delta_kj ) delta_ac FEH[ Ix ][ xb ]
+
+      FGH singlet: < SG_ckdx | F | SH_aibj > = ( -2 ) ( delta_ac delta_bd + delta_ad delta_bc ) delta_ik FGH[ Ix ][ xj ]
+                                             + ( -2 ) ( delta_ac delta_bd + delta_ad delta_bc ) delta_jk FGH[ Ix ][ xi ]
+
+      FGH triplet: < TG_ckdx | F | TH_aibj > = ( -6 ) ( delta_ac delta_bd - delta_ad delta_bc ) delta_ik FGH[ Ix ][ xj ]
+                                             - ( -6 ) ( delta_ac delta_bd - delta_ad delta_bc ) delta_jk FGH[ Ix ][ xi ]
+
+         FEH[ Ix ][ xc ] = sum_w SEE[ Ix ][ xw ] fock[ wc ]
+         FGH[ Ix ][ xk ] = sum_w SGG[ Ix ][ xw ] fock[ wk ]
+
+   */
+
+   FEH = new double*[ num_irreps ];
+   FGH = new double*[ num_irreps ];
+
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+
+      const int NOCC = indices->getNOCC( irrep );
+      const int NACT = indices->getNDMRG( irrep );
+      const int N_OA = NOCC + NACT;
+      const int NVIR = indices->getNVIRT( irrep );
+
+      FEH[ irrep ] = new double[ NACT * NVIR ];
+      FGH[ irrep ] = new double[ NACT * NOCC ];
+
+      for ( int c = 0; c < NVIR; c++ ){
+         for ( int x = 0; x < NACT; x++ ){
+            double value = 0.0;
+            for ( int w = 0; w < NACT; w++ ){ value += SEE[ irrep ][ x + NACT * w ] * fock->get( irrep, NOCC + w, N_OA + c ); }
+            FEH[ irrep ][ x + NACT * c ] = value;
+         }
+      }
+
+      for ( int k = 0; k < NOCC; k++ ){
+         for ( int x = 0; x < NACT; x++ ){
+            double value = 0.0;
+            for ( int w = 0; w < NACT; w++ ){ value += SGG[ irrep ][ x + NACT * w ] * fock->get( irrep, NOCC + w, k ); }
+            FEH[ irrep ][ x + NACT * k ] = value;
+         }
+      }
    }
 
 }
