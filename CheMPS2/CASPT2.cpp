@@ -59,8 +59,6 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    make_FEE_FGG(); // Needs to be called AFTER make_S**()!
    make_FBB_FFF_singlet(); // Needs to be called AFTER make_S**()!
    make_FBB_FFF_triplet(); // Needs to be called AFTER make_S**()!
-   
-   make_FEH_FGH(); // Needs to be called AFTER make_S**()!
 
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
@@ -86,8 +84,9 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
       
       cout.precision(8);
       cout << std::fixed;
-      cout << "E(CASPT2-D)                = " << energy_caspt2d << endl;
-      cout << "Test 8 according to molcas = " << -0.1596306078 << endl;
+      cout << "E(CASPT2-D)            = " << energy_caspt2d << endl;
+      cout << "MOLCAS test 8 CASPT2-D = " << -0.1596306078 << endl;
+      cout << "MOLCAS test 8 CASPT2-N = " << -0.1599978130 << endl;
       cout.unsetf( std::ios::floatfield );
       cout.precision(15);
 
@@ -103,8 +102,6 @@ CheMPS2::CASPT2::~CASPT2(){
       delete [] FDD[ irrep ];
       delete [] FEE[ irrep ];
       delete [] FGG[ irrep ];
-      delete [] FEH[ irrep ];
-      delete [] FGH[ irrep ];
       delete [] FBB_singlet[ irrep ];
       delete [] FBB_triplet[ irrep ];
       delete [] FFF_singlet[ irrep ];
@@ -115,8 +112,6 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] FDD;
    delete [] FEE;
    delete [] FGG;
-   delete [] FEH;
-   delete [] FGH;
    delete [] FBB_singlet;
    delete [] FBB_triplet;
    delete [] FFF_singlet;
@@ -725,24 +720,6 @@ void CheMPS2::CASPT2::recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, 
 
 }
 
-void CheMPS2::CASPT2::recreatehelper_left( double * ROT, int OLDSIZE, int NEWSIZE, double * matrix, int RIGHTSIZE, double * work ){
-
-   if ( NEWSIZE * OLDSIZE * RIGHTSIZE == 0 ){ return; }
-
-   // work = ROT^T * matrix
-   double set = 0.0;
-   double one = 1.0;
-   char trans   = 'T';
-   char notrans = 'N';
-   dgemm_( &trans, &notrans, &NEWSIZE, &RIGHTSIZE, &OLDSIZE, &one, ROT, &OLDSIZE, matrix, &OLDSIZE, &set, work, &NEWSIZE );
-
-   // matrix = work
-   int size_copy = NEWSIZE * RIGHTSIZE;
-   int inc1 = 1;
-   dcopy_( &size_copy, work, &inc1, matrix, &inc1 );
-
-}
-
 void CheMPS2::CASPT2::recreate(){
 
    const int maxsize = get_maxsize(); // Minimum 3
@@ -770,11 +747,6 @@ void CheMPS2::CASPT2::recreate(){
       newsize_B_triplet[ irrep ] = recreatehelper( FBB_triplet[ irrep ], SBB_triplet[ irrep ], size_B_triplet[ irrep ], work, eigs, lwork );
       newsize_F_singlet[ irrep ] = recreatehelper( FFF_singlet[ irrep ], SFF_singlet[ irrep ], size_F_singlet[ irrep ], work, eigs, lwork );
       newsize_F_triplet[ irrep ] = recreatehelper( FFF_triplet[ irrep ], SFF_triplet[ irrep ], size_F_triplet[ irrep ], work, eigs, lwork );
-   }
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      recreatehelper_left( SEE[ irrep ], size_E[ irrep ], newsize_E[ irrep ], FEH[ irrep ], indices->getNVIRT( irrep ), work );
-      recreatehelper_left( SGG[ irrep ], size_G[ irrep ], newsize_G[ irrep ], FGH[ irrep ], indices->getNOCC( irrep ),  work );
    }
 
    delete [] work;
@@ -934,7 +906,7 @@ int CheMPS2::CASPT2::get_maxsize() const{
 
    int maxsize = 0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      maxsize = max( max( max( max( max( max( max( max( max( max( max(
+      maxsize = max( max( max( max( max( max( max( max( max(
                                         size_A[irrep],
                                         size_C[irrep] ),
                                         size_D[irrep] ),
@@ -944,8 +916,6 @@ int CheMPS2::CASPT2::get_maxsize() const{
                                         size_B_triplet[irrep] ),
                                         size_F_singlet[irrep] ),
                                         size_F_triplet[irrep] ),
-                                        indices->getNOCC( irrep ) ),
-                                        indices->getNVIRT( irrep ) ),
                                         maxsize );
    }
    if ( maxsize <= 2 ){ maxsize = 3; }
@@ -959,17 +929,17 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
          TODO  | A  Bsinglet  Btriplet  C     D1     D2    Esinglet  Etriplet  Fsinglet  Ftriplet  Gsinglet  Gtriplet  Hsinglet  Htriplet
       ---------+-------------------------------------------------------------------------------------------------------------------------
       A        | OK    x       x        0     x      x     GRAD      GRAD      0         0         0         0         0         0
-      Bsinglet | x     OK      0        0     0      0     x         0         0         0         0         0         0         0
-      Btriplet | x     0       OK       0     0      0     0         x         0         0         0         0         0         0
+      Bsinglet | x     OK      0        0     0      0     xy        0         0         0         0         0         0         0
+      Btriplet | x     0       OK       0     0      0     0         xy        0         0         0         0         0         0
       C        | 0     0       0        OK    x      x     0         0         x         x         GRAD      GRAD      0         0
       D1       | x     0       0        x     OK     OK    x         x         0         0         x         x         GRAD      GRAD
       D2       | x     0       0        x     OK     OK    x         x         0         0         x         x         GRAD      GRAD
-      Esinglet | GRAD  x       0        0     x      x     OK        0         0         0         0         0         xy        0
-      Etriplet | GRAD  0       x        0     x      x     0         OK        0         0         0         0         0         xy
-      Fsinglet | 0     0       0        x     0      0     0         0         OK        0         x         0         0         0
-      Ftriplet | 0     0       0        x     0      0     0         0         0         OK        0         x         0         0
-      Gsinglet | 0     0       0        GRAD  x      x     0         0         x         0         OK        0         xy        0
-      Gtriplet | 0     0       0        GRAD  x      x     0         0         0         x         0         OK        0         xy
+      Esinglet | GRAD  xy      0        0     x      x     OK        0         0         0         0         0         xy        0
+      Etriplet | GRAD  0       xy       0     x      x     0         OK        0         0         0         0         0         xy
+      Fsinglet | 0     0       0        x     0      0     0         0         OK        0         xy        0         0         0
+      Ftriplet | 0     0       0        x     0      0     0         0         0         OK        0         xy        0         0
+      Gsinglet | 0     0       0        GRAD  x      x     0         0         xy        0         OK        0         xy        0
+      Gtriplet | 0     0       0        GRAD  x      x     0         0         0         xy        0         OK        0         xy
       Hsinglet | 0     0       0        0     GRAD   GRAD  xy        0         0         0         xy        0         OK        0
       Htriplet | 0     0       0        0     GRAD   GRAD  0         xy        0         0         0         xy        0         OK
       
@@ -979,10 +949,18 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
    for ( int elem = 0; elem < total_size; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
 
    /*
-      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
-      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
+      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl sum_w ( delta_bc fock[ wa ] + delta_ac fock[ wb ] ) SEE[ Ix ][ xw ] / sqrt( 1 + delta_ab )
+      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl sum_w ( delta_bc fock[ wa ] - delta_ac fock[ wb ] ) SEE[ Ix ][ xw ] / sqrt( 1 + delta_ab )
+      
+      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd sum_w ( delta_ik fock[ jw ] + delta_jk fock[ iw ] ) SGG[ Ix ][ xw ] / sqrt( 1 + delta_ij )
+      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd sum_w ( delta_ik fock[ jw ] - delta_jk fock[ iw ] ) SGG[ Ix ][ xw ] / sqrt( 1 + delta_ij )
+      
+      FBE singlet: < SB_xkyl | F | SE_tiaj > = +2 delta_ik delta_jl sum_{w full} fock[ wa ] SBB_singlet[ Ixy ][ xytw ]
+      FBE triplet: < TB_xkyl | F | TE_tiaj > = +2 delta_ik delta_jl sum_{w full} fock[ wa ] SBB_triplet[ Ixy ][ xytw ]
+      
+      FFG singlet: < SF_cxdy | F | SG_aibt > = -2 delta_ac delta_bd sum_{w full} fock[ iw ] SFF_singlet[ Ixy ][ xywt ]
+      FFG triplet: < TF_cxdy | F | TG_cxdy > = -2 delta_ab delta_bd sum_{w full} fock[ iw ] SFF_triplet[ Ixy ][ xywt ]
+      
    */
 
 }
@@ -2438,53 +2416,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
       }
       assert( jump_aibj_singlet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] );
       assert( jump_aibj_triplet == jump[ 1 + irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] - jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] );
-   }
-
-}
-
-void CheMPS2::CASPT2::make_FEH_FGH(){
-
-   /*
-      FEH singlet: < SE_xkcl | F | SH_aibj > = +2 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] + delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FEH triplet: < TE_xkcl | F | TH_aibj > = +6 delta_ik delta_jl ( delta_bc FEH[ Ix ][ xa ] - delta_ac FEH[ Ix ][ xb ] ) / sqrt( 1 + delta_ab )
-      FGH singlet: < SG_ckdx | F | SH_aibj > = -2 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] + delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
-      FGH triplet: < TG_ckdx | F | TH_aibj > = -6 delta_ac delta_bd ( delta_ik FGH[ Ix ][ xj ] - delta_jk FGH[ Ix ][ xi ] ) / sqrt( 1 + delta_ij )
-
-         FEH[ Ix ][ xc ] = sum_w SEE[ Ix ][ xw ] fock[ wc ]
-         FGH[ Ix ][ xk ] = sum_w SGG[ Ix ][ xw ] fock[ wk ]
-
-   */
-
-   FEH = new double*[ num_irreps ];
-   FGH = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      const int NOCC = indices->getNOCC( irrep );
-      const int NACT = indices->getNDMRG( irrep );
-      const int N_OA = NOCC + NACT;
-      const int NVIR = indices->getNVIRT( irrep );
-
-      FEH[ irrep ] = new double[ NACT * NVIR ];
-      FGH[ irrep ] = new double[ NACT * NOCC ];
-
-      for ( int c = 0; c < NVIR; c++ ){
-         for ( int x = 0; x < NACT; x++ ){
-            double value = 0.0;
-            for ( int w = 0; w < NACT; w++ ){ value += SEE[ irrep ][ x + NACT * w ] * fock->get( irrep, NOCC + w, N_OA + c ); }
-            FEH[ irrep ][ x + NACT * c ] = value;
-         }
-      }
-
-      for ( int k = 0; k < NOCC; k++ ){
-         for ( int x = 0; x < NACT; x++ ){
-            double value = 0.0;
-            for ( int w = 0; w < NACT; w++ ){ value += SGG[ irrep ][ x + NACT * w ] * fock->get( irrep, NOCC + w, k ); }
-            FEH[ irrep ][ x + NACT * k ] = value;
-         }
-      }
    }
 
 }

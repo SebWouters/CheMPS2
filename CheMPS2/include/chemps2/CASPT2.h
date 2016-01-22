@@ -171,8 +171,6 @@ namespace CheMPS2{
          double ** FDD;
          double ** FEE;
          double ** FGG;
-         double ** FEH;
-         double ** FGH;
          double ** FBB_singlet;
          double ** FBB_triplet;
          double ** FFF_singlet;
@@ -184,13 +182,11 @@ namespace CheMPS2{
          void make_FBB_FFF_singlet();
          void make_FBB_FFF_triplet();
          void make_FEE_FGG();
-         void make_FEH_FGH();
          
          // Diagonalize the overlap matrices and adjust jump, vector_rhs, and FXX accordingly
          void recreate();
          static int recreatehelper( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
          static void recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
-         static void recreatehelper_left( double * ROT, int OLDSIZE, int NEWSIZE, double * matrix, int RIGHTSIZE, double * work );
          
          
    };
