@@ -142,7 +142,12 @@ namespace CheMPS2{
          int * size_B_triplet;
          int * size_F_singlet;
          int * size_F_triplet;
+
+         // Functions for the partitioning of the vector in blocks
          int get_maxsize() const;
+         static int jump_AC( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int irrep_v );
+         static int jump_D(  const DMRGSCFindices * idx, const int irrep_t, const int irrep_u );
+         static int jump_BF( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int ST );
          
          // The RHS of the linear problem
          double * vector_rhs;
@@ -165,7 +170,7 @@ namespace CheMPS2{
          void make_SBB_SFF_triplet();
          void make_SEE_SGG();
          
-         // Variables for the Fock operator
+         // Variables for the diagonal part of the Fock operator
          double ** FAA;
          double ** FCC;
          double ** FDD;
@@ -176,6 +181,20 @@ namespace CheMPS2{
          double ** FFF_singlet;
          double ** FFF_triplet;
          
+         // Variables for the off-diagonal part of the Fock operator: Operator[ IL ][ IR ][ w ][ left + SIZE * right ]
+         double **** FAD;
+         double **** FCD;
+         double *** FEH;
+         double *** FGH;
+         double **** FAB_singlet;
+         double **** FAB_triplet;
+         double **** FCF_singlet;
+         double **** FCF_triplet;
+         double **** FBE_singlet;
+         double **** FBE_triplet;
+         double **** FFG_singlet;
+         double **** FFG_triplet;
+
          // Fill helper variables for the Fock operator
          void make_FAA_FCC();
          void make_FDD();
@@ -183,10 +202,18 @@ namespace CheMPS2{
          void make_FBB_FFF_triplet();
          void make_FEE_FGG();
          
+         void make_FAD_FCD();
+         void make_FEH_FGH();
+         void make_FAB_FCF_singlet();
+         void make_FAB_FCF_triplet();
+         void make_FBE_FFG_singlet();
+         void make_FBE_FFG_triplet();
+
          // Diagonalize the overlap matrices and adjust jump, vector_rhs, and FXX accordingly
          void recreate();
-         static int recreatehelper( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
-         static void recreatehelper2( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
+         static int  recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
+         static void recreatehelper2( double * LEFT, double * RIGHT, double ** matrix, double * work, int OLD_LEFT, int NEW_LEFT, int OLD_RIGHT, int NEW_RIGHT, const int number );
+         static void recreatehelper3( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
          
          
    };
