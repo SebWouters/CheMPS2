@@ -67,6 +67,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    make_FAB_FCF_triplet();
    make_FBE_FFG_singlet();
    make_FBE_FFG_triplet();
+   make_FDE_FDG();
 
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
@@ -140,6 +141,10 @@ CheMPS2::CASPT2::~CASPT2(){
             delete [] FBE_triplet[ irrep_left ][ irrep_right ][ w ];
             delete [] FFG_singlet[ irrep_left ][ irrep_right ][ w ];
             delete [] FFG_triplet[ irrep_left ][ irrep_right ][ w ];
+            delete [] FDE_singlet[ irrep_left ][ irrep_right ][ w ];
+            delete [] FDE_triplet[ irrep_left ][ irrep_right ][ w ];
+            delete [] FDG_singlet[ irrep_left ][ irrep_right ][ w ];
+            delete [] FDG_triplet[ irrep_left ][ irrep_right ][ w ];
          }
          delete [] FAD[ irrep_left ][ irrep_right ];
          delete [] FCD[ irrep_left ][ irrep_right ];
@@ -151,6 +156,10 @@ CheMPS2::CASPT2::~CASPT2(){
          delete [] FBE_triplet[ irrep_left ][ irrep_right ];
          delete [] FFG_singlet[ irrep_left ][ irrep_right ];
          delete [] FFG_triplet[ irrep_left ][ irrep_right ];
+         delete [] FDE_singlet[ irrep_left ][ irrep_right ];
+         delete [] FDE_triplet[ irrep_left ][ irrep_right ];
+         delete [] FDG_singlet[ irrep_left ][ irrep_right ];
+         delete [] FDG_triplet[ irrep_left ][ irrep_right ];
       }
       delete [] FAD[ irrep_left ];
       delete [] FCD[ irrep_left ];
@@ -162,6 +171,10 @@ CheMPS2::CASPT2::~CASPT2(){
       delete [] FBE_triplet[ irrep_left ];
       delete [] FFG_singlet[ irrep_left ];
       delete [] FFG_triplet[ irrep_left ];
+      delete [] FDE_singlet[ irrep_left ];
+      delete [] FDE_triplet[ irrep_left ];
+      delete [] FDG_singlet[ irrep_left ];
+      delete [] FDG_triplet[ irrep_left ];
    }
    delete [] FAD;
    delete [] FCD;
@@ -173,6 +186,10 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] FBE_triplet;
    delete [] FFG_singlet;
    delete [] FFG_triplet;
+   delete [] FDE_singlet;
+   delete [] FDE_triplet;
+   delete [] FDG_singlet;
+   delete [] FDG_triplet;
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int num_w = indices->getNDMRG( irrep );
@@ -879,6 +896,16 @@ void CheMPS2::CASPT2::recreate(){
             recreatehelper2( SFF_triplet[ IL ], SGG[ IR ], FFG_triplet[ IL ][ IR ], work, size_F_triplet[ IL ], newsize_F_triplet[ IL ], size_G[ IR ], newsize_G[ IR ], num_w );
          }
 
+         if ( newsize_D[ IL ] * newsize_E[ IR ] * num_w > 0 ){
+            recreatehelper2( SDD[ IL ], SEE[ IR ], FDE_singlet[ IL ][ IR ], work, size_D[ IL ], newsize_D[ IL ], size_E[ IR ], newsize_E[ IR ], num_w );
+            recreatehelper2( SDD[ IL ], SEE[ IR ], FDE_triplet[ IL ][ IR ], work, size_D[ IL ], newsize_D[ IL ], size_E[ IR ], newsize_E[ IR ], num_w );
+         }
+
+         if ( newsize_D[ IL ] * newsize_G[ IR ] * num_w > 0 ){
+            recreatehelper2( SDD[ IL ], SGG[ IR ], FDG_singlet[ IL ][ IR ], work, size_D[ IL ], newsize_D[ IL ], size_G[ IR ], newsize_G[ IR ], num_w );
+            recreatehelper2( SDD[ IL ], SGG[ IR ], FDG_triplet[ IL ][ IR ], work, size_D[ IL ], newsize_D[ IL ], size_G[ IR ], newsize_G[ IR ], num_w );
+         }
+
          if ( IR == 0 ){ // IL == irrep_w
             if ( newsize_E[ IL ] * num_w > 0 ){
                double one = 1.0;
@@ -1107,6 +1134,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
            < TE_xkdl E_wc TH_aibj > = 6 delta_ik delta_jl ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FEH[ Ix ][ w ][ x ]
       FGH: < SG_cldx E_kw SH_aibj > = 2 delta_ac delta_bd ( delta_il delta_jk + delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
            < TG_cldx E_kw TH_aibj > = 6 delta_ac delta_bd ( delta_il delta_jk - delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
+      FDE: < D(blxy) E_kw SE_tiaj > = 1 delta_ab ( delta_ik delta_jl + delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_singlet[ Ib x Il ][ It ][ w ][ xy, t ]
+           < D(blxy) E_kw TE_tiaj > = 3 delta_ab ( delta_ik delta_jl - delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_triplet[ Ib x Il ][ It ][ w ][ xy, t ]
+      FDG: < D(djxy) E_wc SG_aibt > = 1 delta_ij ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_singlet[ Ij x Id ][ It ][ w ][ xy, t ]
+           < D(djxy) E_wc TG_aibt > = 3 delta_ij ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_triplet[ Ij x Id ][ It ][ w ][ xy, t ]
    */
 
 }
@@ -2632,6 +2663,171 @@ int CheMPS2::CASPT2::jump_BF( const DMRGSCFindices * idx, const int irrep_t, con
       }
    }
    return jump_bf;
+
+}
+
+void CheMPS2::CASPT2::make_FDE_FDG(){
+
+   /*
+      FD1E singlet: < E_yx E_lb E_kw SE_tiaj > = 1 delta_ab ( delta_ik delta_jl + delta_il delta_jk ) / sqrt( 1 + delta_ij ) FD1E_singlet[ Ib x Il ][ It ][ w ][ xy, t ]
+      FD2E singlet: < E_yb E_lx E_kw SE_tiaj > = 1 delta_ab ( delta_ik delta_jl + delta_il delta_jk ) / sqrt( 1 + delta_ij ) FD2E_singlet[ Ib x Il ][ It ][ w ][ xy, t ]
+      FD1E triplet: < E_yx E_lb E_kw TE_tiaj > = 3 delta_ab ( delta_ik delta_jl - delta_il delta_jk ) / sqrt( 1 + delta_ij ) FD1E_triplet[ Ib x Il ][ It ][ w ][ xy, t ]
+      FD2E triplet: < E_yb E_lx E_kw TE_tiaj > = 3 delta_ab ( delta_ik delta_jl - delta_il delta_jk ) / sqrt( 1 + delta_ij ) FD2E_triplet[ Ib x Il ][ It ][ w ][ xy, t ]
+
+            FD1E_singlet[ Ib x Il ][ It ][ w ][ xy, t ] = ( + 2 delta_tw Gamma_yx
+                                                            - delta_tx Gamma_yw
+                                                            - Gamma_ytxw
+                                                          )
+
+            FD2E_singlet[ Ib x Il ][ It ][ w ][ xy, t ] = ( + Gamma_ytxw
+                                                            + Gamma_ytwx
+                                                            - delta_tx Gamma_yw
+                                                            - delta_tw Gamma_yx
+                                                          )
+
+            FD1E_triplet[ Ib x Il ][ It ][ w ][ xy, t ] = ( + 2 delta_tw Gamma_yx
+                                                            - delta_tx Gamma_yw
+                                                            - Gamma_ytxw
+                                                          )
+
+            FD2E_triplet[ Ib x Il ][ It ][ w ][ xy, t ] = ( + Gamma_ytxw / 3
+                                                            - Gamma_ytwx / 3
+                                                            + delta_tx Gamma_yw
+                                                            - delta_tw Gamma_yx
+                                                          )
+
+      FD1G singlet: < E_yx E_jd E_wc SG_aibt > = 1 delta_ij ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FD1G_singlet[ Ij x Id ][ It ][ w ][ xy, t ]
+      FD2G singlet: < E_yd E_jx E_wc SG_aibt > = 1 delta_ij ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FD2G_singlet[ Ij x Id ][ It ][ w ][ xy, t ]
+      FD1G triplet: < E_yx E_jd E_wc TG_aibt > = 3 delta_ij ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FD1G_triplet[ Ij x Id ][ It ][ w ][ xy, t ]
+      FD2G triplet: < E_yd E_jx E_wc TG_aibt > = 3 delta_ij ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FD2G_triplet[ Ij x Id ][ It ][ w ][ xy, t ]
+
+            FD1G_singlet[ Ij x Id ][ It ][ w ][ xy, t ] = ( + Gamma_ywxt
+                                                            + delta_wx Gamma_yt
+                                                          )
+
+            FD2G_singlet[ Ij x Id ][ It ][ w ][ xy, t ] = ( + delta_xw Gamma_yt
+                                                            - Gamma_ywtx
+                                                            - Gamma_ywxt
+                                                          )
+
+            FD1G_triplet[ Ij x Id ][ It ][ w ][ xy, t ] = ( - Gamma_ywxt
+                                                            - delta_wx Gamma_yt
+                                                          )
+
+            FD2G_triplet[ Ij x Id ][ It ][ w ][ xy, t ] = ( + delta_xw Gamma_yt
+                                                            - Gamma ywtx / 3
+                                                            + Gamma ywxt / 3
+                                                          )
+   */
+
+   FDE_singlet = new double***[ num_irreps ];
+   FDE_triplet = new double***[ num_irreps ];
+   FDG_singlet = new double***[ num_irreps ];
+   FDG_triplet = new double***[ num_irreps ];
+
+   const int LAS = indices->getDMRGcumulative( num_irreps );
+
+   for ( int irrep_left = 0; irrep_left < num_irreps; irrep_left++ ){
+
+      const int SIZE_left = size_D[ irrep_left ];
+      const int D2JUMP    = SIZE_left / 2;
+      FDE_singlet[ irrep_left ] = new double**[ num_irreps ];
+      FDE_triplet[ irrep_left ] = new double**[ num_irreps ];
+      FDG_singlet[ irrep_left ] = new double**[ num_irreps ];
+      FDG_triplet[ irrep_left ] = new double**[ num_irreps ];
+
+      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
+
+         const int SIZE_right = indices->getNDMRG( irrep_t );
+         const int d_t     = indices->getDMRGcumulative( irrep_t );
+         const int num_t   = indices->getNDMRG( irrep_t );
+         const int irrep_w = Irreps::directProd( irrep_left, irrep_t );
+         const int d_w     = indices->getDMRGcumulative( irrep_w );
+         const int num_w   = indices->getNDMRG( irrep_w );
+         FDE_singlet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
+         FDE_triplet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
+         FDG_singlet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
+         FDG_triplet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
+
+         for ( int w = 0; w < num_w; w++ ){
+
+            FDE_singlet[ irrep_left ][ irrep_t ][ w ] = new double[ SIZE_left * SIZE_right ];
+            FDE_triplet[ irrep_left ][ irrep_t ][ w ] = new double[ SIZE_left * SIZE_right ];
+            FDG_singlet[ irrep_left ][ irrep_t ][ w ] = new double[ SIZE_left * SIZE_right ];
+            FDG_triplet[ irrep_left ][ irrep_t ][ w ] = new double[ SIZE_left * SIZE_right ];
+
+            double * FDE_sing = FDE_singlet[ irrep_left ][ irrep_t ][ w ];
+            double * FDE_trip = FDE_triplet[ irrep_left ][ irrep_t ][ w ];
+            double * FDG_sing = FDG_singlet[ irrep_left ][ irrep_t ][ w ];
+            double * FDG_trip = FDG_triplet[ irrep_left ][ irrep_t ][ w ];
+
+            int jump_row = 0;
+            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
+               const int d_x     = indices->getDMRGcumulative( irrep_x );
+               const int num_x   = indices->getNDMRG( irrep_x );
+               const int irrep_y = Irreps::directProd( irrep_left, irrep_x );
+               const int d_y     = indices->getDMRGcumulative( irrep_y );
+               const int num_y   = indices->getNDMRG( irrep_y );
+
+               for ( int t = 0; t < num_t; t++ ){
+                  for ( int y = 0; y < num_y; y++ ){
+                     for ( int x = 0; x < num_x; x++ ){
+                        const double gamma_ytxw = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_w + w ))) ];
+                        const double gamma_ytwx = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_w + w + LAS * ( d_x + x ))) ];
+                        FDE_sing[          jump_row + x + num_x * y + SIZE_left * t ] = - gamma_ytxw;
+                        FDE_sing[ D2JUMP + jump_row + x + num_x * y + SIZE_left * t ] = + gamma_ytxw + gamma_ytwx;
+                        FDE_trip[          jump_row + x + num_x * y + SIZE_left * t ] = - gamma_ytxw;
+                        FDE_trip[ D2JUMP + jump_row + x + num_x * y + SIZE_left * t ] = ( gamma_ytxw - gamma_ytwx ) / 3.0;
+                        const double gamma_ywtx = two_rdm[ d_y + y + LAS * ( d_w + w + LAS * ( d_t + t + LAS * ( d_x + x ))) ];
+                        const double gamma_ywxt = two_rdm[ d_y + y + LAS * ( d_w + w + LAS * ( d_x + x + LAS * ( d_t + t ))) ];
+                        FDG_sing[          jump_row + x + num_x * y + SIZE_left * t ] = + gamma_ywxt;
+                        FDG_sing[ D2JUMP + jump_row + x + num_x * y + SIZE_left * t ] = - gamma_ywxt - gamma_ywtx;
+                        FDG_trip[          jump_row + x + num_x * y + SIZE_left * t ] = - gamma_ywxt;
+                        FDG_trip[ D2JUMP + jump_row + x + num_x * y + SIZE_left * t ] = ( gamma_ywxt - gamma_ywtx ) / 3.0;
+                     }
+                  }
+               }
+
+               if (( irrep_t == irrep_w ) && ( irrep_x == irrep_y )){
+                  for ( int x = 0; x < num_x; x++ ){
+                     for ( int y = 0; y < num_x; y++ ){
+                        const double gamma_yx = one_rdm[ d_y + y + LAS * ( d_x + x ) ];
+                        FDE_sing[          jump_row + x + num_x * y + SIZE_left * w ] += 2 * gamma_yx;
+                        FDE_sing[ D2JUMP + jump_row + x + num_x * y + SIZE_left * w ] -= gamma_yx;
+                        FDE_trip[          jump_row + x + num_x * y + SIZE_left * w ] += 2 * gamma_yx;
+                        FDE_trip[ D2JUMP + jump_row + x + num_x * y + SIZE_left * w ] -= gamma_yx;
+                     }
+                  }
+               }
+
+               if (( irrep_t == irrep_x ) && ( irrep_y == irrep_w )){
+                  for ( int y = 0; y < num_y; y++ ){
+                     const double gamma_yw = one_rdm[ d_y + y + LAS * ( d_w + w ) ];
+                     for ( int tx = 0; tx < num_x; tx++ ){
+                        FDE_sing[          jump_row + tx + num_x * y + SIZE_left * tx ] -= gamma_yw;
+                        FDE_sing[ D2JUMP + jump_row + tx + num_x * y + SIZE_left * tx ] -= gamma_yw;
+                        FDE_trip[          jump_row + tx + num_x * y + SIZE_left * tx ] -= gamma_yw;
+                        FDE_trip[ D2JUMP + jump_row + tx + num_x * y + SIZE_left * tx ] += gamma_yw;
+                     }
+                  }
+               }
+
+               if (( irrep_t == irrep_y ) && ( irrep_w == irrep_x )){
+                  for ( int t = 0; t < num_t; t++ ){
+                     for ( int y = 0; y < num_y; y++ ){
+                        const double gamma_yt = one_rdm[ d_y + y + LAS * ( d_t + t ) ];
+                        FDG_sing[          jump_row + w + num_x * y + SIZE_left * t ] += gamma_yt;
+                        FDG_sing[ D2JUMP + jump_row + w + num_x * y + SIZE_left * t ] += gamma_yt;
+                        FDG_trip[          jump_row + w + num_x * y + SIZE_left * t ] -= gamma_yt;
+                        FDG_trip[ D2JUMP + jump_row + w + num_x * y + SIZE_left * t ] += gamma_yt;
+                     }
+                  }
+               }
+               jump_row += num_x * num_y;
+            }
+         }
+      }
+   }
 
 }
 

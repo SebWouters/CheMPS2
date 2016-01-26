@@ -194,6 +194,10 @@ namespace CheMPS2{
          double **** FBE_triplet;
          double **** FFG_singlet;
          double **** FFG_triplet;
+         double **** FDE_singlet;
+         double **** FDE_triplet;
+         double **** FDG_singlet;
+         double **** FDG_triplet;
 
          // Fill helper variables for the Fock operator
          void make_FAA_FCC();
@@ -208,6 +212,7 @@ namespace CheMPS2{
          void make_FAB_FCF_triplet();
          void make_FBE_FFG_singlet();
          void make_FBE_FFG_triplet();
+         void make_FDE_FDG();
 
          // Diagonalize the overlap matrices and adjust jump, vector_rhs, and FXX accordingly
          void recreate();
