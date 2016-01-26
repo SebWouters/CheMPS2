@@ -145,9 +145,10 @@ namespace CheMPS2{
 
          // Functions for the partitioning of the vector in blocks
          int get_maxsize() const;
-         static int jump_AC( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int irrep_v );
-         static int jump_D(  const DMRGSCFindices * idx, const int irrep_t, const int irrep_u );
-         static int jump_BF( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int ST );
+         static int jump_AC_active( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int irrep_v );
+         static int jump_BF_active( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int ST );
+         static int jump_D_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_a );
+         static int jump_B_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_j, const int ST );
          
          // The RHS of the linear problem
          double * vector_rhs;
