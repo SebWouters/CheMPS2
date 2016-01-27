@@ -357,7 +357,6 @@ void CheMPS2::DMRG::delete_3rdm_operators(const int boundary){
             const int orb_l = boundary - 1 - cnt3;
             const int orb_k = orb_l - cnt2;
             const int orb_j = orb_k - cnt1;
-            const int irr   = Irreps::directProd( Irreps::directProd( denBK->gIrrep( orb_j ), denBK->gIrrep( orb_k ) ), denBK->gIrrep( orb_l ) );
             
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIchemps2::owner_3rdm_diagram( L, orb_j, orb_k, orb_l ) == MPIRANK )

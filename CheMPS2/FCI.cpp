@@ -750,7 +750,6 @@ void CheMPS2::FCI::apply_excitation( double * orig_vector, double * result_vecto
    const int result_target_irrep          = getIrrepProduct( getIrrepProduct( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ), orig_target_irrep );
    const int   orig_irrep_center          = getIrrepProduct( TargetIrrep,   orig_target_irrep );
    const int result_irrep_center          = getIrrepProduct( TargetIrrep, result_target_irrep );
-   const unsigned long long   orig_length = getVecLength(   orig_irrep_center );
    const unsigned long long result_length = getVecLength( result_irrep_center );
    
    ClearVector( result_length , result_vector );

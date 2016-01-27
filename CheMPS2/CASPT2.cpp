@@ -766,10 +766,8 @@ long long CheMPS2::CASPT2::debug_total_length() const{
       for ( int i2 = 0; i2 < num_irreps; i2++ ){
          const long long nocc2 = indices->getNOCC( i2 );
          const long long nact2 = indices->getNDMRG( i2 );
-         const long long nvir2 = indices->getNVIRT( i2 );
          for ( int i3 = 0; i3 < num_irreps; i3++ ){
             const int i4 = Irreps::directProd( Irreps::directProd( i1, i2 ), i3 );
-            const long long nocc3 = indices->getNOCC( i3 );
             const long long nact3 = indices->getNDMRG( i3 );
             const long long nvir3 = indices->getNVIRT( i3 );
             const long long nocc4 = indices->getNOCC( i4 );
@@ -1183,10 +1181,11 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
 
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
    for ( int elem = 0; elem < total_size; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
-   
-   double * workspace = new double[ get_maxsize() * get_maxsize() ];
+
+   const int maxlinsize = get_maxsize();
+   double * workspace = new double[ maxlinsize * maxlinsize ];
    const double SQRT2 = sqrt( 2.0 );
-   
+
    // FAD: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii == Ij
       int SIZE_L = size_A[ IL ];
@@ -1218,7 +1217,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
          }
       }
    }
-   
+
    // FAD transpose: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){
       int SIZE_L = size_D[ IL ];
@@ -1251,7 +1250,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
          }
       }
    }
-   
+
    // FCD: < C(bxyz) E_kw D(aitu) > = delta_ik delta_ab FCD[ Ib ][ Ii x Ia ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia == Ib
       int SIZE_L = size_C[ IL ];
@@ -1281,7 +1280,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
          }
       }
    }
-   
+
    // FCD transpose: < C(bxyz) E_kw D(aitu) > = delta_ik delta_ab FCD[ Ib ][ Ii x Ia ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){
       int SIZE_L = size_D[ IL ];
@@ -1312,7 +1311,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
          }
       }
    }
-   
+
    // FAB singlet: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
       int SIZE_L = size_A[ IL ];
@@ -2532,7 +2531,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                // Fill workspace[ xy ] with [ (ix|jy) + (iy|jx) ] * (( x==y ) ? 0.5 : 1.0 )
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
                   const int occ_xy = indices->getNOCC( irrep_xy );
                   const int num_xy = indices->getNDMRG( irrep_xy );
 
@@ -2569,7 +2567,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                // Fill workspace[ xy ] with [ (ix|jy) - (iy|jx) ]
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
                   const int occ_xy = indices->getNOCC( irrep_xy );
                   const int num_xy = indices->getNDMRG( irrep_xy );
 
@@ -2612,8 +2609,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
                      if ( irrep_x < irrep_y ){
-                        const int d_x   = indices->getDMRGcumulative( irrep_x );
-                        const int d_y   = indices->getDMRGcumulative( irrep_y );
                         const int occ_x = indices->getNOCC( irrep_x );
                         const int occ_y = indices->getNOCC( irrep_y );
                         const int num_x = indices->getNDMRG( irrep_x );
@@ -2644,8 +2639,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
                      if ( irrep_x < irrep_y ){
-                        const int d_x   = indices->getDMRGcumulative( irrep_x );
-                        const int d_y   = indices->getDMRGcumulative( irrep_y );
                         const int occ_x = indices->getNOCC( irrep_x );
                         const int occ_y = indices->getNOCC( irrep_y );
                         const int num_x = indices->getNDMRG( irrep_x );
@@ -2687,7 +2680,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                // Fill workspace[ xy ] with [ (ax|by) + (ay|bx) ] * (( x==y ) ? 0.5 : 1.0 )
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
                   const int occ_xy = indices->getNOCC( irrep_xy );
                   const int num_xy = indices->getNDMRG( irrep_xy );
 
@@ -2725,7 +2717,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                // Fill workspace[ xy ] with [ (ax|by) - (ay|bx) ]
                int jump_xy = 0;
                for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-                  const int d_xy   = indices->getDMRGcumulative( irrep_xy );
                   const int occ_xy = indices->getNOCC( irrep_xy );
                   const int num_xy = indices->getNDMRG( irrep_xy );
 
@@ -2770,8 +2761,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
                      if ( irrep_x < irrep_y ){
-                        const int d_x = indices->getDMRGcumulative( irrep_x );
-                        const int d_y = indices->getDMRGcumulative( irrep_y );
                         const int occ_x = indices->getNOCC( irrep_x );
                         const int occ_y = indices->getNOCC( irrep_y );
                         const int num_x = indices->getNDMRG( irrep_x );
@@ -2802,8 +2791,6 @@ void CheMPS2::CASPT2::construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFint
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int irrep_y = Irreps::directProd( irrep, irrep_x );
                      if ( irrep_x < irrep_y ){
-                        const int d_x = indices->getDMRGcumulative( irrep_x );
-                        const int d_y = indices->getDMRGcumulative( irrep_y );
                         const int occ_x = indices->getNOCC( irrep_x );
                         const int occ_y = indices->getNOCC( irrep_y );
                         const int num_x = indices->getNDMRG( irrep_x );
@@ -3328,8 +3315,6 @@ void CheMPS2::CASPT2::make_FBE_FFG_singlet(){
    FBE_singlet = new double***[ num_irreps ];
    FFG_singlet = new double***[ num_irreps ];
 
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
    for ( int irrep_left = 0; irrep_left < num_irreps; irrep_left++ ){
 
       assert( size_B_singlet[ irrep_left ] == size_F_singlet[ irrep_left ] ); // At construction
@@ -3340,10 +3325,8 @@ void CheMPS2::CASPT2::make_FBE_FFG_singlet(){
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
 
          const int SIZE_right = indices->getNDMRG( irrep_t );
-         const int d_t     = indices->getDMRGcumulative( irrep_t );
          const int num_t   = indices->getNDMRG( irrep_t );
          const int irrep_w = Irreps::directProd( irrep_left, irrep_t );
-         const int d_w     = indices->getDMRGcumulative( irrep_w );
          const int num_w   = indices->getNDMRG( irrep_w );
          FBE_singlet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
          FFG_singlet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
@@ -3408,8 +3391,6 @@ void CheMPS2::CASPT2::make_FBE_FFG_triplet(){
    FBE_triplet = new double***[ num_irreps ];
    FFG_triplet = new double***[ num_irreps ];
 
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
    for ( int irrep_left = 0; irrep_left < num_irreps; irrep_left++ ){
 
       assert( size_B_triplet[ irrep_left ] == size_F_triplet[ irrep_left ] ); // At construction
@@ -3420,10 +3401,8 @@ void CheMPS2::CASPT2::make_FBE_FFG_triplet(){
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
 
          const int SIZE_right = indices->getNDMRG( irrep_t );
-         const int d_t     = indices->getDMRGcumulative( irrep_t );
          const int num_t   = indices->getNDMRG( irrep_t );
          const int irrep_w = Irreps::directProd( irrep_left, irrep_t );
-         const int d_w     = indices->getDMRGcumulative( irrep_w );
          const int num_w   = indices->getNDMRG( irrep_w );
          FBE_triplet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
          FFG_triplet[ irrep_left ][ irrep_t ] = new double*[ num_w ];
@@ -3521,7 +3500,6 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
 
          assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
          const int SIZE_right = size_B_singlet[ 0 ];
-         const int d_w   = indices->getDMRGcumulative( irrep_left );
          const int num_w = indices->getNDMRG( irrep_left );
          FAB_singlet[ irrep_left ][ 0 ] = new double*[ num_w ];
          FCF_singlet[ irrep_left ][ 0 ] = new double*[ num_w ];
@@ -3706,7 +3684,6 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
          assert( size_B_singlet[ irrep_right ] == size_F_singlet[ irrep_right ] ); // At construction
          const int SIZE_right = size_B_singlet[ irrep_right ];
          const int irrep_w = Irreps::directProd( irrep_left, irrep_right );
-         const int d_w     = indices->getDMRGcumulative( irrep_w );
          const int num_w   = indices->getNDMRG( irrep_w );
          FAB_singlet[ irrep_left ][ irrep_right ] = new double*[ num_w ];
          FCF_singlet[ irrep_left ][ irrep_right ] = new double*[ num_w ];
@@ -3936,7 +3913,6 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
 
          assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
          const int SIZE_right = size_B_triplet[ 0 ];
-         const int d_w   = indices->getDMRGcumulative( irrep_left );
          const int num_w = indices->getNDMRG( irrep_left );
          FAB_triplet[ irrep_left ][ 0 ] = new double*[ num_w ];
          FCF_triplet[ irrep_left ][ 0 ] = new double*[ num_w ];
@@ -3951,9 +3927,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
 
             int jump_col = 0;
             for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-               const int d_ut    = indices->getDMRGcumulative( irrep_ut );
-               const int num_ut  = indices->getNDMRG( irrep_ut );
-               const int nocc_ut = indices->getNOCC( irrep_ut );
+               const int d_ut   = indices->getDMRGcumulative( irrep_ut );
+               const int num_ut = indices->getNDMRG( irrep_ut );
                assert( jump_col == jump_BF_active( indices, irrep_ut, irrep_ut, -1 ) );
 
                const int jump_AB1 = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left ); 
@@ -3976,11 +3951,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                   const int d_x    = indices->getDMRGcumulative( irrep_x );
                   const int num_x  = indices->getNDMRG( irrep_x );
-                  const int nocc_x = indices->getNOCC( irrep_x );
                   for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
                      const int d_y     = indices->getDMRGcumulative( irrep_y );
                      const int num_y   = indices->getNDMRG( irrep_y );
-                     const int nocc_y  = indices->getNOCC( irrep_y );
                      const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
                      const int d_z     = indices->getDMRGcumulative( irrep_z );
                      const int num_z   = indices->getNDMRG( irrep_z );
@@ -4124,7 +4097,6 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
          assert( size_B_triplet[ irrep_right ] == size_F_triplet[ irrep_right ] ); // At construction
          const int SIZE_right = size_B_triplet[ irrep_right ];
          const int irrep_w = Irreps::directProd( irrep_left, irrep_right );
-         const int d_w     = indices->getDMRGcumulative( irrep_w );
          const int num_w   = indices->getNDMRG( irrep_w );
          FAB_triplet[ irrep_left ][ irrep_right ] = new double*[ num_w ];
          FCF_triplet[ irrep_left ][ irrep_right ] = new double*[ num_w ];
@@ -4141,12 +4113,10 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
             for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
                const int irrep_u = Irreps::directProd( irrep_right, irrep_t );
                if ( irrep_t < irrep_u ){
-                  const int d_t    = indices->getDMRGcumulative( irrep_t );
-                  const int num_t  = indices->getNDMRG( irrep_t );
-                  const int nocc_t = indices->getNOCC( irrep_t );
-                  const int d_u    = indices->getDMRGcumulative( irrep_u );
-                  const int num_u  = indices->getNDMRG( irrep_u );
-                  const int nocc_u = indices->getNOCC( irrep_u );
+                  const int d_t   = indices->getDMRGcumulative( irrep_t );
+                  const int num_t = indices->getNDMRG( irrep_t );
+                  const int d_u   = indices->getDMRGcumulative( irrep_u );
+                  const int num_u = indices->getNDMRG( irrep_u );
                   assert( jump_col == jump_BF_active( indices, irrep_t, irrep_u, -1 ) );
 
                   const int jump_AB1 = jump_AC_active( indices, irrep_u, irrep_t, irrep_w ); 
@@ -4169,11 +4139,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                      const int d_x    = indices->getDMRGcumulative( irrep_x );
                      const int num_x  = indices->getNDMRG( irrep_x );
-                     const int nocc_x = indices->getNOCC( irrep_x );
                      for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
                         const int d_y     = indices->getDMRGcumulative( irrep_y );
                         const int num_y   = indices->getNDMRG( irrep_y );
-                        const int nocc_y  = indices->getNOCC( irrep_y );
                         const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
                         const int d_z     = indices->getDMRGcumulative( irrep_z );
                         const int num_z   = indices->getNDMRG( irrep_z );
@@ -4372,9 +4340,7 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
             int jump_col = 0;
             for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-               const int d_t     = indices->getDMRGcumulative( irrep_t );
                const int num_t   = indices->getNDMRG( irrep_t );
-               const int nocc_t  = indices->getNOCC( irrep_t );
                const int irrep_u = Irreps::directProd( irrep_right, irrep_t );
                const int d_u     = indices->getDMRGcumulative( irrep_u );
                const int num_u   = indices->getNDMRG( irrep_u );
@@ -4398,11 +4364,9 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                   const int d_x    = indices->getDMRGcumulative( irrep_x );
                   const int num_x  = indices->getNDMRG( irrep_x );
-                  const int nocc_x = indices->getNOCC( irrep_x );
                   for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
                      const int d_y     = indices->getDMRGcumulative( irrep_y );
                      const int num_y   = indices->getNDMRG( irrep_y );
-                     const int nocc_y  = indices->getNOCC( irrep_y );
                      const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
                      const int d_z     = indices->getDMRGcumulative( irrep_z );
                      const int num_z   = indices->getNDMRG( irrep_z );

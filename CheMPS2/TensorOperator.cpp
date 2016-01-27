@@ -448,7 +448,6 @@ double CheMPS2::TensorOperator::inproduct( TensorOperator * buddy, const char tr
 
    if ( buddy == NULL ){ return 0.0; }
 
-   const int orb_i = gIndex();
    assert( get_2j() == buddy->get_2j()    );
    assert( n_elec   == buddy->get_nelec() );
    assert( n_irrep  == buddy->get_irrep() );
