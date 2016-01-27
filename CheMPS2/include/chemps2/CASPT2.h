@@ -48,7 +48,7 @@ namespace CheMPS2{
     
     The CASPT2 class contains the functions to perform second order multireference perturbation theory on top of a CASSCF wavefuntion [CASPT1, CASPT2]. CASPT2 has recently also been used with DMRG as active space solver: the active space 4-RDM contracted with the Fock operator, together with the 1-, 2- and 3-RDM are required thereto [CASPT3]. Alternatively, cumulant approximations can be used as well [CASPT4]. To mitigate problems with CASPT2 several modifications of the zeroth order Hamiltonian have been introduced: IPEA corrections [CASPT5], the g1 term [CASPT6], real level shifts [CASPT7] and imaginary level shifts [CASPT8].
     
-    \section biblio References
+    \section biblio_caspt2 References
 
     [CASPT1]  K. Andersson, P.-A. Malmqvist, B.O. Roos, A.J. Sadlej and K. Wolinski, Journal of Physical Chemistry 94, 5483-5488 (1990). http://dx.doi.org/10.1021/j100377a012 \n
     [CASPT2]  K. Andersson, P.‐A. Malmqvist and B.O. Roos, Journal of Chemical Physics 96, 1218-1226 (1992). http://dx.doi.org/10.1063/1.462209 \n

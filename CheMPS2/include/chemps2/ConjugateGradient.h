@@ -29,7 +29,7 @@ namespace CheMPS2{
 
         \f$ operator * x = b \f$. \n
 
-    With a diagonal preconditioner, the problem is turned into \n
+    With precon = 1 / sqrt( diag( operator ) ), the problem is turned into \n
 
         \f$ precon * operator * precon * xtilde = precon * b \f$ \n
         \f$ x = precon * xtilde \f$.
@@ -49,7 +49,7 @@ namespace CheMPS2{
          virtual ~ConjugateGradient();
 
          //! The iterator to converge the ground state vector
-         /** \param whichpointers Array of double* of length 3 to return pointers to vectors to the caller
+         /** \param pointers Array of double* of length 3 to return pointers to vectors to the caller
              \return Instruction character. 'A' means copy the initial guess to pointers[0], the diagonal of the symmetric matrix to pointers[1], and the right-hand side of the problem to pointers[2]. 'B' means calculate pointers[1] = symmetric matrix times pointers[0]. 'C' means that the converged solution can be copied back from pointers[0], and the residual norm from pointers[1][0]. 'D' means that an error has occurred. */
          char step( double ** pointers );
 
