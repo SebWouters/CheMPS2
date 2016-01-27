@@ -76,6 +76,9 @@ namespace CheMPS2{
 
          //! Destructor
          virtual ~CASPT2();
+         
+         //! Solve the CASPT2 energy
+         double solve( const bool diag_only = false ) const;
 
       private:
       

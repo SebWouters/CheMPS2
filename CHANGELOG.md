@@ -1,4 +1,5 @@
 #### Current HEAD
+* Class ConjugateGradient
 * Break API: bump up SO version (psi4 interface does NOT need to change!)
 * Class TensorOperator: replaces TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD
 * Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)
@@ -8,7 +9,7 @@
 * Cumulant::gamma4_ham: cu(4) reconstruction of 4-RDM based on DMRG ThreeDM
 * FCI::Fock4RDM: fast contraction of Fock matrix with FCI 4-RDM
 * Cumulant::gamma4_fock_contract_ham: fast contraction of Fock matrix with cu(4) reconstruction of 4-RDM
-* CASPT2-D (CASPT2 follows)
+* CASPT2-D (CASPT2-N follows)
 
 #### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab

@@ -416,24 +416,22 @@ namespace CheMPS2{
              \param out Array of size getVecLength(0), which contains on exit (alpha + beta * Hamiltonian) * in */
          void CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const;
          
-         //! Calculate out = precon * [(alpha + beta * Hamiltonian)^2 + eta^2] * precon * in (Econstant is taken into account!!)
+         //! Calculate out = [(alpha + beta * Hamiltonian)^2 + eta^2] * in (Econstant is taken into account!!)
          /** \param alpha The parameter alpha of the operator
              \param beta The parameter beta of the operator
              \param eta The parameter eta of the operator
-             \param precon The diagonal preconditioner
              \param in On entry the vector of size getVecLength(0) on which the operator should be applied; unchanged on exit
-             \param out Array of size getVecLength(0), which contains on exit precon * [(alpha + beta * Hamiltonian)^2 + eta^2] * precon * in
-             \param temp Workspace of size getVecLength(0)
-             \param temp2 Workspace of size getVecLength(0) */
-         void CGOperator(const double alpha, const double beta, const double eta, double * precon, double * in, double * temp, double * temp2, double * out) const;
+             \param out Array of size getVecLength(0), which contains on exit [(alpha + beta * Hamiltonian)^2 + eta^2] * in
+             \param temp Workspace of size getVecLength(0) */
+         void CGoperator(const double alpha, const double beta, const double eta, double * in, double * temp, double * out) const;
          
-         //! Calculate (without approximation) precon = (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 } (Econstant is taken into account!!)
+         //! Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstant is taken into account!!)
          /** \param alpha The parameter alpha of the operator
              \param beta The parameter beta of the operator
              \param eta The parameter eta of the operator
-             \param precon Array of size getVecLength(0), which contains on exit (diag[(alpha + beta * Hamiltonian)^2 + eta^2])^{ -1/2 }
+             \param diagonal Array of size getVecLength(0), which contains on exit diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ]
              \param workspace Workspace of size getVecLength(0) */
-         void CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const;
+         void CGdiagonal(const double alpha, const double beta, const double eta, double * diagonal, double * workspace) const;
          
 //==========> Protected functions regarding the higher order RDMs
 

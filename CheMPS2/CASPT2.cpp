@@ -27,6 +27,7 @@
 #include "CASPT2.h"
 #include "Lapack.h"
 #include "Options.h"
+#include "ConjugateGradient.h"
 
 using std::cout;
 using std::endl;
@@ -80,76 +81,36 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
       double * diag_fock = new double[ total_size ];
       diagonal( diag_fock, -E_FOCK );
-      
-      double min_eig = 1e18;
-      for ( int elem = 0; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
-      cout << "Minimum eigenvalue diag(FOCK) = " << min_eig << endl;
 
-      // Calculate E(CASPT2-D) = - < Psi0 | H P_SD [ blockdiag(F) - E_FOCK * S ]^{-1} P_SD H | Psi0 >
-      double energy_caspt2d = 0.0;
-      for ( int elem = 0; elem < total_size; elem++ ){ energy_caspt2d -= vector_rhs[ elem ] * vector_rhs[ elem ] / diag_fock[ elem ]; }
-      
-      cout.precision(8);
-      cout << std::fixed;
-      cout << "E(CASPT2-D)            = " << energy_caspt2d << endl;
-      cout << "MOLCAS test 8 CASPT2-D = " << -0.1596306078 << endl;
-      cout << "MOLCAS test 8 CASPT2-N = " << -0.1599978130 << endl;
-      cout.unsetf( std::ios::floatfield );
-      cout.precision(15);
-      
+      cout << "MOLCAS test8 CASPT2-N= " << -0.1599978130 << endl;
+      cout << "MOLCAS test8 CASPT2-D= " << -0.1596306078 << endl;
+      const double energy_caspt2_n = solve();
+      cout << "MOLCAS test8 CASPT2-N= " << -0.1599978130 << endl;
+      cout << "MOLCAS test8 CASPT2-D= " << -0.1596306078 << endl;
+
       double * vector = new double[ total_size ];
-      double * result = new double[ total_size ];
-      for ( int elem = 0; elem < total_size; elem++ ){ vector[ elem ] = vector_rhs[ elem ] / diag_fock[ elem ]; }
-      matvec( vector, result, diag_fock );
-      
-      if ( true ){
-         double * matrix = new double[ total_size * total_size ];
-         for ( int col = 0; col < total_size; col++ ){
-            for ( int row = 0; row < total_size; row++ ){ vector[ row ] = 0.0; }
-            vector[ col ] = 1.0;
-            matvec( vector, matrix + col * total_size, diag_fock );
-         }
-         double rms = 0.0;
-         for ( int col = 0; col < total_size; col++ ){
-            for ( int row = col+1; row < total_size; row++ ){
-               const double diff = matrix[ row + total_size * col ] - matrix[ col + total_size * row ];
-               rms += diff * diff;
-               if ( fabs( diff ) > 1e-6 ){ cout << " matrix[" << row << "," << col << "] - matrix[" << col << "," << row << "] = " <<  diff << endl; }
-            }
-         }
-         rms = sqrt( rms );
-         cout << "RMS deviation from symmetric = " << rms << endl;
-         
-         
-         /*// matrix = V lambda V^T
-         double * work = new double[ total_size * total_size ];
-         int lwork = total_size * total_size;
-         char jobz = 'V';
-         char uplo = 'U';
-         int info = 1;
-         dsyev_( &jobz, &uplo, &total_size, matrix, &total_size, result, work, &lwork, &info);
-         
-         // vector = V^T Ham | 0 >
-         char trans = 'T';
-         double one = 1.0;
-         double zero = 0.0;
-         int inc1 = 1;
-         dgemv_( &trans, &total_size, &total_size, &one, matrix, &total_size, vector_rhs, &inc1, &zero, vector, &inc1 );
-         
-         // energy = - < 0 | Ham V ( lambda )^{-1} V^T Ham | 0 >
-         double resultvalue = 0.0;
-         for ( int elem = 0; elem < total_size; total_size++ ){
-            resultvalue -= vector[ elem ] * vector[ elem ] / result[ elem ];
-         }
-         cout << "E(CASPT2-N-PARTIAL)    = " << resultvalue << endl;
-         delete [] work;*/
-         
-         delete [] matrix;
+      double * matrix = new double[ total_size * total_size ];
+
+      for ( int col = 0; col < total_size; col++ ){
+         for ( int row = 0; row < total_size; row++ ){ vector[ row ] = 0.0; }
+         vector[ col ] = 1.0;
+         matvec( vector, matrix + col * total_size, diag_fock );
       }
 
-      delete [] diag_fock;
+      double rms = 0.0;
+      for ( int col = 0; col < total_size; col++ ){
+         for ( int row = col+1; row < total_size; row++ ){
+            const double diff = matrix[ row + total_size * col ] - matrix[ col + total_size * row ];
+            rms += diff * diff;
+            if ( fabs( diff ) > 1e-6 ){ cout << " matrix[" << row << "," << col << "] - matrix[" << col << "," << row << "] = " <<  diff << endl; }
+         }
+      }
+      rms = sqrt( rms );
+      cout << "RMS deviation from symmetric = " << rms << endl;
+
       delete [] vector;
-      delete [] result;
+      delete [] matrix;
+      delete [] diag_fock;
 
    }
 
@@ -266,6 +227,58 @@ CheMPS2::CASPT2::~CASPT2(){
    delete [] size_F_triplet;
    delete [] jump;
    delete [] vector_rhs;
+
+}
+
+double CheMPS2::CASPT2::solve( const bool diag_only ) const{
+
+   int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+
+   double * diag_fock = new double[ total_size ];
+   diagonal( diag_fock, -E_FOCK );
+
+   double energy_caspt2_d = 0.0;
+   for ( int elem = 0; elem < total_size; elem++ ){
+      energy_caspt2_d -= vector_rhs[ elem ] * vector_rhs[ elem ] / diag_fock[ elem ];
+   }
+   cout << "CASPT2 : E(CASPT2-D) = " << energy_caspt2_d << endl;
+   
+   double min_eig = 1e18;
+   for ( int elem = 0; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
+   cout << "CASPT2 : Min. diag(FOCK) = " << min_eig << endl;
+
+   double best_energy = energy_caspt2_d;
+   if ( diag_only == false ){
+
+      ConjugateGradient CG( total_size, 1e-10, 1e-12, false );
+      double ** pointers = new double*[ 3 ];
+      char instruction = CG.step( pointers );
+      assert( instruction == 'A' );
+      for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 0 ][ elem ] = vector_rhs[ elem ] / diag_fock[ elem ]; } // Initial guess of F * x = V
+      for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 1 ][ elem ] =  diag_fock[ elem ];                     } // Diagonal of the operator F
+      for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 2 ][ elem ] = vector_rhs[ elem ];                     } // RHS of the linear problem F * x = V
+      int inc1 = 1;
+      instruction = CG.step( pointers );
+      assert( instruction == 'B' );
+      while ( instruction == 'B' ){
+         matvec( pointers[ 0 ], pointers[ 1 ], diag_fock );
+         instruction = CG.step( pointers );
+      }
+      assert( instruction == 'C' );
+      best_energy = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
+      {
+         matvec( pointers[ 0 ], pointers[ 1 ], diag_fock );
+         double alpha = -1.0;
+         daxpy_( &total_size, &alpha, vector_rhs, &inc1, pointers[ 1 ], &inc1 );
+         const double rnorm = sqrt( ddot_( &total_size, pointers[ 1 ], &inc1, pointers[ 1 ], &inc1 ) );
+         cout << "CASPT2 : Residual norm for the solution of F * c = V is " << rnorm << endl;
+      }
+      delete [] pointers;
+      cout << "CASPT2 : E(CASPT2-N) = " << best_energy << endl;
+
+   }
+   delete [] diag_fock;
+   return best_energy;
 
 }
 

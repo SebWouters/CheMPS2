@@ -31,6 +31,7 @@ using std::endl;
 #include "Irreps.h"
 #include "Lapack.h"
 #include "Davidson.h"
+#include "ConjugateGradient.h"
 
 CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigned int theNel_down, const int TargetIrrep_in, const double maxMemWorkMB_in, const int FCIverbose_in){
 
@@ -2136,115 +2137,76 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
 void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError) const{
 
    const unsigned long long vecLength = getVecLength( 0 );
-   
-   // Create a few helper arrays
-   double * RESID  = new double[ vecLength ];
-   double * PVEC   = new double[ vecLength ];
-   double * OxPVEC = new double[ vecLength ];
-   double * temp   = new double[ vecLength ];
-   double * temp2  = new double[ vecLength ];
-   double * precon = new double[ vecLength ];
-   CGDiagPrecond( alpha , beta , eta , precon , temp );
-   
+
+   // Calculate the diagonal of the CG operator
+   double * temp = new double[ vecLength ];
+   double * diag = new double[ vecLength ];
+   CGdiagonal( alpha, beta, eta, diag, temp );
+
    assert( RealSol != NULL );
    assert( ImagSol != NULL );
    assert( fabs( eta ) > 0.0 );
 
    /* 
          ( alpha + beta H + I eta ) Solution = RHS
-      
+
       is solved with the conjugate gradient (CG) method. Solution = RealSol + I * ImagSol.
       CG requires a symmetric positive definite operator. Therefore:
-      
-         precon * [ ( alpha + beta H )^2 + eta^2 ] * precon * SolutionTilde = precon * ( alpha + beta H - I eta ) * RHS
-         Solution = precon * SolutionTilde
-         
+
+         [ ( alpha + beta H )^2 + eta^2 ] * Solution = ( alpha + beta H - I eta ) * RHS
+
       Clue: Solve for ImagSol first. RealSol is then simply
-      
+
          RealSol = - ( alpha + beta H ) / eta * ImagSol
    */
-   
+
    /**** Solve for ImagSol ****/
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = - eta * precon[ cnt ] * RHS[ cnt ]; } // RESID = - eta * precon * RHS
-   if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the imaginary part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-   FCIdcopy( vecLength, RESID, ImagSol ); // Well educated initial guess for the imaginary part (guess is exact if operator is diagonal)
-   CGCoreSolver( alpha, beta, eta, precon, ImagSol, RESID, PVEC, OxPVEC, temp, temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ ImagSol[ cnt ] = precon[ cnt ] * ImagSol[ cnt ]; }
-   
+   double ** pointers = new double*[ 3 ];
+   const double CG_RTOL = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
+   double RMSerror = 0.0;
+   {
+      ConjugateGradient CG( vecLength, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
+      char instruction = CG.step( pointers );
+      assert( instruction == 'A' );
+      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 0 ][ cnt ] = - eta * RHS[ cnt ] / diag[ cnt ]; } // Initial guess
+      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; }                      // Diagonal of the operator
+      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 2 ][ cnt ] = - eta * RHS[ cnt ]; }               // RHS of the problem
+      instruction = CG.step( pointers );
+      assert( instruction == 'B' );
+      while ( instruction == 'B' ){
+         CGoperator( alpha, beta, eta, pointers[ 0 ], temp, pointers[ 1 ] );
+         instruction = CG.step( pointers );
+      }
+      assert( instruction == 'C' );
+      FCIdcopy( vecLength, pointers[ 0 ], ImagSol );
+      RMSerror += pointers[ 1 ][ 0 ] * pointers[ 1 ][ 0 ];
+   }
+
    /**** Solve for RealSol ****/
-   CGAlphaPlusBetaHAM( -alpha/eta, -beta/eta, ImagSol, RealSol ); // Initial guess RealSol can be obtained from ImagSol
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
-      if ( fabs( precon[cnt] ) > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ){
-         RealSol[cnt] = RealSol[cnt] / precon[cnt];
-      } else {
-         RealSol[cnt] = RealSol[cnt] / CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+   {
+      ConjugateGradient CG( vecLength, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
+      char instruction = CG.step( pointers );
+      assert( instruction == 'A' );
+      CGAlphaPlusBetaHAM( - alpha / eta, - beta / eta, ImagSol, pointers[ 0 ] );                      // Initial guess real part can be obtained from the imaginary part
+      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; } // Diagonal of the operator
+      CGAlphaPlusBetaHAM( alpha, beta, RHS, pointers[ 2 ] );                                          // RHS of the problem
+      instruction = CG.step( pointers );
+      assert( instruction == 'B' );
+      while ( instruction == 'B' ){
+         CGoperator( alpha, beta, eta, pointers[ 0 ], temp, pointers[ 1 ] );
+         instruction = CG.step( pointers );
       }
+      assert( instruction == 'C' );
+      FCIdcopy( vecLength, pointers[ 0 ], RealSol );
+      RMSerror += pointers[ 1 ][ 0 ] * pointers[ 1 ][ 0 ];
    }
-   CGAlphaPlusBetaHAM( alpha, beta, RHS, RESID ); // RESID = ( alpha + beta * H ) * RHS
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RESID[ cnt ] = precon[ cnt ] * RESID[ cnt ]; } // RESID = precon * ( alpha + beta * H ) * RHS
-   if ( FCIverbose > 1 ){ cout << "FCI::CGSolveSystem : Two-norm of the RHS for the real part = " << FCIfrobeniusnorm( vecLength , RESID ) << endl; }
-   CGCoreSolver( alpha, beta, eta, precon, RealSol, RESID, PVEC, OxPVEC, temp, temp2 ); // RESID contains the RHS of ( precon * Op * precon ) * |x> = |b>
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ RealSol[ cnt ] = precon[ cnt ] * RealSol[ cnt ]; }
-   
-   if (( checkError ) && ( FCIverbose > 0 )){
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ precon[ cnt ] = 1.0; }
-      CGOperator( alpha , beta , eta , precon , RealSol , temp , temp2 , OxPVEC );
-      CGAlphaPlusBetaHAM( alpha , beta , RHS , RESID );
-      FCIdaxpy( vecLength , -1.0 , RESID , OxPVEC );
-      double RMSerror = FCIddot( vecLength , OxPVEC , OxPVEC );
-      CGOperator( alpha , beta , eta , precon , ImagSol , temp , temp2 , OxPVEC );
-      FCIdaxpy( vecLength , eta , RHS , OxPVEC );
-      RMSerror += FCIddot( vecLength , OxPVEC , OxPVEC );
-      RMSerror = sqrt( RMSerror );
-      cout << "FCI::CGSolveSystem : RMS error when checking the solution (without preconditioner) = " << RMSerror << endl;
-   }
-   
-   // Clean up
+   RMSerror = sqrt( RMSerror );
+   delete [] pointers;
    delete [] temp;
-   delete [] temp2;
-   delete [] RESID;
-   delete [] PVEC;
-   delete [] OxPVEC;
-   delete [] precon;
+   delete [] diag;
 
-}
-
-void CheMPS2::FCI::CGCoreSolver(const double alpha, const double beta, const double eta, double * precon, double * Sol, double * RESID, double * PVEC, double * OxPVEC, double * temp, double * temp2) const{
-
-   const unsigned long long vecLength = getVecLength( 0 );
-   const double CGRESIDUALTHRESHOLD = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
-   if ( FCIverbose>1 ){ cout << "FCI::CGCoreSolver : The residual norm for convergence = " << CGRESIDUALTHRESHOLD << endl; }
-
-   /*
-      Operator = precon * [ ( alpha + beta * H )^2 + eta^2 ] * precon : positive definite and symmetric
-      x_0 = Sol
-      p_0 (PVEC) = r_0 (RESID) = b - Operator * x_0
-      k (count_k) = 0
-   */
-
-   int count_k = 0;
-   CGOperator( alpha , beta , eta , precon , Sol , temp , temp2 , OxPVEC ); // O_p_k = Operator * Sol
-   FCIdaxpy( vecLength , -1.0 , OxPVEC , RESID );                           // r_0 = b - Operator * x_0
-   FCIdcopy( vecLength , RESID , PVEC );                                    // p_0 = r_0
-   double rkT_rk = FCIddot( vecLength , RESID , RESID );
-   double residualNorm = sqrt( rkT_rk );
-   
-   while ( residualNorm >= CGRESIDUALTHRESHOLD ){
-   
-      CGOperator( alpha , beta , eta , precon, PVEC , temp , temp2 , OxPVEC ); // O_p_k = Operator * p_k
-      const double alpha_k = rkT_rk / FCIddot( vecLength , PVEC , OxPVEC );    // alpha_k = r_k^T * r_k / ( p_k^T * O_p_k )
-      FCIdaxpy( vecLength ,  alpha_k , PVEC   , Sol   );                       // x_{k+1} = x_k + alpha_k * p_k
-      FCIdaxpy( vecLength , -alpha_k , OxPVEC , RESID );                       // r_{k+1} = r_k - alpha_k * A * p_k
-      const double rkplus1T_rkplus1 = FCIddot( vecLength , RESID , RESID );
-      const double beta_k = rkplus1T_rkplus1 / rkT_rk ;                        // beta_k = r_{k+1}^T * r_{k+1} / ( r_k^T * r_k )
-      for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){
-         PVEC[ cnt ] = RESID[ cnt ] + beta_k * PVEC[ cnt ];                    // p_{k+1} = r_{k+1} + beta_k * p_k
-      }
-      count_k++;
-      rkT_rk = rkplus1T_rkplus1;
-      residualNorm = sqrt( rkT_rk );
-      if ( FCIverbose > 1 ){ cout << "FCI::CGCoreSolver : At step " << count_k << " the residual norm is " << residualNorm << endl; }
-      
+   if (( checkError ) && ( FCIverbose > 0 )){
+      cout << "FCI::CGSolveSystem : RMS error when checking the solution = " << RMSerror << endl;
    }
 
 }
@@ -2260,26 +2222,20 @@ void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, dou
 
 }
 
-void CheMPS2::FCI::CGOperator(const double alpha, const double beta, const double eta, double * precon, double * in, double * temp, double * temp2, double * out) const{
+void CheMPS2::FCI::CGoperator(const double alpha, const double beta, const double eta, double * in, double * temp, double * out) const{
 
    const unsigned long long vecLength = getVecLength( 0 );
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
-      temp[ cnt ] = precon[ cnt ] * in[ cnt ];                 // temp  = precon * in
-   }
-   CGAlphaPlusBetaHAM( alpha , beta , temp  , temp2 );         // temp2 = ( alpha + beta * H )   * precon * in
-   CGAlphaPlusBetaHAM( alpha , beta , temp2 , out   );         // out   = ( alpha + beta * H )^2 * precon * in
-   FCIdaxpy( vecLength , eta*eta , temp , out );               // out   = [ ( alpha + beta * H )^2 + eta*eta ] * precon * in
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
-      out[ cnt ] = precon[ cnt ] * out[ cnt ];                 // out   = precon * [ ( alpha + beta * H )^2 + eta*eta ] * precon * in
-   }
+   CGAlphaPlusBetaHAM( alpha, beta, in,   temp ); // temp  = ( alpha + beta * H )   * in
+   CGAlphaPlusBetaHAM( alpha, beta, temp, out  ); // out   = ( alpha + beta * H )^2 * in
+   FCIdaxpy( vecLength, eta*eta, in, out );       // out   = [ ( alpha + beta * H )^2 + eta*eta ] * in
 
 }
 
-void CheMPS2::FCI::CGDiagPrecond(const double alpha, const double beta, const double eta, double * precon, double * workspace) const{
+void CheMPS2::FCI::CGdiagonal(const double alpha, const double beta, const double eta, double * diagonal, double * workspace) const{
 
-   // With operator = [ ( alpha + beta * H )^2 + eta*eta ] ; precon becomes 1 / sqrt( diag ( operator ) ).
+   // diagonal becomes diag[ ( alpha + beta * H )^2 + eta*eta ]
    
-   DiagHam( precon );
+   DiagHam( diagonal );
    DiagHamSquared( workspace );
    
    const unsigned long long vecLength = getVecLength( 0 );
@@ -2288,19 +2244,18 @@ void CheMPS2::FCI::CGDiagPrecond(const double alpha, const double beta, const do
    const double factor2 = 2 * alpha_bis * beta;
    const double factor3 = beta * beta;
    for (unsigned long long row = 0; row < vecLength; row++){
-      const double diagElement = factor1 + factor2 * precon[ row ] + factor3 * workspace[ row ];
-      precon[ row ] = 1.0 / sqrt( diagElement );
+      diagonal[ row ] = factor1 + factor2 * diagonal[ row ] + factor3 * workspace[ row ];
    }
    
    if ( FCIverbose>1 ){
-      double minval = precon[0];
-      double maxval = precon[0];
+      double minval = diagonal[0];
+      double maxval = diagonal[0];
       for (unsigned long long cnt = 1; cnt < vecLength; cnt++){
-         if ( precon[ cnt ] > maxval ){ maxval = precon[ cnt ]; }
-         if ( precon[ cnt ] < minval ){ minval = precon[ cnt ]; }
+         if ( diagonal[ cnt ] > maxval ){ maxval = diagonal[ cnt ]; }
+         if ( diagonal[ cnt ] < minval ){ minval = diagonal[ cnt ]; }
       }
-      cout << "FCI::CGDiagPrecond : Minimum value of diag[ ( alpha + beta * Ham )^2 + eta^2 ] = " << 1.0/(maxval*maxval) << endl;
-      cout << "FCI::CGDiagPrecond : Maximum value of diag[ ( alpha + beta * Ham )^2 + eta^2 ] = " << 1.0/(minval*minval) << endl;
+      cout << "FCI::CGdiagonal : Minimum value of diag[ ( alpha + beta * Ham )^2 + eta^2 ] = " << minval << endl;
+      cout << "FCI::CGdiagonal : Maximum value of diag[ ( alpha + beta * Ham )^2 + eta^2 ] = " << maxval << endl;
    }
 
 }

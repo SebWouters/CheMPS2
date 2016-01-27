@@ -361,7 +361,10 @@ states of the carbon dimer.
 contains all DMRG-SCF functions which are specific to the augmented Hessian
 Newton-Raphson update scheme, including the functions to calculate the
 gradient and Hessian.
-    
+
+[CheMPS2/ConjugateGradient.cpp](CheMPS2/ConjugateGradient.cpp) is an implementation of
+the conjugate gradient algorithm, in the style of the Davidson class.
+
 [CheMPS2/ConvergenceScheme.cpp](CheMPS2/ConvergenceScheme.cpp) contains
 all functions of the ConvergenceScheme class, which contains the instructions
 for the subsequent DMRG sweeps.
@@ -545,6 +548,9 @@ class for the one-body matrix elements.
 libchemps2 from the command line.
     
 [CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.
+
+[CheMPS2/include/chemps2/ConjugateGradient.h](CheMPS2/include/chemps2/ConjugateGradient.h) contains the definitions of the
+ConjugateGradient class.
 
 [CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the
 ConvergenceScheme class.
