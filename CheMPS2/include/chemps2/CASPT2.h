@@ -152,6 +152,7 @@ namespace CheMPS2{
          static int jump_BF_active( const DMRGSCFindices * idx, const int irrep_t, const int irrep_u, const int ST );
          static int jump_D_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_a );
          static int jump_B_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_j, const int ST );
+         static int jump_F_nonactive( const DMRGSCFindices * idx, const int irrep_a, const int irrep_b, const int ST );
          
          // The RHS of the linear problem
          double * vector_rhs;
