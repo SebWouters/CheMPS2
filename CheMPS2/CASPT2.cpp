@@ -1175,18 +1175,18 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       
    */
 
-   const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   for ( int elem = 0; elem < total_size; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
+   const int vectorlength = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   for ( int elem = 0; elem < vectorlength; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
 
    const int maxlinsize = get_maxsize();
    double * workspace = new double[ maxlinsize * maxlinsize ];
    const double SQRT2 = sqrt( 2.0 );
 
    // FAD: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii == Ij
+   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii == Ij == Ix x Iy x Iz
       int SIZE_L = size_A[ IL ];
       const int nocc_ij = indices->getNOCC( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){
+      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
          int SIZE_R = size_D[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Ia == Ic == Iw == IL x IR
          const int shift = shift_D_nonactive( indices, IL, Iw );
@@ -1228,7 +1228,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia == Ib
       int SIZE_L = size_C[ IL ];
       const int nvir_ab = indices->getNVIRT( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){
+      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
          int SIZE_R = size_D[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Ii == Ik == Iw == IL x IR
          const int shift = shift_D_nonactive( indices, Iw, IL );
@@ -1239,7 +1239,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
             for ( int ik = 0; ik < nocc_w; ik++ ){
                for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
                for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, nocc_w + w, ik );
+                  double f_kw = fock->get( Iw, ik, nocc_w + w );
                   int inc1 = 1;
                   daxpy_( &total_size, &f_kw, FCD[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
@@ -1264,107 +1264,64 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       }
    }
 
-   // FAB singlet regular: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
+   // FAB singlet: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
       int SIZE_L = size_A[ IL ];
       const int nocc_l = indices->getNOCC( IL );
       for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
          int SIZE_R = size_B_singlet[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         if ( SIZE_L * SIZE_R * nocc_l * nact_w * nocc_w > 0 ){
-            if ( IR == 0 ){ // Ii == Ij == Ik == Il
-               const int shift = shift_B_nonactive( indices, Iw, IL, +1 );
-               for ( int l = 0; l < nocc_l; l++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * l;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int k = 0; k < nocc_l; k++ ){
-                        const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
-                        double f_kw = fock->get( Iw, k, nocc_w + w ) * (( k == l ) ? SQRT2 : 1.0 );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_kw, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FAB_singlet[ IL ][ 0 ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            } else { // Ii < Ij
-               const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, +1 ) : shift_B_nonactive( indices, IL, Iw, +1 ));
-               for ( int l = 0; l < nocc_l; l++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * l;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int k = 0; k < nocc_w; k++ ){
-                        const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                        double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
-                        double f_kw = fock->get( Iw, k, nocc_w + w );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_kw, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FAB_singlet[ IL ][ IR ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FAB singlet transpose: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii x Ij == It x Iu
-      int SIZE_L = size_B_singlet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == Il == Ix x Iy x Iz
-         int SIZE_R = size_A[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == IL x IR == Ik
-         const int nocc_l = indices->getNOCC( IR );
+         const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, +1 ) : shift_B_nonactive( indices, IL, Iw, +1 ));
          const int nocc_w = indices->getNOCC( Iw );
          const int nact_w = indices->getNDMRG( Iw );
          int total_size = SIZE_L * SIZE_R;
          if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
-            if ( IL == 0 ){ // Ii == Ij == Il == Ik
-               const int shift = shift_B_nonactive( indices, Iw, IR, +1 );
-               for ( int k = 0; k < nocc_w; k++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_wk = fock->get( Iw, nocc_w + w, k );
+            for ( int k = 0; k < nocc_w; k++ ){
+               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+               for ( int w = 0; w < nact_w; w++ ){
+                  double f_kw = fock->get( Iw, k, nocc_w + w );
+                  int inc1 = 1;
+                  daxpy_( &total_size, &f_kw, FAB_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+               }
+               if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
+                  for ( int l = 0; l < nocc_l; l++ ){
+                     const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     double factor = (( k == l ) ? SQRT2 : 1.0 );
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_wk, FAB_singlet[ IR ][ 0 ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int l = 0; l < nocc_l; l++ ){
                      const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_R * l;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_L * count;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
                      double one = 1.0;
-                     double alpha = (( k == l ) ? SQRT2 : 1.0 );
+                     double factor = (( k == l ) ? SQRT2 : 1.0 );
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &alpha, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
-               }
-            } else {
-               const int shift = (( Iw < IR ) ? shift_B_nonactive( indices, Iw, IR, +1 ) : shift_B_nonactive( indices, IR, Iw, +1 ));
-               for ( int k = 0; k < nocc_w; k++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_wk = fock->get( Iw, nocc_w + w, k );
+               } else {
+                  for ( int l = 0; l < nocc_l; l++ ){
+                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_wk, FAB_singlet[ IR ][ IL ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( Iw < IR ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_R * l;
-                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_L * count;
+                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
                      double one = 1.0;
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                }
             }
@@ -1372,124 +1329,83 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       }
    }
 
-   // FAB triplet regular: < A(xlyz) E_kw TB_tiuj > = ( delta_ik delta_jl - delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_triplet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
+   // FAB triplet: < A(xlyz) E_kw TB_tiuj > = ( delta_ik delta_jl - delta_jk delta_il ) * FAB_triplet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
       int SIZE_L = size_A[ IL ];
       const int nocc_l = indices->getNOCC( IL );
       for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
          int SIZE_R = size_B_triplet[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         if ( SIZE_L * SIZE_R * nocc_l * nact_w * nocc_w > 0 ){
-            if ( IR == 0 ){ // Ii == Ij == Ik == Il
-               const int shift = shift_B_nonactive( indices, Iw, IL, -1 );
-               for ( int l = 0; l < nocc_l; l++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * l;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int k = 0; k < l; k++ ){
-                        const int count = shift + k + ( l * ( l - 1 ) ) / 2;
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                        double f_kw = fock->get( Iw, k, nocc_w + w );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_kw, origin, &inc1, workspace, &inc1 );
-                     }
-                     for ( int k = l+1; k < nocc_l; k++ ){
-                        const int count = shift + l + ( k * ( k - 1 ) ) / 2;
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                        double f_kw = -fock->get( Iw, k, nocc_w + w ); // Minus sign
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_kw, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FAB_triplet[ IL ][ 0 ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            } else { // Ii < Ij
-               const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, -1 ) : shift_B_nonactive( indices, IL, Iw, -1 ));
-               for ( int l = 0; l < nocc_l; l++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * l;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int k = 0; k < nocc_w; k++ ){
-                        const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                        double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                        double f_kw = (( Iw < IL ) ? +1 : -1 ) * fock->get( Iw, k, nocc_w + w ); // Minus sign
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_kw, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FAB_triplet[ IL ][ IR ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FAB triplet transpose: < A(xlyz) E_kw TB_tiuj > = ( delta_ik delta_jl - delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_triplet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii x Ij == It x Iu
-      int SIZE_L = size_B_triplet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == Il == Ix x Iy x Iz
-         int SIZE_R = size_A[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == IL x IR == Ik
-         const int nocc_l = indices->getNOCC( IR );
+         const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, -1 ) : shift_B_nonactive( indices, IL, Iw, -1 ));
          const int nocc_w = indices->getNOCC( Iw );
          const int nact_w = indices->getNDMRG( Iw );
          int total_size = SIZE_L * SIZE_R;
          if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
-            if ( IL == 0 ){ // Ii == Ij == Il == Ik
-               const int shift = shift_B_nonactive( indices, Iw, IR, -1 );
-               for ( int k = 0; k < nocc_w; k++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_wk = fock->get( Iw, nocc_w + w, k );
+            for ( int k = 0; k < nocc_w; k++ ){
+               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+               for ( int w = 0; w < nact_w; w++ ){
+                  double f_kw = fock->get( Iw, k, nocc_w + w );
+                  int inc1 = 1;
+                  daxpy_( &total_size, &f_kw, FAB_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+               }
+               if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
+                  for ( int l = 0; l < k; l++ ){
+                     const int count = shift + l + ( k * ( k - 1 ) ) / 2;
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     double minus_one = -1.0; // ( k > l  --->  - delta_jk delta_il )
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_wk, FAB_triplet[ IR ][ 0 ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &minus_one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+                  for ( int l = k+1; l < nocc_l; l++ ){
+                     const int count = shift + k + ( l * ( l - 1 ) ) / 2;
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0; // ( k < l  --->  + delta_ik delta_jl )
+                     char notrans = 'N';
+                     int inc1 = 1;
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int l = 0; l < k; l++ ){
                      const int count = shift + l + ( k * ( k - 1 ) ) / 2;
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_R * l;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_L * count;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
                      double one = 1.0;
-                     double minus_one = -1.0;
+                     double minus_one = -1.0; // ( k > l  --->  - delta_jk delta_il )
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &minus_one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &minus_one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
-                  for ( int l = k+1; l < nocc_w; l++ ){
+                  for ( int l = k+1; l < nocc_l; l++ ){
                      const int count = shift + k + ( l * ( l - 1 ) ) / 2;
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_R * l;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_L * count;
-                     double one = 1.0;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0; // ( k < l  --->  + delta_ik delta_jl )
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
-               }
-            } else {
-               const int shift = (( Iw < IR ) ? shift_B_nonactive( indices, Iw, IR, -1 ) : shift_B_nonactive( indices, IR, Iw, -1 ));
-               for ( int k = 0; k < nocc_w; k++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_wk = fock->get( Iw, nocc_w + w, k );
+               } else {
+                  double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( k < l  --->  + delta_ik delta_jl ) and ( k > l  --->  - delta_jk delta_il )
+                  for ( int l = 0; l < nocc_l; l++ ){
+                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_wk, FAB_triplet[ IR ][ IL ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( Iw < IR ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_R * l;
-                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_L * count;
+                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
                      double one = 1.0;
-                     double alpha = (( Iw < IR ) ? +1.0 : -1.0 );
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &alpha, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                }
             }
@@ -1497,111 +1413,66 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       }
    }
 
-   // FCF singlet regular: < C(dxyz) E_wc SF_atbu > = ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_singlet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
+   // FCF singlet: < C(dxyz) E_wc SF_atbu > = ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_singlet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
       int SIZE_L = size_C[ IL ];
       const int nvir_d = indices->getNVIRT( IL );
       for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
          int SIZE_R = size_F_singlet[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         if ( SIZE_L * SIZE_R * nvir_d * nact_w * nvir_w > 0 ){
-            if ( IR == 0 ){ // Ia == Ib == Ic == Id
-               const int shift = shift_F_nonactive( indices, Iw, IL, +1 );
-               for ( int d = 0; d < nvir_d; d++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * d;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int c = 0; c < nvir_w; c++ ){
-                        const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
-                        double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c ) * (( c == d ) ? SQRT2 : 1.0 );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_wc, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FCF_singlet[ IL ][ 0 ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            } else { // Ia < Ib
-               const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, +1 ) : shift_F_nonactive( indices, IL, Iw, +1 ));
-               for ( int d = 0; d < nvir_d; d++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * d;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int c = 0; c < nvir_w; c++ ){
-                        const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                        double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
-                        double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_wc, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FCF_singlet[ IL ][ IR ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FCF singlet transpose: < C(dxyz) E_wc SF_atbu > = ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_singlet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia x Ib == It x Iu
-      int SIZE_L = size_F_singlet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == Id == Ix x Iy x Iz
-         int SIZE_R = size_C[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == IL x IR == Ic
-         const int nvir_d = indices->getNVIRT( IR );
+         const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, +1 ) : shift_F_nonactive( indices, IL, Iw, +1 ));
          const int nocc_w = indices->getNOCC( Iw );
          const int nact_w = indices->getNDMRG( Iw );
          const int n_oa_w = nocc_w + nact_w;
          const int nvir_w = indices->getNVIRT( Iw );
          int total_size = SIZE_L * SIZE_R;
          if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
-            if ( IL == 0 ){ // Ia == Ib == Ic == Id
-               const int shift = shift_F_nonactive( indices, Iw, IR, +1 );
-               for ( int c = 0; c < nvir_w; c++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_cw = fock->get( Iw, n_oa_w + c, nocc_w + w );
+            for ( int c = 0; c < nvir_w; c++ ){
+               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+               for ( int w = 0; w < nact_w; w++ ){
+                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
+                  int inc1 = 1;
+                  daxpy_( &total_size, &f_wc, FCF_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+               }
+               if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
+                  for ( int d = 0; d < nvir_d; d++ ){
+                     const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     double factor = (( c == d ) ? SQRT2 : 1.0 );
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_cw, FCF_singlet[ IR ][ 0 ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int d = 0; d < nvir_d; d++ ){
                      const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_R * d;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_L * count;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
                      double one = 1.0;
-                     double alpha = (( c == d ) ? SQRT2 : 1.0 );
+                     double factor = (( c == d ) ? SQRT2 : 1.0 );
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &alpha, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
-               }
-            } else {
-               const int shift = (( Iw < IR ) ? shift_F_nonactive( indices, Iw, IR, +1 ) : shift_F_nonactive( indices, IR, Iw, +1 ));
-               for ( int c = 0; c < nvir_w; c++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_cw = fock->get( Iw, n_oa_w + c, nocc_w + w );
+               } else {
+                  for ( int d = 0; d < nvir_d; d++ ){
+                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     char notrans = 'N';
                      int inc1 = 1;
-                     daxpy_( &total_size, &f_cw, FCF_singlet[ IR ][ IL ][ w ], &inc1, workspace, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                   for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( Iw < IR ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_R * d;
-                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_L * count;
+                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
                      double one = 1.0;
                      char trans = 'T';
                      int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                }
             }
@@ -1609,61 +1480,85 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       }
    }
 
-   // FCF triplet regular: < C(dxyz) E_wc TF_atbu > = ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_triplet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
+   // FCF triplet: < C(dxyz) E_wc TF_atbu > = ( delta_ac delta_bd - delta_ad delta_bc ) * FCF_triplet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
       int SIZE_L = size_C[ IL ];
       const int nvir_d = indices->getNVIRT( IL );
       for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
          int SIZE_R = size_F_triplet[ IR ];
          const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
+         const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, -1 ) : shift_F_nonactive( indices, IL, Iw, -1 ));
          const int nocc_w = indices->getNOCC( Iw );
          const int nact_w = indices->getNDMRG( Iw );
          const int n_oa_w = nocc_w + nact_w;
          const int nvir_w = indices->getNVIRT( Iw );
-         if ( SIZE_L * SIZE_R * nvir_d * nact_w * nvir_w > 0 ){
-            if ( IR == 0 ){ // Ia == Ib == Ic == Id
-               const int shift = shift_F_nonactive( indices, Iw, IL, -1 );
-               for ( int d = 0; d < nvir_d; d++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * d;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int c = 0; c < d; c++ ){
-                        const int count = shift + c + ( d * ( d - 1 ) ) / 2;
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                        double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_wc, origin, &inc1, workspace, &inc1 );
-                     }
-                     for ( int c = d+1; c < nvir_w; c++ ){
-                        const int count = shift + d + ( c * ( c - 1 ) ) / 2;
-                        double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                        double f_wc = -fock->get( Iw, nocc_w + w, n_oa_w + c ); // Minus sign
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_wc, origin, &inc1, workspace, &inc1 );
-                     }
-                     double one = 1.0;
-                     char notrans = 'N';
-                     int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FCF_triplet[ IL ][ 0 ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
-                  }
+         int total_size = SIZE_L * SIZE_R;
+         if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
+            for ( int c = 0; c < nvir_w; c++ ){
+               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+               for ( int w = 0; w < nact_w; w++ ){
+                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
+                  int inc1 = 1;
+                  daxpy_( &total_size, &f_wc, FCF_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
-            } else { // Ia < Ib
-               const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, -1 ) : shift_F_nonactive( indices, IL, Iw, -1 ));
-               for ( int d = 0; d < nvir_d; d++ ){
-                  double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * d;
-                  for ( int w = 0; w < nact_w; w++ ){
-                     for ( int cnt = 0; cnt < SIZE_R; cnt++ ){ workspace[ cnt ] = 0.0; }
-                     for ( int c = 0; c < nvir_w; c++ ){
-                        const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                        double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                        double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c ) * (( Iw < IL ) ? +1 : -1 ); //Minus sign
-                        int inc1 = 1;
-                        daxpy_( &SIZE_R, &f_wc, origin, &inc1, workspace, &inc1 );
-                     }
+               if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
+                  for ( int d = 0; d < c; d++ ){
+                     const int count = shift + d + ( c * ( c - 1 ) ) / 2;
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     double minus_one = -1.0; // ( c > d  --->  - delta_ad delta_bc )
+                     char notrans = 'N';
+                     int inc1 = 1;
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &minus_one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+                  for ( int d = c+1; d < nvir_d; d++ ){
+                     const int count = shift + c + ( d * ( d - 1 ) ) / 2;
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0; // ( c < d  --->  + delta_ac delta_bd )
+                     char notrans = 'N';
+                     int inc1 = 1;
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+                  for ( int d = 0; d < c; d++ ){
+                     const int count = shift + d + ( c * ( c - 1 ) ) / 2;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     double minus_one = -1.0; // ( c > d  --->  - delta_ad delta_bc )
+                     char trans = 'T';
+                     int inc1 = 1;
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &minus_one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+                  for ( int d = c+1; d < nvir_d; d++ ){
+                     const int count = shift + c + ( d * ( d - 1 ) ) / 2;
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0; // ( c < d  --->  + delta_ac delta_bd )
+                     char trans = 'T';
+                     int inc1 = 1;
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &one, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+               } else {
+                  double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( c < d  --->  + delta_ac delta_bd ) and ( c > d  --->  - delta_ad delta_bc )
+                  for ( int d = 0; d < nvir_d; d++ ){
+                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
                      double one = 1.0;
                      char notrans = 'N';
                      int inc1 = 1;
-                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &one, FCF_triplet[ IL ][ IR ][ w ], &SIZE_L, workspace, &inc1, &one, target, &inc1 );
+                     dgemv_( &notrans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
+                  }
+                  for ( int d = 0; d < nvir_d; d++ ){
+                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                     double * origin = vector + jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                     double * target = result + jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                     double one = 1.0;
+                     char trans = 'T';
+                     int inc1 = 1;
+                     dgemv_( &trans, &SIZE_L, &SIZE_R, &factor, workspace, &SIZE_L, origin, &inc1, &one, target, &inc1 );
                   }
                }
             }
@@ -1671,73 +1566,6 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       }
    }
 
-   // FCF triplet transpose: < C(dxyz) E_wc TF_atbu > = ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_triplet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia x Ib == It x Iu
-      int SIZE_L = size_F_triplet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == Id == Ix x Iy x Iz
-         int SIZE_R = size_C[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == IL x IR == Ic
-         const int nvir_d = indices->getNVIRT( IR );
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( SIZE_L * SIZE_R * nvir_d * nact_w * nvir_w > 0 ){
-            if ( IL == 0 ){ // Ia == Ib == Ic == Id
-               const int shift = shift_F_nonactive( indices, Iw, IR, -1 );
-               for ( int c = 0; c < nvir_w; c++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_cw = fock->get( Iw, n_oa_w + c, nocc_w + w );
-                     int inc1 = 1;
-                     daxpy_( &total_size, &f_cw, FCF_triplet[ IR ][ 0 ][ w ], &inc1, workspace, &inc1 );
-                  }
-                  for ( int d = 0; d < c; d++ ){
-                     const int count = shift + d + ( c * ( c - 1 ) ) / 2;
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_R * d;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_L * count;
-                     double one = 1.0;
-                     double minus_one = -1.0;
-                     char trans = 'T';
-                     int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &minus_one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count = shift + c + ( d * ( d - 1 ) ) / 2;
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_R * d;
-                     double * target = result + jump[      num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_L * count;
-                     double one = 1.0;
-                     char trans = 'T';
-                     int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &one, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
-                  }
-               }
-            } else {
-               const int shift = (( Iw < IR ) ? shift_F_nonactive( indices, Iw, IR, -1 ) : shift_F_nonactive( indices, IR, Iw, -1 ));
-               for ( int c = 0; c < nvir_w; c++ ){
-                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-                  for ( int w = 0; w < nact_w; w++ ){
-                     double f_cw = fock->get( Iw, n_oa_w + c, nocc_w + w );
-                     int inc1 = 1;
-                     daxpy_( &total_size, &f_cw, FCF_triplet[ IR ][ IL ][ w ], &inc1, workspace, &inc1 );
-                  }
-                  for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( Iw < IR ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                     double * origin = vector + jump[ IR + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_R * d;
-                     double * target = result + jump[ IL + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_L * count;
-                     double one = 1.0;
-                     double alpha = (( Iw < IR ) ? +1.0 : -1.0 );
-                     char trans = 'T';
-                     int inc1 = 1;
-                     dgemv_( &trans, &SIZE_R, &SIZE_L, &alpha, workspace, &SIZE_R, origin, &inc1, &one, target, &inc1 );
-                  }
-               }
-            }
-         }
-      }
-   }
-   
    // FBE singlet: < SB_xkyl E_wc SE_tiaj > = 2 delta_ac delta_ik delta_jl FBE_singlet[ Ik x Il ][ It ][ w ][ xy, t ]
    for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iik x Ijl == Ix x Iy
       int SIZE_L = size_B_singlet[ IL ];
@@ -5001,8 +4829,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + u ))) ];
-                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= value;
+                                    const double gamma_zxyu = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + u ))) ];
+                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= gamma_zxyu;
                                  }
                               }
                            }
@@ -5012,9 +4840,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_x == irrep_y ){
                            for ( int u = w; u < num_ut; u++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
+                                 const double gamma_zu = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
-                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= value;
+                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= gamma_zu;
                                  }
                               }
                            }
@@ -5061,8 +4889,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + t ))) ];
-                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= value;
+                                    const double gamma_zxyt = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + t ))) ];
+                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= gamma_zxyt;
                                  }
                               }
                            }
@@ -5072,9 +4900,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_x == irrep_y ){
                            for ( int t = 0; t <= w; t++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
+                                 const double gamma_zt = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
-                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= value;
+                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= gamma_zt;
                                  }
                               }
                            }
@@ -5186,8 +5014,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
-                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= value;
+                                       const double gamma_zxyu = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
+                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= gamma_zxyu;
                                     }
                                  }
                               }
@@ -5197,9 +5025,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_x == irrep_y ){
                               for ( int u = 0; u < num_u; u++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
+                                    const double gamma_zu = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
-                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= value;
+                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= gamma_zu;
                                     }
                                  }
                               }
@@ -5249,8 +5077,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_t + t ))) ];
-                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
+                                       const double gamma_zxyt = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_t + t ))) ];
+                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= gamma_zxyt;
                                     }
                                  }
                               }
@@ -5260,9 +5088,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_x == irrep_y ){
                               for ( int t = 0; t < num_t; t++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
+                                    const double gamma_zt = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
-                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
+                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= gamma_zt;
                                     }
                                  }
                               }
@@ -5409,8 +5237,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + u ))) ];
-                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] += value;
+                                    const double gamma_zxyu = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + u ))) ];
+                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] += gamma_zxyu;
                                  }
                               }
                            }
@@ -5420,9 +5248,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_x == irrep_y ){
                            for ( int u = w+1; u < num_ut; u++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
+                                 const double gamma_zu = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
-                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] += value;
+                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] += gamma_zu;
                                  }
                               }
                            }
@@ -5469,8 +5297,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + t ))) ];
-                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] -= value;
+                                    const double gamma_zxyt = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_ut + t ))) ];
+                                    CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] -= gamma_zxyt;
                                  }
                               }
                            }
@@ -5480,9 +5308,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_x == irrep_y ){
                            for ( int t = 0; t < w; t++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
+                                 const double gamma_zt = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
-                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] -= value;
+                                    CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] -= gamma_zt;
                                  }
                               }
                            }
@@ -5594,8 +5422,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
-                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] += value;
+                                       const double gamma_zxyu = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
+                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] += gamma_zxyu;
                                     }
                                  }
                               }
@@ -5605,9 +5433,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_x == irrep_y ){
                               for ( int u = 0; u < num_u; u++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
+                                    const double gamma_zu = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
-                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] += value;
+                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] += gamma_zu;
                                     }
                                  }
                               }
@@ -5657,8 +5485,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_t + t ))) ];
-                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
+                                       const double gamma_zxyt = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_t + t ))) ];
+                                       CFptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= gamma_zxyt;
                                     }
                                  }
                               }
@@ -5668,9 +5496,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_x == irrep_y ){
                               for ( int t = 0; t < num_t; t++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
+                                    const double gamma_zt = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
-                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
+                                       CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= gamma_zt;
                                     }
                                  }
                               }
@@ -5744,10 +5572,10 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
             int jump_col = 0;
             for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-               const int num_t   = indices->getNDMRG( irrep_t );
                const int irrep_u = Irreps::directProd( irrep_right, irrep_t );
-               const int d_u     = indices->getDMRGcumulative( irrep_u );
-               const int num_u   = indices->getNDMRG( irrep_u );
+               const int num_t = indices->getNDMRG( irrep_t );
+               const int d_u   = indices->getDMRGcumulative( irrep_u );
+               const int num_u = indices->getNDMRG( irrep_u );
 
                const int jump_AD1 = jump_AC_active( indices, irrep_w, irrep_t, irrep_u );
                const int jump_AD2 = jump_AC_active( indices, irrep_t, irrep_w, irrep_u );
@@ -5766,14 +5594,14 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
                int jump_row = 0;
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
+                  const int d_x   = indices->getDMRGcumulative( irrep_x );
+                  const int num_x = indices->getNDMRG( irrep_x );
                   for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                     const int d_y     = indices->getDMRGcumulative( irrep_y );
-                     const int num_y   = indices->getNDMRG( irrep_y );
                      const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
-                     const int d_z     = indices->getDMRGcumulative( irrep_z );
-                     const int num_z   = indices->getNDMRG( irrep_z );
+                     const int d_y   = indices->getDMRGcumulative( irrep_y );
+                     const int num_y = indices->getNDMRG( irrep_y );
+                     const int d_z   = indices->getDMRGcumulative( irrep_z );
+                     const int num_z = indices->getNDMRG( irrep_z );
                      assert( jump_row == jump_AC_active( indices, irrep_x, irrep_y, irrep_z ) );
 
                      if ( irrep_t == irrep_w ){
@@ -5782,8 +5610,8 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
-                                    CD2ptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_t * u ) ] += 2 * value;
+                                    const double gamma_zxyu = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_u + u ))) ];
+                                    CD2ptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_t * u ) ] += 2 * gamma_zxyu;
                                  }
                               }
                            }
@@ -5792,10 +5620,10 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
                         // + 2 delta_tw delta_xy Gamma_zu
                         if ( irrep_x == irrep_y ){
                            for ( int u = 0; u < num_u; u++ ){
-                              for ( int xy = 0; xy < num_x; xy++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
-                                    CD2ptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_t * u ) ] += 2 * value;
+                              for ( int z = 0; z < num_z; z++ ){
+                                 const double gamma_zu = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
+                                 for ( int xy = 0; xy < num_x; xy++ ){
+                                    CD2ptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_t * u ) ] += 2 * gamma_zu;
                                  }
                               }
                            }
@@ -5808,8 +5636,8 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_w + w ))) ];
-                                    CD2ptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tu + num_u * tu ) ] += value;
+                                    const double gamma_zxyw = two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_w + w ))) ];
+                                    CD2ptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tu + num_u * tu ) ] += gamma_zxyw;
                                  }
                               }
                            }
@@ -5817,11 +5645,11 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
                         // + delta_tu delta_xy Gamma_zw
                         if ( irrep_x == irrep_y ){
-                           for ( int tu = 0; tu < num_u; tu++ ){
-                              for ( int xy = 0; xy < num_x; xy++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    const double value = one_rdm[ d_z + z + LAS * ( d_w + w ) ];
-                                    CD2ptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + tu + num_u * tu ) ] += value;
+                           for ( int z = 0; z < num_z; z++ ){
+                              const double gamma_zw = one_rdm[ d_z + z + LAS * ( d_w + w ) ];
+                              for ( int tu = 0; tu < num_u; tu++ ){
+                                 for ( int xy = 0; xy < num_x; xy++ ){
+                                    CD2ptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + tu + num_u * tu ) ] += gamma_zw;
                                  }
                               }
                            }
