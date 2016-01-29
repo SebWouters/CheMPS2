@@ -250,7 +250,7 @@ double CheMPS2::CASPT2::solve( const bool diag_only ) const{
    double best_energy = energy_caspt2_d;
    if ( diag_only == false ){
 
-      const double CG_RTOL = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * total_size );
+      const double CG_RTOL = 1e-12; //CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * total_size );
       ConjugateGradient CG( total_size, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
       double ** pointers = new double*[ 3 ];
       char instruction = CG.step( pointers );
@@ -4914,7 +4914,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
 
          assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
          const int SIZE_right = size_B_singlet[ 0 ];
-         const int num_w = indices->getNDMRG( irrep_left );
+         const int num_w = indices->getNDMRG( irrep_left ); // irrep_w == irrep_left x irrep_right = irrep_left
          FAB_singlet[ irrep_left ][ 0 ] = new double*[ num_w ];
          FCF_singlet[ irrep_left ][ 0 ] = new double*[ num_w ];
 
@@ -4928,36 +4928,34 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
 
             int jump_col = 0;
             for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-               const int d_ut    = indices->getDMRGcumulative( irrep_ut );
-               const int num_ut  = indices->getNDMRG( irrep_ut );
+               const int d_ut   = indices->getDMRGcumulative( irrep_ut );
+               const int num_ut = indices->getNDMRG( irrep_ut );
                assert( jump_col == jump_BF_active( indices, irrep_ut, irrep_ut, +1 ) );
 
-               const int jump_AB1 = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left );
-               const int jump_AB2 = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left );
-               const int jump_CF1 = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut );
-               const int jump_CF2 = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut );
+               const int jump_AB = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left );
+               const int jump_CF = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut );
 
                for ( int t = 0; t < num_ut; t++ ){
                   for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
                      for ( int xyz = 0; xyz < SIZE_left; xyz++ ){
-                        ABptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) ] = ( - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB1 + u + num_ut * ( t + num_ut * w )) ]
-                                                                                                - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB2 + t + num_ut * ( u + num_ut * w )) ] );
-                        CFptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) ] = ( + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF1 + u + num_ut * ( w + num_w  * t )) ]
-                                                                                                + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF2 + t + num_ut * ( w + num_w  * u )) ] );
+                        ABptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) ] = ( - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB + u + num_ut * ( t + num_ut * w )) ]
+                                                                                                - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB + t + num_ut * ( u + num_ut * w )) ] );
+                        CFptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) ] = ( + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF + u + num_ut * ( w + num_w  * t )) ]
+                                                                                                + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF + t + num_ut * ( w + num_w  * u )) ] );
                      }
                   }
                }
 
                int jump_row = 0;
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
+                  const int d_x   = indices->getDMRGcumulative( irrep_x );
+                  const int num_x = indices->getNDMRG( irrep_x );
                   for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                     const int d_y     = indices->getDMRGcumulative( irrep_y );
-                     const int num_y   = indices->getNDMRG( irrep_y );
                      const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
-                     const int d_z     = indices->getDMRGcumulative( irrep_z );
-                     const int num_z   = indices->getNDMRG( irrep_z );
+                     const int d_y   = indices->getDMRGcumulative( irrep_y );
+                     const int num_y = indices->getNDMRG( irrep_y );
+                     const int d_z   = indices->getDMRGcumulative( irrep_z );
+                     const int num_z = indices->getNDMRG( irrep_z );
                      assert( jump_row == jump_AC_active( indices, irrep_x, irrep_y, irrep_z ) );
 
                      if ( irrep_ut == irrep_left ){
@@ -4967,8 +4965,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_ut + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= value;
+                                    const double gamma_zuyx = two_rdm[ d_z + z + LAS * ( d_ut + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= gamma_zuyx;
                                  }
                               }
                            }
@@ -4978,9 +4976,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_ut == irrep_y ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                 const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                  for ( int uy = w; uy < num_y; uy++ ){
-                                    ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + ( uy * ( uy + 1 ) ) / 2 ) ] -= value;
+                                    ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + ( uy * ( uy + 1 ) ) / 2 ) ] -= gamma_zx;
                                  }
                               }
                            }
@@ -4990,9 +4988,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_ut == irrep_x ){
                            for ( int y = 0; y < num_y; y++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                 const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                  for ( int ux = w; ux < num_x; ux++ ){
-                                    ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( ux * ( ux + 1 ) ) / 2 ) ] += 2 * value;
+                                    ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( ux * ( ux + 1 ) ) / 2 ) ] += 2 * gamma_zy;
                                  }
                               }
                            }
@@ -5014,24 +5012,21 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_x == irrep_y ){
                            for ( int u = w; u < num_ut; u++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_ut + u ) ];
+                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
                                     CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u + 1 ) ) / 2 ) ] -= value;
                                  }
                               }
                            }
                         }
-                     }
-
-                     if ( irrep_ut == irrep_left ){
 
                         // FAB_singlet[ xyz,tu ] -= delta_uw Gamma_ztyx
                         for ( int t = 0; t <= w; t++ ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_ut + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= value;
+                                    const double gamma_ztyx = two_rdm[ d_z + z + LAS * ( d_ut + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= gamma_ztyx;
                                  }
                               }
                            }
@@ -5041,9 +5036,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_ut == irrep_y ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                 const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                  for ( int ty = 0; ty <= w; ty++ ){
-                                    ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + ( w * ( w + 1 ) ) / 2 ) ] -= value;
+                                    ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + ( w * ( w + 1 ) ) / 2 ) ] -= gamma_zx;
                                  }
                               }
                            }
@@ -5053,9 +5048,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_ut == irrep_x ){
                            for ( int y = 0; y < num_y; y++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                 const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                  for ( int tx = 0; tx <= w; tx++ ){
-                                    ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + ( w * ( w + 1 ) ) / 2 ) ] += 2 * value;
+                                    ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + ( w * ( w + 1 ) ) / 2 ) ] += 2 * gamma_zy;
                                  }
                               }
                            }
@@ -5077,7 +5072,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                         if ( irrep_x == irrep_y ){
                            for ( int t = 0; t <= w; t++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_ut + t ) ];
+                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
                                     CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w + 1 ) ) / 2 ) ] -= value;
                                  }
@@ -5114,10 +5109,10 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
             for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
                const int irrep_u = Irreps::directProd( irrep_right, irrep_t );
                if ( irrep_t < irrep_u ){
-                  const int d_t    = indices->getDMRGcumulative( irrep_t );
-                  const int num_t  = indices->getNDMRG( irrep_t );
-                  const int d_u    = indices->getDMRGcumulative( irrep_u );
-                  const int num_u  = indices->getNDMRG( irrep_u );
+                  const int d_t   = indices->getDMRGcumulative( irrep_t );
+                  const int num_t = indices->getNDMRG( irrep_t );
+                  const int d_u   = indices->getDMRGcumulative( irrep_u );
+                  const int num_u = indices->getNDMRG( irrep_u );
                   assert( jump_col == jump_BF_active( indices, irrep_t, irrep_u, +1 ) );
 
                   const int jump_AB1 = jump_AC_active( indices, irrep_u, irrep_t, irrep_w );
@@ -5138,14 +5133,14 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
 
                   int jump_row = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-                     const int d_x    = indices->getDMRGcumulative( irrep_x );
-                     const int num_x  = indices->getNDMRG( irrep_x );
+                     const int d_x   = indices->getDMRGcumulative( irrep_x );
+                     const int num_x = indices->getNDMRG( irrep_x );
                      for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                        const int d_y     = indices->getDMRGcumulative( irrep_y );
-                        const int num_y   = indices->getNDMRG( irrep_y );
                         const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
-                        const int d_z     = indices->getDMRGcumulative( irrep_z );
-                        const int num_z   = indices->getNDMRG( irrep_z );
+                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int num_y = indices->getNDMRG( irrep_y );
+                        const int d_z   = indices->getDMRGcumulative( irrep_z );
+                        const int num_z = indices->getNDMRG( irrep_z );
                         assert( jump_row == jump_AC_active( indices, irrep_x, irrep_y, irrep_z ) );
 
                         if ( irrep_t == irrep_w ){
@@ -5155,8 +5150,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= value;
+                                       const double gamma_zuyx = two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= gamma_zuyx;
                                     }
                                  }
                               }
@@ -5166,9 +5161,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_u == irrep_y ){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                    const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                     for ( int uy = 0; uy < num_y; uy++ ){
-                                       ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + num_w * uy ) ] -= value;
+                                       ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + num_w * uy ) ] -= gamma_zx;
                                     }
                                  }
                               }
@@ -5178,9 +5173,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_u == irrep_x ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                    const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                     for ( int ux = 0; ux < num_x; ux++ ){
-                                       ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * ux ) ] += 2 * value;
+                                       ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * ux ) ] += 2 * gamma_zy;
                                     }
                                  }
                               }
@@ -5202,7 +5197,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_x == irrep_y ){
                               for ( int u = 0; u < num_u; u++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_u + u ) ];
+                                    const double value = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
                                        CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= value;
                                     }
@@ -5218,8 +5213,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
+                                       const double gamma_ztyx = two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= gamma_ztyx;
                                     }
                                  }
                               }
@@ -5229,9 +5224,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_t == irrep_y ){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                    const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                     for ( int ty = 0; ty < num_y; ty++ ){
-                                       ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + num_y * w ) ] -= value;
+                                       ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + num_y * w ) ] -= gamma_zx;
                                     }
                                  }
                               }
@@ -5241,9 +5236,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_t == irrep_x ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                    const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                     for ( int tx = 0; tx < num_x; tx++ ){
-                                       ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + num_x * w ) ] += 2 * value;
+                                       ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + num_x * w ) ] += 2 * gamma_zy;
                                     }
                                  }
                               }
@@ -5265,7 +5260,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_singlet(){
                            if ( irrep_x == irrep_y ){
                               for ( int t = 0; t < num_t; t++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_t + t ) ];
+                                    const double value = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
                                        CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
                                     }
@@ -5345,32 +5340,30 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                const int num_ut = indices->getNDMRG( irrep_ut );
                assert( jump_col == jump_BF_active( indices, irrep_ut, irrep_ut, -1 ) );
 
-               const int jump_AB1 = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left ); 
-               const int jump_AB2 = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left );
-               const int jump_CF1 = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut ); 
-               const int jump_CF2 = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut );
+               const int jump_AB = jump_AC_active( indices, irrep_ut, irrep_ut, irrep_left );
+               const int jump_CF = jump_AC_active( indices, irrep_ut, irrep_left, irrep_ut );
 
                for ( int t = 0; t < num_ut; t++ ){
                   for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
                      for ( int xyz = 0; xyz < SIZE_left; xyz++ ){
-                        ABptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) ] = ( - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB1 + u + num_ut * ( t + num_ut * w )) ]
-                                                                                                + SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB2 + t + num_ut * ( u + num_ut * w )) ] );
-                        CFptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) ] = ( + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF1 + u + num_ut * ( w + num_w  * t )) ]
-                                                                                                - SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF2 + t + num_ut * ( w + num_w  * u )) ] );
+                        ABptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) ] = ( - SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB + u + num_ut * ( t + num_ut * w )) ]
+                                                                                                + SAA[ irrep_left ][ xyz + SIZE_left * ( jump_AB + t + num_ut * ( u + num_ut * w )) ] );
+                        CFptr[ xyz + SIZE_left * ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) ] = ( + SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF + u + num_ut * ( w + num_w  * t )) ]
+                                                                                                - SCC[ irrep_left ][ xyz + SIZE_left * ( jump_CF + t + num_ut * ( w + num_w  * u )) ] );
                      }
                   }
                }
 
                int jump_row = 0;
                for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
+                  const int d_x   = indices->getDMRGcumulative( irrep_x );
+                  const int num_x = indices->getNDMRG( irrep_x );
                   for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                     const int d_y     = indices->getDMRGcumulative( irrep_y );
-                     const int num_y   = indices->getNDMRG( irrep_y );
                      const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
-                     const int d_z     = indices->getDMRGcumulative( irrep_z );
-                     const int num_z   = indices->getNDMRG( irrep_z );
+                     const int d_y   = indices->getDMRGcumulative( irrep_y );
+                     const int num_y = indices->getNDMRG( irrep_y );
+                     const int d_z   = indices->getDMRGcumulative( irrep_z );
+                     const int num_z = indices->getNDMRG( irrep_z );
                      assert( jump_row == jump_AC_active( indices, irrep_x, irrep_y, irrep_z ) );
 
                      if ( irrep_ut == irrep_left ){
@@ -5380,8 +5373,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_ut + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * value;
+                                    const double gamma_zuyx = two_rdm[ d_z + z + LAS * ( d_ut + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * gamma_zuyx;
                                  }
                               }
                            }
@@ -5391,9 +5384,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_ut == irrep_y ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                 const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                  for ( int uy = w+1; uy < num_y; uy++ ){
-                                    ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * value;
+                                    ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * gamma_zx;
                                  }
                               }
                            }
@@ -5403,9 +5396,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_ut == irrep_x ){
                            for ( int y = 0; y < num_y; y++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                 const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                  for ( int ux = w+1; ux < num_x; ux++ ){
-                                    ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( ux * ( ux - 1 ) ) / 2 ) ] += 6 * value;
+                                    ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + ( ux * ( ux - 1 ) ) / 2 ) ] += 6 * gamma_zy;
                                  }
                               }
                            }
@@ -5427,24 +5420,21 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_x == irrep_y ){
                            for ( int u = w+1; u < num_ut; u++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_ut + u ) ];
+                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + u ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
                                     CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + ( u * ( u - 1 ) ) / 2 ) ] += value;
                                  }
                               }
                            }
                         }
-                     }
-
-                     if ( irrep_ut == irrep_left ){
 
                         // FAB_triplet[ xyz,tu ] += 3 delta_uw Gamma_ztyx
                         for ( int t = 0; t < w; t++ ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_ut + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] += 3 * value;
+                                    const double gamma_ztyx = two_rdm[ d_z + z + LAS * ( d_ut + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                    ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] += 3 * gamma_ztyx;
                                  }
                               }
                            }
@@ -5454,9 +5444,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_ut == irrep_y ){
                            for ( int x = 0; x < num_x; x++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                 const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                  for ( int ty = 0; ty < w; ty++ ){
-                                    ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + ( w * ( w - 1 ) ) / 2 ) ] += 3 * value;
+                                    ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + ( w * ( w - 1 ) ) / 2 ) ] += 3 * gamma_zx;
                                  }
                               }
                            }
@@ -5466,9 +5456,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_ut == irrep_x ){
                            for ( int y = 0; y < num_y; y++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                 const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                  for ( int tx = 0; tx < w; tx++ ){
-                                    ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + ( w * ( w - 1 ) ) / 2 ) ] -= 6 * value;
+                                    ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + ( w * ( w - 1 ) ) / 2 ) ] -= 6 * gamma_zy;
                                  }
                               }
                            }
@@ -5490,7 +5480,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                         if ( irrep_x == irrep_y ){
                            for ( int t = 0; t < w; t++ ){
                               for ( int z = 0; z < num_z; z++ ){
-                                 const double value = two_rdm[ d_z + z + LAS * ( d_ut + t ) ];
+                                 const double value = one_rdm[ d_z + z + LAS * ( d_ut + t ) ];
                                  for ( int xy = 0; xy < num_x; xy++ ){
                                     CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + ( w * ( w - 1 ) ) / 2 ) ] -= value;
                                  }
@@ -5551,14 +5541,14 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
 
                   int jump_row = 0;
                   for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-                     const int d_x    = indices->getDMRGcumulative( irrep_x );
-                     const int num_x  = indices->getNDMRG( irrep_x );
+                     const int d_x   = indices->getDMRGcumulative( irrep_x );
+                     const int num_x = indices->getNDMRG( irrep_x );
                      for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                        const int d_y     = indices->getDMRGcumulative( irrep_y );
-                        const int num_y   = indices->getNDMRG( irrep_y );
                         const int irrep_z = Irreps::directProd( Irreps::directProd( irrep_left, irrep_x ), irrep_y );
-                        const int d_z     = indices->getDMRGcumulative( irrep_z );
-                        const int num_z   = indices->getNDMRG( irrep_z );
+                        const int d_y   = indices->getDMRGcumulative( irrep_y );
+                        const int num_y = indices->getNDMRG( irrep_y );
+                        const int d_z   = indices->getDMRGcumulative( irrep_z );
+                        const int num_z = indices->getNDMRG( irrep_z );
                         assert( jump_row == jump_AC_active( indices, irrep_x, irrep_y, irrep_z ) );
 
                         if ( irrep_t == irrep_w ){
@@ -5568,8 +5558,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= 3 * value;
+                                       const double gamma_zuyx = two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] -= 3 * gamma_zuyx;
                                     }
                                  }
                               }
@@ -5579,9 +5569,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_u == irrep_y ){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                    const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                     for ( int uy = 0; uy < num_y; uy++ ){
-                                       ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + num_w * uy ) ] -= 3 * value;
+                                       ABptr[ jump_row + x + num_x * ( uy + num_y * z ) + SIZE_left * ( jump_col + w + num_w * uy ) ] -= 3 * gamma_zx;
                                     }
                                  }
                               }
@@ -5591,9 +5581,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_u == irrep_x ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                    const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                     for ( int ux = 0; ux < num_x; ux++ ){
-                                       ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * ux ) ] += 6 * value;
+                                       ABptr[ jump_row + ux + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + w + num_w * ux ) ] += 6 * gamma_zy;
                                     }
                                  }
                               }
@@ -5615,7 +5605,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_x == irrep_y ){
                               for ( int u = 0; u < num_u; u++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_u + u ) ];
+                                    const double value = one_rdm[ d_z + z + LAS * ( d_u + u ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
                                        CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + w + num_w * u ) ] += value;
                                     }
@@ -5631,8 +5621,8 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     for ( int z = 0; z < num_z; z++ ){
-                                       const double value = two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
-                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] += 3 * value;
+                                       const double gamma_ztyx = two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_x + x ))) ];
+                                       ABptr[ jump_row + x + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] += 3 * gamma_ztyx;
                                     }
                                  }
                               }
@@ -5642,9 +5632,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_t == irrep_y ){
                               for ( int x = 0; x < num_x; x++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_x + x ) ];
+                                    const double gamma_zx = one_rdm[ d_z + z + LAS * ( d_x + x ) ];
                                     for ( int ty = 0; ty < num_y; ty++ ){
-                                       ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + num_y * w ) ] += 3 * value;
+                                       ABptr[ jump_row + x + num_x * ( ty + num_y * z ) + SIZE_left * ( jump_col + ty + num_y * w ) ] += 3 * gamma_zx;
                                     }
                                  }
                               }
@@ -5654,9 +5644,9 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_t == irrep_x ){
                               for ( int y = 0; y < num_y; y++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_y + y ) ];
+                                    const double gamma_zy = one_rdm[ d_z + z + LAS * ( d_y + y ) ];
                                     for ( int tx = 0; tx < num_x; tx++ ){
-                                       ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + num_x * w ) ] -= 6 * value;
+                                       ABptr[ jump_row + tx + num_x * ( y + num_y * z ) + SIZE_left * ( jump_col + tx + num_x * w ) ] -= 6 * gamma_zy;
                                     }
                                  }
                               }
@@ -5678,7 +5668,7 @@ void CheMPS2::CASPT2::make_FAB_FCF_triplet(){
                            if ( irrep_x == irrep_y ){
                               for ( int t = 0; t < num_t; t++ ){
                                  for ( int z = 0; z < num_z; z++ ){
-                                    const double value = two_rdm[ d_z + z + LAS * ( d_t + t ) ];
+                                    const double value = one_rdm[ d_z + z + LAS * ( d_t + t ) ];
                                     for ( int xy = 0; xy < num_x; xy++ ){
                                        CFptr[ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE_left * ( jump_col + t + num_t * w ) ] -= value;
                                     }
