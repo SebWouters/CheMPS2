@@ -9,7 +9,7 @@
 * Cumulant::gamma4_ham: cu(4) reconstruction of 4-RDM based on DMRG ThreeDM
 * FCI::Fock4RDM: fast contraction of Fock matrix with FCI 4-RDM
 * Cumulant::gamma4_fock_contract_ham: fast contraction of Fock matrix with cu(4) reconstruction of 4-RDM
-* CASPT2-D (CASPT2-N follows)
+* CASPT2-D and CASPT2-N
 
 #### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab
