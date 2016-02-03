@@ -1836,7 +1836,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   for ( int d = c; d < nvir_d; d++ ){
                      const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const int factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
+                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
                      for ( int ij = 0; ij < size_ij; ij++ ){
                         const double prefactor = factor * vector[ jump_H + ij + size_ij * count_cd ];
                         for ( int x = 0; x < nact_w; x++ ){
@@ -1856,7 +1856,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   for ( int d = c; d < nvir_d; d++ ){
                      const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const int factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
+                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
                      for ( int ij = 0; ij < size_ij; ij++ ){
                         double value = 0.0;
                         for ( int x = 0; x < nact_w; x++ ){
@@ -1957,9 +1957,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   for ( int d = 0; d < c; d++ ){
                      const int count_cd = d + ( c * ( c - 1 ) ) / 2;
                      for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = -6 * vector[ jump_H + ij + size_ij * count_cd ];
+                        const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
                         for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
                         }
                      }
                   }
@@ -1979,7 +1979,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                         for ( int x = 0; x < nact_w; x++ ){
                            value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
                         }
-                        result[ jump_H + ij + size_ij * count_cd ] += -6 * value;
+                        result[ jump_H + ij + size_ij * count_cd ] -= 6 * value;
                      }
                   }
                   for ( int d = c+1; d < nvir_d; d++ ){
@@ -2004,9 +2004,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
                      for ( int d = 0; d < nvir_d; d++ ){
                         for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = -6 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
+                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
                            for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
                            }
                         }
                      }
@@ -2016,7 +2016,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            for ( int x = 0; x < nact_w; x++ ){
                               value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
                            }
-                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] += -6 * value; // ( d + nvir_d * c ) because Id < Ic
+                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] -= 6 * value; // ( d + nvir_d * c ) because Id < Ic
                         }
                      }
                   }
@@ -2092,7 +2092,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   for ( int l = k; l < nocc_l; l++ ){
                      const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const int factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
+                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
                      for ( int ab = 0; ab < size_ab; ab++ ){
                         const double prefactor = factor * vector[ jump_H + count_kl + size_ij * ab ];
                         for ( int x = 0; x < nact_w; x++ ){
@@ -2112,7 +2112,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   for ( int l = k; l < nocc_l; l++ ){
                      const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const int factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
+                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
                      for ( int ab = 0; ab < size_ab; ab++ ){
                         double value = 0.0;
                         for ( int x = 0; x < nact_w; x++ ){
@@ -2186,9 +2186,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
                      for ( int l = 0; l < nocc_l; l++ ){
                         for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = -6 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
+                           const double prefactor = 6 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
                            for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
                            }
                         }
                      }
@@ -2198,7 +2198,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            for ( int x = 0; x < nact_w; x++ ){
                               value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
                            }
-                           result[ jump_H + k + nocc_w * l + size_ij * ab ] += -6 * value;
+                           result[ jump_H + k + nocc_w * l + size_ij * ab ] -= 6 * value;
                         }
                      }
                   }
@@ -2223,9 +2223,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   for ( int l = k+1; l < nocc_l; l++ ){
                      const int count_kl = k + ( l * ( l - 1 ) ) / 2;
                      for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = -6 * vector[ jump_H + count_kl + size_ij * ab ];
+                        const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
                         for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
                         }
                      }
                   }
@@ -2246,7 +2246,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                         for ( int x = 0; x < nact_w; x++ ){
                            value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
                         }
-                        result[ jump_H + count_kl + size_ij * ab ] += -6 * value;
+                        result[ jump_H + count_kl + size_ij * ab ] -= 6 * value;
                      }
                   }
                }
@@ -2304,9 +2304,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                const int nvir_ab = indices->getNVIRT( Iab );
                const int Il = Irreps::directProd( Iab, IL );
                const int nocc_l = indices->getNOCC( Il );
+               const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+               const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
+                                                                                                               : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
                if ( Ikw == Il ){ // irrep_k == irrep_l
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il,  Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * shift_E_nonactive( indices, Iab, Ikw, Il, +1 );
                   for ( int l = 0; l < nocc_l; l++ ){
                      const int cnt_kl = (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
                      double factor = (( k == l ) ? SQRT2 : 1.0 );
@@ -2328,9 +2329,6 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      }
                   }
                } else { // irrep_k != irrep_l
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw < Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
-                                                                                                                 : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
                   for ( int l = 0; l < nocc_l; l++ ){
                      const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
                      double factor = 1.0;
@@ -2377,9 +2375,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                const int nvir_ab = indices->getNVIRT( Iab );
                const int Il = Irreps::directProd( Iab, IL );
                const int nocc_l = indices->getNOCC( Il );
+               const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+               const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
+                                                                                                               : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
                if ( Ikw == Il ){ // irrep_k == irrep_l
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il,  Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * shift_E_nonactive( indices, Iab, Ikw, Il, -1 );
                   for ( int l = 0; l < k; l++ ){
                      const int cnt_kl = l + ( k * ( k - 1 ) ) / 2;
                      double factor = -3.0;
@@ -2421,9 +2420,6 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      }
                   }
                } else { // irrep_k != irrep_l
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw < Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
-                                                                                                                 : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
                   for ( int l = 0; l < nocc_l; l++ ){
                      const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
                      double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
@@ -2473,8 +2469,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                const int Id = Irreps::directProd( Iij, IL );
                const int nvir_d = indices->getNVIRT( Id );
                const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+               const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
+                                                                                                               : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
                if ( Iwc == Id ){ // irrep_c == irrep_d
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * shift_G_nonactive( indices, Iij, Iwc, Id, +1 );
                   for ( int d = 0; d < nvir_d; d++ ){
                      const int cnt_cd = (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
                      double factor = (( c == d ) ? SQRT2 : 1.0 );
@@ -2496,8 +2493,6 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      }
                   }
                } else { // irrep_c != irrep_d
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc < Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
-                                                                                                                 : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
                   for ( int d = 0; d < nvir_d; d++ ){
                      const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
                      double factor = 1.0;
@@ -2547,8 +2542,9 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                const int Id = Irreps::directProd( Iij, IL );
                const int nvir_d = indices->getNVIRT( Id );
                const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+               const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
+                                                                                                               : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
                if ( Iwc == Id ){ // irrep_c == irrep_d
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * shift_G_nonactive( indices, Iij, Iwc, Id, -1 );
                   for ( int d = 0; d < c; d++ ){
                      const int cnt_cd = d + ( c * ( c - 1 ) ) / 2;
                      double factor = -3.0;
@@ -2590,8 +2586,6 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      }
                   }
                } else { // irrep_c != irrep_d
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc < Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
-                                                                                                                 : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
                   for ( int d = 0; d < nvir_d; d++ ){
                      const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
                      double factor = (( Iwc < Id ) ? 3.0 : -3.0 );
