@@ -105,9 +105,9 @@ namespace CheMPS2{
          
          //! Calculates the FCI ground state with Davidson's algorithm
          /** \param inoutput If inoutput!=NULL, vector with getVecLength(0) variables which contains the initial guess at the start, and on exit the solution of the FCI calculation
-             \param DAVIDSON_NUM_VEC The maximum number of vectors to use in Davidson's algorithm; adjustable in case memory becomes an issue
+             \param DVDSN_NUM_VEC The maximum number of vectors to use in Davidson's algorithm; adjustable in case memory becomes an issue
              \return The ground state energy */
-         double GSDavidson(double * inoutput=NULL, const int DAVIDSON_NUM_VEC=CheMPS2::HEFF_DAVIDSON_NUM_VEC) const;
+         double GSDavidson(double * inoutput=NULL, const int DVDSN_NUM_VEC=CheMPS2::DAVIDSON_NUM_VEC) const;
          
          //! Return the global counter of the Slater determinant with the lowest energy
          /** \return The global counter of the Slater determinant with the lowest energy */

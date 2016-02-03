@@ -1988,26 +1988,27 @@ void CheMPS2::FCI::FillRandom(const unsigned long long vecLength, double * vec){
 
 }
 
-double CheMPS2::FCI::GSDavidson(double * inoutput, const int DAVIDSON_NUM_VEC) const{
+double CheMPS2::FCI::GSDavidson(double * inoutput, const int DVDSN_NUM_VEC) const{
 
    const int veclength = getVecLength( 0 ); // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
-   const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * veclength );
-   
-   Davidson deBoskabouter( veclength, DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing for FCI
+   Davidson deBoskabouter( veclength, DVDSN_NUM_VEC,
+                                      CheMPS2::DAVIDSON_NUM_VEC_KEEP,
+                                      CheMPS2::DAVIDSON_FCI_RTOL,
+                                      CheMPS2::DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing for FCI
    double ** whichpointers = new double*[2];
-   
+
    char instruction = deBoskabouter.FetchInstruction( whichpointers );
    assert( instruction == 'A' );
    if ( inoutput != NULL ){ FCIdcopy( veclength, inoutput, whichpointers[0] ); }
    else { FillRandom( veclength, whichpointers[0] ); }
    DiagHam( whichpointers[1] );
-   
+
    instruction = deBoskabouter.FetchInstruction( whichpointers );
    while ( instruction == 'B' ){
       HamTimesVec( whichpointers[0], whichpointers[1] );
       instruction = deBoskabouter.FetchInstruction( whichpointers );
    }
-   
+
    assert( instruction == 'C' );
    if ( inoutput != NULL ){ FCIdcopy( veclength, whichpointers[0], inoutput ); }
    const double FCIenergy = whichpointers[1][0] + getEconst();
@@ -2161,10 +2162,9 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 
    /**** Solve for ImagSol ****/
    double ** pointers = new double*[ 3 ];
-   const double CG_RTOL = 100.0 * CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * vecLength );
    double RMSerror = 0.0;
    {
-      ConjugateGradient CG( vecLength, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
+      ConjugateGradient CG( vecLength, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
       char instruction = CG.step( pointers );
       assert( instruction == 'A' );
       for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 0 ][ cnt ] = - eta * RHS[ cnt ] / diag[ cnt ]; } // Initial guess
@@ -2183,7 +2183,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 
    /**** Solve for RealSol ****/
    {
-      ConjugateGradient CG( vecLength, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
+      ConjugateGradient CG( vecLength, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
       char instruction = CG.step( pointers );
       assert( instruction == 'A' );
       CGAlphaPlusBetaHAM( - alpha / eta, - beta / eta, ImagSol, pointers[ 0 ] );                      // Initial guess real part can be obtained from the imaginary part

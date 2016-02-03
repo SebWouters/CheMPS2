@@ -243,15 +243,14 @@ double CheMPS2::CASPT2::solve( const bool diag_only ) const{
    }
    cout << "CASPT2 : E(CASPT2-D) = " << energy_caspt2_d << endl;
    
-   double min_eig = 1e18;
-   for ( int elem = 0; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
-   cout << "CASPT2 : Min. diag(FOCK) = " << min_eig << endl;
+   double min_eig = diag_fock[ 0 ];
+   for ( int elem = 1; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
+   cout << "CASPT2 : Minimum value on diagonal of 0th order operator = " << min_eig << endl;
 
    double best_energy = energy_caspt2_d;
    if ( diag_only == false ){
 
-      const double CG_RTOL = 1e-12; //CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * total_size );
-      ConjugateGradient CG( total_size, CG_RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false );
+      ConjugateGradient CG( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
       double ** pointers = new double*[ 3 ];
       char instruction = CG.step( pointers );
       assert( instruction == 'A' );
@@ -268,7 +267,9 @@ double CheMPS2::CASPT2::solve( const bool diag_only ) const{
       assert( instruction == 'C' );
       best_energy = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
       const double rnorm = pointers[ 1 ][ 0 ];
-      cout << "CASPT2 : Residual norm for the solution of F * c = V is " << rnorm << endl;
+      cout << "CASPT2 : Residual norm of F * c - V = " << rnorm << endl;
+      const double weight = 1.0 / ( 1.0 + ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 0 ], & inc1 ) );
+      cout << "CASPT2 : Fraction of CASSCF wfn in 1st order wfn = " << weight << endl;
       delete [] pointers;
       cout << "CASPT2 : E(CASPT2-N) = " << best_energy << endl;
 

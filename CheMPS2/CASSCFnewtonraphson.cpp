@@ -277,15 +277,17 @@ void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const 
 
    //Find the lowest eigenvalue and corresponding eigenvector of the augmented hessian
    {
-      const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * dim );
-      Davidson deBoskabouter(dim, CheMPS2::HEFF_DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false); // No debug printing
+      Davidson deBoskabouter( dim, CheMPS2::DAVIDSON_NUM_VEC,
+                                   CheMPS2::DAVIDSON_NUM_VEC_KEEP,
+                                   CheMPS2::DAVIDSON_FCI_RTOL,
+                                   CheMPS2::DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing
       double ** whichpointers = new double*[2];
 
       char instruction = deBoskabouter.FetchInstruction( whichpointers );
       assert( instruction == 'A' );
       for (int cnt = 0; cnt < dim; cnt++){ whichpointers[1][cnt] = hessian[cnt*(1+dim)]; } // Preconditioner = diagonal elements of the augmented Hessian
       for (int cnt = 0; cnt < x_linearlength; cnt++){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
-         const double denom = ( whichpointers[1][cnt] > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
+         const double denom = ( whichpointers[1][cnt] > CheMPS2::DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::DAVIDSON_PRECOND_CUTOFF;
          whichpointers[0][cnt] = - theupdate[cnt] / denom;
       }
       whichpointers[0][x_linearlength] = 1.0;
