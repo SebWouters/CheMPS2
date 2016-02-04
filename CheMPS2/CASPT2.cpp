@@ -77,41 +77,40 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
    {
 
-      int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-
-      double * diag_fock = new double[ total_size ];
-      diagonal( diag_fock, -E_FOCK );
-
       cout << "MOLCAS test8 CASPT2-N= " << -0.1599978130 << endl;
       cout << "MOLCAS test8 CASPT2-D= " << -0.1596306078 << endl;
       const double energy_caspt2_n = solve();
       cout << "MOLCAS test8 CASPT2-N= " << -0.1599978130 << endl;
       cout << "MOLCAS test8 CASPT2-D= " << -0.1596306078 << endl;
 
-      double * vector = new double[ total_size ];
-      double * matrix = new double[ total_size * total_size ];
+      if ( false ){
+         int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+         double * vector = new double[ total_size ];
+         double * matrix = new double[ total_size * total_size ];
+         double * diag_fock = new double[ total_size ];
+         diagonal( diag_fock, -E_FOCK );
 
-      for ( int col = 0; col < total_size; col++ ){
-         for ( int row = 0; row < total_size; row++ ){ vector[ row ] = 0.0; }
-         vector[ col ] = 1.0;
-         matvec( vector, matrix + col * total_size, diag_fock );
-      }
-
-      double rms = 0.0;
-      for ( int col = 0; col < total_size; col++ ){
-         for ( int row = col+1; row < total_size; row++ ){
-            const double diff = matrix[ row + total_size * col ] - matrix[ col + total_size * row ];
-            rms += diff * diff;
-            if ( fabs( diff ) > 1e-6 ){ cout << " matrix[" << row << "," << col << "] - matrix[" << col << "," << row << "] = " <<  diff << endl; }
+         for ( int col = 0; col < total_size; col++ ){
+            for ( int row = 0; row < total_size; row++ ){ vector[ row ] = 0.0; }
+            vector[ col ] = 1.0;
+            matvec( vector, matrix + col * total_size, diag_fock );
          }
+
+         double rms = 0.0;
+         for ( int col = 0; col < total_size; col++ ){
+            for ( int row = col+1; row < total_size; row++ ){
+               const double diff = matrix[ row + total_size * col ] - matrix[ col + total_size * row ];
+               rms += diff * diff;
+               if ( fabs( diff ) > 1e-6 ){ cout << " matrix[" << row << "," << col << "] - matrix[" << col << "," << row << "] = " <<  diff << endl; }
+            }
+         }
+         rms = sqrt( rms );
+         cout << "RMS deviation from symmetric = " << rms << endl;
+
+         delete [] vector;
+         delete [] matrix;
+         delete [] diag_fock;
       }
-      rms = sqrt( rms );
-      cout << "RMS deviation from symmetric = " << rms << endl;
-
-      delete [] vector;
-      delete [] matrix;
-      delete [] diag_fock;
-
    }
 
 }

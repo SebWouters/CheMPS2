@@ -189,6 +189,17 @@ namespace CheMPS2{
              \param theDMRGSCFoptions Contains the DMRGSCF options
              \return The converged DMRGSCF energy */
          double solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
+
+         //! Calculate the caspt2 energy for a converged casscf wavefunction
+         /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
+             \param TwoS Twice the targeted spin
+             \param Irrep Desired wave-function irrep
+             \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
+             \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
+             \param theDMRGSCFoptions Contains the DMRGSCF options
+             \param g1correction Whether or not Andersson's g1-correction needs to be added to the Fock matrix (Andersson, Theor. Chim. Acta 91, 31-46 (1995))
+             \return The total CASPT2 energy ( ECASSCF + EPT2 ) */
+         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const bool g1correction = false);
          
          //! CASSCF unitary rotation remove call
          void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
@@ -268,6 +279,49 @@ namespace CheMPS2{
              \param localIdx Object which handles the index conventions for CASSCF
              \param eigenvecs Where the eigenvectors are stored */
          static void fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs);
+
+         //! Block-diagonalize the occupied-occupied block of the Fock matrix
+         /** \param Tmat Matrix with the one-electron integrals
+             \param Qocc Matrix with the Coulomb and exchange contributions of the occupied (inactive) orbitals
+             \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
+             \param Umat The unitary rotation which needs to be updated so that the Fock matrix will be block-diagonal in the occupied block
+             \param work1 Workspace of size NumORB * NumORB 
+             \param work2 Workspace of size NumORB * NumORB * 2
+             \param idx Object which handles the index conventions for CASSCF */
+         static void pseudocanonical_occupied( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx );
+
+         //! Block-diagonalize the virtual-virtual block of the Fock matrix
+         /** \param Tmat Matrix with the one-electron integrals
+             \param Qocc Matrix with the Coulomb and exchange contributions of the occupied (inactive) orbitals
+             \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
+             \param Umat The unitary rotation which needs to be updated so that the Fock matrix will be block-diagonal in the virtual block
+             \param work1 Workspace of size NumORB * NumORB 
+             \param work2 Workspace of size NumORB * NumORB * 2
+             \param idx Object which handles the index conventions for CASSCF */
+         static void pseudocanonical_virtual( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx );
+
+         //! Construct the Fock matrix
+         /** \param Fock Matrix to store the Fock operator in
+             \param Tmat Matrix with the one-electron integrals
+             \param Qocc Matrix with the Coulomb and exchange contributions of the occupied (inactive) orbitals
+             \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
+             \param idx Object which handles the index conventions for CASSCF */
+         static void construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, const DMRGSCFindices * idx );
+
+         //! Add Andersson's g1-correction to the Fock operator
+         /** \param Fock Matrix to add the g-correction to
+             \param Kmat Andersson's K-matrix
+             \param work1 Workspace of size NumORB * NumORB
+             \param work2 Workspace of size NumORB * NumORB * 2
+             \param one_rdm DMRG active space 1-RDM
+             \param idx Object which handles the index conventions for CASSCF */
+         static void add_g1_to_fock( DMRGSCFmatrix * Fock, DMRGSCFmatrix * Kmat, double * work1, double * work2, double * one_rdm, const DMRGSCFindices * idx );
+
+         //! Copy the active-active block of a matrix
+         /** \param mat Matrix from which the active-active block needs to be copied
+             \param idx Object which handles the index conventions for CASSCF
+             \param result Where to store the active space block */
+         static void copy_active( const DMRGSCFmatrix * mat, const DMRGSCFindices * idx, double * result );
          
       private:
       
@@ -335,6 +389,9 @@ namespace CheMPS2{
          void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix);
          void buildQmatOCC();
          void buildQmatACT();
+
+         // Build Andersson's K-matrix
+         void buildKmatAndersson( DMRGSCFmatrix * result );
          
          //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;

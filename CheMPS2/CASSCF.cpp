@@ -22,6 +22,7 @@
 #include <fstream>
 #include <string>
 #include <math.h>
+#include <algorithm>
 
 #include "CASSCF.h"
 #include "Lapack.h"
@@ -30,6 +31,7 @@ using std::string;
 using std::ifstream;
 using std::cout;
 using std::endl;
+using std::max;
 
 CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int * nocc_in, int * ndmrg_in, int * nvirt_in){
 
@@ -401,6 +403,157 @@ void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
          for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
             HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, theTmatrix->get(irrep, NumOCC+cnt1, NumOCC+cnt2) + theQmatOCC->get(irrep, NumOCC+cnt1, NumOCC+cnt2) );
          }
+      }
+   }
+
+}
+
+void CheMPS2::CASSCF::buildKmatAndersson( DMRGSCFmatrix * result ){
+
+   theQmatWORK->clear();
+
+   // Construct ( 2 - RDM ) * RDM in the original orbitals in theQmatWORK
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+
+      int NACT = iHandler->getNDMRG( irrep );
+      if ( NACT > 0 ){
+
+         // In the current orbitals, ( 2 - RDM ) * RDM differs only from zero for the active space
+         int NACT = iHandler->getNDMRG( irrep );
+         const int JUMP = iHandler->getDMRGcumulative( irrep );
+         double * data  = theQmatWORK->getBlock( irrep );
+         for ( int row = 0; row < NACT; row++ ){
+            for ( int col = 0; col < NACT; col++ ){
+               double value = 2 * DMRG1DM[ JUMP + row + nOrbDMRG * ( JUMP + col ) ];
+               for ( int sum = 0; sum < NACT; sum++ ){
+                  value -= DMRG1DM[ JUMP + row + nOrbDMRG * ( JUMP + sum ) ] * DMRG1DM[ JUMP + sum + nOrbDMRG * ( JUMP + col ) ];
+               }
+               data[ row + NACT * col ] = value;
+            }
+         }
+
+         // Rotate ( 2 - RDM ) * RDM from the current to the original orbitals
+         int NOCC = iHandler->getNOCC( irrep );
+         int NORB = iHandler->getNORB( irrep );
+         double alpha  = 1.0;
+         double beta   = 0.0;
+         double * Umat = unitary->getBlock( irrep ) + NOCC;
+         double * work =  result->getBlock( irrep );
+         char trans    = 'T';
+         char notrans  = 'N';
+         dgemm_( &trans,   &notrans, &NORB, &NACT, &NACT, &alpha, Umat, &NORB, data, &NACT, &beta, work, &NORB );
+         dgemm_( &notrans, &notrans, &NORB, &NORB, &NACT, &alpha, work, &NORB, Umat, &NORB, &beta, data, &NORB );
+
+      }
+   }
+
+   // Construct Andersson's K-matrix from Theor. Chim. Acta 91, 31-46 (1995).
+   for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
+      const int shift1 = iHandler->getOrigNOCCstart( irrep1 );
+      const int NORB1  = iHandler->getNORB( irrep1 );
+      for ( int row1 = 0; row1 < NORB1; row1++ ){
+         for ( int col1 = 0; col1 < NORB1; col1++ ){
+            double value = 0.0;
+            for ( int irrep2 = 0; irrep2 < num_irreps; irrep2++ ){
+               const int shift2 = iHandler->getOrigNOCCstart( irrep2 );
+               const int NORB2  = iHandler->getNORB( irrep2 );
+               for ( int row2 = 0; row2 < NORB2; row2++ ){
+                  for ( int col2 = 0; col2 < NORB2; col2++ ){
+                     value += theQmatWORK->get( irrep2, row2, col2 ) * HamOrig->getVmat( shift1 + row1, shift2 + col2, shift2 + row2, shift1 + col1 );
+                  }
+               }
+            }
+            result->set( irrep1, row1, col1, value );
+         }
+      }
+   }
+
+   rotateOldToNew( result );
+
+}
+
+void CheMPS2::CASSCF::pseudocanonical_occupied( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx ){
+
+   const int n_irreps = idx->getNirreps();
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      int NORB = idx->getNORB( irrep );
+      int NOCC = idx->getNOCC( irrep );
+      if ( NOCC > 1 ){
+
+         // Construct the occupied-occupied block of the Fock matrix
+         for ( int row = 0; row < NOCC; row++ ){
+            for ( int col = 0; col < NOCC; col++ ){
+               work1[ row + NOCC * col ] = ( Tmat->get( irrep, row, col )
+                                           + Qocc->get( irrep, row, col )
+                                           + Qact->get( irrep, row, col ) );
+            }
+         }
+
+         // Diagonalize the occupied-occupied block
+         char jobz = 'V';
+         char uplo = 'U';
+         int info;
+         int size = max( 3 * NOCC - 1, NOCC * NOCC );
+         dsyev_( &jobz, &uplo, &NOCC, work1, &NOCC, work2 + size, work2, &size, &info );
+
+         // Adjust the u-matrix accordingly
+         double * umatrix = Umat->getBlock( irrep );
+         for ( int row = 0; row < NOCC; row++ ){
+            for ( int col = 0; col < NORB; col++ ){
+               work2[ row + NOCC * col ] = umatrix[ row + NORB * col ];
+            }
+         }
+         char trans   = 'T';
+         char notrans = 'N';
+         double one = 1.0;
+         double set = 0.0;
+         dgemm_( &trans, &notrans, &NOCC, &NORB, &NOCC, &one, work1, &NOCC, work2, &NOCC, &set, umatrix, &NORB );
+
+      }
+   }
+
+}
+
+void CheMPS2::CASSCF::pseudocanonical_virtual( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx ){
+
+   const int n_irreps = idx->getNirreps();
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      int NORB  = idx->getNORB( irrep );
+      int NVIRT = idx->getNVIRT( irrep );
+      int NJUMP = NORB - NVIRT;
+      if ( NVIRT > 1 ){
+
+         // Construct the virtual-virtual block of the Fock matrix
+         for ( int row = 0; row < NVIRT; row++ ){
+            for ( int col = 0; col < NVIRT; col++ ){
+               work1[ row + NVIRT * col ] = ( Tmat->get( irrep, NJUMP + row, NJUMP + col )
+                                            + Qocc->get( irrep, NJUMP + row, NJUMP + col )
+                                            + Qact->get( irrep, NJUMP + row, NJUMP + col ) );
+            }
+         }
+
+         // Diagonalize the virtual-virtual block
+         char jobz = 'V';
+         char uplo = 'U';
+         int info;
+         int size = max( 3 * NVIRT - 1, NVIRT * NVIRT );
+         dsyev_( &jobz, &uplo, &NVIRT, work1, &NVIRT, work2 + size, work2, &size, &info );
+
+         // Adjust the u-matrix accordingly
+         double * umatrix = Umat->getBlock( irrep ) + NJUMP;
+         for ( int row = 0; row < NVIRT; row++ ){
+            for ( int col = 0; col < NORB; col++ ){
+               work2[ row + NVIRT * col ] = umatrix[ row + NORB * col ];
+            }
+         }
+         char trans   = 'T';
+         char notrans = 'N';
+         double one = 1.0;
+         double set = 0.0;
+         dgemm_( &trans, &notrans, &NVIRT, &NORB, &NVIRT, &one, work1, &NVIRT, work2, &NVIRT, &set, umatrix, &NORB );
+
       }
    }
 
