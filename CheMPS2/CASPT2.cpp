@@ -75,7 +75,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
    recreate(); // Remove the overlap matrices
 
-   {
+   /*{
 
       cout << "MOLCAS test8 CASPT2-N= " << -0.1599978130 << endl;
       cout << "MOLCAS test8 CASPT2-D= " << -0.1596306078 << endl;
@@ -111,7 +111,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
          delete [] matrix;
          delete [] diag_fock;
       }
-   }
+   }*/
 
 }
 

@@ -39,7 +39,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const bool g1correction ){
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions ){
 
    // Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
    int maxlinsize   = 0;
@@ -91,8 +91,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    double Energy = 0.0;
    double * three_dm = new double[ nOrbDMRGpower4 * nOrbDMRG * nOrbDMRG ];
    double * contract = new double[ nOrbDMRGpower4 * nOrbDMRG * nOrbDMRG ];
-   DMRGSCFmatrix * theKmatAndersson = NULL;
-   if ( g1correction ){ theKmatAndersson = new DMRGSCFmatrix( iHandler ); }
    
    // Solve the active space problem
    if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI
@@ -116,10 +114,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       buildTmatrix();
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      if ( g1correction ){
-         buildKmatAndersson( theKmatAndersson );
-         add_g1_to_fock( theFmatrix, theKmatAndersson, mem1, mem2, DMRG1DM, iHandler );
-      }
       copy_active( theFmatrix, iHandler, mem1 );                              // Fock
       theFCI->Fock4RDM( inoutput, three_dm, mem1, contract );                 // trace( Fock * 4-RDM )
       delete theFCI;
@@ -146,10 +140,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       buildTmatrix();
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      if ( g1correction ){
-         buildKmatAndersson( theKmatAndersson );
-         add_g1_to_fock( theFmatrix, theKmatAndersson, mem1, mem2, DMRG1DM, iHandler );
-      }
       copy_active( theFmatrix, iHandler, mem1 );                                                                 // Fock
       CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem1, contract ); // trace( Fock * 4-RDM )
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
@@ -157,8 +147,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       delete theDMRG;
 
    }
-   
-   const double E_CASSCF = Energy;
+
    delete Prob;
    delete HamAS;
    
@@ -169,15 +158,15 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete [] mem1;
    delete [] mem2;
    if (doBlockWise){ delete [] mem3; }
-   if ( g1correction ){ delete theKmatAndersson; }
    
    CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract );
+   const double E_CASPT2 = myCASPT2->solve();
    
    delete myCASPT2;
    delete [] three_dm;
    delete [] contract;
    
-   return Energy;
+   return E_CASPT2;
 
 }
 
@@ -191,73 +180,6 @@ void CheMPS2::CASSCF::construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix 
             Fock->set( irrep, row, col, Tmat->get( irrep, row, col )
                                       + Qocc->get( irrep, row, col )
                                       + Qact->get( irrep, row, col ) );
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASSCF::add_g1_to_fock( DMRGSCFmatrix * Fock, DMRGSCFmatrix * Kmat, double * work1, double * work2, double * one_rdm, const DMRGSCFindices * idx ){
-
-   const int n_irreps = idx->getNirreps();
-
-   // g1 = - 1/4 [ Dkd + dKD ]
-   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
-
-      const int NORB = idx->getNORB( irrep );
-      if ( NORB > 0 ){
-
-         // work1 = D
-         const int NOCC = idx->getNOCC( irrep );
-         const int NACT = idx->getNDMRG( irrep );
-         const int NVIR = idx->getNVIRT( irrep );
-         const int N_OA = NOCC + NACT;
-         const int JUMP = idx->getDMRGcumulative( irrep );
-         const int LAS  = idx->getDMRGcumulative( n_irreps );
-         for ( int cnt = 0; cnt < NORB * NORB; cnt++ ){ work1[ cnt ] = 0.0; }
-         for ( int occ = 0; occ < NOCC; occ++ ){ work1[ occ + NORB * occ ] = 2.0; }
-         for ( int row = 0; row < NACT; row++ ){
-            for ( int col = 0; col < NACT; col++ ){
-               work1[ NOCC + row + NORB * ( NOCC + col ) ] = one_rdm[ JUMP + row + LAS * ( JUMP + col ) ];
-            }
-         }
-
-         // work2 = DK
-         int linsize = NORB;
-         char notrans = 'N';
-         double alpha = 1.0;
-         double beta = 0.0;
-         dgemm_( &notrans, &notrans, &linsize, &linsize, &linsize, &alpha, work1, &linsize, Kmat->getBlock( irrep ), &linsize, &beta, work2, &linsize );
-
-         // work3 = DK
-         int copysize = NORB * NORB;
-         int inc1 = 1;
-         double * work3 = work2 + copysize;
-         dcopy_( &copysize, work2, &inc1, work3, &inc1 );
-
-         // work3 = DK(2-D) = 2 * work3 - work2 * work1
-         alpha = -1.0;
-         beta = 2.0;
-         dgemm_( &notrans, &notrans, &linsize, &linsize, &linsize, &alpha, work2, &linsize, work1, &linsize, &beta, work3, &linsize );
-
-         // Not an approximation: the occupied-occupied and virtual-virtual block of work3 should be 0
-         for ( int row = 0; row < NOCC; row++ ){
-            for ( int col = 0; col < NOCC; col++ ){
-               work3[ row + NORB * col ] = 0.0;
-            }
-         }
-         for ( int row = 0; row < NVIR; row++ ){
-            for ( int col = 0; col < NVIR; col++ ){
-               work3[ N_OA + row + NORB * ( N_OA + col ) ] = 0.0;
-            }
-         }
-
-         // Fock = Fock - 0.25 ( DK(2-D) + (2-D)KD )
-         double * Fblock = Fock->getBlock( irrep );
-         for ( int row = 0; row < NORB; row++ ){
-            for ( int col = 0; col < NORB; col++ ){
-               Fblock[ row + NORB * col ] -= 0.25 * ( work3[ row + NORB * col ] + work3[ col + NORB * row ] );
-            }
          }
       }
    }

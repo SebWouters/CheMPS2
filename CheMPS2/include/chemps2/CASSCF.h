@@ -190,16 +190,15 @@ namespace CheMPS2{
              \return The converged DMRGSCF energy */
          double solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
 
-         //! Calculate the caspt2 energy for a converged casscf wavefunction
+         //! Calculate the caspt2 correction energy for a converged casscf wavefunction
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
              \param TwoS Twice the targeted spin
              \param Irrep Desired wave-function irrep
              \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
              \param theDMRGSCFoptions Contains the DMRGSCF options
-             \param g1correction Whether or not Andersson's g1-correction needs to be added to the Fock matrix (Andersson, Theor. Chim. Acta 91, 31-46 (1995))
-             \return The total CASPT2 energy ( ECASSCF + EPT2 ) */
-         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const bool g1correction = false);
+             \return The CASPT2 correction energy */
+         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
          
          //! CASSCF unitary rotation remove call
          void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
@@ -308,15 +307,6 @@ namespace CheMPS2{
              \param idx Object which handles the index conventions for CASSCF */
          static void construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, const DMRGSCFindices * idx );
 
-         //! Add Andersson's g1-correction to the Fock operator
-         /** \param Fock Matrix to add the g-correction to
-             \param Kmat Andersson's K-matrix
-             \param work1 Workspace of size NumORB * NumORB
-             \param work2 Workspace of size NumORB * NumORB * 2
-             \param one_rdm DMRG active space 1-RDM
-             \param idx Object which handles the index conventions for CASSCF */
-         static void add_g1_to_fock( DMRGSCFmatrix * Fock, DMRGSCFmatrix * Kmat, double * work1, double * work2, double * one_rdm, const DMRGSCFindices * idx );
-
          //! Copy the active-active block of a matrix
          /** \param mat Matrix from which the active-active block needs to be copied
              \param idx Object which handles the index conventions for CASSCF
@@ -389,9 +379,6 @@ namespace CheMPS2{
          void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix);
          void buildQmatOCC();
          void buildQmatACT();
-
-         // Build Andersson's K-matrix
-         void buildKmatAndersson( DMRGSCFmatrix * result );
          
          //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;
