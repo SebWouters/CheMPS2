@@ -885,146 +885,6 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
 
 }
 
-void CheMPS2::FCI::Fill3RDM(double * vector, double * three_rdm) const{
-
-   assert( Nel_up + Nel_down >= 3 );
-
-   struct timeval start, end;
-   gettimeofday(&start, NULL);
-   
-   /*
-      Gamma_{ijk,lmn} = < E_il E_jm E_kn >
-                      - delta_kl < E_jm E_in >
-                      - delta_jl < E_im E_kn >
-                      - delta_km < E_il E_jn >
-                      + delta_kl delta_im < E_jn >
-                      + delta_jl delta_km < E_in >
-   */
-   
-   ClearVector( L*L*L*L*L*L, three_rdm );
-   const unsigned long long orig_length = getVecLength( 0 );
-   unsigned long long max_length = getVecLength( 0 );
-   for ( unsigned int irrep = 1; irrep < NumIrreps; irrep++ ){
-      if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
-   }
-   double * workspace1 = new double[ max_length  ];
-   double * workspace2 = new double[ max_length  ];
-   double * workspace3 = new double[ orig_length ];
-
-   for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = n
-      for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){ // crea1 = k >= n
-
-         const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
-         const int target_irrep1 = getIrrepProduct( TargetIrrep, irrep_center1 );
-         apply_excitation( vector, workspace1, crea1, anni1, TargetIrrep );
-
-         if ( irrep_center1 == 0 ){
-
-            const double value = FCIddot( orig_length, workspace1, vector ); // < E_{crea1,anni1} >
-            for ( unsigned int m = anni1; m < L; m++ ){
-               for ( unsigned int l = anni1; l < L; l++ ){
-                  three_rdm[ m + L * ( crea1 + L * ( l + L * ( l + L * ( m + L * anni1 ) ) ) ) ] += value; // + delta_kl delta_im < E_jn >
-                  three_rdm[ crea1 + L * ( l + L * ( m + L * ( l + L * ( m + L * anni1 ) ) ) ) ] += value; // + delta_jl delta_km < E_in >
-               }
-            }
-
-         }
-
-         for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){ // crea2 = j >= n
-            for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = m >= n
-
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ) , getOrb2Irrep( anni2 ) );
-               const int target_irrep2 = getIrrepProduct( target_irrep1, irrep_center2 );
-               const int irrep_center3 = getIrrepProduct( irrep_center1, irrep_center2 );
-               apply_excitation( workspace1, workspace2, crea2, anni2, target_irrep1 );
-
-               if ( irrep_center1 == irrep_center2 ){
-
-                  const double value = FCIddot( orig_length, workspace2, vector ); // < E_{crea2,anni2} E_{crea1,anni1} >
-                  for ( unsigned int orb = anni1; orb < L; orb++ ){
-                     three_rdm[ crea1 + L * ( crea2 + L * ( orb   + L * ( orb   + L * ( anni2 + L * anni1 ) ) ) ) ] -= value; // - delta_kl < E_jm E_in >
-                     three_rdm[ crea2 + L * ( orb   + L * ( crea1 + L * ( orb   + L * ( anni2 + L * anni1 ) ) ) ) ] -= value; // - delta_jl < E_im E_kn >
-                     three_rdm[ crea2 + L * ( crea1 + L * ( orb   + L * ( anni2 + L * ( orb   + L * anni1 ) ) ) ) ] -= value; // - delta_km < E_il E_jn >
-                  }
-
-               }
-
-               for ( unsigned int crea3 = (( crea2 == crea1 ) ? crea1 + 1 : crea2 ); crea3 < L; crea3++ ){ // crea3 = i >= j = crea2 >= n = anni1
-                  for ( unsigned int anni3 = (( anni2 == anni1 ) ? anni1 + 1 : anni1 ); anni3 < L; anni3++ ){ // anni3 = l >= n
-
-                     const int irrep_product3 = getIrrepProduct( getOrb2Irrep( crea3 ) , getOrb2Irrep( anni3 ) );
-                     if ( irrep_product3 == irrep_center3 ){
-
-                        apply_excitation( workspace2, workspace3, crea3, anni3, target_irrep2 );
-                        const double value = FCIddot( orig_length, workspace3, vector ); // < E_{crea3,anni3} E_{crea2,anni2} E_{crea1,anni1} >
-                        three_rdm[ crea3 + L * ( crea2 + L * ( crea1 + L * ( anni3 + L * ( anni2 + L * anni1 ) ) ) ) ] += value; // < E_il E_jm E_kn >
-
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   delete [] workspace1;
-   delete [] workspace2;
-   delete [] workspace3;
-   
-   // Make 12-fold permutation symmetric
-   for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){
-      for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){
-         const int irrep_prod1 = getIrrepProduct( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) ); // Ic1 x Ia1
-         for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){
-            const int irrep_prod2 = getIrrepProduct( irrep_prod1 , getOrb2Irrep( crea2 ) ); // Ic1 x Ia1 x Ic2
-            for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){
-               const int irrep_prod3 = getIrrepProduct( irrep_prod2 , getOrb2Irrep( anni2 ) ); // Ic1 x Ia1 x Ic2 x Ia2
-               for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){
-                  const int irrep_prod4 = getIrrepProduct( irrep_prod3 , getOrb2Irrep( crea3 ) ); // Ic1 x Ia1 x Ic2 x Ia2 x Ic3
-                  for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){
-                     if ( irrep_prod4 == getOrb2Irrep( anni3 )){ // Ic1 x Ia1 x Ic2 x Ia2 x Ic3 == Ia3
-                     
-                        /*      crea3 >= crea2 >= anni1
-                           crea1, anni3, anni2 >= anni1  */
-                  
-   const double value = three_rdm[ crea3 + L * ( crea2 + L * ( crea1 + L * ( anni3 + L * ( anni2 + L * anni1 ) ) ) ) ];
-                        three_rdm[ crea2 + L * ( crea3 + L * ( crea1 + L * ( anni2 + L * ( anni3 + L * anni1 ) ) ) ) ] = value;
-                        
-                        three_rdm[ crea2 + L * ( crea1 + L * ( crea3 + L * ( anni2 + L * ( anni1 + L * anni3 ) ) ) ) ] = value;
-                        three_rdm[ crea3 + L * ( crea1 + L * ( crea2 + L * ( anni3 + L * ( anni1 + L * anni2 ) ) ) ) ] = value;
-                        
-                        three_rdm[ crea1 + L * ( crea3 + L * ( crea2 + L * ( anni1 + L * ( anni3 + L * anni2 ) ) ) ) ] = value;
-                        three_rdm[ crea1 + L * ( crea2 + L * ( crea3 + L * ( anni1 + L * ( anni2 + L * anni3 ) ) ) ) ] = value;
-                        
-                        three_rdm[ anni3 + L * ( anni2 + L * ( anni1 + L * ( crea3 + L * ( crea2 + L * crea1 ) ) ) ) ] = value;
-                        three_rdm[ anni2 + L * ( anni3 + L * ( anni1 + L * ( crea2 + L * ( crea3 + L * crea1 ) ) ) ) ] = value;
-                        
-                        three_rdm[ anni2 + L * ( anni1 + L * ( anni3 + L * ( crea2 + L * ( crea1 + L * crea3 ) ) ) ) ] = value;
-                        three_rdm[ anni3 + L * ( anni1 + L * ( anni2 + L * ( crea3 + L * ( crea1 + L * crea2 ) ) ) ) ] = value;
-                        
-                        three_rdm[ anni1 + L * ( anni3 + L * ( anni2 + L * ( crea1 + L * ( crea3 + L * crea2 ) ) ) ) ] = value;
-                        three_rdm[ anni1 + L * ( anni2 + L * ( anni3 + L * ( crea1 + L * ( crea2 + L * crea3 ) ) ) ) ] = value;
-                        
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   
-   for ( unsigned int anni = 0; anni < L; anni++ ){
-      for ( unsigned int combo = 0; combo < L*L*L; combo++ ){
-         three_rdm[ combo + L * L * L * anni * ( 1 + L + L * L ) ] = 0.0;
-         three_rdm[ anni * ( 1 + L + L * L ) + L * L * L * combo ] = 0.0;
-      }
-   }
-   
-   gettimeofday(&end, NULL);
-   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-   if ( FCIverbose > 0 ){ cout << "FCI::Fill3RDM : Wall time = " << elapsed << " seconds" << endl; }
-
-}
-
 void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
 
    assert( Nel_up + Nel_down >= 4 );
@@ -1289,31 +1149,34 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
 
 }
 
-void CheMPS2::FCI::Fock4RDM(double * vector, double * three_rdm, double * fock, double * output) const{
+void CheMPS2::FCI::Fock4RDM( double * vector, double * three_rdm, double * fock, double * output ) const{
 
    assert( Nel_up + Nel_down >= 4 );
+   const double elapsed = Driver3RDM( vector, output, three_rdm, fock, L + 1 );
+   if ( FCIverbose > 0 ){ cout << "FCI::Fock4RDM : Wall time = " << elapsed << " seconds" << endl; }
+
+}
+
+void CheMPS2::FCI::Fill3RDM( double * vector, double * output ) const{
+
+   assert( Nel_up + Nel_down >= 3 );
+   const double elapsed = Driver3RDM( vector, output, NULL, NULL, L + 1 );
+   if ( FCIverbose > 0 ){ cout << "FCI::Fill3RDM : Wall time = " << elapsed << " seconds" << endl; }
+
+}
+
+void CheMPS2::FCI::Diag4RDM( double * vector, double * three_rdm, const unsigned int orbz, double * output ) const{
+
+   assert( Nel_up + Nel_down >= 4 );
+   const double elapsed = Driver3RDM( vector, output, three_rdm, NULL, orbz );
+   if ( FCIverbose > 0 ){ cout << "FCI::Diag4RDM : Wall time = " << elapsed << " seconds" << endl; }
+
+}
+
+double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * three_rdm, double * fock, const unsigned int orbz ) const{
 
    struct timeval start, end;
    gettimeofday(&start, NULL);
-   
-   /*
-      | Chi > = sum_{l,t} fock[l,t] E_lt | 0 >
-
-      sum_{l,t} fock[l,t] Gamma_{ijkl,pqrt} = < 0 | E_ip E_jq E_kr | Chi >
-                                            - delta_kq < 0 | E_ip E_jr | Chi >
-                                            - delta_kp < 0 | E_ir E_jq | Chi >
-                                            - delta_jp < 0 | E_iq E_kr | Chi >
-                                            + delta_kq delta_jp < 0 | E_ir | Chi >
-                                            + delta_kp delta_jr < 0 | E_iq | Chi >
-                                            - sum_{t} ( fock[r,t] Gamma_{ijk,pqt}
-                                                      + fock[q,t] Gamma_{ikj,prt}
-                                                      + fock[p,t] Gamma_{jki,qrt} )
-
-      sum_{l,t} fock[l,t] Gamma_{ijkl,pqrt} = sum_{s1,s2,s3} < 0 | a^+_{i,s1} a^+_{j,s2} a^+_{k,s3} a_{r,s3} a_{q,s2} a_{p,s1} | Chi >
-                                            - sum_{t} ( fock[r,t] Gamma_{ijk,pqt}
-                                                      + fock[q,t] Gamma_{ikj,prt}
-                                                      + fock[p,t] Gamma_{jki,qrt} )
-   */
 
    ClearVector( L*L*L*L*L*L, output );
    const unsigned long long orig_length = getVecLength( 0 );
@@ -1324,17 +1187,69 @@ void CheMPS2::FCI::Fock4RDM(double * vector, double * three_rdm, double * fock, 
    double * workspace1 = new double[ max_length  ];
    double * workspace2 = new double[ max_length  ];
    double * workspace3 = new double[ orig_length ];
-   
-   // | Chi > = sum_{l,t} fock[l,t] E_lt |0>
-   double * chi = new double[ orig_length ];
-   ClearVector( orig_length, chi );
-   for ( unsigned int anni = 0; anni < L; anni++ ){
-      for ( unsigned int crea = 0; crea < L; crea++ ){
-         if ( getOrb2Irrep( crea ) == getOrb2Irrep( anni ) ){
-            apply_excitation( vector, workspace1, crea, anni, TargetIrrep );
-            FCIdaxpy( orig_length, fock[ crea + L * anni ], workspace1, chi );
+
+   double * chi = NULL;
+   const bool task_fock =  ( fock != NULL );
+   const bool task_E_zz = (( fock == NULL ) && ( three_rdm != NULL ));
+   const bool task_3rdm = (( fock == NULL ) && ( three_rdm == NULL ));
+
+   if ( task_3rdm ){
+
+      assert( orbz == L + 1 );
+      chi = vector; // | Chi > = | 0 >
+
+      /* Calculate the 3-RDM:
+            Gamma_{ijk,pqr} = < 0 | E_ip E_jq E_kr | Chi >
+                            - delta_kq < 0 | E_ip E_jr | Chi >
+                            - delta_kp < 0 | E_ir E_jq | Chi >
+                            - delta_jp < 0 | E_iq E_kr | Chi >
+                            + delta_kq delta_jp < 0 | E_ir | Chi >
+                            + delta_kp delta_jr < 0 | E_iq | Chi >
+      */
+   }
+
+   if ( task_E_zz ){
+
+      assert( orbz < L );
+      chi = new double[ orig_length ];
+      apply_excitation( vector, chi, orbz, orbz, TargetIrrep ); // | Chi > = E_zz | 0 >
+
+      /* Calculate the 4-RDM elements with orbital z fixed:
+            Gamma_{ijkz,pqrz} = < 0 | E_ip E_jq E_kr | Chi >
+                              - delta_kq < 0 | E_ip E_jr | Chi >
+                              - delta_kp < 0 | E_ir E_jq | Chi >
+                              - delta_jp < 0 | E_iq E_kr | Chi >
+                              + delta_kq delta_jp < 0 | E_ir | Chi >
+                              + delta_kp delta_jr < 0 | E_iq | Chi >
+                              - ( delta_pz + delta_qz + delta_rz ) Gamma_{ijk,pqr}
+      */
+   }
+
+   if ( task_fock ){
+
+      assert( orbz == L + 1 );
+      chi = new double[ orig_length ];
+      ClearVector( orig_length, chi );
+      for ( unsigned int anni = 0; anni < L; anni++ ){
+         for ( unsigned int crea = 0; crea < L; crea++ ){
+            if ( getOrb2Irrep( crea ) == getOrb2Irrep( anni ) ){
+               apply_excitation( vector, workspace1, crea, anni, TargetIrrep );
+               FCIdaxpy( orig_length, fock[ crea + L * anni ], workspace1, chi ); // | Chi > = sum_{l,t} fock[l,t] E_lt | 0 >
+            }
          }
       }
+
+      /* Calculate the 4-RDM contracted with the Fock operator:
+            sum_{l,t} fock[l,t] Gamma_{ijkl,pqrt} = < 0 | E_ip E_jq E_kr | Chi >
+                                                  - delta_kq < 0 | E_ip E_jr | Chi >
+                                                  - delta_kp < 0 | E_ir E_jq | Chi >
+                                                  - delta_jp < 0 | E_iq E_kr | Chi >
+                                                  + delta_kq delta_jp < 0 | E_ir | Chi >
+                                                  + delta_kp delta_jr < 0 | E_iq | Chi >
+                                                  - sum_{t} ( fock[r,t] Gamma_{ijk,pqt}
+                                                            + fock[q,t] Gamma_{ijk,ptr}
+                                                            + fock[p,t] Gamma_{ijk,tqr} )
+      */
    }
 
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = i ( works in on the bra ) ( smaller than j, k )
@@ -1378,27 +1293,37 @@ void CheMPS2::FCI::Fock4RDM(double * vector, double * three_rdm, double * fock, 
                   }
 
                }
-               
+
                if (( crea1 >= anni1 ) && ( crea2 >= anni1 )){
-               
+
                   for ( unsigned int crea3 = (( crea1 == crea2 ) ? crea2 + 1 : crea2 ); crea3 < L; crea3++ ){ // crea3 = r >= ( q = crea2 ) >= ( i = anni1 )
                      for ( unsigned int anni3 = (( anni1 == anni2 ) ? anni1 + 1 : anni1 ); anni3 < L; anni3++ ){ // anni3 = k >= ( i = anni1 )
 
                         const int irrep_product3 = getIrrepProduct( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
 
                         if ( irrep_center3 == irrep_product3 ){ // I1 x I2 x I3 = Itrivial
-                        
+
                            apply_excitation( workspace2, workspace3, crea3, anni3, target_irrep2 );
-                           
+
                            // value = < Chi | E_{crea3,anni3} E_{crea2,anni2} E_{crea1,anni1} | 0 >
                            double value = FCIddot( orig_length, workspace3, chi );
 
-                           for ( unsigned int t = 0; t < L; t++ ){
-                              // Irrep diagonality of fock is checked by three_rdm values being zero
-                              value -= ( fock[ crea3 + L * t ] * three_rdm[ anni1 + L*( anni2 + L*( anni3 + L*( crea1 + L*( crea2 + L * t )))) ]    // fock[r,t] Gamma_{ijk,pqt}
-                                       + fock[ crea2 + L * t ] * three_rdm[ anni1 + L*( anni3 + L*( anni2 + L*( crea1 + L*( crea3 + L * t )))) ]    // fock[q,t] Gamma_{ikj,prt}
-                                       + fock[ crea1 + L * t ] * three_rdm[ anni2 + L*( anni3 + L*( anni1 + L*( crea2 + L*( crea3 + L * t )))) ] ); // fock[p,t] Gamma_{jki,qrt}
+                           if ( task_fock ){
+                              for ( unsigned int t = 0; t < L; t++ ){
+                                 // Irrep diagonality of fock is checked by three_rdm values being zero
+                                 value -= ( fock[ crea3 + L * t ] * three_rdm[ anni1 + L*( anni2 + L*( anni3 + L*( crea1 + L*( crea2 + L * t     )))) ]
+                                          + fock[ crea2 + L * t ] * three_rdm[ anni1 + L*( anni2 + L*( anni3 + L*( crea1 + L*( t     + L * crea3 )))) ]
+                                          + fock[ crea1 + L * t ] * three_rdm[ anni1 + L*( anni2 + L*( anni3 + L*( t     + L*( crea2 + L * crea3 )))) ] );
+                              }
                            }
+
+                           if ( task_E_zz ){
+                              const int number = (( orbz == crea1 ) ? 1 : 0 ) + (( orbz == crea2 ) ? 1 : 0 ) + (( orbz == crea3 ) ? 1 : 0 );
+                              if ( number > 0 ){
+                                 value -= number * three_rdm[ anni1 + L*( anni2 + L*( anni3 + L*( crea1 + L*( crea2 + L * crea3 )))) ];
+                              }
+                           }
+
                            output[ anni1 + L*( anni2 + L*( anni3 + L*( crea1 + L*( crea2 + L * crea3 )))) ] += value;
 
                         }
@@ -1412,8 +1337,8 @@ void CheMPS2::FCI::Fock4RDM(double * vector, double * three_rdm, double * fock, 
    delete [] workspace1;
    delete [] workspace2;
    delete [] workspace3;
-   delete [] chi;
-   
+   if (( task_fock ) || ( task_E_zz )){ delete [] chi; }
+
    // Make 12-fold permutation symmetric
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){
@@ -1465,7 +1390,7 @@ void CheMPS2::FCI::Fock4RDM(double * vector, double * three_rdm, double * fock, 
    
    gettimeofday(&end, NULL);
    const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-   if ( FCIverbose > 0 ){ cout << "FCI::Fock4RDM : Wall time = " << elapsed << " seconds" << endl; }
+   return elapsed;
 
 }
 

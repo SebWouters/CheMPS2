@@ -136,6 +136,13 @@ namespace CheMPS2{
              \param output To store the contraction output(i,j,k,p,q,r) = output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ]; needs to be of size getL()^6; point group symmetry shows in elements being zero; has 12-fold permutation symmetry just like 3-RDM */
          void Fock4RDM(double * vector, double * ThreeRDM, double * Fock, double * output) const;
          
+         //! Construct part of the 4-RDM: output(i,j,k,p,q,r) = Gamma^4(i,j,k,z,p,q,r,z)
+         /** \param vector The FCI vector of length getVecLength(0)
+             \param ThreeRDM The spin-summed 3-RDM as calculated by Fill3RDM
+             \param orbz The orbital z which is fixed in Gamma^4(i,j,k,z,p,q,r,z)
+             \param output To store part of the 4-RDM output(i,j,k,p,q,r) = output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ]; needs to be of size getL()^6; point group symmetry shows in elements being zero; has 12-fold permutation symmetry just like 3-RDM */
+         void Diag4RDM( double * vector, double * three_rdm, const unsigned int orbz, double * output ) const;
+         
          //! Measure S(S+1) (spin squared)
          /** \param vector The FCI vector of length getVecLength(0)
              \return Measured value of S(S+1) */
@@ -546,6 +553,9 @@ namespace CheMPS2{
          
          //! Initialize a part of the private variables
          void StartupIrrepCenter();
+         
+         //! Actual routine used by Fill3RDM, Fock4RDM, Diag4RDM
+         double Driver3RDM(double * vector, double * output, double * three_rdm, double * fock, const unsigned int orbz) const;
 
    };
 
