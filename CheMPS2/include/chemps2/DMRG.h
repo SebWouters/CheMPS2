@@ -112,6 +112,12 @@ namespace CheMPS2{
          /** \return The 3-RDM. Returns a NULL pointer if not yet calculated. */
          ThreeDM * get3DM(){ return the3DM; }
          
+         //! After the 3-RDM has been calculated, the 4-RDM terms Gamma4_ijkz,pqrz (with z fixed) can be obtained
+         /** \param output Array to store the 4-RDM terms: output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = Gamma4_ijkz,pqrz (with z fixed). (Hamiltonian indices are used.)
+             \param ham_orbz The fixed orbital (Hamiltonian index.)
+             \param last_case If true, everything will be set up to allow to continue sweeping */
+         void Diag4RDM( double * output, const int ham_orbz, const bool last_case );
+         
          //! Get the pointer to the Correlations
          /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
          Correlations * getCorrelations(){ return theCorr; }
@@ -272,6 +278,7 @@ namespace CheMPS2{
          void updateMovingRightSafeFirstTime(const int cnt);
          void updateMovingRightSafe2DM(const int cnt);
          void updateMovingLeftSafe(const int cnt);
+         void updateMovingLeftSafeFirstTime(const int cnt);
          void updateMovingLeftSafe2DM(const int cnt);
          void deleteAllBoundaryOperators();
          static int trianglefunction(const int k, const int glob);
@@ -285,6 +292,9 @@ namespace CheMPS2{
          
          //Helper functions for making the Correlations boundary operators
          void update_correlations_tensors(const int siteindex);
+         
+         //Helper function for the diagonal 4-RDM
+         void diag_4rdm_helper( double * output, const int ham_orbz, const double alpha, const double beta, const bool add, const double factor );
          
          //The storage and functions to handle excited states
          int nStates;

@@ -35,7 +35,7 @@ CheMPS2::Problem::Problem(const Hamiltonian * Hamin, const int TwoSin, const int
    TwoS = TwoSin;
    N = Nin;
    Irrep = Irrepin;
-   bReorderD2h = false;
+   bReorder = false;
    
    checkConsistency();
    mx_elem = NULL;
@@ -44,7 +44,7 @@ CheMPS2::Problem::Problem(const Hamiltonian * Hamin, const int TwoSin, const int
 
 CheMPS2::Problem::~Problem(){
 
-   if (bReorderD2h){
+   if (bReorder){
       delete [] f1;
       delete [] f2;
    }
@@ -55,15 +55,15 @@ CheMPS2::Problem::~Problem(){
 
 void CheMPS2::Problem::SetupReorderD2h(){
 
-   if (bReorderD2h){
+   if (bReorder){
       delete [] f1;
       delete [] f2;
-      bReorderD2h = false;
+      bReorder = false;
    }
 
    if (gSy()==7){ //Only if D2h of course
    
-      bReorderD2h = true;
+      bReorder = true;
       f1 = new int[Ham->getL()];
       f2 = new int[Ham->getL()];
       
@@ -95,15 +95,15 @@ void CheMPS2::Problem::SetupReorderD2h(){
 
 void CheMPS2::Problem::SetupReorderC2v(){
 
-   if (bReorderD2h){
+   if (bReorder){
       delete [] f1;
       delete [] f2;
-      bReorderD2h = false;
+      bReorder = false;
    }
 
    if (gSy()==5){ //Only if C2v of course
    
-      bReorderD2h = true;
+      bReorder = true;
       f1 = new int[Ham->getL()];
       f2 = new int[Ham->getL()];
       
@@ -149,13 +149,13 @@ void CheMPS2::Problem::SetupReorderC2v(){
 
 void CheMPS2::Problem::setup_reorder_custom(int * dmrg2ham){
 
-   if (bReorderD2h){
+   if (bReorder){
       delete [] f1;
       delete [] f2;
-      bReorderD2h = false;
+      bReorder = false;
    }
    
-   bReorderD2h = true;
+   bReorder = true;
    f1 = new int[Ham->getL()]; // Is going to be the inverse of dmrg2ham
    f2 = new int[Ham->getL()]; // Is going to be dmrg2ham copied
 
@@ -335,7 +335,7 @@ void CheMPS2::Problem::setup_reorder_dinfh(int * docc, const double sp_threshold
 
 int CheMPS2::Problem::gIrrep(const int nOrb) const{
    
-   if (!bReorderD2h){
+   if (!bReorder){
       return Ham->getOrbitalIrrep(nOrb);
    }
    
@@ -343,9 +343,9 @@ int CheMPS2::Problem::gIrrep(const int nOrb) const{
 
 }
 
-bool CheMPS2::Problem::gReorderD2h() const{ return bReorderD2h; }
-int CheMPS2::Problem::gf1(const int HamOrb) const{ return (bReorderD2h)?f1[HamOrb]:-1; }
-int CheMPS2::Problem::gf2(const int DMRGOrb) const{ return (bReorderD2h)?f2[DMRGOrb]:-1; }
+bool CheMPS2::Problem::gReorder() const{ return bReorder; }
+int CheMPS2::Problem::gf1(const int HamOrb) const{ return (bReorder)?f1[HamOrb]:-1; }
+int CheMPS2::Problem::gf2(const int DMRGOrb) const{ return (bReorder)?f2[DMRGOrb]:-1; }
 
 double CheMPS2::Problem::gMxElement(const int alpha, const int beta, const int gamma, const int delta) const{
 
@@ -365,13 +365,13 @@ void CheMPS2::Problem::construct_mxelem(){
    const double prefact = 1.0/(N-1);
    
    for (int orb1 = 0; orb1 < L; orb1++){
-      const int map1 = (( !bReorderD2h ) ? orb1 : f2[ orb1 ]);
+      const int map1 = (( !bReorder ) ? orb1 : f2[ orb1 ]);
       for (int orb2 = 0; orb2 < L; orb2++){
-         const int map2 = (( !bReorderD2h ) ? orb2 : f2[ orb2 ]);
+         const int map2 = (( !bReorder ) ? orb2 : f2[ orb2 ]);
          for (int orb3 = 0; orb3 < L; orb3++){
-            const int map3 = (( !bReorderD2h ) ? orb3 : f2[ orb3 ]);
+            const int map3 = (( !bReorder ) ? orb3 : f2[ orb3 ]);
             for (int orb4 = 0; orb4 < L; orb4++){
-               const int map4 = (( !bReorderD2h ) ? orb4 : f2[ orb4 ]);
+               const int map4 = (( !bReorder ) ? orb4 : f2[ orb4 ]);
                setMxElement( orb1, orb2, orb3, orb4, Ham->getVmat(map1,map2,map3,map4)
                                                      + prefact*((orb1==orb3)?Ham->getTmat(map2,map4):0)
                                                      + prefact*((orb2==orb4)?Ham->getTmat(map1,map3):0) );

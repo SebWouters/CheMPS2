@@ -26,13 +26,25 @@
 
 using std::min;
 
-CheMPS2::TensorT::TensorT(const int indexIn, const int IlocalIn, const SyBookkeeper * denBKIn) : Tensor(){
+CheMPS2::TensorT::TensorT( const int index_in, const SyBookkeeper * denBK_in ) : Tensor(){
 
-   index = indexIn; //left boundary = index ; right boundary = index+1
-   Ilocal = IlocalIn;
-   denBK = denBKIn;
-   
+   index = index_in; //left boundary = index ; right boundary = index+1
+   denBK = denBK_in;
+
    AllocateAllArrays();
+
+}
+
+CheMPS2::TensorT::TensorT( TensorT & tocopy ) : Tensor(){
+
+   index = tocopy.gIndex();
+   denBK = tocopy.gBK();
+
+   AllocateAllArrays();
+
+   int totalsize = kappa2index[nKappa];
+   int inc1 = 1;
+   dcopy_( &totalsize, tocopy.gStorage(), &inc1, storage, &inc1 );
 
 }
 
@@ -47,7 +59,7 @@ void CheMPS2::TensorT::AllocateAllArrays(){
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
                      if (TwoSR>=0){
-                        int IR = (NR==NL+1)?(Irreps::directProd(IL,Ilocal)):IL ;
+                        int IR = (NR==NL+1)?(Irreps::directProd(IL,denBK->gIrrep(index))):IL ;
                         int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                         if (dimR>0) nKappa++;
                      }
@@ -76,7 +88,7 @@ void CheMPS2::TensorT::AllocateAllArrays(){
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
                      if (TwoSR>=0){
-                        int IR = (NR==NL+1)?(Irreps::directProd(IL,Ilocal)):IL ;
+                        int IR = (NR==NL+1)?(Irreps::directProd(IL,denBK->gIrrep(index))):IL ;
                         int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                         if (dimR>0){
                            sectorN1[nKappa] = NL;
@@ -152,7 +164,22 @@ double * CheMPS2::TensorT::gStorage(const int N1, const int TwoS1, const int I1,
 
 int CheMPS2::TensorT::gIndex() const { return index; }
 
+const CheMPS2::SyBookkeeper * CheMPS2::TensorT::gBK() const{ return denBK; }
+
 void CheMPS2::TensorT::random(){ for (int cnt=0; cnt<kappa2index[nKappa]; cnt++){ storage[cnt] = ((double) rand())/RAND_MAX; } }
+
+void CheMPS2::TensorT::number_operator( const double alpha, const double beta ){
+
+   #pragma omp parallel for schedule(dynamic)
+   for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
+      int size = kappa2index[ ikappa + 1 ] - kappa2index[ ikappa ];
+      double * array = storage + kappa2index[ ikappa ];
+      double factor = beta + alpha * ( sectorNR[ ikappa ] - sectorN1[ ikappa ] );
+      int inc1 = 1;
+      dscal_( &size, &factor, array, &inc1 );
+   }
+
+}
 
 void CheMPS2::TensorT::QR(Tensor * Rstorage){
 
@@ -304,9 +331,7 @@ void CheMPS2::TensorT::LQ(Tensor * Lstorage){
                   double * tau = new double[minofdims];
                   double * work = new double[dimL];
                   dgelqf_(&dimL,&dimRtotal,mem,&dimL,tau,work,&dimL,&info);
-                  
 
-               
                   //Copy L to Lstorage
                   double * wheretoput = Lstorage->gStorage(NL,TwoSL,IL,NL,TwoSL,IL); //dimL x dimL
                
@@ -414,7 +439,7 @@ bool CheMPS2::TensorT::CheckLeftNormal() const{
                bool firsttime = true;
                for (int NL=NR-2; NL<=NR; NL++){
                   for (int TwoSL=TwoSR-((NR==NL+1)?1:0); TwoSL<TwoSR+2; TwoSL+=2){
-                     int IL = (NR==NL+1)?(Irreps::directProd(Ilocal,IR)):IR;
+                     int IL = (NR==NL+1)?(Irreps::directProd(denBK->gIrrep(index),IR)):IR;
                      int dimL = denBK->gCurrentDim(index,NL,TwoSL,IL);
                      if (dimL>0){
                         double * Block = storage + kappa2index[gKappa(NL,TwoSL,IL,NR,TwoSR,IR)];
@@ -455,7 +480,7 @@ bool CheMPS2::TensorT::CheckRightNormal() const{
                bool firsttime = true;
                for (int NR=NL; NR<=NL+2; NR++){
                   for (int TwoSR=TwoSL-((NR==NL+1)?1:0); TwoSR<TwoSL+2; TwoSR+=2){
-                     int IR = (NR==NL+1)?(Irreps::directProd(Ilocal,IL)):IL;
+                     int IR = (NR==NL+1)?(Irreps::directProd(denBK->gIrrep(index),IL)):IL;
                      int dimR = denBK->gCurrentDim(index+1,NR,TwoSR,IR);
                      if (dimR>0){
                         double * Block = storage + kappa2index[gKappa(NL,TwoSL,IL,NR,TwoSR,IR)];

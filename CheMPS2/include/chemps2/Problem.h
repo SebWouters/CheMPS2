@@ -98,9 +98,9 @@ namespace CheMPS2{
          /** \return True if consistent, else false */
          bool checkConsistency() const;
          
-         //! Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps, not only d2h)
-         /** \return Whether the Hamiltonian orbitals are reordered (for all irreps, not only d2h) */
-         bool gReorderD2h() const;
+         //! Get whether the Hamiltonian orbitals are reordered for the DMRG calculation
+         /** \return Whether the Hamiltonian orbitals are reordered */
+         bool gReorder() const;
          
          //! Get the DMRG index corresponding to a Ham index
          /** \param HamOrb The Ham index
@@ -144,8 +144,8 @@ namespace CheMPS2{
          //The targeted irrep
          int Irrep;
          
-         //Whether or not to reorder D2h
-         bool bReorderD2h;
+         //Whether or not to reorder
+         bool bReorder;
          
          //f1[HamiltonianIndex] = DMRGindex
          int * f1;

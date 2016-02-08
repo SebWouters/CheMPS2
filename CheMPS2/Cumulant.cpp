@@ -35,7 +35,7 @@ CheMPS2::Cumulant::~Cumulant(){ }
    const int L = prob->gL();
    
    int * irreps = new int[ L ];
-   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( orb ) : orb ); }
+   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( orb ) : orb ); }
    
    #pragma omp parallel for schedule(dynamic)
    for ( int i = 0; i < L; i++ ){
@@ -91,7 +91,7 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
    
    /* Construct an array with the orbital irreps in Hamiltonian indices */
    int * irreps = new int[ L ];
-   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( orb ) : orb ); }
+   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( orb ) : orb ); }
    
    /* Helper arrays with partial (mult) or full (dot) contractions of objects with the CASPT2 Fock operator */
    double * G3dotF  = new double[ L*L*L*L ];
@@ -383,14 +383,14 @@ double CheMPS2::Cumulant::gamma4_ham(const Problem * prob, const ThreeDM * the3D
                                                                                                          const int p, const int q, const int r, const int s){
    
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   const int irrep_i = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( i ) : i );
-   const int irrep_j = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( j ) : j );
-   const int irrep_k = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( k ) : k );
-   const int irrep_l = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( l ) : l );
-   const int irrep_p = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( p ) : p );
-   const int irrep_q = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( q ) : q );
-   const int irrep_r = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( r ) : r );
-   const int irrep_s = prob->gIrrep(( prob->gReorderD2h() ) ? prob->gf1( s ) : s );
+   const int irrep_i = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( i ) : i );
+   const int irrep_j = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( j ) : j );
+   const int irrep_k = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( k ) : k );
+   const int irrep_l = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( l ) : l );
+   const int irrep_p = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( p ) : p );
+   const int irrep_q = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( q ) : q );
+   const int irrep_r = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( r ) : r );
+   const int irrep_s = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( s ) : s );
    
    const int irrep_ij = Irreps::directProd( irrep_i, irrep_j );
    const int irrep_kl = Irreps::directProd( irrep_k, irrep_l );

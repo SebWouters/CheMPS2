@@ -143,7 +143,7 @@ double CheMPS2::TwoDM::get1RDM_DMRG(const int cnt1, const int cnt2) const{
 double CheMPS2::TwoDM::getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getTwoDMA_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2), Prob->gf1(cnt3), Prob->gf1(cnt4) );
    }
    return getTwoDMA_DMRG( cnt1, cnt2, cnt3, cnt4 );
@@ -153,7 +153,7 @@ double CheMPS2::TwoDM::getTwoDMA_HAM(const int cnt1, const int cnt2, const int c
 double CheMPS2::TwoDM::getTwoDMB_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getTwoDMB_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2), Prob->gf1(cnt3), Prob->gf1(cnt4) );
    }
    return getTwoDMB_DMRG( cnt1, cnt2, cnt3, cnt4 );
@@ -163,7 +163,7 @@ double CheMPS2::TwoDM::getTwoDMB_HAM(const int cnt1, const int cnt2, const int c
 double CheMPS2::TwoDM::get1RDM_HAM(const int cnt1, const int cnt2) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return get1RDM_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2) );
    }
    return get1RDM_DMRG( cnt1, cnt2 );
@@ -310,21 +310,21 @@ void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
    fprintf( capturing, " &2-RDM NORB= %d,NELEC= %d,MS2= %d,\n", L, Prob->gN(), Prob->gTwoS() );
    fprintf( capturing, "  ORBSYM=" );
    for (int HamOrb=0; HamOrb<L; HamOrb++){
-      const int DMRGOrb = ( Prob->gReorderD2h() ) ? Prob->gf1( HamOrb ) : HamOrb;
+      const int DMRGOrb = ( Prob->gReorder() ) ? Prob->gf1( HamOrb ) : HamOrb;
       fprintf( capturing, "%d,", psi2molpro[ Prob->gIrrep( DMRGOrb ) ] );
    }
    fprintf( capturing, "\n  ISYM=%d,\n /\n", psi2molpro[ Prob->gIrrep() ] );
    delete [] psi2molpro;
    
    for (int ham_p=0; ham_p<L; ham_p++){
-      const int dmrg_p = (Prob->gReorderD2h())?Prob->gf1(ham_p):ham_p;
+      const int dmrg_p = (Prob->gReorder())?Prob->gf1(ham_p):ham_p;
       for (int ham_q=0; ham_q<=ham_p; ham_q++){ // p >= q
-         const int dmrg_q = (Prob->gReorderD2h())?Prob->gf1(ham_q):ham_q;
+         const int dmrg_q = (Prob->gReorder())?Prob->gf1(ham_q):ham_q;
          const int irrep_pq = Irreps::directProd( Prob->gIrrep(dmrg_p), Prob->gIrrep(dmrg_q) );
          for (int ham_r=0; ham_r<=ham_p; ham_r++){ // p >= r
-            const int dmrg_r = (Prob->gReorderD2h())?Prob->gf1(ham_r):ham_r;
+            const int dmrg_r = (Prob->gReorder())?Prob->gf1(ham_r):ham_r;
             for (int ham_s=0; ham_s<=ham_p; ham_s++){ // p >= s
-               const int dmrg_s = (Prob->gReorderD2h())?Prob->gf1(ham_s):ham_s;
+               const int dmrg_s = (Prob->gReorder())?Prob->gf1(ham_s):ham_s;
                const int irrep_rs = Irreps::directProd( Prob->gIrrep(dmrg_r), Prob->gIrrep(dmrg_s) );
                if ( irrep_pq == irrep_rs ){
                   const int num_equal = (( ham_q == ham_p ) ? 1 : 0 )
@@ -352,9 +352,9 @@ void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
    // 1-RDM in Hamiltonian indices with p >= q
    const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
    for (int ham_p=0; ham_p<L; ham_p++){
-      const int dmrg_p = (Prob->gReorderD2h())?Prob->gf1(ham_p):ham_p;
+      const int dmrg_p = (Prob->gReorder())?Prob->gf1(ham_p):ham_p;
       for (int ham_q=0; ham_q<=ham_p; ham_q++){
-         const int dmrg_q = (Prob->gReorderD2h())?Prob->gf1(ham_q):ham_q;
+         const int dmrg_q = (Prob->gReorder())?Prob->gf1(ham_q):ham_q;
          if ( Prob->gIrrep(dmrg_p) == Prob->gIrrep(dmrg_q) ){
             double value = 0.0;
             for ( int orbsum = 0; orbsum < L; orbsum++ ){ value += getTwoDMA_DMRG( dmrg_p, orbsum, dmrg_q, orbsum ); }

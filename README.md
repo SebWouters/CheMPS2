@@ -418,7 +418,7 @@ Edmiston-Ruedenberg classes.
 class to store a tensor which is required to compute the DMRG-SCF Hessian.
 
 [CheMPS2/DMRGtechnics.cpp](CheMPS2/DMRGtechnics.cpp) contains the
-functions related to the 2-RDM and the excited-state calculations.
+functions related to the RDM and excited-state calculations.
 
 [CheMPS2/EdmistonRuedenberg.cpp](CheMPS2/EdmistonRuedenberg.cpp) contains
 an orbital localization function based on the Edmiston-Ruedenberg cost function
@@ -435,9 +435,8 @@ the FourIndex container class for the two-body matrix elements.
 of the Hamiltonian class, including functions to get or set specific variables,
 as well as the save and load functions to store the Hamiltonian on disk.
 
-[CheMPS2/Heff.cpp](CheMPS2/Heff.cpp) contains the constructor and
-destructor of the Heff class, as well as the top-level functions to perform
-the effective Hamiltonian times guess-vector multiplication and Davidson's
+[CheMPS2/Heff.cpp](CheMPS2/Heff.cpp) contains top-level functions to perform
+the effective Hamiltonian times vector multiplication for Davidson's
 algorithm.
 
 [CheMPS2/HeffDiagonal.cpp](CheMPS2/HeffDiagonal.cpp) contains the

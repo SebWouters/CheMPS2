@@ -108,7 +108,7 @@ double CheMPS2::Correlations::getCspin_DMRG(const int row, const int col) const{
 double CheMPS2::Correlations::getCspin_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCspin_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCspin_DMRG( row, col );
@@ -120,7 +120,7 @@ double CheMPS2::Correlations::getCdens_DMRG(const int row, const int col) const{
 double CheMPS2::Correlations::getCdens_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCdens_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCdens_DMRG( row, col );
@@ -132,7 +132,7 @@ double CheMPS2::Correlations::getCspinflip_DMRG(const int row, const int col) co
 double CheMPS2::Correlations::getCspinflip_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCspinflip_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCspinflip_DMRG( row, col );
@@ -144,7 +144,7 @@ double CheMPS2::Correlations::getCdirad_DMRG(const int row, const int col) const
 double CheMPS2::Correlations::getCdirad_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCdirad_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCdirad_DMRG( row, col );
@@ -156,7 +156,7 @@ double CheMPS2::Correlations::getMutualInformation_DMRG(const int row, const int
 double CheMPS2::Correlations::getMutualInformation_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getMutualInformation_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getMutualInformation_DMRG( row, col );
@@ -183,7 +183,7 @@ double CheMPS2::Correlations::SingleOrbitalEntropy_DMRG(const int index) const{
 
 double CheMPS2::Correlations::SingleOrbitalEntropy_HAM(const int index) const{
 
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return SingleOrbitalEntropy_DMRG( Prob->gf1(index) );
    }
    return SingleOrbitalEntropy_DMRG( index );
@@ -588,8 +588,8 @@ void CheMPS2::Correlations::PrintTableNice(const double * table, const int sPrec
                thestream << prefix << " 0 ";
                for (int cnt=0; cnt<sPrecision; cnt++){ thestream << " "; }
             } else {
-               int row2 = (Prob->gReorderD2h()) ? Prob->gf1(row) : row;
-               int col2 = (Prob->gReorderD2h()) ? Prob->gf1(col) : col;
+               int row2 = (Prob->gReorder()) ? Prob->gf1(row) : row;
+               int col2 = (Prob->gReorder()) ? Prob->gf1(col) : col;
                if (table[row2 + L*col2] < 0.0){
                   thestream << prefix        << table[row2 + L*col2];
                } else {

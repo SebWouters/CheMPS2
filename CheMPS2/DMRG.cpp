@@ -117,7 +117,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
    if (loadedMPS){ loadDIM(MPSstoragename,denBK); }
    
    MPS = new TensorT * [L];
-   for (int cnt=0; cnt<L; cnt++){ MPS[cnt] = new TensorT(cnt,denBK->gIrrep(cnt),denBK); }
+   for (int cnt=0; cnt<L; cnt++){ MPS[cnt] = new TensorT( cnt, denBK ); }
    
    if (loadedMPS){
       bool isConverged;

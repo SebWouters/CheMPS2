@@ -106,7 +106,7 @@ double CheMPS2::ThreeDM::get_dmrg_index(const int cnt1, const int cnt2, const in
 double CheMPS2::ThreeDM::get_ham_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( prob->gReorderD2h() ){
+   if ( prob->gReorder() ){
       return get_dmrg_index( prob->gf1(cnt1), prob->gf1(cnt2), prob->gf1(cnt3), prob->gf1(cnt4), prob->gf1(cnt5), prob->gf1(cnt6) );
    }
    return get_dmrg_index( cnt1, cnt2, cnt3, cnt4, cnt5, cnt6 );

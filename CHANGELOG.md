@@ -1,15 +1,27 @@
 #### Current HEAD
 * Class ConjugateGradient
-* Break API: bump up SO version (psi4 interface does NOT need to change!)
-* Class TensorOperator: replaces TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD
-* Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)
-* Further DMRG sweeps allowed after RDM calculation
-* FCI 3- and 4-RDM in FCI::Fill3RDM and FCI::Fill4RDM
-* DMRG 3-RDM in ThreeDM class in O(L^4 D^3 + L^6 D^2) ([Kurashige, JCP 141, 174111 (2014)](http://dx.doi.org/10.1063/1.4900878))
-* Cumulant::gamma4_ham: cu(4) reconstruction of 4-RDM based on DMRG ThreeDM
-* FCI::Fock4RDM: fast contraction of Fock matrix with FCI 4-RDM
-* Cumulant::gamma4_fock_contract_ham: fast contraction of Fock matrix with cu(4) reconstruction of 4-RDM
-* CASPT2-D and CASPT2-N
+* Class TensorOperator
+* Class ThreeDM: DMRG 3-RDM in O(L^4 D^3 + L^6 D^2)
+* Class Cumulant: Cumulant reconstruction of the DMRG 4-RDM
+* Class CASPT2: Routines for the CASPT2-N energy (IPEA follows)
+* DMRG diagonal 4-RDM in DMRG::Diag4RDM
+* Sweeps after RDM calculation allowed
+* FCI 3-RDM in FCI::Fill3RDM
+* FCI 4-RDM in FCI::Fill4RDM
+* FCI diagonal 4-RDM in FCI::Diag4RDM
+* FCI 4-RDM contraction with Fock operator in FCI::Fock4RDM
+* Break API: bump up SO version
+* Deprecate TwoDMstorage class
+* Deprecate TensorDiag class
+* Deprecate TensorSwap class
+* Deprecate TensorS0Abase class
+* Deprecate TensorS1Bbase class
+* Deprecate TensorF0Cbase class
+* Deprecate TensorF1Dbase class
+* Deprecate TensorA class
+* Deprecate TensorB class
+* Deprecate TensorC class
+* Deprecate TensorD class
 
 #### Version 1.6 (2015-08-26):
 * Disk i/o improvements with HDF5's hyperslab

@@ -36,10 +36,13 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param indexIn The site index
-             \param IlocalIn The local irrep index
-             \param denBKIn The problem to be solved */
-         TensorT(const int indexIn, const int IlocalIn, const SyBookkeeper * denBKIn);
+         /** \param index_in The site index
+             \param denBK_in The symmetry bookkeeper of the problem at hand */
+         TensorT( const int index_in, const SyBookkeeper * denBK_in );
+         
+         //! Copy constructor
+         /** \param tocopy MPS tensor to be copied */
+         TensorT( TensorT & tocopy );
          
          //! Destructor
          virtual ~TensorT();
@@ -81,8 +84,17 @@ namespace CheMPS2{
          /** \return the index */
          int gIndex() const;
          
+         //! Get the pointer to the symmetry bookkeeper
+         /** \return the pointer to the symmetry bookkeeper */
+         const SyBookkeeper * gBK() const;
+         
          //! Fill storage with random numbers 0 < val < 1.
          void random();
+         
+         //! Apply alpha * ( number operator ) + beta to the MPS tensor
+         /** \param alpha Prefactor of the number operator
+             \param beta  Constant to be multiplied with the MPS tensor */
+         void number_operator( const double alpha, const double beta );
          
          //! Left-normalization
          /** \param Rstorage Where the R-part of the QR-decomposition can be stored (diagonal TensorOperator). */
@@ -112,9 +124,6 @@ namespace CheMPS2{
          bool CheckRightNormal() const;
          
       private:
-      
-         //The local irrep
-         int Ilocal;
       
          //right particle number sector
          int * sectorNR;

@@ -346,6 +346,192 @@ void CheMPS2::DMRG::print_tensor_update_performance() const{
 
 }
 
+void CheMPS2::DMRG::Diag4RDM( double * output, const int ham_orbz, const bool last_case ){
+
+   struct timeval start, end;
+   gettimeofday(&start, NULL);
+
+   assert( the3DM != NULL );
+
+   diag_4rdm_helper( output, ham_orbz, 1.0, 1.0, false, 0.5 ); // output = 0.5 * 3rdm[ ( 1 + E_zz ) | 0 > ]
+   diag_4rdm_helper( output, ham_orbz, 1.0, 0.0, true, -0.5 ); // output = 0.5 * ( 3rdm[ ( 1 + E_zz ) | 0 > ] - 3rdm[ E_zz | 0 > ] )
+
+   for ( int ham1 = 0; ham1 < L; ham1++ ){
+      for ( int ham2 = 0; ham2 < L; ham2++ ){
+         for ( int ham3 = 0; ham3 < L; ham3++ ){
+            for ( int ham4 = 0; ham4 < L; ham4++ ){
+               for ( int ham5 = 0; ham5 < L; ham5++ ){
+                  for ( int ham6 = 0; ham6 < L; ham6++ ){
+                     const int number = ( 1 + (( ham1 == ham_orbz ) ? 1 : 0 )
+                                            + (( ham2 == ham_orbz ) ? 1 : 0 )
+                                            + (( ham3 == ham_orbz ) ? 1 : 0 )
+                                            + (( ham4 == ham_orbz ) ? 1 : 0 )
+                                            + (( ham5 == ham_orbz ) ? 1 : 0 )
+                                            + (( ham6 == ham_orbz ) ? 1 : 0 ) );
+                     output[ ham1 + L * ( ham2 + L * ( ham3 + L * ( ham4 + L * ( ham5 + L * ham6 )))) ] -= 0.5 * number * the3DM->get_ham_index( ham1, ham2, ham3, ham4, ham5, ham6 );
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   if ( last_case ){ PreSolve(); } // Need to set up the renormalized operators again to continue sweeping
+
+   gettimeofday(&end, NULL);
+   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+   cout << "CheMPS2::DMRG::Diag4RDM : Elapsed wall time = " << elapsed << " seconds." << endl;
+
+}
+
+void CheMPS2::DMRG::diag_4rdm_helper( double * output, const int ham_orbz, const double alpha, const double beta, const bool add, const double factor ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   // Make a back-up of the entirely left-normalized MPS
+   TensorT ** backup_mps = new TensorT * [ L ];
+   for ( int orbital = 0; orbital < L; orbital++ ){
+      backup_mps[ orbital ] = MPS[ orbital ];
+      MPS[ orbital ] = new TensorT( *(backup_mps[ orbital ]) );
+   }
+   deleteAllBoundaryOperators();
+
+   // Apply the number operator to the specific MPS tensor
+   assert( ham_orbz >= 0 );
+   assert( ham_orbz <  L );
+   const int dmrg_orbz = (( Prob->gReorder() ) ? Prob->gf1( ham_orbz ) : ham_orbz );
+   MPS[ dmrg_orbz ]->number_operator( alpha, beta );
+
+   // Right normalize the wavefunction except for the first MPS tensor (contains the norm)
+   for ( int siteindex = L - 1; siteindex > 0; siteindex-- ){
+
+      /* Change the MPS gauge */
+      if ( am_i_master ){
+         TensorOperator * left = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK);
+         MPS[siteindex]->LQ(left);
+         MPS[siteindex-1]->RightMultiply(left);
+         delete left;
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      MPIchemps2::broadcast_tensor(MPS[siteindex],   MPI_CHEMPS2_MASTER);
+      MPIchemps2::broadcast_tensor(MPS[siteindex-1], MPI_CHEMPS2_MASTER);
+      #endif
+
+      /* Construct the right renormalized operators */
+      updateMovingLeftSafeFirstTime(siteindex-1);
+
+   }
+
+   ThreeDM * helper3rdm = new ThreeDM( denBK, Prob );
+   tensor_3rdm_a_J0_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_a_J1_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_a_J1_quartet = new Tensor3RDM****[L-1];
+   tensor_3rdm_b_J0_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_b_J1_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_b_J1_quartet = new Tensor3RDM****[L-1];
+   tensor_3rdm_c_J0_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_c_J1_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_c_J1_quartet = new Tensor3RDM****[L-1];
+   tensor_3rdm_d_J0_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_d_J1_doublet = new Tensor3RDM****[L-1];
+   tensor_3rdm_d_J1_quartet = new Tensor3RDM****[L-1];
+
+   // Leftmost contribution to the helper3rdm
+   helper3rdm->fill_site( MPS[0], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL );
+
+   // Other contributions to the helper3rdm
+   for ( int siteindex = 1; siteindex < L; siteindex++ ){
+
+      /* Change the MPS gauge */
+      if ( am_i_master ){
+         TensorOperator * right = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK);
+         MPS[siteindex-1]->QR(right);
+         MPS[siteindex]->LeftMultiply(right);
+         delete right;
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      MPIchemps2::broadcast_tensor(MPS[siteindex-1], MPI_CHEMPS2_MASTER);
+      MPIchemps2::broadcast_tensor(MPS[siteindex],   MPI_CHEMPS2_MASTER);
+      #endif
+
+      /* Update the required renormalized operators */
+      update_safe_3rdm_operators(siteindex);
+      updateMovingRightSafe2DM(siteindex-1);
+
+      /* Current contribution to helper3rdm */
+      helper3rdm->fill_site( MPS[siteindex], Ltensors, F0tensors, F1tensors, S0tensors, S1tensors,
+                             tensor_3rdm_a_J0_doublet[siteindex-1], tensor_3rdm_a_J1_doublet[siteindex-1], tensor_3rdm_a_J1_quartet[siteindex-1],
+                             tensor_3rdm_b_J0_doublet[siteindex-1], tensor_3rdm_b_J1_doublet[siteindex-1], tensor_3rdm_b_J1_quartet[siteindex-1],
+                             tensor_3rdm_c_J0_doublet[siteindex-1], tensor_3rdm_c_J1_doublet[siteindex-1], tensor_3rdm_c_J1_quartet[siteindex-1],
+                             tensor_3rdm_d_J0_doublet[siteindex-1], tensor_3rdm_d_J1_doublet[siteindex-1], tensor_3rdm_d_J1_quartet[siteindex-1] );
+
+   }
+
+   // Collect all data
+   #ifdef CHEMPS2_MPI_COMPILATION
+   helper3rdm->mpi_allreduce();
+   #endif
+
+   // Copy the contributions
+   helper3rdm->correct_higher_multiplicities();
+   delete_3rdm_operators(L-1);
+   delete [] tensor_3rdm_a_J0_doublet;
+   delete [] tensor_3rdm_a_J1_doublet;
+   delete [] tensor_3rdm_a_J1_quartet;
+   delete [] tensor_3rdm_b_J0_doublet;
+   delete [] tensor_3rdm_b_J1_doublet;
+   delete [] tensor_3rdm_b_J1_quartet;
+   delete [] tensor_3rdm_c_J0_doublet;
+   delete [] tensor_3rdm_c_J1_doublet;
+   delete [] tensor_3rdm_c_J1_quartet;
+   delete [] tensor_3rdm_d_J0_doublet;
+   delete [] tensor_3rdm_d_J1_doublet;
+   delete [] tensor_3rdm_d_J1_quartet;
+   if ( add ){
+      for ( int ham1 = 0; ham1 < L; ham1++ ){
+         for ( int ham2 = 0; ham2 < L; ham2++ ){
+            for ( int ham3 = 0; ham3 < L; ham3++ ){
+               for ( int ham4 = 0; ham4 < L; ham4++ ){
+                  for ( int ham5 = 0; ham5 < L; ham5++ ){
+                     for ( int ham6 = 0; ham6 < L; ham6++ ){
+                        output[ ham1 + L * ( ham2 + L * ( ham3 + L * ( ham4 + L * ( ham5 + L * ham6 )))) ] += factor * helper3rdm->get_ham_index( ham1, ham2, ham3, ham4, ham5, ham6 );
+                     }
+                  }
+               }
+            }
+         }
+      }
+   } else {
+      for ( int ham1 = 0; ham1 < L; ham1++ ){
+         for ( int ham2 = 0; ham2 < L; ham2++ ){
+            for ( int ham3 = 0; ham3 < L; ham3++ ){
+               for ( int ham4 = 0; ham4 < L; ham4++ ){
+                  for ( int ham5 = 0; ham5 < L; ham5++ ){
+                     for ( int ham6 = 0; ham6 < L; ham6++ ){
+                        output[ ham1 + L * ( ham2 + L * ( ham3 + L * ( ham4 + L * ( ham5 + L * ham6 )))) ] = factor * helper3rdm->get_ham_index( ham1, ham2, ham3, ham4, ham5, ham6 );
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   // Throw out the changed MPS and place back the original left-normalized MPS
+   for ( int orbital = 0; orbital < L; orbital++ ){
+      delete MPS[ orbital ];
+      MPS[ orbital ] = backup_mps[ orbital ];
+   }
+   delete [] backup_mps;
+   delete helper3rdm;
+   deleteAllBoundaryOperators();
+
+}
+
 double CheMPS2::DMRG::getSpecificCoefficient(int * coeff) const{
    
    int * alpha = new int[ L ];
@@ -373,7 +559,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta, const bool mpi_
       int twoSz = 0;
       int iTot = 0;
       for (int DMRGindex=0; DMRGindex<L; DMRGindex++){
-         const int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
+         const int HamIndex = (Prob->gReorder()) ? Prob->gf2(DMRGindex) : DMRGindex;
          assert( ( alpha[HamIndex] == 0 ) || ( alpha[HamIndex] == 1 ) );
          assert( (  beta[HamIndex] == 0 ) || (  beta[HamIndex] == 1 ) );
          nTot  += alpha[HamIndex] + beta[HamIndex];
@@ -432,7 +618,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta, const bool mpi_
          for (int count = 0; count < Dmax; count++){ arrayR[count] = 0.0; }
          
          //The local occupation
-         const int HamIndex = (Prob->gReorderD2h()) ? Prob->gf2(DMRGindex) : DMRGindex;
+         const int HamIndex = (Prob->gReorder()) ? Prob->gf2(DMRGindex) : DMRGindex;
          const int Nlocal   = alpha[HamIndex] + beta[HamIndex];
          const int twoSzloc = alpha[HamIndex] - beta[HamIndex];
          

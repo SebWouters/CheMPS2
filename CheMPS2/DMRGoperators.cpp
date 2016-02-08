@@ -53,6 +53,30 @@ void CheMPS2::DMRG::updateMovingRightSafeFirstTime(const int cnt){
 
 }
 
+void CheMPS2::DMRG::updateMovingLeftSafeFirstTime(const int cnt){
+
+   if (isAllocated[cnt]==1){
+      deleteTensors(cnt, true);
+      isAllocated[cnt]=0;
+   }
+   if (isAllocated[cnt]==0){
+      allocateTensors(cnt, false);
+      isAllocated[cnt]=2;
+   }
+   updateMovingLeft(cnt);
+
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){
+      if (cnt+1<L-1){
+         if (isAllocated[cnt+1]==2){
+            OperatorsOnDisk(cnt+1, false, true);
+            deleteTensors(cnt+1, false);
+            isAllocated[cnt+1]=0;
+         }
+      }
+   }
+
+}
+
 void CheMPS2::DMRG::updateMovingRightSafe(const int cnt){
 
    if (isAllocated[cnt]==2){

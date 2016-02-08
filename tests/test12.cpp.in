@@ -67,10 +67,16 @@ int main(void){
    theDMRG->calc_rdms_and_correlations(do_3rdm);
    theDMRG->getCorrelations()->Print();
    
+   //Get a diagonal block of the 4-RDM
+   const int ham_orbz = 3;
+   double * dmrg_diag_4rdm = new double[ L*L*L*L*L*L ];
+   theDMRG->Diag4RDM( dmrg_diag_4rdm, ham_orbz, false );
+   
    //Calculate FCI reference energy
    double EnergyFCI   = 0.0;
    double RMSerror2DM = 0.0;
    double RMSerror3DM = 0.0;
+   double RMSerror4DM = 0.0;
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
    #endif
@@ -115,22 +121,44 @@ int main(void){
             }
          }
       }
+      double * RDMspace2 = new double[ L*L*L*L*L*L ];
+      theFCI->Diag4RDM( inoutput, RDMspace, ham_orbz, RDMspace2 );
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  for (int orb5=0; orb5<L; orb5++){
+                     for (int orb6=0; orb6<L; orb6++){
+                        const double difference = RDMspace2[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
+                                                - dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
+                        RMSerror4DM += difference * difference;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      delete [] RDMspace2;
       delete [] RDMspace;
       delete [] inoutput;
       delete theFCI;
       RMSerror2DM = sqrt(RMSerror2DM);
       RMSerror3DM = sqrt(RMSerror3DM);
+      RMSerror4DM = sqrt(RMSerror4DM);
       cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDM = " << RMSerror2DM << endl;
       cout << "Frobenius norm of the difference of the DMRG and FCI 3-RDM = " << RMSerror3DM << endl;
+      cout << "Frobenius norm of the difference of the DMRG and FCI diag(4-RDM) for fixed orbital " << ham_orbz << " = " << RMSerror4DM << endl;
       cout << "******************************************************************" << endl;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI,   1, MPI_CHEMPS2_MASTER );
    CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror2DM, 1, MPI_CHEMPS2_MASTER );
    CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror3DM, 1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror4DM, 1, MPI_CHEMPS2_MASTER );
    #endif
    
    //Clean up DMRG
+   delete [] dmrg_diag_4rdm;
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
@@ -139,7 +167,7 @@ int main(void){
    delete Ham;
    
    //Check succes
-   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 ) && ( RMSerror3DM < 1e-3 )) ? true : false;
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 ) && ( RMSerror3DM < 1e-3 ) && ( RMSerror4DM < 1e-3 )) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
