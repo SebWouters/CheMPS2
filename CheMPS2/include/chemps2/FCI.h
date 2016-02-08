@@ -138,7 +138,7 @@ namespace CheMPS2{
          
          //! Construct part of the 4-RDM: output(i,j,k,p,q,r) = Gamma^4(i,j,k,z,p,q,r,z)
          /** \param vector The FCI vector of length getVecLength(0)
-             \param ThreeRDM The spin-summed 3-RDM as calculated by Fill3RDM
+             \param three_rdm The spin-summed 3-RDM as calculated by Fill3RDM
              \param orbz The orbital z which is fixed in Gamma^4(i,j,k,z,p,q,r,z)
              \param output To store part of the 4-RDM output(i,j,k,p,q,r) = output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r ) ) ) ) ]; needs to be of size getL()^6; point group symmetry shows in elements being zero; has 12-fold permutation symmetry just like 3-RDM */
          void Diag4RDM( double * vector, double * three_rdm, const unsigned int orbz, double * output ) const;
