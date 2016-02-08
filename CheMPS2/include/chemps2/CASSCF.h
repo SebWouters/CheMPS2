@@ -257,21 +257,18 @@ namespace CheMPS2{
              \param localDMRG2DM The CASSCF 2-RDM */
          static void setDMRG1DM(const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM);
          
-         //! Calculate the natural orbitals and their occupation numbers
-         /** \param localIdx Object which handles the index conventions for CASSCF
-             \param eigenvecs Where to store the natural orbitals
-             \param workmem Work memory
-             \param localDMRG1DM The CASSCF 1-RDM */
-         static void calcNOON(CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs, double * workmem, double * localDMRG1DM);
+         //! Copy a one-orbital quantity from array format to DMRGSCFmatrix format
+         /** \param origin Array to copy
+             \param result DMRGSCFmatrix to store the copy
+             \param idx Object which handles the index conventions for CASSCF
+             \param one_rdm If true, the occupied orbitals get occupation 2 */
+         static void copy_active( double * origin, DMRGSCFmatrix * result, const DMRGSCFindices * idx, const bool one_rdm );
          
-         //! Rotate the CASSCF 1-RDM and 2-RDM to a new basis (to calculate the gradient and Hessian)
-         /** \param nDMRGelectrons The number of DMRG active space electrons
-             \param totOrbDMRG The total number of DMRG orbitals
-             \param eigenvecs Where the eigenvectors are stored
-             \param work Work memory
-             \param localDMRG1DM The CASSCF 1-RDM
-             \param localDMRG2DM The CASSCF 2-RDM */
-         static void rotate2DMand1DM(const int nDMRGelectrons, int totOrbDMRG, double * eigenvecs, double * work, double * localDMRG1DM, double * localDMRG2DM);
+         //! Copy a one-orbital quantity from DMRGSCFmatrix format to array format
+         /** \param origin DMRGSCFmatrix to copy
+             \param result Array to store the copy
+             \param idx Object which handles the index conventions for CASSCF */
+         static void copy_active( const DMRGSCFmatrix * origin, double * result, const DMRGSCFindices * idx );
          
          //! From an Edmiston-Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs
          /** \param unitary The Edmiston-Ruedenberg active space rotation
@@ -279,25 +276,16 @@ namespace CheMPS2{
              \param eigenvecs Where the eigenvectors are stored */
          static void fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs);
 
-         //! Block-diagonalize the occupied-occupied block of the Fock matrix
-         /** \param Tmat Matrix with the one-electron integrals
-             \param Qocc Matrix with the Coulomb and exchange contributions of the occupied (inactive) orbitals
-             \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
-             \param Umat The unitary rotation which needs to be updated so that the Fock matrix will be block-diagonal in the occupied block
-             \param work1 Workspace of size NumORB * NumORB 
-             \param work2 Workspace of size NumORB * NumORB * 2
-             \param idx Object which handles the index conventions for CASSCF */
-         static void pseudocanonical_occupied( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx );
-
-         //! Block-diagonalize the virtual-virtual block of the Fock matrix
-         /** \param Tmat Matrix with the one-electron integrals
-             \param Qocc Matrix with the Coulomb and exchange contributions of the occupied (inactive) orbitals
-             \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
-             \param Umat The unitary rotation which needs to be updated so that the Fock matrix will be block-diagonal in the virtual block
-             \param work1 Workspace of size NumORB * NumORB 
-             \param work2 Workspace of size NumORB * NumORB * 2
-             \param idx Object which handles the index conventions for CASSCF */
-         static void pseudocanonical_virtual( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx );
+         //! Block-diagonalize Mat
+         /** \param space Can be 'O', 'A', or 'V' and denotes which block of Mat should be considered
+             \param Mat Matrix to block-diagonalize
+             \param Umat The unitary rotation will be updated so that Mat is block-diagonal in the orbitals 'space'
+             \param work1 Workspace
+             \param work2 Workspace
+             \param idx Object which handles the index conventions for CASSCF
+             \param invert If true, the eigenvectors are sorted from large to small instead of the other way around
+             \param localDMRG2RDM If not NULL, this 2-RDM-type array will be rotated to the new eigenvecs */
+         static void block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * localDMRG2RDM );
 
          //! Construct the Fock matrix
          /** \param Fock Matrix to store the Fock operator in
@@ -306,12 +294,12 @@ namespace CheMPS2{
              \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
              \param idx Object which handles the index conventions for CASSCF */
          static void construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, const DMRGSCFindices * idx );
-
-         //! Copy the active-active block of a matrix
-         /** \param mat Matrix from which the active-active block needs to be copied
+         
+         //! Return the RMS deviation from block-diagonal
+         /** \param matrix Matrix to be assessed
              \param idx Object which handles the index conventions for CASSCF
-             \param result Where to store the active space block */
-         static void copy_active( const DMRGSCFmatrix * mat, const DMRGSCFindices * idx, double * result );
+             \return RMS deviation from block-diagonal */
+         static double deviation_from_blockdiag( DMRGSCFmatrix * matrix, const DMRGSCFindices * idx );
          
       private:
       

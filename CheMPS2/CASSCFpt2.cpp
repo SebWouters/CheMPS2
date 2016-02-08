@@ -41,6 +41,9 @@ using std::max;
 
 double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions ){
 
+   const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
+   assert( num_elec >= 0 );
+
    // Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
    int maxlinsize   = 0;
    int maxlinsizeOK = 0;
@@ -50,14 +53,14 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::DMRGSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
    }
    const bool doBlockWise = (maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
-   
+
    // Determine the blocksize for the 2-body transformation
    int maxBlockSize = maxlinsize;
    if (doBlockWise){
       int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::DMRGSCF_maxlinsizeCutoff ) + 0.01);
       maxBlockSize = max( (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01) , maxlinsizeOK ); //If a particular index can be rotated at once....
    }
-   
+
    // Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
    const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
    const int nOrbDMRGpower4 = nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG;
@@ -66,37 +69,35 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    double * mem2 = new double[sizeWorkmem];
    double * mem3 = NULL;
    if (doBlockWise){ mem3 = new double[maxBSpower4]; }
-   
-   // The two-body rotator
-   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
-   
-   // Load unitary from disk
-   if (theDMRGSCFoptions->getStoreUnitary()){
-      struct stat stFileInfo;
-      int intStat = stat((theDMRGSCFoptions->getUnitaryStorageName()).c_str(),&stFileInfo);
-      if (intStat==0){ unitary->loadU(theDMRGSCFoptions->getUnitaryStorageName()); }
-   }
+
+   // Rotate to pseudocanonical orbitals
+   buildTmatrix();
+   buildQmatOCC();
+   buildQmatACT(); // DMRG1RDM needs to be set by CASSCF::solve
+   construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
+   block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
+   block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM );
+   block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
 
    // Fill active space Hamiltonian
    Hamiltonian * HamAS = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
-   int N = Nelectrons;
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ N -= 2*iHandler->getNOCC(irrep); }
-   Problem * Prob = new Problem(HamAS, TwoS, N, Irrep);
+   Problem * Prob = new Problem(HamAS, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
    buildQmatOCC();
    buildTmatrix();
    fillConstAndTmatDMRG(HamAS);
+   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
    if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamAS, unitary, mem1, mem2, mem3, maxBlockSize); }
    else {            theRotator.fillVmatDMRG(HamAS, unitary, mem1, mem2); }
    double Energy = 0.0;
    double * three_dm = new double[ nOrbDMRGpower4 * nOrbDMRG * nOrbDMRG ];
    double * contract = new double[ nOrbDMRGpower4 * nOrbDMRG * nOrbDMRG ];
-   
+
    // Solve the active space problem
    if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI
 
-      const int nalpha = ( N + TwoS ) / 2;
-      const int nbeta  = ( N - TwoS ) / 2;
+      const int nalpha = ( num_elec + TwoS ) / 2;
+      const int nbeta  = ( num_elec - TwoS ) / 2;
       const double workmem = 1000.0; // 1GB
       const int verbose = 2;
       CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamAS, nalpha, nbeta, Irrep, workmem, verbose );
@@ -106,15 +107,11 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       Energy = theFCI->GSDavidson( inoutput );
       theFCI->Fill2RDM( inoutput, DMRG2DM );                                  // 2-RDM
       theFCI->Fill3RDM( inoutput, three_dm );                                 // 3-RDM
-      setDMRG1DM( N, nOrbDMRG, DMRG1DM, DMRG2DM );                            // 1-RDM
-      buildQmatACT(); // <--- after 1-RDM calculation
-      pseudocanonical_occupied( theTmatrix, theQmatOCC, theQmatACT, unitary, mem1, mem2, iHandler );
-      pseudocanonical_virtual(  theTmatrix, theQmatOCC, theQmatACT, unitary, mem1, mem2, iHandler );
-      buildQmatOCC();
-      buildTmatrix();
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );                     // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      copy_active( theFmatrix, iHandler, mem1 );                              // Fock
+      cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
+      copy_active( theFmatrix, mem1, iHandler );                              // Fock
       theFCI->Fock4RDM( inoutput, three_dm, mem1, contract );                 // trace( Fock * 4-RDM )
       delete theFCI;
       delete [] inoutput;
@@ -128,20 +125,15 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
          Energy = theDMRG->Solve();
          if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
-      const double calculate_3rdm = true;
-      theDMRG->calc_rdms_and_correlations( calculate_3rdm );
+      theDMRG->calc_rdms_and_correlations( true );
       copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM  );                                                      // 2-RDM
       copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );                                                      // 3-RDM
-      setDMRG1DM( N, nOrbDMRG, DMRG1DM, DMRG2DM );                                                               // 1-RDM
-      buildQmatACT(); // <--- after 1-RDM calculation
-      pseudocanonical_occupied( theTmatrix, theQmatOCC, theQmatACT, unitary, mem1, mem2, iHandler );
-      pseudocanonical_virtual(  theTmatrix, theQmatOCC, theQmatACT, unitary, mem1, mem2, iHandler );
-      buildQmatOCC();
-      buildTmatrix();
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );                                                        // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      copy_active( theFmatrix, iHandler, mem1 );                                                                 // Fock
-      CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem1, contract ); // trace( Fock * 4-RDM )
+      cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
+      copy_active( theFmatrix, mem1, iHandler );                                                                 // Fock
+      CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem1, contract );
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
       if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
@@ -185,28 +177,38 @@ void CheMPS2::CASSCF::construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix 
    }
 
 }
-
-void CheMPS2::CASSCF::copy_active( const DMRGSCFmatrix * mat, const DMRGSCFindices * idx, double * result ){
-
+   
+double CheMPS2::CASSCF::deviation_from_blockdiag( DMRGSCFmatrix * matrix, const DMRGSCFindices * idx ){
+   
+   double rms_deviation = 0.0;
    const int n_irreps = idx->getNirreps();
-   const int LAS      = idx->getDMRGcumulative( n_irreps );
-   for ( int cnt = 0; cnt < LAS * LAS; cnt++ ){ result[ cnt ] = 0.0; }
-
-   int passed = 0;
    for ( int irrep = 0; irrep < n_irreps; irrep++ ){
-      const int NOCC = idx->getNOCC(  irrep );
-      const int NACT = idx->getNDMRG( irrep );
-      for ( int row = 0; row < NACT; row++ ){
-         for ( int col = 0; col < NACT; col++ ){
-            result[ passed + row + LAS * ( passed + col ) ] = mat->get( irrep, NOCC + row, NOCC + col );
+      const int NOCC = idx->getNOCC( irrep );
+      for ( int row = 0; row < NOCC; row++ ){
+         for ( int col = row + 1; col < NOCC; col++ ){
+            rms_deviation += matrix->get( irrep, row, col ) * matrix->get( irrep, row, col );
+            rms_deviation += matrix->get( irrep, col, row ) * matrix->get( irrep, col, row );
          }
       }
-      passed += NACT;
+      const int NACT = idx->getNDMRG( irrep );
+      for ( int row = 0; row < NACT; row++ ){
+         for ( int col = row + 1; col < NACT; col++ ){
+            rms_deviation += matrix->get( irrep, NOCC + row, NOCC + col ) * matrix->get( irrep, NOCC + row, NOCC + col );
+            rms_deviation += matrix->get( irrep, NOCC + col, NOCC + row ) * matrix->get( irrep, NOCC + col, NOCC + row );
+         }
+      }
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      for ( int row = 0; row < NVIR; row++ ){
+         for ( int col = row + 1; col < NVIR; col++ ){
+            rms_deviation += matrix->get( irrep, N_OA + row, N_OA + col ) * matrix->get( irrep, N_OA + row, N_OA + col );
+            rms_deviation += matrix->get( irrep, N_OA + col, N_OA + row ) * matrix->get( irrep, N_OA + col, N_OA + row );
+         }
+      }
    }
-
-   assert( passed == LAS );
+   rms_deviation = sqrt( rms_deviation );
+   return rms_deviation;
 
 }
-
 
 

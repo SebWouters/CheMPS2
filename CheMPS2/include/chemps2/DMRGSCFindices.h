@@ -101,6 +101,10 @@ namespace CheMPS2{
              \return The irrep of the corresponding orbital */
          int getOrbitalIrrep(const int index) const;
          
+         //! Get the total number of occupied orbitals
+         /** \return The total number of occupied orbitals */
+         int getNOCCsum() const;
+         
          //! Print my contents
          void Print() const;
 

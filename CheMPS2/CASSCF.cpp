@@ -23,6 +23,7 @@
 #include <string>
 #include <math.h>
 #include <algorithm>
+#include <assert.h>
 
 #include "CASSCF.h"
 #include "Lapack.h"
@@ -189,72 +190,6 @@ void CheMPS2::CASSCF::fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * un
 
 }
 
-void CheMPS2::CASSCF::calcNOON(DMRGSCFindices * localIdx, double * eigenvecs, double * workmem, double * localDMRG1DM){
-
-   const int numIrreps = localIdx->getNirreps();
-   int totOrbDMRG = localIdx->getDMRGcumulative( numIrreps );
-   int size = totOrbDMRG * totOrbDMRG;
-   double * eigenval = workmem + size;
-
-   for (int cnt=0; cnt<size; cnt++){ eigenvecs[cnt] = localDMRG1DM[cnt]; }
-
-   char jobz = 'V';
-   char uplo = 'U';
-   int info;
-   int passed = 0;
-   for (int irrep=0; irrep<numIrreps; irrep++){
-
-      int NDMRG = localIdx->getNDMRG(irrep);
-      if (NDMRG > 0){
-         //Calculate the eigenvectors and values per block
-         dsyev_(&jobz, &uplo, &NDMRG, eigenvecs + passed*(1+totOrbDMRG), &totOrbDMRG, eigenval + passed, workmem, &size, &info);
-
-         //Sort the eigenvecs
-         for (int col=0; col<NDMRG/2; col++){
-            for (int row=0; row<NDMRG; row++){
-               double temp = eigenvecs[passed + row + totOrbDMRG * (passed + NDMRG - 1 - col)];
-               eigenvecs[passed + row + totOrbDMRG * (passed + NDMRG - 1 - col)] = eigenvecs[passed + row + totOrbDMRG * (passed + col)];
-               eigenvecs[passed + row + totOrbDMRG * (passed + col)] = temp;
-            }
-         }
-      }
-
-      //Update the number of passed DMRG orbitals
-      passed += NDMRG;
-
-   }
-
-}
-
-void CheMPS2::CASSCF::rotate2DMand1DM(const int nDMRGelectrons, int totOrbDMRG, double * eigenvecs, double * work, double * localDMRG1DM, double * localDMRG2DM){
-
-   char notr = 'N';
-   char tran = 'T';
-   double alpha = 1.0;
-   double beta = 0.0;
-
-   int power1 = totOrbDMRG;
-   int power2 = totOrbDMRG*totOrbDMRG;
-   int power3 = totOrbDMRG*totOrbDMRG*totOrbDMRG;
-
-   //2DM: Gamma_{ijkl} --> Gamma_{ajkl}
-   dgemm_(&tran,&notr,&power1,&power3,&power1,&alpha,eigenvecs,&power1,localDMRG2DM,&power1,&beta,work,&power1);
-   //2DM: Gamma_{ajkl} --> Gamma_{ajkd}
-   dgemm_(&notr,&notr,&power3,&power1,&power1,&alpha,work,&power3,eigenvecs,&power1,&beta,localDMRG2DM,&power3);
-   //2DM: Gamma_{ajkd} --> Gamma_{ajcd}
-   for (int cnt=0; cnt<totOrbDMRG; cnt++){
-      dgemm_(&notr,&notr,&power2,&power1,&power1,&alpha,localDMRG2DM + cnt*power3,&power2,eigenvecs,&power1,&beta,work + cnt*power3,&power2);
-   }
-   //2DM: Gamma_{ajcd} --> Gamma_{abcd}
-   for (int cnt=0; cnt<power2; cnt++){
-      dgemm_(&notr,&notr,&power1,&power1,&power1,&alpha,work + cnt*power2,&power1,eigenvecs,&power1,&beta,localDMRG2DM + cnt*power2,&power1);
-   }
-
-   //Update 1DM
-   setDMRG1DM(nDMRGelectrons, totOrbDMRG, localDMRG1DM, localDMRG2DM);
-
-}
-
 void CheMPS2::CASSCF::rotateOldToNew(DMRGSCFmatrix * myMatrix){
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
@@ -408,88 +343,132 @@ void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
 
 }
 
-void CheMPS2::CASSCF::pseudocanonical_occupied( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx ){
+void CheMPS2::CASSCF::copy_active( double * origin, DMRGSCFmatrix * result, const DMRGSCFindices * idx, const bool one_rdm ){
+
+   result->clear();
 
    const int n_irreps = idx->getNirreps();
+   const int tot_dmrg = idx->getDMRGcumulative( n_irreps );
+
+   int passed = 0;
    for ( int irrep = 0; irrep < n_irreps; irrep++ ){
 
-      int NORB = idx->getNORB( irrep );
-      int NOCC = idx->getNOCC( irrep );
-      if ( NOCC > 1 ){
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
 
-         // Construct the occupied-occupied block of the Fock matrix
-         for ( int row = 0; row < NOCC; row++ ){
-            for ( int col = 0; col < NOCC; col++ ){
-               work1[ row + NOCC * col ] = ( Tmat->get( irrep, row, col )
-                                           + Qocc->get( irrep, row, col )
-                                           + Qact->get( irrep, row, col ) );
-            }
+      if ( one_rdm ){
+         for ( int orb = 0; orb < NOCC; orb++ ){
+            result->set( irrep, orb, orb, 2.0 );
          }
-
-         // Diagonalize the occupied-occupied block
-         char jobz = 'V';
-         char uplo = 'U';
-         int info;
-         int size = max( 3 * NOCC - 1, NOCC * NOCC );
-         dsyev_( &jobz, &uplo, &NOCC, work1, &NOCC, work2 + size, work2, &size, &info );
-
-         // Adjust the u-matrix accordingly
-         double * umatrix = Umat->getBlock( irrep );
-         for ( int row = 0; row < NOCC; row++ ){
-            for ( int col = 0; col < NORB; col++ ){
-               work2[ row + NOCC * col ] = umatrix[ row + NORB * col ];
-            }
-         }
-         char trans   = 'T';
-         char notrans = 'N';
-         double one = 1.0;
-         double set = 0.0;
-         dgemm_( &trans, &notrans, &NOCC, &NORB, &NOCC, &one, work1, &NOCC, work2, &NOCC, &set, umatrix, &NORB );
-
       }
+
+      for ( int row = 0; row < NACT; row++ ){
+         for ( int col = 0; col < NACT; col++ ){
+            result->set( irrep, NOCC + row, NOCC + col, origin[ passed + row + tot_dmrg * ( passed + col ) ] );
+         }
+      }
+
+      passed += NACT;
    }
+
+   assert( passed == tot_dmrg );
 
 }
 
-void CheMPS2::CASSCF::pseudocanonical_virtual( const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx ){
+void CheMPS2::CASSCF::copy_active( const DMRGSCFmatrix * origin, double * result, const DMRGSCFindices * idx ){
 
    const int n_irreps = idx->getNirreps();
+   const int tot_dmrg = idx->getDMRGcumulative( n_irreps );
+
+   for ( int cnt = 0; cnt < tot_dmrg * tot_dmrg; cnt++ ){ result[ cnt ] = 0.0; }
+
+   int passed = 0;
    for ( int irrep = 0; irrep < n_irreps; irrep++ ){
 
-      int NORB  = idx->getNORB( irrep );
-      int NVIRT = idx->getNVIRT( irrep );
-      int NJUMP = NORB - NVIRT;
-      if ( NVIRT > 1 ){
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
 
-         // Construct the virtual-virtual block of the Fock matrix
-         for ( int row = 0; row < NVIRT; row++ ){
-            for ( int col = 0; col < NVIRT; col++ ){
-               work1[ row + NVIRT * col ] = ( Tmat->get( irrep, NJUMP + row, NJUMP + col )
-                                            + Qocc->get( irrep, NJUMP + row, NJUMP + col )
-                                            + Qact->get( irrep, NJUMP + row, NJUMP + col ) );
+      for ( int row = 0; row < NACT; row++ ){
+         for ( int col = 0; col < NACT; col++ ){
+            result[ passed + row + tot_dmrg * ( passed + col ) ] = origin->get( irrep, NOCC + row, NOCC + col );
+         }
+      }
+
+      passed += NACT;
+   }
+
+   assert( passed == tot_dmrg );
+
+}
+
+void CheMPS2::CASSCF::block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * localDMRG2RDM ){
+
+   const int n_irreps = idx->getNirreps();
+   const int tot_dmrg = idx->getDMRGcumulative( n_irreps );
+
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      int NTOTAL  = idx->getNORB( irrep );
+      int NROTATE = (( space == 'O' ) ? idx->getNOCC( irrep ) : (( space == 'A' ) ? idx->getNDMRG( irrep ) : idx->getNVIRT( irrep )));
+      int NSHIFT  = (( space == 'O' ) ? 0                     : (( space == 'A' ) ? idx->getNOCC( irrep )  : NTOTAL - NROTATE      ));
+      int NJUMP   = idx->getDMRGcumulative( irrep );
+      if ( NROTATE > 1 ){
+
+         // Diagonalize the relevant block of Mat
+         {
+            for ( int row = 0; row < NROTATE; row++ ){
+               for ( int col = 0; col < NROTATE; col++ ){
+                  work1[ row + NROTATE * col ] = Mat->get( irrep, NSHIFT + row, NSHIFT + col );
+               }
+            }
+            char jobz = 'V';
+            char uplo = 'U';
+            int info;
+            int size = max( 3 * NROTATE - 1, NROTATE * NROTATE );
+            dsyev_( &jobz, &uplo, &NROTATE, work1, &NROTATE, work2 + size, work2, &size, &info );
+         }
+
+         // Invert the order (large to small)
+         if ( invert ){
+            for ( int col = 0; col < NROTATE/2; col++ ){
+               for ( int row = 0; row < NROTATE; row++ ){
+                  const double temp = work1[ row + NROTATE * ( NROTATE - 1 - col ) ];
+                  work1[ row + NROTATE * ( NROTATE - 1 - col ) ] = work1[ row + NROTATE * col ];
+                  work1[ row + NROTATE * col ] = temp;
+               }
             }
          }
 
-         // Diagonalize the virtual-virtual block
-         char jobz = 'V';
-         char uplo = 'U';
-         int info;
-         int size = max( 3 * NVIRT - 1, NVIRT * NVIRT );
-         dsyev_( &jobz, &uplo, &NVIRT, work1, &NVIRT, work2 + size, work2, &size, &info );
-
          // Adjust the u-matrix accordingly
-         double * umatrix = Umat->getBlock( irrep ) + NJUMP;
-         for ( int row = 0; row < NVIRT; row++ ){
-            for ( int col = 0; col < NORB; col++ ){
-               work2[ row + NVIRT * col ] = umatrix[ row + NORB * col ];
+         double * umatrix = Umat->getBlock( irrep ) + NSHIFT;
+         for ( int row = 0; row < NROTATE; row++ ){
+            for ( int col = 0; col < NTOTAL; col++ ){
+               work2[ row + NROTATE * col ] = umatrix[ row + NTOTAL * col ];
             }
          }
          char trans   = 'T';
          char notrans = 'N';
          double one = 1.0;
          double set = 0.0;
-         dgemm_( &trans, &notrans, &NVIRT, &NORB, &NVIRT, &one, work1, &NVIRT, work2, &NVIRT, &set, umatrix, &NORB );
+         dgemm_( &trans, &notrans, &NROTATE, &NTOTAL, &NROTATE, &one, work1, &NROTATE, work2, &NROTATE, &set, umatrix, &NTOTAL );
 
+         // Adjust the 2-RDM accordingly
+         if (( localDMRG2RDM != NULL ) && ( space == 'A' )){
+            int power[] = { 1,
+                            tot_dmrg,
+                            tot_dmrg * tot_dmrg,
+                            tot_dmrg * tot_dmrg * tot_dmrg,
+                            tot_dmrg * tot_dmrg * tot_dmrg * tot_dmrg };
+            for ( int index = 3; index >= 0; index-- ){
+               for ( int cnt = 0; cnt < power[ 3 - index ]; cnt++ ){
+                  double * two_dm_ptr = localDMRG2RDM + power[ index ] * NJUMP + power[ index + 1 ] * cnt;
+                  dgemm_( &notrans, &notrans, power + index, &NROTATE, &NROTATE, &one, two_dm_ptr, power + index, work1, &NROTATE, &set, work2, power + index );
+                  int size = power[ index ] * NROTATE;
+                  int inc1 = 1;
+                  dcopy_( &size, work2, &inc1, two_dm_ptr, &inc1 );
+               }
+            }
+         }
       }
    }
 

@@ -112,6 +112,14 @@ int * CheMPS2::DMRGSCFindices::getIrrepOfEachDMRGorbital(){ return irrepOfEachDM
 
 int CheMPS2::DMRGSCFindices::getOrbitalIrrep(const int index) const{ return irrepOfEachOrbital[index]; }
 
+int CheMPS2::DMRGSCFindices::getNOCCsum() const{
+
+   int total = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ total += getNOCC( irrep ); }
+   return total;
+
+}
+
 void CheMPS2::DMRGSCFindices::Print() const{
 
    cout << "NORB  = [ ";

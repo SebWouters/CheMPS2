@@ -40,6 +40,9 @@ using std::max;
 
 double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
 
+   const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
+   assert( num_elec >= 0 );
+
    //Convergence variables
    double gradNorm = 1.0;
    double updateNorm = 1.0;
@@ -51,9 +54,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
    
    //The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
-   int N = Nelectrons;
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ N -= 2*iHandler->getNOCC(irrep); }
-   Problem * Prob = new Problem(HamDMRG, TwoS, N, Irrep);
+   Problem * Prob = new Problem(HamDMRG, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
    
    //Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
@@ -171,8 +172,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
       
       if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM
       
-         const int nalpha = ( N + TwoS ) / 2;
-         const int nbeta  = ( N - TwoS ) / 2;
+         const int nalpha = ( num_elec + TwoS ) / 2;
+         const int nbeta  = ( num_elec - TwoS ) / 2;
          const double workmem = 1000.0; // 1GB
          const int verbose = 2;
          CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamDMRG, nalpha, nbeta, Irrep, workmem, verbose );
@@ -211,18 +212,18 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          }
          
       }
-      setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
-      
+      setDMRG1DM(num_elec, nOrbDMRG, DMRG1DM, DMRG2DM);
+
       //Possibly rotate the active space to the natural orbitals
       if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         calcNOON(iHandler, mem1, mem2, DMRG1DM);
-         rotate2DMand1DM(N, nOrbDMRG, mem1, mem2, DMRG1DM, DMRG2DM);
-         unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
+         copy_active( DMRG1DM, theQmatWORK, iHandler, true );
+         block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM ); // Unitary is updated and DMRG2DM rotated
+         setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
          buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildTmatrix();
          cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
-      
+
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
       if (doBlockWise){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, maxBlockSize); }
@@ -232,7 +233,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
       augmentedHessianNR(theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm);
-   
+
    }
    
    delete [] mem1;
