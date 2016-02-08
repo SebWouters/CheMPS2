@@ -30,6 +30,7 @@ cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
         double Solve()
         void calc2DMandCorrelations()
         void calc_rdms_and_correlations(const bint do_3rdm)
+        void Diag4RDM(double * output, const int ham_orbz, const bint last_case)
         TwoRDM.TwoDM * get2DM()
         ThreeRDM.ThreeDM * get3DM()
         Corr.Correlations * getCorrelations()

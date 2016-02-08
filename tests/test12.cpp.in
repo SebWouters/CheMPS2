@@ -121,16 +121,16 @@ int main(void){
             }
          }
       }
-      double * RDMspace2 = new double[ L*L*L*L*L*L ];
-      theFCI->Diag4RDM( inoutput, RDMspace, ham_orbz, RDMspace2 );
+      double * fci_diag_4rdm = new double[ L*L*L*L*L*L ];
+      theFCI->Diag4RDM( inoutput, RDMspace, ham_orbz, fci_diag_4rdm );
       for (int orb1=0; orb1<L; orb1++){
          for (int orb2=0; orb2<L; orb2++){
             for (int orb3=0; orb3<L; orb3++){
                for (int orb4=0; orb4<L; orb4++){
                   for (int orb5=0; orb5<L; orb5++){
                      for (int orb6=0; orb6<L; orb6++){
-                        const double difference = RDMspace2[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
-                                                - dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
+                        const double difference = fci_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
+                                               - dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
                         RMSerror4DM += difference * difference;
                      }
                   }
@@ -138,7 +138,7 @@ int main(void){
             }
          }
       }
-      delete [] RDMspace2;
+      delete [] fci_diag_4rdm;
       delete [] RDMspace;
       delete [] inoutput;
       delete theFCI;

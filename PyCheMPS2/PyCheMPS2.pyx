@@ -172,6 +172,9 @@ cdef class PyDMRG:
     #Access functions of the ThreeDM class
     def get3DM(self, int i1, int i2, int i3, int i4, int i5, int i6):
         return self.thisptr.get3DM().get_ham_index(i1, i2, i3, i4, i5, i6)
+    def Diag4RDM(self, np.ndarray[double, ndim=1, mode="c"] output not None, unsigned int ham_orbz, bint last_case):
+        assert output.flags['C_CONTIGUOUS']
+        self.thisptr.Diag4RDM(&output[0], ham_orbz, last_case)
     def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None):
         assert alpha.flags['C_CONTIGUOUS']
         assert  beta.flags['C_CONTIGUOUS']
@@ -273,6 +276,11 @@ cdef class PyFCI:
         assert GSvector.flags['C_CONTIGUOUS']
         assert  FourRDM.flags['C_CONTIGUOUS']
         self.thisptr.Fill4RDM(&GSvector[0], &FourRDM[0])
+    def Diag4RDM(self, np.ndarray[double, ndim=1, mode="c"] GSvector not None, np.ndarray[double, ndim=1, mode="c"] ThreeRDM not None, unsigned int ham_orbz, np.ndarray[double, ndim=1, mode="c"] output not None):
+        assert GSvector.flags['C_CONTIGUOUS']
+        assert ThreeRDM.flags['C_CONTIGUOUS']
+        assert   output.flags['C_CONTIGUOUS']
+        self.thisptr.Diag4RDM(&GSvector[0], &ThreeRDM[0], ham_orbz, &output[0])
     def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
         self.thisptr.FillRandom(vecLength, &vector[0])
