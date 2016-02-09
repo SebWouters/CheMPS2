@@ -47,28 +47,20 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
    vector_helper(); // Needs to be called BEFORE make_S**()!
 
-   make_SAA_SCC();
-   make_SDD();
-   make_SEE_SGG();
+   make_AA_CC( true, NULL, 0.0 );
+   make_DD( true, 0.0 );
+   make_EE_GG( true, 0.0 );
    make_SBB_SFF_singlet();
-   make_SBB_SFF_triplet();
+   make_BB_FF_triplet( true, 0.0 );
 
    construct_rhs( oei, ints ); // Needs to be called AFTER make_S**()!
 
    // The following Fock operator constructors need to be called AFTER make_S**()!
-   if ( part4rdm == NULL ){
-      make_FAA_FCC();
-      make_FDD();
-      make_FEE_FGG();
-      make_FBB_FFF_singlet();
-      make_FBB_FFF_triplet();
-   } else {
-      make_diag_FAA_FCC( part4rdm, IPEA );
-      make_diag_FDD( IPEA );
-      make_diag_FEE_FGG( IPEA );
-      make_diag_FBB_FFF_singlet( IPEA );
-      make_diag_FBB_FFF_triplet( IPEA );
-   }
+   make_AA_CC( false, part4rdm, IPEA );
+   make_DD( false, IPEA );
+   make_EE_GG( false, IPEA );
+   make_FBB_FFF_singlet( IPEA );
+   make_BB_FF_triplet( false, IPEA );
 
    make_FAD_FCD();
    make_FEH_FGH();
@@ -5630,45 +5622,50 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
 }
 
-void CheMPS2::CASPT2::make_FAA_FCC(){
+void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, double * part4rdm, const double IPEA ){
 
    /*
-      FAA: < E_zy E_jx ( f_pq E_pq ) E_ti E_uv > = delta_ij * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
+      SAA: < E_zy E_jx | 1 | E_ti E_uv > = delta_ij ( SAA[ Ii ][ xyztuv ] )
+      FAA: < E_zy E_jx | F | E_ti E_uv > = delta_ij ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
 
-            FAA[ Ii ][ xyztuv ] = ( - f_dot_4dm[ ztuyxv ]
-                                    + 2 delta_tx f_dot_3dm[ zuyv ]
-                                    - delta_uy f_dot_3dm[ ztvx ]
-                                    - delta_ux f_dot_3dm[ ztyv ]
-                                    - delta_ty f_dot_3dm[ zuxv ]
-                                    + ( 2 delta_tx delta_uy - delta_ux delta_ty ) f_dot_2dm[ zv ]
-                                    + sum_r SAA[ Ii ][ xyzruv ] f_rt
-                                    + sum_r SAA[ Ii ][ xyztrv ] f_ru
-                                    + sum_s SAA[ Ii ][ syztuv ] f_xs
-                                    + sum_s SAA[ Ii ][ xsztuv ] f_ys
-                                    - f_xt ( 2 * Gamma_{zuyv} + 2 * delta_yu Gamma_{zv} )
-                                    - f_yu (   - Gamma_{ztvx} + 2 * delta_xt Gamma_{zv} )
-                                    - f_yt (   - Gamma_{zuxv} -     delta_xu Gamma_{zv} )
-                                    - f_xu (   - Gamma_{ztyv} -     delta_yt Gamma_{zv} )
-                                  )
+         SAA[ Ii ][ xyztuv ] = ( - Gamma_{ztuyxv}
+                                 + 2 delta_tx Gamma_{zuyv}
+                                 -   delta_uy Gamma_{tzxv}
+                                 -   delta_ty Gamma_{zuxv}
+                                 -   delta_ux Gamma_{ztyv}
+                                 + ( 2 delta_tx delta_uy - delta_ux delta_ty ) Gamma_{zv}
+                               )
 
-      FCC: < E_zy E_xb ( f_pq E_pq ) E_at E_uv > = delta_ab * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
+         FAA[ Ii ][ xyztuv ] = ( - f_dot_4dm[ ztuyxv ] + ( f_tt + f_uu + f_xx + f_yy ) SAA[ Ii ][ xyztuv ]
+                                 + 2 delta_tx ( f_dot_3dm[ zuyv ] - f_tt Gamma_{zuyv} )
+                                 -   delta_uy ( f_dot_3dm[ ztvx ] - f_uu Gamma_{ztvx} )
+                                 -   delta_ty ( f_dot_3dm[ zuxv ] - f_tt Gamma_{zuxv} )
+                                 -   delta_ux ( f_dot_3dm[ ztyv ] - f_uu Gamma_{ztyv} )
+                                 + ( 2 delta_tx delta_uy - delta_ux delta_ty ) ( f_dot_2dm[ zv ] - ( f_tt + f_uu ) Gamma_{zv} )
+                               )
 
-            FCC[ Ia ][ xyztuv ] = ( + f_dot_4dm[ zxuytv ]
-                                    + delta_uy f_dot_3dm[ xztv ]
-                                    + delta_xy f_dot_3dm[ zutv ]
-                                    + delta_ut f_dot_3dm[ zxyv ]
-                                    + delta_ut delta_xy f_dot_2dm[ zv ]
-                                    + sum_s f_ys SCC[ Ia ] [ xsztuv ]
-                                    + sum_r f_ru SCC[ Ia ] [ xyztrv ]
-                                    - f_yx ( Gamma_{zutv} + delta_ut Gamma_{zv} )
-                                    - f_tu ( Gamma_{zxyv} + delta_yx Gamma_{zv} )
-                                    - f_yu Gamma_{zxvt}
-                                  )
+      SCC: < E_zy E_xb | 1 | E_at E_uv > = delta_ab ( SCC[ Ia ][ xyztuv ] )
+      FCC: < E_zy E_xb | F | E_at E_uv > = delta_ab ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
 
+         SCC[ Ia ][ xyztuv ] = ( + Gamma_{zxuytv}
+                                 + delta_uy Gamma_{xztv}
+                                 + delta_xy Gamma_{zutv}
+                                 + delta_ut Gamma_{zxyv}
+                                 + delta_ut delta_xy Gamma_{zv}
+                               )
+
+         FCC[ Ia ][ xyztuv ] = ( + f_dot_4dm[ zxuytv ] + ( f_uu + f_yy ) SCC[ Ia ][ xyztuv ]
+                                 + delta_uy ( f_dot_3dm[ xztv ] - f_uu Gamma_{xztv} )
+                                 + delta_xy ( f_dot_3dm[ zutv ] - f_xx Gamma_{zutv} )
+                                 + delta_ut ( f_dot_3dm[ zxyv ] - f_tt Gamma_{zxyv} )
+                                 + delta_ut delta_xy ( f_dot_2dm[ zv ] - ( f_tt + f_xx ) Gamma_{zv} )
+                               )
    */
 
-   FAA = new double*[ num_irreps ];
-   FCC = new double*[ num_irreps ];
+   if ( OVLP ){ SAA = new double*[ num_irreps ];
+                SCC = new double*[ num_irreps ]; }
+   else {       FAA = new double*[ num_irreps ];
+                FCC = new double*[ num_irreps ]; }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
@@ -5676,8 +5673,10 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
 
       assert( size_A[ irrep ] == size_C[ irrep ] ); // At construction
       const int SIZE = size_A[ irrep ];
-      FAA[ irrep ] = new double[ SIZE * SIZE ];
-      FCC[ irrep ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SAA[ irrep ] = new double[ SIZE * SIZE ];
+                   SCC[ irrep ] = new double[ SIZE * SIZE ]; }
+      else {       FAA[ irrep ] = new double[ SIZE * SIZE ];
+                   FCC[ irrep ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
@@ -5704,561 +5703,38 @@ void CheMPS2::CASPT2::make_FAA_FCC(){
                   const int d_z     = indices->getDMRGcumulative( irrep_z );
                   const int num_z   = indices->getNDMRG( irrep_z );
 
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-
-                                    // FAA: - f_dot_4dm[ ztuyxv ]
-                                    double val = - f_dot_4dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ];
-
-                                    // FAA: + sum_r SAA[ Ii ][ xyzruv ] f_rt
-                                    for ( int r = 0; r < num_t; r++ ){
-                                       val += ( fock->get( irrep_t, nocc_t + r, nocc_t + t )
-                                              * SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + r + num_t * ( u + num_u * v ) ) ] );
-                                    }
-
-                                    // FAA: + sum_r SAA[ Ii ][ xyztrv ] f_ru
-                                    for ( int r = 0; r < num_u; r++ ){
-                                       val += ( fock->get( irrep_u, nocc_u + r, nocc_u + u )
-                                              * SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( r + num_u * v ) ) ] );
-                                    }
-
-                                    // FAA: + sum_s SAA[ Ii ][ syztuv ] f_xs
-                                    for ( int s = 0; s < num_x; s++ ){
-                                       val += ( fock->get( irrep_x, nocc_x + x, nocc_x + s )
-                                              * SAA[ irrep ][ jump_row + s + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
-                                    }
-
-                                    // FAA: + sum_s SAA[ Ii ][ xsztuv ] f_ys
-                                    for ( int s = 0; s < num_y; s++ ){
-                                       val += ( fock->get( irrep_y, nocc_y + y, nocc_y + s )
-                                              * SAA[ irrep ][ jump_row + x + num_x * ( s + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
-                                    }
-
-                                    FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] = val;
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-
-                                    // FCC: + f_dot_4dm[ zxuytv ]
-                                    double val = f_dot_4dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ];
-
-                                    // FCC: + sum_s f_ys SCC[ Ia ] [ xsztuv ]
-                                    for ( int s = 0; s < num_y; s++ ){
-                                       val += ( fock->get( irrep_y, nocc_y + y, nocc_y + s )
-                                              * SCC[ irrep ][ jump_row + x + num_x * ( s + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] );
-                                    }
-
-                                    // FCC: + sum_r f_ru SCC[ Ia ] [ xyztrv ]
-                                    for ( int r = 0; r < num_u; r++ ){
-                                       val += ( fock->get( irrep_u, nocc_u + r, nocc_u + u )
-                                              * SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( r + num_u * v ) ) ] );
-                                    }
-
-                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ] = val;
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_x ){ // FAA: + 2 delta_tx f_dot_3dm[ zuyv ]
-                     for ( int xt = 0; xt < num_t; xt++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( u + num_u * v ) ) ]
-                                       += 2 * f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // FAA: - delta_uy f_dot_3dm[ tzxv ]
-                     for ( int uy = 0; uy < num_u; uy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
-                                       -= f_dot_3dm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_y ){ // FAA: - delta_ty f_dot_3dm[ zuxv ]
-                     for ( int ty = 0; ty < num_t; ty++ ){
+                  // SAA: - Gamma_{ztuyxv}
+                  // FAA: - f_dot_4dm[ ztuyxv ] + ( f_tt + f_uu + f_xx + f_yy ) SAA[ Ii ][ xyztuv ]
+                  if ( OVLP ){
+                     for ( int t = 0; t < num_t; t++ ){ 
                         for ( int u = 0; u < num_u; u++ ){
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
-                                       -= f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_x ){ // FAA: - delta_ux f_dot_3dm[ ztyv ]
-                     for ( int ux = 0; ux < num_u; ux++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
-                                       -= f_dot_3dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // FCC: + delta_uy f_dot_3dm[ xztv ]
-                     for ( int uy = 0; uy < num_y; uy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
-                                       += f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_x == irrep_y ){ // FCC: + delta_xy f_dot_3dm[ zutv ]
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                       += f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_t ){ // FCC: + delta_ut f_dot_3dm[ zxyv ]
-                     for ( int ut = 0; ut < num_u; ut++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
-                                       += f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_x == irrep_t ){ // FAA: - 2 * f_xt * Gamma_{zuyv}
-                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           const double f_xt = fock->get( irrep_t, nocc_t + x, nocc_t + t );
-                           for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    for ( int y = 0; y < num_y; y++ ){
-                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                          -= 2 * f_xt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_y == irrep_u ){ // FAA: + f_yu * Gamma_{ztvx}
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double f_yu = fock->get( irrep_u, nocc_u + y, nocc_u + u );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    for ( int x = 0; x < num_x; x++ ){
-                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                          += f_yu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_v + v + LAS * ( d_x + x ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_y == irrep_t ){ // FAA: + f_yt * Gamma_{zuxv}
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           const double f_yt = fock->get( irrep_t, nocc_t + y, nocc_t + t );
-                           for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    for ( int x = 0; x < num_x; x++ ){
-                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                          += f_yt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_x == irrep_u ){ // FAA: + f_xu * Gamma_{ztyv}
-                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double f_xu = fock->get( irrep_u, nocc_u + x, nocc_u + u );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    for ( int y = 0; y < num_y; y++ ){
-                                       FAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                          += f_xu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_x == irrep_y ){ // FCC: - f_yx Gamma_{zutv}
-                    for ( int x = 0; x < num_x; x++ ){
-                        for ( int y = 0; y < num_x; y++ ){
-                           const double f_yx = fock->get( irrep_x, nocc_x + y, nocc_x + x );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int u = 0; u < num_u; u++ ){
-                                 for ( int t = 0; t < num_t; t++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                          -= f_yx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_u ){ // FCC: - f_tu Gamma_{zxyv}
-                     for ( int t = 0; t < num_t; t++ ){
-                        for ( int u = 0; u < num_t; u++ ){
-                           const double f_tu = fock->get( irrep_t, nocc_t + t, nocc_t + u );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
-                                    for ( int x = 0; x < num_x; x++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_t * v ) ) ]
-                                          -= f_tu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ) ) ) ];
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
+                                       SAA[ irrep ][ ptr ] = - three_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ];
                                     }
                                  }
                               }
                            }
                         }
                      }
-                  }
-
-                  if ( irrep_y == irrep_u ){ // FCC: - f_yu Gamma_{zxvt}
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int u = 0; u < num_y; u++ ){
-                           const double f_yu = fock->get( irrep_y, nocc_y + y, nocc_y + u );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int t = 0; t < num_t; t++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    for ( int x = 0; x < num_x; x++ ){
-                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_y * v ) ) ]
-                                          -= f_yu * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_v + v + LAS * ( d_t + t ) ) ) ];
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){
-
-                     // FAA: + 2 delta_tx delta_uy f_dot_2dm[ zv ]
-                     for ( int xt = 0; xt < num_t; xt++ ){
-                        for ( int uy = 0; uy < num_u; uy++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
-                                    += 2 * f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
-                              }
-                           }
-                        }
-                     }
-
-                     // FAA: - 2 * f_xt * delta_yu Gamma_{zv}
-                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           const double f_xt = fock->get( irrep_t, nocc_t + x, nocc_t + t );
-                           for ( int uy = 0; uy < num_y; uy++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
-                                       -= 2 * f_xt * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-
-                     // FAA: - 2 * f_yu * delta_xt Gamma_{zv}
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double f_yu = fock->get( irrep_u, nocc_u + y, nocc_u + u );
-                           for ( int xt = 0; xt < num_x; xt++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_x * ( u + num_u * v ) ) ]
-                                       -= 2 * f_yu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
-
-                     // FAA: - delta_ux delta_ty f_dot_2dm[ zv ]
-                     for ( int ty = 0; ty < num_t; ty++ ){
-                        for ( int ux = 0; ux < num_u; ux++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
-                                    -= f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
-                              }
-                           }
-                        }
-                     }
-
-                     // FAA: + f_xu * delta_yt * Gamma_{zv}
-                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double f_xu = fock->get( irrep_u, nocc_u + x, nocc_u + u );
-                           for ( int yt = 0; yt < num_y; yt++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( yt + num_y * z ) + SIZE * ( jump_col + yt + num_y * ( u + num_u * v ) ) ]
-                                       += f_xu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-
-                     // FAA: + f_yt * delta_xu * Gamma_{zv}
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           const double f_yt = fock->get( irrep_t, nocc_t + y, nocc_t + t );
-                           for ( int xu = 0; xu < num_x; xu++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + xu + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( xu + num_x * v ) ) ]
-                                       += f_yt * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){
-
-                     // FCC: + delta_ut delta_xy f_dot_2dm[ zv ]
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        for ( int tu = 0; tu < num_t; tu++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
-                                    += f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ];
-                              }
-                           }
-                        }
-                     }
-
-                     // FCC: - f_tu delta_yx Gamma_{zv}
+                  } else {
                      for ( int t = 0; t < num_t; t++ ){
-                        for ( int u = 0; u < num_t; u++ ){
-                           const double f_tu = fock->get( irrep_t, nocc_t + t, nocc_t + u );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 for ( int xy = 0; xy < num_x; xy++ ){
-                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_t * v ) ) ]
-                                       -= f_tu * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-
-                     // FCC: - f_yx delta_ut Gamma_{zv}
-                     for ( int x = 0; x < num_x; x++ ){
-                        for ( int y = 0; y < num_x; y++ ){
-                           const double f_yx = fock->get( irrep_x, nocc_x + y, nocc_x + x );
-                           for ( int ut = 0; ut < num_u; ut++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_x * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
-                                       -= f_yx * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y * num_z;
-               }
-            }
-            jump_col += num_t * num_u * num_v;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_diag_FAA_FCC( double * part4rdm, const double IPEA ){
-
-   FAA = new double*[ num_irreps ];
-   FCC = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      assert( size_A[ irrep ] == size_C[ irrep ] ); // At construction
-      const int SIZE = size_A[ irrep ];
-      FAA[ irrep ] = new double[ SIZE * SIZE ];
-      FCC[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int d_t    = indices->getDMRGcumulative( irrep_t );
-         const int num_t  = indices->getNDMRG( irrep_t );
-         const int nocc_t = indices->getNOCC( irrep_t );
-         for ( int irrep_u = 0; irrep_u < num_irreps; irrep_u++ ){
-            const int d_u     = indices->getDMRGcumulative( irrep_u );
-            const int num_u   = indices->getNDMRG( irrep_u );
-            const int nocc_u  = indices->getNOCC( irrep_u );
-            const int irrep_v = Irreps::directProd( Irreps::directProd( irrep, irrep_t ), irrep_u );
-            const int d_v     = indices->getDMRGcumulative( irrep_v );
-            const int num_v   = indices->getNDMRG( irrep_v );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int d_x    = indices->getDMRGcumulative( irrep_x );
-               const int num_x  = indices->getNDMRG( irrep_x );
-               const int nocc_x = indices->getNOCC( irrep_x );
-               for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                  const int d_y     = indices->getDMRGcumulative( irrep_y );
-                  const int num_y   = indices->getNDMRG( irrep_y );
-                  const int nocc_y  = indices->getNOCC( irrep_y );
-                  const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
-                  const int d_z     = indices->getDMRGcumulative( irrep_z );
-                  const int num_z   = indices->getNDMRG( irrep_z );
-
-                  // FAA: - f_dot_4dm[ ztuyxv ] + ( f_tt + f_uu + f_xx + f_yy ) * SAA[ xyztuv ]
-                  for ( int t = 0; t < num_t; t++ ){
-                     const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
-                     for ( int u = 0; u < num_u; u++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
-                              for ( int y = 0; y < num_y; y++ ){
-                                 const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-                                 for ( int z = 0; z < num_z; z++ ){
-
-                                    const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
-                                    FAA[ irrep ][ ptr ] = ( - f_dot_4dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ]
-                                                            + ( f_tt + f_uu + f_xx + f_yy ) * SAA[ irrep ][ ptr ] );
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  // FCC: + f_dot_4dm[ zxuytv ] + ( f_uu + f_yy ) * SCC[ xyztuv ]
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-                                 for ( int z = 0; z < num_z; z++ ){
-
-                                    const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
-                                    FCC[ irrep ][ ptr ] = ( + f_dot_4dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ]
-                                                            + ( f_yy + f_uu ) * SCC[ irrep ][ ptr ] );
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_x ){ // FAA: + 2 delta_tx ( f_dot_3dm[ zuyv ] - f_xt * Gamma_{zuyv} )
-                     for ( int tx = 0; tx < num_t; tx++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + tx, nocc_t + tx );
+                        const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
                         for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + tx + num_x * ( y + num_y * z ) + SIZE * ( jump_col + tx + num_t * ( u + num_u * v ) ) ]
-                                       += 2 * ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
-                                         - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // FAA: - delta_uy ( f_dot_3dm[ tzxv ] - f_yu * Gamma_{ztvx} )
-                     for ( int uy = 0; uy < num_u; uy++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
-                        for ( int t = 0; t < num_t; t++ ){
+                           const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
-                                       -= ( f_dot_3dm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
-                                     - f_uu * two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
+                                 const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
+                                       FAA[ irrep ][ ptr ] = - f_dot_4dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ]
+                                                             + ( f_tt + f_uu + f_xx + f_yy ) * SAA[ irrep ][ ptr ];
+                                    }
                                  }
                               }
                            }
@@ -6266,50 +5742,36 @@ void CheMPS2::CASPT2::make_diag_FAA_FCC( double * part4rdm, const double IPEA ){
                      }
                   }
 
-                  if ( irrep_t == irrep_y ){ // FAA: - delta_ty ( f_dot_3dm[ zuxv ] - f_yt * Gamma_{zuxv} )
-                     for ( int ty = 0; ty < num_t; ty++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
+                  // SCC: + Gamma_{zxuytv}
+                  // FCC: + f_dot_4dm[ zxuytv ] + ( f_uu + f_yy ) SCC[ Ia ][ xyztuv ]
+                  if ( OVLP ){
+                     for ( int t = 0; t < num_t; t++ ){
                         for ( int u = 0; u < num_u; u++ ){
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
-                                       -= ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
-                                     - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
+                                       SCC[ irrep ][ ptr ] = three_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ];
+                                    }
                                  }
                               }
                            }
                         }
                      }
-                  }
-
-                  if ( irrep_u == irrep_x ){ // FAA: - delta_ux ( f_dot_3dm[ ztyv ] - f_xu * Gamma_{ztyv} )
-                     for ( int ux = 0; ux < num_u; ux++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
-                                       -= ( f_dot_3dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
-                                     - f_uu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // FCC: + delta_uy ( f_dot_3dm[ xztv ] - f_yu Gamma_{zxvt} )
-                     for ( int uy = 0; uy < num_y; uy++ ){
-                        const double f_uu = fock->get( irrep_y, nocc_y + uy, nocc_y + uy );
-                        for ( int t = 0; t < num_t; t++ ){
+                  } else {
+                     for ( int t = 0; t < num_t; t++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
-                                       += ( f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
-                                     - f_uu * two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
+                                       FCC[ irrep ][ ptr ] = f_dot_4dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ]
+                                                           + ( f_yy + f_uu ) * SCC[ irrep ][ ptr ];
+                                    }
                                  }
                               }
                            }
@@ -6317,16 +5779,33 @@ void CheMPS2::CASPT2::make_diag_FAA_FCC( double * part4rdm, const double IPEA ){
                      }
                   }
 
-                  if ( irrep_x == irrep_y ){ // FCC: + delta_xy ( f_dot_3dm[ zutv ] - f_yx Gamma_{zutv} )
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
-                        for ( int t = 0; t < num_t; t++ ){
+                  // SAA: + 2 delta_tx Gamma_{zuyv}
+                  // FAA: + 2 delta_tx ( f_dot_3dm[ zuyv ] - f_tt Gamma_{zuyv} )
+                  if ( irrep_t == irrep_x ){
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_t; xt++ ){
                            for ( int u = 0; u < num_u; u++ ){
                               for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                       += ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
-                                     - f_xx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( u + num_u * v ) ) ]
+                                          += 2 * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int tx = 0; tx < num_t; tx++ ){
+                           const double f_tt = fock->get( irrep_t, nocc_t + tx, nocc_t + tx );
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FAA[ irrep ][ jump_row + tx + num_x * ( y + num_y * z ) + SIZE * ( jump_col + tx + num_t * ( u + num_u * v ) ) ]
+                                          += 2 * ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
+                                            - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
+                                    }
                                  }
                               }
                            }
@@ -6334,145 +5813,33 @@ void CheMPS2::CASPT2::make_diag_FAA_FCC( double * part4rdm, const double IPEA ){
                      }
                   }
 
-                  if ( irrep_u == irrep_t ){ // FCC: + delta_ut ( f_dot_3dm[ zxyv ] - f_tu Gamma_{zxyv} )
-                     for ( int ut = 0; ut < num_u; ut++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + ut, nocc_t + ut );
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
-                                       += ( f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
-                                     - f_tt * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
+                  // SAA: - delta_uy Gamma_{ztvx}
+                  // FAA: - delta_uy ( f_dot_3dm[ ztvx ] - f_uu Gamma_{ztvx} )
+                  if ( irrep_u == irrep_y ){
+                     if ( OVLP ){
+                        for ( int uy = 0; uy < num_u; uy++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                          -= two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
+                                    }
                                  }
                               }
                            }
                         }
-                     }
-                  }
-
-                  // FAA: + 2 delta_tx delta_uy ( f_dot_2dm[ zv ] - f_xt Gamma_{zv} - f_yu Gamma_{zv} )
-                  if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){
-                     for ( int xt = 0; xt < num_t; xt++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
+                     } else {
                         for ( int uy = 0; uy < num_u; uy++ ){
                            const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
-                                    += 2 * ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  // FAA: - delta_ux delta_ty ( f_dot_2dm[ zv ] - f_xu Gamma_{zv} - f_yt Gamma_{zv} )
-                  if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
-                     for ( int ty = 0; ty < num_t; ty++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
-                        for ( int ux = 0; ux < num_u; ux++ ){
-                           const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
-                                    -= ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  // FCC: + delta_ut delta_xy ( f_dot_2dm[ zv ] - f_tu Gamma_{zv} - f_yx Gamma_{zv} )
-                  if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
-                        for ( int tu = 0; tu < num_t; tu++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + tu, nocc_t + tu );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
-                                    += ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_xx ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
-                              }
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y * num_z;
-               }
-            }
-            jump_col += num_t * num_u * num_v;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_SAA_SCC(){
-
-   /*
-      SAA: < E_zy E_jx E_ti E_uv > = delta_ij SAA[ Ii ][ xyztuv ]
-
-            SAA[ Ii ][ xyztuv ] = ( + 2 delta_tx Gamma_{zuyv}
-                                    + 2 delta_tx delta_uy Gamma_{zv}
-                                    - Gamma_{ztuyxv}
-                                    - delta_uy Gamma_{tzxv}
-                                    - delta_ty Gamma_{zuxv}
-                                    - delta_ux Gamma_{ztyv}
-                                    - delta_ux delta_ty Gamma_{zv}
-                                  )
-
-      SCC: < E_zy E_xb E_at E_uv > = delta_ab SCC[ Ia ][ xyztuv ]
-
-            SCC[ Ia ][ xyztuv ] = ( + Gamma_{zxuytv}
-                                    + delta_uy Gamma_{xztv}
-                                    + delta_xy Gamma_{zutv}
-                                    + delta_ut Gamma_{zxyv}
-                                    + delta_ut delta_xy Gamma_{zv}
-                                  )
-   */
-
-   SAA = new double*[ num_irreps ];
-   SCC = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      assert( size_A[ irrep ] == size_C[ irrep ] ); // At construction
-      const int SIZE = size_A[ irrep ];
-      SAA[ irrep ] = new double[ SIZE * SIZE ];
-      SCC[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int d_t   = indices->getDMRGcumulative( irrep_t );
-         const int num_t = indices->getNDMRG( irrep_t );
-         for ( int irrep_u = 0; irrep_u < num_irreps; irrep_u++ ){
-            const int d_u     = indices->getDMRGcumulative( irrep_u );
-            const int num_u   = indices->getNDMRG( irrep_u );
-            const int irrep_v = Irreps::directProd( Irreps::directProd( irrep, irrep_t ), irrep_u );
-            const int d_v     = indices->getDMRGcumulative( irrep_v );
-            const int num_v   = indices->getNDMRG( irrep_v );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int d_x   = indices->getDMRGcumulative( irrep_x );
-               const int num_x = indices->getNDMRG( irrep_x );
-               for ( int irrep_y = 0; irrep_y < num_irreps; irrep_y++ ){
-                  const int d_y     = indices->getDMRGcumulative( irrep_y );
-                  const int num_y   = indices->getNDMRG( irrep_y );
-                  const int irrep_z = Irreps::directProd( Irreps::directProd( irrep, irrep_x ), irrep_y );
-                  const int d_z     = indices->getDMRGcumulative( irrep_z );
-                  const int num_z   = indices->getNDMRG( irrep_z );
-
-                  for ( int t = 0; t < num_t; t++ ){ // SAA: - Gamma_{ztuyxv}
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SAA[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                       = - three_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ];
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                          -= ( f_dot_3dm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
+                                        - f_uu * two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
+                                    }
                                  }
                               }
                            }
@@ -6480,104 +5847,33 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                      }
                   }
 
-                  for ( int t = 0; t < num_t; t++ ){ // SCC: + Gamma_{zxuytv}
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                       = three_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_x ){ // SAA: + 2 delta_tx Gamma_{zuyv}
-                     for ( int xt = 0; xt < num_t; xt++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( u + num_u * v ) ) ]
-                                       += 2 * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // SAA: - delta_uy Gamma_{tzxv}
-                     for ( int uy = 0; uy < num_u; uy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
-                                       -= two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_t == irrep_y ){ // SAA: - delta_ty Gamma_{zuxv}
-                     for ( int ty = 0; ty < num_t; ty++ ){
-                        for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
-                                       -= two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_x ){ // SAA: - delta_ux Gamma_{ztyv}
-                     for ( int ux = 0; ux < num_u; ux++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
-                                       -= two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_u == irrep_y ){ // SCC: + delta_uy Gamma_{xztv}
-                     for ( int uy = 0; uy < num_u; uy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
-                                       += two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if ( irrep_x == irrep_y ){ // SCC: + delta_xy Gamma_{zutv}
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        for ( int t = 0; t < num_t; t++ ){
+                  // SAA: - delta_ty Gamma_{zuxv}
+                  // FAA: - delta_ty ( f_dot_3dm[ zuxv ] - f_tt Gamma_{zuxv} )
+                  if ( irrep_t == irrep_y ){
+                     if ( OVLP ){
+                        for ( int ty = 0; ty < num_t; ty++ ){
                            for ( int u = 0; u < num_u; u++ ){
                               for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
-                                       += two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
+                                          -= two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int ty = 0; ty < num_t; ty++ ){
+                           const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
+                                          -= ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
+                                        - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
+                                    }
                                  }
                               }
                            }
@@ -6585,54 +5881,226 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
                      }
                   }
 
-                  if ( irrep_u == irrep_t ){ // SCC: + delta_ut Gamma_{zxyv}
-                     for ( int ut = 0; ut < num_u; ut++ ){
-                        for ( int v = 0; v < num_v; v++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
-                                    SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_t * ( ut + num_u * v ) ) ]
-                                       += two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){ // SAA: + 2 delta_tx delta_uy Gamma_{zv}
-                     for ( int xt = 0; xt < num_t; xt++ ){
-                        for ( int uy = 0; uy < num_u; uy++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 SAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
-                                    += 2 * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
-                              }
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){ // SAA: - delta_ux delta_ty Gamma_{zv}
-                     for ( int ty = 0; ty < num_t; ty++ ){
+                  // SAA: - delta_ux Gamma_{ztyv}
+                  // FAA: - delta_ux ( f_dot_3dm[ ztyv ] - f_uu Gamma_{ztyv} )
+                  if ( irrep_u == irrep_x ){
+                     if ( OVLP ){
                         for ( int ux = 0; ux < num_u; ux++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 SAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
-                                    -= one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
+                                          -= two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int ux = 0; ux < num_u; ux++ ){
+                           const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
+                                          -= ( f_dot_3dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
+                                        - f_uu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
+                                    }
+                                 }
                               }
                            }
                         }
                      }
                   }
 
-                  if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){ // SCC: + delta_ut delta_xy Gamma_{zv}
-                     for ( int xy = 0; xy < num_x; xy++ ){
-                        for ( int tu = 0; tu < num_t; tu++ ){
-                           for ( int v = 0; v < num_z; v++ ){
-                              for ( int z = 0; z < num_z; z++ ){
-                                 SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
-                                    += one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                  // SCC: + delta_uy Gamma_{xztv}
+                  // FCC: + delta_uy ( f_dot_3dm[ xztv ] - f_uu Gamma_{xztv} )
+                  if ( irrep_u == irrep_y ){
+                     if ( OVLP ){
+                        for ( int uy = 0; uy < num_u; uy++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
+                                          += two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int uy = 0; uy < num_y; uy++ ){
+                           const double f_uu = fock->get( irrep_y, nocc_y + uy, nocc_y + uy );
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int x = 0; x < num_x; x++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
+                                          += ( f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
+                                        - f_uu * two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // SCC: + delta_xy Gamma_{zutv}
+                  // FCC: + delta_xy ( f_dot_3dm[ zutv ] - f_xx Gamma_{zutv} )
+                  if ( irrep_x == irrep_y ){
+                     if ( OVLP ){
+                        for ( int xy = 0; xy < num_x; xy++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int u = 0; u < num_u; u++ ){
+                                 for ( int v = 0; v < num_v; v++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          += two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int xy = 0; xy < num_x; xy++ ){
+                           const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int u = 0; u < num_u; u++ ){
+                                 for ( int v = 0; v < num_v; v++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
+                                          += ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
+                                        - f_xx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // SCC: + delta_ut Gamma_{zxyv}
+                  // FCC: + delta_ut ( f_dot_3dm[ zxyv ] - f_tt Gamma_{zxyv} )
+                  if ( irrep_u == irrep_t ){
+                     if ( OVLP ){
+                        for ( int ut = 0; ut < num_u; ut++ ){
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_t * ( ut + num_u * v ) ) ]
+                                          += two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int ut = 0; ut < num_u; ut++ ){
+                           const double f_tt = fock->get( irrep_t, nocc_t + ut, nocc_t + ut );
+                           for ( int v = 0; v < num_v; v++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 for ( int y = 0; y < num_y; y++ ){
+                                    for ( int z = 0; z < num_z; z++ ){
+                                       FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
+                                          += ( f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
+                                        - f_tt * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
+                                    }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // SAA: + 2 delta_tx delta_uy Gamma_{zv}
+                  // FAA: + 2 delta_tx delta_uy ( f_dot_2dm[ zv ] - ( f_tt + f_uu ) Gamma_{zv} )
+                  if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_t; xt++ ){
+                           for ( int uy = 0; uy < num_u; uy++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    SAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
+                                       += 2 * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int xt = 0; xt < num_t; xt++ ){
+                           const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
+                           for ( int uy = 0; uy < num_u; uy++ ){
+                              const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
+                                       += 2 * ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // SAA: - delta_ux delta_ty Gamma_{zv}
+                  // FAA: - delta_ux delta_ty ( f_dot_2dm[ zv ] - ( f_tt + f_uu ) Gamma_{zv} )
+                  if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
+                     if ( OVLP ){
+                        for ( int ty = 0; ty < num_t; ty++ ){
+                           for ( int ux = 0; ux < num_u; ux++ ){
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    SAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
+                                       -= one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int ty = 0; ty < num_t; ty++ ){
+                           const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
+                           for ( int ux = 0; ux < num_u; ux++ ){
+                              const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
+                                       -= ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+
+                  // SCC: + delta_ut delta_xy Gamma_{zv}
+                  // FCC: + delta_ut delta_xy ( f_dot_2dm[ zv ] - ( f_tt + f_xx ) Gamma_{zv} )
+                  if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){
+                     if ( OVLP ){
+                        for ( int xy = 0; xy < num_x; xy++ ){
+                           for ( int tu = 0; tu < num_t; tu++ ){
+                              for ( int v = 0; v < num_z; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
+                                       += one_rdm[ d_z + z + LAS * ( d_v + v ) ];
+                                 }
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int xy = 0; xy < num_x; xy++ ){
+                           const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
+                           for ( int tu = 0; tu < num_t; tu++ ){
+                              const double f_tt = fock->get( irrep_t, nocc_t + tu, nocc_t + tu );
+                              for ( int v = 0; v < num_v; v++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
+                                       += ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_xx ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
+                                 }
                               }
                            }
                         }
@@ -6648,284 +6116,137 @@ void CheMPS2::CASPT2::make_SAA_SCC(){
 
 }
 
-void CheMPS2::CASPT2::make_FDD(){
+void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
 
    /*
-      FDD: < E_yx E_jb ( f_pq E_pq) E_ai E_tu > = delta_ab delta_ij ( FDD[ It x Iu ][ xytu ] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ It x Iu ][ xytu ] )
-
-            FD1D1[ It x Iu ][ xytu ] = ( + sum_w f_xw SD1D1[ It x Iu ][ wytu ]
-                                         + sum_v f_vt SD1D1[ Ix x Iy ][ xyvu ]
-                                         + ( 2 * f_dot_3dm[ ytxu ] + 2 * delta_tx f_dot_2dm[ yu ] )
-                                         - 2 f_xt Gamma_{yu}
-                                       )
-
-            FD2D2[ It x Iu ][ xytu ] = ( + sum_w f_xw SD2D2[ It x Iu ][ wytu ]
-                                         + sum_v f_vt SD2D2[ Ix x Iy ][ xyvu ]
-                                         + (   - f_dot_3dm[ ytux ] + 2 * delta_tx f_dot_2dm[ yu ] )
-                                         - 2 f_xt Gamma_{yu}
-                                       )
-
-            FD1D2[ It x Iu ][ xytu ] = ( + sum_w f_xw SD1D2[ It x Iu ][ wytu ]
-                                         + sum_v f_vt SD1D2[ Ix x Iy ][ xyvu ]
-                                         + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
-                                         + f_xt Gamma_{yu}
-                                       )
-
-            FD2D1[ It x Iu ][ xytu ] = ( + sum_w f_xw SD2D1[ It x Iu ][ wytu ]
-                                         + sum_v f_vt SD2D1[ Ix x Iy ][ xyvu ]
-                                         + (   - f_dot_3dm[ ytxu ]     - delta_tx f_dot_2dm[ yu ] )
-                                         + f_xt Gamma_{yu}
-                                       )
-   */
-
-   FDD = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      const int SIZE   = size_D[ irrep ];
-      const int D2JUMP = SIZE / 2;
-      FDD[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int d_t     = indices->getDMRGcumulative( irrep_t );
-         const int num_t   = indices->getNDMRG( irrep_t );
-         const int nocc_t  = indices->getNOCC( irrep_t );
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         const int d_u     = indices->getDMRGcumulative( irrep_u );
-         const int num_u   = indices->getNDMRG( irrep_u );
-         int jump_row = 0;
-         for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-            const int d_x     = indices->getDMRGcumulative( irrep_x );
-            const int num_x   = indices->getNDMRG( irrep_x );
-            const int nocc_x  = indices->getNOCC( irrep_x );
-            const int irrep_y = Irreps::directProd( irrep, irrep_x );
-            const int d_y     = indices->getDMRGcumulative( irrep_y );
-            const int num_y   = indices->getNDMRG( irrep_y );
-
-            for ( int t = 0; t < num_t; t++ ){
-               for ( int u = 0; u < num_u; u++ ){
-                  for ( int x = 0; x < num_x; x++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-
-                        const double f_3dm_ytxu = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
-                        const double f_3dm_ytux = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
-                        const int ptr = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
-
-                        double valD1D1 = 2 * f_3dm_ytxu;
-                        double valD1D2 =   - f_3dm_ytxu;
-                        double valD2D1 =   - f_3dm_ytxu;
-                        double valD2D2 =   - f_3dm_ytux;
-
-                        for ( int v = 0; v < num_t; v++ ){
-                           const double f_vt = fock->get( irrep_t, nocc_t + v, nocc_t + t );
-                           valD1D1 += f_vt * SDD[ irrep ][ ptr + SIZE * ( v - t )                          ];
-                           valD1D2 += f_vt * SDD[ irrep ][ ptr + SIZE * ( v - t ) +          SIZE * D2JUMP ];
-                           valD2D1 += f_vt * SDD[ irrep ][ ptr + SIZE * ( v - t ) + D2JUMP                 ];
-                           valD2D2 += f_vt * SDD[ irrep ][ ptr + SIZE * ( v - t ) + D2JUMP + SIZE * D2JUMP ];
-                        }
-
-                        for ( int w = 0; w < num_x; w++ ){
-                           const double f_xw = fock->get( irrep_x, nocc_x + x, nocc_x + w );
-                           valD1D1 += f_xw * SDD[ irrep ][ ptr + w - x                          ];
-                           valD1D2 += f_xw * SDD[ irrep ][ ptr + w - x +          SIZE * D2JUMP ];
-                           valD2D1 += f_xw * SDD[ irrep ][ ptr + w - x + D2JUMP                 ];
-                           valD2D2 += f_xw * SDD[ irrep ][ ptr + w - x + D2JUMP + SIZE * D2JUMP ];
-                        }
-
-                        FDD[ irrep ][ ptr                          ] = valD1D1;
-                        FDD[ irrep ][ ptr +          SIZE * D2JUMP ] = valD1D2;
-                        FDD[ irrep ][ ptr + D2JUMP                 ] = valD2D1;
-                        FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] = valD2D2;
-                     }
-                  }
-               }
-            }
-
-            if (( irrep_x == irrep_t ) && ( irrep_y == irrep_u )){
-               for ( int xt = 0; xt < num_x; xt++ ){
-                  for ( int u = 0; u < num_u; u++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-                        const double f_2dm_yu = f_dot_2dm[ d_y + y + LAS * ( d_u + u ) ];
-                        FDD[ irrep ][          jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] += 2 * f_2dm_yu; // FD1D1
-                        FDD[ irrep ][          jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] -=     f_2dm_yu; // FD1D2
-                        FDD[ irrep ][ D2JUMP + jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] -=     f_2dm_yu; // FD2D1
-                        FDD[ irrep ][ D2JUMP + jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] += 2 * f_2dm_yu; // FD2D2
-                     }
-                  }
-               }
-               for ( int t = 0; t < num_t; t++ ){
-                  for ( int u = 0; u < num_u; u++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-                        for ( int x = 0; x < num_x; x++ ){
-                           const double f_xt_gamma_yu = fock->get( irrep_t, nocc_t + x, nocc_t + t ) * one_rdm[ d_y + y + LAS * ( d_u + u ) ];
-                           FDD[ irrep ][          jump_row + x + num_x * y + SIZE * (          jump_col + t + num_x * u ) ] -= 2 * f_xt_gamma_yu; // FD1D1
-                           FDD[ irrep ][          jump_row + x + num_x * y + SIZE * ( D2JUMP + jump_col + t + num_x * u ) ] +=     f_xt_gamma_yu; // FD1D2
-                           FDD[ irrep ][ D2JUMP + jump_row + x + num_x * y + SIZE * (          jump_col + t + num_x * u ) ] +=     f_xt_gamma_yu; // FD2D1
-                           FDD[ irrep ][ D2JUMP + jump_row + x + num_x * y + SIZE * ( D2JUMP + jump_col + t + num_x * u ) ] -= 2 * f_xt_gamma_yu; // FD2D2
-                        }
-                     }
-                  }
-               }
-            }
-            jump_row += num_x * num_y;
-         }
-         jump_col += num_t * num_u;
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_diag_FDD( const double IPEA ){
-
-   FDD = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      const int SIZE   = size_D[ irrep ];
-      const int D2JUMP = SIZE / 2;
-      FDD[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int d_t     = indices->getDMRGcumulative( irrep_t );
-         const int num_t   = indices->getNDMRG( irrep_t );
-         const int nocc_t  = indices->getNOCC( irrep_t );
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         const int d_u     = indices->getDMRGcumulative( irrep_u );
-         const int num_u   = indices->getNDMRG( irrep_u );
-         int jump_row = 0;
-         for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-            const int d_x     = indices->getDMRGcumulative( irrep_x );
-            const int num_x   = indices->getNDMRG( irrep_x );
-            const int nocc_x  = indices->getNOCC( irrep_x );
-            const int irrep_y = Irreps::directProd( irrep, irrep_x );
-            const int d_y     = indices->getDMRGcumulative( irrep_y );
-            const int num_y   = indices->getNDMRG( irrep_y );
-
-            for ( int t = 0; t < num_t; t++ ){
-               const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
-               for ( int u = 0; u < num_u; u++ ){
-                  for ( int x = 0; x < num_x; x++ ){
-                     const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
-                     for ( int y = 0; y < num_y; y++ ){
-
-                        const double f_3dm_ytxu = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
-                        const double f_3dm_ytux = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
-                        const int ptr = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
-                        FDD[ irrep ][ ptr                          ] = 2 * f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr                          ];
-                        FDD[ irrep ][ ptr +          SIZE * D2JUMP ] =   - f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr +          SIZE * D2JUMP ];
-                        FDD[ irrep ][ ptr + D2JUMP                 ] =   - f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr + D2JUMP                 ];
-                        FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] =   - f_3dm_ytux + ( f_xx + f_tt ) * SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ];
-                     }
-                  }
-               }
-            }
-
-            if (( irrep_x == irrep_t ) && ( irrep_y == irrep_u )){
-               for ( int xt = 0; xt < num_x; xt++ ){
-                  const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
-                  for ( int u = 0; u < num_y; u++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-                        const double value = ( f_dot_2dm[ d_y + y + LAS * ( d_y + u ) ]
-                                        - f_tt * one_rdm[ d_y + y + LAS * ( d_y + u ) ] );
-                        FDD[ irrep ][          jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] += 2 * value;
-                        FDD[ irrep ][          jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] -=     value;
-                        FDD[ irrep ][ D2JUMP + jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] -=     value;
-                        FDD[ irrep ][ D2JUMP + jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] += 2 * value;
-                     }
-                  }
-               }
-            }
-            jump_row += num_x * num_y;
-         }
-         jump_col += num_t * num_u;
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_SDD(){
-
-   /*
-      SD1D1: < E_yx E_jb E_ai E_tu > = delta_ab delta_ij SD1D1[ It x Iu ][ xytu ]
+      SDD: < D(bjxy) | 1 | D(aitu) > = delta_ab delta_ij ( SDD[ It x Iu ][ xytu ] )
+      FDD: < D(bjxy) | F | D(aitu) > = delta_ab delta_ij ( FDD[ It x Iu ][ xytu ] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ It x Iu ][ xytu ] )
 
             SD1D1[ It x Iu ][ xytu ] = ( + 2 * Gamma_{ytxu}
                                          + 2 * delta_tx Gamma_{yu}
                                        )
 
-      SD2D2: < E_yb E_jx E_ti E_au > = delta_ab delta_ij SD2D2[ xytu ]
-
-            SD2D2[ It x Iu ][ xytu ] = ( + 2 * delta_tx Gamma_{yu}
-                                         - Gamma_{ytux}
+            FD1D1[ It x Iu ][ xytu ] = ( + 2 * f_dot_3dm[ ytxu ] + ( f_xx + f_tt ) SD1D1[ It x Iu ][ xytu ]
+                                         + 2 * delta_tx ( f_dot_2dm[ yu ] - f_tt Gamma_{yu} )
                                        )
 
-      SD1D2: < E_yx E_jb E_ti E_au > = delta_ab delta_ij SD1D2[ xytu ]
+            SD2D2[ It x Iu ][ xytu ] = ( - Gamma_{ytux}
+                                         + 2 * delta_tx Gamma_{yu}
+                                       )
+
+            FD2D2[ It x Iu ][ xytu ] = ( - f_dot_3dm[ ytux ] + ( f_xx + f_tt ) SD2D2[ It x Iu ][ xytu ]
+                                         + 2 * delta_tx ( f_dot_2dm[ yu ] - f_tt Gamma_{yu} )
+                                       )
 
             SD1D2[ It x Iu ][ xytu ] = ( - Gamma_{ytxu}
                                          - delta_tx Gamma_{yu}
                                        )
 
-      SD2D1: < E_yb E_jx E_ai E_tu > = delta_ab delta_ij SD2D1[ xytu ]
+            FD1D2[ It x Iu ][ xytu ] = ( - f_dot_3dm[ ytxu ] + ( f_xx + f_tt ) SD1D2[ It x Iu ][ xytu ]
+                                         - delta_tx ( f_dot_2dm[ yu ] - f_tt Gamma_{yu} )
+                                       )
 
             SD2D1[ It x Iu ][ xytu ] = ( - Gamma_{ytxu}
                                          - delta_tx Gamma_{yu}
                                        )
+
+            FD2D1[ It x Iu ][ xytu ] = ( - f_dot_3dm[ ytxu ] + ( f_xx + f_tt ) SD2D1[ It x Iu ][ xytu ]
+                                         - delta_tx ( f_dot_2dm[ yu ] - f_tt Gamma_{yu} )
+                                       )
    */
 
-   SDD = new double*[ num_irreps ];
+   if ( OVLP ){ SDD = new double*[ num_irreps ]; }
+   else {       FDD = new double*[ num_irreps ]; }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
-   for ( int irrep_ai = 0; irrep_ai < num_irreps; irrep_ai++ ){
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
-      const int SIZE   = size_D[ irrep_ai ];
+      const int SIZE   = size_D[ irrep ];
       const int D2JUMP = SIZE / 2;
-      SDD[ irrep_ai ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SDD[ irrep ] = new double[ SIZE * SIZE ]; }
+      else {       FDD[ irrep ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int d_t     = indices->getDMRGcumulative( irrep_t );
          const int num_t   = indices->getNDMRG( irrep_t );
-         const int irrep_u = Irreps::directProd( irrep_ai, irrep_t );
+         const int nocc_t  = indices->getNOCC( irrep_t );
+         const int irrep_u = Irreps::directProd( irrep, irrep_t );
          const int d_u     = indices->getDMRGcumulative( irrep_u );
          const int num_u   = indices->getNDMRG( irrep_u );
          int jump_row = 0;
          for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
             const int d_x     = indices->getDMRGcumulative( irrep_x );
             const int num_x   = indices->getNDMRG( irrep_x );
-            const int irrep_y = Irreps::directProd( irrep_ai, irrep_x );
+            const int nocc_x  = indices->getNOCC( irrep_x );
+            const int irrep_y = Irreps::directProd( irrep, irrep_x );
             const int d_y     = indices->getDMRGcumulative( irrep_y );
             const int num_y   = indices->getNDMRG( irrep_y );
 
-            for ( int t = 0; t < num_t; t++ ){
-               for ( int u = 0; u < num_u; u++ ){
-                  for ( int x = 0; x < num_x; x++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-                        const double gamma_ytxu = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
-                        const double gamma_ytux = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
-                        SDD[ irrep_ai ][          jump_row + x + num_x * y + SIZE * (          jump_col + t + num_t * u ) ] = 2 * gamma_ytxu; // SD1D1
-                        SDD[ irrep_ai ][          jump_row + x + num_x * y + SIZE * ( D2JUMP + jump_col + t + num_t * u ) ] =   - gamma_ytxu; // SD1D2
-                        SDD[ irrep_ai ][ D2JUMP + jump_row + x + num_x * y + SIZE * (          jump_col + t + num_t * u ) ] =   - gamma_ytxu; // SD2D1
-                        SDD[ irrep_ai ][ D2JUMP + jump_row + x + num_x * y + SIZE * ( D2JUMP + jump_col + t + num_t * u ) ] =   - gamma_ytux; // SD2D2
+            if ( OVLP ){
+               for ( int t = 0; t < num_t; t++ ){
+                  for ( int u = 0; u < num_u; u++ ){
+                     for ( int x = 0; x < num_x; x++ ){
+                        for ( int y = 0; y < num_y; y++ ){
+                           const double gamma_ytxu = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
+                           const double gamma_ytux = two_rdm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
+                           const int ptr = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
+                           SDD[ irrep ][ ptr                          ] = 2 * gamma_ytxu;
+                           SDD[ irrep ][ ptr +          SIZE * D2JUMP ] =   - gamma_ytxu;
+                           SDD[ irrep ][ ptr + D2JUMP                 ] =   - gamma_ytxu;
+                           SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] =   - gamma_ytux;
+                        }
+                     }
+                  }
+               }
+            } else {
+               for ( int t = 0; t < num_t; t++ ){
+                  const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
+                  for ( int u = 0; u < num_u; u++ ){
+                     for ( int x = 0; x < num_x; x++ ){
+                        const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
+                        for ( int y = 0; y < num_y; y++ ){
+                           const double f_3dm_ytxu = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_x + x + LAS * ( d_u + u ))) ];
+                           const double f_3dm_ytux = f_dot_3dm[ d_y + y + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_x + x ))) ];
+                           const int ptr = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
+                           FDD[ irrep ][ ptr                          ] = 2 * f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr                          ];
+                           FDD[ irrep ][ ptr +          SIZE * D2JUMP ] =   - f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr +          SIZE * D2JUMP ];
+                           FDD[ irrep ][ ptr + D2JUMP                 ] =   - f_3dm_ytxu + ( f_xx + f_tt ) * SDD[ irrep ][ ptr + D2JUMP                 ];
+                           FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] =   - f_3dm_ytux + ( f_xx + f_tt ) * SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ];
+                        }
                      }
                   }
                }
             }
 
             if (( irrep_x == irrep_t ) && ( irrep_y == irrep_u )){
-               for ( int xt = 0; xt < num_x; xt++ ){
-                  for ( int u = 0; u < num_u; u++ ){
-                     for ( int y = 0; y < num_y; y++ ){
-                        const double gamma_yu = one_rdm[ d_y + y + LAS * ( d_u + u ) ];
-                        SDD[ irrep_ai ][          jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] += 2 * gamma_yu; // SD1D1
-                        SDD[ irrep_ai ][          jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] -=     gamma_yu; // SD1D2
-                        SDD[ irrep_ai ][ D2JUMP + jump_row + xt + num_x * y + SIZE * (          jump_col + xt + num_x * u ) ] -=     gamma_yu; // SD2D1
-                        SDD[ irrep_ai ][ D2JUMP + jump_row + xt + num_x * y + SIZE * ( D2JUMP + jump_col + xt + num_x * u ) ] += 2 * gamma_yu; // SD2D2
+               if ( OVLP ){
+                  for ( int xt = 0; xt < num_x; xt++ ){
+                     for ( int u = 0; u < num_y; u++ ){
+                        for ( int y = 0; y < num_y; y++ ){
+                           const double gamma_yu = one_rdm[ d_y + y + LAS * ( d_u + u ) ];
+                           const int ptr = jump_row + xt + num_x * y + SIZE * ( jump_col + xt + num_x * u );
+                           SDD[ irrep ][ ptr                          ] += 2 * gamma_yu;
+                           SDD[ irrep ][ ptr +          SIZE * D2JUMP ] -=     gamma_yu;
+                           SDD[ irrep ][ ptr + D2JUMP                 ] -=     gamma_yu;
+                           SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] += 2 * gamma_yu;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int xt = 0; xt < num_x; xt++ ){
+                     const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
+                     for ( int u = 0; u < num_y; u++ ){
+                        for ( int y = 0; y < num_y; y++ ){
+                           const double val_yu = ( f_dot_2dm[ d_y + y + LAS * ( d_y + u ) ]
+                                            - f_tt * one_rdm[ d_y + y + LAS * ( d_y + u ) ] );
+                           const int ptr = jump_row + xt + num_x * y + SIZE * ( jump_col + xt + num_x * u );
+                           FDD[ irrep ][ ptr                          ] += 2 * val_yu;
+                           FDD[ irrep ][ ptr +          SIZE * D2JUMP ] -=     val_yu;
+                           FDD[ irrep ][ ptr + D2JUMP                 ] -=     val_yu;
+                           FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] += 2 * val_yu;
+                        }
                      }
                   }
                }
@@ -6938,7 +6259,7 @@ void CheMPS2::CASPT2::make_SDD(){
 
 }
 
-void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
+void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
 
    /*
       FBB singlet: < SB_xkyl | ( f_pq E_pq ) | SB_tiuj >
@@ -6949,20 +6270,12 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
 
          FBB_singlet[ Iij ][ xytu ] = ( + f_dot_3dm[ utyx ]
                                         + f_dot_3dm[ tuyx ]
-                                        + 2 delta_uy delta_tx f_dot_1dm
-                                        + 2 delta_ux delta_ty f_dot_1dm
-                                        -   delta_uy f_dot_2dm[ tx ]
-                                        -   delta_tx f_dot_2dm[ uy ]
-                                        -   delta_ux f_dot_2dm[ ty ]
-                                        -   delta_ty f_dot_2dm[ ux ]
-                                        + sum_v f_vu SBB_singlet[ xytv ]
-                                        + sum_v f_vt SBB_singlet[ xyvu ]
-                                        + sum_w f_yw SBB_singlet[ xwtu ]
-                                        + sum_w f_xw SBB_singlet[ wytu ]
-                                        - f_xt ( 2 delta_uy - Gamma_{uy} )
-                                        - f_yu ( 2 delta_tx - Gamma_{tx} )
-                                        - f_xu ( 2 delta_ty - Gamma_{ty} )
-                                        - f_yt ( 2 delta_ux - Gamma_{ux} )
+                                        + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
+                                        + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - f_tt - f_uu )
+                                        -   delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                                        -   delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                                        -   delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
+                                        -   delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
                                       )
 
          FFF_singlet[ Iab ][ xytu ] = ( + f_dot_3dm[ yxut ]
@@ -6994,287 +6307,8 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet(){
             const int nocc_xy = indices->getNOCC( irrep_xy );
             const int shift   = jump_row + SIZE * jump_col;
 
-            for ( int t = 0; t < num_ut; t++ ){
-               for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
-                  for ( int x = 0; x < num_xy; x++ ){
-                     for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-
-                        // + f_dot_3dm_{utyx} + f_dot_3dm_{utxy}
-                        const double fdotsum = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                               + f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-
-                        double sbb_value = fdotsum;
-
-                        // FBB: + sum_v f_vu SBB_singlet[ xytv ] = + sum_(v>=t) f_vu SBB_singlet[ xytv ] + sum_(v<t) f_vu SBB_singlet[ xyvt ]
-                        for ( int v = 0; v < t; v++ ){
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( t * ( t + 1 ) ) / 2 ) ] );
-                        }
-                        for ( int v = t; v < num_ut; v++ ){
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( v * ( v + 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_v f_vt SBB_singlet[ xyvu ] = + sum_(v<u) f_vt SBB_singlet[ xyvu ] + sum_(v>=u) f_vt SBB_singlet[ xyuv ]
-                        for ( int v = 0; v < u; v++ ){
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( v + ( u * ( u + 1 ) ) / 2 ) ] );
-                        }
-                        for ( int v = u; v < num_ut; v++ ){
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( u + ( v * ( v + 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_w f_yw SBB_singlet[ xwtu ] = + sum_(w>=x) f_yw SBB_singlet[ xwtu ] + sum_(w<x) f_yw SBB_singlet[ wxtu ]
-                        for ( int w = 0; w < x; w++ ){
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_singlet[ 0 ][ shift + w + ( x * ( x + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
-                        }
-                        for ( int w = x; w < num_xy; w++ ){
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_singlet[ 0 ][ shift + x + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_w f_xw SBB_singlet[ wytu ] = + sum_(w<y) f_xw SBB_singlet[ wytu ] + sum_(w>=y) f_xw SBB_singlet[ ywtu ]
-                        for ( int w = 0; w < y; w++ ){
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_singlet[ 0 ][ shift + w + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
-                        }
-                        for ( int w = y; w < num_xy; w++ ){
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_singlet[ 0 ][ shift + y + ( w * ( w + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] );
-                        }
-
-                        FBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = sbb_value;
-                        FFF_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] = fdotsum;
-                     }
-                  }
-               }
-            }
-
-            if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy and d_ut = d_xy
-
-               // FBB: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) f_dot_1dm --> last term only if x <= y == t <= u or hence all equal
-               for ( int t = 0; t < num_ut; t++ ){
-                  FBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * f_dot_1dm;
-                  for ( int u = t+1; u < num_ut; u++ ){
-                     FBB_singlet[ 0 ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2 * f_dot_1dm;
-                  }
-               }
-
-               // FBB: - delta_uy f_dot_2dm[ tx ]
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
-                     for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
-                        const double val_tx = f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ];
-                        FBB_singlet[ 0 ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= val_tx;
-                     }
-                  }
-               }
-
-               // FBB: - delta_tx f_dot_2dm[ uy ]
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
-                     for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
-                        const double val_uy = f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ];
-                        FBB_singlet[ 0 ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= val_uy;
-                     }
-                  }
-               }
-
-               // FBB: - delta_ux f_dot_2dm[ ty ]
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
-                     for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
-                        const double val_ty = f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ];
-                        FBB_singlet[ 0 ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= val_ty;
-                     }
-                  }
-               }
-
-               // FBB: - delta_ty f_dot_2dm[ ux ]
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
-                     for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
-                        const double val_ux = f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ];
-                        FBB_singlet[ 0 ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= val_ux;
-                     }
-                  }
-               }
-
-               for ( int t = 0; t < num_ut; t++ ){
-                  for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
-                     for ( int x = 0; x < num_ut; x++ ){
-                        for ( int y = x; y < num_ut; y++ ){ // 0 <= x <= y < num_xy == num_ut
-                           const double value = ( fock->get( irrep_ut, nocc_ut + x, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * y ]    // - f_xt ( 2 delta_uy - Gamma_{uy} )
-                                                + fock->get( irrep_ut, nocc_ut + y, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * x ]    // - f_yu ( 2 delta_tx - Gamma_{tx} )
-                                                + fock->get( irrep_ut, nocc_ut + x, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * y ]    // - f_xu ( 2 delta_ty - Gamma_{ty} )
-                                                + fock->get( irrep_ut, nocc_ut + y, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * x ] ); // - f_yt ( 2 delta_ux - Gamma_{ux} )
-                           FBB_singlet[ 0 ][ shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] -= value;
-                        }
-                     }
-                  }
-               }
-            }
-            jump_row += ( num_xy * ( num_xy + 1 ) ) / 2;
-         }
-         jump_col += ( num_ut * ( num_ut + 1 ) ) / 2;
-      }
-   }
-
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
-
-      assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
-      const int SIZE = size_B_singlet[ irrep ];
-      FBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         if ( irrep_t < irrep_u ){
-            const int d_t    = indices->getDMRGcumulative( irrep_t );
-            const int num_t  = indices->getNDMRG( irrep_t );
-            const int nocc_t = indices->getNOCC( irrep_t );
-            const int d_u    = indices->getDMRGcumulative( irrep_u );
-            const int num_u  = indices->getNDMRG( irrep_u );
-            const int nocc_u = indices->getNOCC( irrep_u );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int irrep_y = Irreps::directProd( irrep, irrep_x );
-               if ( irrep_x < irrep_y ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
-                  const int nocc_x = indices->getNOCC( irrep_x );
-                  const int d_y    = indices->getDMRGcumulative( irrep_y );
-                  const int num_y  = indices->getNDMRG( irrep_y );
-                  const int nocc_y = indices->getNOCC( irrep_y );
-                  const int shift  = jump_row + SIZE * jump_col;
-
-                  /*
-                      + 2 delta_ux delta_ty f_dot_1dm
-                      - delta_ux f_dot_2dm[ ty ]
-                      - delta_ty f_dot_2dm[ ux ]
-                      - f_xu ( 2 delta_ty - Gamma_{ty} )
-                      - f_yt ( 2 delta_ux - Gamma_{ux} )
-
-                      Because irrep_x < irrep_y = irrep_t < irrep_u is incompatible with irrep_x == irrep_u, these terms are zero
-                  */
-
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int x = 0; x < num_x; x++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-
-                              // + f_dot_3dm_{utyx} + f_dot_3dm_{utxy}
-                              const double fdotsum = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                     + f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-
-                              double sbb_value = fdotsum;
-
-                              // FBB: + sum_v f_vu SBB_singlet[ xytv ]
-                              for ( int v = 0; v < num_u; v++ ){
-                                 sbb_value += fock->get( irrep_u, nocc_u + v, nocc_u + u ) * SBB_singlet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * v ) ];
-                              }
-
-                              // FBB: + sum_v f_vt SBB_singlet[ xyvu ]
-                              for ( int v = 0; v < num_t; v++ ){
-                                 sbb_value += fock->get( irrep_t, nocc_t + v, nocc_t + t ) * SBB_singlet[ irrep ][ shift + x + num_x * y + SIZE * ( v + num_t * u ) ];
-                              }
-
-                              // FBB: + sum_w f_yw SBB_singlet[ xwtu ]
-                              for ( int w = 0; w < num_y; w++ ){
-                                 sbb_value += fock->get( irrep_y, nocc_y + y, nocc_y + w ) * SBB_singlet[ irrep ][ shift + x + num_x * w + SIZE * ( t + num_t * u ) ];
-                              }
-
-                              // FBB: + sum_w f_xw SBB_singlet[ wytu ]
-                              for ( int w = 0; w < num_x; w++ ){
-                                 sbb_value += fock->get( irrep_x, nocc_x + x, nocc_x + w ) * SBB_singlet[ irrep ][ shift + w + num_x * y + SIZE * ( t + num_t * u ) ];
-                              }
-
-                              FBB_singlet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = sbb_value;
-                              FFF_singlet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = fdotsum;
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
-
-                     // 2 delta_uy delta_tx f_dot_1dm
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           FBB_singlet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 2 * f_dot_1dm;
-                        }
-                     }
-
-                     // - delta_tx f_dot_2dm[ uy ]
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double val_uy = f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ];
-                              FBB_singlet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= val_uy;
-                           }
-                        }
-                     }
-
-                     // - delta_uy f_dot_2dm[ tx ]
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double val_tx = f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ];
-                              FBB_singlet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_t * yu ) ] -= val_tx;
-                           }
-                        }
-                     }
-
-                     for ( int t = 0; t < num_x; t++ ){ // num_t == num_x
-                        for ( int u = 0; u < num_y; u++ ){ // num_u == num_y
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 const double value = ( fock->get( irrep_x, nocc_x + x, nocc_x + t ) * SEE[ irrep_y ][ u + num_y * y ]    // - f_xt ( 2 delta_uy - Gamma_{uy} )
-                                                      + fock->get( irrep_y, nocc_y + y, nocc_y + u ) * SEE[ irrep_x ][ t + num_x * x ] ); // - f_yu ( 2 delta_tx - Gamma_{tx} )
-                                 FBB_singlet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] -= value;
-                              }
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y;
-               }
-            }
-            jump_col += num_t * num_u;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
-
-   FBB_singlet = new double*[ num_irreps ];
-   FFF_singlet = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
-      const int SIZE = size_B_singlet[ 0 ];
-      FBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
-      FFF_singlet[ 0 ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-         const int d_ut    = indices->getDMRGcumulative( irrep_ut );
-         const int num_ut  = indices->getNDMRG( irrep_ut );
-         const int nocc_ut = indices->getNOCC( irrep_ut );
-         int jump_row = 0;
-         for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-            const int d_xy    = indices->getDMRGcumulative( irrep_xy );
-            const int num_xy  = indices->getNDMRG( irrep_xy );
-            const int nocc_xy = indices->getNOCC( irrep_xy );
-            const int shift   = jump_row + SIZE * jump_col;
-
+            // FBB singlet: + f_dot_3dm[ utyx ] + f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
+            // FFF singlet: + f_dot_3dm[ yxut ] + f_dot_3dm[ yxtu ]
             for ( int t = 0; t < num_ut; t++ ){
                const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
                for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
@@ -7297,7 +6331,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
 
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy and d_ut = d_xy
 
-               // FBB: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - ( f_tt + f_uu ) ) --> last term only if x <= y == t <= u or hence all equal
+               // FBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - ( f_tt + f_uu ) ) --> last term only if x <= y == t <= u or hence all equal
                for ( int t = 0; t < num_ut; t++ ){
                   const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
                   FBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * ( f_dot_1dm - 2 * f_tt );
@@ -7307,7 +6341,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                   }
                }
 
-               // FBB: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+               // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
                for ( int uy = 0; uy < num_ut; uy++ ){
                   const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
                   for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
@@ -7319,7 +6353,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                   }
                }
 
-               // FBB: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+               // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                for ( int tx = 0; tx < num_ut; tx++ ){
                   const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
                   for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
@@ -7331,7 +6365,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                   }
                }
 
-               // FBB: - delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
+               // FBB singlet: - delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
                for ( int ux = 0; ux < num_ut; ux++ ){
                   const double f_uu = fock->get( irrep_ut, nocc_ut + ux, nocc_ut + ux );
                   for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
@@ -7343,7 +6377,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                   }
                }
 
-               // FBB: - delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
+               // FBB singlet: - delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
                for ( int ty = 0; ty < num_ut; ty++ ){
                   const double f_tt = fock->get( irrep_ut, nocc_ut + ty, nocc_ut + ty );
                   for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
@@ -7390,6 +6424,8 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                   const int nocc_y = indices->getNOCC( irrep_y );
                   const int shift  = jump_row + SIZE * jump_col;
 
+                  // FBB singlet: + f_dot_3dm[ utyx ] + f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
+                  // FFF singlet: + f_dot_3dm[ yxut ] + f_dot_3dm[ yxtu ]
                   for ( int t = 0; t < num_t; t++ ){
                      const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
                      for ( int u = 0; u < num_u; u++ ){
@@ -7412,7 +6448,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
 
                   if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
 
-                     // 2 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
+                     // FBB singlet: + 2 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
                      for ( int xt = 0; xt < num_x; xt++ ){
                         const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
                         for ( int yu = 0; yu < num_y; yu++ ){
@@ -7421,7 +6457,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                         }
                      }
 
-                     // - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                     // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                      for ( int xt = 0; xt < num_x; xt++ ){
                         const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
                         for ( int u = 0; u < num_y; u++ ){
@@ -7433,7 +6469,7 @@ void CheMPS2::CASPT2::make_diag_FBB_FFF_singlet( const double IPEA ){
                         }
                      }
 
-                     // - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                     // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
                      for ( int yu = 0; yu < num_y; yu++ ){
                         const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
                         for ( int t = 0; t < num_x; t++ ){
@@ -7464,12 +6500,11 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
 
             SBB_singlet[ It x Iu ][ xytu ] = ( + Gamma_{utyx}
                                                + Gamma_{utxy}
-                                               + 2 delta_uy delta_tx
-                                               + 2 delta_ux delta_ty
-                                               -   delta_uy Gamma_{tx}
-                                               -   delta_tx Gamma_{uy}
-                                               -   delta_ux Gamma_{ty}
-                                               -   delta_ty Gamma_{ux}
+                                               + 2 ( delta_uy delta_tx + delta_ux delta_ty )
+                                               - delta_uy Gamma_{tx}
+                                               - delta_tx Gamma_{uy}
+                                               - delta_ux Gamma_{ty}
+                                               - delta_ty Gamma_{ux}
                                              )
 
       SFF singlet: | SF_atbu > = ( E_at E_bu + E_bt E_au ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b and t <= u
@@ -7501,7 +6536,8 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
             const int d_xy   = indices->getDMRGcumulative( irrep_xy );
             const int num_xy = indices->getNDMRG( irrep_xy );
 
-            // Gamma_{utyx} + Gamma_{utxy}
+            // SBB singlet: + Gamma_{utyx} + Gamma_{utxy}
+            // SFF singlet: + Gamma_{yxut} + Gamma_{yxtu}
             for ( int t = 0; t < num_ut; t++ ){
                for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
                   for ( int x = 0; x < num_xy; x++ ){
@@ -7518,7 +6554,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
 
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy
 
-               // + 2 ( delta_uy delta_tx + delta_ux delta_ty ) --> last term only if x <= y = t <= u or hence all equal
+               // SBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) --> last term only if x <= y = t <= u or hence all equal
                for ( int t = 0; t < num_ut; t++ ){
                   SBB_singlet[ 0 ][ jump_row + t + (t*(t+1))/2 + SIZE * ( jump_col + t + (t*(t+1))/2 ) ] += 4.0;
                   for ( int u = t+1; u < num_ut; u++ ){
@@ -7526,7 +6562,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   }
                }
 
-               // - delta_uy Gamma_{tx}
+               // SBB singlet: - delta_uy Gamma_{tx}
                for ( int uy = 0; uy < num_ut; uy++ ){
                   for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
                      for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
@@ -7536,7 +6572,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   }
                }
 
-               // - delta_tx Gamma_{uy}
+               // SBB singlet: - delta_tx Gamma_{uy}
                for ( int tx = 0; tx < num_ut; tx++ ){
                   for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
                      for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
@@ -7546,7 +6582,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   }
                }
 
-               // - delta_ux Gamma_{ty}
+               // SBB singlet: - delta_ux Gamma_{ty}
                for ( int ux = 0; ux < num_ut; ux++ ){
                   for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
                      for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
@@ -7556,7 +6592,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   }
                }
 
-               // - delta_ty Gamma_{ux}
+               // SBB singlet: - delta_ty Gamma_{ux}
                for ( int ty = 0; ty < num_ut; ty++ ){
                   for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
                      for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
@@ -7596,12 +6632,8 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   const int d_y   = indices->getDMRGcumulative( irrep_y );
                   const int num_y = indices->getNDMRG( irrep_y );
 
-                  /*
-                      2 delta_ux delta_ty - delta_ux Gamma_{ty} - delta_ty Gamma_{ux}
-                      Because irrep_x < irrep_y = irrep_t < irrep_u is incompatible with irrep_x == irrep_u, these terms are zero
-                  */
-
-                  // Gamma_{utyx} + Gamma_{utxy}
+                  // SBB singlet: + Gamma_{utyx} + Gamma_{utxy}
+                  // SFF singlet: + Gamma_{yxut} + Gamma_{yxtu}
                   for ( int t = 0; t < num_t; t++ ){
                      for ( int u = 0; u < num_u; u++ ){
                         for ( int x = 0; x < num_x; x++ ){
@@ -7618,14 +6650,14 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
 
                   if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
 
-                     // 2 delta_uy delta_tx
+                     // SBB singlet: + 2 delta_uy delta_tx
                      for ( int xt = 0; xt < num_x; xt++ ){
                         for ( int yu = 0; yu < num_y; yu++ ){
                            SBB_singlet[ irrep ][ jump_row + xt + num_x * yu + SIZE * ( jump_col + xt + num_x * yu ) ] += 2.0;
                         }
                      }
 
-                     // - delta_tx Gamma_{uy}
+                     // SBB singlet: - delta_tx Gamma_{uy}
                      for ( int xt = 0; xt < num_x; xt++ ){
                         for ( int u = 0; u < num_y; u++ ){
                            for ( int y = 0; y < num_y; y++ ){
@@ -7635,7 +6667,7 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                         }
                      }
 
-                     // - delta_uy Gamma_{tx}
+                     // SBB singlet: - delta_uy Gamma_{tx}
                      for ( int yu = 0; yu < num_y; yu++ ){
                         for ( int t = 0; t < num_x; t++ ){
                            for ( int x = 0; x < num_x; x++ ){
@@ -7655,48 +6687,63 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
 
 }
 
-void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
+void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
 
    /*
-      FBB triplet: < TB_xkyl | ( f_pq E_pq ) | TB_tiuj >
-                      = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
+      | TB_tiuj > = ( E_ti E_uj - E_tj E_ui ) / sqrt( 1 + delta_ij ) | 0 >  with  i < j and t < u
 
-      FFF triplet: < TF_cxdy | ( f_pq E_pq ) | TF_atbu >
-                      = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
+      SBB triplet: < TB_xkyl | 1 | TB_tiuj > = 2 delta_ik delta_jl ( SBB_triplet[ Itu ][ xytu ] )
+      FBB triplet: < TB_xkyl | F | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Itu ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Itu ][ xytu ] )
 
-         FBB_triplet[ Iij ][ xytu ] = ( + f_dot_3dm[ utyx ]
-                                        - f_dot_3dm[ tuyx ]
-                                        + 6 delta_uy delta_tx f_dot_1dm
-                                        - 6 delta_ux delta_ty f_dot_1dm
-                                        - 3 delta_uy f_dot_2dm[ tx ]
-                                        - 3 delta_tx f_dot_2dm[ uy ]
-                                        + 3 delta_ux f_dot_2dm[ ty ]
-                                        + 3 delta_ty f_dot_2dm[ ux ]
-                                        + sum_v f_vu SBB_triplet[ xytv ]
-                                        + sum_v f_vt SBB_triplet[ xyvu ]
-                                        + sum_w f_yw SBB_triplet[ xwtu ]
-                                        + sum_w f_xw SBB_triplet[ wytu ]
-                                        - 3 f_xt ( 2 delta_uy - Gamma_{uy} )
-                                        - 3 f_yu ( 2 delta_tx - Gamma_{tx} )
-                                        + 3 f_xu ( 2 delta_ty - Gamma_{ty} )
-                                        + 3 f_yt ( 2 delta_ux - Gamma_{ux} )
-                                      )
+            SBB_triplet[ Itu ][ xytu ] = ( + Gamma_{utyx}
+                                           - Gamma_{utxy}
+                                           + 6 delta_uy delta_tx
+                                           - 6 delta_ux delta_ty
+                                           - 3 delta_uy Gamma_{tx}
+                                           - 3 delta_tx Gamma_{uy}
+                                           + 3 delta_ux Gamma_{ty}
+                                           + 3 delta_ty Gamma_{ux}
+                                         )
 
-         FFF_triplet[ Iab ][ xytu ] = ( + f_dot_3dm[ yxut ]
-                                        - f_dot_3dm[ yxtu ]
-                                      )
+            FBB_triplet[ Itu ][ xytu ] = ( + f_dot_3dm[ utyx ]
+                                           - f_dot_3dm[ tuyx ]
+                                           + ( f_tt + f_uu + f_xx + f_yy ) SBB_triplet[ xytu ]
+                                           + 6 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
+                                           - 6 delta_ux delta_ty ( f_dot_1dm - f_tt - f_uu )
+                                           - 3 delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                                           - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                                           + 3 delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
+                                           + 3 delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
+                                         )
+
+      | TF_atbu > = ( E_at E_bu - E_bt E_au ) / sqrt( 1 + delta_ab ) | 0 >  with  a < b and t < u
+
+      SFF triplet: < TF_cxdy | 1 | TF_atbu > = 2 delta_ac delta_bd ( SFF_triplet[ Itu ][ xytu ] )
+      FFF triplet: < TF_cxdy | F | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Itu ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Itu ][ xytu ] )
+
+            SFF_triplet[ Itu ][ xytu ] = ( + Gamma_{yxut}
+                                           - Gamma_{yxtu}
+                                         )
+
+            FFF_triplet[ Itu ][ xytu ] = ( + f_dot_3dm[ yxut ]
+                                           - f_dot_3dm[ yxtu ]
+                                         )
    */
 
-   FBB_triplet = new double*[ num_irreps ];
-   FFF_triplet = new double*[ num_irreps ];
+   if ( OVLP ){ SBB_triplet = new double*[ num_irreps ];
+                SFF_triplet = new double*[ num_irreps ]; }
+   else {       FBB_triplet = new double*[ num_irreps ];
+                FFF_triplet = new double*[ num_irreps ]; }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
       assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
       const int SIZE = size_B_triplet[ 0 ];
-      FBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
-      FFF_triplet[ 0 ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
+                   SFF_triplet[ 0 ] = new double[ SIZE * SIZE ]; }
+      else {       FBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
+                   FFF_triplet[ 0 ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
@@ -7710,521 +6757,39 @@ void CheMPS2::CASPT2::make_FBB_FFF_triplet(){
             const int nocc_xy = indices->getNOCC( irrep_xy );
             const int shift   = jump_row + SIZE * jump_col;
 
-            for ( int t = 0; t < num_ut; t++ ){
-               for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
-                  for ( int x = 0; x < num_xy; x++ ){
-                     for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-
-                        // + f_dot_3dm_{utyx} - f_dot_3dm_{utxy}
-                        const double fdotdiff = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                                - f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-
-                        double sbb_value = fdotdiff;
-
-                        // FBB: + sum_v f_vu SBB_triplet[ xytv ] = + sum_(v>=t) f_vu SBB_triplet[ xytv ] - sum_(v<t) f_vu SBB_triplet[ xyvt ]
-                        for ( int v = 0; v < t; v++ ){ // Swap ( t <--> u ) --> minus sign
-                           sbb_value -= ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( t * ( t - 1 ) ) / 2 ) ] );
-                        }
-                        for ( int v = t+1; v < num_ut; v++ ){ // Natural replacement --> plus sign
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + u )
-                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( v * ( v - 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_v f_vt SBB_triplet[ xyvu ] = + sum_(v<u) f_vt SBB_triplet[ xyvu ] - sum_(v>=u) f_vt SBB_triplet[ xyuv ]
-                        for ( int v = 0; v < u; v++ ){ // Natural replacement --> plus sign
-                           sbb_value += ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( v + ( u * ( u - 1 ) ) / 2 ) ] );
-                        }
-                        for ( int v = u+1; v < num_ut; v++ ){ // Swap ( t <--> u ) --> minus sign
-                           sbb_value -= ( fock->get( irrep_ut, nocc_ut + v, nocc_ut + t )
-                                        * SBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( u + ( v * ( v - 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_w f_yw SBB_triplet[ xwtu ] = + sum_(w>=x) f_yw SBB_triplet[ xwtu ] - sum_(w<x) f_yw SBB_triplet[ wxtu ]
-                        for ( int w = 0; w < x; w++ ){ // Swap ( x <--> y ) --> minus sign
-                           sbb_value -= ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_triplet[ 0 ][ shift + w + ( x * ( x - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
-                        }
-                        for ( int w = x+1; w < num_xy; w++ ){ // Natural replacement --> plus sign
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + y, nocc_xy + w )
-                                        * SBB_triplet[ 0 ][ shift + x + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
-                        }
-
-                        // FBB: + sum_w f_xw SBB_triplet[ wytu ] = + sum_(w<y) f_xw SBB_triplet[ wytu ] - sum_(w>=y) f_xw SBB_triplet[ ywtu ]
-                        for ( int w = 0; w < y; w++ ){ // Natural replacement --> plus sign
-                           sbb_value += ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_triplet[ 0 ][ shift + w + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
-                        }
-                        for ( int w = y+1; w < num_xy; w++ ){ // Swap ( x <--> y ) --> minus sign
-                           sbb_value -= ( fock->get( irrep_xy, nocc_xy + x, nocc_xy + w )
-                                        * SBB_triplet[ 0 ][ shift + y + ( w * ( w - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] );
-                        }
-
-                        FBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = sbb_value;
-                        FFF_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] = fdotdiff;
-                     }
-                  }
-               }
-            }
-
-            if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy and d_ut = d_xy
-
-               // FBB: + 6 ( delta_uy delta_tx - delta_ux delta_ty ) f_dot_1dm --> last term only if x < y = t < u or NEVER
-               for ( int t = 0; t < num_ut; t++ ){
-                  for ( int u = t+1; u < num_ut; u++ ){
-                     FBB_triplet[ 0 ][ shift + t + ( u * ( u - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] += 6 * f_dot_1dm;
-                  }
-               }
-
-               // FBB: - 3 delta_uy f_dot_2dm[ tx ]
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
-                     for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
-                        const double val_tx = f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ];
-                        FBB_triplet[ 0 ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * val_tx;
-                     }
-                  }
-               }
-
-               // FBB: - 3 delta_tx f_dot_2dm[ uy ]
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
-                     for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
-                        const double val_uy = f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ];
-                        FBB_triplet[ 0 ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * val_uy;
-                     }
-                  }
-               }
-
-               // FBB: + 3 delta_ux f_dot_2dm[ ty ]
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
-                     for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
-                        const double val_ty = f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ];
-                        FBB_triplet[ 0 ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * val_ty;
-                     }
-                  }
-               }
-
-               // FBB: + 3 delta_ty f_dot_2dm[ ux ]
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
-                     for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
-                        const double val_ux = f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ];
-                        FBB_triplet[ 0 ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * val_ux;
-                     }
-                  }
-               }
-
+            // SBB triplet: + Gamma_{utyx} - Gamma_{utxy}
+            // SFF triplet: + Gamma_{yxut} - Gamma_{yxtu}
+            // FBB triplet: + f_dot_3dm[ utyx ] - f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_triplet[ xytu ]
+            // FFF triplet: + f_dot_3dm[ yxut ] - f_dot_3dm[ yxtu ]
+            if ( OVLP ){
                for ( int t = 0; t < num_ut; t++ ){
                   for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
-                     for ( int x = 0; x < num_ut; x++ ){
-                        for ( int y = x+1; y < num_ut; y++ ){ // 0 <= x < y < num_xy == num_ut
-                           const double value = ( fock->get( irrep_ut, nocc_ut + x, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * y ]    // - 3 f_xt ( 2 delta_uy - Gamma_{uy} )
-                                                + fock->get( irrep_ut, nocc_ut + y, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * x ]    // - 3 f_yu ( 2 delta_tx - Gamma_{tx} )
-                                                - fock->get( irrep_ut, nocc_ut + x, nocc_ut + u ) * SEE[ irrep_ut ][ t + num_ut * y ]    // + 3 f_xu ( 2 delta_ty - Gamma_{ty} )
-                                                - fock->get( irrep_ut, nocc_ut + y, nocc_ut + t ) * SEE[ irrep_ut ][ u + num_ut * x ] ); // + 3 f_yt ( 2 delta_ux - Gamma_{ux} )
-                           FBB_triplet[ 0 ][ shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * value;
+                     for ( int x = 0; x < num_xy; x++ ){
+                        for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
+                           const int ptr = shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 );
+                           const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
+                                                - two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
+                           SBB_triplet[ 0 ][ ptr ] = value;
+                           SFF_triplet[ 0 ][ ptr ] = value;
                         }
                      }
                   }
                }
-            }
-            jump_row += ( num_xy * ( num_xy - 1 ) ) / 2;
-         }
-         jump_col += ( num_ut * ( num_ut - 1 ) ) / 2;
-      }
-   }
-
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
-
-      assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
-      const int SIZE = size_B_triplet[ irrep ];
-      FBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         if ( irrep_t < irrep_u ){
-            const int d_t    = indices->getDMRGcumulative( irrep_t );
-            const int num_t  = indices->getNDMRG( irrep_t );
-            const int nocc_t = indices->getNOCC( irrep_t );
-            const int d_u    = indices->getDMRGcumulative( irrep_u );
-            const int num_u  = indices->getNDMRG( irrep_u );
-            const int nocc_u = indices->getNOCC( irrep_u );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int irrep_y = Irreps::directProd( irrep, irrep_x );
-               if ( irrep_x < irrep_y ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
-                  const int nocc_x = indices->getNOCC( irrep_x );
-                  const int d_y    = indices->getDMRGcumulative( irrep_y );
-                  const int num_y  = indices->getNDMRG( irrep_y );
-                  const int nocc_y = indices->getNOCC( irrep_y );
-                  const int shift  = jump_row + SIZE * jump_col;
-
-                  /*
-                      - 6 delta_ux delta_ty f_dot_1dm
-                      + 3 delta_ux f_dot_2dm[ ty ]
-                      + 3 delta_ty f_dot_2dm[ ux ]
-                      + 3 f_xu ( 2 delta_ty - Gamma_{ty} )
-                      + 3 f_yt ( 2 delta_ux - Gamma_{ux} )
-
-                      Because irrep_x < irrep_y = irrep_t < irrep_u is incompatible with irrep_x == irrep_u, these terms are zero
-                  */
-
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int x = 0; x < num_x; x++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-
-                              // + f_dot_3dm_{utyx} - f_dot_3dm_{utxy}
-                              const double fdotdiff = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                      - f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-
-                              double sbb_value = fdotdiff;
-
-                              // FBB: + sum_v f_vu SBB_triplet[ xytv ]
-                              for ( int v = 0; v < num_u; v++ ){
-                                 sbb_value += fock->get( irrep_u, nocc_u + v, nocc_u + u ) * SBB_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * v ) ];
-                              }
-
-                              // FBB: + sum_v f_vt SBB_triplet[ xyvu ]
-                              for ( int v = 0; v < num_t; v++ ){
-                                 sbb_value += fock->get( irrep_t, nocc_t + v, nocc_t + t ) * SBB_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( v + num_t * u ) ];
-                              }
-
-                              // FBB: + sum_w f_yw SBB_triplet[ xwtu ]
-                              for ( int w = 0; w < num_y; w++ ){
-                                 sbb_value += fock->get( irrep_y, nocc_y + y, nocc_y + w ) * SBB_triplet[ irrep ][ shift + x + num_x * w + SIZE * ( t + num_t * u ) ];
-                              }
-
-                              // FBB: + sum_w f_xw SBB_triplet[ wytu ]
-                              for ( int w = 0; w < num_x; w++ ){
-                                 sbb_value += fock->get( irrep_x, nocc_x + x, nocc_x + w ) * SBB_triplet[ irrep ][ shift + w + num_x * y + SIZE * ( t + num_t * u ) ];
-                              }
-
-                              FBB_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = sbb_value;
-                              FFF_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] = fdotdiff;
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
-
-                     // + 6 delta_uy delta_tx f_dot_1dm
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           FBB_triplet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 6 * f_dot_1dm;
-                        }
-                     }
-
-                     // - 3 delta_tx f_dot_2dm[ uy ]
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double val_uy = f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ];
-                              FBB_triplet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= 3 * val_uy;
-                           }
-                        }
-                     }
-
-                     // - 3 delta_uy f_dot_2dm[ tx ]
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double val_tx = f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ];
-                              FBB_triplet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_x * yu ) ] -= 3 * val_tx;
-                           }
-                        }
-                     }
-
-                     for ( int t = 0; t < num_x; t++ ){ // num_t == num_x
-                        for ( int u = 0; u < num_y; u++ ){ // num_u == num_y
-                           for ( int x = 0; x < num_x; x++ ){
-                              for ( int y = 0; y < num_y; y++ ){
-                                 const double value = ( fock->get( irrep_x, nocc_x + x, nocc_x + t ) * SEE[ irrep_y ][ u + num_y * y ]    // - 3 f_xt ( 2 delta_uy - Gamma_{uy} )
-                                                      + fock->get( irrep_y, nocc_y + y, nocc_y + u ) * SEE[ irrep_x ][ t + num_x * x ] ); // - 3 f_yu ( 2 delta_tx - Gamma_{tx} )
-                                 FBB_triplet[ irrep ][ shift + x + num_x * y + SIZE * ( t + num_t * u ) ] -= 3 * value;
-                              }
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y;
-               }
-            }
-            jump_col += num_t * num_u;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_diag_FBB_FFF_triplet( const double IPEA ){
-
-   FBB_triplet = new double*[ num_irreps ];
-   FFF_triplet = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
-      const int SIZE = size_B_triplet[ 0 ];
-      FBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
-      FFF_triplet[ 0 ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-         const int d_ut    = indices->getDMRGcumulative( irrep_ut );
-         const int num_ut  = indices->getNDMRG( irrep_ut );
-         const int nocc_ut = indices->getNOCC( irrep_ut );
-         int jump_row = 0;
-         for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-            const int d_xy    = indices->getDMRGcumulative( irrep_xy );
-            const int num_xy  = indices->getNDMRG( irrep_xy );
-            const int nocc_xy = indices->getNOCC( irrep_xy );
-            const int shift   = jump_row + SIZE * jump_col;
-
-            for ( int t = 0; t < num_ut; t++ ){
-               const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
-               for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
-                  for ( int x = 0; x < num_xy; x++ ){
-                     const double f_xx = fock->get( irrep_xy, nocc_xy + x, nocc_xy + x );
-                     for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-                        const double f_yy = fock->get( irrep_xy, nocc_xy + y, nocc_xy + y );
-
-                        const int ptr = shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 );
-                        const double fdotdiff = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                                - f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-
-                        FBB_triplet[ 0 ][ ptr ] = fdotdiff + ( f_tt + f_uu + f_xx + f_yy ) * SBB_triplet[ 0 ][ ptr ];
-                        FFF_triplet[ 0 ][ ptr ] = fdotdiff;
-                     }
-                  }
-               }
-            }
-
-            if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy and d_ut = d_xy
-
-               // FBB: + 6 ( delta_uy delta_tx - delta_ux delta_ty ) ( f_dot_1dm - f_tt - f_uu ) --> last term only if x < y = t < u or NEVER
+            } else {
                for ( int t = 0; t < num_ut; t++ ){
                   const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
-                  for ( int u = t+1; u < num_ut; u++ ){
+                  for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
                      const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
-                     FBB_triplet[ 0 ][ shift + t + ( u * ( u - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 ) ] += 6 * ( f_dot_1dm - f_tt - f_uu );
-                  }
-               }
-
-               // FBB: - 3 delta_uy ( f_dot_2dm[ tx ] - f_yu Gamma_{tx} )
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
-                  for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
-                     for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
-                        const double val_tx = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ]
-                                         - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + x ) ] );
-                        FBB_triplet[ 0 ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * val_tx;
-                     }
-                  }
-               }
-
-               // FBB: - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
-                  for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
-                     for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
-                        const double val_uy = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ]
-                                         - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + y ) ] );
-                        FBB_triplet[ 0 ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * val_uy;
-                     }
-                  }
-               }
-
-               // FBB: + 3 delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + ux, nocc_ut + ux );
-                  for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
-                     for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
-                        const double val_ty = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ]
-                                         - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + y ) ] );
-                        FBB_triplet[ 0 ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * val_ty;
-                     }
-                  }
-               }
-
-               // FBB: + 3 delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  const double f_tt = fock->get( irrep_ut, nocc_ut + ty, nocc_ut + ty );
-                  for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
-                     for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
-                        const double val_ux = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ]
-                                         - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + x ) ] );
-                        FBB_triplet[ 0 ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * val_ux;
-                     }
-                  }
-               }
-            }
-            jump_row += ( num_xy * ( num_xy - 1 ) ) / 2;
-         }
-         jump_col += ( num_ut * ( num_ut - 1 ) ) / 2;
-      }
-   }
-
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
-
-      assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
-      const int SIZE = size_B_triplet[ irrep ];
-      FBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         if ( irrep_t < irrep_u ){
-            const int d_t    = indices->getDMRGcumulative( irrep_t );
-            const int num_t  = indices->getNDMRG( irrep_t );
-            const int nocc_t = indices->getNOCC( irrep_t );
-            const int d_u    = indices->getDMRGcumulative( irrep_u );
-            const int num_u  = indices->getNDMRG( irrep_u );
-            const int nocc_u = indices->getNOCC( irrep_u );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int irrep_y = Irreps::directProd( irrep, irrep_x );
-               if ( irrep_x < irrep_y ){
-                  const int d_x    = indices->getDMRGcumulative( irrep_x );
-                  const int num_x  = indices->getNDMRG( irrep_x );
-                  const int nocc_x = indices->getNOCC( irrep_x );
-                  const int d_y    = indices->getDMRGcumulative( irrep_y );
-                  const int num_y  = indices->getNDMRG( irrep_y );
-                  const int nocc_y = indices->getNOCC( irrep_y );
-                  const int shift  = jump_row + SIZE * jump_col;
-
-                  for ( int t = 0; t < num_t; t++ ){
-                     const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
-                     for ( int u = 0; u < num_u; u++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                        for ( int x = 0; x < num_x; x++ ){
-                           const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-
-                              const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
-                              const double fdotdiff = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                      - f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-
-                              FBB_triplet[ irrep ][ ptr ] = fdotdiff + ( f_tt + f_uu + f_xx + f_yy ) * SBB_triplet[ irrep ][ ptr ];
-                              FFF_triplet[ irrep ][ ptr ] = fdotdiff;
-                           }
+                     for ( int x = 0; x < num_xy; x++ ){
+                        const double f_xx = fock->get( irrep_xy, nocc_xy + x, nocc_xy + x );
+                        for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
+                           const double f_yy = fock->get( irrep_xy, nocc_xy + y, nocc_xy + y );
+                           const int ptr = shift + x + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( u * ( u - 1 ) ) / 2 );
+                           const double fdotdiff = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
+                                                   - f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
+                           FBB_triplet[ 0 ][ ptr ] = fdotdiff + ( f_tt + f_uu + f_xx + f_yy ) * SBB_triplet[ 0 ][ ptr ];
+                           FFF_triplet[ 0 ][ ptr ] = fdotdiff;
                         }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
-
-                     // + 6 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
-                           FBB_triplet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 6 * ( f_dot_1dm - f_tt - f_uu );
-                        }
-                     }
-
-                     // - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double val_uy = ( f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ]
-                                               - f_tt * one_rdm[ d_u + u + LAS * ( d_u + y ) ] );
-                              FBB_triplet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= 3 * val_uy;
-                           }
-                        }
-                     }
-
-                     // - 3 delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double val_tx = ( f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ]
-                                               - f_uu * one_rdm[ d_t + t + LAS * ( d_t + x ) ] );
-                              FBB_triplet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_x * yu ) ] -= 3 * val_tx;
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y;
-               }
-            }
-            jump_col += num_t * num_u;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
-
-   /*
-      SBB triplet: | TB_tiuj > = ( E_ti E_uj - E_tj E_ui ) / sqrt( 1 + delta_ij ) | 0 >  with  i < j and t < u
-
-            < TB_xkyl | TB_tiuj > = 2 delta_ik delta_jl SBB_triplet[ It x Iu ][ xytu ]
-
-            SBB_triplet[ It x Iu ][ xytu ] = ( + Gamma_{utyx}
-                                               - Gamma_{utxy}
-                                               + 6 delta_uy delta_tx
-                                               - 6 delta_ux delta_ty
-                                               - 3 delta_uy Gamma_{tx}
-                                               - 3 delta_tx Gamma_{uy}
-                                               + 3 delta_ux Gamma_{ty}
-                                               + 3 delta_ty Gamma_{ux}
-                                             )
-
-      SFF triplet: | TF_atbu > = ( E_at E_bu - E_bt E_au ) / sqrt( 1 + delta_ab ) | 0 >  with  a < b and t < u
-
-            < TF_cxdy | TF_atbu > = 2 delta_ac delta_bd SFF_triplet[ It x Iu ][ xytu ]
-
-            SFF_triplet[ It x Iu ][ xytu ] = ( + Gamma_{yxut}
-                                               - Gamma_{yxtu}
-                                             )
-   */
-
-   SBB_triplet = new double*[ num_irreps ];
-   SFF_triplet = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      assert( size_B_triplet[ 0 ] == size_F_triplet[ 0 ] ); // At construction
-      const int SIZE = size_B_triplet[ 0 ];
-      SBB_triplet[ 0 ] = new double[ SIZE * SIZE ];
-      SFF_triplet[ 0 ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-         const int d_ut   = indices->getDMRGcumulative( irrep_ut );
-         const int num_ut = indices->getNDMRG( irrep_ut );
-         int jump_row = 0;
-         for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-            const int d_xy   = indices->getDMRGcumulative( irrep_xy );
-            const int num_xy = indices->getNDMRG( irrep_xy );
-
-            // Gamma_{utyx} - Gamma_{utxy}
-            for ( int t = 0; t < num_ut; t++ ){
-               for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
-                  for ( int x = 0; x < num_xy; x++ ){
-                     for ( int y = x+1; y < num_xy; y++ ){ // 0 <= x < y < num_xy
-                        const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                             - two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-                        const int pointer = jump_row + x + (y*(y-1))/2 + SIZE * ( jump_col + t + (u*(u-1))/2 );
-                        SBB_triplet[ 0 ][ pointer ] = value;
-                        SFF_triplet[ 0 ][ pointer ] = value;
                      }
                   }
                }
@@ -8232,49 +6797,116 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
 
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal --> num_ut == num_xy
 
-               // + 6 ( delta_uy delta_tx - delta_ux delta_ty ) --> last term only if x < y = t < u or NEVER
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  for ( int uy = tx+1; uy < num_ut; uy++ ){
-                     SBB_triplet[ 0 ][ jump_row + tx + (uy*(uy-1))/2 + SIZE * ( jump_col + tx + (uy*(uy-1))/2 ) ] += 6.0;
+               // SBB triplet: + 6 ( delta_uy delta_tx - delta_ux delta_ty )
+               // FBB triplet: + 6 ( delta_uy delta_tx - delta_ux delta_ty ) ( f_dot_1dm - f_tt - f_uu )
+               if ( OVLP ){
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     for ( int uy = tx+1; uy < num_ut; uy++ ){
+                        SBB_triplet[ 0 ][ shift + tx + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( tx + ( uy * ( uy - 1 ) ) / 2 ) ] += 6.0;
+                     }
                   }
-               }
-
-               // - 3 delta_uy Gamma_{tx}
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
-                     for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
-                        const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_xy + x ) ];
-                        SBB_triplet[ 0 ][ jump_row + x + (uy*(uy-1))/2 + SIZE * ( jump_col + t + (uy*(uy-1))/2 ) ] -= 3 * gamma_tx;
+               } else {
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
+                     for ( int uy = tx+1; uy < num_ut; uy++ ){
+                        const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
+                        FBB_triplet[ 0 ][ shift + tx + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( tx + ( uy * ( uy - 1 ) ) / 2 ) ] += 6 * ( f_dot_1dm - f_tt - f_uu );
                      }
                   }
                }
 
-               // - 3 delta_tx Gamma_{uy}
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
-                     for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
-                        const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_xy + y ) ];
-                        SBB_triplet[ 0 ][ jump_row + tx + (y*(y-1))/2 + SIZE * ( jump_col + tx + (u*(u-1))/2 ) ] -= 3 * gamma_uy;
+               // SBB triplet: - 3 delta_uy ( Gamma_{tx} )
+               // FBB triplet: - 3 delta_uy ( f_dot_2dm[ tx ] - f_yu Gamma_{tx} )
+               if ( OVLP ){
+                  for ( int uy = 0; uy < num_ut; uy++ ){
+                     for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
+                        for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
+                           const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_xy + x ) ];
+                           SBB_triplet[ 0 ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * gamma_tx;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int uy = 0; uy < num_ut; uy++ ){
+                     const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
+                     for ( int t = 0; t < uy; t++ ){ // 0 <= t < uy < num_ut
+                        for ( int x = 0; x < uy; x++ ){ // 0 <= x < uy < num_ut
+                           const double val_tx = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ]
+                                            - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + x ) ] );
+                           FBB_triplet[ 0 ][ shift + x + ( uy * ( uy - 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy - 1 ) ) / 2 ) ] -= 3 * val_tx;
+                        }
                      }
                   }
                }
 
-               // + 3 delta_ux Gamma_{ty}
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
-                     for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
-                        const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_xy + y ) ];
-                        SBB_triplet[ 0 ][ jump_row + ux + (y*(y-1))/2 + SIZE * ( jump_col + t + (ux*(ux-1))/2 ) ] += 3 * gamma_ty;
+               // SBB triplet: - 3 delta_tx ( Gamma_{uy} )
+               // FBB triplet: - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+               if ( OVLP ){
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
+                        for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
+                           const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_xy + y ) ];
+                           SBB_triplet[ 0 ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * gamma_uy;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
+                     for ( int u = tx+1; u < num_ut; u++ ){ // 0 <= tx < u < num_ut
+                        for ( int y = tx+1; y < num_ut; y++ ){ // 0 <= tx < y < num_xy = num_ut
+                           const double val_uy = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ]
+                                            - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + y ) ] );
+                           FBB_triplet[ 0 ][ shift + tx + ( y * ( y - 1 ) ) / 2 + SIZE * ( tx + ( u * ( u - 1 ) ) / 2 ) ] -= 3 * val_uy;
+                        }
                      }
                   }
                }
 
-               // + 3 delta_ty Gamma_{ux}
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
-                     for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
-                        const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_xy + x ) ];
-                        SBB_triplet[ 0 ][ jump_row + x + (ty*(ty-1))/2 + SIZE * ( jump_col + ty + (u*(u-1))/2 ) ] += 3 * gamma_ux;
+               // SBB triplet: + 3 delta_ux ( Gamma_{ty} )
+               // FBB triplet: + 3 delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
+               if ( OVLP ){
+                  for ( int ux = 0; ux < num_ut; ux++ ){
+                     for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
+                        for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
+                           const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_xy + y ) ];
+                           SBB_triplet[ 0 ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * gamma_ty;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int ux = 0; ux < num_ut; ux++ ){
+                     const double f_uu = fock->get( irrep_ut, nocc_ut + ux, nocc_ut + ux );
+                     for ( int t = 0; t < ux; t++ ){ // 0 <= t < ux < num_ut
+                        for ( int y = ux+1; y < num_ut; y++ ){ // 0 <= ux < y < num_xy = num_ut
+                           const double val_ty = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ]
+                                            - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + y ) ] );
+                           FBB_triplet[ 0 ][ shift + ux + ( y * ( y - 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux - 1 ) ) / 2 ) ] += 3 * val_ty;
+                        }
+                     }
+                  }
+               }
+
+               // SBB triplet: + 3 delta_ty ( Gamma_{ux} )
+               // FBB triplet: + 3 delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
+               if ( OVLP ){
+                  for ( int ty = 0; ty < num_ut; ty++ ){
+                     for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
+                        for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
+                           const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_xy + x ) ];
+                           SBB_triplet[ 0 ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * gamma_ux;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int ty = 0; ty < num_ut; ty++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + ty, nocc_ut + ty );
+                     for ( int u = ty+1; u < num_ut; u++ ){ // 0 <= ty < u < num_ut
+                        for ( int x = 0; x < ty; x++ ){ // 0 <= x < ty < num_ut
+                           const double val_ux = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ]
+                                            - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + x ) ] );
+                           FBB_triplet[ 0 ][ shift + x + ( ty * ( ty - 1 ) ) / 2 + SIZE * ( ty + ( u * ( u - 1 ) ) / 2 ) ] += 3 * val_ux;
+                        }
                      }
                   }
                }
@@ -8289,41 +6921,66 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
 
       assert( size_B_triplet[ irrep ] == size_F_triplet[ irrep ] ); // At construction
       const int SIZE = size_B_triplet[ irrep ];
-      SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
-      SFF_triplet[ irrep ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
+                   SFF_triplet[ irrep ] = new double[ SIZE * SIZE ]; }
+      else {       FBB_triplet[ irrep ] = new double[ SIZE * SIZE ];
+                   FFF_triplet[ irrep ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
          const int irrep_u = Irreps::directProd( irrep, irrep_t );
          if ( irrep_t < irrep_u ){
-            const int d_t   = indices->getDMRGcumulative( irrep_t );
-            const int num_t = indices->getNDMRG( irrep_t );
-            const int d_u   = indices->getDMRGcumulative( irrep_u );
-            const int num_u = indices->getNDMRG( irrep_u );
+            const int d_t    = indices->getDMRGcumulative( irrep_t );
+            const int num_t  = indices->getNDMRG( irrep_t );
+            const int nocc_t = indices->getNOCC( irrep_t );
+            const int d_u    = indices->getDMRGcumulative( irrep_u );
+            const int num_u  = indices->getNDMRG( irrep_u );
+            const int nocc_u = indices->getNOCC( irrep_u );
             int jump_row = 0;
             for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
                const int irrep_y = Irreps::directProd( irrep, irrep_x );
                if ( irrep_x < irrep_y ){
-                  const int d_x   = indices->getDMRGcumulative( irrep_x );
-                  const int num_x = indices->getNDMRG( irrep_x );
-                  const int d_y   = indices->getDMRGcumulative( irrep_y );
-                  const int num_y = indices->getNDMRG( irrep_y );
+                  const int d_x    = indices->getDMRGcumulative( irrep_x );
+                  const int num_x  = indices->getNDMRG( irrep_x );
+                  const int nocc_x = indices->getNOCC( irrep_x );
+                  const int d_y    = indices->getDMRGcumulative( irrep_y );
+                  const int num_y  = indices->getNDMRG( irrep_y );
+                  const int nocc_y = indices->getNOCC( irrep_y );
+                  const int shift  = jump_row + SIZE * jump_col;
 
-                  /*
-                      - 6 delta_ux delta_ty + 3 delta_ux Gamma_{ty} + 3 delta_ty Gamma_{ux}
-                      Because irrep_x < irrep_y = irrep_t < irrep_u is incompatible with irrep_x == irrep_u, these terms are zero
-                  */
-
-                  // Gamma_{utyx} - Gamma_{utxy}
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int x = 0; x < num_x; x++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double value = ( two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                   - two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-                              const int pointer = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
-                              SBB_triplet[ irrep ][ pointer ] = value;
-                              SFF_triplet[ irrep ][ pointer ] = value;
+                  // SBB triplet: + Gamma_{utyx} - Gamma_{utxy}
+                  // SFF triplet: + Gamma_{yxut} - Gamma_{yxtu}
+                  // FBB triplet: + f_dot_3dm[ utyx ] - f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_triplet[ xytu ]
+                  // FFF triplet: + f_dot_3dm[ yxut ] - f_dot_3dm[ yxtu ]
+                  if ( OVLP ){
+                     for ( int t = 0; t < num_t; t++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
+                                 const double value = ( two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
+                                                      - two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
+                                 SBB_triplet[ irrep ][ ptr ] = value;
+                                 SFF_triplet[ irrep ][ ptr ] = value;
+                              }
+                           }
+                        }
+                     }
+                  } else {
+                     for ( int t = 0; t < num_t; t++ ){
+                        const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
+                           for ( int x = 0; x < num_x; x++ ){
+                              const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
+                                 const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
+                                 const double fdotdiff = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
+                                                         - f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
+                                 FBB_triplet[ irrep ][ ptr ] = fdotdiff + ( f_tt + f_uu + f_xx + f_yy ) * SBB_triplet[ irrep ][ ptr ];
+                                 FFF_triplet[ irrep ][ ptr ] = fdotdiff;
+                              }
                            }
                         }
                      }
@@ -8331,29 +6988,68 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
 
                   if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // --> num_t == num_x   and   num_u == num_y
 
-                     // + 6 delta_uy delta_tx
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           SBB_triplet[ irrep ][ jump_row + xt + num_x * yu + SIZE * ( jump_col + xt + num_x * yu ) ] += 6.0;
+                     // SBB triplet: + 6 delta_uy delta_tx
+                     // FBB triplet: + 6 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           for ( int yu = 0; yu < num_y; yu++ ){
+                              SBB_triplet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 6.0;
+                           }
                         }
-                     }
-
-                     // - 3 delta_tx Gamma_{uy}
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double gamma_uy = one_rdm[ d_u + u + LAS * ( d_y + y ) ];
-                              SBB_triplet[ irrep ][ jump_row + xt + num_x * y + SIZE * ( jump_col + xt + num_x * u ) ] -= 3 * gamma_uy;
+                     } else {
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
+                           for ( int yu = 0; yu < num_y; yu++ ){
+                              const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
+                              FBB_triplet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 6 * ( f_dot_1dm - f_tt - f_uu );
                            }
                         }
                      }
 
-                     // - 3 delta_uy Gamma_{tx}
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double gamma_tx = one_rdm[ d_t + t + LAS * ( d_x + x ) ];
-                              SBB_triplet[ irrep ][ jump_row + x + num_x * yu + SIZE * ( jump_col + t + num_x * yu ) ] -= 3 * gamma_tx;
+                     // SBB triplet: - 3 delta_tx ( Gamma_{uy} )
+                     // FBB triplet: - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           for ( int u = 0; u < num_y; u++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double gamma_uy = one_rdm[ d_u + u + LAS * ( d_y + y ) ];
+                                 SBB_triplet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= 3 * gamma_uy;
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
+                           for ( int u = 0; u < num_y; u++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double val_uy = ( f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ]
+                                                  - f_tt * one_rdm[ d_u + u + LAS * ( d_u + y ) ] );
+                                 FBB_triplet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= 3 * val_uy;
+                              }
+                           }
+                        }
+                     }
+
+                     // SBB triplet: - 3 delta_uy ( Gamma_{tx} )
+                     // FBB triplet: - 3 delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                     if ( OVLP ){
+                        for ( int yu = 0; yu < num_y; yu++ ){
+                           for ( int t = 0; t < num_x; t++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 const double gamma_tx = one_rdm[ d_t + t + LAS * ( d_x + x ) ];
+                                 SBB_triplet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_x * yu ) ] -= 3 * gamma_tx;
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int yu = 0; yu < num_y; yu++ ){
+                           const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
+                           for ( int t = 0; t < num_x; t++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 const double val_tx = ( f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ]
+                                                  - f_uu * one_rdm[ d_t + t + LAS * ( d_t + x ) ] );
+                                 FBB_triplet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_x * yu ) ] -= 3 * val_tx;
+                              }
                            }
                         }
                      }
@@ -8368,152 +7064,82 @@ void CheMPS2::CASPT2::make_SBB_SFF_triplet(){
 
 }
 
-void CheMPS2::CASPT2::make_FEE_FGG(){
+void CheMPS2::CASPT2::make_EE_GG( const bool OVLP, const double IPEA ){
 
    /*
+      | SE_tiaj > = ( E_ti E_aj + E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <= j
+      | TE_tiaj > = ( E_ti E_aj - E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <  j
 
-      FEE singlet: | SE_tiaj > = ( E_ti E_aj + E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <= j
-      FEE triplet: | TE_tiaj > = ( E_ti E_aj - E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <  j
-
-         < SE_ukbl | f_pq E_pq | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-         < TE_ukbl | f_pq E_pq | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-
-         FEE[ It ][ ut ] = ( + 2 * delta_ut * f_dot_1dm
-                             - f_dot_2dm[ It ][ tu ]
-                             + 2 * f_ut
-                             - sum_v Gamma_uv f_vt
-                             - sum_w f_uw Gamma_wt
-                           )
-
-      FGG singlet: | SG_aibt > = ( E_ai E_bt + E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b
-      FGG triplet: | TG_aibt > = ( E_ai E_bt - E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <  b
-
-         < SG_cjdu | f_pq E_pq | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-         < TG_cjdu | f_pq E_pq | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-
-         FGG[ It ][ ut ] = ( + f_dot_2dm[ It ][ ut ]
-                           )
-   */
-
-   FEE = new double*[ num_irreps ];
-   FGG = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      const int SIZE = indices->getNDMRG( irrep );
-      FEE[ irrep ] = new double[ SIZE * SIZE ];
-      FGG[ irrep ] = new double[ SIZE * SIZE ];
-      const int jumpx = indices->getDMRGcumulative( irrep );
-      const int NOCC  = indices->getNOCC( irrep );
-
-      //FGG
-      for ( int t = 0; t < SIZE; t++ ){
-         for ( int u = 0; u < SIZE; u++ ){
-            FGG[ irrep ][ u + SIZE * t ] = f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
-         }
-      }
-
-      //FEE
-      for ( int t = 0; t < SIZE; t++ ){
-         for ( int u = 0; u < SIZE; u++ ){
-
-            double value = 2 * fock->get( irrep, NOCC + u, NOCC + t ) - f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
-            for ( int vw = 0; vw < SIZE; vw++ ){
-               value -= ( one_rdm[ jumpx + u + LAS * ( jumpx + vw ) ] * fock->get( irrep, NOCC + vw, NOCC + t )
-                        + fock->get( irrep, NOCC + u, NOCC + vw ) * one_rdm[ jumpx + vw + LAS * ( jumpx + t ) ] );
-            }
-            FEE[ irrep ][ u + SIZE * t ] = value;
-         }
-         FEE[ irrep ][ t + SIZE * t ] += 2 * f_dot_1dm;
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_diag_FEE_FGG( const double IPEA ){
-
-   FEE = new double*[ num_irreps ];
-   FGG = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-
-      const int SIZE = indices->getNDMRG( irrep );
-      FEE[ irrep ] = new double[ SIZE * SIZE ];
-      FGG[ irrep ] = new double[ SIZE * SIZE ];
-      const int jumpx = indices->getDMRGcumulative( irrep );
-      const int NOCC  = indices->getNOCC( irrep );
-
-      //FGG
-      for ( int t = 0; t < SIZE; t++ ){
-         for ( int u = 0; u < SIZE; u++ ){
-            FGG[ irrep ][ u + SIZE * t ] = f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
-         }
-      }
-
-      //FEE
-      for ( int t = 0; t < SIZE; t++ ){
-         const double f_tt = fock->get( irrep, NOCC + t, NOCC + t );
-         for ( int u = 0; u < SIZE; u++ ){
-            const double f_uu = fock->get( irrep, NOCC + u, NOCC + u );
-            FEE[ irrep ][ u + SIZE * t ] = ( - f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ]
-                             - ( f_tt + f_uu ) * one_rdm[ jumpx + u + LAS * ( jumpx + t ) ] );
-         }
-         FEE[ irrep ][ t + SIZE * t ] += 2 * ( f_dot_1dm + f_tt );
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_SEE_SGG(){
-
-   /*
-      SEE singlet: | SE_tiaj > = ( E_ti E_aj + E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <= j
-      SEE triplet: | TE_tiaj > = ( E_ti E_aj - E_tj E_ai ) / sqrt( 1 + delta_ij ) | 0 >  with  i <  j
-
-            < SE_ukbl | SE_tiaj > = 2 delta_ab delta_ik delta_jl SEE[ It ][ ut ]
-            < TE_ukbl | TE_tiaj > = 6 delta_ab delta_ik delta_jl SEE[ It ][ ut ]
+         < SE_ukbl | 1 | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( SEE[ It ][ ut ] )
+         < SE_ukbl | F | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+         < TE_ukbl | 1 | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( SEE[ It ][ ut ] )
+         < TE_ukbl | F | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
 
             SEE[ It ][ ut ] = ( + 2 delta_tu
                                 - Gamma_tu
                               )
 
-      SGG singlet: | SG_aibt > = ( E_ai E_bt + E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b
-      SGG triplet: | TG_aibt > = ( E_ai E_bt - E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <  b
+            FEE[ It ][ ut ] = ( + 2 * delta_ut * ( f_dot_1dm + f_tt )
+                                - f_dot_2dm[ It ][ tu ] - ( f_tt + f_uu ) Gamma_ut
+                              )
 
-            < SG_cjdu | SG_aibt > = 2 delta_ij delta_ac delta_bd SGG[ It ][ ut ]
-            < TG_cjdu | TG_aibt > = 6 delta_ij delta_ac delta_bd SGG[ It ][ ut ]
+      | SG_aibt > = ( E_ai E_bt + E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b
+      | TG_aibt > = ( E_ai E_bt - E_bi E_at ) / sqrt( 1 + delta_ab ) | 0 >  with  a <  b
+
+         < SG_cjdu | 1 | SG_aibt > = 2 delta_ij delta_ac delta_bd ( SGG[ It ][ ut ] )
+         < SG_cjdu | F | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+         < TG_cjdu | 1 | TG_aibt > = 6 delta_ij delta_ac delta_bd ( SGG[ It ][ ut ] )
+         < TG_cjdu | F | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
 
             SGG[ It ][ ut ] = ( + Gamma_ut
                               )
+
+            FGG[ It ][ ut ] = ( + f_dot_2dm[ It ][ ut ]
+                              )
    */
 
-   SEE = new double*[ num_irreps ];
-   SGG = new double*[ num_irreps ];
+   if ( OVLP ){
+      SEE = new double*[ num_irreps ];
+      SGG = new double*[ num_irreps ];
+   } else {
+      FEE = new double*[ num_irreps ];
+      FGG = new double*[ num_irreps ];
+   }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-
-      const int SIZE = indices->getNDMRG( irrep_ut );
-      SEE[ irrep_ut ] = new double[ SIZE * SIZE ];
-      SGG[ irrep_ut ] = new double[ SIZE * SIZE ];
-      const int d_ut = indices->getDMRGcumulative( irrep_ut );
-
-      for ( int t = 0; t < SIZE; t++ ){
-         for ( int u = 0; u < SIZE; u++ ){
-            const double gamma_ut = one_rdm[ d_ut + u + LAS * ( d_ut + t ) ];
-            SEE[ irrep_ut ][ u + SIZE * t ] = - gamma_ut;
-            SGG[ irrep_ut ][ u + SIZE * t ] =   gamma_ut;
+      const int d_ut  = indices->getDMRGcumulative( irrep_ut );
+      const int SIZE  = indices->getNDMRG( irrep_ut );
+      const int jumpx = indices->getDMRGcumulative( irrep_ut );
+      const int NOCC  = indices->getNOCC( irrep_ut );
+      if ( OVLP ){
+         SEE[ irrep_ut ] = new double[ SIZE * SIZE ];
+         SGG[ irrep_ut ] = new double[ SIZE * SIZE ];
+         for ( int t = 0; t < SIZE; t++ ){
+            for ( int u = 0; u < SIZE; u++ ){
+               const double gamma_ut = one_rdm[ d_ut + u + LAS * ( d_ut + t ) ];
+               SEE[ irrep_ut ][ u + SIZE * t ] = - gamma_ut;
+               SGG[ irrep_ut ][ u + SIZE * t ] =   gamma_ut;
+            }
+            SEE[ irrep_ut ][ t + SIZE * t ] += 2.0;
          }
-         SEE[ irrep_ut ][ t + SIZE * t ] += 2.0;
+      } else {
+         FEE[ irrep_ut ] = new double[ SIZE * SIZE ];
+         FGG[ irrep_ut ] = new double[ SIZE * SIZE ];
+         for ( int t = 0; t < SIZE; t++ ){
+            const double f_tt = fock->get( irrep_ut, NOCC + t, NOCC + t );
+            for ( int u = 0; u < SIZE; u++ ){
+               const double f_uu = fock->get( irrep_ut, NOCC + u, NOCC + u );
+               FEE[ irrep_ut ][ u + SIZE * t ] = - ( f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ]
+                                   + ( f_tt + f_uu ) * one_rdm[ jumpx + u + LAS * ( jumpx + t ) ] );
+               FGG[ irrep_ut ][ u + SIZE * t ] =     f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
+            }
+            FEE[ irrep_ut ][ t + SIZE * t ] += 2 * ( f_dot_1dm + f_tt );
+         }
       }
    }
 
 }
-
 
 

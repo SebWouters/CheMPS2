@@ -172,14 +172,7 @@ namespace CheMPS2{
          double ** SBB_triplet;
          double ** SFF_singlet;
          double ** SFF_triplet;
-         
-         // Fill some helper variables for the overlap
-         void make_SAA_SCC();
-         void make_SDD();
-         void make_SBB_SFF_singlet();
-         void make_SBB_SFF_triplet();
-         void make_SEE_SGG();
-         
+
          // Variables for the diagonal part of the Fock operator
          double ** FAA;
          double ** FCC;
@@ -209,17 +202,14 @@ namespace CheMPS2{
          double **** FDG_singlet;
          double **** FDG_triplet;
 
-         // Fill helper variables for the Fock operator
-         void make_FAA_FCC();
-         void make_FDD();
-         void make_FBB_FFF_singlet();
-         void make_FBB_FFF_triplet();
-         void make_FEE_FGG();
-         void make_diag_FAA_FCC( double * part4rdm, const double IPEA );
-         void make_diag_FDD( const double IPEA );
-         void make_diag_FEE_FGG( const double IPEA );
-         void make_diag_FBB_FFF_singlet( const double IPEA );
-         void make_diag_FBB_FFF_triplet( const double IPEA );
+         // Fill overlap and Fock matrices
+         void make_SBB_SFF_singlet();
+         void make_FBB_FFF_singlet( const double IPEA );
+         
+         void make_AA_CC( const bool OVLP, double * part4rdm, const double IPEA );
+         void make_DD( const bool OVLP, const double IPEA );
+         void make_EE_GG( const bool OVLP, const double IPEA );
+         void make_BB_FF_triplet( const bool OVLP, const double IPEA );
          
          void make_FAD_FCD();
          void make_FEH_FGH();
