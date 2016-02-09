@@ -197,8 +197,9 @@ namespace CheMPS2{
              \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
              \param theDMRGSCFoptions Contains the DMRGSCF options
+             \param IPEA The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004)
              \return The CASPT2 correction energy */
-         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
+         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA);
          
          //! CASSCF unitary rotation remove call
          void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
@@ -353,6 +354,9 @@ namespace CheMPS2{
          
          //Calculate the hessian
          static void calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump);
+         
+         //Determine the block_size for orbital rotations
+         static int orbital_rotation_size( const int maxlinsize, const int CUTOFF, const DMRGSCFindices * idx );
          
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          DMRGSCFmatrix * theFmatrix;

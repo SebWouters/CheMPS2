@@ -20,11 +20,13 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <iostream>
+#include <algorithm>
 
 #include "DMRGSCFindices.h"
 
 using std::cout;
 using std::endl;
+using std::max;
 
 CheMPS2::DMRGSCFindices::DMRGSCFindices(const int L, const int Group, int * NOCCin, int * NDMRGin, int * NVIRTin){
 
@@ -117,6 +119,22 @@ int CheMPS2::DMRGSCFindices::getNOCCsum() const{
    int total = 0;
    for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ total += getNOCC( irrep ); }
    return total;
+
+}
+
+int CheMPS2::DMRGSCFindices::getNORBmax() const{
+
+   int the_max = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ the_max = max( the_max, getNORB( irrep ) ); }
+   return the_max;
+
+}
+
+int CheMPS2::DMRGSCFindices::getROTparamsize() const{
+
+   int paramsize = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ paramsize += ( getNORB( irrep ) * ( getNORB( irrep ) - 1 ) ) / 2; }
+   return paramsize;
 
 }
 

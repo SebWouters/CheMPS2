@@ -38,6 +38,30 @@ using std::cout;
 using std::endl;
 using std::max;
 
+int CheMPS2::CASSCF::orbital_rotation_size( const int maxlinsize, const int CUTOFF, const DMRGSCFindices * idx ){
+
+   const int n_irreps = idx->getNirreps();
+
+   int max_norb_ok = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+      const int NORB = idx->getNORB( irrep );
+      if (( NORB > max_norb_ok ) && ( NORB <= CUTOFF )){ max_norb_ok = NORB; }
+   }
+   if ( max_norb_ok == maxlinsize ){ return maxlinsize; }
+
+   const int factor     = (int) ( ceil( ( 1.0 * maxlinsize ) / CUTOFF ) + 0.1 );
+   const int newlinsize = (int) ( ceil( ( 1.0 * maxlinsize ) / factor ) + 0.1 );
+   const int block_size = max( newlinsize, max_norb_ok ); // If a particular index can be rotated at once...
+
+   cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize  << endl;
+   cout << "              The size cutoff for 2-body transfo = " << CUTOFF      << endl;
+   cout << "              The max. # orb per irrep <= cutoff = " << max_norb_ok << endl;
+   cout << "              The blocksize for piecewise tfo    = " << block_size  << endl;
+
+   return block_size;
+
+}
+
 double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
@@ -49,7 +73,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
    double * gradient = new double[unitary->getNumVariablesX()];
    for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
    double * theDIISparameterVector = NULL;
-   int theDIISvectorParamSize = 0;
+   const int linsizeDIIS = iHandler->getROTparamsize();
    double Energy = 1e8;
    
    //The CheMPS2::Problem for the inner DMRG calculation
@@ -57,36 +81,19 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
    Problem * Prob = new Problem(HamDMRG, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
    
-   //Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
-   int maxlinsize   = 0;
-   int maxlinsizeOK = 0;
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int linsize_irrep = iHandler->getNORB(irrep);
-      theDIISvectorParamSize += linsize_irrep*(linsize_irrep-1)/2;
-      if  (linsize_irrep > maxlinsize  )                                                         {  maxlinsize  = linsize_irrep; }
-      if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::DMRGSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
-   }
-   const bool doBlockWise = (maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
+   //Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
+   const int  maxlinsize = iHandler->getNORBmax();
+   const bool block_wise = (( maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff ) ? false : true ); //Only if bigger, do we want to work blockwise
+   const int  block_size = (( block_wise ) ? orbital_rotation_size( maxlinsize, CheMPS2::DMRGSCF_maxlinsizeCutoff, iHandler ) : maxlinsize );
    
-   //Determine the blocksize for the 2-body transformation
-   int maxBlockSize = maxlinsize;
-   if (doBlockWise){
-      int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::DMRGSCF_maxlinsizeCutoff ) + 0.01);
-      maxBlockSize = max( (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01) , maxlinsizeOK ); //If a particular index can be rotated at once....
-      cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize << endl;
-      cout << "              The size cutoff for 2-body transfo = " << CheMPS2::DMRGSCF_maxlinsizeCutoff << endl;
-      cout << "              The max. # orb per irrep <= cutoff = " << maxlinsizeOK << endl;
-      cout << "              The blocksize for piecewise tfo    = " << maxBlockSize << endl;
-   }
-   
-   //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
-   const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int nOrbDMRGpower4 = nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG;
-   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRGpower4 ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
-   double * mem1 = new double[sizeWorkmem];
-   double * mem2 = new double[sizeWorkmem];
+   //Allocate 2-body rotation memory: One array is approx (block_size/273.0)^4 * 42 GiB --> [block_size=100 --> 750 MB]
+   const int block_size_power4 = block_size * block_size * block_size * block_size; //Note that 273**4 overfloats the 32 bit integer!!!
+   const int tot_dmrg_power4   = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
+   const int work_mem_size     = max( max( block_size_power4 , maxlinsize * maxlinsize * 4 ) , tot_dmrg_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+   double * mem1 = new double[ work_mem_size ];
+   double * mem2 = new double[ work_mem_size ];
    double * mem3 = NULL;
-   if (doBlockWise){ mem3 = new double[maxBSpower4]; }
+   if ( block_wise ){ mem3 = new double[ block_size_power4 ]; }
    
    //The two-body rotator and Edmiston-Ruedenberg active space localizer
    DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
@@ -106,8 +113,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
       int intStat = stat((theDMRGSCFoptions->getDIISStorageName()).c_str(),&stFileInfo);
       if (intStat==0){
          if (theDIIS == NULL){
-            theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-            theDIISparameterVector = new double[ theDIISvectorParamSize ];
+            theDIIS = new DIIS(linsizeDIIS, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
+            theDIISparameterVector = new double[ linsizeDIIS ];
          }
          theDIIS->loadDIIS(theDMRGSCFoptions->getDIISStorageName());
       }
@@ -135,8 +142,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
                cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
             if (theDIIS == NULL){
-               theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-               theDIISparameterVector = new double[ theDIISvectorParamSize ];
+               theDIIS = new DIIS( linsizeDIIS, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
+               theDIISparameterVector = new double[ linsizeDIIS ];
                unitary->makeSureAllBlocksDetOne(mem1, mem2);
             }
             unitary->getLog(theDIISparameterVector, mem1, mem2);
@@ -153,8 +160,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
       buildQmatOCC();
       buildTmatrix();
       fillConstAndTmatDMRG(HamDMRG);
-      if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
-      else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
+      if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, block_size); }
+      else {             theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
       
       //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
       if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
@@ -165,8 +172,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
          buildTmatrix();
          fillConstAndTmatDMRG(HamDMRG);
-         if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
-         else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
+         if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, block_size); }
+         else {             theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
          cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
       
@@ -187,7 +194,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          
       } else { //Do the DMRG sweeps, and calculate the 2DM
       
-         for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
+         for ( int cnt = 0; cnt < tot_dmrg_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
          DMRG * theDMRG = new DMRG(Prob, OptScheme);
          for (int state = 0; state < rootNum; state++){
             if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
@@ -208,7 +215,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          delete theDMRG;
          if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
             const double averagingfactor = 1.0 / rootNum;
-            for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
+            for ( int cnt = 0; cnt < tot_dmrg_power4; cnt++ ){ DMRG2DM[ cnt ] *= averagingfactor; }
          }
          
       }
@@ -226,8 +233,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
 
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      if (doBlockWise){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, maxBlockSize); }
-      else {            theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
+      if ( block_wise ){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, block_size); }
+      else {             theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
       buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
       buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
 
@@ -238,7 +245,7 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
    
    delete [] mem1;
    delete [] mem2;
-   if (doBlockWise){ delete [] mem3; }
+   if ( block_wise ){ delete [] mem3; }
    
    delete Prob;
    delete HamDMRG;

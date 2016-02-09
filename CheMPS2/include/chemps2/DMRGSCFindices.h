@@ -105,6 +105,14 @@ namespace CheMPS2{
          /** \return The total number of occupied orbitals */
          int getNOCCsum() const;
          
+         //! Get the maximum NORB
+         /** \return The maximum NORB */
+         int getNORBmax() const;
+         
+         //! Get the orbital rotation parameter space size
+         /** \return The orbital rotation parameter space size */
+         int getROTparamsize() const;
+         
          //! Print my contents
          void Print() const;
 

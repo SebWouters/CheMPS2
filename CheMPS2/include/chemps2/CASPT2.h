@@ -71,8 +71,10 @@ namespace CheMPS2{
              \param one_dm   The spin-summed one-particle density matrix one_dm[i+L*j] = sum_sigma < a^+_i,sigma a_j,sigma > (with L the number DMRG orbitals)
              \param two_dm   The spin-summed two-particle density matrix two_dm[i+L*(j+L*(k+L*l))] = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > (with L the number DMRG orbitals)
              \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals)
-             \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals) */
-         CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract);
+             \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals)
+             \param part4rdm The part of the 4-RDM needed for IPEA: part4rdm[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{r,z} a_{r,z} a_{r,s} a_{q,tau} a_{p,sigma} >. If NULL, the IPEA shift is not applied.
+             \param IPEA     The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004) */
+         CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract, double * part4rdm, const double IPEA);
 
          //! Destructor
          virtual ~CASPT2();
@@ -213,6 +215,11 @@ namespace CheMPS2{
          void make_FBB_FFF_singlet();
          void make_FBB_FFF_triplet();
          void make_FEE_FGG();
+         void make_diag_FAA_FCC( double * part4rdm, const double IPEA );
+         void make_diag_FDD( const double IPEA );
+         void make_diag_FEE_FGG( const double IPEA );
+         void make_diag_FBB_FFF_singlet( const double IPEA );
+         void make_diag_FBB_FFF_triplet( const double IPEA );
          
          void make_FAD_FCD();
          void make_FEH_FGH();
