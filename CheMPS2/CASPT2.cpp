@@ -50,16 +50,17 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    make_AA_CC( true, NULL, 0.0 );
    make_DD( true, 0.0 );
    make_EE_GG( true, 0.0 );
-   make_SBB_SFF_singlet();
+   make_BB_FF_singlet( true, 0.0 );
    make_BB_FF_triplet( true, 0.0 );
 
-   construct_rhs( oei, ints ); // Needs to be called AFTER make_S**()!
+   // Needs to be called AFTER make_S**()!
+   construct_rhs( oei, ints );
 
    // The following Fock operator constructors need to be called AFTER make_S**()!
    make_AA_CC( false, part4rdm, IPEA );
    make_DD( false, IPEA );
    make_EE_GG( false, IPEA );
-   make_FBB_FFF_singlet( IPEA );
+   make_BB_FF_singlet( false, IPEA );
    make_BB_FF_triplet( false, IPEA );
 
    make_FAD_FCD();
@@ -6225,7 +6226,7 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
                   for ( int xt = 0; xt < num_x; xt++ ){
                      for ( int u = 0; u < num_y; u++ ){
                         for ( int y = 0; y < num_y; y++ ){
-                           const double gamma_yu = one_rdm[ d_y + y + LAS * ( d_u + u ) ];
+                           const double gamma_yu = one_rdm[ d_y + y + LAS * ( d_y + u ) ];
                            const int ptr = jump_row + xt + num_x * y + SIZE * ( jump_col + xt + num_x * u );
                            SDD[ irrep ][ ptr                          ] += 2 * gamma_yu;
                            SDD[ irrep ][ ptr +          SIZE * D2JUMP ] -=     gamma_yu;
@@ -6259,41 +6260,61 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
 
 }
 
-void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
+void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
 
    /*
-      FBB singlet: < SB_xkyl | ( f_pq E_pq ) | SB_tiuj >
-                      = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
+      | SB_tiuj > = ( E_ti E_uj + E_tj E_ui ) / sqrt( 1 + delta_ij ) | 0 >  with  i <= j and t <= u
 
-      FFF singlet: < SF_cxdy | ( f_pq E_pq ) | SF_atbu >
-                      = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
+      SBB singlet: < SB_xkyl | 1 | SB_tiuj > = 2 delta_ik delta_jl ( SBB_singlet[ Itu ][ xytu ] )
+      FBB singlet: < SB_xkyl | F | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Itu ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Itu ][ xytu ] )
 
-         FBB_singlet[ Iij ][ xytu ] = ( + f_dot_3dm[ utyx ]
-                                        + f_dot_3dm[ tuyx ]
-                                        + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
-                                        + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - f_tt - f_uu )
-                                        -   delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
-                                        -   delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
-                                        -   delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
-                                        -   delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
-                                      )
+            SBB_singlet[ Itu ][ xytu ] = ( + Gamma_{utyx}
+                                           + Gamma_{utxy}
+                                           + 2 ( delta_uy delta_tx + delta_ux delta_ty )
+                                           - delta_uy Gamma_{tx}
+                                           - delta_tx Gamma_{uy}
+                                           - delta_ux Gamma_{ty}
+                                           - delta_ty Gamma_{ux}
+                                         )
 
-         FFF_singlet[ Iab ][ xytu ] = ( + f_dot_3dm[ yxut ]
-                                        + f_dot_3dm[ yxtu ]
-                                      )
+            FBB_singlet[ Itu ][ xytu ] = ( + f_dot_3dm[ utyx ]
+                                           + f_dot_3dm[ tuyx ]
+                                           + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
+                                           + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - f_tt - f_uu )
+                                           -   delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                                           -   delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                                           -   delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
+                                           -   delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
+                                         )
 
+      | SF_atbu > = ( E_at E_bu + E_bt E_au ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b and t <= u
+
+      SFF singlet: < SF_cxdy | 1 | SF_atbu > = 2 delta_ac delta_bd ( SFF_singlet[ Itu ][ xytu ] )
+      FFF singlet: < SF_cxdy | F | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
+
+            SFF_singlet[ Itu ][ xytu ] = ( + Gamma_{yxut}
+                                           + Gamma_{yxtu}
+                                         )
+
+            FFF_singlet[ Itu ][ xytu ] = ( + f_dot_3dm[ yxut ]
+                                           + f_dot_3dm[ yxtu ]
+                                         )
    */
 
-   FBB_singlet = new double*[ num_irreps ];
-   FFF_singlet = new double*[ num_irreps ];
+   if ( OVLP ){ SBB_singlet = new double*[ num_irreps ];
+                SFF_singlet = new double*[ num_irreps ]; }
+   else {       FBB_singlet = new double*[ num_irreps ];
+                FFF_singlet = new double*[ num_irreps ]; }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
       assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
       const int SIZE = size_B_singlet[ 0 ];
-      FBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
-      FFF_singlet[ 0 ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
+                   SFF_singlet[ 0 ] = new double[ SIZE * SIZE ]; }
+      else {       FBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
+                   FFF_singlet[ 0 ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
@@ -6307,23 +6328,39 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
             const int nocc_xy = indices->getNOCC( irrep_xy );
             const int shift   = jump_row + SIZE * jump_col;
 
+            // SBB singlet: + Gamma_{utyx} + Gamma_{utxy}
+            // SFF singlet: + Gamma_{yxut} + Gamma_{yxtu}
             // FBB singlet: + f_dot_3dm[ utyx ] + f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
             // FFF singlet: + f_dot_3dm[ yxut ] + f_dot_3dm[ yxtu ]
-            for ( int t = 0; t < num_ut; t++ ){
-               const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
-               for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
-                  for ( int x = 0; x < num_xy; x++ ){
-                     const double f_xx = fock->get( irrep_xy, nocc_xy + x, nocc_xy + x );
-                     for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-                        const double f_yy = fock->get( irrep_xy, nocc_xy + y, nocc_xy + y );
-
-                        const int ptr = shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 );
-                        const double fdotsum = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                               + f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-
-                        FBB_singlet[ 0 ][ ptr ] = fdotsum + ( f_tt + f_uu + f_xx + f_yy ) * SBB_singlet[ 0 ][ ptr ];
-                        FFF_singlet[ 0 ][ ptr ] = fdotsum;
+            if ( OVLP ){
+               for ( int t = 0; t < num_ut; t++ ){
+                  for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
+                     for ( int x = 0; x < num_xy; x++ ){
+                        for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
+                           const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
+                                                + two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
+                           const int ptr = shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 );
+                           SBB_singlet[ 0 ][ ptr ] = value;
+                           SFF_singlet[ 0 ][ ptr ] = value;
+                        }
+                     }
+                  }
+               }
+            } else {
+               for ( int t = 0; t < num_ut; t++ ){
+                  const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
+                  for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
+                     const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
+                     for ( int x = 0; x < num_xy; x++ ){
+                        const double f_xx = fock->get( irrep_xy, nocc_xy + x, nocc_xy + x );
+                        for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
+                           const double f_yy = fock->get( irrep_xy, nocc_xy + y, nocc_xy + y );
+                           const int ptr = shift + x + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 );
+                           const double fdotsum = ( f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
+                                                  + f_dot_3dm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
+                           FBB_singlet[ 0 ][ ptr ] = fdotsum + ( f_tt + f_uu + f_xx + f_yy ) * SBB_singlet[ 0 ][ ptr ];
+                           FFF_singlet[ 0 ][ ptr ] = fdotsum;
+                        }
                      }
                   }
                }
@@ -6331,60 +6368,118 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
 
             if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy and d_ut = d_xy
 
-               // FBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - ( f_tt + f_uu ) ) --> last term only if x <= y == t <= u or hence all equal
-               for ( int t = 0; t < num_ut; t++ ){
-                  const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
-                  FBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * ( f_dot_1dm - 2 * f_tt );
-                  for ( int u = t+1; u < num_ut; u++ ){
-                     const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
-                     FBB_singlet[ 0 ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2 * ( f_dot_1dm - f_tt - f_uu );
+               // SBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty )
+               // FBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) ( f_dot_1dm - ( f_tt + f_uu ) )
+               if ( OVLP ){
+                  for ( int t = 0; t < num_ut; t++ ){
+                     SBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4.0;
+                     for ( int u = t+1; u < num_ut; u++ ){
+                        SBB_singlet[ 0 ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2.0;
+                     }
+                  }
+               } else {
+                  for ( int t = 0; t < num_ut; t++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + t, nocc_ut + t );
+                     FBB_singlet[ 0 ][ shift + t + ( t * ( t + 1 ) ) / 2 + SIZE * ( t + ( t * ( t + 1 ) ) / 2 ) ] += 4 * ( f_dot_1dm - 2 * f_tt );
+                     for ( int u = t+1; u < num_ut; u++ ){
+                        const double f_uu = fock->get( irrep_ut, nocc_ut + u, nocc_ut + u );
+                        FBB_singlet[ 0 ][ shift + t + ( u * ( u + 1 ) ) / 2 + SIZE * ( t + ( u * ( u + 1 ) ) / 2 ) ] += 2 * ( f_dot_1dm - f_tt - f_uu );
+                     }
                   }
                }
 
+               // SBB singlet: - delta_uy ( Gamma_{tx} )
                // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
-                  for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
-                     for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
-                        const double val_tx = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ]
-                                         - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + x ) ] );
-                        FBB_singlet[ 0 ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= val_tx;
+               if ( OVLP ){
+                  for ( int uy = 0; uy < num_ut; uy++ ){
+                     for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
+                        for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
+                           const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_ut + x ) ];
+                           SBB_singlet[ 0 ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= gamma_tx;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int uy = 0; uy < num_ut; uy++ ){
+                     const double f_uu = fock->get( irrep_ut, nocc_ut + uy, nocc_ut + uy );
+                     for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
+                        for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
+                           const double val_tx = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + x ) ]
+                                            - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + x ) ] );
+                           FBB_singlet[ 0 ][ shift + x + ( uy * ( uy + 1 ) ) / 2 + SIZE * ( t + ( uy * ( uy + 1 ) ) / 2 ) ] -= val_tx;
+                        }
                      }
                   }
                }
 
+               // SBB singlet: - delta_tx ( Gamma_{uy} )
                // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
-                  for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
-                     for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
-                        const double val_uy = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ]
-                                         - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + y ) ] );
-                        FBB_singlet[ 0 ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= val_uy;
+               if ( OVLP ){
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
+                        for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
+                           const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_ut + y ) ];
+                           SBB_singlet[ 0 ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= gamma_uy;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int tx = 0; tx < num_ut; tx++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + tx, nocc_ut + tx );
+                     for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
+                        for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
+                           const double val_uy = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + y ) ]
+                                            - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + y ) ] );
+                           FBB_singlet[ 0 ][ shift + tx + ( y * ( y + 1 ) ) / 2 + SIZE * ( tx + ( u * ( u + 1 ) ) / 2 ) ] -= val_uy;
+                        }
                      }
                   }
                }
 
+               // SBB singlet: - delta_ux ( Gamma_{ty} )
                // FBB singlet: - delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  const double f_uu = fock->get( irrep_ut, nocc_ut + ux, nocc_ut + ux );
-                  for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
-                     for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
-                        const double val_ty = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ]
-                                         - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + y ) ] );
-                        FBB_singlet[ 0 ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= val_ty;
+               if ( OVLP ){
+                  for ( int ux = 0; ux < num_ut; ux++ ){
+                     for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
+                        for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
+                           const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_ut + y ) ];
+                           SBB_singlet[ 0 ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= gamma_ty;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int ux = 0; ux < num_ut; ux++ ){
+                     const double f_uu = fock->get( irrep_ut, nocc_ut + ux, nocc_ut + ux );
+                     for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
+                        for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
+                           const double val_ty = ( f_dot_2dm[ d_ut + t + LAS * ( d_ut + y ) ]
+                                            - f_uu * one_rdm[ d_ut + t + LAS * ( d_ut + y ) ] );
+                           FBB_singlet[ 0 ][ shift + ux + ( y * ( y + 1 ) ) / 2 + SIZE * ( t + ( ux * ( ux + 1 ) ) / 2 ) ] -= val_ty;
+                        }
                      }
                   }
                }
 
+               // SBB singlet: - delta_ty ( Gamma_{ux} )
                // FBB singlet: - delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  const double f_tt = fock->get( irrep_ut, nocc_ut + ty, nocc_ut + ty );
-                  for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
-                     for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
-                        const double val_ux = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ]
-                                         - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + x ) ] );
-                        FBB_singlet[ 0 ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= val_ux;
+               if ( OVLP ){
+                  for ( int ty = 0; ty < num_ut; ty++ ){
+                     for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
+                        for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
+                           const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_ut + x ) ];
+                           SBB_singlet[ 0 ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= gamma_ux;
+                        }
+                     }
+                  }
+               } else {
+                  for ( int ty = 0; ty < num_ut; ty++ ){
+                     const double f_tt = fock->get( irrep_ut, nocc_ut + ty, nocc_ut + ty );
+                     for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
+                        for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
+                           const double val_ux = ( f_dot_2dm[ d_ut + u + LAS * ( d_ut + x ) ]
+                                            - f_tt * one_rdm[ d_ut + u + LAS * ( d_ut + x ) ] );
+                           FBB_singlet[ 0 ][ shift + x + ( ty * ( ty + 1 ) ) / 2 + SIZE * ( ty + ( u * ( u + 1 ) ) / 2 ) ] -= val_ux;
+                        }
                      }
                   }
                }
@@ -6399,8 +6494,10 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
 
       assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
       const int SIZE = size_B_singlet[ irrep ];
-      FBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      FFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
+      if ( OVLP ){ SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
+                   SFF_singlet[ irrep ] = new double[ SIZE * SIZE ]; }
+      else {       FBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
+                   FFF_singlet[ irrep ] = new double[ SIZE * SIZE ]; }
 
       int jump_col = 0;
       for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
@@ -6424,225 +6521,39 @@ void CheMPS2::CASPT2::make_FBB_FFF_singlet( const double IPEA ){
                   const int nocc_y = indices->getNOCC( irrep_y );
                   const int shift  = jump_row + SIZE * jump_col;
 
-                  // FBB singlet: + f_dot_3dm[ utyx ] + f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
-                  // FFF singlet: + f_dot_3dm[ yxut ] + f_dot_3dm[ yxtu ]
-                  for ( int t = 0; t < num_t; t++ ){
-                     const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
-                     for ( int u = 0; u < num_u; u++ ){
-                        const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                        for ( int x = 0; x < num_x; x++ ){
-                           const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-
-                              const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
-                              const double fdotsum = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                     + f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-
-                              FBB_singlet[ irrep ][ ptr ] = fdotsum + ( f_xx + f_yy + f_tt + f_uu ) * SBB_singlet[ irrep ][ ptr ];
-                              FFF_singlet[ irrep ][ ptr ] = fdotsum;
-                           }
-                        }
-                     }
-                  }
-
-                  if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
-
-                     // FBB singlet: + 2 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
-                           FBB_singlet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 2 * ( f_dot_1dm - f_tt - f_uu );
-                        }
-                     }
-
-                     // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double val_uy = ( f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ]
-                                               - f_tt * one_rdm[ d_u + u + LAS * ( d_u + y ) ] );
-                              FBB_singlet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= val_uy;
-                           }
-                        }
-                     }
-
-                     // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double val_tx = ( f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ]
-                                               - f_uu * one_rdm[ d_t + t + LAS * ( d_t + x ) ] );
-                              FBB_singlet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_t * yu ) ] -= val_tx;
-                           }
-                        }
-                     }
-                  }
-                  jump_row += num_x * num_y;
-               }
-            }
-            jump_col += num_t * num_u;
-         }
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
-
-   /*
-      SBB singlet: | SB_tiuj > = ( E_ti E_uj + E_tj E_ui ) / sqrt( 1 + delta_ij ) | 0 >  with  i <= j and t <= u
-
-            < SB_xkyl | SB_tiuj > = 2 delta_ik delta_jl SBB_singlet[ It x Iu ][ xytu ]
-
-            SBB_singlet[ It x Iu ][ xytu ] = ( + Gamma_{utyx}
-                                               + Gamma_{utxy}
-                                               + 2 ( delta_uy delta_tx + delta_ux delta_ty )
-                                               - delta_uy Gamma_{tx}
-                                               - delta_tx Gamma_{uy}
-                                               - delta_ux Gamma_{ty}
-                                               - delta_ty Gamma_{ux}
-                                             )
-
-      SFF singlet: | SF_atbu > = ( E_at E_bu + E_bt E_au ) / sqrt( 1 + delta_ab ) | 0 >  with  a <= b and t <= u
-
-            < SF_cxdy | SF_atbu > = 2 delta_ac delta_bd SFF_singlet[ It x Iu ][ xytu ]
-
-            SFF_singlet[ It x Iu ][ xytu ] = ( + Gamma_{yxut}
-                                               + Gamma_{yxtu}
-                                             )
-   */
-
-   SBB_singlet = new double*[ num_irreps ];
-   SFF_singlet = new double*[ num_irreps ];
-
-   const int LAS = indices->getDMRGcumulative( num_irreps );
-
-   { // First do irrep == Iia x Ijb == 0 -->  It == Iu and Ix == Iy
-      assert( size_B_singlet[ 0 ] == size_F_singlet[ 0 ] ); // At construction
-      const int SIZE = size_B_singlet[ 0 ];
-      SBB_singlet[ 0 ] = new double[ SIZE * SIZE ];
-      SFF_singlet[ 0 ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
-         const int d_ut   = indices->getDMRGcumulative( irrep_ut );
-         const int num_ut = indices->getNDMRG( irrep_ut );
-         int jump_row = 0;
-         for ( int irrep_xy = 0; irrep_xy < num_irreps; irrep_xy++ ){
-            const int d_xy   = indices->getDMRGcumulative( irrep_xy );
-            const int num_xy = indices->getNDMRG( irrep_xy );
-
-            // SBB singlet: + Gamma_{utyx} + Gamma_{utxy}
-            // SFF singlet: + Gamma_{yxut} + Gamma_{yxtu}
-            for ( int t = 0; t < num_ut; t++ ){
-               for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
-                  for ( int x = 0; x < num_xy; x++ ){
-                     for ( int y = x; y < num_xy; y++ ){ // 0 <= x <= y < num_xy
-                        const double value = ( two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + t + LAS * ( d_ut + u ))) ]
-                                             + two_rdm[ d_xy + x + LAS * ( d_xy + y + LAS * ( d_ut + u + LAS * ( d_ut + t ))) ] );
-                        const int pointer = jump_row + x + (y*(y+1))/2 + SIZE * ( jump_col + t + (u*(u+1))/2 );
-                        SBB_singlet[ 0 ][ pointer ] = value;
-                        SFF_singlet[ 0 ][ pointer ] = value;
-                     }
-                  }
-               }
-            }
-
-            if ( irrep_ut == irrep_xy ){ // All four irreps are equal: num_ut = num_xy
-
-               // SBB singlet: + 2 ( delta_uy delta_tx + delta_ux delta_ty ) --> last term only if x <= y = t <= u or hence all equal
-               for ( int t = 0; t < num_ut; t++ ){
-                  SBB_singlet[ 0 ][ jump_row + t + (t*(t+1))/2 + SIZE * ( jump_col + t + (t*(t+1))/2 ) ] += 4.0;
-                  for ( int u = t+1; u < num_ut; u++ ){
-                     SBB_singlet[ 0 ][ jump_row + t + (u*(u+1))/2 + SIZE * ( jump_col + t + (u*(u+1))/2 ) ] += 2.0;
-                  }
-               }
-
-               // SBB singlet: - delta_uy Gamma_{tx}
-               for ( int uy = 0; uy < num_ut; uy++ ){
-                  for ( int t = 0; t <= uy; t++ ){ // 0 <= t <= uy < num_ut
-                     for ( int x = 0; x <= uy; x++ ){ // 0 <= x <= uy < num_ut
-                        const double gamma_tx = one_rdm[ d_ut + t + LAS * ( d_xy + x ) ];
-                        SBB_singlet[ 0 ][ jump_row + x + (uy*(uy+1))/2 + SIZE * ( jump_col + t + (uy*(uy+1))/2 ) ] -= gamma_tx;
-                     }
-                  }
-               }
-
-               // SBB singlet: - delta_tx Gamma_{uy}
-               for ( int tx = 0; tx < num_ut; tx++ ){
-                  for ( int u = tx; u < num_ut; u++ ){ // 0 <= tx <= u < num_ut
-                     for ( int y = tx; y < num_ut; y++ ){ // 0 <= tx <= y < num_xy = num_ut
-                        const double gamma_uy = one_rdm[ d_ut + u + LAS * ( d_xy + y ) ];
-                        SBB_singlet[ 0 ][ jump_row + tx + (y*(y+1))/2 + SIZE * ( jump_col + tx + (u*(u+1))/2 ) ] -= gamma_uy;
-                     }
-                  }
-               }
-
-               // SBB singlet: - delta_ux Gamma_{ty}
-               for ( int ux = 0; ux < num_ut; ux++ ){
-                  for ( int t = 0; t <= ux; t++ ){ // 0 <= t <= ux < num_ut
-                     for ( int y = ux; y < num_ut; y++ ){ // 0 <= ux <= y < num_xy = num_ut
-                        const double gamma_ty = one_rdm[ d_ut + t + LAS * ( d_xy + y ) ];
-                        SBB_singlet[ 0 ][ jump_row + ux + (y*(y+1))/2 + SIZE * ( jump_col + t + (ux*(ux+1))/2 ) ] -= gamma_ty;
-                     }
-                  }
-               }
-
-               // SBB singlet: - delta_ty Gamma_{ux}
-               for ( int ty = 0; ty < num_ut; ty++ ){
-                  for ( int u = ty; u < num_ut; u++ ){ // 0 <= ty <= u < num_ut
-                     for ( int x = 0; x <= ty; x++ ){ // 0 <= x <= ty < num_ut
-                        const double gamma_ux = one_rdm[ d_ut + u + LAS * ( d_xy + x ) ];
-                        SBB_singlet[ 0 ][ jump_row + x + (ty*(ty+1))/2 + SIZE * ( jump_col + ty + (u*(u+1))/2 ) ] -= gamma_ux;
-                     }
-                  }
-               }
-            }
-            jump_row += ( num_xy * ( num_xy + 1 ) ) / 2;
-         }
-         jump_col += ( num_ut * ( num_ut + 1 ) ) / 2;
-      }
-   }
-
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){ // Then do irrep == Iia x Ijb != 0 -->  It != Iu and Ix != Iy
-
-      assert( size_B_singlet[ irrep ] == size_F_singlet[ irrep ] ); // At construction
-      const int SIZE = size_B_singlet[ irrep ];
-      SBB_singlet[ irrep ] = new double[ SIZE * SIZE ];
-      SFF_singlet[ irrep ] = new double[ SIZE * SIZE ];
-
-      int jump_col = 0;
-      for ( int irrep_t = 0; irrep_t < num_irreps; irrep_t++ ){
-         const int irrep_u = Irreps::directProd( irrep, irrep_t );
-         if ( irrep_t < irrep_u ){
-            const int d_t   = indices->getDMRGcumulative( irrep_t );
-            const int num_t = indices->getNDMRG( irrep_t );
-            const int d_u   = indices->getDMRGcumulative( irrep_u );
-            const int num_u = indices->getNDMRG( irrep_u );
-            int jump_row = 0;
-            for ( int irrep_x = 0; irrep_x < num_irreps; irrep_x++ ){
-               const int irrep_y = Irreps::directProd( irrep, irrep_x );
-               if ( irrep_x < irrep_y ){
-                  const int d_x   = indices->getDMRGcumulative( irrep_x );
-                  const int num_x = indices->getNDMRG( irrep_x );
-                  const int d_y   = indices->getDMRGcumulative( irrep_y );
-                  const int num_y = indices->getNDMRG( irrep_y );
-
                   // SBB singlet: + Gamma_{utyx} + Gamma_{utxy}
                   // SFF singlet: + Gamma_{yxut} + Gamma_{yxtu}
-                  for ( int t = 0; t < num_t; t++ ){
-                     for ( int u = 0; u < num_u; u++ ){
-                        for ( int x = 0; x < num_x; x++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double value = ( two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
-                                                   + two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
-                              const int pointer = jump_row + x + num_x * y + SIZE * ( jump_col + t + num_t * u );
-                              SBB_singlet[ irrep ][ pointer ] = value;
-                              SFF_singlet[ irrep ][ pointer ] = value;
+                  // FBB singlet: + f_dot_3dm[ utyx ] + f_dot_3dm[ tuyx ] + ( f_tt + f_uu + f_xx + f_yy ) SBB_singlet[ xytu ]
+                  // FFF singlet: + f_dot_3dm[ yxut ] + f_dot_3dm[ yxtu ]
+                  if ( OVLP ){
+                     for ( int t = 0; t < num_t; t++ ){
+                        for ( int u = 0; u < num_u; u++ ){
+                           for ( int x = 0; x < num_x; x++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double value = ( two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
+                                                      + two_rdm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
+                                 const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
+                                 SBB_singlet[ irrep ][ ptr ] = value;
+                                 SFF_singlet[ irrep ][ ptr ] = value;
+                              }
+                           }
+                        }
+                     }
+                  } else {
+                     for ( int t = 0; t < num_t; t++ ){
+                        const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
+                        for ( int u = 0; u < num_u; u++ ){
+                           const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
+                           for ( int x = 0; x < num_x; x++ ){
+                              const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
+                                 const int ptr = shift + x + num_x * y + SIZE * ( t + num_t * u );
+                                 const double fdotsum = ( f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_u + u ))) ]
+                                                        + f_dot_3dm[ d_x + x + LAS * ( d_y + y + LAS * ( d_u + u + LAS * ( d_t + t ))) ] );
+                                 FBB_singlet[ irrep ][ ptr ] = fdotsum + ( f_xx + f_yy + f_tt + f_uu ) * SBB_singlet[ irrep ][ ptr ];
+                                 FFF_singlet[ irrep ][ ptr ] = fdotsum;
+                              }
                            }
                         }
                      }
@@ -6651,28 +6562,67 @@ void CheMPS2::CASPT2::make_SBB_SFF_singlet(){
                   if (( irrep_u == irrep_y ) && ( irrep_t == irrep_x )){ // num_t == num_x  and  num_u == num_y
 
                      // SBB singlet: + 2 delta_uy delta_tx
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int yu = 0; yu < num_y; yu++ ){
-                           SBB_singlet[ irrep ][ jump_row + xt + num_x * yu + SIZE * ( jump_col + xt + num_x * yu ) ] += 2.0;
+                     // FBB singlet: + 2 delta_uy delta_tx ( f_dot_1dm - f_tt - f_uu )
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           for ( int yu = 0; yu < num_y; yu++ ){
+                              SBB_singlet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 2.0;
+                           }
                         }
-                     }
-
-                     // SBB singlet: - delta_tx Gamma_{uy}
-                     for ( int xt = 0; xt < num_x; xt++ ){
-                        for ( int u = 0; u < num_y; u++ ){
-                           for ( int y = 0; y < num_y; y++ ){
-                              const double gamma_uy = one_rdm[ d_u + u + LAS * ( d_y + y ) ];
-                              SBB_singlet[ irrep ][ jump_row + xt + num_x * y + SIZE * ( jump_col + xt + num_x * u ) ] -= gamma_uy;
+                     } else {
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
+                           for ( int yu = 0; yu < num_y; yu++ ){
+                              const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
+                              FBB_singlet[ irrep ][ shift + xt + num_x * yu + SIZE * ( xt + num_x * yu ) ] += 2 * ( f_dot_1dm - f_tt - f_uu );
                            }
                         }
                      }
 
-                     // SBB singlet: - delta_uy Gamma_{tx}
-                     for ( int yu = 0; yu < num_y; yu++ ){
-                        for ( int t = 0; t < num_x; t++ ){
-                           for ( int x = 0; x < num_x; x++ ){
-                              const double gamma_tx = one_rdm[ d_t + t + LAS * ( d_x + x ) ];
-                              SBB_singlet[ irrep ][ jump_row + x + num_x * yu + SIZE * ( jump_col + t + num_t * yu ) ] -= gamma_tx;
+                     // SBB singlet: - delta_tx ( Gamma_{uy} )
+                     // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
+                     if ( OVLP ){
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           for ( int u = 0; u < num_y; u++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double gamma_uy = one_rdm[ d_u + u + LAS * ( d_u + y ) ];
+                                 SBB_singlet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= gamma_uy;
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int xt = 0; xt < num_x; xt++ ){
+                           const double f_tt = fock->get( irrep_x, nocc_x + xt, nocc_x + xt );
+                           for ( int u = 0; u < num_y; u++ ){
+                              for ( int y = 0; y < num_y; y++ ){
+                                 const double val_uy = ( f_dot_2dm[ d_u + u + LAS * ( d_u + y ) ]
+                                                  - f_tt * one_rdm[ d_u + u + LAS * ( d_u + y ) ] );
+                                 FBB_singlet[ irrep ][ shift + xt + num_x * y + SIZE * ( xt + num_x * u ) ] -= val_uy;
+                              }
+                           }
+                        }
+                     }
+
+                     // SBB singlet: - delta_uy ( Gamma_{tx} )
+                     // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
+                     if ( OVLP ){
+                        for ( int yu = 0; yu < num_y; yu++ ){
+                           for ( int t = 0; t < num_x; t++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 const double gamma_tx = one_rdm[ d_t + t + LAS * ( d_t + x ) ];
+                                 SBB_singlet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_t * yu ) ] -= gamma_tx;
+                              }
+                           }
+                        }
+                     } else {
+                        for ( int yu = 0; yu < num_y; yu++ ){
+                           const double f_uu = fock->get( irrep_y, nocc_y + yu, nocc_y + yu );
+                           for ( int t = 0; t < num_x; t++ ){
+                              for ( int x = 0; x < num_x; x++ ){
+                                 const double val_tx = ( f_dot_2dm[ d_t + t + LAS * ( d_t + x ) ]
+                                                  - f_uu * one_rdm[ d_t + t + LAS * ( d_t + x ) ] );
+                                 FBB_singlet[ irrep ][ shift + x + num_x * yu + SIZE * ( t + num_t * yu ) ] -= val_tx;
+                              }
                            }
                         }
                      }
@@ -7098,20 +7048,16 @@ void CheMPS2::CASPT2::make_EE_GG( const bool OVLP, const double IPEA ){
                               )
    */
 
-   if ( OVLP ){
-      SEE = new double*[ num_irreps ];
-      SGG = new double*[ num_irreps ];
-   } else {
-      FEE = new double*[ num_irreps ];
-      FGG = new double*[ num_irreps ];
-   }
+   if ( OVLP ){ SEE = new double*[ num_irreps ];
+                SGG = new double*[ num_irreps ]; }
+   else {       FEE = new double*[ num_irreps ];
+                FGG = new double*[ num_irreps ]; }
 
    const int LAS = indices->getDMRGcumulative( num_irreps );
 
    for ( int irrep_ut = 0; irrep_ut < num_irreps; irrep_ut++ ){
       const int d_ut  = indices->getDMRGcumulative( irrep_ut );
       const int SIZE  = indices->getNDMRG( irrep_ut );
-      const int jumpx = indices->getDMRGcumulative( irrep_ut );
       const int NOCC  = indices->getNOCC( irrep_ut );
       if ( OVLP ){
          SEE[ irrep_ut ] = new double[ SIZE * SIZE ];
@@ -7131,9 +7077,10 @@ void CheMPS2::CASPT2::make_EE_GG( const bool OVLP, const double IPEA ){
             const double f_tt = fock->get( irrep_ut, NOCC + t, NOCC + t );
             for ( int u = 0; u < SIZE; u++ ){
                const double f_uu = fock->get( irrep_ut, NOCC + u, NOCC + u );
-               FEE[ irrep_ut ][ u + SIZE * t ] = - ( f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ]
-                                   + ( f_tt + f_uu ) * one_rdm[ jumpx + u + LAS * ( jumpx + t ) ] );
-               FGG[ irrep_ut ][ u + SIZE * t ] =     f_dot_2dm[ jumpx + u + LAS * ( jumpx + t ) ];
+               const double gamma_ut =   one_rdm[ d_ut + u + LAS * ( d_ut + t ) ];
+               const double fdot2_ut = f_dot_2dm[ d_ut + u + LAS * ( d_ut + t ) ];
+               FEE[ irrep_ut ][ u + SIZE * t ] = - fdot2_ut - ( f_tt + f_uu ) * gamma_ut;
+               FGG[ irrep_ut ][ u + SIZE * t ] =   fdot2_ut;
             }
             FEE[ irrep_ut ][ t + SIZE * t ] += 2 * ( f_dot_1dm + f_tt );
          }

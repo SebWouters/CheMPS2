@@ -203,12 +203,10 @@ namespace CheMPS2{
          double **** FDG_triplet;
 
          // Fill overlap and Fock matrices
-         void make_SBB_SFF_singlet();
-         void make_FBB_FFF_singlet( const double IPEA );
-         
          void make_AA_CC( const bool OVLP, double * part4rdm, const double IPEA );
          void make_DD( const bool OVLP, const double IPEA );
          void make_EE_GG( const bool OVLP, const double IPEA );
+         void make_BB_FF_singlet( const bool OVLP, const double IPEA );
          void make_BB_FF_triplet( const bool OVLP, const double IPEA );
          
          void make_FAD_FCD();
