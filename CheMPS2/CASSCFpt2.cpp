@@ -54,7 +54,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    const int tot_dmrg_power4   = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
    const int tot_dmrg_power6   = tot_dmrg_power4 * nOrbDMRG * nOrbDMRG;
    const int work_mem_size     = max( max( block_size_power4 , maxlinsize * maxlinsize * 4 ) , tot_dmrg_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
-   double * mem1 = new double[ max( work_mem_size, tot_dmrg_power6 ) ]; //Also as workspace to construct part4rdm
+   double * mem1 = new double[ work_mem_size ];
    double * mem2 = new double[ work_mem_size ];
    double * mem3 = NULL;
    if ( block_wise ){ mem3 = new double[ block_size_power4 ]; }
@@ -81,8 +81,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    double E_CASSCF = 0.0;
    double * three_dm = new double[ tot_dmrg_power6 ];
    double * contract = new double[ tot_dmrg_power6 ];
-   double * part4rdm = NULL;
-   if ( IPEA > 0.0 ){ part4rdm = new double[ tot_dmrg_power6 ]; }
 
    // Solve the active space problem
    if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI
@@ -103,20 +101,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
       copy_active( theFmatrix, mem2, iHandler );                 // Fock
-      if ( part4rdm == NULL ){
-         theFCI->Fock4RDM( inoutput, three_dm, mem2, contract ); // trace( Fock * 4-RDM )
-      } else {
-         for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
-         for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-            theFCI->Diag4RDM( inoutput, three_dm, ham_orbz, mem1 );
-            int size = tot_dmrg_power6;
-            double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-            int inc1 = 1;
-            daxpy_( &size, &f_zz, mem1, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-            size = tot_dmrg_power4 * nOrbDMRG;
-            dcopy_( &size, mem1 + size * ham_orbz, &inc1, part4rdm + size * ham_orbz, &inc1 ); // IPEA
-         }
-      }
+      theFCI->Fock4RDM( inoutput, three_dm, mem2, contract );    // trace( Fock * 4-RDM )
       delete theFCI;
       delete [] inoutput;
 
@@ -130,26 +115,22 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
          if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
       theDMRG->calc_rdms_and_correlations( true );
-      copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM  );    // 2-RDM
-      copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );    // 3-RDM
-      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );      // 1-RDM
+      copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM  );        // 2-RDM
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );          // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
-      copy_active( theFmatrix, mem2, iHandler );               // Fock
+      copy_active( theFmatrix, mem2, iHandler );                   // Fock
       //CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
       for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-         theDMRG->Diag4RDM( mem1, ham_orbz, false );
+         theDMRG->Diag4RDM( three_dm, ham_orbz, false );
          int size = tot_dmrg_power6;
          double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
          int inc1 = 1;
-         daxpy_( &size, &f_zz, mem1, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-         if ( part4rdm != NULL ){
-            size = tot_dmrg_power4 * nOrbDMRG;
-            dcopy_( &size, mem1 + size * ham_orbz, &inc1, part4rdm + size * ham_orbz, &inc1 ); // IPEA
-         }
+         daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
       }
+      copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );        // 3-RDM --> three_dm was used as work space for the constracted 4-RDM
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
       if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
@@ -167,7 +148,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete [] mem2;
    if ( block_wise ){ delete [] mem3; }
    
-   CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, part4rdm, IPEA );
+   CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );
    const double E_CASPT2 = myCASPT2->solve();
    
    cout << "MOLCAS  test8 CASPT2-D = " << -0.1596306078 << endl;
@@ -177,7 +158,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete myCASPT2;
    delete [] three_dm;
    delete [] contract;
-   if ( part4rdm != NULL ){ delete [] part4rdm; }
    
    return E_CASPT2;
 

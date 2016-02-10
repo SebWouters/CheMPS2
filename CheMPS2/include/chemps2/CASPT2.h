@@ -72,9 +72,8 @@ namespace CheMPS2{
              \param two_dm   The spin-summed two-particle density matrix two_dm[i+L*(j+L*(k+L*l))] = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > (with L the number DMRG orbitals)
              \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals)
              \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals)
-             \param part4rdm The part of the 4-RDM needed for IPEA: part4rdm[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{r,z} a_{r,z} a_{r,s} a_{q,tau} a_{p,sigma} >. If NULL, the IPEA shift is not applied.
              \param IPEA     The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004) */
-         CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract, double * part4rdm, const double IPEA);
+         CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract, const double IPEA);
 
          //! Destructor
          virtual ~CASPT2();
@@ -203,12 +202,12 @@ namespace CheMPS2{
          double **** FDG_triplet;
 
          // Fill overlap and Fock matrices
-         void make_AA_CC( const bool OVLP, double * part4rdm, const double IPEA );
+         void make_AA_CC( const bool OVLP, const double IPEA );
          void make_DD( const bool OVLP, const double IPEA );
          void make_EE_GG( const bool OVLP, const double IPEA );
          void make_BB_FF_singlet( const bool OVLP, const double IPEA );
          void make_BB_FF_triplet( const bool OVLP, const double IPEA );
-         
+
          void make_FAD_FCD();
          void make_FEH_FGH();
          void make_FAB_FCF_singlet();

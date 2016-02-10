@@ -34,7 +34,7 @@ using std::endl;
 using std::min;
 using std::max;
 
-CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm, double * part4rdm, const double IPEA ){
+CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock_in, double * one_dm, double * two_dm, double * three_dm, double * contract_4dm, const double IPEA ){
 
    indices    = idx;
    fock       = fock_in;
@@ -47,7 +47,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
    vector_helper(); // Needs to be called BEFORE make_S**()!
 
-   make_AA_CC( true, NULL, 0.0 );
+   make_AA_CC( true, 0.0 );
    make_DD( true, 0.0 );
    make_EE_GG( true, 0.0 );
    make_BB_FF_singlet( true, 0.0 );
@@ -57,7 +57,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    construct_rhs( oei, ints );
 
    // The following Fock operator constructors need to be called AFTER make_S**()!
-   make_AA_CC( false, part4rdm, IPEA );
+   make_AA_CC( false, IPEA );
    make_DD( false, IPEA );
    make_EE_GG( false, IPEA );
    make_BB_FF_singlet( false, IPEA );
@@ -5623,7 +5623,7 @@ void CheMPS2::CASPT2::make_FAD_FCD(){
 
 }
 
-void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, double * part4rdm, const double IPEA ){
+void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
 
    /*
       SAA: < E_zy E_jx | 1 | E_ti E_uv > = delta_ij ( SAA[ Ii ][ xyztuv ] )
@@ -6388,7 +6388,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB singlet: - delta_uy ( Gamma_{tx} )
+               // SBB singlet: - delta_uy Gamma_{tx}
                // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
                if ( OVLP ){
                   for ( int uy = 0; uy < num_ut; uy++ ){
@@ -6412,7 +6412,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB singlet: - delta_tx ( Gamma_{uy} )
+               // SBB singlet: - delta_tx Gamma_{uy}
                // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                if ( OVLP ){
                   for ( int tx = 0; tx < num_ut; tx++ ){
@@ -6436,7 +6436,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB singlet: - delta_ux ( Gamma_{ty} )
+               // SBB singlet: - delta_ux Gamma_{ty}
                // FBB singlet: - delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
                if ( OVLP ){
                   for ( int ux = 0; ux < num_ut; ux++ ){
@@ -6460,7 +6460,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB singlet: - delta_ty ( Gamma_{ux} )
+               // SBB singlet: - delta_ty Gamma_{ux}
                // FBB singlet: - delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
                if ( OVLP ){
                   for ( int ty = 0; ty < num_ut; ty++ ){
@@ -6579,7 +6579,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                         }
                      }
 
-                     // SBB singlet: - delta_tx ( Gamma_{uy} )
+                     // SBB singlet: - delta_tx Gamma_{uy}
                      // FBB singlet: - delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                      if ( OVLP ){
                         for ( int xt = 0; xt < num_x; xt++ ){
@@ -6603,7 +6603,7 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                         }
                      }
 
-                     // SBB singlet: - delta_uy ( Gamma_{tx} )
+                     // SBB singlet: - delta_uy Gamma_{tx}
                      // FBB singlet: - delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
                      if ( OVLP ){
                         for ( int yu = 0; yu < num_y; yu++ ){
@@ -6765,7 +6765,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB triplet: - 3 delta_uy ( Gamma_{tx} )
+               // SBB triplet: - 3 delta_uy Gamma_{tx}
                // FBB triplet: - 3 delta_uy ( f_dot_2dm[ tx ] - f_yu Gamma_{tx} )
                if ( OVLP ){
                   for ( int uy = 0; uy < num_ut; uy++ ){
@@ -6789,7 +6789,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB triplet: - 3 delta_tx ( Gamma_{uy} )
+               // SBB triplet: - 3 delta_tx Gamma_{uy}
                // FBB triplet: - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                if ( OVLP ){
                   for ( int tx = 0; tx < num_ut; tx++ ){
@@ -6813,7 +6813,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB triplet: + 3 delta_ux ( Gamma_{ty} )
+               // SBB triplet: + 3 delta_ux Gamma_{ty}
                // FBB triplet: + 3 delta_ux ( f_dot_2dm[ ty ] - f_uu Gamma_{ty} )
                if ( OVLP ){
                   for ( int ux = 0; ux < num_ut; ux++ ){
@@ -6837,7 +6837,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                   }
                }
 
-               // SBB triplet: + 3 delta_ty ( Gamma_{ux} )
+               // SBB triplet: + 3 delta_ty Gamma_{ux}
                // FBB triplet: + 3 delta_ty ( f_dot_2dm[ ux ] - f_tt Gamma_{ux} )
                if ( OVLP ){
                   for ( int ty = 0; ty < num_ut; ty++ ){
@@ -6956,7 +6956,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                         }
                      }
 
-                     // SBB triplet: - 3 delta_tx ( Gamma_{uy} )
+                     // SBB triplet: - 3 delta_tx Gamma_{uy}
                      // FBB triplet: - 3 delta_tx ( f_dot_2dm[ uy ] - f_tt Gamma_{uy} )
                      if ( OVLP ){
                         for ( int xt = 0; xt < num_x; xt++ ){
@@ -6980,7 +6980,7 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                         }
                      }
 
-                     // SBB triplet: - 3 delta_uy ( Gamma_{tx} )
+                     // SBB triplet: - 3 delta_uy Gamma_{tx}
                      // FBB triplet: - 3 delta_uy ( f_dot_2dm[ tx ] - f_uu Gamma_{tx} )
                      if ( OVLP ){
                         for ( int yu = 0; yu < num_y; yu++ ){
