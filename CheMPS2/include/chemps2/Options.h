@@ -45,7 +45,7 @@ namespace CheMPS2{
    const bool   DMRGSCF_storeDIIS             = true;
    const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
 
-   const double CASPT2_OVLP_CUTOFF            = 1e-7;
+   const double CASPT2_OVLP_CUTOFF            = 1e-8;
 
    const double CONJ_GRADIENT_RTOL            = 1e-10;
    const double CONJ_GRADIENT_PRECOND_CUTOFF  = 1e-12;
