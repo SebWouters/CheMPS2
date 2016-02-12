@@ -97,6 +97,9 @@ namespace CheMPS2{
          /** \return The min. energy encountered so far during the sweeps. */
          double Solve();
          
+         //! Reconstruct the renormalized operators when you overwrite the matrix elements with Prob->setMxElement()
+         void PreSolve();
+         
          //! Calculate the 2-RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge.
          void calc2DMandCorrelations(){ calc_rdms_and_correlations(false); }
          
@@ -248,9 +251,6 @@ namespace CheMPS2{
          TensorGYZ ** Ztensors;
          TensorKM  ** Ktensors;
          TensorKM  ** Mtensors;
-         
-         //Sets everything up for the first solve
-         void PreSolve();
          
          //sweepleft
          double sweepleft(const bool change, const int instruction, const bool am_i_master);

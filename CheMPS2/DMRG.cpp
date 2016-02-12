@@ -191,6 +191,8 @@ CheMPS2::DMRG::~DMRG(){
 }
 
 void CheMPS2::DMRG::PreSolve(){
+
+   deleteAllBoundaryOperators();
    
    for (int cnt=0; cnt<L-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }
    

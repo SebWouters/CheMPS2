@@ -84,7 +84,7 @@ int main(void){
    delete theDMRG;
    
    //Hack: overwrite the matrix elements in momentum space (4-fold symmetry!!!) directly in the Problem object
-   theDMRG = new CheMPS2::DMRG(Prob, OptScheme);  // Prob->construct_mxelem() is called now
+   theDMRG = new CheMPS2::DMRG(Prob, OptScheme); // Prob->construct_mxelem() is called now
    for (int orb1=0; orb1<L_square; orb1++){
       const int k1x = orb1 % L_linear;
       const int k1y = orb1 / L_linear;
@@ -111,6 +111,7 @@ int main(void){
          }
       }
    }
+   theDMRG->PreSolve(); // New matrix elements require reconstruction of complementary renormalized operators
    const double EnergyMomentum = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    
