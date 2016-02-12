@@ -64,7 +64,16 @@ int main(void){
    delete [] irreps;
 
    CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
-   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme); // Prob->construct_mxelem() is called now
+   for ( int orb1 = 0; orb1 < L; orb1++ ){
+      for ( int orb2 = 0; orb2 < L; orb2++ ){
+         for ( int orb3 = 0; orb3 < L; orb3++ ){
+            for ( int orb4 = 0; orb4 < L; orb4++ ){
+               Prob->setMxElement( orb1, orb2, orb3, orb4, 0.0 );
+            }
+         }
+      }
+   }
    for ( int orb1 = 0; orb1 < L; orb1++ ){
       for ( int orb2 = 0; orb2 < L; orb2++ ){
          const double eri = g * pow( fabs( eps[ orb1 ] * eps[ orb2 ] ), power );
@@ -77,7 +86,7 @@ int main(void){
          }
       }
    }
-
+   theDMRG->PreSolve(); // New matrix elements require reconstruction of complementary renormalized operators
    const double Energy = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -96,7 +105,7 @@ int main(void){
    delete Ham;
 
    //Check succes
-   const bool success = (( fabs( -25.513413760057 - Energy ) < 1e-8 ) ? true : false );
+   const bool success = (( fabs( -25.513413760059 - Energy ) < 1e-8 ) ? true : false );
 
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

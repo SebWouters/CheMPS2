@@ -131,6 +131,8 @@ cdef class PyDMRG:
         del self.thisptr
     def Solve(self):
         return self.thisptr.Solve()
+    def PreSolve(self):
+        self.thisptr.PreSolve()
     def calc2DMandCorrelations(self):
         self.thisptr.calc2DMandCorrelations()
     def calc_rdms_and_correlations(self, bint do_3rdm):

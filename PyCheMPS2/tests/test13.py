@@ -74,6 +74,7 @@ for orb1 in range( L ):
       else:
          Prob.setMxElement( orb1, orb1, orb2, orb2, eri )
          Prob.setMxElement( orb1, orb2, orb1, orb2, oei )
+theDMRG.PreSolve() # New matrix elements require reconstruction of complementary renormalized operators
 Energy = theDMRG.Solve()
 theDMRG.calc2DMandCorrelations()
 theDMRG.printCorrelations()
@@ -88,7 +89,7 @@ del Ham
 del Initializer
 
 # Check whether the test succeeded
-if ( np.fabs( -25.513413760057 - Energy ) < 1e-8 ):
+if ( np.fabs( -25.513413760059 - Energy ) < 1e-8 ):
     print "================> Did test 13 succeed : yes"
 else:
     print "================> Did test 13 succeed : no"

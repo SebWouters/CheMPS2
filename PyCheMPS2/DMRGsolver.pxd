@@ -28,6 +28,7 @@ cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
     cdef cppclass DMRG:
         DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bint makechkpt, const string tmpfolder) except +
         double Solve()
+        void PreSolve()
         void calc2DMandCorrelations()
         void calc_rdms_and_correlations(const bint do_3rdm)
         void Diag4RDM(double * output, const int ham_orbz, const bint last_case)

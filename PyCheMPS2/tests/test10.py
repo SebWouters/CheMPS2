@@ -104,6 +104,7 @@ for orb1 in range(L_square):
                 if (( orb1 == orb3 ) and ( orb2 == orb4 )):
                     temp += (Telem1+Telem2)/(Nelec-1)
                 Prob.setMxElement(orb1,orb2,orb3,orb4,temp)
+theDMRG.PreSolve() # New matrix elements require reconstruction of complementary renormalized operators
 EnergyMomentum = theDMRG.Solve()
 theDMRG.calc2DMandCorrelations()
 
