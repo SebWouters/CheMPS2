@@ -22,7 +22,6 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
-#include "FCI.h"
 #include "MPIchemps2.h"
 
 using namespace std;
@@ -34,35 +33,52 @@ int main(void){
    #endif
 
    CheMPS2::Initialize::Init();
-   
-   //The Hamiltonian: 1D Hubbard model
-   const int L = 10;
-   const int Group = 0;
-   const double U = 2.0;
-   const double T = -1.0;
-   int * irreps = new int[L];
-   for (int cnt=0; cnt<L; cnt++){ irreps[cnt] = 0; }
-   //The Hamiltonian initializes all its matrix elements to 0.0
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L, Group, irreps);
-   delete [] irreps;
-   for (int cnt=0; cnt<L; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }
-   for (int cnt=0; cnt<L-1; cnt++){ Ham->setTmat(cnt,cnt+1,T); }
-   
-   //The targeted state
-   const int TwoS = 5;
-   const int N = 9;
-   const int Irrep = 0;
-   CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
-   
+
+   const int L = 8; //Number of single-particle states
+   double eps[] = { -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5 };
+   const double g = -1.0;
+   const double power = 0.0;
+
+   const int N = L;     //Number of fermions in the model
+   const int TwoS = 0;  //Twice the total spin
+   const int Irrep = 0; //No point group is used, Irrep should ALWAYS be zero.
+
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
    //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-   OptScheme->setInstruction(0,   30, 1e-10,  3, 0.1);
-   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0);
-   
-   //Run ground state calculation
+   OptScheme->setInstruction(0,  100, 1e-10, 10, 0.5 );
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0 );
+
+   /*
+   Model: h_ij = delta_ij eps[i]
+          v_ijkl = delta_ij delta_kl g ( eps[i] * eps[k] ) ^ {power}
+          h_ijkl = v_ijkl + ( delta_ik h_jl + delta_jl h_ik ) / ( N - 1 )
+          Ham = 0.5 sum_ijkl h_ijkl sum_sigma,tau a^+_{i,sigma} a^+_{j,tau} a_{l,tau} a_{k,sigma}
+   */
+
+   // C1 point group symmetry
+   const int group = 0;
+   int * irreps = new int[ L ];
+   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = 0; }
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( L, group, irreps ); // The Hamiltonian initializes all its matrix elements to zero
+   delete [] irreps;
+
+   CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
-   const double EnergyDMRG = theDMRG->Solve();
+   for ( int orb1 = 0; orb1 < L; orb1++ ){
+      for ( int orb2 = 0; orb2 < L; orb2++ ){
+         const double eri = g * pow( fabs( eps[ orb1 ] * eps[ orb2 ] ), power );
+         const double oei = ( eps[ orb1 ] + eps[ orb2 ] ) / ( N - 1 );
+         if ( orb1 == orb2 ){
+            Prob->setMxElement( orb1, orb1, orb2, orb2, eri + oei );
+         } else {
+            Prob->setMxElement( orb1, orb1, orb2, orb2, eri );
+            Prob->setMxElement( orb1, orb2, orb1, orb2, oei );
+         }
+      }
+   }
+
+   const double Energy = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    #ifdef CHEMPS2_MPI_COMPILATION
    if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
@@ -70,43 +86,23 @@ int main(void){
    {
       theDMRG->getCorrelations()->Print();
    }
-   
+
    //Clean up DMRG
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
    delete Prob;
-   
-   //Calculate FCI reference energy
-   double EnergyFCI = 0.0;
-   #ifdef CHEMPS2_MPI_COMPILATION
-   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
-   #endif
-   {
-      const int Nel_up   = ( N + TwoS ) / 2;
-      const int Nel_down = ( N - TwoS ) / 2;
-      const double maxMemWorkMB = 10.0;
-      const int FCIverbose = 1;
-      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
-      EnergyFCI = theFCI->GSDavidson(NULL);
-      delete theFCI;
-   }
-   #ifdef CHEMPS2_MPI_COMPILATION
-   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI, 1, MPI_CHEMPS2_MASTER );
-   #endif
-   
-   //Clean up the Hamiltonian
    delete Ham;
-   
+
    //Check succes
-   const bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) ? true : false;
-   
+   const bool success = (( fabs( -25.513413760057 - Energy ) < 1e-8 ) ? true : false );
+
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
    #endif
-   
-   cout << "================> Did test 4 succeed : ";
+
+   cout << "================> Did test 13 succeed : ";
    if (success){
       cout << "yes" << endl;
       return 0; //Success

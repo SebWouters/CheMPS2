@@ -728,6 +728,10 @@ fourfold permutation symmetry.
 [tests/test4.cpp.in](tests/test4.cpp.in), in which the FCI and DMRG
 2- and 3-RDM are compared for a wavefunction with higher multiplicity.
 
+[tests/test13.cpp.in](tests/test13.cpp.in) contains a ground state DMRG
+calculation of a BCS Hamiltonian. The matrix elements only have fourfold
+permutation symmetry.
+
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
 contains the matrix elements for test3 and test11.
 

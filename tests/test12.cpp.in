@@ -65,7 +65,12 @@ int main(void){
    const double EnergyDMRG = theDMRG->Solve();
    const bool do_3rdm = true;
    theDMRG->calc_rdms_and_correlations(do_3rdm);
-   theDMRG->getCorrelations()->Print();
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      theDMRG->getCorrelations()->Print();
+   }
    
    //Get a diagonal block of the 4-RDM
    const int ham_orbz = 3;
