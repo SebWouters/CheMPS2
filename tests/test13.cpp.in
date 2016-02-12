@@ -67,15 +67,6 @@ int main(void){
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme); // Prob->construct_mxelem() is called now
    for ( int orb1 = 0; orb1 < L; orb1++ ){
       for ( int orb2 = 0; orb2 < L; orb2++ ){
-         for ( int orb3 = 0; orb3 < L; orb3++ ){
-            for ( int orb4 = 0; orb4 < L; orb4++ ){
-               Prob->setMxElement( orb1, orb2, orb3, orb4, 0.0 );
-            }
-         }
-      }
-   }
-   for ( int orb1 = 0; orb1 < L; orb1++ ){
-      for ( int orb2 = 0; orb2 < L; orb2++ ){
          const double eri = g * pow( fabs( eps[ orb1 ] * eps[ orb2 ] ), power );
          const double oei = ( eps[ orb1 ] + eps[ orb2 ] ) / ( N - 1 );
          if ( orb1 == orb2 ){

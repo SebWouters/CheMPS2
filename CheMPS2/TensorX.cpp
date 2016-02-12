@@ -126,14 +126,14 @@ void CheMPS2::TensorX::makenewRight(const int ikappa, TensorT * denT){
    
    int dimR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
    int dimL = denBK->gCurrentDim(index-1, sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa]);
+   double alpha = Prob->gMxElement(index-1,index-1,index-1,index-1);
       
-   if (dimL>0){
+   if ((dimL>0) && (fabs(alpha)>0.0)){
       
       double * BlockT = denT->gStorage(sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
       char trans = 'T';
       char notr = 'N';
       double beta = 0.0; //because there's only 1 term contributing per kappa, we might as well set it i.o. adding
-      double alpha = Prob->gMxElement(index-1,index-1,index-1,index-1);
       dgemm_(&trans,&notr,&dimR,&dimR,&dimL,&alpha,BlockT,&dimL,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimR);
       
    } else {
@@ -146,14 +146,14 @@ void CheMPS2::TensorX::makenewLeft(const int ikappa, TensorT * denT){
    
    int dimL = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);
    int dimR = denBK->gCurrentDim(index+1, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);
+   double alpha = Prob->gMxElement(index,index,index,index);
 
-   if (dimR>0){
+   if ((dimR>0) && (fabs(alpha)>0.0)){
    
       double * BlockT = denT->gStorage(sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);
       char trans = 'T';
       char notr = 'N';
       double beta = 0.0; //set, not add (only 1 term)
-      double alpha = Prob->gMxElement(index,index,index,index);
       dgemm_(&notr,&trans,&dimL,&dimL,&dimR,&alpha,BlockT,&dimL,BlockT,&dimL,&beta,storage+kappa2index[ikappa],&dimL);
       
    } else {
