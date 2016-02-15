@@ -77,9 +77,9 @@ namespace CheMPS2{
 
          //! Destructor
          virtual ~CASPT2();
-         
+
          //! Solve the CASPT2 energy
-         double solve( const bool diag_only = false ) const;
+         double solve() const;
 
       private:
       
@@ -133,7 +133,12 @@ namespace CheMPS2{
          void diagonal( double * result, const double ovlp_prefactor ) const;
          
          // Fill result with Fock operator times vector
-         void matvec( double * vector, double * result, double * diag_fock ) const;
+         void matvec( double * vector, double * result, char trans_diag ) const;
+         static void matvec_helper_diag( double * origin, double * target, int SIZE, double * FOCK, double alpha, double beta, char totrans );
+         static void matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans );
+         static void diagonal_helper1( double * FOCK, const int SIZE_L, const int SIZE_R, double * result );
+         static void diagonal_helper2( double * FOCK2, double * FOCK, const int SIZE, const int alpha, const double beta, double * target );
+         //void check_symmetric() const;
          
          // Variables for the partitioning of the vector in blocks
          int * jump;
@@ -218,7 +223,7 @@ namespace CheMPS2{
 
          // Diagonalize the overlap matrices and adjust jump, vector_rhs, and FXX accordingly
          void recreate();
-         static int  recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
+         static int  recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * work2, double * eigs, int lwork );
          static void recreatehelper2( double * LEFT, double * RIGHT, double ** matrix, double * work, int OLD_LEFT, int NEW_LEFT, int OLD_RIGHT, int NEW_RIGHT, const int number );
          static void recreatehelper3( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
          
