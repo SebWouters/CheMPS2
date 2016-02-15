@@ -151,9 +151,10 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );
    const double E_CASPT2 = myCASPT2->solve();
    
-   cout << "MOLCAS  test8 CASPT2-D = " << -0.1596306078 << endl;
-   cout << "MOLCAS  test8 CASPT2-N = " << -0.1599978130 << endl;
-   cout << "CheMPS2 test8 CASPT2-N = " << E_CASPT2 << endl;
+   cout << "MOLCAS  test8 CASPT2-D  = " << -0.1596306078 << endl;
+   cout << "MOLCAS  test8 CASPT2-N  = " << -0.1599978130 << endl;
+   cout << "MOLCAS  test8 IPEA 0.25 = " << -0.1586938730 << endl;
+   cout << "CheMPS2 test8 CASPT2-N  = " << E_CASPT2 << endl;
    
    delete myCASPT2;
    delete [] three_dm;

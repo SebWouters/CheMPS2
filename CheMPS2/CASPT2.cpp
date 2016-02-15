@@ -80,17 +80,17 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
 
 }
 
-/*void CheMPS2::CASPT2::check_symmetric() const{
+void CheMPS2::CASPT2::check_symmetric() const{
 
-   int total_size  = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   double * matrix = new double[ total_size * total_size ];
-   double * work   = new double[ total_size ];
-   double * work2  = new double[ total_size ];
+   const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   double * matrix    = new double[ total_size * total_size ];
+   double * diag_fock = new double[ total_size ];
+   double * work      = new double[ total_size ];
+   diagonal( diag_fock );
    for ( int col = 0; col < total_size; col++ ){
       for ( int row = 0; row < total_size; row++ ){ work[ row ] = 0.0; }
       work[ col ] = 1.0;
-      matvec( work, work2, 'N' );
-      matvec( work2, matrix + col * total_size, 'T' );
+      matvec( work, matrix + col * total_size, diag_fock );
    }
    double rms_symmetric = 0.0;
    for ( int row = 0; row < total_size; row++ ){
@@ -102,10 +102,10 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    rms_symmetric = sqrt( rms_symmetric );
    cout << "CASPT2 : RMS deviation from symmetric operator = " << rms_symmetric << endl;
    delete [] work;
-   delete [] work2;
+   delete [] diag_fock;
    delete [] matrix;
 
-}*/
+}
 
 CheMPS2::CASPT2::~CASPT2(){
 
@@ -224,33 +224,71 @@ CheMPS2::CASPT2::~CASPT2(){
 double CheMPS2::CASPT2::solve() const{
 
    int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   double * work = new double[ total_size ];
+   double * diag_fock = new double[ total_size ];
+   diagonal( diag_fock );
+
+   double min_eig = diag_fock[ 0 ];
+   for ( int elem = 1; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
+   cout << "CASPT2 : Minimum value on diagonal of 0th order operator = " << min_eig << endl;
+
    ConjugateGradient CG( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
    double ** pointers = new double*[ 3 ];
    char instruction = CG.step( pointers );
    assert( instruction == 'A' );
-   matvec( vector_rhs, pointers[ 2 ], 'T' ); // RHS of the linear problem ( F - E_F S )^T * ( F - E_F S ) * x = ( F - E_F S )^T * V
-   matvec( NULL,       pointers[ 1 ], 'P' ); // Diagonal preconditioner
-   for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 0 ][ elem ] = pointers[ 2 ][ elem ] / pointers[ 1 ][ elem ]; } // Initial guess = RHS / diag
+   for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 0 ][ elem ] = vector_rhs[ elem ] / diag_fock[ elem ]; } // Initial guess of F * x = V
+   for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 1 ][ elem ] =  diag_fock[ elem ]; } // Diagonal of the operator F
+   for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 2 ][ elem ] = vector_rhs[ elem ]; } // RHS of the linear problem F * x = V
+   int inc1 = 1;
+   const double E_CASPT2_D = - ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 2 ], &inc1 );
+   cout << "CASPT2 : E(CASPT2-D) = " << E_CASPT2_D << endl;
    instruction = CG.step( pointers );
    assert( instruction == 'B' );
    while ( instruction == 'B' ){
-      matvec( pointers[ 0 ], work, 'N' );
-      matvec( work, pointers[ 1 ], 'T' );
+      matvec( pointers[ 0 ], pointers[ 1 ], diag_fock );
       instruction = CG.step( pointers );
    }
    assert( instruction == 'C' );
-   int inc1 = 1;
-   const double E_CASPT2 = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
+   const double E_CASPT2_N = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
    const double rnorm = pointers[ 1 ][ 0 ];
    cout << "CASPT2 : Residual norm of F * c - V = " << rnorm << endl;
-   const double weight = 1.0 / ( 1.0 + ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 0 ], & inc1 ) );
-   cout << "CASPT2 : Fraction of CASSCF wfn in 1st order wfn = " << weight << endl;
-   cout << "CASPT2 : Number of matrix-vector products = " << CG.get_num_matvec() << endl;
+
+   //double energies[ CHEMPS2_CASPT2_NUM_CASES ];
+   double inproducts[ CHEMPS2_CASPT2_NUM_CASES ];
+   for ( int geval = 0; geval < CHEMPS2_CASPT2_NUM_CASES; geval++ ){
+      int pntr = jump[ num_irreps * geval ];
+      int size = jump[ num_irreps * ( geval + 1 ) ] - pntr;
+      //energies[ geval ] = - ddot_( &size, pointers[ 0 ] + pntr, &inc1, vector_rhs + pntr, &inc1 );
+      inproducts[ geval ] = ddot_( &size, pointers[ 0 ] + pntr, &inc1, pointers[ 0 ] + pntr, & inc1 );
+   }
    delete [] pointers;
-   cout << "CASPT2 : E2 = " << E_CASPT2 << endl;
-   delete [] work;
-   return E_CASPT2;
+   const double C1_dot_C1 = ( inproducts[ CHEMPS2_CASPT2_A ]
+                            + inproducts[ CHEMPS2_CASPT2_C ]
+                            + inproducts[ CHEMPS2_CASPT2_D ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_B_SINGLET ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_B_TRIPLET ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_F_SINGLET ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_F_TRIPLET ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_E_SINGLET ]
+                            +  6 * inproducts[ CHEMPS2_CASPT2_E_TRIPLET ]
+                            +  2 * inproducts[ CHEMPS2_CASPT2_G_SINGLET ]
+                            +  6 * inproducts[ CHEMPS2_CASPT2_G_TRIPLET ]
+                            +  4 * inproducts[ CHEMPS2_CASPT2_H_SINGLET ]
+                            + 12 * inproducts[ CHEMPS2_CASPT2_H_TRIPLET ] );
+   cout << "CASPT2 : Fraction of CASSCF wfn in 1st order wfn = " << 1.0 / ( 1.0 + C1_dot_C1 ) << endl;
+   cout << "CASPT2 : Number of matrix-vector products = " << CG.get_num_matvec() << endl;
+   /*
+   cout << "CASPT2 : Energy VJTU = " << energies[ CHEMPS2_CASPT2_A ] << endl;
+   cout << "CASPT2 : Energy VJTI = " << energies[ CHEMPS2_CASPT2_B_SINGLET ] + energies[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
+   cout << "CASPT2 : Energy ATVX = " << energies[ CHEMPS2_CASPT2_C ] << endl;
+   cout << "CASPT2 : Energy AIVX = " << energies[ CHEMPS2_CASPT2_D ] << endl;
+   cout << "CASPT2 : Energy VJAI = " << energies[ CHEMPS2_CASPT2_E_SINGLET ] + energies[ CHEMPS2_CASPT2_E_TRIPLET ] << endl;
+   cout << "CASPT2 : Energy BVAT = " << energies[ CHEMPS2_CASPT2_F_SINGLET ] + energies[ CHEMPS2_CASPT2_F_TRIPLET ] << endl;
+   cout << "CASPT2 : Energy BJAT = " << energies[ CHEMPS2_CASPT2_G_SINGLET ] + energies[ CHEMPS2_CASPT2_G_TRIPLET ] << endl;
+   cout << "CASPT2 : Energy BJAI = " << energies[ CHEMPS2_CASPT2_H_SINGLET ] + energies[ CHEMPS2_CASPT2_H_TRIPLET ] << endl;
+   */
+   cout << "CASPT2 : E(CASPT2-N) = " << E_CASPT2_N << endl;
+   delete [] diag_fock;
+   return E_CASPT2_N;
 
 }
 
@@ -767,7 +805,7 @@ long long CheMPS2::CASPT2::debug_total_length() const{
 
 }
 
-int CheMPS2::CASPT2::recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * work2, double * eigs, int lwork ){
+int CheMPS2::CASPT2::recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork ){
 
    if ( SIZE == 0 ){ return SIZE; }
 
@@ -805,19 +843,17 @@ int CheMPS2::CASPT2::recreatehelper1( double * FOCK, double * OVLP, int SIZE, do
    dgemm_( &notrans, &notrans, &SIZE,    &NEWSIZE, &SIZE, &one, FOCK, &SIZE, OVLP + skip * SIZE, &SIZE, &set, work, &SIZE    ); // work = FOCK * V * eigs^{-0.5}
    dgemm_( &trans,   &notrans, &NEWSIZE, &NEWSIZE, &SIZE, &one, OVLP + skip * SIZE, &SIZE, work, &SIZE, &set, FOCK, &NEWSIZE ); // FOCK = ( V * eigs^{-0.5} )^T * work
 
-   // FOCK = U_F * lambda * V_F^T
-   dgemm_( &trans, &notrans, &NEWSIZE, &NEWSIZE, &NEWSIZE, &one, FOCK, &NEWSIZE, FOCK, &NEWSIZE, &set, work, &NEWSIZE );
-   dsyev_( &jobz, &uplo, &NEWSIZE, work, &NEWSIZE, eigs, work2, &lwork, &info );
+   // FOCK_tilde = U_F_tilde eigs_F_tilde U_F_tilde^T
+   dsyev_( &jobz, &uplo, &NEWSIZE, FOCK, &NEWSIZE, eigs, work, &lwork, &info ); // eigs in ascending order
 
-   // OVLP = U_S eigs_S^{-0.5} V_F
-   dgemm_( &notrans, &notrans, &SIZE, &NEWSIZE, &NEWSIZE, &one, OVLP + skip * SIZE, &SIZE, work, &NEWSIZE, &set, work2, &SIZE );
+   // OVLP  <---  U_S eigs_S^{-0.5} U_F_tilde
+   dgemm_( &notrans, &notrans, &SIZE, &NEWSIZE, &NEWSIZE, &one, OVLP + skip * SIZE, &SIZE, FOCK, &NEWSIZE, &set, work, &SIZE );
    int size_copy = SIZE * NEWSIZE;
    int inc1 = 1;
-   dcopy_( &size_copy, work2, &inc1, OVLP, &inc1 );
+   dcopy_( &size_copy, work, &inc1, OVLP, &inc1 );
 
-   // FOCK = V_F^T * U_F * lambda
-   dgemm_( &notrans, &notrans, &NEWSIZE, &NEWSIZE, &NEWSIZE, &one, FOCK, &NEWSIZE, work,  &NEWSIZE, &set, work2, &NEWSIZE );
-   dgemm_( &trans,   &notrans, &NEWSIZE, &NEWSIZE, &NEWSIZE, &one, work, &NEWSIZE, work2, &NEWSIZE, &set, FOCK,  &NEWSIZE );
+   // FOCK  <---  eigs_F_tilde
+   dcopy_( &NEWSIZE, eigs, &inc1, FOCK, &inc1 );
 
    return NEWSIZE;
 
@@ -856,7 +892,6 @@ void CheMPS2::CASPT2::recreate(){
    const int maxsize = get_maxsize(); // Minimum 3
    const int lwork = maxsize * maxsize;
    double * work  = new double[ lwork ];
-   double * work2 = new double[ lwork ];
    double * eigs  = new double[ maxsize ];
 
    int * newsize_A = new int[ num_irreps ];
@@ -870,15 +905,15 @@ void CheMPS2::CASPT2::recreate(){
    int * newsize_F_triplet = new int[ num_irreps ];
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      newsize_A[ irrep ] = recreatehelper1( FAA[ irrep ], SAA[ irrep ], size_A[ irrep ], work, work2, eigs, lwork );
-      newsize_C[ irrep ] = recreatehelper1( FCC[ irrep ], SCC[ irrep ], size_C[ irrep ], work, work2, eigs, lwork );
-      newsize_D[ irrep ] = recreatehelper1( FDD[ irrep ], SDD[ irrep ], size_D[ irrep ], work, work2, eigs, lwork );
-      newsize_E[ irrep ] = recreatehelper1( FEE[ irrep ], SEE[ irrep ], size_E[ irrep ], work, work2, eigs, lwork );
-      newsize_G[ irrep ] = recreatehelper1( FGG[ irrep ], SGG[ irrep ], size_G[ irrep ], work, work2, eigs, lwork );
-      newsize_B_singlet[ irrep ] = recreatehelper1( FBB_singlet[ irrep ], SBB_singlet[ irrep ], size_B_singlet[ irrep ], work, work2, eigs, lwork );
-      newsize_B_triplet[ irrep ] = recreatehelper1( FBB_triplet[ irrep ], SBB_triplet[ irrep ], size_B_triplet[ irrep ], work, work2, eigs, lwork );
-      newsize_F_singlet[ irrep ] = recreatehelper1( FFF_singlet[ irrep ], SFF_singlet[ irrep ], size_F_singlet[ irrep ], work, work2, eigs, lwork );
-      newsize_F_triplet[ irrep ] = recreatehelper1( FFF_triplet[ irrep ], SFF_triplet[ irrep ], size_F_triplet[ irrep ], work, work2, eigs, lwork );
+      newsize_A[ irrep ] = recreatehelper1( FAA[ irrep ], SAA[ irrep ], size_A[ irrep ], work, eigs, lwork );
+      newsize_C[ irrep ] = recreatehelper1( FCC[ irrep ], SCC[ irrep ], size_C[ irrep ], work, eigs, lwork );
+      newsize_D[ irrep ] = recreatehelper1( FDD[ irrep ], SDD[ irrep ], size_D[ irrep ], work, eigs, lwork );
+      newsize_E[ irrep ] = recreatehelper1( FEE[ irrep ], SEE[ irrep ], size_E[ irrep ], work, eigs, lwork );
+      newsize_G[ irrep ] = recreatehelper1( FGG[ irrep ], SGG[ irrep ], size_G[ irrep ], work, eigs, lwork );
+      newsize_B_singlet[ irrep ] = recreatehelper1( FBB_singlet[ irrep ], SBB_singlet[ irrep ], size_B_singlet[ irrep ], work, eigs, lwork );
+      newsize_B_triplet[ irrep ] = recreatehelper1( FBB_triplet[ irrep ], SBB_triplet[ irrep ], size_B_triplet[ irrep ], work, eigs, lwork );
+      newsize_F_singlet[ irrep ] = recreatehelper1( FFF_singlet[ irrep ], SFF_singlet[ irrep ], size_F_singlet[ irrep ], work, eigs, lwork );
+      newsize_F_triplet[ irrep ] = recreatehelper1( FFF_triplet[ irrep ], SFF_triplet[ irrep ], size_F_triplet[ irrep ], work, eigs, lwork );
    }
 
    for ( int IL = 0; IL < num_irreps; IL++ ){
@@ -952,7 +987,6 @@ void CheMPS2::CASPT2::recreate(){
    }
 
    delete [] work;
-   delete [] work2;
    delete [] eigs;
 
    double * tempvector_rhs = new double[ jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ] ];
@@ -1126,36 +1160,6 @@ int CheMPS2::CASPT2::get_maxsize() const{
 
 }
 
-void CheMPS2::CASPT2::diagonal_helper1( double * FOCK, const int SIZE_L, const int SIZE_R, double * result ){
-
-   // result[ i ] = FOCK[ :, i ]^T * FOCK[ :, i ]
-   for ( int col = 0; col < SIZE_R; col++ ){
-      result[ col ] = 0.0;
-      for ( int row = 0; row < SIZE_L; row++ ){
-         result[ col ] += FOCK[ row + SIZE_L * col ] * FOCK[ row + SIZE_L * col ];
-      }
-   }
-
-}
-
-void CheMPS2::CASPT2::diagonal_helper2( double * FOCK2, double * FOCK, const int SIZE, const int alpha, const double beta, double * target ){
-
-   for ( int elem = 0; elem < SIZE; elem++ ){
-      target[ elem ] = alpha * alpha * FOCK2[ elem ] + 2 * alpha * beta * FOCK[ elem * ( 1 + SIZE ) ] + beta * beta;
-   }
-
-}
-
-void CheMPS2::CASPT2::matvec_helper_diag( double * origin, double * target, int SIZE, double * FOCK, double alpha, double beta, char totrans ){
-
-   // target = ( alpha * FOCK^{ totrans } + beta ) * origin
-   double set = 0.0;
-   int inc1 = 1;
-   dgemv_( &totrans, &SIZE, &SIZE, &alpha, FOCK, &SIZE, origin, &inc1, &set, target, &inc1 );
-   daxpy_( &SIZE, &beta, origin, &inc1, target, &inc1 );
-
-}
-
 void CheMPS2::CASPT2::matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans ){
 
    // target += alpha * FOCK^{ totrans } * origin
@@ -1165,7 +1169,7 @@ void CheMPS2::CASPT2::matvec_helper_offdiag( double * origin, double * target, i
 
 }
 
-void CheMPS2::CASPT2::matvec( double * vector, double * result, const char trans_diag ) const{
+void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fock ) const{
 
    /*
          FOCK  | A  Bsinglet  Btriplet  C     D1     D2    Esinglet  Etriplet  Fsinglet  Ftriplet  Gsinglet  Gtriplet  Hsinglet  Htriplet
@@ -1187,644 +1191,11 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, const char trans
       
    */
 
-   assert( ( trans_diag == 'T' ) || ( trans_diag == 'N' ) || ( trans_diag == 'P' ) );
-   const bool preconditioner = (( trans_diag == 'P' ) ? true : false );
+   const int vectorlength = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   for ( int elem = 0; elem < vectorlength; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
+
    const int maxlinsize = get_maxsize();
    double * workspace = new double[ maxlinsize * maxlinsize ];
-
-   // FAA: < E_zy E_jx | F | E_ti E_uv > = delta_ij * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_A[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FAA[ irrep ], SIZE, SIZE, workspace ); }
-         const int NOCC = indices->getNOCC( irrep );
-         for ( int count = 0; count < NOCC; count++ ){
-            const double beta = - f_dot_1dm - fock->get( irrep, count, count );
-            const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
-            if ( preconditioner ){
-               diagonal_helper2( workspace, FAA[ irrep ], SIZE, 1, beta, result + pointer );
-            } else {
-               matvec_helper_diag( vector + pointer, result + pointer, SIZE, FAA[ irrep ], 1.0, beta, trans_diag );
-            }
-         }
-      }
-   }
-
-   // FCC: < E_zy E_xb | F | E_at E_uv > = delta_ab * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_C[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FCC[ irrep ], SIZE, SIZE, workspace ); }
-         const int NVIR = indices->getNVIRT( irrep );
-         const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
-         for ( int count = 0; count < NVIR; count++ ){
-            const double beta = - f_dot_1dm + fock->get( irrep, N_OA + count, N_OA + count );
-            const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
-            if ( preconditioner ){
-               diagonal_helper2( workspace, FCC[ irrep ], SIZE, 1, beta, result + pointer );
-            } else {
-               matvec_helper_diag( vector + pointer, result + pointer, SIZE, FCC[ irrep ], 1.0, beta, trans_diag );
-            }
-         }
-      }
-   }
-
-   // FDD: < E_yx E_jb | F | E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_D[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FDD[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_a = Irreps::directProd( irrep_i, irrep );
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            for ( int i = 0; i < NOCC_i; i++ ){
-               const double f_ii = fock->get( irrep_i, i, i );
-               for ( int a = 0; a < NVIR_a; a++ ){
-                  const double beta = - f_dot_1dm + fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - f_ii;
-                  const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * ( shift + i + NOCC_i * a );
-                  if ( preconditioner ){
-                     diagonal_helper2( workspace, FDD[ irrep ], SIZE, 1, beta, result + pointer );
-                  } else {
-                     matvec_helper_diag( vector + pointer, result + pointer, SIZE, FDD[ irrep ], 1.0, beta, trans_diag );
-                  }
-               }
-            }
-            shift += NOCC_i * NVIR_a;
-         }
-      }
-   }
-
-   // FBB singlet: < SB_xkyl | F | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
-   {
-      const int SIZE = size_B_singlet[ 0 ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FBB_singlet[ 0 ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-            const int nocc_ij = indices->getNOCC( irrep_ij );
-            for ( int i = 0; i < nocc_ij; i++ ){
-               const double f_ii = fock->get( irrep_ij, i, i );
-               for ( int j = i; j < nocc_ij; j++ ){
-                  const double beta = - f_dot_1dm - f_ii - fock->get( irrep_ij, j, j );
-                  const int pointer = jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * ( shift + i + ( j * ( j + 1 ) ) / 2 );
-                  if ( preconditioner ){
-                     diagonal_helper2( workspace, FBB_singlet[ 0 ], SIZE, 2, 2 * beta, result + pointer );
-                  } else {
-                     matvec_helper_diag( vector + pointer, result + pointer, SIZE, FBB_singlet[ 0 ], 2.0, 2 * beta, trans_diag );
-                  }
-               }
-            }
-            shift += ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_B_singlet[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FBB_singlet[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_j = Irreps::directProd( irrep, irrep_i );
-            if ( irrep_i < irrep_j ){
-               const int nocc_i = indices->getNOCC( irrep_i );
-               const int nocc_j = indices->getNOCC( irrep_j );
-               for ( int i = 0; i < nocc_i; i++ ){
-                  const double f_ii = fock->get( irrep_i, i, i );
-                  for ( int j = 0; j < nocc_j; j++ ){
-                     const double beta = - f_dot_1dm - f_ii - fock->get( irrep_j, j, j );
-                     const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * ( shift + i + nocc_i * j );
-                     if ( preconditioner ){
-                        diagonal_helper2( workspace, FBB_singlet[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                     } else {
-                        matvec_helper_diag( vector + pointer, result + pointer, SIZE, FBB_singlet[ irrep ], 2.0, 2 * beta, trans_diag );
-                     }
-                  }
-               }
-               shift += nocc_i * nocc_j;
-            }
-         }
-      }
-   }
-
-   // FBB triplet: < TB_xkyl | F | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
-   {
-      const int SIZE = size_B_triplet[ 0 ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FBB_triplet[ 0 ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-            const int nocc_ij = indices->getNOCC( irrep_ij );
-            for ( int i = 0; i < nocc_ij; i++ ){
-               const double f_ii = fock->get( irrep_ij, i, i );
-               for ( int j = i+1; j < nocc_ij; j++ ){
-                  const double beta = - f_dot_1dm - f_ii - fock->get( irrep_ij, j, j );
-                  const int pointer = jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * ( shift + i + ( j * ( j - 1 ) ) / 2 );
-                  if ( preconditioner ){
-                     diagonal_helper2( workspace, FBB_triplet[ 0 ], SIZE, 2, 2 * beta, result + pointer );
-                  } else {
-                     matvec_helper_diag( vector + pointer, result + pointer, SIZE, FBB_triplet[ 0 ], 2.0, 2 * beta, trans_diag );
-                  }
-               }
-            }
-            shift += ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_B_triplet[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FBB_triplet[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_j = Irreps::directProd( irrep, irrep_i );
-            if ( irrep_i < irrep_j ){
-               const int nocc_i = indices->getNOCC( irrep_i );
-               const int nocc_j = indices->getNOCC( irrep_j );
-               for ( int i = 0; i < nocc_i; i++ ){
-                  const double f_ii = fock->get( irrep_i, i, i );
-                  for ( int j = 0; j < nocc_j; j++ ){
-                     const double beta = - f_dot_1dm - f_ii - fock->get( irrep_j, j, j );
-                     const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * ( shift + i + nocc_i * j );
-                     if ( preconditioner ){
-                        diagonal_helper2( workspace, FBB_triplet[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                     } else {
-                        matvec_helper_diag( vector + pointer, result + pointer, SIZE, FBB_triplet[ irrep ], 2.0, 2 * beta, trans_diag );
-                     }
-                  }
-               }
-               shift += nocc_i * nocc_j;
-            }
-         }
-      }
-   }
-
-   // FFF singlet: < SF_cxdy | F | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
-   {
-      const int SIZE = size_F_singlet[ 0 ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FFF_singlet[ 0 ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a; b < NVIR_ab; b++ ){
-                  const double beta = - f_dot_1dm + f_aa + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  const int pointer = jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * ( shift + a + ( b * ( b + 1 ) ) / 2 );
-                  if ( preconditioner ){
-                     diagonal_helper2( workspace, FFF_singlet[ 0 ], SIZE, 2, 2 * beta, result + pointer );
-                  } else {
-                     matvec_helper_diag( vector + pointer, result + pointer, SIZE, FFF_singlet[ 0 ], 2.0, 2 * beta, trans_diag );
-                  }
-               }
-            }
-            shift += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_F_singlet[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FFF_singlet[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int irrep_b = Irreps::directProd( irrep, irrep_a );
-            if ( irrep_a < irrep_b ){
-               const int NVIR_a = indices->getNVIRT( irrep_a );
-               const int NVIR_b = indices->getNVIRT( irrep_b );
-               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-               for ( int a = 0; a < NVIR_a; a++ ){
-                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                  for ( int b = 0; b < NVIR_b; b++ ){
-                     const double beta = - f_dot_1dm + f_aa + fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                     const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * ( shift + a + NVIR_a * b );
-                     if ( preconditioner ){
-                        diagonal_helper2( workspace, FFF_singlet[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                     } else {
-                        matvec_helper_diag( vector + pointer, result + pointer, SIZE, FFF_singlet[ irrep ], 2.0, 2 * beta, trans_diag );
-                     }
-                  }
-               }
-               shift += NVIR_a * NVIR_b;
-            }
-         }
-      }
-   }
-
-   // FFF triplet: < TF_cxdy | F | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
-   {
-      const int SIZE = size_F_triplet[ 0 ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FFF_triplet[ 0 ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a+1; b < NVIR_ab; b++ ){
-                  const double beta = - f_dot_1dm + f_aa + fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  const int pointer = jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * ( shift + a + ( b * ( b - 1 ) ) / 2 );
-                  if ( preconditioner ){
-                     diagonal_helper2( workspace, FFF_triplet[ 0 ], SIZE, 2, 2 * beta, result + pointer );
-                  } else {
-                     matvec_helper_diag( vector + pointer, result + pointer, SIZE, FFF_triplet[ 0 ], 2.0, 2 * beta, trans_diag );
-                  }
-               }
-            }
-            shift += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_F_triplet[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FFF_triplet[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int irrep_b = Irreps::directProd( irrep, irrep_a );
-            if ( irrep_a < irrep_b ){
-               const int NVIR_a = indices->getNVIRT( irrep_a );
-               const int NVIR_b = indices->getNVIRT( irrep_b );
-               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-               for ( int a = 0; a < NVIR_a; a++ ){
-                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                  for ( int b = 0; b < NVIR_b; b++ ){
-                     const double beta = - f_dot_1dm + f_aa + fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                     const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * ( shift + a + NVIR_a * b );
-                     if ( preconditioner ){
-                        diagonal_helper2( workspace, FFF_triplet[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                     } else {
-                        matvec_helper_diag( vector + pointer, result + pointer, SIZE, FFF_triplet[ irrep ], 2.0, 2 * beta, trans_diag );
-                     }
-                  }
-               }
-               shift += NVIR_a * NVIR_b;
-            }
-         }
-      }
-   }
-
-   // FEE singlet: < SE_ukbl | F | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_E[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FEE[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
-            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
-               if ( irrep_i == irrep_j ){
-                  const int NOCC_ij = indices->getNOCC( irrep_i );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = i; j < NOCC_ij; j++ ){
-                        const int count = i + ( j * ( j + 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double beta = - f_dot_1dm + fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - f_ii - f_jj;
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FEE[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FEE[ irrep ], 2.0, 2 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
-               }
-               if ( irrep_i < irrep_j ){
-                  const int NOCC_i = indices->getNOCC( irrep_i );
-                  const int NOCC_j = indices->getNOCC( irrep_j );
-                  for ( int i = 0; i < NOCC_i; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = 0; j < NOCC_j; j++ ){
-                        const int count = i + NOCC_i * j;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double beta = - f_dot_1dm + fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - f_ii - f_jj;
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FEE[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FEE[ irrep ], 2.0, 2 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += NVIR_a * NOCC_i * NOCC_j;
-               }
-            }
-         }
-      }
-   }
-
-   // FEE triplet: < TE_ukbl | F | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_E[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FEE[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
-            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
-               if ( irrep_i == irrep_j ){
-                  const int NOCC_ij = indices->getNOCC( irrep_i );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = i+1; j < NOCC_ij; j++ ){
-                        const int count = i + ( j * ( j - 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double beta = - f_dot_1dm + fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - f_ii - f_jj;
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FEE[ irrep ], SIZE, 6, 6 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FEE[ irrep ], 6.0, 6 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
-               }
-               if ( irrep_i < irrep_j ){
-                  const int NOCC_i = indices->getNOCC( irrep_i );
-                  const int NOCC_j = indices->getNOCC( irrep_j );
-                  for ( int i = 0; i < NOCC_i; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = 0; j < NOCC_j; j++ ){
-                        const int count = i + NOCC_i * j;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double beta = - f_dot_1dm + fock->get( irrep_a, N_OA_a + a, N_OA_a + a ) - f_ii - f_jj;
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FEE[ irrep ], SIZE, 6, 6 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FEE[ irrep ], 6.0, 6 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += NVIR_a * NOCC_i * NOCC_j;
-               }
-            }
-         }
-      }
-   }
-   
-   // FGG singlet: < SG_cjdu | F | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_G[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FGG[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
-               if ( irrep_a == irrep_b ){
-                  const int NVIR_ab = indices->getNVIRT( irrep_a );
-                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  for ( int a = 0; a < NVIR_ab; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
-                     for ( int b = a; b < NVIR_ab; b++ ){
-                        const int count = a + ( b * ( b + 1 ) ) / 2;
-                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double beta = - f_dot_1dm + f_aa + f_bb - fock->get( irrep_i, i, i );
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FGG[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FGG[ irrep ], 2.0, 2 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-               }
-               if ( irrep_a < irrep_b ){
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int count = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double beta = - f_dot_1dm + f_aa + f_bb - fock->get( irrep_i, i, i );
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FGG[ irrep ], SIZE, 2, 2 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FGG[ irrep ], 2.0, 2 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += NOCC_i * NVIR_a * NVIR_b;
-               }
-            }
-         }
-      }
-   }
-   
-   // FGG triplet: < TG_cjdu | F | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_G[ irrep ];
-      if ( SIZE > 0 ){
-         if ( preconditioner ){ diagonal_helper1( FGG[ irrep ], SIZE, SIZE, workspace ); }
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
-               if ( irrep_a == irrep_b ){
-                  const int NVIR_ab = indices->getNVIRT( irrep_a );
-                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  for ( int a = 0; a < NVIR_ab; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
-                     for ( int b = a+1; b < NVIR_ab; b++ ){
-                        const int count = a + ( b * ( b - 1 ) ) / 2;
-                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double beta = - f_dot_1dm + f_aa + f_bb - fock->get( irrep_i, i, i );
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FGG[ irrep ], SIZE, 6, 6 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FGG[ irrep ], 6.0, 6 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-               }
-               if ( irrep_a < irrep_b ){
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int count = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double beta = - f_dot_1dm + f_aa + f_bb - fock->get( irrep_i, i, i );
-                           const int pointer = jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           if ( preconditioner ){
-                              diagonal_helper2( workspace, FGG[ irrep ], SIZE, 6, 6 * beta, result + pointer );
-                           } else {
-                              matvec_helper_diag( vector + pointer, result + pointer, SIZE, FGG[ irrep ], 6.0, 6 * beta, trans_diag );
-                           }
-                        }
-                     }
-                  }
-                  shift += NOCC_i * NVIR_a * NVIR_b;
-               }
-            }
-         }
-      }
-   }
-
-   // FHH singlet and triplet
-   {
-      int shift = 0;
-      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-         const int NOCC_ij = indices->getNOCC( irrep_ij );
-         const int size_ij = ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            const int size_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a; b < NVIR_ab; b++ ){
-                  const int cnt_ab = a + ( b * ( b + 1 ) ) / 2;
-                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_ij, i, i );
-                     for ( int j = i; j < NOCC_ij; j++ ){
-                        const int cnt_ij = i + ( j * ( j + 1 ) ) / 2;
-                        const double term = f_aa + f_bb - f_ii - fock->get( irrep_ij, j, j );
-                        if ( preconditioner ){
-                           target[ cnt_ij + size_ij * cnt_ab ] = 16 * term * term;
-                        } else {
-                           target[ cnt_ij + size_ij * cnt_ab ] = 4 * term * origin[ cnt_ij + size_ij * cnt_ab ];
-                        }
-                     }
-                  }
-               }
-            }
-            shift += size_ij * size_ab;
-         }
-      }
-   }
-   {
-      int shift = 0;
-      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-         const int NOCC_ij = indices->getNOCC( irrep_ij );
-         const int size_ij = ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            const int size_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-            double * origin = vector + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a+1; b < NVIR_ab; b++ ){
-                  const int cnt_ab = a + ( b * ( b - 1 ) ) / 2;
-                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_ij, i, i );
-                     for ( int j = i+1; j < NOCC_ij; j++ ){
-                        const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
-                        const double term = f_aa + f_bb - f_ii - fock->get( irrep_ij, j, j );
-                        if ( preconditioner ){
-                           target[ cnt_ij + size_ij * cnt_ab ] = 144 * term * term;
-                        } else {
-                           target[ cnt_ij + size_ij * cnt_ab ] = 12 * term * origin[ cnt_ij + size_ij * cnt_ab ];
-                        }
-                     }
-                  }
-               }
-            }
-            shift += size_ij * size_ab;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      int shift = 0;
-      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-         const int irrep_j = Irreps::directProd( irrep, irrep_i );
-         if ( irrep_i < irrep_j ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int NOCC_j = indices->getNOCC( irrep_j );
-            const int size_ij = NOCC_i * NOCC_j;
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep, irrep_a );
-               if ( irrep_a < irrep_b ){
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  const int size_ab = NVIR_a * NVIR_b;
-                  double * origin_singlet = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-                  double * target_singlet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-                  double * origin_triplet = vector + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-                  double * target_triplet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int cnt_ab = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int j = 0; j < NOCC_j; j++ ){
-                           const double f_jj = fock->get( irrep_j, j, j );
-                           for ( int i = 0; i < NOCC_i; i++ ){
-                              const int cnt_ij = i + NOCC_i * j;
-                              const double term = f_aa + f_bb - fock->get( irrep_i, i, i ) - f_jj;
-                              if ( preconditioner ){
-                                 target_singlet[ cnt_ij + size_ij * cnt_ab ] =  16 * term * term;
-                                 target_triplet[ cnt_ij + size_ij * cnt_ab ] = 144 * term * term;
-                              } else {
-                                 target_singlet[ cnt_ij + size_ij * cnt_ab ] =  4 * term * origin_singlet[ cnt_ij + size_ij * cnt_ab ];
-                                 target_triplet[ cnt_ij + size_ij * cnt_ab ] = 12 * term * origin_triplet[ cnt_ij + size_ij * cnt_ab ];
-                              }
-                           }
-                        }
-                     }
-                  }
-                  shift += size_ij * size_ab;
-               }
-            }
-         }
-      }
-   }
-
-   if ( preconditioner ){ delete [] workspace; return; }
    const double SQRT2 = sqrt( 2.0 );
 
    // FAD: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
@@ -3165,6 +2536,583 @@ int CheMPS2::CASPT2::shift_D_nonactive( const DMRGSCFindices * idx, const int ir
       }
    }
    return shift;
+
+}
+
+void CheMPS2::CASPT2::diagonal( double * result ) const{
+
+   // FAA: < E_zy E_jx | F | E_ti E_uv > = delta_ij * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_A[ irrep ];
+      if ( SIZE > 0 ){
+         const int NOCC = indices->getNOCC( irrep );
+         for ( int count = 0; count < NOCC; count++ ){
+            const double beta = - f_dot_1dm - fock->get( irrep, count, count );
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FAA[ irrep ][ elem ] + beta; }
+         }
+      }
+   }
+
+   // FCC: < E_zy E_xb | F | E_at E_uv > = delta_ab * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_C[ irrep ];
+      if ( SIZE > 0 ){
+         const int NVIR = indices->getNVIRT( irrep );
+         const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
+         for ( int count = 0; count < NVIR; count++ ){
+            const double beta = - f_dot_1dm + fock->get( irrep, N_OA + count, N_OA + count );
+            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FCC[ irrep ][ elem ] + beta; }
+         }
+      }
+   }
+
+   // FDD: < E_yx E_jb | F | E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_D[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_a = Irreps::directProd( irrep_i, irrep );
+            assert( shift == shift_D_nonactive( indices, irrep_i, irrep_a ) );
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+            for ( int i = 0; i < NOCC_i; i++ ){
+               const double f_ii = fock->get( irrep_i, i, i );
+               for ( int a = 0; a < NVIR_a; a++ ){
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                  const double beta = - f_dot_1dm + f_aa - f_ii;
+                  const int count = shift + i + NOCC_i * a;
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FDD[ irrep ][ elem ] + beta; }
+               }
+            }
+            shift += NOCC_i * NVIR_a;
+         }
+      }
+   }
+
+   // FBB singlet: < SB_xkyl | F | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
+   {
+      const int SIZE = size_B_singlet[ 0 ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+            assert( shift == shift_B_nonactive( indices, irrep_ij, irrep_ij, +1 ) );
+            const int nocc_ij = indices->getNOCC( irrep_ij );
+            for ( int i = 0; i < nocc_ij; i++ ){
+               const double f_ii = fock->get( irrep_ij, i, i );
+               for ( int j = i; j < nocc_ij; j++ ){
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double beta = - f_dot_1dm - f_ii - f_jj;
+                  const int count = shift + i + ( j * ( j + 1 ) ) / 2;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_singlet[ 0 ][ elem ] + beta ); }
+               }
+            }
+            shift += ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
+         }
+      }
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_B_singlet[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i < irrep_j ){
+               assert( shift == shift_B_nonactive( indices, irrep_i, irrep_j, +1 ) );
+               const int nocc_i = indices->getNOCC( irrep_i );
+               const int nocc_j = indices->getNOCC( irrep_j );
+               for ( int i = 0; i < nocc_i; i++ ){
+                  const double f_ii = fock->get( irrep_i, i, i );
+                  for ( int j = 0; j < nocc_j; j++ ){
+                     const double f_jj = fock->get( irrep_j, j, j );
+                     const double beta = - f_dot_1dm - f_ii - f_jj;
+                     const int count = shift + i + nocc_i * j;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_singlet[ irrep ][ elem ] + beta ); }
+                  }
+               }
+               shift += nocc_i * nocc_j;
+            }
+         }
+      }
+   }
+
+   // FBB triplet: < TB_xkyl | F | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
+   {
+      const int SIZE = size_B_triplet[ 0 ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+            assert( shift == shift_B_nonactive( indices, irrep_ij, irrep_ij, -1 ) );
+            const int nocc_ij = indices->getNOCC( irrep_ij );
+            for ( int i = 0; i < nocc_ij; i++ ){
+               const double f_ii = fock->get( irrep_ij, i, i );
+               for ( int j = i+1; j < nocc_ij; j++ ){
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double beta = - f_dot_1dm - f_ii - f_jj;
+                  const int count = shift + i + ( j * ( j - 1 ) ) / 2;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ 0 ][ elem ] + beta ); }
+               }
+            }
+            shift += ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
+         }
+      }
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_B_triplet[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i < irrep_j ){
+               assert( shift == shift_B_nonactive( indices, irrep_i, irrep_j, -1 ) );
+               const int nocc_i = indices->getNOCC( irrep_i );
+               const int nocc_j = indices->getNOCC( irrep_j );
+               for ( int i = 0; i < nocc_i; i++ ){
+                  const double f_ii = fock->get( irrep_i, i, i );
+                  for ( int j = 0; j < nocc_j; j++ ){
+                     const double f_jj = fock->get( irrep_j, j, j );
+                     const double beta = - f_dot_1dm - f_ii - f_jj;
+                     const int count = shift + i + nocc_i * j;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ irrep ][ elem ] + beta ); }
+                  }
+               }
+               shift += nocc_i * nocc_j;
+            }
+         }
+      }
+   }
+
+   // FFF singlet: < SF_cxdy | F | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
+   {
+      const int SIZE = size_F_singlet[ 0 ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+            assert( shift == shift_F_nonactive( indices, irrep_ab, irrep_ab, +1 ) );
+            const int NVIR_ab = indices->getNVIRT( irrep_ab );
+            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+            for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+               for ( int b = a; b < NVIR_ab; b++ ){
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double beta = - f_dot_1dm + f_aa + f_bb;
+                  const int count = shift + a + ( b * ( b + 1 ) ) / 2;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ 0 ][ elem ] + beta ); }
+               }
+            }
+            shift += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+         }
+      }
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_F_singlet[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int irrep_b = Irreps::directProd( irrep, irrep_a );
+            if ( irrep_a < irrep_b ){
+               assert( shift == shift_F_nonactive( indices, irrep_a, irrep_b, +1 ) );
+               const int NVIR_a = indices->getNVIRT( irrep_a );
+               const int NVIR_b = indices->getNVIRT( irrep_b );
+               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+               for ( int a = 0; a < NVIR_a; a++ ){
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                  for ( int b = 0; b < NVIR_b; b++ ){
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = - f_dot_1dm + f_aa + f_bb;
+                     const int count = shift + a + NVIR_a * b;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ irrep ][ elem ] + beta ); }
+                  }
+               }
+               shift += NVIR_a * NVIR_b;
+            }
+         }
+      }
+   }
+
+   // FFF triplet: < TF_cxdy | F | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
+   {
+      const int SIZE = size_F_triplet[ 0 ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+            assert( shift == shift_F_nonactive( indices, irrep_ab, irrep_ab, -1 ) );
+            const int NVIR_ab = indices->getNVIRT( irrep_ab );
+            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+            for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+               for ( int b = a+1; b < NVIR_ab; b++ ){
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double beta = - f_dot_1dm + f_aa + f_bb;
+                  const int count = shift + a + ( b * ( b - 1 ) ) / 2;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ 0 ][ elem ] + beta ); }
+               }
+            }
+            shift += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+         }
+      }
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_F_triplet[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int irrep_b = Irreps::directProd( irrep, irrep_a );
+            if ( irrep_a < irrep_b ){
+               assert( shift == shift_F_nonactive( indices, irrep_a, irrep_b, -1 ) );
+               const int NVIR_a = indices->getNVIRT( irrep_a );
+               const int NVIR_b = indices->getNVIRT( irrep_b );
+               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+               for ( int a = 0; a < NVIR_a; a++ ){
+                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                  for ( int b = 0; b < NVIR_b; b++ ){
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = - f_dot_1dm + f_aa + f_bb;
+                     const int count = shift + a + NVIR_a * b;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ irrep ][ elem ] + beta ); }
+                  }
+               }
+               shift += NVIR_a * NVIR_b;
+            }
+         }
+      }
+   }
+
+   // FEE singlet: < SE_ukbl | F | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_E[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+               if ( irrep_i == irrep_j ){
+                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, +1 ) );
+                  const int NOCC_ij = indices->getNOCC( irrep_i );
+                  for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
+                     for ( int j = i; j < NOCC_ij; j++ ){
+                        const int count = i + ( j * ( j + 1 ) ) / 2;
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        for ( int a = 0; a < NVIR_a; a++ ){
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+               }
+               if ( irrep_i < irrep_j ){
+                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, +1 ) );
+                  const int NOCC_i = indices->getNOCC( irrep_i );
+                  const int NOCC_j = indices->getNOCC( irrep_j );
+                  for ( int i = 0; i < NOCC_i; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
+                     for ( int j = 0; j < NOCC_j; j++ ){
+                        const int count = i + NOCC_i * j;
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        for ( int a = 0; a < NVIR_a; a++ ){
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += NVIR_a * NOCC_i * NOCC_j;
+               }
+            }
+         }
+      }
+   }
+
+   // FEE triplet: < TE_ukbl | F | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_E[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+            const int NVIR_a = indices->getNVIRT( irrep_a );
+            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+               if ( irrep_i == irrep_j ){
+                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, -1 ) );
+                  const int NOCC_ij = indices->getNOCC( irrep_i );
+                  for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
+                     for ( int j = i+1; j < NOCC_ij; j++ ){
+                        const int count = i + ( j * ( j - 1 ) ) / 2;
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        for ( int a = 0; a < NVIR_a; a++ ){
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
+               }
+               if ( irrep_i < irrep_j ){
+                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, -1 ) );
+                  const int NOCC_i = indices->getNOCC( irrep_i );
+                  const int NOCC_j = indices->getNOCC( irrep_j );
+                  for ( int i = 0; i < NOCC_i; i++ ){
+                     const double f_ii = fock->get( irrep_i, i, i );
+                     for ( int j = 0; j < NOCC_j; j++ ){
+                        const int count = i + NOCC_i * j;
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        for ( int a = 0; a < NVIR_a; a++ ){
+                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += NVIR_a * NOCC_i * NOCC_j;
+               }
+            }
+         }
+      }
+   }
+   
+   // FGG singlet: < SG_cjdu | F | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_G[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+               if ( irrep_a == irrep_b ){
+                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, +1 ) );
+                  const int NVIR_ab = indices->getNVIRT( irrep_a );
+                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  for ( int a = 0; a < NVIR_ab; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
+                     for ( int b = a; b < NVIR_ab; b++ ){
+                        const int count = a + ( b * ( b + 1 ) ) / 2;
+                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
+                        for ( int i = 0; i < NOCC_i; i++ ){
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+               }
+               if ( irrep_a < irrep_b ){
+                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, +1 ) );
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int NVIR_b = indices->getNVIRT( irrep_b );
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  for ( int a = 0; a < NVIR_a; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                     for ( int b = 0; b < NVIR_b; b++ ){
+                        const int count = a + NVIR_a * b;
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        for ( int i = 0; i < NOCC_i; i++ ){
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += NOCC_i * NVIR_a * NVIR_b;
+               }
+            }
+         }
+      }
+   }
+   
+   // FGG triplet: < TG_cjdu | F | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int SIZE = size_G[ irrep ];
+      if ( SIZE > 0 ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+               if ( irrep_a == irrep_b ){
+                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, -1 ) );
+                  const int NVIR_ab = indices->getNVIRT( irrep_a );
+                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  for ( int a = 0; a < NVIR_ab; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
+                     for ( int b = a+1; b < NVIR_ab; b++ ){
+                        const int count = a + ( b * ( b - 1 ) ) / 2;
+                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
+                        for ( int i = 0; i < NOCC_i; i++ ){
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+               }
+               if ( irrep_a < irrep_b ){
+                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, -1 ) );
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int NVIR_b = indices->getNVIRT( irrep_b );
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  for ( int a = 0; a < NVIR_a; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                     for ( int b = 0; b < NVIR_b; b++ ){
+                        const int count = a + NVIR_a * b;
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        for ( int i = 0; i < NOCC_i; i++ ){
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
+                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
+                        }
+                     }
+                  }
+                  shift += NOCC_i * NVIR_a * NVIR_b;
+               }
+            }
+         }
+      }
+   }
+
+   // FHH singlet and triplet
+   {
+      int shift = 0;
+      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+         const int NOCC_ij = indices->getNOCC( irrep_ij );
+         const int size_ij = ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+            assert( shift == shift_H_nonactive( indices, irrep_ij, irrep_ij, irrep_ab, irrep_ab, +1 ) );
+            const int NVIR_ab = indices->getNVIRT( irrep_ab );
+            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+            const int size_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
+            for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+               for ( int b = a; b < NVIR_ab; b++ ){
+                  const int cnt_ab = a + ( b * ( b + 1 ) ) / 2;
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_ij, i, i );
+                     for ( int j = i; j < NOCC_ij; j++ ){
+                        const int cnt_ij = i + ( j * ( j + 1 ) ) / 2;
+                        const double f_jj = fock->get( irrep_ij, j, j );
+                        const double term = f_aa + f_bb - f_ii - f_jj;
+                        target[ cnt_ij + size_ij * cnt_ab ] = 4 * term;
+                     }
+                  }
+               }
+            }
+            shift += size_ij * size_ab;
+         }
+      }
+   }
+   {
+      int shift = 0;
+      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+         const int NOCC_ij = indices->getNOCC( irrep_ij );
+         const int size_ij = ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
+         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+            assert( shift == shift_H_nonactive( indices, irrep_ij, irrep_ij, irrep_ab, irrep_ab, -1 ) );
+            const int NVIR_ab = indices->getNVIRT( irrep_ab );
+            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+            const int size_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
+            for ( int a = 0; a < NVIR_ab; a++ ){
+               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+               for ( int b = a+1; b < NVIR_ab; b++ ){
+                  const int cnt_ab = a + ( b * ( b - 1 ) ) / 2;
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  for ( int i = 0; i < NOCC_ij; i++ ){
+                     const double f_ii = fock->get( irrep_ij, i, i );
+                     for ( int j = i+1; j < NOCC_ij; j++ ){
+                        const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
+                        const double f_jj = fock->get( irrep_ij, j, j );
+                        const double term = f_aa + f_bb - f_ii - f_jj;
+                        target[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
+                     }
+                  }
+               }
+            }
+            shift += size_ij * size_ab;
+         }
+      }
+   }
+   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+      int shift = 0;
+      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+         const int irrep_j = Irreps::directProd( irrep, irrep_i );
+         if ( irrep_i < irrep_j ){
+            const int NOCC_i = indices->getNOCC( irrep_i );
+            const int NOCC_j = indices->getNOCC( irrep_j );
+            const int size_ij = NOCC_i * NOCC_j;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep, irrep_a );
+               if ( irrep_a < irrep_b ){
+                  assert( shift == shift_H_nonactive( indices, irrep_i, irrep_j, irrep_a, irrep_b, 0 ) );
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int NVIR_b = indices->getNVIRT( irrep_b );
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  const int size_ab = NVIR_a * NVIR_b;
+                  double * target_singlet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
+                  double * target_triplet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
+                  for ( int a = 0; a < NVIR_a; a++ ){
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                     for ( int b = 0; b < NVIR_b; b++ ){
+                        const int cnt_ab = a + NVIR_a * b;
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        for ( int i = 0; i < NOCC_i; i++ ){
+                           const double f_ii = fock->get( irrep_i, i, i );
+                           for ( int j = 0; j < NOCC_j; j++ ){
+                              const int cnt_ij = i + NOCC_i * j;
+                              const double f_jj = fock->get( irrep_j, j, j );
+                              const double term = f_aa + f_bb - f_ii - f_jj;
+                              target_singlet[ cnt_ij + size_ij * cnt_ab ] =  4 * term;
+                              target_triplet[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
+                           }
+                        }
+                     }
+                  }
+                  shift += size_ij * size_ab;
+               }
+            }
+         }
+      }
+   }
 
 }
 
@@ -5520,7 +5468,7 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // SAA: - Gamma_{ztuyxv}
                   // FAA: - f_dot_4dm[ ztuyxv ] + ( f_tt + f_uu + f_xx + f_yy ) SAA[ Ii ][ xyztuv ]
                   if ( OVLP ){
-                     for ( int t = 0; t < num_t; t++ ){ 
+                     for ( int t = 0; t < num_t; t++ ){
                         for ( int u = 0; u < num_u; u++ ){
                            for ( int v = 0; v < num_v; v++ ){
                               for ( int x = 0; x < num_x; x++ ){
@@ -5550,6 +5498,14 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                                                              + ( f_tt + f_uu + f_xx + f_yy ) * SAA[ irrep ][ ptr ];
                                     }
                                  }
+                              }
+                              if ( jump_row == jump_col ){
+                                 const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
+                                 const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                                 const double gamma_vv = one_rdm[ d_v + v + LAS * ( d_v + v ) ];
+                                 const double ipea_tuv = 0.5 * IPEA * ( 2 + gamma_tt + gamma_uu - gamma_vv );
+                                 const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
+                                 FAA[ irrep ][ ptr ] += ipea_tuv * SAA[ irrep ][ ptr ];
                               }
                            }
                         }
@@ -5587,6 +5543,14 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                                                            + ( f_yy + f_uu ) * SCC[ irrep ][ ptr ];
                                     }
                                  }
+                              }
+                              if ( jump_row == jump_col ){
+                                 const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
+                                 const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                                 const double gamma_vv = one_rdm[ d_v + v + LAS * ( d_v + v ) ];
+                                 const double ipea_tuv = 0.5 * IPEA * ( 4 - gamma_tt + gamma_uu - gamma_vv );
+                                 const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
+                                 FCC[ irrep ][ ptr ] += ipea_tuv * SCC[ irrep ][ ptr ];
                               }
                            }
                         }
@@ -6030,6 +5994,16 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
                            FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] =   - f_3dm_ytux + ( f_xx + f_tt ) * SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ];
                         }
                      }
+                     if ( jump_row == jump_col ){
+                        const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
+                        const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                        const double ipea_tu = 0.5 * IPEA * ( 2 + gamma_tt - gamma_uu );
+                        const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
+                        FDD[ irrep ][ ptr                          ] += ipea_tu * SDD[ irrep ][ ptr                          ];
+                        FDD[ irrep ][ ptr +          SIZE * D2JUMP ] += ipea_tu * SDD[ irrep ][ ptr +          SIZE * D2JUMP ];
+                        FDD[ irrep ][ ptr + D2JUMP                 ] += ipea_tu * SDD[ irrep ][ ptr + D2JUMP                 ];
+                        FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] += ipea_tu * SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ];
+                     }
                   }
                }
             }
@@ -6174,6 +6148,15 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                            FBB_singlet[ 0 ][ ptr ] = fdotsum + ( f_tt + f_uu + f_xx + f_yy ) * SBB_singlet[ 0 ][ ptr ];
                            FFF_singlet[ 0 ][ ptr ] = fdotsum;
                         }
+                     }
+                     if ( jump_row == jump_col ){
+                        const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
+                        const double gamma_uu = one_rdm[ d_ut + u + LAS * ( d_ut + u ) ];
+                        const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                        const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
+                        const int ptr = ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) * ( 1 + SIZE );
+                        FBB_singlet[ 0 ][ ptr ] += ipea_B_tu * SBB_singlet[ 0 ][ ptr ];
+                        FFF_singlet[ 0 ][ ptr ] += ipea_F_tu * SFF_singlet[ 0 ][ ptr ];
                      }
                   }
                }
@@ -6368,6 +6351,15 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                                  FFF_singlet[ irrep ][ ptr ] = fdotsum;
                               }
                            }
+                           if ( jump_row == jump_col ){
+                              const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
+                              const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                              const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                              const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
+                              const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
+                              FBB_singlet[ irrep ][ ptr ] += ipea_B_tu * SBB_singlet[ irrep ][ ptr ];
+                              FFF_singlet[ irrep ][ ptr ] += ipea_F_tu * SFF_singlet[ irrep ][ ptr ];
+                           }
                         }
                      }
                   }
@@ -6553,6 +6545,15 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                            FBB_triplet[ 0 ][ ptr ] = fdotdiff + ( f_tt + f_uu + f_xx + f_yy ) * SBB_triplet[ 0 ][ ptr ];
                            FFF_triplet[ 0 ][ ptr ] = fdotdiff;
                         }
+                     }
+                     if ( jump_row == jump_col ){
+                        const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
+                        const double gamma_uu = one_rdm[ d_ut + u + LAS * ( d_ut + u ) ];
+                        const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                        const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
+                        const int ptr = ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) * ( 1 + SIZE );
+                        FBB_triplet[ 0 ][ ptr ] += ipea_B_tu * SBB_triplet[ 0 ][ ptr ];
+                        FFF_triplet[ 0 ][ ptr ] += ipea_F_tu * SFF_triplet[ 0 ][ ptr ];
                      }
                   }
                }
@@ -6745,6 +6746,15 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                                  FFF_triplet[ irrep ][ ptr ] = fdotdiff;
                               }
                            }
+                           if ( jump_row == jump_col ){
+                              const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
+                              const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                              const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                              const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
+                              const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
+                              FBB_triplet[ irrep ][ ptr ] += ipea_B_tu * SBB_triplet[ irrep ][ ptr ];
+                              FFF_triplet[ irrep ][ ptr ] += ipea_F_tu * SFF_triplet[ irrep ][ ptr ];
+                           }
                         }
                      }
                   }
@@ -6896,6 +6906,11 @@ void CheMPS2::CASPT2::make_EE_GG( const bool OVLP, const double IPEA ){
                FGG[ irrep_ut ][ u + SIZE * t ] =   fdot2_ut;
             }
             FEE[ irrep_ut ][ t + SIZE * t ] += 2 * ( f_dot_1dm + f_tt );
+            const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
+            const double ipea_E_t = 0.5 * IPEA * ( gamma_tt );
+            const double ipea_G_t = 0.5 * IPEA * ( 2 - gamma_tt );
+            FEE[ irrep_ut ][ t + SIZE * t ] += ipea_E_t * SEE[ irrep_ut ][ t + SIZE * t ];
+            FGG[ irrep_ut ][ t + SIZE * t ] += ipea_G_t * SGG[ irrep_ut ][ t + SIZE * t ];
          }
       }
    }
