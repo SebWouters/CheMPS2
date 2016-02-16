@@ -189,15 +189,18 @@ CheMPS2::CASPT2::~CASPT2(){
 
 }
 
-double CheMPS2::CASPT2::solve() const{
+double CheMPS2::CASPT2::solve( const double imag_shift ) const{
+
+   // Normalizations of sectors   A  Bs Bt C  D  Es Et Fs Ft Gs Gt Hs Ht
+   const int normalizations[] = { 1, 2, 2, 1, 1, 2, 6, 2, 2, 2, 6, 4, 12 };
+   const bool apply_shift = (( fabs( imag_shift ) > 0.0 ) ? true : false );
 
    int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
    double * diag_fock = new double[ total_size ];
    diagonal( diag_fock );
-
    double min_eig = diag_fock[ 0 ];
    for ( int elem = 1; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
-   cout << "CASPT2 : Minimum value on diagonal of 0th order operator = " << min_eig << endl;
+   cout << "CASPT2 : Minimum(diagonal)    = " << min_eig << endl;
 
    ConjugateGradient CG( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
    double ** pointers = new double*[ 3 ];
@@ -207,54 +210,83 @@ double CheMPS2::CASPT2::solve() const{
    for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 1 ][ elem ] =  diag_fock[ elem ]; } // Diagonal of the operator F
    for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 2 ][ elem ] = vector_rhs[ elem ]; } // RHS of the linear problem F * x = V
    int inc1 = 1;
-   const double E_CASPT2_D = - ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 2 ], &inc1 );
-   cout << "CASPT2 : E(CASPT2-D) = " << E_CASPT2_D << endl;
+   const double E2_DIAGONAL = - ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 2 ], &inc1 );
    instruction = CG.step( pointers );
    assert( instruction == 'B' );
    while ( instruction == 'B' ){
       matvec( pointers[ 0 ], pointers[ 1 ], diag_fock );
+      if ( apply_shift ){ add_shift( pointers[ 0 ], pointers[ 1 ], diag_fock, imag_shift, normalizations ); }
       instruction = CG.step( pointers );
    }
    assert( instruction == 'C' );
-   const double E_CASPT2_N = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
+   const double E2_NONVARIATIONAL = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
    const double rnorm = pointers[ 1 ][ 0 ];
-   cout << "CASPT2 : Residual norm of F * c - V = " << rnorm << endl;
+   cout << "CASPT2 : Number of iterations = " << CG.get_num_matvec() << endl;
+   cout << "CASPT2 : Residual norm        = " << rnorm << endl;
+   matvec( pointers[ 0 ], pointers[ 1 ], diag_fock ); // pointers[ 1 ] is a WORK array when instruction == 'C'
+   const double E2_VARIATIONAL = 2 * E2_NONVARIATIONAL + ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 1 ], &inc1 );
    delete [] diag_fock;
 
-   double energies[ CHEMPS2_CASPT2_NUM_CASES ];
-   double inproducts[ CHEMPS2_CASPT2_NUM_CASES ];
-   for ( int geval = 0; geval < CHEMPS2_CASPT2_NUM_CASES; geval++ ){
-      int pntr = jump[ num_irreps * geval ];
-      int size = jump[ num_irreps * ( geval + 1 ) ] - pntr;
-      energies[ geval ] = - ddot_( &size, pointers[ 0 ] + pntr, &inc1, vector_rhs + pntr, &inc1 );
-      inproducts[ geval ] = ddot_( &size, pointers[ 0 ] + pntr, &inc1, pointers[ 0 ] + pntr, & inc1 );
-   }
+   const double inproduct = inproduct_vectors( pointers[ 0 ], pointers[ 0 ], normalizations );
+   const double reference_weight = 1.0 / ( 1.0 + inproduct );
+   cout << "CASPT2 : Reference weight     = " << reference_weight << endl;
+   //energy_per_sector( pointers[ 0 ] );
    delete [] pointers;
-   const double C1_dot_C1 = ( inproducts[ CHEMPS2_CASPT2_A ]
-                            + inproducts[ CHEMPS2_CASPT2_C ]
-                            + inproducts[ CHEMPS2_CASPT2_D ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_B_SINGLET ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_B_TRIPLET ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_F_SINGLET ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_F_TRIPLET ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_E_SINGLET ]
-                            +  6 * inproducts[ CHEMPS2_CASPT2_E_TRIPLET ]
-                            +  2 * inproducts[ CHEMPS2_CASPT2_G_SINGLET ]
-                            +  6 * inproducts[ CHEMPS2_CASPT2_G_TRIPLET ]
-                            +  4 * inproducts[ CHEMPS2_CASPT2_H_SINGLET ]
-                            + 12 * inproducts[ CHEMPS2_CASPT2_H_TRIPLET ] );
-   cout << "CASPT2 : Fraction of CASSCF wfn in 1st order wfn = " << 1.0 / ( 1.0 + C1_dot_C1 ) << endl;
-   cout << "CASPT2 : Number of matrix-vector products = " << CG.get_num_matvec() << endl;
-   cout << "CASPT2 : Energy VJTU = " << energies[ CHEMPS2_CASPT2_A ] << endl;
-   cout << "                VJTI = " << energies[ CHEMPS2_CASPT2_B_SINGLET ] + energies[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
-   cout << "                ATVX = " << energies[ CHEMPS2_CASPT2_C ] << endl;
-   cout << "                AIVX = " << energies[ CHEMPS2_CASPT2_D ] << endl;
-   cout << "                VJAI = " << energies[ CHEMPS2_CASPT2_E_SINGLET ] + energies[ CHEMPS2_CASPT2_E_TRIPLET ] << endl;
-   cout << "                BVAT = " << energies[ CHEMPS2_CASPT2_F_SINGLET ] + energies[ CHEMPS2_CASPT2_F_TRIPLET ] << endl;
-   cout << "                BJAT = " << energies[ CHEMPS2_CASPT2_G_SINGLET ] + energies[ CHEMPS2_CASPT2_G_TRIPLET ] << endl;
-   cout << "                BJAI = " << energies[ CHEMPS2_CASPT2_H_SINGLET ] + energies[ CHEMPS2_CASPT2_H_TRIPLET ] << endl;
-   cout << "CASPT2 : E(CASPT2-N) = " << E_CASPT2_N << endl;
-   return E_CASPT2_N;
+
+   cout << "CASPT2 : E2 [DIAGONAL]        = " << E2_DIAGONAL << endl;
+   cout << "CASPT2 : E2 [NON-VARIATIONAL] = " << E2_NONVARIATIONAL << endl;
+   cout << "CASPT2 : E2 [VARIATIONAL]     = " << E2_VARIATIONAL << endl;
+   return E2_VARIATIONAL;
+
+}
+
+void CheMPS2::CASPT2::add_shift( double * vector, double * result, double * diag_fock, const double imag_shift, const int * normalizations ) const{
+
+   for ( int sector = 0; sector < CHEMPS2_CASPT2_NUM_CASES; sector++ ){
+      const int start = jump[ num_irreps * sector         ];
+      const int stop  = jump[ num_irreps * ( sector + 1 ) ];
+      const double factor = imag_shift * imag_shift * normalizations[ sector ] * normalizations[ sector ];
+      for ( int elem = start; elem < stop; elem ++ ){
+         result[ elem ] += factor * vector[ elem ] / diag_fock[ elem ];
+      }
+   }
+
+}
+
+double CheMPS2::CASPT2::inproduct_vectors( double * first, double * second, const int * normalizations ) const{
+
+   int inc1 = 1;
+   double value = 0.0;
+   for ( int sector = 0; sector < CHEMPS2_CASPT2_NUM_CASES; sector++ ){
+      int pointer = jump[ num_irreps * sector         ];
+      int size    = jump[ num_irreps * ( sector + 1 ) ] - pointer;
+      value += normalizations[ sector ] * ddot_( &size, first + pointer, &inc1, second + pointer, &inc1 );
+   }
+   return value;
+
+}
+
+void CheMPS2::CASPT2::energy_per_sector( double * solution ) const{
+
+   int inc1 = 1;
+   double energies[ CHEMPS2_CASPT2_NUM_CASES ];
+   for ( int sector = 0; sector < CHEMPS2_CASPT2_NUM_CASES; sector++ ){
+      int pointer = jump[ num_irreps * sector         ];
+      int size    = jump[ num_irreps * ( sector + 1 ) ] - pointer;
+      energies[ sector ] = - ddot_( &size, solution + pointer, &inc1, vector_rhs + pointer, &inc1 );
+   }
+   cout << "************************************************" << endl;
+   cout << "*   CASPT2 non-variational energy per sector   *" << endl;
+   cout << "************************************************" << endl;
+   cout << "   A or VJTU = " << energies[ CHEMPS2_CASPT2_A ] << endl;
+   cout << "   B or VJTI = " << energies[ CHEMPS2_CASPT2_B_SINGLET ] + energies[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
+   cout << "   C or ATVX = " << energies[ CHEMPS2_CASPT2_C ] << endl;
+   cout << "   D or AIVX = " << energies[ CHEMPS2_CASPT2_D ] << endl;
+   cout << "   E or VJAI = " << energies[ CHEMPS2_CASPT2_E_SINGLET ] + energies[ CHEMPS2_CASPT2_E_TRIPLET ] << endl;
+   cout << "   F or BVAT = " << energies[ CHEMPS2_CASPT2_F_SINGLET ] + energies[ CHEMPS2_CASPT2_F_TRIPLET ] << endl;
+   cout << "   G or BJAT = " << energies[ CHEMPS2_CASPT2_G_SINGLET ] + energies[ CHEMPS2_CASPT2_G_TRIPLET ] << endl;
+   cout << "   H or BJAI = " << energies[ CHEMPS2_CASPT2_H_SINGLET ] + energies[ CHEMPS2_CASPT2_H_TRIPLET ] << endl;
+   cout << "************************************************" << endl;
 
 }
 
@@ -338,6 +370,7 @@ void CheMPS2::CASPT2::create_f_dots(){
       }
    }
 
+   /*
    double sum_f_kk = 0.0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NOCC = indices->getNOCC( irrep );
@@ -347,7 +380,8 @@ void CheMPS2::CASPT2::create_f_dots(){
    }
 
    const double E_FOCK = 2 * sum_f_kk + f_dot_1dm;
-   cout << "CASPT2 : < 0 | F | 0 > = " << E_FOCK << endl;
+   cout << "CASPT2 : < 0 | F | 0 >        = " << E_FOCK << endl;
+   */
 
 }
 
@@ -720,7 +754,7 @@ int CheMPS2::CASPT2::vector_helper(){
    delete [] helper;
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
    assert( total_size == debug_total_length() );
-   cout << "CASPT2 :     Original size of the V_SD space = " << total_size << endl;
+   cout << "CASPT2 : Old size V_SD space  = " << total_size << endl;
    return total_size;
 
 }
@@ -1101,7 +1135,7 @@ void CheMPS2::CASPT2::recreate(){
    delete [] SFF_triplet;
 
    const int total_size = jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ];
-   cout << "CASPT2 : Nonredundant size of the V_SD space = " << total_size << endl;
+   cout << "CASPT2 : New size V_SD space  = " << total_size << endl;
 
 }
 

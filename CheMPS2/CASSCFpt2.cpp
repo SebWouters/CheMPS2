@@ -39,7 +39,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA ){
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG ){
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
@@ -99,7 +99,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );        // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
       copy_active( theFmatrix, mem2, iHandler );                 // Fock
       theFCI->Fock4RDM( inoutput, three_dm, mem2, contract );    // trace( Fock * 4-RDM )
       delete theFCI;
@@ -119,7 +118,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );          // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      cout << "CASPT2 : Fock operator RMS deviation from block-diagonal = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
       copy_active( theFmatrix, mem2, iHandler );                   // Fock
       //CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
@@ -139,7 +137,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
    delete Prob;
    delete HamAS;
-   
+
    //Calculate the matrix elements needed to calculate the gradient and hessian
    if ( block_wise ){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, block_size); }
    else {             theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
@@ -147,19 +145,15 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete [] mem1;
    delete [] mem2;
    if ( block_wise ){ delete [] mem3; }
-   
+
+   cout << "CASPT2 : Norm F - F_pseudocan = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
    CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );
-   const double E_CASPT2 = myCASPT2->solve();
-   
-   cout << "MOLCAS  test8 CASPT2-D  = " << -0.1596306078 << endl;
-   cout << "MOLCAS  test8 CASPT2-N  = " << -0.1599978130 << endl;
-   cout << "MOLCAS  test8 IPEA 0.25 = " << -0.1586938730 << endl;
-   cout << "CheMPS2 test8 CASPT2-N  = " << E_CASPT2 << endl;
-   
+   const double E_CASPT2 = myCASPT2->solve( IMAG );
+
    delete myCASPT2;
    delete [] three_dm;
    delete [] contract;
-   
+
    return E_CASPT2;
 
 }

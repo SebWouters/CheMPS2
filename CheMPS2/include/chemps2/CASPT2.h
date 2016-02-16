@@ -78,9 +78,10 @@ namespace CheMPS2{
          //! Destructor
          virtual ~CASPT2();
 
-         //! Solve for the CASPT2 energy. Note that the IPEA shift has been set in the constructor.
-         /** \return The CASPT2 correction energy */
-         double solve() const;
+         //! Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor)
+         /** \param imag_shift The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
+             \return The CASPT2 variational correction energy */
+         double solve( const double imag_shift ) const;
 
       private:
 
@@ -130,6 +131,11 @@ namespace CheMPS2{
          // Fill result with Fock operator times vector
          void matvec( double * vector, double * result, double * diag_fock ) const;
          static void matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans );
+
+         // Helper functions for solve
+         void add_shift( double * vector, double * result, double * diag_fock, const double shift, const int * normalizations ) const;
+         double inproduct_vectors( double * first, double * second, const int * normalizations ) const;
+         void energy_per_sector( double * solution ) const;
 
          // Variables for the partitioning of the vector in blocks
          int * jump;
