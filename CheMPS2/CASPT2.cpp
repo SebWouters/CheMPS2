@@ -43,9 +43,9 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    three_rdm  = three_dm;
    f_dot_4dm  = contract_4dm;
    num_irreps = indices->getNirreps();
-   create_f_dots(); // Sets E_FOCK
 
-   vector_helper(); // Needs to be called BEFORE make_S**()!
+   create_f_dots();
+   vector_helper();
 
    make_AA_CC( true, 0.0 );
    make_DD( true, 0.0 );
@@ -53,16 +53,13 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    make_BB_FF_singlet( true, 0.0 );
    make_BB_FF_triplet( true, 0.0 );
 
-   // Needs to be called AFTER make_S**()!
    construct_rhs( oei, ints );
 
-   // The following Fock operator constructors need to be called AFTER make_S**()!
    make_AA_CC( false, IPEA );
    make_DD( false, IPEA );
    make_EE_GG( false, IPEA );
    make_BB_FF_singlet( false, IPEA );
    make_BB_FF_triplet( false, IPEA );
-
    make_FAD_FCD();
    make_FEH_FGH();
    make_FAB_FCF_singlet();
@@ -74,36 +71,7 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
 
-   recreate(); // Remove the overlap matrices
-
-   //check_symmetric();
-
-}
-
-void CheMPS2::CASPT2::check_symmetric() const{
-
-   const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   double * matrix    = new double[ total_size * total_size ];
-   double * diag_fock = new double[ total_size ];
-   double * work      = new double[ total_size ];
-   diagonal( diag_fock );
-   for ( int col = 0; col < total_size; col++ ){
-      for ( int row = 0; row < total_size; row++ ){ work[ row ] = 0.0; }
-      work[ col ] = 1.0;
-      matvec( work, matrix + col * total_size, diag_fock );
-   }
-   double rms_symmetric = 0.0;
-   for ( int row = 0; row < total_size; row++ ){
-      for ( int col = row + 1; col < total_size; col++ ){
-         const double diff = matrix[ row + total_size * col ] - matrix[ col + total_size * row ];
-         rms_symmetric += diff * diff;
-      }
-   }
-   rms_symmetric = sqrt( rms_symmetric );
-   cout << "CASPT2 : RMS deviation from symmetric operator = " << rms_symmetric << endl;
-   delete [] work;
-   delete [] diag_fock;
-   delete [] matrix;
+   recreate();
 
 }
 
@@ -251,13 +219,14 @@ double CheMPS2::CASPT2::solve() const{
    const double E_CASPT2_N = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
    const double rnorm = pointers[ 1 ][ 0 ];
    cout << "CASPT2 : Residual norm of F * c - V = " << rnorm << endl;
+   delete [] diag_fock;
 
-   //double energies[ CHEMPS2_CASPT2_NUM_CASES ];
+   double energies[ CHEMPS2_CASPT2_NUM_CASES ];
    double inproducts[ CHEMPS2_CASPT2_NUM_CASES ];
    for ( int geval = 0; geval < CHEMPS2_CASPT2_NUM_CASES; geval++ ){
       int pntr = jump[ num_irreps * geval ];
       int size = jump[ num_irreps * ( geval + 1 ) ] - pntr;
-      //energies[ geval ] = - ddot_( &size, pointers[ 0 ] + pntr, &inc1, vector_rhs + pntr, &inc1 );
+      energies[ geval ] = - ddot_( &size, pointers[ 0 ] + pntr, &inc1, vector_rhs + pntr, &inc1 );
       inproducts[ geval ] = ddot_( &size, pointers[ 0 ] + pntr, &inc1, pointers[ 0 ] + pntr, & inc1 );
    }
    delete [] pointers;
@@ -276,18 +245,15 @@ double CheMPS2::CASPT2::solve() const{
                             + 12 * inproducts[ CHEMPS2_CASPT2_H_TRIPLET ] );
    cout << "CASPT2 : Fraction of CASSCF wfn in 1st order wfn = " << 1.0 / ( 1.0 + C1_dot_C1 ) << endl;
    cout << "CASPT2 : Number of matrix-vector products = " << CG.get_num_matvec() << endl;
-   /*
    cout << "CASPT2 : Energy VJTU = " << energies[ CHEMPS2_CASPT2_A ] << endl;
-   cout << "CASPT2 : Energy VJTI = " << energies[ CHEMPS2_CASPT2_B_SINGLET ] + energies[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
-   cout << "CASPT2 : Energy ATVX = " << energies[ CHEMPS2_CASPT2_C ] << endl;
-   cout << "CASPT2 : Energy AIVX = " << energies[ CHEMPS2_CASPT2_D ] << endl;
-   cout << "CASPT2 : Energy VJAI = " << energies[ CHEMPS2_CASPT2_E_SINGLET ] + energies[ CHEMPS2_CASPT2_E_TRIPLET ] << endl;
-   cout << "CASPT2 : Energy BVAT = " << energies[ CHEMPS2_CASPT2_F_SINGLET ] + energies[ CHEMPS2_CASPT2_F_TRIPLET ] << endl;
-   cout << "CASPT2 : Energy BJAT = " << energies[ CHEMPS2_CASPT2_G_SINGLET ] + energies[ CHEMPS2_CASPT2_G_TRIPLET ] << endl;
-   cout << "CASPT2 : Energy BJAI = " << energies[ CHEMPS2_CASPT2_H_SINGLET ] + energies[ CHEMPS2_CASPT2_H_TRIPLET ] << endl;
-   */
+   cout << "                VJTI = " << energies[ CHEMPS2_CASPT2_B_SINGLET ] + energies[ CHEMPS2_CASPT2_B_TRIPLET ] << endl;
+   cout << "                ATVX = " << energies[ CHEMPS2_CASPT2_C ] << endl;
+   cout << "                AIVX = " << energies[ CHEMPS2_CASPT2_D ] << endl;
+   cout << "                VJAI = " << energies[ CHEMPS2_CASPT2_E_SINGLET ] + energies[ CHEMPS2_CASPT2_E_TRIPLET ] << endl;
+   cout << "                BVAT = " << energies[ CHEMPS2_CASPT2_F_SINGLET ] + energies[ CHEMPS2_CASPT2_F_TRIPLET ] << endl;
+   cout << "                BJAT = " << energies[ CHEMPS2_CASPT2_G_SINGLET ] + energies[ CHEMPS2_CASPT2_G_TRIPLET ] << endl;
+   cout << "                BJAI = " << energies[ CHEMPS2_CASPT2_H_SINGLET ] + energies[ CHEMPS2_CASPT2_H_TRIPLET ] << endl;
    cout << "CASPT2 : E(CASPT2-N) = " << E_CASPT2_N << endl;
-   delete [] diag_fock;
    return E_CASPT2_N;
 
 }
@@ -372,7 +338,7 @@ void CheMPS2::CASPT2::create_f_dots(){
       }
    }
 
-   sum_f_kk = 0.0;
+   double sum_f_kk = 0.0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NOCC = indices->getNOCC( irrep );
       for ( int orb = 0; orb < NOCC; orb++ ){
@@ -380,7 +346,7 @@ void CheMPS2::CASPT2::create_f_dots(){
       }
    }
 
-   E_FOCK = 2 * sum_f_kk + f_dot_1dm;
+   const double E_FOCK = 2 * sum_f_kk + f_dot_1dm;
    cout << "CASPT2 : < 0 | F | 0 > = " << E_FOCK << endl;
 
 }
@@ -5500,9 +5466,11 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                                  }
                               }
                               if ( jump_row == jump_col ){
-                                 const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
-                                 const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
-                                 const double gamma_vv = one_rdm[ d_v + v + LAS * ( d_v + v ) ];
+                                 // E_ti E_uv | 0 >
+                                 // t: excitation into, u: excitation into, v: excitation out of
+                                 const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                                 const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
+                                 const double gamma_vv = one_rdm[ ( d_v + v ) * ( 1 + LAS ) ];
                                  const double ipea_tuv = 0.5 * IPEA * ( 2 + gamma_tt + gamma_uu - gamma_vv );
                                  const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
                                  FAA[ irrep ][ ptr ] += ipea_tuv * SAA[ irrep ][ ptr ];
@@ -5545,9 +5513,11 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                                  }
                               }
                               if ( jump_row == jump_col ){
-                                 const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
-                                 const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
-                                 const double gamma_vv = one_rdm[ d_v + v + LAS * ( d_v + v ) ];
+                                 // E_at E_uv | 0 >
+                                 // t: excitation out of, u: excitation into, v: excitation out of
+                                 const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                                 const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
+                                 const double gamma_vv = one_rdm[ ( d_v + v ) * ( 1 + LAS ) ];
                                  const double ipea_tuv = 0.5 * IPEA * ( 4 - gamma_tt + gamma_uu - gamma_vv );
                                  const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
                                  FCC[ irrep ][ ptr ] += ipea_tuv * SCC[ irrep ][ ptr ];
@@ -5995,8 +5965,10 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
                         }
                      }
                      if ( jump_row == jump_col ){
-                        const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
-                        const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                        // D1: E_ai E_tu | 0 >, D2: E_ti E_au | 0 >
+                        // t: excitation into, u excitation out of
+                        const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                        const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
                         const double ipea_tu = 0.5 * IPEA * ( 2 + gamma_tt - gamma_uu );
                         const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
                         FDD[ irrep ][ ptr                          ] += ipea_tu * SDD[ irrep ][ ptr                          ];
@@ -6150,8 +6122,10 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                         }
                      }
                      if ( jump_row == jump_col ){
-                        const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
-                        const double gamma_uu = one_rdm[ d_ut + u + LAS * ( d_ut + u ) ];
+                        // B: E_ti E_uj | 0 >, tu: excitation into
+                        // F: E_at E_bu | 0 >, tu: excitation out of
+                        const double gamma_tt = one_rdm[ ( d_ut + t ) * ( 1 + LAS ) ];
+                        const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
                         const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
                         const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
                         const int ptr = ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) * ( 1 + SIZE );
@@ -6352,8 +6326,10 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                               }
                            }
                            if ( jump_row == jump_col ){
-                              const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
-                              const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                              // B: E_ti E_uj | 0 >, tu: excitation into
+                              // F: E_at E_bu | 0 >, tu: excitation out of
+                              const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                              const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
                               const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
                               const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
                               const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
@@ -6547,8 +6523,10 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                         }
                      }
                      if ( jump_row == jump_col ){
-                        const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
-                        const double gamma_uu = one_rdm[ d_ut + u + LAS * ( d_ut + u ) ];
+                        // B: E_ti E_uj | 0 >, tu: excitation into
+                        // F: E_at E_bu | 0 >, tu: excitation out of
+                        const double gamma_tt = one_rdm[ ( d_ut + t ) * ( 1 + LAS ) ];
+                        const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
                         const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
                         const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
                         const int ptr = ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) * ( 1 + SIZE );
@@ -6747,8 +6725,10 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                               }
                            }
                            if ( jump_row == jump_col ){
-                              const double gamma_tt = one_rdm[ d_t + t + LAS * ( d_t + t ) ];
-                              const double gamma_uu = one_rdm[ d_u + u + LAS * ( d_u + u ) ];
+                              // B: E_ti E_uj | 0 >, tu: excitation into
+                              // F: E_at E_bu | 0 >, tu: excitation out of
+                              const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                              const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
                               const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
                               const double ipea_F_tu = 0.5 * IPEA * ( 4 - gamma_tt - gamma_uu );
                               const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
@@ -6906,11 +6886,16 @@ void CheMPS2::CASPT2::make_EE_GG( const bool OVLP, const double IPEA ){
                FGG[ irrep_ut ][ u + SIZE * t ] =   fdot2_ut;
             }
             FEE[ irrep_ut ][ t + SIZE * t ] += 2 * ( f_dot_1dm + f_tt );
-            const double gamma_tt = one_rdm[ d_ut + t + LAS * ( d_ut + t ) ];
-            const double ipea_E_t = 0.5 * IPEA * ( gamma_tt );
-            const double ipea_G_t = 0.5 * IPEA * ( 2 - gamma_tt );
-            FEE[ irrep_ut ][ t + SIZE * t ] += ipea_E_t * SEE[ irrep_ut ][ t + SIZE * t ];
-            FGG[ irrep_ut ][ t + SIZE * t ] += ipea_G_t * SGG[ irrep_ut ][ t + SIZE * t ];
+            {
+               // E: E_ti E_aj | 0 >, t: excitation into
+               // G: E_ai E_bt | 0 >, t: excitation out of
+               const double gamma_tt = one_rdm[ ( d_ut + t ) * ( 1 + LAS ) ];
+               const double ipea_E_t = 0.5 * IPEA * ( gamma_tt );
+               const double ipea_G_t = 0.5 * IPEA * ( 2 - gamma_tt );
+               const int ptr = t * ( 1 + SIZE );
+               FEE[ irrep_ut ][ ptr ] += ipea_E_t * SEE[ irrep_ut ][ ptr ];
+               FGG[ irrep_ut ][ ptr ] += ipea_G_t * SGG[ irrep_ut ][ ptr ];
+            }
          }
       }
    }

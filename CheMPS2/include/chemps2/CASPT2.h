@@ -43,11 +43,11 @@ namespace CheMPS2{
 /** CASPT2 class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date December 11, 2015
-    
+
     \section theo_caspt2 Information
-    
+
     The CASPT2 class contains the functions to perform second order multireference perturbation theory on top of a CASSCF wavefuntion [CASPT1, CASPT2]. CASPT2 has recently also been used with DMRG as active space solver: the active space 4-RDM contracted with the Fock operator, together with the 1-, 2- and 3-RDM are required thereto [CASPT3]. Alternatively, cumulant approximations can be used as well [CASPT4]. To mitigate problems with CASPT2 several modifications of the zeroth order Hamiltonian have been introduced: IPEA corrections [CASPT5], the g1 term [CASPT6], real level shifts [CASPT7] and imaginary level shifts [CASPT8].
-    
+
     \section biblio_caspt2 References
 
     [CASPT1]  K. Andersson, P.-A. Malmqvist, B.O. Roos, A.J. Sadlej and K. Wolinski, Journal of Physical Chemistry 94, 5483-5488 (1990). http://dx.doi.org/10.1021/j100377a012 \n
@@ -65,59 +65,54 @@ namespace CheMPS2{
 
          //! Constructor
          /** \param idx      DMRGSCFindices which contain the partitioning into occupied, active, and virtual orbitals per irrep
-             \param ints     The two-electron integrals needed for CASSCF and CASPT2
-             \param oei      The one-electron integrals
-             \param fock     The fock matrix of CASPT2 with the occupied-occupied block and the virtual-virtual block diagonal!
-             \param one_dm   The spin-summed one-particle density matrix one_dm[i+L*j] = sum_sigma < a^+_i,sigma a_j,sigma > (with L the number DMRG orbitals)
-             \param two_dm   The spin-summed two-particle density matrix two_dm[i+L*(j+L*(k+L*l))] = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > (with L the number DMRG orbitals)
-             \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals)
-             \param contract The spin-summed four-particle density matrix contracted with the fock operator (as performed by Cumulant::gamma4_fock_contract_ham or FCI::Fock4RDM) contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{l,t,sigma,tau,s,z} fock(l,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} a^+_{l,z} a_{t,z} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals)
+             \param ints     The two-electron integrals needed for CASSCF and CASPT2, in pseudocanonical orbitals
+             \param oei      All one-electron integrals, in pseudocanonical orbitals
+             \param fock     The fock matrix of CASPT2, in pseudocanonical orbitals
+             \param one_dm   The spin-summed one-particle density matrix one_dm[i+L*j] = sum_sigma < a^+_i,sigma a_j,sigma > (with L the number DMRG orbitals), in pseudocanonical orbitals
+             \param two_dm   The spin-summed two-particle density matrix two_dm[i+L*(j+L*(k+L*l))] = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > (with L the number DMRG orbitals), in pseudocanonical orbitals
+             \param three_dm The spin-summed three-particle density matrix three_dm[i+L*(j+L*(k+L*(l+L*(m+L*n))))] = sum_z,tau,s < a^+_{i,z} a^+_{j,tau} a^+_{k,s} a_{n,s} a_{m,tau} a_{l,z} > (with L the number DMRG orbitals), in pseudocanonical orbitals
+             \param contract The spin-summed four-particle density matrix contracted with the fock operator contract[i+L*(j+L*(k+L*(p+L*(q+L*r))))] = sum_{t,sigma,tau,s} fock(t,t) < a^+_{i,sigma} a^+_{j,tau} a^+_{k,s} E_{tt} a_{r,s} a_{q,tau} a_{p,sigma} > (with L the number DMRG orbitals), in pseudocanonical orbitals
              \param IPEA     The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004) */
          CASPT2(DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFmatrix * oei, DMRGSCFmatrix * fock, double * one_dm, double * two_dm, double * three_dm, double * contract, const double IPEA);
 
          //! Destructor
          virtual ~CASPT2();
 
-         //! Solve the CASPT2 energy
+         //! Solve for the CASPT2 energy. Note that the IPEA shift has been set in the constructor.
+         /** \return The CASPT2 correction energy */
          double solve() const;
 
       private:
-      
-         // The number of occupied, active and virtual orbitals per irrep (externally allocated and deleted)
+
+         // The number of occupied, active, and virtual orbitals per irrep (externally allocated and deleted)
          const DMRGSCFindices * indices;
-         
-         // The Fock matrix (externally allocated and deleted)
+
+         // The Fock matrix in pseudocanonical orbitals (externally allocated and deleted)
          const DMRGSCFmatrix * fock;
-         
+
          // The active space 1-RDM (externally allocated and deleted)
          double * one_rdm;
-         
+
          // The active space 2-RDM (externally allocated and deleted)
          double * two_rdm;
-         
+
          // The active space 3-RDM (externally allocated and deleted)
          double * three_rdm;
-         
+
          // The active space 4-RDM contracted with the Fock operator (externally allocated and deleted)
          double * f_dot_4dm;
-         
+
          // The active space 3-RDM contracted with the Fock operator (allocated and deleted in this class)
          double * f_dot_3dm;
-         
+
          // The active space 2-RDM contracted with the Fock operator (allocated and deleted in this class)
          double * f_dot_2dm;
-         
+
          // The active space 1-RDM contracted with the Fock operator
          double f_dot_1dm;
-         
-         // The sum of the Fock operator corresponding to occupied orbitals
-         double sum_f_kk;
-         
+
          // The number of irreps
          int num_irreps;
-
-         // The Fock operator expectation value
-         double E_FOCK;
 
          // Calculate the expectation value of the Fock operator
          void create_f_dots();
@@ -125,18 +120,17 @@ namespace CheMPS2{
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
          long long debug_total_length() const;
-         
+
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals );
-         
+
          // Fill result with the diagonal elements of the Fock operator
          void diagonal( double * result ) const;
-         
+
          // Fill result with Fock operator times vector
          void matvec( double * vector, double * result, double * diag_fock ) const;
          static void matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans );
-         void check_symmetric() const;
-         
+
          // Variables for the partitioning of the vector in blocks
          int * jump;
          int * size_A;
@@ -159,11 +153,11 @@ namespace CheMPS2{
          static int shift_E_nonactive( const DMRGSCFindices * idx, const int irrep_a, const int irrep_i, const int irrep_j, const int ST );
          static int shift_G_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_a, const int irrep_b, const int ST );
          static int shift_H_nonactive( const DMRGSCFindices * idx, const int irrep_i, const int irrep_j, const int irrep_a, const int irrep_b, const int ST );
-         
+
          // The RHS of the linear problem
          double * vector_rhs;
-         
-         // Variables for the overlap
+
+         // Variables for the overlap (only allocated during creation of the CASPT2 object)
          double ** SAA;
          double ** SCC;
          double ** SDD;
@@ -184,7 +178,7 @@ namespace CheMPS2{
          double ** FBB_triplet;
          double ** FFF_singlet;
          double ** FFF_triplet;
-         
+
          // Variables for the off-diagonal part of the Fock operator: Operator[ IL ][ IR ][ w ][ left + SIZE * right ]
          double **** FAD;
          double **** FCD;
@@ -223,8 +217,7 @@ namespace CheMPS2{
          static int  recreatehelper1( double * FOCK, double * OVLP, int SIZE, double * work, double * eigs, int lwork );
          static void recreatehelper2( double * LEFT, double * RIGHT, double ** matrix, double * work, int OLD_LEFT, int NEW_LEFT, int OLD_RIGHT, int NEW_RIGHT, const int number );
          static void recreatehelper3( double * OVLP, int OLDSIZE, int NEWSIZE, double * rhs_old, double * rhs_new, const int num_rhs );
-         
-         
+
    };
 }
 
