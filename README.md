@@ -348,19 +348,26 @@ elaborate information on
 List of files in CheMPS2
 ------------------------
 
-[CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the constructor and
-destructor of the CASSCF class, as well as the functions which allow to
-update, get or set its variables.
-    
+[CheMPS2/CASPT2.cpp](CheMPS2/CASPT2.cpp) contains an implementation of
+internally contracted CASPT2. The user can specify an IPEA shift and/or
+an imaginary shift to mitigate possible intruder state problems.
+
+[CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the functionality
+to construct the active space Hamiltonian.
+
 [CheMPS2/CASSCFdebug.cpp](CheMPS2/CASSCFdebug.cpp) contains two
 functions: one for calculating the ROHF energy; and one for fetching FCI
 coefficients to determine the point group symmetry of certain electronic
 states of the carbon dimer.
-    
+
 [CheMPS2/CASSCFnewtonraphson.cpp](CheMPS2/CASSCFnewtonraphson.cpp)
 contains all DMRG-SCF functions which are specific to the augmented Hessian
 Newton-Raphson update scheme, including the functions to calculate the
 gradient and Hessian.
+
+[CheMPS2/CASSCFpt2.cpp](CheMPS2/CASSCFpt2.cpp) provides the interface between
+the CASSCF and CASPT2 classes. The routines for the 3-RDM and the Fock operator
+contracted with the 4-RDM are called here.
 
 [CheMPS2/ConjugateGradient.cpp](CheMPS2/ConjugateGradient.cpp) is an implementation of
 the conjugate gradient algorithm, in the style of the Davidson class.
@@ -545,7 +552,9 @@ class for the one-body matrix elements.
 
 [CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use
 libchemps2 from the command line.
-    
+
+[CheMPS2/include/chemps2/CASPT2.h](CheMPS2/include/chemps2/CASPT2.h) contains the definitions of the CASPT2 class.
+
 [CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.
 
 [CheMPS2/include/chemps2/ConjugateGradient.h](CheMPS2/include/chemps2/ConjugateGradient.h) contains the definitions of the
@@ -732,6 +741,10 @@ fourfold permutation symmetry.
 calculation of a BCS Hamiltonian. The matrix elements only have fourfold
 permutation symmetry.
 
+[tests/test14.cpp.in](tests/test14.cpp.in) is a copy of the CASSCF
+calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with in addition
+the calculation of the CASPT2 variational second order correction energy.
+
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
 contains the matrix elements for test3 and test11.
 
@@ -745,7 +758,7 @@ contains the matrix elements for test1 and test5.
 contains the matrix elements for test6 and test7.
 
 [tests/matrixelements/N2.CCPVDZ.FCIDUMP](tests/matrixelements/N2.CCPVDZ.FCIDUMP)
-contains the matrix elements for test8 and test9.
+contains the matrix elements for test8, test9, and test14.
 
 The python tests in [PyCheMPS2/tests/](PyCheMPS2/tests/) are an identical
 conversion of the c++ tests.

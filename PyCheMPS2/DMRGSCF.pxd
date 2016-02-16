@@ -23,8 +23,9 @@ cimport DMRGSCFopt
 
 cdef extern from "chemps2/CASSCF.h" namespace "CheMPS2":
     cdef cppclass CASSCF:
-        CASSCF(Ham.Hamiltonian *, int *, int *, int *, int *, int *) except +
-        double solve(const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions *)
+        CASSCF( Ham.Hamiltonian *, int *, int *, int *, int *, int * ) except +
+        double  solve( const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions * )
+        double caspt2( const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions *, const double, const double )
         void deleteStoredUnitary()
         void deleteStoredDIIS()
 

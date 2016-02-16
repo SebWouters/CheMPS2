@@ -242,6 +242,12 @@ cdef class PyCASSCF:
         del self.thisptr
     def solve(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
         return self.thisptr.solve(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
+    def caspt2(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG):
+        return self.thisptr.caspt2(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG)
+    def solve_fci(self, int Nel, int TwoS, int Irrep, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
+        return self.thisptr.solve(Nel, TwoS, Irrep, NULL, rootNum, theDMRGSCFopts.thisptr)
+    def caspt2_fci(self, int Nel, int TwoS, int Irrep, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG):
+        return self.thisptr.caspt2(Nel, TwoS, Irrep, NULL, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG)
     def deleteStoredUnitary(self):
         self.thisptr.deleteStoredUnitary()
     def deleteStoredDIIS(self):

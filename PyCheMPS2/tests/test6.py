@@ -31,9 +31,6 @@ psi4group = 7 # d2h: see chemps2/Irreps.h
 filename  = '../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
 orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
-DOCC = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see O2.ccpvdz.out
-SOCC = np.array([ 0, 0, 0, 0, 0, 0, 0, 0 ], dtype=ctypes.c_int)
-L = Ham.getL()
 
 # Define the symmetry sector
 TwoS = 0     # Two times the targeted spin
@@ -41,6 +38,8 @@ N = 16       # The number of electrons
 Irrep = 0    # The targeted irrep
 
 # Define the CASSCF
+DOCC  = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see O2.ccpvdz.out
+SOCC  = np.array([ 0, 0, 0, 0, 0, 0, 0, 0 ], dtype=ctypes.c_int)
 NOCC  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
 NDMRG = np.array([ 2, 0, 2, 2, 0, 2, 2, 2 ], dtype=ctypes.c_int)
 NVIRT = np.array([ 4, 1, 1, 1, 1, 4, 1, 1 ], dtype=ctypes.c_int)
