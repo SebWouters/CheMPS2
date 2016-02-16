@@ -380,6 +380,11 @@ for the subsequent DMRG sweeps.
 functionality to calculate the spin, density, and spin-flip correlation
 functions as well as the two-orbital mutual information.
 
+[CheMPS2/Cumulant.cpp](CheMPS2/Cumulant.cpp) contains the functionality
+to reconstruct the 4-RDM from lower order reduced density matrices. There is
+also a fast contraction of the Fock operator with the cumulant-reconstructed
+4-RDM.
+
 [CheMPS2/Davidson.cpp](CheMPS2/Davidson.cpp) is an implementation of
 Davidson's algorithm.
 
@@ -565,6 +570,8 @@ ConvergenceScheme class.
 
 [CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the
 Correlations class.
+
+[CheMPS2/include/chemps2/Cumulant.h](CheMPS2/include/chemps2/Cumulant.h) contains the definitions of the Cumulant class.
 
 [CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the
 Davidson class.
