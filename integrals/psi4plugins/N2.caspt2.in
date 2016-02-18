@@ -1,6 +1,6 @@
-molecule O2 {
-  O       0.0   0.0   0.0
-  O       0.0   0.0   3.0 
+molecule N2 {
+  N       0.0000   0.0000   0.0000
+  N       0.0000   0.0000   2.1180
 units au
 }
 
@@ -10,13 +10,13 @@ import dmrg
 set basis          cc-pVDZ
 set reference      rhf
 set scf_type       PK
-
-
+set e_convergence  1e-12
+set d_convergence  1e-12
 
 set dmrg wfn_irrep            0
 set dmrg wfn_multp            1
 set dmrg frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
-set dmrg active               [ 2 , 0 , 2 , 2 , 0 , 2 , 2 , 2 ]
+set dmrg active               [ 2 , 0 , 1 , 1 , 0 , 2 , 1 , 1 ]
 
 set dmrg dmrg_states          [   500,  1000,  1000 ]
 set dmrg dmrg_e_convergence   [ 1e-10, 1e-10, 1e-10 ]
@@ -32,11 +32,14 @@ set dmrg dmrg_diis_branch     1e-2
 set dmrg dmrg_store_diis      true
 
 set dmrg dmrg_max_iter        100
-set dmrg dmrg_which_root      2   # First excited state
-set dmrg dmrg_state_avg       true
-set dmrg dmrg_active_space    NO  # INPUT; NO; LOC
+set dmrg dmrg_which_root      1   # Ground state
+set dmrg dmrg_state_avg       false
+set dmrg dmrg_active_space    INPUT # INPUT; NO; LOC
 set dmrg dmrg_loc_random      false
 
-energy('dmrg')
+set dmrg dmrg_caspt2          true
+set dmrg dmrg_ipea            0.00
+set dmrg dmrg_imag_shift      0.00
 
+energy('dmrg')
 

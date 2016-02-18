@@ -21,9 +21,6 @@
 #include "chemps2/CASPT2.h"
 #include "chemps2/Lapack.h"
 
-using namespace std;
-using namespace boost;
-
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints->DPD_ID(x)
 

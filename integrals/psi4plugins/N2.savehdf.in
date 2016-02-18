@@ -1,0 +1,18 @@
+molecule N2 {
+   N       0.0000   0.0000   0.0000
+   N       0.0000   0.0000   2.1180
+units au
+}
+
+sys.path.insert(0, './..')
+import savehdf
+
+set basis cc-pVDZ
+set reference rhf
+set scf_type PK
+set e_convergence 1e-12
+set d_convergence 1e-12
+set ints_tolerance 0.0
+
+energy('savehdf')
+

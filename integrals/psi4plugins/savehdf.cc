@@ -14,8 +14,6 @@
 #include "chemps2/Hamiltonian.h"
 #include "chemps2/Problem.h"
 
-using namespace std;
-
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
 
