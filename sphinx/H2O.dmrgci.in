@@ -32,4 +32,3 @@ set dmrg dmrg_max_iter        1
 
 energy('dmrg')
 
-

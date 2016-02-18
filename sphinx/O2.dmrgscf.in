@@ -37,4 +37,3 @@ set dmrg dmrg_loc_random      false
 
 energy('dmrg')
 
-
