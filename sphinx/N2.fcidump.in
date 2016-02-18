@@ -4,16 +4,17 @@ molecule N2 {
 units au
 }
 
-plugin_load("fcidump/fcidump.so")
+sys.path.insert(0, './..')
+import fcidump
 
 set basis cc-pVDZ
 set reference rhf
+set scf_type PK
 set e_convergence 1e-12
 set d_convergence 1e-12
 set ints_tolerance 0.0
 
 set fcidump dumpfilename N2.ccpvdz.fcidump
 
-scf()
+energy('fcidump')
 
-plugin("fcidump.so")

@@ -6,28 +6,30 @@ molecule H2O {
  units angstrom
 }
 
-plugin_load("dmrgscf/dmrgscf.so")
+sys.path.insert(0, './..')
+import dmrg
 
 set basis          cc-pVDZ
 set reference      rhf
+set scf_type       PK
 set e_convergence  1e-13
 set d_convergence  1e-13
 set ints_tolerance 0.0
 
-set dmrgscf wfn_irrep            0
-set dmrgscf wfn_multp            1
-set dmrgscf frozen_docc          [ 1 , 0 , 0 , 0 ]
-set dmrgscf active               [ 5 , 0 , 4 , 2 ]
+set dmrg wfn_irrep            0
+set dmrg wfn_multp            1
+set dmrg frozen_docc          [ 1 , 0 , 0 , 0 ]
+set dmrg active               [ 5 , 0 , 4 , 2 ]
 
-set dmrgscf dmrg_states          [  200,  500, 1000, 1000 ]
-set dmrgscf dmrg_econv           [ 1e-8, 1e-8, 1e-8, 1e-8 ]
-set dmrgscf dmrg_maxsweeps       [    5,    5,    5,  100 ]
-set dmrgscf dmrg_noiseprefactors [ 0.03, 0.03, 0.03,  0.0 ]
-set dmrgscf dmrg_print_corr      false
-set dmrgscf mps_chkpt            false
+set dmrg dmrg_states          [  200,  500, 1000, 1000 ]
+set dmrg dmrg_e_convergence   [ 1e-8, 1e-8, 1e-8, 1e-8 ]
+set dmrg dmrg_maxsweeps       [    5,    5,    5,  100 ]
+set dmrg dmrg_noiseprefactors [ 0.03, 0.03, 0.03,  0.0 ]
+set dmrg dmrg_print_corr      false
+set dmrg dmrg_chkpt           false
 
-set dmrgscf dmrgscf_max_iter     1
+set dmrg dmrg_max_iter        1
 
-scf()
+energy('dmrg')
 
-plugin("dmrgscf.so")
+

@@ -4,14 +4,15 @@ molecule N2 {
 units au
 }
 
-plugin_load("savehdf/savehdf.so")
+sys.path.insert(0, './..')
+import savehdf
 
 set basis cc-pVDZ
 set reference rhf
+set scf_type PK
 set e_convergence 1e-12
 set d_convergence 1e-12
 set ints_tolerance 0.0
 
-scf()
+energy('savehdf')
 
-plugin("savehdf.so")

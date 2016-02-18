@@ -4,39 +4,39 @@ molecule O2 {
 units au
 }
 
-plugin_load("dmrgscf/dmrgscf.so")
+sys.path.insert(0, './..')
+import dmrg
 
-set basis     cc-pVDZ
-set reference rhf
+set basis          cc-pVDZ
+set reference      rhf
+set scf_type       PK
 
 
 
-set dmrgscf wfn_irrep            0
-set dmrgscf wfn_multp            1
-set dmrgscf frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
-set dmrgscf active               [ 2 , 0 , 2 , 2 , 0 , 2 , 2 , 2 ]
+set dmrg wfn_irrep            0
+set dmrg wfn_multp            1
+set dmrg frozen_docc          [ 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 ]
+set dmrg active               [ 2 , 0 , 2 , 2 , 0 , 2 , 2 , 2 ]
 
-set dmrgscf dmrg_states          [   500,  1000,  1000 ]
-set dmrgscf dmrg_econv           [ 1e-10, 1e-10, 1e-10 ]
-set dmrgscf dmrg_maxsweeps       [     5,     5,    10 ]
-set dmrgscf dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
-set dmrgscf dmrg_print_corr      false
-set dmrgscf mps_chkpt            false
+set dmrg dmrg_states          [   500,  1000,  1000 ]
+set dmrg dmrg_e_convergence   [ 1e-10, 1e-10, 1e-10 ]
+set dmrg dmrg_maxsweeps       [     5,     5,    10 ]
+set dmrg dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrg dmrg_print_corr      false
+set dmrg dmrg_chkpt           false
 
-set dmrgscf dmrgscf_convergence  1e-6
-set dmrgscf dmrgscf_store_unit   true
-set dmrgscf dmrgscf_do_diis      true
-set dmrgscf dmrgscf_diis_branch  1e-2
-set dmrgscf dmrgscf_store_diis   true
+set dmrg d_convergence        1e-6
+set dmrg dmrg_store_unit      true
+set dmrg dmrg_do_diis         true
+set dmrg dmrg_diis_branch     1e-2
+set dmrg dmrg_store_diis      true
 
-set dmrgscf dmrgscf_max_iter     100
-set dmrgscf dmrgscf_which_root   2   # First excited state
-set dmrgscf dmrgscf_state_avg    true
-set dmrgscf dmrgscf_active_space NO  # INPUT; NO; LOC
-set dmrgscf dmrgscf_loc_random   false
+set dmrg dmrg_max_iter        100
+set dmrg dmrg_which_root      2   # First excited state
+set dmrg dmrg_state_avg       true
+set dmrg dmrg_active_space    NO  # INPUT; NO; LOC
+set dmrg dmrg_loc_random      false
 
-scf()
-
-plugin("dmrgscf.so")
+energy('dmrg')
 
 
