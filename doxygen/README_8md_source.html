@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;==============================================================================</div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;Copyright (C) 2013-2015 Sebastian Wouters &lt;sebastianwouters@gmail.com&gt;</div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;Copyright (C) 2013-2016 Sebastian Wouters &lt;sebastianwouters@gmail.com&gt;</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;This program is free software; you can redistribute it and/or modify</div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;it under the terms of the GNU General Public License as published by</div>
@@ -457,408 +457,439 @@ $(document).ready(function(){initNavTree('README_8md.html','');});
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;List of files in CheMPS2</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;------------------------</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;[CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the constructor and</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;destructor of the CASSCF class, as well as the functions which allow to</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;update, get or set its variables.</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    </div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;[CheMPS2/CASSCFdebug.cpp](CheMPS2/CASSCFdebug.cpp) contains two</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;functions: one for calculating the ROHF energy; and one for fetching FCI</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;coefficients to determine the point group symmetry of certain electronic</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;states of the carbon dimer.</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    </div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;[CheMPS2/CASSCFnewtonraphson.cpp](CheMPS2/CASSCFnewtonraphson.cpp)</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;contains all DMRG-SCF functions which are specific to the augmented Hessian</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;Newton-Raphson update scheme, including the functions to calculate the</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;gradient and Hessian.</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;    </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;[CheMPS2/ConvergenceScheme.cpp](CheMPS2/ConvergenceScheme.cpp) contains</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;all functions of the ConvergenceScheme class, which contains the instructions</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;for the subsequent DMRG sweeps.</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;[CheMPS2/Correlations.cpp](CheMPS2/Correlations.cpp) contains all the</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;functionality to calculate the spin, density, and spin-flip correlation</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;functions as well as the two-orbital mutual information.</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;[CheMPS2/Davidson.cpp](CheMPS2/Davidson.cpp) is an implementation of</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;Davidson&#39;s algorithm.</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;[CheMPS2/DIIS.cpp](CheMPS2/DIIS.cpp) contains a DIIS convergence</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;speed-up for DMRG-SCF.</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;[CheMPS2/CASPT2.cpp](CheMPS2/CASPT2.cpp) contains an implementation of</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;internally contracted CASPT2. The user can specify an IPEA shift and/or</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;an imaginary shift to mitigate possible intruder state problems.</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;[CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the functionality</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;to construct the active space Hamiltonian.</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;[CheMPS2/CASSCFdebug.cpp](CheMPS2/CASSCFdebug.cpp) contains two</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;functions: one for calculating the ROHF energy; and one for fetching FCI</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;coefficients to determine the point group symmetry of certain electronic</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;states of the carbon dimer.</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;[CheMPS2/CASSCFnewtonraphson.cpp](CheMPS2/CASSCFnewtonraphson.cpp)</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;contains all DMRG-SCF functions which are specific to the augmented Hessian</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;Newton-Raphson update scheme, including the functions to calculate the</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;gradient and Hessian.</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;[CheMPS2/CASSCFpt2.cpp](CheMPS2/CASSCFpt2.cpp) provides the interface between</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;the CASSCF and CASPT2 classes. The routines for the 3-RDM and the Fock operator</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;contracted with the 4-RDM are called here.</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;[CheMPS2/ConjugateGradient.cpp](CheMPS2/ConjugateGradient.cpp) is an implementation of</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;the conjugate gradient algorithm, in the style of the Davidson class.</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;[CheMPS2/ConvergenceScheme.cpp](CheMPS2/ConvergenceScheme.cpp) contains</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;all functions of the ConvergenceScheme class, which contains the instructions</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;for the subsequent DMRG sweeps.</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;[CheMPS2/DMRG.cpp](CheMPS2/DMRG.cpp) contains the constructor and</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;destructor of the DMRG class, as well as the top-level sweep functions.</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;[CheMPS2/DMRGmpsio.cpp](CheMPS2/DMRGmpsio.cpp) contains the store and</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;load functions for the DMRG checkpoint file (the MPS).</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;[CheMPS2/DMRGoperators3RDM.cpp](CheMPS2/DMRGoperators3RDM.cpp) contains all</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;update functions for the renormalized operators specific for the ThreeDM and the</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;Correlations.</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;[CheMPS2/DMRGoperators.cpp](CheMPS2/DMRGoperators.cpp) contains all</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;functions related to the DMRG renormalized operators: saving to disk, loading</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;from disk, and updating.</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;[CheMPS2/DMRGSCFindices.cpp](CheMPS2/DMRGSCFindices.cpp) contains the</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;index conversions for the DMRG-SCF algorithm.</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;[CheMPS2/DMRGSCFintegrals.cpp](CheMPS2/DMRGSCFintegrals.cpp) is a container</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;class for two-body matrix elements with at most two virtual indices.</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;[CheMPS2/DMRGSCFmatrix.cpp](CheMPS2/DMRGSCFmatrix.cpp) is a container</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;class for orbital matrices which are blockdiagonal in the irreps.</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;[CheMPS2/DMRGSCFoptions.cpp](CheMPS2/DMRGSCFoptions.cpp) is a container</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;routine.</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;[CheMPS2/DMRGSCFunitary.cpp](CheMPS2/DMRGSCFunitary.cpp) contains the</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;storage and handling of the unitary matrix and its nonredundant skew-symmetric</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;parametrization required for the DMRG-SCF algorithm.</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;[CheMPS2/DMRGSCFVmatRotations.cpp](CheMPS2/DMRGSCFVmatRotations.cpp)</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;performs the two-body matrix element rotations for the DMRGSCF and</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;Edmiston-Ruedenberg classes.</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;[CheMPS2/Correlations.cpp](CheMPS2/Correlations.cpp) contains all the</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;functionality to calculate the spin, density, and spin-flip correlation</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;functions as well as the two-orbital mutual information.</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;[CheMPS2/Cumulant.cpp](CheMPS2/Cumulant.cpp) contains the functionality</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;to reconstruct the 4-RDM from lower order reduced density matrices. There is</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;also a fast contraction of the Fock operator with the cumulant-reconstructed</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;4-RDM.</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;[CheMPS2/Davidson.cpp](CheMPS2/Davidson.cpp) is an implementation of</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;Davidson&#39;s algorithm.</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;[CheMPS2/DIIS.cpp](CheMPS2/DIIS.cpp) contains a DIIS convergence</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;speed-up for DMRG-SCF.</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;[CheMPS2/DMRG.cpp](CheMPS2/DMRG.cpp) contains the constructor and</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;destructor of the DMRG class, as well as the top-level sweep functions.</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;[CheMPS2/DMRGmpsio.cpp](CheMPS2/DMRGmpsio.cpp) contains the store and</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;load functions for the DMRG checkpoint file (the MPS).</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;[CheMPS2/DMRGoperators3RDM.cpp](CheMPS2/DMRGoperators3RDM.cpp) contains all</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;update functions for the renormalized operators specific for the ThreeDM and the</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;Correlations.</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;[CheMPS2/DMRGoperators.cpp](CheMPS2/DMRGoperators.cpp) contains all</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;functions related to the DMRG renormalized operators: saving to disk, loading</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;from disk, and updating.</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;[CheMPS2/DMRGSCFindices.cpp](CheMPS2/DMRGSCFindices.cpp) contains the</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;index conversions for the DMRG-SCF algorithm.</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;[CheMPS2/DMRGSCFintegrals.cpp](CheMPS2/DMRGSCFintegrals.cpp) is a container</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;class for two-body matrix elements with at most two virtual indices.</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;[CheMPS2/DMRGSCFwtilde.cpp](CheMPS2/DMRGSCFwtilde.cpp) is a container</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;class to store a tensor which is required to compute the DMRG-SCF Hessian.</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;[CheMPS2/DMRGSCFmatrix.cpp](CheMPS2/DMRGSCFmatrix.cpp) is a container</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;class for orbital matrices which are blockdiagonal in the irreps.</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;[CheMPS2/DMRGtechnics.cpp](CheMPS2/DMRGtechnics.cpp) contains the</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;functions related to the 2-RDM and the excited-state calculations.</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;[CheMPS2/EdmistonRuedenberg.cpp](CheMPS2/EdmistonRuedenberg.cpp) contains</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;an orbital localization function based on the Edmiston-Ruedenberg cost function</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;and an augmented Hessian Newton-Raphson optimizer.</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;[CheMPS2/FCI.cpp](CheMPS2/FCI.cpp) contains a full configuration</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;interaction solver based on Davidson&#39;s algorithm. It also contains the</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;functionality to calculate Green&#39;s functions.</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;[CheMPS2/FourIndex.cpp](CheMPS2/FourIndex.cpp) contains all functions of</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;the FourIndex container class for the two-body matrix elements.</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;[CheMPS2/Hamiltonian.cpp](CheMPS2/Hamiltonian.cpp) contains all functions</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;of the Hamiltonian class, including functions to get or set specific variables,</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;as well as the save and load functions to store the Hamiltonian on disk.</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;[CheMPS2/DMRGSCFoptions.cpp](CheMPS2/DMRGSCFoptions.cpp) is a container</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;routine.</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;[CheMPS2/DMRGSCFunitary.cpp](CheMPS2/DMRGSCFunitary.cpp) contains the</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;storage and handling of the unitary matrix and its nonredundant skew-symmetric</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;parametrization required for the DMRG-SCF algorithm.</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;[CheMPS2/DMRGSCFVmatRotations.cpp](CheMPS2/DMRGSCFVmatRotations.cpp)</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;performs the two-body matrix element rotations for the DMRGSCF and</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;Edmiston-Ruedenberg classes.</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;[CheMPS2/DMRGSCFwtilde.cpp](CheMPS2/DMRGSCFwtilde.cpp) is a container</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;class to store a tensor which is required to compute the DMRG-SCF Hessian.</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;[CheMPS2/DMRGtechnics.cpp](CheMPS2/DMRGtechnics.cpp) contains the</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;functions related to the RDM and excited-state calculations.</div>
 <div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;[CheMPS2/Heff.cpp](CheMPS2/Heff.cpp) contains the constructor and</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;destructor of the Heff class, as well as the top-level functions to perform</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;the effective Hamiltonian times guess-vector multiplication and Davidson&#39;s</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;algorithm.</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;[CheMPS2/HeffDiagonal.cpp](CheMPS2/HeffDiagonal.cpp) contains the</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;functions to calculate the diagonal elements of the effective Hamiltonian.</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;These are required as preconditioner in Davidson&#39;s algorithm.</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    </div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;[CheMPS2/HeffDiagrams1.cpp](CheMPS2/HeffDiagrams1.cpp) contains a subset</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;multiplication.</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;[CheMPS2/HeffDiagrams2.cpp](CheMPS2/HeffDiagrams2.cpp) contains a subset</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160; of functions to perform the effective Hamiltonian times guess-vector</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; multiplication.</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;[CheMPS2/HeffDiagrams3.cpp](CheMPS2/HeffDiagrams3.cpp) contains a subset</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;multiplication.</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;[CheMPS2/HeffDiagrams4.cpp](CheMPS2/HeffDiagrams4.cpp) contains a subset</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;multiplication.</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;[CheMPS2/HeffDiagrams5.cpp](CheMPS2/HeffDiagrams5.cpp) contains a subset</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;multiplication.</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;[CheMPS2/Initialize.cpp](CheMPS2/Initialize.cpp) allows to set the seed</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;of the random number generator and cout.precision (added for PyCheMPS2).</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;[CheMPS2/Irreps.cpp](CheMPS2/Irreps.cpp) contains the psi4 symmetry</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;conventions.</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;[CheMPS2/EdmistonRuedenberg.cpp](CheMPS2/EdmistonRuedenberg.cpp) contains</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;an orbital localization function based on the Edmiston-Ruedenberg cost function</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;and an augmented Hessian Newton-Raphson optimizer.</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;[CheMPS2/FCI.cpp](CheMPS2/FCI.cpp) contains a full configuration</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;interaction solver based on Davidson&#39;s algorithm. It also contains the</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;functionality to calculate Green&#39;s functions.</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;[CheMPS2/FourIndex.cpp](CheMPS2/FourIndex.cpp) contains all functions of</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;the FourIndex container class for the two-body matrix elements.</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;[CheMPS2/Hamiltonian.cpp](CheMPS2/Hamiltonian.cpp) contains all functions</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;of the Hamiltonian class, including functions to get or set specific variables,</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;as well as the save and load functions to store the Hamiltonian on disk.</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;</div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;[CheMPS2/Heff.cpp](CheMPS2/Heff.cpp) contains top-level functions to perform</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;the effective Hamiltonian times vector multiplication for Davidson&#39;s</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;algorithm.</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;[CheMPS2/HeffDiagonal.cpp](CheMPS2/HeffDiagonal.cpp) contains the</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;functions to calculate the diagonal elements of the effective Hamiltonian.</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;These are required as preconditioner in Davidson&#39;s algorithm.</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    </div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;[CheMPS2/HeffDiagrams1.cpp](CheMPS2/HeffDiagrams1.cpp) contains a subset</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;multiplication.</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;[CheMPS2/HeffDiagrams2.cpp](CheMPS2/HeffDiagrams2.cpp) contains a subset</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; of functions to perform the effective Hamiltonian times guess-vector</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; multiplication.</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;[CheMPS2/HeffDiagrams3.cpp](CheMPS2/HeffDiagrams3.cpp) contains a subset</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;multiplication.</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;[CheMPS2/PrintLicense.cpp](CheMPS2/PrintLicense.cpp) contains a function</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;which prints the license disclaimer.</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;[CheMPS2/Problem.cpp](CheMPS2/Problem.cpp) contains all Problem class</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;functions. This wrapper class allows to set the desired symmetry sector for</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;the DMRG algorithm.</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;[CheMPS2/Sobject.cpp](CheMPS2/Sobject.cpp) contains all Sobject class</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;functions. This class constructs, stores, and decomposes the reduced two-site</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;object.</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;[CheMPS2/HeffDiagrams4.cpp](CheMPS2/HeffDiagrams4.cpp) contains a subset</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;multiplication.</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;[CheMPS2/HeffDiagrams5.cpp](CheMPS2/HeffDiagrams5.cpp) contains a subset</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;of functions to perform the effective Hamiltonian times guess-vector</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;multiplication.</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;[CheMPS2/Initialize.cpp](CheMPS2/Initialize.cpp) allows to set the seed</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;of the random number generator and cout.precision (added for PyCheMPS2).</div>
 <div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;[CheMPS2/SyBookkeeper.cpp](CheMPS2/SyBookkeeper.cpp) contains all</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;dimensions of all symmetry sectors at all boundaries.</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;[CheMPS2/Tensor3RDM.cpp](CheMPS2/Tensor3RDM.cpp) contains all initialization functions</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;for the spin-reduced renormalized operators of three second quantized operators.</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;[CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;stores and handles the reduced spin-0 part of two sandwiched second</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;quantized operators, of which the particle symmetry sectors are equal.</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;[CheMPS2/TensorF1.cpp](CheMPS2/TensorF1.cpp) contains all TensorF1 functions. This class</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;stores and handles the reduced spin-1 part of two sandwiched second</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;quantized operators, of which the particle symmetry sectors are equal.</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;[CheMPS2/TensorGYZ.cpp](CheMPS2/TensorGYZ.cpp) contains the contruct and update functions</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;information.</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;[CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and update functions</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;for the K- and M-tensors. It is required for the two-orbital mutual information.</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;[CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;and handles the reduced spin-1/2 part of a single sandwiched second quantized</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;operator.</div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;[CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) implements the storage and handling of the partial</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;terms which are required to calculate the overlap between two MPSs.</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;[CheMPS2/Irreps.cpp](CheMPS2/Irreps.cpp) contains the psi4 symmetry</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;conventions.</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;[CheMPS2/PrintLicense.cpp](CheMPS2/PrintLicense.cpp) contains a function</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;which prints the license disclaimer.</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;[CheMPS2/Problem.cpp](CheMPS2/Problem.cpp) contains all Problem class</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;functions. This wrapper class allows to set the desired symmetry sector for</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;the DMRG algorithm.</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;[CheMPS2/Sobject.cpp](CheMPS2/Sobject.cpp) contains all Sobject class</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;functions. This class constructs, stores, and decomposes the reduced two-site</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;object.</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;[CheMPS2/SyBookkeeper.cpp](CheMPS2/SyBookkeeper.cpp) contains all</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;dimensions of all symmetry sectors at all boundaries.</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;[CheMPS2/Tensor3RDM.cpp](CheMPS2/Tensor3RDM.cpp) contains all initialization functions</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;for the spin-reduced renormalized operators of three second quantized operators.</div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;[CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;stores and handles the reduced spin-0 part of two sandwiched second</div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;quantized operators, of which the particle symmetry sectors are equal.</div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;[CheMPS2/TensorF1.cpp](CheMPS2/TensorF1.cpp) contains all TensorF1 functions. This class</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;stores and handles the reduced spin-1 part of two sandwiched second</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;quantized operators, of which the particle symmetry sectors are equal.</div>
 <div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;[CheMPS2/TensorOperator.cpp](CheMPS2/TensorOperator.cpp) implements the storage and handling of</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;tensor operators with a given spin, particle number, and point group irrep. It replaces the</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;previous classes TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase,</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD.</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;[CheMPS2/TensorQ.cpp](CheMPS2/TensorQ.cpp) contains all TensorQ functions. This class stores</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;and handles the complementary reduced spin-1/2 part of three sandwiched second</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;quantized operators.</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;[CheMPS2/TensorS0.cpp](CheMPS2/TensorS0.cpp) contains all TensorS0 functions. This class</div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;stores and handles the reduced spin-0 part of two sandwiched second</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;quantized operators, of which the particle symmetry sectors differ by 2.</div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;</div>
-<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;[CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class</div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;stores and handles the reduced spin-1 part of two sandwiched second</div>
-<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;quantized operators, of which the particle symmetry sectors differ by 2.</div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;</div>
-<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;[CheMPS2/TensorT.cpp](CheMPS2/TensorT.cpp) contains all TensorT functions. This class</div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;stores and handles the reduced part of an MPS site-tensor.</div>
-<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;</div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;[CheMPS2/TensorX.cpp](CheMPS2/TensorX.cpp) contains all TensorX functions. This class</div>
-<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;stores and handles the complementary reduced spin-0 part of four sandwiched</div>
-<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;second quantized operators, which is of course diagonal in the symmetry</div>
-<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;sectors.</div>
-<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;</div>
-<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;[CheMPS2/ThreeDM.cpp](CheMPS2/ThreeDM.cpp) contains all functions to calculate and store the</div>
-<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;3-RDM from the DMRG-optimized MPS.</div>
-<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;[CheMPS2/TwoDM.cpp](CheMPS2/TwoDM.cpp) contains all functions to calculate and store the</div>
-<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;2-RDM from the DMRG-optimized MPS.</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;[CheMPS2/TensorGYZ.cpp](CheMPS2/TensorGYZ.cpp) contains the contruct and update functions</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;information.</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;[CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and update functions</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;for the K- and M-tensors. It is required for the two-orbital mutual information.</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;[CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;and handles the reduced spin-1/2 part of a single sandwiched second quantized</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;operator.</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;[CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) implements the storage and handling of the partial</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;terms which are required to calculate the overlap between two MPSs.</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;[CheMPS2/TensorOperator.cpp](CheMPS2/TensorOperator.cpp) implements the storage and handling of</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;tensor operators with a given spin, particle number, and point group irrep. It replaces the</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;previous classes TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase,</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD.</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;[CheMPS2/TensorQ.cpp](CheMPS2/TensorQ.cpp) contains all TensorQ functions. This class stores</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;and handles the complementary reduced spin-1/2 part of three sandwiched second</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;quantized operators.</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;[CheMPS2/TensorS0.cpp](CheMPS2/TensorS0.cpp) contains all TensorS0 functions. This class</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;stores and handles the reduced spin-0 part of two sandwiched second</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;quantized operators, of which the particle symmetry sectors differ by 2.</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;[CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;stores and handles the reduced spin-1 part of two sandwiched second</div>
+<div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;quantized operators, of which the particle symmetry sectors differ by 2.</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;</div>
-<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;[CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container</div>
-<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;class for the one-body matrix elements.</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;[CheMPS2/TensorT.cpp](CheMPS2/TensorT.cpp) contains all TensorT functions. This class</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;stores and handles the reduced part of an MPS site-tensor.</div>
 <div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;</div>
-<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;[CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use</div>
-<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;libchemps2 from the command line.</div>
-<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;    </div>
-<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;[CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.</div>
+<div class="line"><a name="l00544"></a><span class="lineno">  544</span>&#160;[CheMPS2/TensorX.cpp](CheMPS2/TensorX.cpp) contains all TensorX functions. This class</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;stores and handles the complementary reduced spin-0 part of four sandwiched</div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;second quantized operators, which is of course diagonal in the symmetry</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;sectors.</div>
 <div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;</div>
-<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;[CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the</div>
-<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;ConvergenceScheme class.</div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;[CheMPS2/ThreeDM.cpp](CheMPS2/ThreeDM.cpp) contains all functions to calculate and store the</div>
+<div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;3-RDM from the DMRG-optimized MPS.</div>
 <div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;[CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;Correlations class.</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;[CheMPS2/TwoDM.cpp](CheMPS2/TwoDM.cpp) contains all functions to calculate and store the</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;2-RDM from the DMRG-optimized MPS.</div>
 <div class="line"><a name="l00554"></a><span class="lineno">  554</span>&#160;</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;[CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;Davidson class.</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;[CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;class for the one-body matrix elements.</div>
 <div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;[CheMPS2/include/chemps2/DIIS.h](CheMPS2/include/chemps2/DIIS.h) contains the definitions of the DIIS class.</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;[CheMPS2/include/chemps2/DMRG.h](CheMPS2/include/chemps2/DMRG.h) contains the definitions of the DMRG class.</div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;</div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;[CheMPS2/include/chemps2/DMRGSCFindices.h](CheMPS2/include/chemps2/DMRGSCFindices.h) contains the definitions of the</div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;DMRGSCFindices class.</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;[CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;libchemps2 from the command line.</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;[CheMPS2/include/chemps2/CASPT2.h](CheMPS2/include/chemps2/CASPT2.h) contains the definitions of the CASPT2 class.</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;</div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;[CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;[CheMPS2/include/chemps2/DMRGSCFintegrals.h](CheMPS2/include/chemps2/DMRGSCFintegrals.h) contains the definitions of the</div>
-<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;DMRGSCFintegrals class.</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;[CheMPS2/include/chemps2/ConjugateGradient.h](CheMPS2/include/chemps2/ConjugateGradient.h) contains the definitions of the</div>
+<div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;ConjugateGradient class.</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;</div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;[CheMPS2/include/chemps2/DMRGSCFmatrix.h](CheMPS2/include/chemps2/DMRGSCFmatrix.h) contains the definitions of the</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;DMRGSCFmatrix class.</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;[CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;ConvergenceScheme class.</div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;[CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;DMRGSCFoptions container class.</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;[CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;Correlations class.</div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;DMRGSCFunitary class.</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;[CheMPS2/include/chemps2/DMRGSCFVmatRotations.h](CheMPS2/include/chemps2/DMRGSCFVmatRotations.h) contains the definitions of the</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;DMRGSCFVmatRotations class.</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;[CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;DMRGSCFwtilde class.</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;[CheMPS2/include/chemps2/Cumulant.h](CheMPS2/include/chemps2/Cumulant.h) contains the definitions of the Cumulant class.</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;[CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;Davidson class.</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;[CheMPS2/include/chemps2/DIIS.h](CheMPS2/include/chemps2/DIIS.h) contains the definitions of the DIIS class.</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;[CheMPS2/include/chemps2/DMRG.h](CheMPS2/include/chemps2/DMRG.h) contains the definitions of the DMRG class.</div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;[CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;EdmistonRuedenberg class.</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;[CheMPS2/include/chemps2/DMRGSCFindices.h](CheMPS2/include/chemps2/DMRGSCFindices.h) contains the definitions of the</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;DMRGSCFindices class.</div>
 <div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;</div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;[CheMPS2/include/chemps2/FCI.h](CheMPS2/include/chemps2/FCI.h) contains the definitions of the FCI class.</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;</div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;[CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex</div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;class.</div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;</div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;[CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian</div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;class.</div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;</div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;[CheMPS2/include/chemps2/Heff.h](CheMPS2/include/chemps2/Heff.h) contains the definitions of the Heff class.</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;</div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;[CheMPS2/include/chemps2/Initialize.h](CheMPS2/include/chemps2/Initialize.h) contains the definitions of the Initialize</div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;class.</div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;[CheMPS2/include/chemps2/Irreps.h](CheMPS2/include/chemps2/Irreps.h) contains the definitions of the Irrep class.</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;[CheMPS2/include/chemps2/DMRGSCFintegrals.h](CheMPS2/include/chemps2/DMRGSCFintegrals.h) contains the definitions of the</div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;DMRGSCFintegrals class.</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;</div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;[CheMPS2/include/chemps2/DMRGSCFmatrix.h](CheMPS2/include/chemps2/DMRGSCFmatrix.h) contains the definitions of the</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;DMRGSCFmatrix class.</div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;[CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;DMRGSCFoptions container class.</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;DMRGSCFunitary class.</div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;</div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;[CheMPS2/include/chemps2/DMRGSCFVmatRotations.h](CheMPS2/include/chemps2/DMRGSCFVmatRotations.h) contains the definitions of the</div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;DMRGSCFVmatRotations class.</div>
 <div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;[CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;and LAPACK routines.</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;[CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the</div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;DMRGSCFwtilde class.</div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;</div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;[CheMPS2/include/chemps2/MPIchemps2.h](CheMPS2/include/chemps2/MPIchemps2.h) contains the</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;distribution of (complementary) renormalized operators over MPI processes, as well as</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;wrappers for the MPI communication routines in the C API.</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;[CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. </div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;[CheMPS2/include/chemps2/Options.h](CheMPS2/include/chemps2/Options.h) contains all the options of the CheMPS2</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;namespace. Here the checkpoint storage names and folders can be set, as well</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;as parameters related to memory usage and convergence.</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;[CheMPS2/include/chemps2/Problem.h](CheMPS2/include/chemps2/Problem.h) contains the definitions of the Problem class.</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;[CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the</div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;EdmistonRuedenberg class.</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;[CheMPS2/include/chemps2/FCI.h](CheMPS2/include/chemps2/FCI.h) contains the definitions of the FCI class.</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;[CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;class.</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;[CheMPS2/include/chemps2/Gsl.h](CheMPS2/include/chemps2/Gsl.h) contains the definitions of the external GSL routines.</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;[CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;class.</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;</div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;[CheMPS2/include/chemps2/Sobject.h](CheMPS2/include/chemps2/Sobject.h) contains the definitions of the Sobject class.</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;[CheMPS2/include/chemps2/Heff.h](CheMPS2/include/chemps2/Heff.h) contains the definitions of the Heff class.</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;[CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;SyBookkeeper class.</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;[CheMPS2/include/chemps2/Initialize.h](CheMPS2/include/chemps2/Initialize.h) contains the definitions of the Initialize</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;class.</div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;[CheMPS2/include/chemps2/Tensor3RDM.h](CheMPS2/include/chemps2/Tensor3RDM.h) contains the definitions of the Tensor3RDM class.</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;[CheMPS2/include/chemps2/Irreps.h](CheMPS2/include/chemps2/Irreps.h) contains the definitions of the Irrep class.</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;[CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;[CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;</div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;[CheMPS2/include/chemps2/TensorGYZ.h](CheMPS2/include/chemps2/TensorGYZ.h) contains the definitions of the TensorGYZ</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;class.</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;[CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;and LAPACK routines.</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;[CheMPS2/include/chemps2/MPIchemps2.h](CheMPS2/include/chemps2/MPIchemps2.h) contains the</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;distribution of (complementary) renormalized operators over MPI processes, as well as</div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;wrappers for the MPI communication routines in the C API.</div>
 <div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;[CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;class.</div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;[CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. </div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;[CheMPS2/include/chemps2/TensorKM.h](CheMPS2/include/chemps2/TensorKM.h) contains the definitions of the TensorKM class.</div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;[CheMPS2/include/chemps2/TensorL.h](CheMPS2/include/chemps2/TensorL.h) contains the definitions of the TensorL class.</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;[CheMPS2/include/chemps2/Options.h](CheMPS2/include/chemps2/Options.h) contains all the options of the CheMPS2</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;namespace. Here the checkpoint storage names and folders can be set, as well</div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;as parameters related to memory usage and convergence.</div>
 <div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;[CheMPS2/include/chemps2/TensorO.h](CheMPS2/include/chemps2/TensorO.h) contains the definitions of the TensorO class.</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;[CheMPS2/include/chemps2/Problem.h](CheMPS2/include/chemps2/Problem.h) contains the definitions of the Problem class.</div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;[CheMPS2/include/chemps2/TensorOperator.h](CheMPS2/include/chemps2/TensorOperator.h) contains the definitions of the TensorOperator class.</div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;[CheMPS2/include/chemps2/Sobject.h](CheMPS2/include/chemps2/Sobject.h) contains the definitions of the Sobject class.</div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;[CheMPS2/include/chemps2/TensorQ.h](CheMPS2/include/chemps2/TensorQ.h) contains the definitions of the TensorQ class.</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;[CheMPS2/include/chemps2/TensorS0.h](CheMPS2/include/chemps2/TensorS0.h) contains the definitions of the TensorS0 class.</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;[CheMPS2/include/chemps2/TensorS1.h](CheMPS2/include/chemps2/TensorS1.h) contains the definitions of the TensorS1 class.</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;[CheMPS2/include/chemps2/TensorT.h](CheMPS2/include/chemps2/TensorT.h) contains the definitions of the TensorT class.</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;[CheMPS2/include/chemps2/TensorX.h](CheMPS2/include/chemps2/TensorX.h) contains the definitions of the TensorX class.</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;[CheMPS2/include/chemps2/ThreeDM.h](CheMPS2/include/chemps2/ThreeDM.h) contains the definitions of the ThreeDM class.</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;[CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;SyBookkeeper class.</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;[CheMPS2/include/chemps2/Tensor3RDM.h](CheMPS2/include/chemps2/Tensor3RDM.h) contains the definitions of the Tensor3RDM class.</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;[CheMPS2/include/chemps2/TensorF0.h](CheMPS2/include/chemps2/TensorF0.h) contains the definitions of the TensorF0 class.</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;[CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;[CheMPS2/include/chemps2/TensorGYZ.h](CheMPS2/include/chemps2/TensorGYZ.h) contains the definitions of the TensorGYZ</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;class.</div>
 <div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;[CheMPS2/include/chemps2/TwoDM.h](CheMPS2/include/chemps2/TwoDM.h) contains the definitions of the TwoDM class.</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;[CheMPS2/include/chemps2/TwoIndex.h](CheMPS2/include/chemps2/TwoIndex.h) contains the definitions of the TwoIndex class.</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;Please note that these files are documented with doxygen comments. The</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;[doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;can be consulted online.</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;[CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;class.</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;[CheMPS2/include/chemps2/TensorKM.h](CheMPS2/include/chemps2/TensorKM.h) contains the definitions of the TensorKM class.</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;[CheMPS2/include/chemps2/TensorL.h](CheMPS2/include/chemps2/TensorL.h) contains the definitions of the TensorL class.</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;[CheMPS2/include/chemps2/TensorO.h](CheMPS2/include/chemps2/TensorO.h) contains the definitions of the TensorO class.</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;List of files to perform test runs</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;----------------------------------</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;[tests/test1.cpp.in](tests/test1.cpp.in) contains several DMRG ground</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;state calculations in different symmetry sectors for the N2 molecule (d2h</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;symmetry) in the minimal STO-3G basis set.</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;[tests/test2.cpp.in](tests/test2.cpp.in) contains a ground state DMRG</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;calculation of the ^1A1 state of H2O (c2v symmetry) in the 6-31G basis set.</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;[CheMPS2/include/chemps2/TensorOperator.h](CheMPS2/include/chemps2/TensorOperator.h) contains the definitions of the TensorOperator class.</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;[CheMPS2/include/chemps2/TensorQ.h](CheMPS2/include/chemps2/TensorQ.h) contains the definitions of the TensorQ class.</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;[CheMPS2/include/chemps2/TensorS0.h](CheMPS2/include/chemps2/TensorS0.h) contains the definitions of the TensorS0 class.</div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;[CheMPS2/include/chemps2/TensorS1.h](CheMPS2/include/chemps2/TensorS1.h) contains the definitions of the TensorS1 class.</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;[CheMPS2/include/chemps2/TensorT.h](CheMPS2/include/chemps2/TensorT.h) contains the definitions of the TensorT class.</div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;</div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;[tests/test3.cpp.in](tests/test3.cpp.in) contains a ground state DMRG</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;[tests/test4.cpp.in](tests/test4.cpp.in) contains a ground state DMRG</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry)</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;with 10 sites and open boundary conditions, containing 9 fermions (just below</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;half-filling).</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;[CheMPS2/include/chemps2/TensorX.h](CheMPS2/include/chemps2/TensorX.h) contains the definitions of the TensorX class.</div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;[CheMPS2/include/chemps2/ThreeDM.h](CheMPS2/include/chemps2/ThreeDM.h) contains the definitions of the ThreeDM class.</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;</div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;[CheMPS2/include/chemps2/TwoDM.h](CheMPS2/include/chemps2/TwoDM.h) contains the definitions of the TwoDM class.</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;[CheMPS2/include/chemps2/TwoIndex.h](CheMPS2/include/chemps2/TwoIndex.h) contains the definitions of the TwoIndex class.</div>
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;[tests/test5.cpp.in](tests/test5.cpp.in) contains an excited state DMRG</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;STO-3G basis set. The ground and two lowest excited states are determined.</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;Please note that these files are documented with doxygen comments. The</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;[doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;can be consulted online.</div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;[tests/test6.cpp.in](tests/test6.cpp.in) contains a state-averaged</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen,</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;significant speedup is obtained with DIIS.</div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;[tests/test7.cpp.in](tests/test7.cpp.in) reads in</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;[tests/matrixelements/O2.CCPVDZ.FCIDUMP](tests/matrixelements/O2.CCPVDZ.FCIDUMP),</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;stores these matrix elements to disk, reads them back in from disk, and</div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;compares the two versions.</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;List of files to perform test runs</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;----------------------------------</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;[tests/test1.cpp.in](tests/test1.cpp.in) contains several DMRG ground</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;state calculations in different symmetry sectors for the N2 molecule (d2h</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;symmetry) in the minimal STO-3G basis set.</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;[tests/test2.cpp.in](tests/test2.cpp.in) contains a ground state DMRG</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;calculation of the ^1A1 state of H2O (c2v symmetry) in the 6-31G basis set.</div>
 <div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;[tests/test8.cpp.in](tests/test8.cpp.in) contains a DMRG-SCF ground state</div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set.</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;(sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;(pi bonding and antibonding) are chosen as active space. A significant speedup</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;is obtained with DIIS. This test is smaller than test6, and is included for</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;debugging with valgrind.</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;[tests/test3.cpp.in](tests/test3.cpp.in) contains a ground state DMRG</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;calculation of the ^1A1 state of CH4 (c2v symmetry) in the STO-3G basis set.</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;[tests/test4.cpp.in](tests/test4.cpp.in) contains a ground state DMRG</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;calculation of the ^6A state of a linear Hubbard chain (forced c1 symmetry)</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;with 10 sites and open boundary conditions, containing 9 fermions (just below</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;half-filling).</div>
 <div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;[tests/test9.cpp.in](tests/test9.cpp.in) is a copy of</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;[tests/test8.cpp.in](tests/test8.cpp.in), with a slightly larger active</div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;space and which works with ordered localized orbitals instead of natural</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;ordering based on the Fiedler vector with the exchange matrix as cost function.</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;[tests/test10.cpp.in](tests/test10.cpp.in) contains a ground state DMRG</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;basis and in the momentum basis. For the latter, the matrix elements only have</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;fourfold permutation symmetry.</div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;[tests/test11.cpp.in](tests/test11.cpp.in) is a copy of</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;[tests/test3.cpp.in](tests/test3.cpp.in), in which the FCI and DMRG</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;2- and 3-RDM are compared. This test also shows that after calculating the</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;2- and/or 3-RDM, it is possible to continue sweeping.</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;[tests/test12.cpp.in](tests/test12.cpp.in) is a copy of</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;[tests/test4.cpp.in](tests/test4.cpp.in), in which the FCI and DMRG</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;2- and 3-RDM are compared for a wavefunction with higher multiplicity.</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;[tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;contains the matrix elements for test3 and test11.</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;[tests/test5.cpp.in](tests/test5.cpp.in) contains an excited state DMRG</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;calculation in the ^1Ag symmetry sector of N2 (d2h symmetry) in the minimal</div>
+<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;STO-3G basis set. The ground and two lowest excited states are determined.</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;[tests/test6.cpp.in](tests/test6.cpp.in) contains a state-averaged</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen,</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;significant speedup is obtained with DIIS.</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;[tests/test7.cpp.in](tests/test7.cpp.in) reads in</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;[tests/matrixelements/O2.CCPVDZ.FCIDUMP](tests/matrixelements/O2.CCPVDZ.FCIDUMP),</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;stores these matrix elements to disk, reads them back in from disk, and</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;compares the two versions.</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;[tests/test8.cpp.in](tests/test8.cpp.in) contains a DMRG-SCF ground state</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set.</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;(sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital</div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;(pi bonding and antibonding) are chosen as active space. A significant speedup</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;is obtained with DIIS. This test is smaller than test6, and is included for</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;debugging with valgrind.</div>
 <div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;[tests/matrixelements/H2O.631G.FCIDUMP](tests/matrixelements/H2O.631G.FCIDUMP)</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;contains the matrix elements for test2.</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;[tests/matrixelements/N2.STO3G.FCIDUMP](tests/matrixelements/N2.STO3G.FCIDUMP)</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;contains the matrix elements for test1 and test5.</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;[tests/test9.cpp.in](tests/test9.cpp.in) is a copy of</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;[tests/test8.cpp.in](tests/test8.cpp.in), with a slightly larger active</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;space and which works with ordered localized orbitals instead of natural</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;ordering based on the Fiedler vector with the exchange matrix as cost function.</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;[tests/matrixelements/O2.CCPVDZ.FCIDUMP](tests/matrixelements/O2.CCPVDZ.FCIDUMP)</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;contains the matrix elements for test6 and test7.</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;[tests/matrixelements/N2.CCPVDZ.FCIDUMP](tests/matrixelements/N2.CCPVDZ.FCIDUMP)</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;contains the matrix elements for test8 and test9.</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;The python tests in [PyCheMPS2/tests/](PyCheMPS2/tests/) are an identical</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;conversion of the c++ tests.</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;These test files illustrate how to use libchemps2. Note that the</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;tests are too small to see (near) linear scaling with the number of cores,</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;although improvement should still be noticeable.</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;[tests/test10.cpp.in](tests/test10.cpp.in) contains a ground state DMRG</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;basis and in the momentum basis. For the latter, the matrix elements only have</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;fourfold permutation symmetry.</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;[tests/test11.cpp.in](tests/test11.cpp.in) is a copy of</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;[tests/test3.cpp.in](tests/test3.cpp.in), in which the FCI and DMRG</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;2- and 3-RDM are compared. This test also shows that after calculating the</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;2- and/or 3-RDM, it is possible to continue sweeping.</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;[tests/test12.cpp.in](tests/test12.cpp.in) is a copy of</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;[tests/test4.cpp.in](tests/test4.cpp.in), in which the FCI and DMRG</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;2- and 3-RDM are compared for a wavefunction with higher multiplicity.</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;[tests/test13.cpp.in](tests/test13.cpp.in) contains a ground state DMRG</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;calculation of a BCS Hamiltonian. The matrix elements only have fourfold</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;permutation symmetry.</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;[tests/test14.cpp.in](tests/test14.cpp.in) is a copy of the CASSCF</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with in addition</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;the calculation of the CASPT2 variational second order correction energy.</div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;[tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;contains the matrix elements for test3 and test11.</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;[tests/matrixelements/H2O.631G.FCIDUMP](tests/matrixelements/H2O.631G.FCIDUMP)</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;contains the matrix elements for test2.</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;[tests/matrixelements/N2.STO3G.FCIDUMP](tests/matrixelements/N2.STO3G.FCIDUMP)</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;contains the matrix elements for test1 and test5.</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;[tests/matrixelements/O2.CCPVDZ.FCIDUMP](tests/matrixelements/O2.CCPVDZ.FCIDUMP)</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;contains the matrix elements for test6 and test7.</div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;[tests/matrixelements/N2.CCPVDZ.FCIDUMP](tests/matrixelements/N2.CCPVDZ.FCIDUMP)</div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;contains the matrix elements for test8, test9, and test14.</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;The python tests in [PyCheMPS2/tests/](PyCheMPS2/tests/) are an identical</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;conversion of the c++ tests.</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;These test files illustrate how to use libchemps2. Note that the</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;tests are too small to see (near) linear scaling with the number of cores,</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;although improvement should still be noticeable.</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>README.md</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

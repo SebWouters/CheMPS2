@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('DMRGSCFmatrix_8h_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -137,7 +137,7 @@ $(document).ready(function(){initNavTree('DMRGSCFmatrix_8h_source.html','');});
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;      <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;      </div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39">DMRGSCFmatrix</a>(<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler_in);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFmatrix.html#aa6765c45dee26bc3e1b199ebba99bad5">DMRGSCFmatrix</a>(<span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler_in);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;         </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;         <span class="keyword">virtual</span> <a class="code" href="classCheMPS2_1_1DMRGSCFmatrix.html#ad33c89e9ee2f5b548fe14dbb3d925638">~DMRGSCFmatrix</a>();</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;         </div>
@@ -155,7 +155,7 @@ $(document).ready(function(){initNavTree('DMRGSCFmatrix_8h_source.html','');});
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;      <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      </div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;         <span class="comment">// The information on the occupied, active, and virtual spaces</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;         <a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;         <span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1DMRGSCFindices.html">DMRGSCFindices</a> * iHandler;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;         </div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;         <span class="comment">// The matrix entries</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;         <span class="keywordtype">double</span> ** entries;</div>
@@ -167,9 +167,9 @@ $(document).ready(function(){initNavTree('DMRGSCFmatrix_8h_source.html','');});
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_a230d9fa54109d0754a054868611177c5"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5">CheMPS2::DMRGSCFmatrix::getBlock</a></div><div class="ttdeci">double * getBlock(const int irrep)</div><div class="ttdoc">Get a matrix block. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00064">DMRGSCFmatrix.cpp:64</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFindices_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFindices.html">CheMPS2::DMRGSCFindices</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFindices_8h_source.html#l00032">DMRGSCFindices.h:32</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_aabfe4afc9eb53ed6f5f7e6196f4c5c39"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39">CheMPS2::DMRGSCFmatrix::DMRGSCFmatrix</a></div><div class="ttdeci">DMRGSCFmatrix(DMRGSCFindices *iHandler_in)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00022">DMRGSCFmatrix.cpp:22</a></div></div>
-<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASSCF_8h_source.html#l00038">CASSCF.h:38</a></div></div>
+<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASPT2_8h_source.html#l00042">CASPT2.h:42</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_a3660ff17cbeb278c265b6461450b1a24"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24">CheMPS2::DMRGSCFmatrix::set</a></div><div class="ttdeci">void set(const int irrep, const int p, const int q, const double val)</div><div class="ttdoc">Set an element. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00042">DMRGSCFmatrix.cpp:42</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_aa6765c45dee26bc3e1b199ebba99bad5"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#aa6765c45dee26bc3e1b199ebba99bad5">CheMPS2::DMRGSCFmatrix::DMRGSCFmatrix</a></div><div class="ttdeci">DMRGSCFmatrix(const DMRGSCFindices *iHandler_in)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00022">DMRGSCFmatrix.cpp:22</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_a0729b05fef0cb96eaf26e7c8d6017931"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#a0729b05fef0cb96eaf26e7c8d6017931">CheMPS2::DMRGSCFmatrix::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdoc">Clear the matrix. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00048">DMRGSCFmatrix.cpp:48</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html">CheMPS2::DMRGSCFmatrix</a></div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8h_source.html#l00032">DMRGSCFmatrix.h:32</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRGSCFmatrix_html_ad33c89e9ee2f5b548fe14dbb3d925638"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFmatrix.html#ad33c89e9ee2f5b548fe14dbb3d925638">CheMPS2::DMRGSCFmatrix::~DMRGSCFmatrix</a></div><div class="ttdeci">virtual ~DMRGSCFmatrix()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFmatrix_8cpp_source.html#l00033">DMRGSCFmatrix.cpp:33</a></div></div>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('DMRGSCFmatrix_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9b42c04f8fd95b4f9151c9c6b143cac5.html">chemps2</a></li><li class="navelem"><b>DMRGSCFmatrix.h</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:43 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:51 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

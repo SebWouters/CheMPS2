@@ -187,11 +187,11 @@ Specific Hamiltonian information</h1>
 <li>groupNumber (in SymmInfo): the number of the Abelian point group symmetry with real-valued character table (see <a class="el" href="Irreps_8h_source.html">Irreps.h</a>)</li>
 <li>orb2irrep: array with the irrep number for each orbital</li>
 <li>Econst: nuclear repulsion energy; or any constant part of the energy not contained in the 1- or 2-particle matrix elements</li>
-<li>Tmat: 1-particle matrix elements; Tmat <img class="formulaInl" alt="$_{a,b}$" src="form_170.png"/> = 0 if <img class="formulaInl" alt="$I_a$" src="form_171.png"/> is different from <img class="formulaInl" alt="$I_b$" src="form_172.png"/></li>
-<li>Vmat: 2-particle matrix elements; Vmat <img class="formulaInl" alt="$_{a,b,c,d}$" src="form_173.png"/> = 0 if <img class="formulaInl" alt="$I_a \otimes I_b$" src="form_174.png"/> is not equal to <img class="formulaInl" alt="$I_c \otimes I_d$" src="form_175.png"/>; the matrix elements are not antisymmetrized and are stored with the convention that both (a &amp; c) and (b &amp; d) have the same spatial variable for the nuclear repulsion integral (physics notation).</li>
+<li>Tmat: 1-particle matrix elements; Tmat <img class="formulaInl" alt="$_{a,b}$" src="form_173.png"/> = 0 if <img class="formulaInl" alt="$I_a$" src="form_174.png"/> is different from <img class="formulaInl" alt="$I_b$" src="form_175.png"/></li>
+<li>Vmat: 2-particle matrix elements; Vmat <img class="formulaInl" alt="$_{a,b,c,d}$" src="form_176.png"/> = 0 if <img class="formulaInl" alt="$I_a \otimes I_b$" src="form_177.png"/> is not equal to <img class="formulaInl" alt="$I_c \otimes I_d$" src="form_178.png"/>; the matrix elements are not antisymmetrized and are stored with the convention that both (a &amp; c) and (b &amp; d) have the same spatial variable for the nuclear repulsion integral (physics notation).</li>
 </ul>
 <p>The targeted spin, particle number and point group symmetry are not defined here. For convenience, the second quantized formulation of the <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> is given here: <br />
- <img class="formulaInl" alt="$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $" src="form_176.png"/><br />
+ <img class="formulaInl" alt="$ \hat{H} = E_{const} + \sum\limits_{ij\sigma} T_{ij} \delta_{I_i,I_j} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \sigma} + \frac{1}{2} \sum\limits_{ijkl\sigma\tau} V_{ijkl} \delta_{I_i \otimes I_j \otimes I_k \otimes I_l, I_{trivial}} \hat{a}_{i \sigma}^{\dagger} \hat{a}_{j \tau}^{\dagger} \hat{a}_{l \tau} \hat{a}_{k \sigma} $" src="form_179.png"/><br />
 where the latin letters denote site-indices and the greek letters spin projections. This <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> preserves spin, spin projection, particle number, and Abelian point group symmetry (if its character table is real at least). </p>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8h_source.html#l00053">53</a> of file <a class="el" href="Hamiltonian_8h_source.html">Hamiltonian.h</a>.</p>
@@ -414,7 +414,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82_icgraph.png" border="0" usemap="#classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82_icgraph" id="classCheMPS2_1_1Hamiltonian_ab6147d890404000374bb96baba0b1f82_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,5,457,47"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="505,13,816,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,23,457,65"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="509,5,693,32"/><area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="505,56,697,83"/></map>
 </div>
 </p>
 
@@ -445,7 +445,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab_icgraph.png" border="0" usemap="#classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab_icgraph" id="classCheMPS2_1_1Hamiltonian_a031fa6987b304e3a7f6114b9f2e1f2ab_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="238,5,381,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="212,56,407,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="455,49,617,90"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="665,49,877,90"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="238,5,381,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="212,56,407,83"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="455,49,617,90"/><area shape="rect" id="node5" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="675,27,867,53"/><area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="665,78,877,119"/></map>
 </div>
 </p>
 
@@ -476,7 +476,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618_icgraph.png" border="0" usemap="#classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618_icgraph" id="classCheMPS2_1_1Hamiltonian_a101963cfa8f06abe798a7ae79faab618_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="215,5,423,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="212,57,427,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="248,123,391,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="222,173,417,200"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad2d958c7b1ca60b43f7aa5eaabeeb0b1" title="Constructor. " alt="" coords="215,5,423,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="212,57,427,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="248,123,391,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="222,173,417,200"/></map>
 </div>
 </p>
 
@@ -507,7 +507,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21_icgraph.png" border="0" usemap="#classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21_icgraph" id="classCheMPS2_1_1Hamiltonian_a8c18f51ded63810e316f1834853dce21_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#aee2071ba5914ed3a6e7120e6d1656144" title="Constructor. " alt="" coords="231,5,439,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036" title="Constructor. " alt="" coords="212,57,457,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="227,122,442,163"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="263,188,406,215"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="250,239,419,265"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad2d958c7b1ca60b43f7aa5eaabeeb0b1" title="Constructor. " alt="" coords="231,5,439,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036" title="Constructor. " alt="" coords="212,57,457,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="227,122,442,163"/><area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="263,188,406,215"/><area shape="rect" id="node6" href="classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="250,239,419,265"/></map>
 </div>
 </p>
 
@@ -583,7 +583,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$T_{index1,index2}$" src="form_177.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$T_{index1,index2}$" src="form_180.png"/> </dd></dl>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00112">112</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
@@ -646,7 +646,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$V_{index1,index2,index3,index4}$" src="form_178.png"/> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><img class="formulaInl" alt="$V_{index1,index2,index3,index4}$" src="form_181.png"/> </dd></dl>
 
 <p>Definition at line <a class="el" href="Hamiltonian_8cpp_source.html#l00136">136</a> of file <a class="el" href="Hamiltonian_8cpp_source.html">Hamiltonian.cpp</a>.</p>
 
@@ -906,7 +906,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="dynsection-11-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1_icgraph.png" border="0" usemap="#classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1_icgraph" id="classCheMPS2_1_1Hamiltonian_a2ddb391c8a20c50bdd2c775cffd8fbb1_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="212,5,457,47"/><area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,71,457,112"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="505,46,816,73"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="212,5,457,47"/><area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,71,457,112"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="509,17,693,43"/><area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="505,71,697,98"/></map>
 </div>
 </p>
 
@@ -984,7 +984,7 @@ where the latin letters denote site-indices and the greek letters spin projectio
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -1,4 +1,6 @@
 <map id="CheMPS2::ThreeDM::get_ham_index" name="CheMPS2::ThreeDM::get_ham_index">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Cumulant.html#a71af6ca25a81326cac7f772bd9723ab7" title="Contract the CASPT2 Fock operator with the cumulant approximation of &#160;in &#160;time, using HAM indices..." alt="" coords="224,5,415,47"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71" title="Get the cumulant approximation of , using HAM indices. " alt="" coords="242,71,397,112"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#ac78aeef75d0a83c75030080c8d1033e7" title="Copy over the DMRG 3&#45;RDM. " alt="" coords="224,5,459,32"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Cumulant.html#a71af6ca25a81326cac7f772bd9723ab7" title="Contract the CASPT2 Fock operator with the cumulant approximation of &#160;in &#160;time, using HAM indices..." alt="" coords="246,57,437,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71" title="Get the cumulant approximation of , using HAM indices. " alt="" coords="264,122,419,163"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="507,5,699,32"/>
 </map>

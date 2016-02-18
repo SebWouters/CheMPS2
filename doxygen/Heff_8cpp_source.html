@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('Heff_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -441,10 +441,10 @@ $(document).ready(function(){initNavTree('Heff_8cpp_source.html','');});
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;   <span class="keywordtype">int</span> inc1 = 1;</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;   <span class="keywordtype">int</span> veclength = denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588">gKappa2index</a>( denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e">gNKappa</a>() );</div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;   <a class="code" href="classCheMPS2_1_1Davidson.html">Davidson</a> deBoskabouter( veclength, CheMPS2::HEFF_DAVIDSON_NUM_VEC,</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                                      CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP,</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;                                      CheMPS2::HEFF_DAVIDSON_DMRG_RTOL,</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                                      CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, CheMPS2::HEFF_debugPrint );</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;   <a class="code" href="classCheMPS2_1_1Davidson.html">Davidson</a> deBoskabouter( veclength, CheMPS2::DAVIDSON_NUM_VEC,</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                                      CheMPS2::DAVIDSON_NUM_VEC_KEEP,</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;                                      CheMPS2::DAVIDSON_DMRG_RTOL,</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                                      CheMPS2::DAVIDSON_PRECOND_CUTOFF, CheMPS2::HEFF_debugPrint );</div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;   <span class="keywordtype">double</span> ** whichpointers = <span class="keyword">new</span> <span class="keywordtype">double</span>*[2];</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;   <span class="keywordtype">char</span> instruction = deBoskabouter.FetchInstruction( whichpointers );</div>
@@ -554,7 +554,7 @@ $(document).ready(function(){initNavTree('Heff_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>Heff.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:43 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:51 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

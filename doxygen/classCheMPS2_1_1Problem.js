@@ -12,7 +12,7 @@ var classCheMPS2_1_1Problem =
     [ "gL", "classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd", null ],
     [ "gMxElement", "classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36", null ],
     [ "gN", "classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f", null ],
-    [ "gReorderD2h", "classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679", null ],
+    [ "gReorder", "classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754", null ],
     [ "gSy", "classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f", null ],
     [ "gTwoS", "classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49", null ],
     [ "setMxElement", "classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14", null ],

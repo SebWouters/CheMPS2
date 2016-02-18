@@ -23,7 +23,7 @@ var searchData=
   ['tensors0',['TensorS0',['../classCheMPS2_1_1TensorS0.html',1,'CheMPS2']]],
   ['tensors1',['TensorS1',['../classCheMPS2_1_1TensorS1.html',1,'CheMPS2']]],
   ['tensors1',['TensorS1',['../classCheMPS2_1_1TensorS1.html#aace92b023968f3dade4111ecea330b9a',1,'CheMPS2::TensorS1']]],
-  ['tensort',['TensorT',['../classCheMPS2_1_1TensorT.html#a08705c000454ebea5b96a4a8a7fbdc0f',1,'CheMPS2::TensorT']]],
+  ['tensort',['TensorT',['../classCheMPS2_1_1TensorT.html#ae22dc74a7537e6e883eae4bfd293f614',1,'CheMPS2::TensorT::TensorT(const int index_in, const SyBookkeeper *denBK_in)'],['../classCheMPS2_1_1TensorT.html#ad06d396a5a4d3cc2d42bb8cea0e5c88f',1,'CheMPS2::TensorT::TensorT(TensorT &amp;tocopy)']]],
   ['tensort',['TensorT',['../classCheMPS2_1_1TensorT.html',1,'CheMPS2']]],
   ['tensorx',['TensorX',['../classCheMPS2_1_1TensorX.html',1,'CheMPS2']]],
   ['tensorx',['TensorX',['../classCheMPS2_1_1TensorX.html#a494fde7a79bf746d09d92b9fe26a3201',1,'CheMPS2::TensorX']]],

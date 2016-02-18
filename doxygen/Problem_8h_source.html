@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('Problem_8h_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -174,7 +174,7 @@ $(document).ready(function(){initNavTree('Problem_8h_source.html','');});
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;         <span class="keywordtype">bool</span> <a class="code" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e">checkConsistency</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;         </div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         <span class="keywordtype">bool</span> <a class="code" href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">gReorderD2h</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;         <span class="keywordtype">bool</span> <a class="code" href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">gReorder</a>() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;         </div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;         <span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9">gf1</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> HamOrb) <span class="keyword">const</span>;</div>
@@ -209,8 +209,8 @@ $(document).ready(function(){initNavTree('Problem_8h_source.html','');});
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;         <span class="comment">//The targeted irrep</span></div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;         <span class="keywordtype">int</span> Irrep;</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;         </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;         <span class="comment">//Whether or not to reorder D2h</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;         <span class="keywordtype">bool</span> bReorderD2h;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;         <span class="comment">//Whether or not to reorder</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;         <span class="keywordtype">bool</span> bReorder;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;         </div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;         <span class="comment">//f1[HamiltonianIndex] = DMRGindex</span></div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;         <span class="keywordtype">int</span> * f1;</div>
@@ -226,9 +226,9 @@ $(document).ready(function(){initNavTree('Problem_8h_source.html','');});
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a0a979c3461cc2824cb7c0e91442d5e14"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14">CheMPS2::Problem::setMxElement</a></div><div class="ttdeci">void setMxElement(const int alpha, const int beta, const int gamma, const int delta, const double value)</div><div class="ttdoc">Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with ...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00356">Problem.cpp:356</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Problem_html_ad451eb3fdbd695b938a15515450b6679"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">CheMPS2::Problem::gReorderD2h</a></div><div class="ttdeci">bool gReorderD2h() const </div><div class="ttdoc">Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00346">Problem.cpp:346</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a24b9329bce03b3d6797750a530d4dd59"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59">CheMPS2::Problem::setup_reorder_dinfh</a></div><div class="ttdeci">void setup_reorder_dinfh(int *docc, const double sp_threshold=1e-5)</div><div class="ttdoc">Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00177">Problem.cpp:177</a></div></div>
-<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASSCF_8h_source.html#l00038">CASSCF.h:38</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Problem_html_a2b562b3dce075741cf3cf038143a2754"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">CheMPS2::Problem::gReorder</a></div><div class="ttdeci">bool gReorder() const </div><div class="ttdoc">Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00346">Problem.cpp:346</a></div></div>
+<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASPT2_8h_source.html#l00042">CASPT2.h:42</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a6e26b40eb9bf80eb9979083b58a4e30e"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e">CheMPS2::Problem::checkConsistency</a></div><div class="ttdeci">bool checkConsistency() const </div><div class="ttdoc">Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0<=Irrep<nIrreps...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00385">Problem.cpp:385</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_aaa734d8f3bf869965af7529df4ff4dfc"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc">CheMPS2::Problem::setup_reorder_custom</a></div><div class="ttdeci">void setup_reorder_custom(int *dmrg2ham)</div><div class="ttdoc">Reorder the orbitals to a custom ordering. Previous reorderings are cleared. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00150">Problem.cpp:150</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a634bbc2ad8be9f45ecd894f0f222885f"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f">CheMPS2::Problem::gN</a></div><div class="ttdeci">int gN() const </div><div class="ttdoc">Get the targeted particle number. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00068">Problem.h:68</a></div></div>
@@ -255,7 +255,7 @@ $(document).ready(function(){initNavTree('Problem_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9b42c04f8fd95b4f9151c9c6b143cac5.html">chemps2</a></li><li class="navelem"><b>Problem.h</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

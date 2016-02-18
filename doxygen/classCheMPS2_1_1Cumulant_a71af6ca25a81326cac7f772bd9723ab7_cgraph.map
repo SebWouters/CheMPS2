@@ -1,7 +1,7 @@
 <map id="CheMPS2::Cumulant::gamma4_fock_contract_ham" name="CheMPS2::Cumulant::gamma4_fock_contract_ham">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="291,5,451,32"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="282,56,461,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps..." alt="" coords="260,107,483,133"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="272,107,471,133"/>
 <area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="289,157,453,184"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1TwoDM.html#a4eb81922bf21b38ed8fb8c4696da3a19" title="Get a 1&#45;RDM term, using the HAM indices. " alt="" coords="253,208,490,235"/>
 <area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="276,259,467,285"/>

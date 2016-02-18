@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -204,7 +204,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;   tempfolder = tmpfolder;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;   </div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;   setupBookkeeperAndMPS();</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   PreSolve();</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   <a class="code" href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4">PreSolve</a>();</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
@@ -226,7 +226,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;   <span class="keywordflow">if</span> (loadedMPS){ loadDIM(MPSstoragename,denBK); }</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;   </div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;   MPS = <span class="keyword">new</span> TensorT * [L];</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){ MPS[cnt] = <span class="keyword">new</span> TensorT(cnt,denBK-&gt;gIrrep(cnt),denBK); }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L; cnt++){ MPS[cnt] = <span class="keyword">new</span> TensorT( cnt, denBK ); }</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;   </div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;   <span class="keywordflow">if</span> (loadedMPS){</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      <span class="keywordtype">bool</span> isConverged;</div>
@@ -299,259 +299,261 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="keywordtype">void</span> CheMPS2::DMRG::PreSolve(){</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;   </div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }</div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4">  193</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4">CheMPS2::DMRG::PreSolve</a>(){</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;   deleteAllBoundaryOperators();</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;   </div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;   TotalMinEnergy = 1e8;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;}</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;L-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;   </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;   TotalMinEnergy = 1e8;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">  202</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">CheMPS2::DMRG::Solve</a>(){</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;}</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;   <span class="keywordtype">bool</span> change = (TotalMinEnergy&lt;1e8) ? <span class="keyword">true</span> : <span class="keyword">false</span>; <span class="comment">//1 sweep from right to left: fixed virtual dimensions</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;   </div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
+<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">  204</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">CheMPS2::DMRG::Solve</a>(){</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;   <span class="keywordtype">bool</span> change = (TotalMinEnergy&lt;1e8) ? <span class="keyword">true</span> : <span class="keyword">false</span>; <span class="comment">//1 sweep from right to left: fixed virtual dimensions</span></div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;   </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master = ( <a class="code" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">MPIchemps2::mpi_rank</a>() == MPI_CHEMPS2_MASTER );</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="preprocessor">   #else</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="preprocessor">   #endif</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;   </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> instruction=0; instruction &lt; OptScheme-&gt;getNInstructions(); instruction++){</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;   </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master = ( <a class="code" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">MPIchemps2::mpi_rank</a>() == MPI_CHEMPS2_MASTER );</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="preprocessor">   #else</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">   #endif</span></div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;   </div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;      <span class="keywordtype">int</span> nIterations = 0;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordtype">double</span> EnergyPrevious = Energy + 10 * OptScheme-&gt;getEconv(instruction); <span class="comment">//Guarantees that there&#39;s always at least 1 left-right sweep</span></div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      </div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="keywordflow">while</span> ( (fabs(Energy-EnergyPrevious) &gt; OptScheme-&gt;getEconv(instruction) ) &amp;&amp; ( nIterations &lt; OptScheme-&gt;getMaxSweeps(instruction) )){</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> instruction=0; instruction &lt; OptScheme-&gt;getNInstructions(); instruction++){</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;   </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      <span class="keywordtype">int</span> nIterations = 0;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;      <span class="keywordtype">double</span> EnergyPrevious = Energy + 10 * OptScheme-&gt;getEconv(instruction); <span class="comment">//Guarantees that there&#39;s always at least 1 left-right sweep</span></div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;      </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> timecnt=0; timecnt&lt;CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;         num_double_write_disk = 0;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;         num_double_read_disk  = 0;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;         <span class="keyword">struct </span>timeval start, end;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;         EnergyPrevious = Energy;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;         gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;         Energy = sweepleft(change, instruction, am_i_master); <span class="comment">// Only relevant call in this block of code</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;         gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;         <span class="keywordtype">double</span> elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;         <span class="keywordflow">if</span> ( am_i_master ){</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***  Information on left sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.join            = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_JOIN  ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.solve           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SOLVE ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.split           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SPLIT ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            print_tensor_update_performance();</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;         }</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;         <span class="keywordflow">if</span> (!change) change = <span class="keyword">true</span>; <span class="comment">//rest of sweeps: variable virtual dimensions</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> timecnt=0; timecnt&lt;CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;         num_double_write_disk = 0;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;         num_double_read_disk  = 0;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;         gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;         Energy = sweepright(change, instruction, am_i_master); <span class="comment">// Only relevant call in this block of code</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;         gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;         <span class="keywordflow">if</span> ( am_i_master ){</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***  Information on right sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.join            = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_JOIN  ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.solve           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SOLVE ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.split           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SPLIT ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            print_tensor_update_performance();</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Energy difference with respect to previous leftright sweep = &quot;</span> &lt;&lt; fabs(Energy-EnergyPrevious) &lt;&lt; endl;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            <span class="keywordflow">if</span> ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, <span class="keyword">false</span>); } <span class="comment">// Only the master proc makes MPS checkpoints !!</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;         }</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;         </div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;         nIterations++;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;         <span class="keywordflow">if</span> (Exc_activated){ calcOverlapsWithLowerStates(); }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;      </div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;      }</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;      <span class="keywordflow">while</span> ( (fabs(Energy-EnergyPrevious) &gt; OptScheme-&gt;getEconv(instruction) ) &amp;&amp; ( nIterations &lt; OptScheme-&gt;getMaxSweeps(instruction) )){</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;      </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> timecnt=0; timecnt&lt;CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;         num_double_write_disk = 0;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;         num_double_read_disk  = 0;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;         <span class="keyword">struct </span>timeval start, end;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;         EnergyPrevious = Energy;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;         gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;         Energy = sweepleft(change, instruction, am_i_master); <span class="comment">// Only relevant call in this block of code</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;         gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;         <span class="keywordtype">double</span> elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;         <span class="keywordflow">if</span> ( am_i_master ){</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***  Information on left sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.join            = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_JOIN  ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.solve           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SOLVE ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.split           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SPLIT ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            print_tensor_update_performance();</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;         }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;         <span class="keywordflow">if</span> (!change) change = <span class="keyword">true</span>; <span class="comment">//rest of sweeps: variable virtual dimensions</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> timecnt=0; timecnt&lt;CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;         num_double_write_disk = 0;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;         num_double_read_disk  = 0;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;         gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;         Energy = sweepright(change, instruction, am_i_master); <span class="comment">// Only relevant call in this block of code</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;         gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;         <span class="keywordflow">if</span> ( am_i_master ){</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***  Information on right sweep &quot;</span> &lt;&lt; nIterations &lt;&lt; <span class="stringliteral">&quot; of instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Elapsed wall time        = &quot;</span> &lt;&lt; elapsed &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.join            = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_JOIN  ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.solve           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SOLVE ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***       |--&gt; S.split           = &quot;</span> &lt;&lt; timings[ CHEMPS2_TIME_S_SPLIT ] &lt;&lt; <span class="stringliteral">&quot; seconds&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;            print_tensor_update_performance();</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy           = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;***     Energy difference with respect to previous leftright sweep = &quot;</span> &lt;&lt; fabs(Energy-EnergyPrevious) &lt;&lt; endl;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            <span class="keywordflow">if</span> ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, <span class="keyword">false</span>); } <span class="comment">// Only the master proc makes MPS checkpoints !!</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;         }</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;         </div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;         nIterations++;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;         <span class="keywordflow">if</span> (Exc_activated){ calcOverlapsWithLowerStates(); }</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;      </div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Information on completed instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     The reduced virtual dimension DSU(2)               = &quot;</span> &lt;&lt; OptScheme-&gt;getD(instruction) &lt;&lt; endl;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy encountered during all instructions = &quot;</span> &lt;&lt; TotalMinEnergy &lt;&lt; endl;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy encountered during the last sweep   = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight during the last sweep     = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;      }</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;   </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;   }</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;      }</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;      </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***  Information on completed instruction &quot;</span> &lt;&lt; instruction &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     The reduced virtual dimension DSU(2)               = &quot;</span> &lt;&lt; OptScheme-&gt;getD(instruction) &lt;&lt; endl;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy encountered during all instructions = &quot;</span> &lt;&lt; TotalMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Minimum energy encountered during the last sweep   = &quot;</span> &lt;&lt; LastMinEnergy &lt;&lt; endl;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;***     Maximum discarded weight during the last sweep     = &quot;</span> &lt;&lt; MaxDiscWeightLastSweep &lt;&lt; endl;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;******************************************************************&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      }</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;   </div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;   <span class="keywordflow">return</span> TotalMinEnergy;</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;}</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;   }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;   </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;   <span class="keywordflow">return</span> TotalMinEnergy;</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepleft(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction, <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master){</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;}</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   LastMinEnergy = 1e8;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   <span class="keyword">struct </span>timeval start, end;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = L-2; index&gt;0; index--){</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;      <span class="comment">//Construct S</span></div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * denS = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a>(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      <span class="comment">//Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      <span class="comment">//Feed everything to the solver</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <a class="code" href="classCheMPS2_1_1Heff.html">Heff</a> Solver(denBK, Prob);</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ VeffTilde = prepare_excitations(denS); }</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="comment">//Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.</span></div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ cleanup_excitations(VeffTilde); }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      Energy += Prob-&gt;gEconst();</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      </div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      <span class="keywordflow">if</span> (( NoiseLevel&gt;0.0 ) &amp;&amp; ( am_i_master )){ denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c">addNoise</a>(NoiseLevel); }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      <span class="comment">//MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df">Split</a>(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">false</span>,change);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      <span class="keyword">delete</span> denS;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      </div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      <span class="comment">//Print info</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;      }</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;      </div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      <span class="comment">//Prepare for next step</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      updateMovingLeftSafe(index);</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;   }</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;   </div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;}</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepleft(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction, <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master){</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;   <span class="keywordtype">double</span> Energy = 0.0;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;   LastMinEnergy = 1e8;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;   <span class="keyword">struct </span>timeval start, end;</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;   </div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = L-2; index&gt;0; index--){</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;      <span class="comment">//Construct S</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;      <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a> * denS = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1Sobject.html">Sobject</a>(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;      <span class="comment">//Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;      </div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;      <span class="comment">//Feed everything to the solver</span></div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;      <a class="code" href="classCheMPS2_1_1Heff.html">Heff</a> Solver(denBK, Prob);</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ VeffTilde = prepare_excitations(denS); }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;      <span class="comment">//Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ cleanup_excitations(VeffTilde); }</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;      Energy += Prob-&gt;gEconst();</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;      </div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;      <span class="keywordflow">if</span> (( NoiseLevel&gt;0.0 ) &amp;&amp; ( am_i_master )){ denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c">addNoise</a>(NoiseLevel); }</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      <span class="comment">//MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df">Split</a>(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">false</span>,change);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      <span class="keyword">delete</span> denS;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      </div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;      <span class="comment">//Print info</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;      }</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;      </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;      <span class="comment">//Prepare for next step</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;      updateMovingLeftSafe(index);</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;   }</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;   </div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepright(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction, <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master){</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;}</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;   <span class="keywordtype">double</span> Energy=0.0;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;   LastMinEnergy = 1e8;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;   <span class="keyword">struct </span>timeval start, end;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;   </div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = 0; index&lt;L-2; index++){</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;      <span class="comment">//Construct S</span></div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      Sobject * denS = <span class="keyword">new</span> Sobject(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      <span class="comment">//Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      </div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      <span class="comment">//Feed everything to solver</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;      Heff Solver(denBK, Prob);</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ VeffTilde = prepare_excitations(denS); }</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      <span class="comment">//Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ cleanup_excitations(VeffTilde); }</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      Energy += Prob-&gt;gEconst();</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      </div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;      <span class="keywordflow">if</span> (( NoiseLevel&gt;0.0 ) &amp;&amp; ( am_i_master )){ denS-&gt;addNoise(NoiseLevel); }</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      <span class="comment">//MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.</span></div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;Split(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">true</span>,change);</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="keyword">delete</span> denS;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      </div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      <span class="comment">//Print info</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      }</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;      </div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      <span class="comment">//Prepare for next step</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      gettimeofday(&amp;start, NULL);</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      updateMovingRightSafe(index);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      gettimeofday(&amp;end, NULL);</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;   }</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;   </div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;}</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="keywordtype">double</span> CheMPS2::DMRG::sweepright(<span class="keyword">const</span> <span class="keywordtype">bool</span> change, <span class="keyword">const</span> <span class="keywordtype">int</span> instruction, <span class="keyword">const</span> <span class="keywordtype">bool</span> am_i_master){</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;   <span class="keywordtype">double</span> Energy=0.0;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;   <span class="keywordtype">double</span> NoiseLevel = OptScheme-&gt;getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;   MaxDiscWeightLastSweep = 0.0;</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;   LastMinEnergy = 1e8;</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;   <span class="keyword">struct </span>timeval start, end;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;   </div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> index = 0; index&lt;L-2; index++){</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;      <span class="comment">//Construct S</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;      Sobject * denS = <span class="keyword">new</span> Sobject(index,denBK-&gt;gIrrep(index),denBK-&gt;gIrrep(index+1),denBK);</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;      <span class="comment">//Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;      denS-&gt;<a class="code" href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">Join</a>(MPS[index],MPS[index+1]);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;      </div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;      <span class="comment">//Feed everything to solver</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;      Heff Solver(denBK, Prob);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;      <span class="keywordtype">double</span> ** VeffTilde = NULL;</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ VeffTilde = prepare_excitations(denS); }</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="comment">//Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.</span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;      <span class="keywordflow">if</span> (Exc_activated){ cleanup_excitations(VeffTilde); }</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;      Energy += Prob-&gt;gEconst();</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;TotalMinEnergy){ TotalMinEnergy = Energy; }</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;      <span class="keywordflow">if</span> (Energy&lt;LastMinEnergy){  LastMinEnergy  = Energy; }</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;      </div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;      <span class="comment">//Decompose the S-object</span></div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;      <span class="keywordflow">if</span> (( NoiseLevel&gt;0.0 ) &amp;&amp; ( am_i_master )){ denS-&gt;addNoise(NoiseLevel); }</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="comment">//MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;      <span class="keywordtype">double</span> discWeight = denS-&gt;Split(MPS[index],MPS[index+1],OptScheme-&gt;getD(instruction),<span class="keyword">true</span>,change);</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      <span class="keyword">delete</span> denS;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      <span class="keywordflow">if</span> (discWeight &gt; MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      </div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      <span class="comment">//Print info</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordflow">if</span> ( am_i_master ){</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;         cout &lt;&lt; <span class="stringliteral">&quot;Energy at sites (&quot;</span> &lt;&lt; index &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; (index+1) &lt;&lt; <span class="stringliteral">&quot;) is &quot;</span> &lt;&lt; Energy &lt;&lt; endl;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;         <span class="keywordflow">if</span> (CheMPS2::DMRG_printDiscardedWeight &amp;&amp; change){ cout &lt;&lt; <span class="stringliteral">&quot;   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = &quot;</span> &lt;&lt; discWeight &lt;&lt; endl; }</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;      }</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;      </div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;      <span class="comment">//Prepare for next step</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;      gettimeofday(&amp;start, NULL);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;      updateMovingRightSafe(index);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;      gettimeofday(&amp;end, NULL);</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;   }</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;   </div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;   <span class="keywordflow">return</span> Energy;</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;</div>
-<div class="line"><a name="l00403"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">  403</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxExcIn){</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;}</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;   Exc_activated = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;   maxExc = maxExcIn;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;   Exc_Eshifts = <span class="keyword">new</span> <span class="keywordtype">double</span>[maxExc];</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;   Exc_MPSs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorT.html">TensorT</a> ** [maxExc];</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;   Exc_BKs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * [maxExc];</div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;   Exc_Overlaps = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> ** [maxExc];</div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;}</div>
+<div class="line"><a name="l00405"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">  405</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> maxExcIn){</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;   Exc_activated = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;   maxExc = maxExcIn;</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;   Exc_Eshifts = <span class="keyword">new</span> <span class="keywordtype">double</span>[maxExc];</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;   Exc_MPSs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorT.html">TensorT</a> ** [maxExc];</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;   Exc_BKs = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * [maxExc];</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;   Exc_Overlaps = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a> ** [maxExc];</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
-<div class="line"><a name="l00414"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">  414</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> EshiftIn){</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;}</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;   assert( Exc_activated );</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;   assert( nStates-1 &lt; maxExc );</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;   </div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;   <span class="keywordflow">if</span> ( the2DM  != NULL ){ <span class="keyword">delete</span> the2DM;  the2DM  = NULL; }</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;   <span class="keywordflow">if</span> ( the3DM  != NULL ){ <span class="keyword">delete</span> the3DM;  the3DM  = NULL; }</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;   <span class="keywordflow">if</span> ( theCorr != NULL ){ <span class="keyword">delete</span> theCorr; theCorr = NULL; }</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;   deleteAllBoundaryOperators();</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;   Exc_Eshifts[nStates-1] = EshiftIn;</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;   <span class="keywordflow">if</span> ( MPIchemps2::owner_specific_excitation( L, nStates-1 ) == <a class="code" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">MPIchemps2::mpi_rank</a>() ){</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="preprocessor">   #endif</span></div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;      Exc_MPSs[nStates-1] = MPS;</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;      Exc_BKs[nStates-1] = denBK;</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      Exc_Overlaps[nStates-1] = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a>*[L-1];</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;   } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> site=0; site&lt;L; site++){ <span class="keyword">delete</span> MPS[site]; }</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;      <span class="keyword">delete</span> [] MPS;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      <span class="keyword">delete</span> denBK;</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;   }</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="preprocessor">   #endif</span></div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;   </div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;   nStates++;</div>
+<div class="line"><a name="l00416"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">  416</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> EshiftIn){</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;   assert( Exc_activated );</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;   assert( nStates-1 &lt; maxExc );</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;   </div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;   <span class="keywordflow">if</span> ( the2DM  != NULL ){ <span class="keyword">delete</span> the2DM;  the2DM  = NULL; }</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;   <span class="keywordflow">if</span> ( the3DM  != NULL ){ <span class="keyword">delete</span> the3DM;  the3DM  = NULL; }</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;   <span class="keywordflow">if</span> ( theCorr != NULL ){ <span class="keyword">delete</span> theCorr; theCorr = NULL; }</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;   deleteAllBoundaryOperators();</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;   Exc_Eshifts[nStates-1] = EshiftIn;</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;   <span class="keywordflow">if</span> ( MPIchemps2::owner_specific_excitation( L, nStates-1 ) == <a class="code" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">MPIchemps2::mpi_rank</a>() ){</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="preprocessor">   #endif</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;      Exc_MPSs[nStates-1] = MPS;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;      Exc_BKs[nStates-1] = denBK;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;      Exc_Overlaps[nStates-1] = <span class="keyword">new</span> <a class="code" href="classCheMPS2_1_1TensorO.html">TensorO</a>*[L-1];</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="preprocessor">   #ifdef CHEMPS2_MPI_COMPILATION</span></div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;   } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> site=0; site&lt;L; site++){ <span class="keyword">delete</span> MPS[site]; }</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;      <span class="keyword">delete</span> [] MPS;</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;      <span class="keyword">delete</span> denBK;</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;   }</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="preprocessor">   #endif</span></div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;   </div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;   setupBookkeeperAndMPS();</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;   PreSolve();</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;}</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;   nStates++;</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;   </div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;   setupBookkeeperAndMPS();</div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;   PreSolve();</div>
 <div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;}</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1TensorO_html"><div class="ttname"><a href="classCheMPS2_1_1TensorO.html">CheMPS2::TensorO</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorO_8h_source.html#l00034">TensorO.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html">CheMPS2::TensorL</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8h_source.html#l00034">TensorL.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorQ_html"><div class="ttname"><a href="classCheMPS2_1_1TensorQ.html">CheMPS2::TensorQ</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorQ_8h_source.html#l00037">TensorQ.h:37</a></div></div>
@@ -562,17 +564,18 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1MPIchemps2_html_a6732ae60b5b4c8a4f1b063f9db304bf5"><div class="ttname"><a href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">CheMPS2::MPIchemps2::mpi_rank</a></div><div class="ttdeci">static int mpi_rank()</div><div class="ttdoc">Get the rank of this MPI process. </div><div class="ttdef"><b>Definition:</b> <a href="MPIchemps2_8h_source.html#l00131">MPIchemps2.h:131</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a6e26b40eb9bf80eb9979083b58a4e30e"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e">CheMPS2::Problem::checkConsistency</a></div><div class="ttdeci">bool checkConsistency() const </div><div class="ttdoc">Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0<=Irrep<nIrreps...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00385">Problem.cpp:385</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html">CheMPS2::SyBookkeeper</a></div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8h_source.html#l00036">SyBookkeeper.h:36</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab6d80dde8b71171ee969a6b7b86193d2"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">CheMPS2::DMRG::Solve</a></div><div class="ttdeci">double Solve()</div><div class="ttdoc">Solver. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00202">DMRG.cpp:202</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab6d80dde8b71171ee969a6b7b86193d2"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">CheMPS2::DMRG::Solve</a></div><div class="ttdeci">double Solve()</div><div class="ttdoc">Solver. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00204">DMRG.cpp:204</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html">CheMPS2::Sobject</a></div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8h_source.html#l00034">Sobject.h:34</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html">CheMPS2::TensorT</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8h_source.html#l00034">TensorT.h:34</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_acfb3123c72e3503f2d6c77dcf9eb141a"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a></div><div class="ttdeci">void newExcitation(const double EshiftIn)</div><div class="ttdoc">Push back current calculation and set everything up to calculate a (new) excitation. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00414">DMRG.cpp:414</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_aa6e349febeaf92b9dfa4c7f92d8507d4"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4">CheMPS2::DMRG::PreSolve</a></div><div class="ttdeci">void PreSolve()</div><div class="ttdoc">Reconstruct the renormalized operators when you overwrite the matrix elements with Prob->setMxElement...</div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00193">DMRG.cpp:193</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_acfb3123c72e3503f2d6c77dcf9eb141a"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a">CheMPS2::DMRG::newExcitation</a></div><div class="ttdeci">void newExcitation(const double EshiftIn)</div><div class="ttdoc">Push back current calculation and set everything up to calculate a (new) excitation. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00416">DMRG.cpp:416</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Heff_html"><div class="ttname"><a href="classCheMPS2_1_1Heff.html">CheMPS2::Heff</a></div><div class="ttdef"><b>Definition:</b> <a href="Heff_8h_source.html#l00042">Heff.h:42</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorX_html"><div class="ttname"><a href="classCheMPS2_1_1TensorX.html">CheMPS2::TensorX</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorX_8h_source.html#l00038">TensorX.h:38</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Sobject_html_a687a29eab89ef3763af8c630b48e3bf6"><div class="ttname"><a href="classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6">CheMPS2::Sobject::Join</a></div><div class="ttdeci">void Join(TensorT *Tleft, TensorT *Tright)</div><div class="ttdoc">Join two sites to form a composite S-object. </div><div class="ttdef"><b>Definition:</b> <a href="Sobject_8cpp_source.html#l00196">Sobject.cpp:196</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1ConvergenceScheme_html"><div class="ttname"><a href="classCheMPS2_1_1ConvergenceScheme.html">CheMPS2::ConvergenceScheme</a></div><div class="ttdef"><b>Definition:</b> <a href="ConvergenceScheme_8h_source.html#l00038">ConvergenceScheme.h:38</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_a6c8741ce96ac0e806a8ddc6c3623d904"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904">CheMPS2::DMRG::PrintLicense</a></div><div class="ttdeci">void PrintLicense()</div><div class="ttdoc">Print the license. </div><div class="ttdef"><b>Definition:</b> <a href="PrintLicense_8cpp_source.html#l00028">PrintLicense.cpp:28</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html"><div class="ttname"><a href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a></div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00035">Problem.h:35</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab442cbc43e2e5d877660859578849133"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a></div><div class="ttdeci">void activateExcitations(const int maxExcIn)</div><div class="ttdoc">Activate the necessary storage and machinery to handle excitations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00403">DMRG.cpp:403</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRG_html_ab442cbc43e2e5d877660859578849133"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133">CheMPS2::DMRG::activateExcitations</a></div><div class="ttdeci">void activateExcitations(const int maxExcIn)</div><div class="ttdoc">Activate the necessary storage and machinery to handle excitations. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00405">DMRG.cpp:405</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1DMRG_html_abe701c20aeb97b48c237bed694d185b5"><div class="ttname"><a href="classCheMPS2_1_1DMRG.html#abe701c20aeb97b48c237bed694d185b5">CheMPS2::DMRG::~DMRG</a></div><div class="ttdeci">virtual ~DMRG()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="DMRG_8cpp_source.html#l00147">DMRG.cpp:147</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html">CheMPS2::TensorOperator</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8h_source.html#l00042">TensorOperator.h:42</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorF0_html"><div class="ttname"><a href="classCheMPS2_1_1TensorF0.html">CheMPS2::TensorF0</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorF0_8h_source.html#l00035">TensorF0.h:35</a></div></div>
@@ -584,7 +587,7 @@ $(document).ready(function(){initNavTree('DMRG_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>DMRG.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:43 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:51 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

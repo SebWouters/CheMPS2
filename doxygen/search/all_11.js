@@ -7,6 +7,5 @@ var searchData=
   ['retardedgf_5faddition',['RetardedGF_addition',['../classCheMPS2_1_1FCI.html#ae8035a4a03bc0232f6a38a90f1477a60',1,'CheMPS2::FCI']]],
   ['retardedgf_5fremoval',['RetardedGF_removal',['../classCheMPS2_1_1FCI.html#aabbf6b2efcbcafcac2a584c08f2be1a6',1,'CheMPS2::FCI']]],
   ['rightmultiply',['RightMultiply',['../classCheMPS2_1_1TensorT.html#a06f61e76a7a6d46c1899141c75678aa8',1,'CheMPS2::TensorT']]],
-  ['rotate2dmand1dm',['rotate2DMand1DM',['../classCheMPS2_1_1CASSCF.html#ad3b59817dede9833446eb513b12284db',1,'CheMPS2::CASSCF']]],
   ['rotateactivespacevectors',['rotateActiveSpaceVectors',['../classCheMPS2_1_1DMRGSCFunitary.html#a2fb26346f9c7a15af27b459f7d5b0d3b',1,'CheMPS2::DMRGSCFunitary']]]
 ];

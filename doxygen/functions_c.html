@@ -152,17 +152,20 @@ $(document).ready(function(){initNavTree('functions_c.html','');});
 <li>calc_rdms_and_correlations()
 : <a class="el" href="classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb">CheMPS2::DMRG</a>
 </li>
-<li>calcNOON()
-: <a class="el" href="classCheMPS2_1_1CASSCF.html#acbda4df2bea2dc0e5667d92eae2e8013">CheMPS2::CASSCF</a>
-</li>
 <li>CalcSpinSquared()
 : <a class="el" href="classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f">CheMPS2::FCI</a>
 </li>
 <li>calculateParam()
 : <a class="el" href="classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3">CheMPS2::DIIS</a>
 </li>
+<li>CASPT2()
+: <a class="el" href="classCheMPS2_1_1CASPT2.html#af50043f2bf494dcd7448358fc116f01d">CheMPS2::CASPT2</a>
+</li>
+<li>caspt2()
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e">CheMPS2::CASSCF</a>
+</li>
 <li>CASSCF()
-: <a class="el" href="classCheMPS2_1_1CASSCF.html#a9c0aeea016f892a6b4a72cee8a37bd96">CheMPS2::CASSCF</a>
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#ad2d958c7b1ca60b43f7aa5eaabeeb0b1">CheMPS2::CASSCF</a>
 </li>
 <li>CGAlphaPlusBetaHAM()
 : <a class="el" href="classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b">CheMPS2::FCI</a>
@@ -170,11 +173,11 @@ $(document).ready(function(){initNavTree('functions_c.html','');});
 <li>CGCoreSolver()
 : <a class="el" href="classCheMPS2_1_1FCI.html#afe4f50a1de6b4c6a6be2f7e8dd4b91e2">CheMPS2::FCI</a>
 </li>
-<li>CGDiagPrecond()
-: <a class="el" href="classCheMPS2_1_1FCI.html#ad3a2132305764e7aa07cf765bec5668e">CheMPS2::FCI</a>
+<li>CGdiagonal()
+: <a class="el" href="classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21">CheMPS2::FCI</a>
 </li>
-<li>CGOperator()
-: <a class="el" href="classCheMPS2_1_1FCI.html#af8496a386028b2eb6ef686817372857c">CheMPS2::FCI</a>
+<li>CGoperator()
+: <a class="el" href="classCheMPS2_1_1FCI.html#a38332cb2e35e961f8b95901002385770">CheMPS2::FCI</a>
 </li>
 <li>CGSolveSystem()
 : <a class="el" href="classCheMPS2_1_1FCI.html#ab41b5c8e777fcdfeb700c7763f64f805">CheMPS2::FCI</a>
@@ -208,9 +211,15 @@ $(document).ready(function(){initNavTree('functions_c.html','');});
 <li>ClearVector()
 : <a class="el" href="classCheMPS2_1_1FCI.html#a030bc8d72d2f0c1fcaf570ab397c49a9">CheMPS2::FCI</a>
 </li>
+<li>ConjugateGradient()
+: <a class="el" href="classCheMPS2_1_1ConjugateGradient.html#ac1585156cdba9b118a6646d98d123706">CheMPS2::ConjugateGradient</a>
+</li>
 <li>construct()
 : <a class="el" href="classCheMPS2_1_1TensorGYZ.html#a8470ec48e82ff7d002a1b248afc98787">CheMPS2::TensorGYZ</a>
 , <a class="el" href="classCheMPS2_1_1TensorKM.html#a466d1067475dc5a5dce28fd693851cba">CheMPS2::TensorKM</a>
+</li>
+<li>construct_fock()
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca">CheMPS2::CASSCF</a>
 </li>
 <li>construct_mxelem()
 : <a class="el" href="classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4">CheMPS2::Problem</a>
@@ -223,6 +232,12 @@ $(document).ready(function(){initNavTree('functions_c.html','');});
 </li>
 <li>copy2DMover()
 : <a class="el" href="classCheMPS2_1_1CASSCF.html#ae8305d7f87c340f9001e497aaf7ba93f">CheMPS2::CASSCF</a>
+</li>
+<li>copy3DMover()
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#ac78aeef75d0a83c75030080c8d1033e7">CheMPS2::CASSCF</a>
+</li>
+<li>copy_active()
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7">CheMPS2::CASSCF</a>
 </li>
 <li>correct_higher_multiplicities()
 : <a class="el" href="classCheMPS2_1_1ThreeDM.html#a0a3de81e9881218690e26094be30b749">CheMPS2::ThreeDM</a>
@@ -240,7 +255,7 @@ $(document).ready(function(){initNavTree('functions_c.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 27 2015 14:39:10 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:26:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

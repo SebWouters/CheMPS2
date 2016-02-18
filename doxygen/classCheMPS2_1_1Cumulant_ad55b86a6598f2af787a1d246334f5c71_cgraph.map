@@ -1,6 +1,6 @@
 <map id="CheMPS2::Cumulant::gamma4_ham" name="CheMPS2::Cumulant::gamma4_ham">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="246,5,425,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps..." alt="" coords="224,56,447,83"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="236,56,435,83"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="253,107,417,133"/>
 <area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="240,157,431,184"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1ThreeDM.html#ae3a0de0da6659adca36ea0cdae16da0e" title="Get a 3&#45;RDM, using the HAM indices. " alt="" coords="250,209,421,250"/>

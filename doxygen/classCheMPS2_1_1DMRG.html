@@ -128,6 +128,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ab6d80dde8b71171ee969a6b7b86193d2"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2">Solve</a> ()</td></tr>
 <tr class="memdesc:ab6d80dde8b71171ee969a6b7b86193d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solver.  <a href="#ab6d80dde8b71171ee969a6b7b86193d2">More...</a><br /></td></tr>
 <tr class="separator:ab6d80dde8b71171ee969a6b7b86193d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6e349febeaf92b9dfa4c7f92d8507d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6e349febeaf92b9dfa4c7f92d8507d4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4">PreSolve</a> ()</td></tr>
+<tr class="memdesc:aa6e349febeaf92b9dfa4c7f92d8507d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reconstruct the renormalized operators when you overwrite the matrix elements with Prob-&gt;setMxElement() <br /></td></tr>
+<tr class="separator:aa6e349febeaf92b9dfa4c7f92d8507d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea1ffffbf2e12b56d602e5b692dd3a79"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aea1ffffbf2e12b56d602e5b692dd3a79"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79">calc2DMandCorrelations</a> ()</td></tr>
 <tr class="memdesc:aea1ffffbf2e12b56d602e5b692dd3a79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the 2-RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. <br /></td></tr>
@@ -141,6 +145,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ae87028e0d13f774aa31d5b41978e6aa4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCheMPS2_1_1ThreeDM.html">ThreeDM</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4">get3DM</a> ()</td></tr>
 <tr class="memdesc:ae87028e0d13f774aa31d5b41978e6aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pointer to the 3-RDM.  <a href="#ae87028e0d13f774aa31d5b41978e6aa4">More...</a><br /></td></tr>
 <tr class="separator:ae87028e0d13f774aa31d5b41978e6aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99a945eeb2a338a4d1a87dcbcad576ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#a99a945eeb2a338a4d1a87dcbcad576ee">Diag4RDM</a> (double *output, const int ham_orbz, const bool last_case)</td></tr>
+<tr class="memdesc:a99a945eeb2a338a4d1a87dcbcad576ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">After the 3-RDM has been calculated, the 4-RDM terms Gamma4_ijkz,pqrz (with z fixed) can be obtained.  <a href="#a99a945eeb2a338a4d1a87dcbcad576ee">More...</a><br /></td></tr>
+<tr class="separator:a99a945eeb2a338a4d1a87dcbcad576ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13008f80dbfd8312ef4aa3990cbbc436"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCheMPS2_1_1Correlations.html">Correlations</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1DMRG.html#a13008f80dbfd8312ef4aa3990cbbc436">getCorrelations</a> ()</td></tr>
 <tr class="memdesc:a13008f80dbfd8312ef4aa3990cbbc436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pointer to the <a class="el" href="classCheMPS2_1_1Correlations.html">Correlations</a>.  <a href="#a13008f80dbfd8312ef4aa3990cbbc436">More...</a><br /></td></tr>
 <tr class="separator:a13008f80dbfd8312ef4aa3990cbbc436"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,7 +250,7 @@ European Physical Journal D 68, 272 (2014) <br />
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph" id="classCheMPS2_1_1DMRG_a53edf0724d79b964dc2130bdcda89dcb_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="277,5,444,47"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="255,71,466,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="233,122,488,149"/><area shape="rect" id="node5" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="536,115,731,156"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="277,5,444,47"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="255,71,466,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="233,122,488,149"/><area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4" title="Reconstruct the renormalized operators when you overwrite the matrix elements with Prob&#45;&gt;setMxElement..." alt="" coords="265,173,457,199"/><area shape="rect" id="node5" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="536,115,731,156"/></map>
 </div>
 </p>
 
@@ -272,7 +279,7 @@ European Physical Journal D 68, 272 (2014) <br />
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00403">403</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00405">405</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -281,7 +288,7 @@ European Physical Journal D 68, 272 (2014) <br />
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_ab442cbc43e2e5d877660859578849133_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_ab442cbc43e2e5d877660859578849133_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_ab442cbc43e2e5d877660859578849133_icgraph" id="classCheMPS2_1_1DMRG_ab442cbc43e2e5d877660859578849133_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="304,5,615,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="308,5,492,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="304,56,496,83"/></map>
 </div>
 </p>
 
@@ -329,7 +336,62 @@ European Physical Journal D 68, 272 (2014) <br />
 <div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_a2f30a27d6a9acd3abe2c1092d6a4defb_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a2f30a27d6a9acd3abe2c1092d6a4defb_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_a2f30a27d6a9acd3abe2c1092d6a4defb_icgraph" id="classCheMPS2_1_1DMRG_a2f30a27d6a9acd3abe2c1092d6a4defb_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="216,5,428,47"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="476,13,787,39"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="226,5,418,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="216,57,428,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="476,64,660,91"/></map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a99a945eeb2a338a4d1a87dcbcad576ee"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::DMRG::Diag4RDM </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>ham_orbz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>last_case</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>After the 3-RDM has been calculated, the 4-RDM terms Gamma4_ijkz,pqrz (with z fixed) can be obtained. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">output</td><td>Array to store the 4-RDM terms: output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = Gamma4_ijkz,pqrz (with z fixed). (<a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> indices are used.) </td></tr>
+    <tr><td class="paramname">ham_orbz</td><td>The fixed orbital (<a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> index.) </td></tr>
+    <tr><td class="paramname">last_case</td><td>If true, everything will be set up to allow to continue sweeping </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="DMRGtechnics_8cpp_source.html#l00349">349</a> of file <a class="el" href="DMRGtechnics_8cpp_source.html">DMRGtechnics.cpp</a>.</p>
+
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRG_a99a945eeb2a338a4d1a87dcbcad576ee_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a99a945eeb2a338a4d1a87dcbcad576ee_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRG_a99a945eeb2a338a4d1a87dcbcad576ee_icgraph" id="classCheMPS2_1_1DMRG_a99a945eeb2a338a4d1a87dcbcad576ee_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="257,5,449,32"/></map>
 </div>
 </p>
 
@@ -359,16 +421,16 @@ European Physical Journal D 68, 272 (2014) <br />
 <p>Get the pointer to the 2-RDM. </p>
 <dl class="section return"><dt>Returns</dt><dd>The 2-RDM. Returns a NULL pointer if not yet calculated. </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00109">109</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00112">112</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_a0b471ea7ea19f7a49e6e1412f443d5ac_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a0b471ea7ea19f7a49e6e1412f443d5ac_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_a0b471ea7ea19f7a49e6e1412f443d5ac_icgraph" id="classCheMPS2_1_1DMRG_a0b471ea7ea19f7a49e6e1412f443d5ac_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="239,5,549,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="243,5,427,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="239,56,431,83"/></map>
 </div>
 </p>
 
@@ -398,7 +460,18 @@ European Physical Journal D 68, 272 (2014) <br />
 <p>Get the pointer to the 3-RDM. </p>
 <dl class="section return"><dt>Returns</dt><dd>The 3-RDM. Returns a NULL pointer if not yet calculated. </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00113">113</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00116">116</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
+
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1DMRG_ae87028e0d13f774aa31d5b41978e6aa4_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_ae87028e0d13f774aa31d5b41978e6aa4_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1DMRG_ae87028e0d13f774aa31d5b41978e6aa4_icgraph" id="classCheMPS2_1_1DMRG_ae87028e0d13f774aa31d5b41978e6aa4_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="239,5,431,32"/></map>
+</div>
+</p>
 
 </div>
 </div>
@@ -426,16 +499,16 @@ European Physical Journal D 68, 272 (2014) <br />
 <p>Get the pointer to the <a class="el" href="classCheMPS2_1_1Correlations.html">Correlations</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="classCheMPS2_1_1Correlations.html">Correlations</a>. Returns a NULL pointer if not yet calculated. </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00117">117</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8h_source.html#l00126">126</a> of file <a class="el" href="DMRG_8h_source.html">DMRG.h</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_a13008f80dbfd8312ef4aa3990cbbc436_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a13008f80dbfd8312ef4aa3990cbbc436_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_a13008f80dbfd8312ef4aa3990cbbc436_icgraph" id="classCheMPS2_1_1DMRG_a13008f80dbfd8312ef4aa3990cbbc436_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="280,5,591,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="280,5,464,32"/></map>
 </div>
 </p>
 
@@ -482,13 +555,13 @@ European Physical Journal D 68, 272 (2014) <br />
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The desired <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGtechnics_8cpp_source.html#l00366">366</a> of file <a class="el" href="DMRGtechnics_8cpp_source.html">DMRGtechnics.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGtechnics_8cpp_source.html#l00552">552</a> of file <a class="el" href="DMRGtechnics_8cpp_source.html">DMRGtechnics.cpp</a>.</p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_a0c38c4f9194d77fdf28dc34c55be55c2_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_a0c38c4f9194d77fdf28dc34c55be55c2_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_a0c38c4f9194d77fdf28dc34c55be55c2_cgraph" id="classCheMPS2_1_1DMRG_a0c38c4f9194d77fdf28dc34c55be55c2_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="292,5,483,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="304,57,471,98"/><area shape="rect" id="node4" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1" title="Phase function. " alt="" coords="308,123,467,149"/></map>
@@ -520,7 +593,7 @@ European Physical Journal D 68, 272 (2014) <br />
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The desired <a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> coefficient </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRGtechnics_8cpp_source.html#l00349">349</a> of file <a class="el" href="DMRGtechnics_8cpp_source.html">DMRGtechnics.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRGtechnics_8cpp_source.html#l00535">535</a> of file <a class="el" href="DMRGtechnics_8cpp_source.html">DMRGtechnics.cpp</a>.</p>
 
 </div>
 </div>
@@ -546,27 +619,27 @@ European Physical Journal D 68, 272 (2014) <br />
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00414">414</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00416">416</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
-<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-7-content" class="dyncontent" style="display:none;">
+<div id="dynsection-9-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_cgraph" id="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="275,5,441,47"/></map>
 </div>
 </p>
 
-<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-10-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-8-content" class="dyncontent" style="display:none;">
+<div id="dynsection-10-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_icgraph" id="classCheMPS2_1_1DMRG_acfb3123c72e3503f2d6c77dcf9eb141a_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="275,5,585,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="279,5,463,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="275,56,467,83"/></map>
 </div>
 </p>
 
@@ -588,27 +661,27 @@ European Physical Journal D 68, 272 (2014) <br />
 <p>Solver. </p>
 <dl class="section return"><dt>Returns</dt><dd>The min. energy encountered so far during the sweeps. </dd></dl>
 
-<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00202">202</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
+<p>Definition at line <a class="el" href="DMRG_8cpp_source.html#l00204">204</a> of file <a class="el" href="DMRG_8cpp_source.html">DMRG.cpp</a>.</p>
 
-<p><div id="dynsection-9" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-9-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-9-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-11" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-11-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-11-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-9-content" class="dyncontent" style="display:none;">
+<div id="dynsection-11-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_cgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_cgraph" id="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="225,5,392,47"/></map>
 </div>
 </p>
 
-<p><div id="dynsection-10" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-10-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-10-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-12" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-12-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-12-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-10-content" class="dyncontent" style="display:none;">
+<div id="dynsection-12-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_icgraph" id="classCheMPS2_1_1DMRG_ab6d80dde8b71171ee969a6b7b86193d2_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="225,5,536,32"/></map>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="229,5,413,32"/><area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="225,56,417,83"/></map>
 </div>
 </p>
 
@@ -629,7 +702,7 @@ European Physical Journal D 68, 272 (2014) <br />
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

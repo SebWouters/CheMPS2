@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -128,10 +128,10 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;gsl/gsl_sf_coupling.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;TensorX.h&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;TensorX.h&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Gsl.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1TensorX.html#a494fde7a79bf746d09d92b9fe26a3201">   27</a></span>&#160;<a class="code" href="classCheMPS2_1_1TensorX.html#a494fde7a79bf746d09d92b9fe26a3201">CheMPS2::TensorX::TensorX</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> indexIn, <span class="keyword">const</span> <span class="keywordtype">bool</span> movingRightIn, <span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * denBKIn, <span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1Problem.html">Problem</a> * ProbIn) :</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<a class="code" href="classCheMPS2_1_1TensorOperator.html">TensorOperator</a>(indexIn,</div>
@@ -235,14 +235,14 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;   </div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;   <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;   <span class="keywordtype">int</span> dimL = denBK-&gt;gCurrentDim(index-1, sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;   <span class="keywordflow">if</span> (dimL&gt;0){</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;      </div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      <span class="keywordtype">double</span> * BlockT = denT-&gt;<a class="code" href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">gStorage</a>(sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//because there&#39;s only 1 term contributing per kappa, we might as well set it i.o. adding</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(index-1,index-1,index-1,index-1);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;   <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(index-1,index-1,index-1,index-1);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;   <span class="keywordflow">if</span> ((dimL&gt;0) &amp;&amp; (fabs(alpha)&gt;0.0)){</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;      </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      <span class="keywordtype">double</span> * BlockT = denT-&gt;<a class="code" href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">gStorage</a>(sectorN1[ikappa]-2, sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;      <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;      <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//because there&#39;s only 1 term contributing per kappa, we might as well set it i.o. adding</span></div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;      dgemm_(&amp;trans,&amp;notr,&amp;dimR,&amp;dimR,&amp;dimL,&amp;alpha,BlockT,&amp;dimL,BlockT,&amp;dimL,&amp;beta,storage+kappa2index[ikappa],&amp;dimR);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;      </div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;   } <span class="keywordflow">else</span> {</div>
@@ -255,14 +255,14 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;   </div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;   <span class="keywordtype">int</span> dimL = denBK-&gt;gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;   <span class="keywordtype">int</span> dimR = denBK-&gt;gCurrentDim(index+1, sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;   <span class="keywordflow">if</span> (dimR&gt;0){</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;   </div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      <span class="keywordtype">double</span> * BlockT = denT-&gt;gStorage(sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//set, not add (only 1 term)</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(index,index,index,index);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;   <span class="keywordtype">double</span> alpha = Prob-&gt;gMxElement(index,index,index,index);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;   <span class="keywordflow">if</span> ((dimR&gt;0) &amp;&amp; (fabs(alpha)&gt;0.0)){</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;   </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      <span class="keywordtype">double</span> * BlockT = denT-&gt;gStorage(sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+2, sectorTwoS1[ikappa], sectorI1[ikappa]);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keywordtype">char</span> trans = <span class="charliteral">&#39;T&#39;</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="keywordtype">char</span> notr = <span class="charliteral">&#39;N&#39;</span>;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="keywordtype">double</span> beta = 0.0; <span class="comment">//set, not add (only 1 term)</span></div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      dgemm_(&amp;notr,&amp;trans,&amp;dimL,&amp;dimL,&amp;dimR,&amp;alpha,BlockT,&amp;dimL,BlockT,&amp;dimL,&amp;beta,storage+kappa2index[ikappa],&amp;dimL);</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      </div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;   } <span class="keywordflow">else</span> {</div>
@@ -755,7 +755,7 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1TensorQ_html"><div class="ttname"><a href="classCheMPS2_1_1TensorQ.html">CheMPS2::TensorQ</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorQ_8h_source.html#l00037">TensorQ.h:37</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html">CheMPS2::SyBookkeeper</a></div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8h_source.html#l00036">SyBookkeeper.h:36</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html">CheMPS2::TensorT</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8h_source.html#l00034">TensorT.h:34</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00143">TensorT.cpp:143</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorX_html"><div class="ttname"><a href="classCheMPS2_1_1TensorX.html">CheMPS2::TensorX</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorX_8h_source.html#l00038">TensorX.h:38</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00123">Irreps.h:123</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html"><div class="ttname"><a href="classCheMPS2_1_1Problem.html">CheMPS2::Problem</a></div><div class="ttdef"><b>Definition:</b> <a href="Problem_8h_source.html#l00035">Problem.h:35</a></div></div>
@@ -767,7 +767,7 @@ $(document).ready(function(){initNavTree('TensorX_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TensorX.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -149,6 +149,9 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 <li>gamma4_ham()
 : <a class="el" href="classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71">CheMPS2::Cumulant</a>
 </li>
+<li>gBK()
+: <a class="el" href="classCheMPS2_1_1TensorT.html#a5c9ed2cb2b6014a9b16b60670ff0d2d5">CheMPS2::TensorT</a>
+</li>
 <li>gCurrentDim()
 : <a class="el" href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">CheMPS2::SyBookkeeper</a>
 </li>
@@ -196,6 +199,12 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 </li>
 <li>get_nelec()
 : <a class="el" href="classCheMPS2_1_1TensorOperator.html#a7438680d389551c7c3d38075f83240ce">CheMPS2::TensorOperator</a>
+</li>
+<li>get_num_irreps()
+: <a class="el" href="classCheMPS2_1_1CASSCF.html#a4ecba3101fed76c3ce03c23c6446a3f8">CheMPS2::CASSCF</a>
+</li>
+<li>get_num_matvec()
+: <a class="el" href="classCheMPS2_1_1ConjugateGradient.html#afe8c8a3af798ce7a300cbb88dc57e3f4">CheMPS2::ConjugateGradient</a>
 </li>
 <li>get_prime_last()
 : <a class="el" href="classCheMPS2_1_1Tensor3RDM.html#a98adc5adc004f729db92bf6c5a853311">CheMPS2::Tensor3RDM</a>
@@ -355,15 +364,20 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 <li>getNOCC()
 : <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892">CheMPS2::DMRGSCFindices</a>
 </li>
+<li>getNOCCsum()
+: <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#a2cb6c31a775d6f155942dc127eee2218">CheMPS2::DMRGSCFindices</a>
+</li>
 <li>getNoisePrefactor()
 : <a class="el" href="classCheMPS2_1_1ConvergenceScheme.html#a06c60aeec22896b5018541ebcae2aeb8">CheMPS2::ConvergenceScheme</a>
 </li>
 <li>getNORB()
 : <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">CheMPS2::DMRGSCFindices</a>
 </li>
+<li>getNORBmax()
+: <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#ade657fa7e0ebf49098f5d22172a0dc01">CheMPS2::DMRGSCFindices</a>
+</li>
 <li>getNumberOfIrreps()
-: <a class="el" href="classCheMPS2_1_1CASSCF.html#afba8add72828a26c426f47a790511bf1">CheMPS2::CASSCF</a>
-, <a class="el" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps</a>
+: <a class="el" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps</a>
 </li>
 <li>getNumDIISVecs()
 : <a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html#a57ed7e22a351ad6fc1621ff95106040a">CheMPS2::DMRGSCFoptions</a>
@@ -404,6 +418,9 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 </li>
 <li>getOrigNVIRTstart()
 : <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#a440634b63107d8a02132ee4bcb7ef0b4">CheMPS2::DMRGSCFindices</a>
+</li>
+<li>getROTparamsize()
+: <a class="el" href="classCheMPS2_1_1DMRGSCFindices.html#a8cbb84d6c55248612af1a9527c4934de">CheMPS2::DMRGSCFindices</a>
 </li>
 <li>getSecondIndex()
 : <a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html#a17f232492ed870c91cca434a6fc2300c">CheMPS2::DMRGSCFunitary</a>
@@ -488,8 +505,8 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813">CheMPS2::Sobject</a>
 </li>
 <li>gIrrep()
-: <a class="el" href="classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad">CheMPS2::Problem</a>
-, <a class="el" href="classCheMPS2_1_1SyBookkeeper.html#ab06fa32f4e352d248ebfe67d850a574a">CheMPS2::SyBookkeeper</a>
+: <a class="el" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff">CheMPS2::Problem</a>
+, <a class="el" href="classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d">CheMPS2::SyBookkeeper</a>
 </li>
 <li>gKappa()
 : <a class="el" href="classCheMPS2_1_1Sobject.html#a5626b98bd01a9fb04f4d8e9e739e3034">CheMPS2::Sobject</a>
@@ -545,19 +562,17 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 : <a class="el" href="classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562">CheMPS2::Sobject</a>
 </li>
 <li>gReorder()
-: <a class="el" href="classCheMPS2_1_1Sobject.html#afa741115faee102be2bacc03b382428c">CheMPS2::Sobject</a>
-</li>
-<li>gReorderD2h()
-: <a class="el" href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">CheMPS2::Problem</a>
+: <a class="el" href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">CheMPS2::Problem</a>
+, <a class="el" href="classCheMPS2_1_1Sobject.html#afa741115faee102be2bacc03b382428c">CheMPS2::Sobject</a>
 </li>
 <li>GSDavidson()
-: <a class="el" href="classCheMPS2_1_1FCI.html#a0335191db1dec9127bcad548fa6f1da3">CheMPS2::FCI</a>
+: <a class="el" href="classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8">CheMPS2::FCI</a>
 </li>
 <li>gStorage()
 : <a class="el" href="classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9">CheMPS2::Sobject</a>
 , <a class="el" href="classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676">CheMPS2::Tensor</a>
 , <a class="el" href="classCheMPS2_1_1TensorO.html#a49ebfadf7c59cba53ed94d3550680b32">CheMPS2::TensorO</a>
-, <a class="el" href="classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d">CheMPS2::TensorOperator</a>
+, <a class="el" href="classCheMPS2_1_1TensorOperator.html#a39164dac1ea39e1cfafccccb1f0c699a">CheMPS2::TensorOperator</a>
 , <a class="el" href="classCheMPS2_1_1TensorT.html#aedead7609c9c66d336d14cdb0fbb5fec">CheMPS2::TensorT</a>
 </li>
 <li>gSy()
@@ -591,7 +606,7 @@ $(document).ready(function(){initNavTree('functions_g.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 27 2015 14:39:10 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:26:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

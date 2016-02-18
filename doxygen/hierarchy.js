@@ -1,6 +1,8 @@
 var hierarchy =
 [
+    [ "CheMPS2::CASPT2", "classCheMPS2_1_1CASPT2.html", null ],
     [ "CheMPS2::CASSCF", "classCheMPS2_1_1CASSCF.html", null ],
+    [ "CheMPS2::ConjugateGradient", "classCheMPS2_1_1ConjugateGradient.html", null ],
     [ "CheMPS2::ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", null ],
     [ "CheMPS2::Correlations", "classCheMPS2_1_1Correlations.html", null ],
     [ "CheMPS2::Cumulant", "classCheMPS2_1_1Cumulant.html", null ],

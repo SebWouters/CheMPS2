@@ -1,5 +1,6 @@
 <map id="CheMPS2::Hamiltonian::setVmat" name="CheMPS2::Hamiltonian::setVmat">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a1a3bd9b8094b6dc6a274c02bc8caf835" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Do entire blocks at once. " alt="" coords="212,5,457,47"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,71,457,112"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1" title="Does the state&#45;specific CASSCF cycle with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="505,46,816,73"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a1d27c8247099602644c423e8dc4f073a" title="Fill the rotated two&#45;body matrix elements of HamDMRG, based on HamOrig and unitary. Cut the blocks into chunks with linear size maxBlockSize. " alt="" coords="212,71,457,112"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="509,17,693,43"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="505,71,697,98"/>
 </map>

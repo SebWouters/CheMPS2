@@ -12,6 +12,8 @@ var searchData=
   ['densityresponsegf',['DensityResponseGF',['../classCheMPS2_1_1FCI.html#a132bbdf8fb4063a5199c7cbbbdccc0e0',1,'CheMPS2::FCI']]],
   ['densityresponsegf_5fbackward',['DensityResponseGF_backward',['../classCheMPS2_1_1FCI.html#aee7af7bfd2815c30db028025d573a684',1,'CheMPS2::FCI']]],
   ['densityresponsegf_5fforward',['DensityResponseGF_forward',['../classCheMPS2_1_1FCI.html#ac8ae42bbe769daf5254064e65adc076f',1,'CheMPS2::FCI']]],
+  ['deviation_5ffrom_5fblockdiag',['deviation_from_blockdiag',['../classCheMPS2_1_1CASSCF.html#ad4c00cd4c21dc402ad5e966232b199d3',1,'CheMPS2::CASSCF']]],
+  ['diag4rdm',['Diag4RDM',['../classCheMPS2_1_1DMRG.html#a99a945eeb2a338a4d1a87dcbcad576ee',1,'CheMPS2::DMRG::Diag4RDM()'],['../classCheMPS2_1_1FCI.html#a77058d7ff4691b13b773dd4ea6118bc8',1,'CheMPS2::FCI::Diag4RDM()']]],
   ['diagham',['DiagHam',['../classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144',1,'CheMPS2::FCI']]],
   ['diaghamsquared',['DiagHamSquared',['../classCheMPS2_1_1FCI.html#a5dd256cb52e3b7a16ce5895dc012664e',1,'CheMPS2::FCI']]],
   ['diis',['DIIS',['../classCheMPS2_1_1DIIS.html#a9cbcd9c6176fdfe09844aa7c89d8e583',1,'CheMPS2::DIIS']]],
@@ -19,10 +21,9 @@ var searchData=
   ['dmrg',['DMRG',['../classCheMPS2_1_1DMRG.html#a53edf0724d79b964dc2130bdcda89dcb',1,'CheMPS2::DMRG']]],
   ['dmrgscfindices',['DMRGSCFindices',['../classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3',1,'CheMPS2::DMRGSCFindices']]],
   ['dmrgscfintegrals',['DMRGSCFintegrals',['../classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426',1,'CheMPS2::DMRGSCFintegrals']]],
-  ['dmrgscfmatrix',['DMRGSCFmatrix',['../classCheMPS2_1_1DMRGSCFmatrix.html#aabfe4afc9eb53ed6f5f7e6196f4c5c39',1,'CheMPS2::DMRGSCFmatrix']]],
+  ['dmrgscfmatrix',['DMRGSCFmatrix',['../classCheMPS2_1_1DMRGSCFmatrix.html#aa6765c45dee26bc3e1b199ebba99bad5',1,'CheMPS2::DMRGSCFmatrix']]],
   ['dmrgscfoptions',['DMRGSCFoptions',['../classCheMPS2_1_1DMRGSCFoptions.html#add6896a9f3cf6b7f13d009a9abc6d7ef',1,'CheMPS2::DMRGSCFoptions']]],
   ['dmrgscfunitary',['DMRGSCFunitary',['../classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36',1,'CheMPS2::DMRGSCFunitary']]],
   ['dmrgscfvmatrotations',['DMRGSCFVmatRotations',['../classCheMPS2_1_1DMRGSCFVmatRotations.html#a5cdf045dc514fcb0f682ac3b3c2cd036',1,'CheMPS2::DMRGSCFVmatRotations']]],
-  ['dmrgscfwtilde',['DMRGSCFwtilde',['../classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0',1,'CheMPS2::DMRGSCFwtilde']]],
-  ['docasscfnewtonraphson',['doCASSCFnewtonraphson',['../classCheMPS2_1_1CASSCF.html#a2ab912e50eb821fed2089e88692ec0b1',1,'CheMPS2::CASSCF']]]
+  ['dmrgscfwtilde',['DMRGSCFwtilde',['../classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0',1,'CheMPS2::DMRGSCFwtilde']]]
 ];

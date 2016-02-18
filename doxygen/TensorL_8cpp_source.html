@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('TensorL_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -128,10 +128,10 @@ $(document).ready(function(){initNavTree('TensorL_8cpp_source.html','');});
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;gsl/gsl_sf_coupling.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;TensorL.h&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;TensorL.h&quot;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Gsl.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1TensorL.html#afa66a63fa8cd26f49de8b93bed3d4bda">   27</a></span>&#160;<a class="code" href="classCheMPS2_1_1TensorL.html#afa66a63fa8cd26f49de8b93bed3d4bda">CheMPS2::TensorL::TensorL</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> indexIn, <span class="keyword">const</span> <span class="keywordtype">int</span> IdiffIn, <span class="keyword">const</span> <span class="keywordtype">bool</span> movingRightIn, <span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * denBKIn) :</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<a class="code" href="classCheMPS2_1_1TensorOperator.html">TensorOperator</a>(indexIn,</div>
@@ -247,7 +247,7 @@ $(document).ready(function(){initNavTree('TensorL_8cpp_source.html','');});
 <div class="ttc" id="classCheMPS2_1_1TensorL_html_a5896b5010d9d8c96b02f0d06aa1ea727"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html#a5896b5010d9d8c96b02f0d06aa1ea727">CheMPS2::TensorL::makenew</a></div><div class="ttdeci">void makenew(TensorT *denT)</div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8cpp_source.html#l00039">TensorL.cpp:39</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html">CheMPS2::SyBookkeeper</a></div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8h_source.html#l00036">SyBookkeeper.h:36</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorT_html"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html">CheMPS2::TensorT</a></div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8h_source.html#l00034">TensorT.h:34</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00143">TensorT.cpp:143</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html_afa66a63fa8cd26f49de8b93bed3d4bda"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html#afa66a63fa8cd26f49de8b93bed3d4bda">CheMPS2::TensorL::TensorL</a></div><div class="ttdeci">TensorL(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper *denBKIn)</div><div class="ttdoc">Constructor. </div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8cpp_source.html#l00027">TensorL.cpp:27</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_a1d86c7a8b3c3a7b9215c0e298f0ae047"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">CheMPS2::Irreps::directProd</a></div><div class="ttdeci">static int directProd(const int Irrep1, const int Irrep2)</div><div class="ttdoc">Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent...</div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8h_source.html#l00123">Irreps.h:123</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorL_html_a1e9e16eafa80c1268be6adff9fcbe63b"><div class="ttname"><a href="classCheMPS2_1_1TensorL.html#a1e9e16eafa80c1268be6adff9fcbe63b">CheMPS2::TensorL::~TensorL</a></div><div class="ttdeci">virtual ~TensorL()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TensorL_8cpp_source.html#l00037">TensorL.cpp:37</a></div></div>
@@ -258,7 +258,7 @@ $(document).ready(function(){initNavTree('TensorL_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TensorL.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

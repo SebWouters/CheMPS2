@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -183,7 +183,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      </div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;   Orb &quot;</span> &lt;&lt; cnt &lt;&lt; <span class="stringliteral">&quot; : &quot;</span>&lt;&lt; cnt-passed+1 &lt;&lt; SymmInfo.<a class="code" href="classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4">getIrrepName</a>(irrep) &lt;&lt; <span class="stringliteral">&quot; = &quot;</span> &lt;&lt; SPenergy &lt;&lt; endl;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;         </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keywordflow">if</span> ((cnt-passed == iHandler-&gt;<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">getNORB</a>(irrep)-1) &amp;&amp; (irrep&lt;numberOfIrreps-1)){</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;      <span class="keywordflow">if</span> ((cnt-passed == iHandler-&gt;<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">getNORB</a>(irrep)-1) &amp;&amp; (irrep&lt;num_irreps-1)){</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;         passed += iHandler-&gt;<a class="code" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">getNORB</a>(irrep);</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;         irrep++;</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      }</div>
@@ -206,7 +206,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;   </div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nOrbDMRG; cnt++){ coeff1[cnt] = coeff2[cnt] = 0; } <span class="comment">//No particles at all</span></div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;   <span class="keywordtype">int</span> passed = 0;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;numberOfIrreps; irrep++){</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> irrep = 0; irrep &lt; num_irreps; irrep++ ){</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      <span class="keywordflow">if</span> (irrep==0){ <span class="comment">//Ag</span></div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb=iHandler-&gt;getNOCC(irrep); orb&lt;3; orb++){ <span class="comment">//1-3 Ag : double</span></div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            coeff1[passed+orb] = coeff2[passed+orb] = 2;</div>
@@ -235,7 +235,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;   </div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> cnt=0; cnt&lt;nOrbDMRG; cnt++){ coeff3[cnt] = coeff4[cnt] = 0; } <span class="comment">//No particles at all</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;   passed = 0;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> irrep=0; irrep&lt;numberOfIrreps; irrep++){</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;   <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> irrep = 0; irrep &lt; num_irreps; irrep++ ){</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="keywordflow">if</span> (irrep==0){ <span class="comment">//Ag</span></div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb=iHandler-&gt;getNOCC(irrep); orb&lt;3; orb++){ <span class="comment">//1-3 Ag : double</span></div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            coeff3[passed+orb] = coeff4[passed+orb] = 2;</div>
@@ -282,7 +282,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="ttc" id="classCheMPS2_1_1DMRGSCFindices_html_a2dbdf51ff018cb4110fdd14b300967c2"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">CheMPS2::DMRGSCFindices::getNORB</a></div><div class="ttdeci">int getNORB(const int irrep) const </div><div class="ttdoc">Get the number of orbitals for an irrep. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFindices_8cpp_source.html#l00095">DMRGSCFindices.cpp:95</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1DMRGSCFindices_html_a2dbdf51ff018cb4110fdd14b300967c2"><div class="ttname"><a href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2">CheMPS2::DMRGSCFindices::getNORB</a></div><div class="ttdeci">int getNORB(const int irrep) const </div><div class="ttdoc">Get the number of orbitals for an irrep. </div><div class="ttdef"><b>Definition:</b> <a href="DMRGSCFindices_8cpp_source.html#l00097">DMRGSCFindices.cpp:97</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_af2d3836be75d50640cbed9a9234af126"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126">CheMPS2::Hamiltonian::getVmat</a></div><div class="ttdeci">double getVmat(const int index1, const int index2, const int index3, const int index4) const </div><div class="ttdoc">Get a Vmat element. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00136">Hamiltonian.cpp:136</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_ac0b8314dc6133642997e648d1169d10f"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f">CheMPS2::Hamiltonian::getTmat</a></div><div class="ttdeci">double getTmat(const int index1, const int index2) const </div><div class="ttdoc">Get a Tmat element. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00112">Hamiltonian.cpp:112</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Hamiltonian_html_a031fa6987b304e3a7f6114b9f2e1f2ab"><div class="ttname"><a href="classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab">CheMPS2::Hamiltonian::getEconst</a></div><div class="ttdeci">double getEconst() const </div><div class="ttdoc">Get the constant energy. </div><div class="ttdef"><b>Definition:</b> <a href="Hamiltonian_8cpp_source.html#l00103">Hamiltonian.cpp:103</a></div></div>
@@ -293,7 +293,7 @@ $(document).ready(function(){initNavTree('CASSCFdebug_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CASSCFdebug.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:43 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:51 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

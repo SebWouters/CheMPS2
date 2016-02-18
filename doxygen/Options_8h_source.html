@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('Options_8h_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -143,63 +143,68 @@ $(document).ready(function(){initNavTree('Options_8h_source.html','');});
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    DMRGSCF_maxlinsizeCutoff      = 100;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_debugPrint            = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_stateAveraged         = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;   </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    DMRGSCF_whichActiveSpace      = 0;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_dumpCorrelations      = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_startLocRandom        = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;   </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_doDIIS                = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> DMRGSCF_DIISgradientBranch    = 1e-2;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    DMRGSCF_numDIISvecs           = 7;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRGSCF_storeDIIS             = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> DMRGSCF_DIISstorageName       = <span class="stringliteral">&quot;CheMPS2_DIIS.h5&quot;</span>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> defaultTMPpath                = <span class="stringliteral">&quot;/tmp&quot;</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_printDiscardedWeight     = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_storeRenormOptrOnDisk    = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_storeMpsOnDisk           = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> DMRG_MPS_storage_prefix       = <span class="stringliteral">&quot;CheMPS2_MPS&quot;</span>;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> DMRG_OPERATOR_storage_prefix  = <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span>;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;   </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   HAMILTONIAN_debugPrint        = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_TmatStorageName   = <span class="stringliteral">&quot;CheMPS2_Ham_Tmat.h5&quot;</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_VmatStorageName   = <span class="stringliteral">&quot;CheMPS2_Ham_Vmat.h5&quot;</span>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_ParentStorageName = <span class="stringliteral">&quot;CheMPS2_Ham_parent.h5&quot;</span>;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;   </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> TWO_RDM_storagename           = <span class="stringliteral">&quot;CheMPS2_2DM.h5&quot;</span>;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> THREE_RDM_storagename         = <span class="stringliteral">&quot;CheMPS2_3DM.h5&quot;</span>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;   </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   HEFF_debugPrint               = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    HEFF_DAVIDSON_NUM_VEC         = 32;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    HEFF_DAVIDSON_NUM_VEC_KEEP    = 3;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> HEFF_DAVIDSON_PRECOND_CUTOFF  = 1e-12;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> HEFF_DAVIDSON_RTOL_BASE       = 1e-10;  <span class="comment">// Base value for FCI and augmented Hessian diagonalization</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> HEFF_DAVIDSON_DMRG_RTOL       = 1e-5;   <span class="comment">// Block&#39;s Davidson tolerance would correspond to HEFF_DAVIDSON_DMRG_RTOL^2</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;   </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   SYBK_debugPrint               = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    SYBK_dimensionCutoff          = 262144;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;   </div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> TENSORT_orthoComparison       = 1e-13;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;   </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   CORRELATIONS_debugPrint       = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CORRELATIONS_discardEig       = 1e-100;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;   </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> EDMISTONRUED_gradThreshold    = 1e-8;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    EDMISTONRUED_maxIter          = 1000;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    EDMISTONRUED_maxIterBackTfo   = 15;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASSCF_8h_source.html#l00038">CASSCF.h:38</a></div></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CASPT2_OVLP_CUTOFF            = 1e-8;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CONJ_GRADIENT_RTOL            = 1e-10;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CONJ_GRADIENT_PRECOND_CUTOFF  = 1e-12;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> defaultTMPpath                = <span class="stringliteral">&quot;/tmp&quot;</span>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_printDiscardedWeight     = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_storeRenormOptrOnDisk    = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   DMRG_storeMpsOnDisk           = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> DMRG_MPS_storage_prefix       = <span class="stringliteral">&quot;CheMPS2_MPS&quot;</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> DMRG_OPERATOR_storage_prefix  = <span class="stringliteral">&quot;CheMPS2_Operators_&quot;</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   HAMILTONIAN_debugPrint        = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_TmatStorageName   = <span class="stringliteral">&quot;CheMPS2_Ham_Tmat.h5&quot;</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_VmatStorageName   = <span class="stringliteral">&quot;CheMPS2_Ham_Vmat.h5&quot;</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> HAMILTONIAN_ParentStorageName = <span class="stringliteral">&quot;CheMPS2_Ham_parent.h5&quot;</span>;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> TWO_RDM_storagename           = <span class="stringliteral">&quot;CheMPS2_2DM.h5&quot;</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">string</span> THREE_RDM_storagename         = <span class="stringliteral">&quot;CheMPS2_3DM.h5&quot;</span>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   HEFF_debugPrint               = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    DAVIDSON_NUM_VEC              = 32;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    DAVIDSON_NUM_VEC_KEEP         = 3;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> DAVIDSON_PRECOND_CUTOFF       = 1e-12;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> DAVIDSON_FCI_RTOL             = 1e-10;  <span class="comment">// Base value for FCI and augmented Hessian diagonalization</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> DAVIDSON_DMRG_RTOL            = 1e-5;   <span class="comment">// Block&#39;s Davidson tolerance would correspond to HEFF_DAVIDSON_DMRG_RTOL^2</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   SYBK_debugPrint               = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    SYBK_dimensionCutoff          = 262144;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> TENSORT_orthoComparison       = 1e-13;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">bool</span>   CORRELATIONS_debugPrint       = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> CORRELATIONS_discardEig       = 1e-100;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> EDMISTONRUED_gradThreshold    = 1e-8;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    EDMISTONRUED_maxIter          = 1000;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span>    EDMISTONRUED_maxIterBackTfo   = 15;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="ttc" id="namespaceCheMPS2_html"><div class="ttname"><a href="namespaceCheMPS2.html">CheMPS2</a></div><div class="ttdef"><b>Definition:</b> <a href="CASPT2_8h_source.html#l00042">CASPT2.h:42</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_9b42c04f8fd95b4f9151c9c6b143cac5.html">chemps2</a></li><li class="navelem"><b>Options.h</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

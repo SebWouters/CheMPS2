@@ -103,12 +103,29 @@ $(document).ready(function(){initNavTree('md__home_seba_Desktop_CheMPS2_github_C
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><ul>
-<li>Break API: bump up SO version (psi4 interface does NOT need to change!)</li>
-<li>Class TensorOperator: replaces TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD</li>
-<li>Deprecate TwoDMstorage class (storage handling occurs in TwoDM class)</li>
-<li>Further optimization allowed after RDM calculation</li>
+<li>Class ConjugateGradient</li>
+<li>Class TensorOperator</li>
+<li>Class ThreeDM: DMRG 3-RDM in O(L^4 D^3 + L^6 D^2)</li>
+<li>Class Cumulant: Cumulant reconstruction of the DMRG 4-RDM</li>
+<li>Class CASPT2: Internally contracted CASPT2</li>
+<li>DMRG diagonal 4-RDM in DMRG::Diag4RDM</li>
+<li>Sweeps after RDM calculation allowed</li>
 <li>FCI 3-RDM in FCI::Fill3RDM</li>
-<li>DMRG 3-RDM in ThreeDM class in O(L^4 D^3 + L^6 D^2) (<a href="http://dx.doi.org/10.1063/1.4900878">Kurashige, JCP 141, 174111 (2014)</a>)</li>
+<li>FCI 4-RDM in FCI::Fill4RDM</li>
+<li>FCI diagonal 4-RDM in FCI::Diag4RDM</li>
+<li>FCI 4-RDM contraction with Fock operator in FCI::Fock4RDM</li>
+<li>Break API: bump up SO version</li>
+<li>Deprecate TwoDMstorage class</li>
+<li>Deprecate TensorDiag class</li>
+<li>Deprecate TensorSwap class</li>
+<li>Deprecate TensorS0Abase class</li>
+<li>Deprecate TensorS1Bbase class</li>
+<li>Deprecate TensorF0Cbase class</li>
+<li>Deprecate TensorF1Dbase class</li>
+<li>Deprecate TensorA class</li>
+<li>Deprecate TensorB class</li>
+<li>Deprecate TensorC class</li>
+<li>Deprecate TensorD class</li>
 </ul>
 <h4>Version 1.6 (2015-08-26):</h4>
 <ul>
@@ -149,7 +166,7 @@ $(document).ready(function(){initNavTree('md__home_seba_Desktop_CheMPS2_github_C
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

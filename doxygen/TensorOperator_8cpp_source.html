@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('TensorOperator_8cpp_source.html','');}
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -129,11 +129,11 @@ $(document).ready(function(){initNavTree('TensorOperator_8cpp_source.html','');}
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;math.h&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;gsl/gsl_sf_coupling.h&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;TensorOperator.h&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;Heff.h&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;TensorOperator.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Lapack.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;Heff.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;Gsl.h&quot;</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1TensorOperator.html#a65b8fb20346acef134ca524d1fbeb3c0">   29</a></span>&#160;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a65b8fb20346acef134ca524d1fbeb3c0">CheMPS2::TensorOperator::TensorOperator</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> index_in, <span class="keyword">const</span> <span class="keywordtype">int</span> two_j_in, <span class="keyword">const</span> <span class="keywordtype">int</span> n_elec_in, <span class="keyword">const</span> <span class="keywordtype">int</span> n_irrep_in, <span class="keyword">const</span> <span class="keywordtype">bool</span> moving_right_in, <span class="keyword">const</span> <span class="keywordtype">bool</span> prime_last_in, <span class="keyword">const</span> <span class="keywordtype">bool</span> jw_phase_in, <span class="keyword">const</span> <a class="code" href="classCheMPS2_1_1SyBookkeeper.html">SyBookkeeper</a> * denBK_in) : <a class="code" href="classCheMPS2_1_1Tensor.html">Tensor</a>(){</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
@@ -557,57 +557,56 @@ $(document).ready(function(){initNavTree('TensorOperator_8cpp_source.html','');}
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;   <span class="keywordflow">if</span> ( buddy == NULL ){ <span class="keywordflow">return</span> 0.0; }</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">int</span> orb_i = gIndex();</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;   assert( get_2j() == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a374c949f32263391f2f8d49532e47f9d">get_2j</a>()    );</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;   assert( n_elec   == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a7438680d389551c7c3d38075f83240ce">get_nelec</a>() );</div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;   assert( n_irrep  == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285">get_irrep</a>() );</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;   <span class="keywordtype">double</span> value = 0.0;</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;   <span class="keywordflow">if</span> ( trans == <span class="charliteral">&#39;N&#39;</span> ){</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keywordtype">int</span> length = kappa2index[ nKappa ];</div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      <span class="keywordtype">int</span> inc    = 1;</div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;      value = ddot_( &amp;length, storage, &amp;inc, buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d">gStorage</a>(), &amp;inc );</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;      <span class="keywordflow">return</span> value;</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;   } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;      assert( n_elec == 0 );</div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> ikappa = 0; ikappa &lt; nKappa; ikappa++ ){</div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;</div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> n_updown   = sectorN1[ ikappa ];</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> two_j_up   = sectorTwoS1[ ikappa ];</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> two_j_down = sector_2S_down[ ikappa ];</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_up   = sectorI1[ ikappa ];</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_down = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ ikappa ], n_irrep );</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;         <span class="keywordtype">double</span> * my_block    = storage + kappa2index[ ikappa ];</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;         <span class="keywordtype">double</span> * buddy_block = buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d">gStorage</a>( n_updown, two_j_down, irrep_down, n_updown, two_j_up, irrep_up );</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> dim_up     = denBK-&gt;gCurrentDim( index, n_updown, two_j_up,   irrep_up   );</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> dim_down   = denBK-&gt;gCurrentDim( index, n_updown, two_j_down, irrep_down );</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;         </div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;         <span class="keywordtype">double</span> temp = 0.0;</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> row = 0; row &lt; dim_up; row++ ){</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;            <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> col = 0; col &lt; dim_down; col++ ){</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;               temp += my_block[ row + dim_up * col ] * buddy_block[ col + dim_down * row ];</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;            }</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;         }</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;         </div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">double</span> prefactor = (( get_2j() == 0 ) ? 1.0 : ( sqrt( ( two_j_up + 1.0 ) / ( two_j_down + 1.0 ) ) * <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">Heff::phase</a>( two_j_up - two_j_down ) ));</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;         value += prefactor * temp;</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;      </div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;      }</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;      <span class="keywordflow">return</span> value;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;   }</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;</div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;   <span class="keywordflow">return</span> value;</div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;}</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;   assert( get_2j() == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a374c949f32263391f2f8d49532e47f9d">get_2j</a>()    );</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;   assert( n_elec   == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a7438680d389551c7c3d38075f83240ce">get_nelec</a>() );</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;   assert( n_irrep  == buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285">get_irrep</a>() );</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;   <span class="keywordtype">double</span> value = 0.0;</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;   <span class="keywordflow">if</span> ( trans == <span class="charliteral">&#39;N&#39;</span> ){</div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;      <span class="keywordtype">int</span> length = kappa2index[ nKappa ];</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;      <span class="keywordtype">int</span> inc    = 1;</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      value = ddot_( &amp;length, storage, &amp;inc, buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d">gStorage</a>(), &amp;inc );</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;      <span class="keywordflow">return</span> value;</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;   } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      assert( n_elec == 0 );</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;      <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> ikappa = 0; ikappa &lt; nKappa; ikappa++ ){</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> n_updown   = sectorN1[ ikappa ];</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> two_j_up   = sectorTwoS1[ ikappa ];</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> two_j_down = sector_2S_down[ ikappa ];</div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_up   = sectorI1[ ikappa ];</div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> irrep_down = <a class="code" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047">Irreps::directProd</a>( sectorI1[ ikappa ], n_irrep );</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;         <span class="keywordtype">double</span> * my_block    = storage + kappa2index[ ikappa ];</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;         <span class="keywordtype">double</span> * buddy_block = buddy-&gt;<a class="code" href="classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d">gStorage</a>( n_updown, two_j_down, irrep_down, n_updown, two_j_up, irrep_up );</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> dim_up     = denBK-&gt;gCurrentDim( index, n_updown, two_j_up,   irrep_up   );</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> dim_down   = denBK-&gt;gCurrentDim( index, n_updown, two_j_down, irrep_down );</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;         </div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;         <span class="keywordtype">double</span> temp = 0.0;</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;         <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> row = 0; row &lt; dim_up; row++ ){</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;            <span class="keywordflow">for</span> ( <span class="keywordtype">int</span> col = 0; col &lt; dim_down; col++ ){</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;               temp += my_block[ row + dim_up * col ] * buddy_block[ col + dim_down * row ];</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;            }</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;         }</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;         </div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">double</span> prefactor = (( get_2j() == 0 ) ? 1.0 : ( sqrt( ( two_j_up + 1.0 ) / ( two_j_down + 1.0 ) ) * <a class="code" href="classCheMPS2_1_1Heff.html#aeb78aeaca1e19055b9ed31b41b2cfcd1">Heff::phase</a>( two_j_up - two_j_down ) ));</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;         value += prefactor * temp;</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;      </div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;      }</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;      <span class="keywordflow">return</span> value;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;   }</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;   <span class="keywordflow">return</span> value;</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;}</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;</div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1SyBookkeeper_html_ab9e13e1079e56b1ee12d4ed82b8c7d82"><div class="ttname"><a href="classCheMPS2_1_1SyBookkeeper.html#ab9e13e1079e56b1ee12d4ed82b8c7d82">CheMPS2::SyBookkeeper::gCurrentDim</a></div><div class="ttdeci">int gCurrentDim(const int bound, const int N, const int TwoS, const int Icnt) const </div><div class="ttdoc">Get the current virtual dimensions. </div><div class="ttdef"><b>Definition:</b> <a href="SyBookkeeper_8cpp_source.html#l00128">SyBookkeeper.cpp:128</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Tensor_html_aba3ee18f13eee357ed13789809082120"><div class="ttname"><a href="classCheMPS2_1_1Tensor.html#aba3ee18f13eee357ed13789809082120">CheMPS2::Tensor::index</a></div><div class="ttdeci">int index</div><div class="ttdoc">Index of the Tensor object. For TensorT: a site index; for other tensors: a boundary index...</div><div class="ttdef"><b>Definition:</b> <a href="Tensor_8h_source.html#l00078">Tensor.h:78</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_a940dd678615ce9d731e0f29465af8615"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#a940dd678615ce9d731e0f29465af8615">CheMPS2::TensorOperator::~TensorOperator</a></div><div class="ttdeci">virtual ~TensorOperator()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8cpp_source.html#l00102">TensorOperator.cpp:102</a></div></div>
@@ -632,7 +631,7 @@ $(document).ready(function(){initNavTree('TensorOperator_8cpp_source.html','');}
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_a7df2ccd2704f234765152ec1dab915cb"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#a7df2ccd2704f234765152ec1dab915cb">CheMPS2::TensorOperator::daxpy</a></div><div class="ttdeci">void daxpy(double alpha, TensorOperator *to_add)</div><div class="ttdoc">daxpy for TensorOperator </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8cpp_source.html#l00399">TensorOperator.cpp:399</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_a9c4a634f1828098e4d581200bee011be"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#a9c4a634f1828098e4d581200bee011be">CheMPS2::TensorOperator::moving_right</a></div><div class="ttdeci">bool moving_right</div><div class="ttdoc">Whether or not moving right. </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8h_source.html#l00146">TensorOperator.h:146</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_a5689f75f8f6a108780525514316a1afb"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#a5689f75f8f6a108780525514316a1afb">CheMPS2::TensorOperator::update_moving_left</a></div><div class="ttdeci">void update_moving_left(const int ikappa, TensorOperator *previous, TensorT *mps_tensor, double *workmem)</div><div class="ttdoc">Update moving left. </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8cpp_source.html#l00285">TensorOperator.cpp:285</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00131">TensorT.cpp:131</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1TensorT_html_aafb4d43ad6178437b47a32a24c375fa3"><div class="ttname"><a href="classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3">CheMPS2::TensorT::gStorage</a></div><div class="ttdeci">double * gStorage()</div><div class="ttdoc">Get the pointer to the storage. </div><div class="ttdef"><b>Definition:</b> <a href="TensorT_8cpp_source.html#l00143">TensorT.cpp:143</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_a7f948cf08871e15bf7a9038787e3dd5a"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#a7f948cf08871e15bf7a9038787e3dd5a">CheMPS2::TensorOperator::update_moving_right</a></div><div class="ttdeci">void update_moving_right(const int ikappa, TensorOperator *previous, TensorT *mps_tensor, double *workmem)</div><div class="ttdoc">Update moving right. </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8cpp_source.html#l00171">TensorOperator.cpp:171</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_ae0dd1f545ba66ee298ba363bed4ca078"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#ae0dd1f545ba66ee298ba363bed4ca078">CheMPS2::TensorOperator::n_irrep</a></div><div class="ttdeci">int n_irrep</div><div class="ttdoc">The (real-valued abelian) point group irrep difference between the symmetry sectors of the lower and ...</div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8h_source.html#l00143">TensorOperator.h:143</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1TensorOperator_html_ad410e3a066869ea14b02292d7119e938"><div class="ttname"><a href="classCheMPS2_1_1TensorOperator.html#ad410e3a066869ea14b02292d7119e938">CheMPS2::TensorOperator::update</a></div><div class="ttdeci">void update(TensorOperator *previous, TensorT *mps_tensor, double *workmem)</div><div class="ttdoc">Clear and update. </div><div class="ttdef"><b>Definition:</b> <a href="TensorOperator_8cpp_source.html#l00155">TensorOperator.cpp:155</a></div></div>
@@ -659,7 +658,7 @@ $(document).ready(function(){initNavTree('TensorOperator_8cpp_source.html','');}
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>TensorOperator.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

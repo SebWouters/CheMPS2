@@ -109,7 +109,7 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2015 Sebastian Wouters</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">   Copyright (C) 2013-2016 Sebastian Wouters</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">   This program is free software; you can redistribute it and/or modify</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">   it under the terms of the GNU General Public License as published by</span></div>
@@ -144,7 +144,7 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;   TwoS = TwoSin;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;   N = Nin;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;   Irrep = Irrepin;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   bReorderD2h = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;   bReorder = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;   </div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;   <a class="code" href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e">checkConsistency</a>();</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;   mx_elem = NULL;</div>
@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#a9bc13e74cc92e3d697e9cc2ac589afc2">   45</a></span>&#160;<a class="code" href="classCheMPS2_1_1Problem.html#a9bc13e74cc92e3d697e9cc2ac589afc2">CheMPS2::Problem::~Problem</a>(){</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;   <span class="keywordflow">if</span> (bReorderD2h){</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;   <span class="keywordflow">if</span> (bReorder){</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;      <span class="keyword">delete</span> [] f1;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      <span class="keyword">delete</span> [] f2;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;   }</div>
@@ -164,15 +164,15 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9">   56</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9">CheMPS2::Problem::SetupReorderD2h</a>(){</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keywordflow">if</span> (bReorderD2h){</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;   <span class="keywordflow">if</span> (bReorder){</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      <span class="keyword">delete</span> [] f1;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;      <span class="keyword">delete</span> [] f2;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      bReorderD2h = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;      bReorder = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;   }</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;   <span class="keywordflow">if</span> (gSy()==7){ <span class="comment">//Only if D2h of course</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;   </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      bReorderD2h = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      bReorder = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;      f1 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()];</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      f2 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()];</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      </div>
@@ -204,15 +204,15 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
 <div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873">   96</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873">CheMPS2::Problem::SetupReorderC2v</a>(){</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   <span class="keywordflow">if</span> (bReorderD2h){</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;   <span class="keywordflow">if</span> (bReorder){</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keyword">delete</span> [] f1;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      <span class="keyword">delete</span> [] f2;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      bReorderD2h = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      bReorder = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;   }</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;   <span class="keywordflow">if</span> (gSy()==5){ <span class="comment">//Only if C2v of course</span></div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;   </div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      bReorderD2h = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      bReorder = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      f1 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()];</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      f2 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()];</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      </div>
@@ -258,13 +258,13 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
 <div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc">  150</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc">CheMPS2::Problem::setup_reorder_custom</a>(<span class="keywordtype">int</span> * dmrg2ham){</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;   <span class="keywordflow">if</span> (bReorderD2h){</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;   <span class="keywordflow">if</span> (bReorder){</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      <span class="keyword">delete</span> [] f1;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      <span class="keyword">delete</span> [] f2;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      bReorderD2h = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      bReorder = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;   }</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;   </div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;   bReorderD2h = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;   bReorder = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;   f1 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()]; <span class="comment">// Is going to be the inverse of dmrg2ham</span></div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;   f2 = <span class="keyword">new</span> <span class="keywordtype">int</span>[Ham-&gt;getL()]; <span class="comment">// Is going to be dmrg2ham copied</span></div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
@@ -444,7 +444,7 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
 <div class="line"><a name="l00336"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff">  336</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad">CheMPS2::Problem::gIrrep</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> nOrb)<span class="keyword"> const</span>{</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;   </div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;   <span class="keywordflow">if</span> (!bReorderD2h){</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;   <span class="keywordflow">if</span> (!bReorder){</div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      <span class="keywordflow">return</span> Ham-&gt;getOrbitalIrrep(nOrb);</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;   }</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;   </div>
@@ -452,9 +452,9 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;}</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
-<div class="line"><a name="l00346"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">  346</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">CheMPS2::Problem::gReorderD2h</a>()<span class="keyword"> const</span>{ <span class="keywordflow">return</span> bReorderD2h; }</div>
-<div class="line"><a name="l00347"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9">  347</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9">CheMPS2::Problem::gf1</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> HamOrb)<span class="keyword"> const</span>{ <span class="keywordflow">return</span> (bReorderD2h)?f1[HamOrb]:-1; }</div>
-<div class="line"><a name="l00348"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a">  348</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a">CheMPS2::Problem::gf2</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> DMRGOrb)<span class="keyword"> const</span>{ <span class="keywordflow">return</span> (bReorderD2h)?f2[DMRGOrb]:-1; }</div>
+<div class="line"><a name="l00346"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">  346</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">CheMPS2::Problem::gReorder</a>()<span class="keyword"> const</span>{ <span class="keywordflow">return</span> bReorder; }</div>
+<div class="line"><a name="l00347"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9">  347</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9">CheMPS2::Problem::gf1</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> HamOrb)<span class="keyword"> const</span>{ <span class="keywordflow">return</span> (bReorder)?f1[HamOrb]:-1; }</div>
+<div class="line"><a name="l00348"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a">  348</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a">CheMPS2::Problem::gf2</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> DMRGOrb)<span class="keyword"> const</span>{ <span class="keywordflow">return</span> (bReorder)?f2[DMRGOrb]:-1; }</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;</div>
 <div class="line"><a name="l00350"></a><span class="lineno"><a class="line" href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36">  350</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36">CheMPS2::Problem::gMxElement</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> alpha, <span class="keyword">const</span> <span class="keywordtype">int</span> beta, <span class="keyword">const</span> <span class="keywordtype">int</span> gamma, <span class="keyword">const</span> <span class="keywordtype">int</span> delta)<span class="keyword"> const</span>{</div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
@@ -474,13 +474,13 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;   <span class="keyword">const</span> <span class="keywordtype">double</span> prefact = 1.0/(N-1);</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;   </div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;   <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb1 = 0; orb1 &lt; L; orb1++){</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> map1 = (( !bReorderD2h ) ? orb1 : f2[ orb1 ]);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">int</span> map1 = (( !bReorder ) ? orb1 : f2[ orb1 ]);</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;      <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb2 = 0; orb2 &lt; L; orb2++){</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> map2 = (( !bReorderD2h ) ? orb2 : f2[ orb2 ]);</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;         <span class="keyword">const</span> <span class="keywordtype">int</span> map2 = (( !bReorder ) ? orb2 : f2[ orb2 ]);</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;         <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb3 = 0; orb3 &lt; L; orb3++){</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> map3 = (( !bReorderD2h ) ? orb3 : f2[ orb3 ]);</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;            <span class="keyword">const</span> <span class="keywordtype">int</span> map3 = (( !bReorder ) ? orb3 : f2[ orb3 ]);</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> orb4 = 0; orb4 &lt; L; orb4++){</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;               <span class="keyword">const</span> <span class="keywordtype">int</span> map4 = (( !bReorderD2h ) ? orb4 : f2[ orb4 ]);</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;               <span class="keyword">const</span> <span class="keywordtype">int</span> map4 = (( !bReorder ) ? orb4 : f2[ orb4 ]);</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;               setMxElement( orb1, orb2, orb3, orb4, Ham-&gt;getVmat(map1,map2,map3,map4)</div>
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                                                     + prefact*((orb1==orb3)?Ham-&gt;getTmat(map2,map4):0)</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                                                     + prefact*((orb2==orb4)?Ham-&gt;getTmat(map1,map3):0) );</div>
@@ -529,9 +529,9 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a0a979c3461cc2824cb7c0e91442d5e14"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14">CheMPS2::Problem::setMxElement</a></div><div class="ttdeci">void setMxElement(const int alpha, const int beta, const int gamma, const int delta, const double value)</div><div class="ttdoc">Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with ...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00356">Problem.cpp:356</a></div></div>
-<div class="ttc" id="classCheMPS2_1_1Problem_html_ad451eb3fdbd695b938a15515450b6679"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#ad451eb3fdbd695b938a15515450b6679">CheMPS2::Problem::gReorderD2h</a></div><div class="ttdeci">bool gReorderD2h() const </div><div class="ttdoc">Get whether the Hamiltonian orbitals are reordered for the DMRG calculation (for all irreps...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00346">Problem.cpp:346</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Irreps_html_afd3d1b65e870aad920125c05606c4a7d"><div class="ttname"><a href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d">CheMPS2::Irreps::getNumberOfIrreps</a></div><div class="ttdeci">int getNumberOfIrreps() const </div><div class="ttdoc">Get the number of irreps for the currently activated group. </div><div class="ttdef"><b>Definition:</b> <a href="Irreps_8cpp_source.html#l00094">Irreps.cpp:94</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a24b9329bce03b3d6797750a530d4dd59"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59">CheMPS2::Problem::setup_reorder_dinfh</a></div><div class="ttdeci">void setup_reorder_dinfh(int *docc, const double sp_threshold=1e-5)</div><div class="ttdoc">Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00177">Problem.cpp:177</a></div></div>
+<div class="ttc" id="classCheMPS2_1_1Problem_html_a2b562b3dce075741cf3cf038143a2754"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754">CheMPS2::Problem::gReorder</a></div><div class="ttdeci">bool gReorder() const </div><div class="ttdoc">Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00346">Problem.cpp:346</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1MPIchemps2_html_a6732ae60b5b4c8a4f1b063f9db304bf5"><div class="ttname"><a href="classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5">CheMPS2::MPIchemps2::mpi_rank</a></div><div class="ttdeci">static int mpi_rank()</div><div class="ttdoc">Get the rank of this MPI process. </div><div class="ttdef"><b>Definition:</b> <a href="MPIchemps2_8h_source.html#l00131">MPIchemps2.h:131</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_a6e26b40eb9bf80eb9979083b58a4e30e"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e">CheMPS2::Problem::checkConsistency</a></div><div class="ttdeci">bool checkConsistency() const </div><div class="ttdoc">Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0<=Irrep<nIrreps...</div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00385">Problem.cpp:385</a></div></div>
 <div class="ttc" id="classCheMPS2_1_1Problem_html_aaa734d8f3bf869965af7529df4ff4dfc"><div class="ttname"><a href="classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc">CheMPS2::Problem::setup_reorder_custom</a></div><div class="ttdeci">void setup_reorder_custom(int *dmrg2ham)</div><div class="ttdoc">Reorder the orbitals to a custom ordering. Previous reorderings are cleared. </div><div class="ttdef"><b>Definition:</b> <a href="Problem_8cpp_source.html#l00150">Problem.cpp:150</a></div></div>
@@ -554,7 +554,7 @@ $(document).ready(function(){initNavTree('Problem_8cpp_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>Problem.cpp</b></li>
-    <li class="footer">Generated on Fri Nov 27 2015 14:38:44 for CheMPS2 by
+    <li class="footer">Generated on Thu Feb 18 2016 10:25:52 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

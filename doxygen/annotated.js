@@ -1,7 +1,9 @@
 var annotated =
 [
     [ "CheMPS2", null, [
+      [ "CASPT2", "classCheMPS2_1_1CASPT2.html", "classCheMPS2_1_1CASPT2" ],
       [ "CASSCF", "classCheMPS2_1_1CASSCF.html", "classCheMPS2_1_1CASSCF" ],
+      [ "ConjugateGradient", "classCheMPS2_1_1ConjugateGradient.html", "classCheMPS2_1_1ConjugateGradient" ],
       [ "ConvergenceScheme", "classCheMPS2_1_1ConvergenceScheme.html", "classCheMPS2_1_1ConvergenceScheme" ],
       [ "Correlations", "classCheMPS2_1_1Correlations.html", "classCheMPS2_1_1Correlations" ],
       [ "Cumulant", "classCheMPS2_1_1Cumulant.html", "classCheMPS2_1_1Cumulant" ],
