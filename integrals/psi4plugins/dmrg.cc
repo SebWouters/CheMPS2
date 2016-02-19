@@ -679,7 +679,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     double * mem2 = new double[sizeWorkMem];
 
     CheMPS2::EdmistonRuedenberg * theLocalizer = NULL;
-    if ( dmrg_active_space.compare("LOC")==0 ){ theLocalizer = new CheMPS2::EdmistonRuedenberg(HamDMRG); }
+    if ( dmrg_active_space.compare("LOC")==0 ){ theLocalizer = new CheMPS2::EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
 
     //Load unitary from disk
     if ( dmrg_store_unit ){

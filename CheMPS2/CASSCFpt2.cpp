@@ -75,7 +75,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    buildQmatOCC();
    buildTmatrix();
    fillConstAndTmatDMRG(HamAS);
-   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
+   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
    if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamAS, unitary, mem1, mem2, mem3, block_size); }
    else {             theRotator.fillVmatDMRG(HamAS, unitary, mem1, mem2); }
    double E_CASSCF = 0.0;

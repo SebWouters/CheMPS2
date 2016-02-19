@@ -96,9 +96,9 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
    if ( block_wise ){ mem3 = new double[ block_size_power4 ]; }
    
    //The two-body rotator and Edmiston-Ruedenberg active space localizer
-   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
+   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
    EdmistonRuedenberg * theLocalizer = NULL;
-   if (theDMRGSCFoptions->getWhichActiveSpace()==2){ theLocalizer = new EdmistonRuedenberg(HamDMRG); }
+   if (theDMRGSCFoptions->getWhichActiveSpace()==2){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
    
    //Load unitary from disk
    if (theDMRGSCFoptions->getStoreUnitary()){

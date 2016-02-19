@@ -128,9 +128,10 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param HamIn The active space Hamiltonian
+         /** \param Vmat The active space two-electron integrals
+             \param group The group number
              \param printLevelIn If 0: nothing is printed. If 1: info at beginning and end. If >1: intermediary info as well. */
-         EdmistonRuedenberg(Hamiltonian * HamIn, const int printLevelIn=1);
+         EdmistonRuedenberg( const FourIndex * Vmat, const int group, const int printLevelIn=1 );
          
          //! Destructor
          virtual ~EdmistonRuedenberg();
@@ -156,8 +157,8 @@ namespace CheMPS2{
          
       private:
       
-         //Pointer to the active space Hamiltonian
-         Hamiltonian * Ham;
+         //Pointer to the active space two-electron integrals
+         const FourIndex * VMAT_ORIG;
          
          //The print level
          int printLevel;

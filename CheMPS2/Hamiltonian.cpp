@@ -31,6 +31,7 @@
 #include "MyHDF5.h"
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::string;
 using std::ifstream;
@@ -63,12 +64,8 @@ CheMPS2::Hamiltonian::Hamiltonian(const int Norbitals, const int nGroup, const i
 
 CheMPS2::Hamiltonian::Hamiltonian( const string filename, const int psi4groupnumber ){
 
-    if ( psi4groupnumber == -1 ){
-        CreateAndFillFromPsi4dump( filename );
-    } else {
-        SymmInfo.setGroup( psi4groupnumber );
-        CreateAndFillFromFCIDUMP( filename );
-    }
+    SymmInfo.setGroup( psi4groupnumber );
+    CreateAndFillFromFCIDUMP( filename );
 
 }
 
@@ -77,7 +74,8 @@ CheMPS2::Hamiltonian::Hamiltonian(const bool fileh5, const string main_file, con
    if (fileh5){
       CreateAndFillFromH5( main_file, file_tmat, file_vmat );
    } else {
-      CreateAndFillFromPsi4dump( main_file );
+      cerr << "CheMPS2::Hamiltonian::Hamiltonian( false, const string , const string , const string ) was deprecated." << endl;
+      assert( fileh5 == true );
    }
    
 }
@@ -119,6 +117,8 @@ double CheMPS2::Hamiltonian::getTmat(const int index1, const int index2) const{
    
 }
 
+const CheMPS2::TwoIndex * CheMPS2::Hamiltonian::getTmat(){ return Tmat; }
+
 void CheMPS2::Hamiltonian::setVmat(const int index1, const int index2, const int index3, const int index4, const double val){
 
    assert( Irreps::directProd(orb2irrep[index1],orb2irrep[index2]) == Irreps::directProd(orb2irrep[index3],orb2irrep[index4]) );
@@ -142,6 +142,8 @@ double CheMPS2::Hamiltonian::getVmat(const int index1, const int index2, const i
    return 0.0;
    
 }
+
+const CheMPS2::FourIndex * CheMPS2::Hamiltonian::getVmat(){ return Vmat; }
 
 void CheMPS2::Hamiltonian::save(const string file_parent, const string file_tmat, const string file_vmat) const{
 
@@ -287,138 +289,6 @@ void CheMPS2::Hamiltonian::CreateAndFillFromH5(const string file_parent, const s
    Vmat = new FourIndex( SymmInfo.getGroupNumber(), irrep2num_orb );
 
    read(file_parent, file_tmat, file_vmat);
-
-}
-
-//Works for the file mointegrals/mointegrals.cc_PRINT which can be used as a plugin in psi4 beta5
-void CheMPS2::Hamiltonian::CreateAndFillFromPsi4dump(const string filename){
-
-   string line, part;
-   int pos;
-   
-   ifstream inputfile(filename.c_str());
-   
-   //First go to the start of the integral dump.
-   bool stop = false;
-   string start = "****  Molecular Integrals For CheMPS Start Here";
-   do{
-      getline(inputfile,line);
-      pos = line.find(start);
-      if (pos==0) stop = true;
-   } while (!stop);
-   
-   //Get the group name and convert it to the group number
-   getline(inputfile,line);
-   pos = line.find("=");
-   part = line.substr(pos+2,line.size()-pos-3);
-   int nGroup = 0;
-   stop = false;
-   do {
-      if (part.compare(SymmInfo.getGroupName(nGroup))==0) stop = true;
-      else nGroup += 1;
-   } while (!stop);
-   SymmInfo.setGroup(nGroup);
-   //cout << "The group was found to be " << SymmInfo.getGroupName() << " ." << endl;
-   
-   //This line says how many irreps there are: skip.
-   getline(inputfile,line);
-   
-   //This line contains the nuclear energy part.
-   getline(inputfile,line);
-   pos = line.find("=");
-   part = line.substr(pos+2,line.size()-pos-3);
-   Econst = atof(part.c_str());
-
-   //This line contains the number of MO's.
-   getline(inputfile,line);
-   pos = line.find("=");
-   part = line.substr(pos+2,line.size()-pos-3);
-   L = atoi(part.c_str());
-   
-   //This line contains only text
-   getline(inputfile,line);
-   
-   //This line contains the irrep numbers --> allocate, read in & set
-   getline(inputfile,line);
-   
-   orb2irrep = new int[L];
-   orb2indexSy = new int[L];
-   int nIrreps = SymmInfo.getNumberOfIrreps();
-   irrep2num_orb = new int[nIrreps];
-   
-   pos = 0;
-   do {
-      orb2irrep[pos] = atoi(line.substr(2*pos,1).c_str());
-      pos++;
-   } while (2*pos < (int)line.size()-1);
-   
-   for (int cnt=0; cnt<nIrreps; cnt++) irrep2num_orb[cnt] = 0;
-   for (int cnt=0; cnt<L; cnt++){
-      orb2indexSy[cnt] = irrep2num_orb[orb2irrep[cnt]];
-      irrep2num_orb[orb2irrep[cnt]]++;
-   }
-   Tmat = new TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
-   Vmat = new FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
-   
-   //Skip three lines --> number of double occupations, single occupations and test line
-   getline(inputfile,line);
-   getline(inputfile,line);
-   getline(inputfile,line);
-   
-   //Read in one-electron integrals
-   getline(inputfile,line);
-   int pos2, index1, index2;
-   double value;
-   while( (line.substr(0,1)).compare("*")!=0 ){
-   
-      pos = 0;
-      pos2 = line.find(" ",pos);
-      index1 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      pos = pos2+1;
-      pos2 = line.find(" ",pos);
-      index2 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      value = atof(line.substr(pos2+1,line.size()-pos2-2).c_str());
-      
-      setTmat(index1,index2,value);
-      
-      getline(inputfile,line);
-   
-   }
-   
-   //Read in two-electron integrals --> in file: chemical notation; in Vmat: physics notation
-   getline(inputfile,line);
-   int index3, index4;
-   while( (line.substr(0,1)).compare("*")!=0 ){
-   
-      pos = 0;
-      pos2 = line.find(" ",pos);
-      index1 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      pos = pos2+1;
-      pos2 = line.find(" ",pos);
-      index2 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      pos = pos2+1;
-      pos2 = line.find(" ",pos);
-      index3 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      pos = pos2+1;
-      pos2 = line.find(" ",pos);
-      index4 = atoi(line.substr(pos,pos2-pos).c_str());
-      
-      value = atof(line.substr(pos2+1,line.size()-pos2-2).c_str());
-      
-      setVmat(index1, index3, index2, index4, value);
-      
-      getline(inputfile,line);
-   
-   }
-   
-   if (CheMPS2::HAMILTONIAN_debugPrint) debugcheck();
-   
-   inputfile.close();
 
 }
 

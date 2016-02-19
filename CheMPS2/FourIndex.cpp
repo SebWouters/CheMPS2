@@ -289,6 +289,8 @@ long long CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int ir
    
 }
 
+int CheMPS2::FourIndex::get_irrep_size( const int irrep ) const{ return Isizes[ irrep ]; }
+
 long long CheMPS2::FourIndex::getPtrAllOK1(const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const{
 
    return storage[Icent][irrep_i][irrep_k][i + k*(k+1)/2][j-i] + l-k;

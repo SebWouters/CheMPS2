@@ -60,14 +60,14 @@ namespace CheMPS2{
              \param OrbIrreps Pointer to array containing the orbital irreps */
          Hamiltonian(const int Norbitals, const int nGroup, const int * OrbIrreps);
          
-         //! Constructor which loads a text dump of a Hamiltonian from disk
-         /** \param filename The filename of the Hamiltonian text dump
-             \param psi4groupnumber If (psi4groupnumber==-1), a psi4 text dump (which can be generated with the plugin psi4plugins/mointegrals.cc_PRINT) is loaded from disk. If psi4groupnumber is an actual group number, a FCIDUMP text dump (which can be generated with the plugin psi4plugins/fcidump.cc) is loaded from disk. Note that the orbital symmetries in the latter are Molpro orbital symmetries! */
-         Hamiltonian(const string filename, const int psi4groupnumber=-1);
+         //! Constructor which loads a FCIDUMP from disk
+         /** \param filename The filename of the FCIDUMP (which can be generated with the plugin psi4plugins/fcidump.cc and has Molpro orbital symmetries!)
+             \param psi4groupnumber The group number according to psi4's conventions */
+         Hamiltonian(const string filename, const int psi4groupnumber);
          
-         //! Constructor which loads a Hamiltonian from disk which was previously saved as a Psi4 text dump or in HDF5 format. A Psi4 text dump can be generated with the plugin psi4plugins/mointegrals.cc_PRINT. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with one of the other constructors, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save().
-         /** \param fileh5 If true, attempt to load a Hamiltonian in HDF5 format. All three filenames should be set then! If false, attempt to load a Hamiltonian which was previously saved as a Psi4 text dump. Only the first filename should be set then!
-             \param main_file If fileh5, the HDF5 Hamiltonian parent filename. If not fileh5, the filename of the Psi4 text dump of the Hamiltonian.
+         //! Constructor which loads a Hamiltonian from disk in HDF5 format. An HDF5 dump can be generated with the plugin psi4plugins/mointegrals.cc_SAVEHAM; or by (1) creating a Hamiltonian with one of the other constructors, (2) filling it with setEconst(), setTmat() and setVmat(), and (3) calling save().
+         /** \param fileh5 If true, attempt to load a Hamiltonian in HDF5 format. All three filenames should be set then! The option false was deprecated.
+             \param main_file The HDF5 Hamiltonian parent filename.
              \param file_tmat The HDF5 Hamiltonian Tmat filename
              \param file_vmat The HDF5 Hamiltonian Vmat filename */
          Hamiltonian(const bool fileh5, const string main_file=HAMILTONIAN_ParentStorageName, const string file_tmat=HAMILTONIAN_TmatStorageName, const string file_vmat=HAMILTONIAN_VmatStorageName);
@@ -132,6 +132,14 @@ namespace CheMPS2{
              \return \f$V_{index1,index2,index3,index4}\f$ */
          double getVmat(const int index1, const int index2, const int index3, const int index4) const;
          
+         //! Get the pointer to the one-electron integrals
+         /** \return The pointer to the one-electron integrals */
+         const TwoIndex * getTmat();
+         
+         //! Get the pointer to the two-electron integrals
+         /** \return The pointer to the two-electron integrals */
+         const FourIndex * getVmat();
+         
          //! Save the Hamiltonian
          /** \param file_parent The HDF5 Hamiltonian parent filename
              \param file_tmat The HDF5 Hamiltonian Tmat filename
@@ -182,9 +190,6 @@ namespace CheMPS2{
          
          //If filename=="LOADH5" in Hamiltonian::Hamiltonian then the HDF5 Hamiltonian is loaded
          void CreateAndFillFromH5(const string file_parent, const string file_tmat, const string file_vmat);
-         
-         //If filename!="LOADH5" in Hamiltonian::Hamiltonian then a Psi4 dump in the file with name "filename" is loaded
-         void CreateAndFillFromPsi4dump(const string filename);
          
          //Load the FCIDUMP Hamiltonian (with molpro irreps!)
          void CreateAndFillFromFCIDUMP( const string fcidumpfile );

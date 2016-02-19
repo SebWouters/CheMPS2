@@ -166,12 +166,12 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param ham_in Hamiltonian containing the matrix elements of the Hamiltonian for which a CASSCF calculation is desired
-             \param docc_in Array containing the number of doubly occupied HF orbitals per irrep
-             \param socc_in Array containing the number of singly occupied HF orbitals per irrep
+             \param docc Array containing the number of doubly occupied HF orbitals per irrep
+             \param socc Array containing the number of singly occupied HF orbitals per irrep
              \param nocc_in Array containing the number of doubly occupied (inactive) orbitals per irrep
              \param ndmrg_in Array containing the number of active orbitals per irrep
              \param nvirt_in Array containing the number of virtual (secondary) orbitals per irrep */
-         CASSCF(Hamiltonian * ham_in, int * docc_in, int * socc_in, int * nocc_in, int * ndmrg_in, int * nvirt_in);
+         CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc_in, int * ndmrg_in, int * nvirt_in);
          
          //! Destructor
          virtual ~CASSCF();
@@ -313,9 +313,11 @@ namespace CheMPS2{
          
          //DIIS object
          DIIS * theDIIS;
-      
+         
          //The original Hamiltonian
-         Hamiltonian * HamOrig;
+         double NUCL_ORIG;
+         const TwoIndex  * TMAT_ORIG;
+         const FourIndex * VMAT_ORIG;
          
          //The rotated 2-body matrix elements with at most two virtual indices
          DMRGSCFintegrals * theRotatedTEI;
@@ -329,12 +331,6 @@ namespace CheMPS2{
          //The number of irreps
          int num_irreps;
          
-         //Double occupations
-         int * DOCC;
-         
-         //Single occupations
-         int * SOCC;
-         
          //Number of DMRG orbitals
          int nOrbDMRG;
          
@@ -345,7 +341,7 @@ namespace CheMPS2{
          double * DMRG2DM;
          
          //Helper function to check HF
-         void checkHF();
+         void checkHF( int * docc, int * socc );
          
          //Fill Econst and Tmat of HamDMRG
          void fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const;

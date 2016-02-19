@@ -31,20 +31,24 @@ using std::cout;
 using std::endl;
 using std::max;
 
-CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg(Hamiltonian * HamIn, const int printLevelIn){
+CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg( const FourIndex * Vmat, const int group, const int printLevelIn ){
 
-   Ham = HamIn;
+   VMAT_ORIG = Vmat;
    printLevel = printLevelIn;
-   SymmInfo.setGroup(Ham->getNGroup());
+   SymmInfo.setGroup( group );
    
-   int * Isizes = new int[SymmInfo.getNumberOfIrreps()];
-   int * Zeroes = new int[SymmInfo.getNumberOfIrreps()];
-   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){ Isizes[irrep] = Zeroes[irrep] = 0; }
-   for (int orb=0; orb<Ham->getL(); orb++){ Isizes[Ham->getOrbitalIrrep(orb)]++; }
+   int * Isizes = new int[ SymmInfo.getNumberOfIrreps() ];
+   int * Zeroes = new int[ SymmInfo.getNumberOfIrreps() ];
+   int L = 0;
+   for ( int irrep = 0; irrep < SymmInfo.getNumberOfIrreps(); irrep++ ){
+      Isizes[ irrep ] = VMAT_ORIG->get_irrep_size( irrep );
+      Zeroes[ irrep ] = 0;
+      L += Isizes[ irrep ];
+   }
    
-   iHandler = new DMRGSCFindices(Ham->getL(), Ham->getNGroup(), Zeroes, Isizes, Zeroes); //Supposes all orbitals are active
-   unitary  = new DMRGSCFunitary(iHandler);
-   VmatRotated = new FourIndex(Ham->getNGroup(), Isizes);
+   iHandler = new DMRGSCFindices( L, group, Zeroes, Isizes, Zeroes ); //Supposes all orbitals are active
+   unitary  = new DMRGSCFunitary( iHandler );
+   VmatRotated = new FourIndex( group, Isizes );
    
    delete [] Zeroes;
    delete [] Isizes;
@@ -87,7 +91,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
       for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] = 0.0; }
    }
 
-   DMRGSCFVmatRotations theRotator(Ham, iHandler);
+   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
    theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
 
    //Setting up the variables for the cost function
@@ -406,7 +410,7 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
    
    delete [] reorder;
    
-   DMRGSCFVmatRotations theRotator(Ham, iHandler);
+   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
    theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
    
    if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = " << FiedlerExchangeCost() << endl; }

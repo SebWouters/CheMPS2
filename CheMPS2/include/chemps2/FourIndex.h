@@ -81,6 +81,11 @@ namespace CheMPS2{
              \param l The fourth index (within the symmetry block) */
          double get(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l) const;
          
+         //! Get a given irrep size
+         /** \param irrep The irrep for which you want to know the irrep size
+             \return The corresponding irrep size */
+         int get_irrep_size( const int irrep ) const;
+         
          //! Save the FourIndex object
          /** \param name filename */
          void save(const std::string name) const;

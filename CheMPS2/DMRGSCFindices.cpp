@@ -31,7 +31,6 @@ using std::max;
 CheMPS2::DMRGSCFindices::DMRGSCFindices(const int L, const int Group, int * NOCCin, int * NDMRGin, int * NVIRTin){
 
    this->L = L;
-   this->Group = Group;
    SymmInfo.setGroup(Group);
    this->Nirreps = SymmInfo.getNumberOfIrreps();
    
@@ -91,6 +90,8 @@ CheMPS2::DMRGSCFindices::~DMRGSCFindices(){
 }
 
 int CheMPS2::DMRGSCFindices::getL() const{ return L; }
+
+int CheMPS2::DMRGSCFindices::getGroupNumber() const{ return SymmInfo.getGroupNumber(); }
 
 int CheMPS2::DMRGSCFindices::getNirreps() const{ return Nirreps; }
 

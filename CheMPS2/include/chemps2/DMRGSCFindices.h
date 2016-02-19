@@ -48,6 +48,10 @@ namespace CheMPS2{
          /** \return The number of orbitals */
          int getL() const;
          
+         //! Get the group number
+         /** \return The group number */
+         int getGroupNumber() const;
+         
          //! Get the number of irreps
          /** \return The number of irreps */
          int getNirreps() const;
@@ -122,10 +126,7 @@ namespace CheMPS2{
          //Number of orbitals
          int L;
          
-         //Group number
-         int Group;
-         
-         //Irreps controller
+         //Irreps controller which contains the group number
          Irreps SymmInfo;
          
          //Number of irreps (follows from Group number)

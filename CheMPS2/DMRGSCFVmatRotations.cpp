@@ -27,12 +27,11 @@
 using std::min;
 using std::max;
 
-CheMPS2::DMRGSCFVmatRotations::DMRGSCFVmatRotations(Hamiltonian * HamOrigIn, DMRGSCFindices * iHandlerIn){
+CheMPS2::DMRGSCFVmatRotations::DMRGSCFVmatRotations( const FourIndex * Vmat, DMRGSCFindices * iHandlerIn ){
 
-   HamOrig = HamOrigIn;
+   VMAT_ORIG = Vmat;
    iHandler = iHandlerIn;
-   SymmInfo.setGroup(HamOrig->getNGroup());
-   numberOfIrreps = SymmInfo.getNumberOfIrreps();
+   numberOfIrreps = iHandler->getNirreps();
 
 }
 
@@ -60,8 +59,7 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatRotated(FourIndex * VmatRotated, DMR
                         for (int cnt3=0; cnt3<linsize3; cnt3++){
                            for (int cnt4=0; cnt4<linsize4; cnt4++){
                               temp1[cnt1 + linsize1 * ( cnt2 + linsize2 * (cnt3 + linsize3 * cnt4) ) ]
-                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
-                                                    iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4 );
+                                = VMAT_ORIG->get( irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4 );
                            }
                         }
                      }
@@ -136,8 +134,7 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFu
                         for (int cnt3=0; cnt3<linsizeORIG3; cnt3++){
                            for (int cnt4=0; cnt4<linsizeORIG4; cnt4++){
                               temp1[cnt1 + linsizeORIG1 * ( cnt2 + linsizeORIG2 * (cnt3 + linsizeORIG3 * cnt4) ) ]
-                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + cnt1, iHandler->getOrigNOCCstart(irrep2) + cnt2,
-                                                    iHandler->getOrigNOCCstart(irrep3) + cnt3, iHandler->getOrigNOCCstart(irrep4) + cnt4 );
+                                = VMAT_ORIG->get( irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4 );
                            }
                         }
                      }
@@ -217,8 +214,7 @@ void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEI(DMRGSCFintegrals * theRotated
                            for (int a2 = 0; a2 < linsize_a2; a2++){
                               // We try to make the Coulomb elements !
                               temp1[ c1 + linsize_orig_c1 * ( c2 + linsize_orig_c2 * ( a1 + linsize_a1 * a2 ) ) ]
-                                = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + c1, iHandler->getOrigNOCCstart( Ia1 ) + a1,
-                                                    iHandler->getOrigNOCCstart( Ic2 ) + c2, iHandler->getOrigNOCCstart( Ia2 ) + a2 );
+                                = VMAT_ORIG->get( Ic1, Ia1, Ic2, Ia2, c1, a1, c2, a2 );
                            }
                         }
                      }
@@ -297,8 +293,7 @@ void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEI(DMRGSCFintegrals * theRotated
                         for (int v2 = 0; v2 < linsize_orig_v2; v2++){
                            // We try to make the Exchange elements !
                            temp1[ c1 + linsize_orig_c1 * ( c2 + linsize_orig_c2 * ( v1 + linsize_orig_v1 * v2 ) ) ]
-                             = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + c1, iHandler->getOrigNOCCstart( Ic2 ) + c2,
-                                                 iHandler->getOrigNOCCstart( Iv1 ) + v1, iHandler->getOrigNOCCstart( Iv2 ) + v2 );
+                             = VMAT_ORIG->get( Ic1, Ic2, Iv1, Iv2, c1, c2, v1, v2 );
                         }
                      }
                   }
@@ -423,7 +418,7 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise(FourIndex * VmatRot
                          Reset the FourIndex object for the particular symmetry case under consideration --> Vmat(i,j,k,l) = 0.0
                          Loop block1, block2, block3, block4 --> factor^4:
                             Loop block1 --> factor:
-                               Copy HamOrig->getVmat(i,j,k,l) for the particular block into mem2_ijkl --> cost (linsize/factor)^4
+                               Copy Vmat(i,j,k,l) for the particular block into mem2_ijkl --> cost (linsize/factor)^4
                                Rotate mem1_ajkl = U_ai mem2_ijkl (but only block1 indices) --> cost(linsize/factor)^5
                                Loop block2 --> factor:
                                   Rotate mem2_abkl = U_bj mem1_ajkl (only block2 indices) --> cost (linsize/factor)^5
@@ -540,16 +535,16 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise(FourIndex * VmatRot
                                                                       : min( targetStart1 + blocksizeV1  , linsize1   );
                                  const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
                                  
-                                 //Copy HamOrig->getVmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
+                                 //Copy Vmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
                                  for (int origIndex1=0; origIndex1<origSize1; origIndex1++){
                                     for (int origIndex2=0; origIndex2<origSize2; origIndex2++){
                                        for (int origIndex3=0; origIndex3<origSize3; origIndex3++){
                                           for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
                                              mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
-                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + origStart1 + origIndex1,
-                                                                    iHandler->getOrigNOCCstart(irrep2) + origStart2 + origIndex2,
-                                                                    iHandler->getOrigNOCCstart(irrep3) + origStart3 + origIndex3,
-                                                                    iHandler->getOrigNOCCstart(irrep4) + origStart4 + origIndex4 );
+                                                = VMAT_ORIG->get( irrep1, irrep2, irrep3, irrep4, origStart1 + origIndex1,
+                                                                                                  origStart2 + origIndex2,
+                                                                                                  origStart3 + origIndex3,
+                                                                                                  origStart4 + origIndex4 );
                                           }
                                        }
                                     }
@@ -821,16 +816,16 @@ void CheMPS2::DMRGSCFVmatRotations::fillVmatDMRGBlockWise(Hamiltonian * HamDMRG,
                                  const int dmrgStop1  = min( (dmrgBlock1 + 1) * blocksizeDMRG1 , linsizeDMRG1 );
                                  const int dmrgSize1  = max( dmrgStop1 - dmrgStart1 , 0 );
                                  
-                                 //Copy HamOrig->getVmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
+                                 //Copy Vmat(i,j,k,l) for the particular ORIGINAL block into mem2_ijkl
                                  for (int origIndex1=0; origIndex1<origSize1; origIndex1++){
                                     for (int origIndex2=0; origIndex2<origSize2; origIndex2++){
                                        for (int origIndex3=0; origIndex3<origSize3; origIndex3++){
                                           for (int origIndex4=0; origIndex4<origSize4; origIndex4++){
                                              mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
-                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart(irrep1) + origStart1 + origIndex1,
-                                                                    iHandler->getOrigNOCCstart(irrep2) + origStart2 + origIndex2,
-                                                                    iHandler->getOrigNOCCstart(irrep3) + origStart3 + origIndex3,
-                                                                    iHandler->getOrigNOCCstart(irrep4) + origStart4 + origIndex4 );
+                                                = VMAT_ORIG->get( irrep1, irrep2, irrep3, irrep4, origStart1 + origIndex1,
+                                                                                                  origStart2 + origIndex2,
+                                                                                                  origStart3 + origIndex3,
+                                                                                                  origStart4 + origIndex4 );
                                           }
                                        }
                                     }
@@ -1044,16 +1039,16 @@ void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEIBlockWise(DMRGSCFintegrals * t
                                  const int targetStop1  = min( (targetBlock1 + 1) * blocksizeOA1 , linsizeOA1 );
                                  const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
                               
-                                 //Copy HamOrig->getVmat(c1,a3,c2,a4) for the particular ORIGINAL block into mem2[c1,c2,a3,a4]
+                                 //Copy Vmat(c1,a3,c2,a4) for the particular ORIGINAL block into mem2[c1,c2,a3,a4]
                                  for (int origIndex1 = 0; origIndex1 < origSize1; origIndex1++){
                                     for (int origIndex2 = 0; origIndex2 < origSize2; origIndex2++){
                                        for (int origIndex3 = 0; origIndex3 < origSize3; origIndex3++){
                                           for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
                                              mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
-                                                = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + origStart1 + origIndex1,
-                                                                    iHandler->getOrigNOCCstart( Ia3 ) + origStart3 + origIndex3,
-                                                                    iHandler->getOrigNOCCstart( Ic2 ) + origStart2 + origIndex2,
-                                                                    iHandler->getOrigNOCCstart( Ia4 ) + origStart4 + origIndex4 );
+                                                = VMAT_ORIG->get( Ic1, Ia3, Ic2, Ia4, origStart1 + origIndex1,
+                                                                                      origStart3 + origIndex3,
+                                                                                      origStart2 + origIndex2,
+                                                                                      origStart4 + origIndex4 );
                                           }
                                        }
                                     }
@@ -1265,16 +1260,16 @@ void CheMPS2::DMRGSCFVmatRotations::fillRotatedTEIBlockWise(DMRGSCFintegrals * t
                               const int targetStop1  = min( (targetBlock1 + 1) * blocksizeOA1 , linsizeOA1 );
                               const int targetSize1  = max( targetStop1 - targetStart1 , 0 );
                            
-                              //Copy HamOrig->getVmat(c1,c2,v3,v4) for the particular ORIGINAL block into mem2[c1,c2,v3,v4]
+                              //Copy Vmat(c1,c2,v3,v4) for the particular ORIGINAL block into mem2[c1,c2,v3,v4]
                               for (int origIndex1 = 0; origIndex1 < origSize1; origIndex1++){
                                  for (int origIndex2 = 0; origIndex2 < origSize2; origIndex2++){
                                     for (int origIndex3 = 0; origIndex3 < origSize3; origIndex3++){
                                        for (int origIndex4 = 0; origIndex4 < origSize4; origIndex4++){
                                           mem2[ origIndex1 + origSize1 * (origIndex2 + origSize2 * (origIndex3 + origSize3 * origIndex4) ) ]
-                                             = HamOrig->getVmat( iHandler->getOrigNOCCstart( Ic1 ) + origStart1 + origIndex1,
-                                                                 iHandler->getOrigNOCCstart( Ic2 ) + origStart2 + origIndex2,
-                                                                 iHandler->getOrigNOCCstart( Iv3 ) + origStart3 + origIndex3,
-                                                                 iHandler->getOrigNOCCstart( Iv4 ) + origStart4 + origIndex4 );
+                                             = VMAT_ORIG->get( Ic1, Ic2, Iv3, Iv4, origStart1 + origIndex1,
+                                                                                   origStart2 + origIndex2,
+                                                                                   origStart3 + origIndex3,
+                                                                                   origStart4 + origIndex4 );
                                        }
                                     }
                                  }
