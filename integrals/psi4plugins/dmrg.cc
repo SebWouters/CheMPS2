@@ -120,6 +120,12 @@ int read_options(std::string name, Options &options)
         
         /*- CASPT2 Imaginary shift -*/
         options.add_double("DMRG_IMAG_SHIFT", 0.0);
+        
+        /*- DMRG-CI or converged DMRG-SCF orbitals in molden format -*/
+        options.add_bool("DMRG_MOLDEN", false);
+        
+        /*- Print out the density matrix in the AO basis -*/
+        options.add_bool("DMRG_DENSITY_AO", false);
 
     }
 
@@ -248,6 +254,59 @@ void buildQmatACT( CheMPS2::DMRGSCFmatrix * theQmatACT, CheMPS2::DMRGSCFindices 
     }
     buildJK( MO_RDM, MO_JK, Cmat, myJK, wfn );
     copyPSIMXtoCHEMPS2MX( MO_JK, iHandler, theQmatACT );
+
+}
+
+
+SharedMatrix print_rdm_ao( CheMPS2::DMRGSCFindices * idx, double * DMRG1DM, SharedMatrix MO_RDM, SharedMatrix Cmat, boost::shared_ptr<Wavefunction> wfn ){
+
+    const int num_irreps = idx->getNirreps();
+    const int tot_dmrg   = idx->getDMRGcumulative( num_irreps );
+    MO_RDM->zero();
+
+    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+
+        const int NOCC  = idx->getNOCC( irrep );
+        const int NACT  = idx->getNDMRG( irrep );
+        const int shift = idx->getDMRGcumulative( irrep );
+
+        for ( int occ = 0; occ < NOCC; occ++ ){
+            MO_RDM->set( irrep, occ, occ, 2.0 );
+        }
+
+        for ( int orb1 = 0; orb1 < NACT; orb1++ ){
+            for ( int orb2 = orb1; orb2 < NACT; orb2++ ){
+                const double value = 0.5 * ( DMRG1DM[ shift + orb1 + tot_dmrg * ( shift + orb2 ) ] + DMRG1DM[ shift + orb2 + tot_dmrg * ( shift + orb1 ) ] );
+                MO_RDM->set( irrep, NOCC + orb1, NOCC + orb2, value );
+                MO_RDM->set( irrep, NOCC + orb2, NOCC + orb1, value );
+            }
+        }
+    }
+
+    int * nmopi = wfn->nmopi();
+    int * nsopi = wfn->nsopi();
+    const int nao = wfn->aotoso()->rowspi( 0 );
+
+    SharedMatrix tfo;       tfo = SharedMatrix( new Matrix( num_irreps, nao, nmopi ) );
+    SharedMatrix work;     work = SharedMatrix( new Matrix( num_irreps, nao, nmopi ) );
+    SharedMatrix AO_RDM; AO_RDM = SharedMatrix( new Matrix( nao, nao ) );
+
+     tfo->gemm( false, false, 1.0, wfn->aotoso(), Cmat,   0.0 );
+    work->gemm( false, false, 1.0, tfo,           MO_RDM, 0.0 );
+
+    for ( int ao_row = 0; ao_row < nao; ao_row++ ){
+        for ( int ao_col = 0; ao_col < nao; ao_col++ ){
+            double value = 0.0;
+            for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+                for ( int mo = 0; mo < nmopi[ irrep ]; mo++ ){
+                    value += work->get( irrep, ao_row, mo ) * tfo->get( irrep, ao_col, mo );
+                }
+            }
+            AO_RDM->set( 0, ao_row, ao_col, value );
+        }
+    }
+
+    return AO_RDM;
 
 }
 
@@ -480,6 +539,8 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     const bool dmrg_caspt2            = options.get_bool("DMRG_CASPT2");
     const double dmrg_ipea            = options.get_double("DMRG_IPEA");
     const double dmrg_imag_shift      = options.get_double("DMRG_IMAG_SHIFT");
+    const bool dmrg_molden            = options.get_bool("DMRG_MOLDEN");
+    const bool dmrg_density_ao        = options.get_bool("DMRG_DENSITY_AO");
     const int dmrg_num_vec_diis       = CheMPS2::DMRGSCF_numDIISvecs;
     const std::string unitaryname     = psi::get_writer_file_prefix( wfn->molecule()->name() ) + ".unitary.h5";
     const std::string diisname        = psi::get_writer_file_prefix( wfn->molecule()->name() ) + ".DIIS.h5";
@@ -888,6 +949,75 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     Process::environment.globals["CURRENT ENERGY"] = Energy;
     Process::environment.globals["DMRGSCF ENERGY"] = Energy;
 
+    if ((( dmrg_molden ) || ( dmrg_caspt2 )) && ( nIterations > 0 )){
+
+        (*outfile) << "################################################" << endl;
+        (*outfile) << "###                                          ###" << endl;
+        (*outfile) << "###   Rotation to pseudocanonical orbitals   ###" << endl;
+        (*outfile) << "###                                          ###" << endl;
+        (*outfile) << "################################################" << endl;
+        CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
+        CheMPS2::CASSCF::block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
+        CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM );
+        CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
+        CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM );
+        update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+        buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
+        buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
+        buildQmatACT( theQmatACT, iHandler, DMRG1DM, work1, work2, wfn->Ca(), myJK, wfn );
+        CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
+
+    }
+
+    if (( dmrg_molden ) && ( nIterations > 0 )){
+
+        SharedVector occupation = SharedVector( new Vector( nirrep, orbspi ) );
+        for ( int h = 0; h < nirrep; h++ ){
+            const int NOCC = iHandler->getNOCC( h );
+            const int NACT = iHandler->getNDMRG( h );
+            const int NVIR = iHandler->getNVIRT( h );
+            for ( int occ = 0; occ < NOCC; occ++ ){
+               occupation->set( h, occ, 1.0 );
+            }
+            for ( int act = 0; act < NACT; act++ ){
+                const double rdmvalue = DMRG1DM[ ( 1 + nOrbDMRG ) * ( iHandler->getDMRGcumulative( h ) + act ) ];
+                occupation->set( h, NOCC + act, 0.5 * rdmvalue );
+            }
+            for ( int vir = 0; vir < NVIR; vir++ ){
+                occupation->set( h, NOCC + NACT + vir, 0.0 );
+            }
+        }
+
+        SharedVector sp_energies = SharedVector( new Vector( nirrep, orbspi ) );
+        for ( int h = 0; h < nirrep; h++ ){
+            const int NOCC = iHandler->getNOCC( h );
+            const int NACT = iHandler->getNDMRG( h );
+            const int NVIR = iHandler->getNVIRT( h );
+            for ( int orb = 0; orb < orbspi[ h ]; orb++ ){
+               sp_energies->set( h, orb, theFmatrix->get( h, orb, orb ) );
+            }
+        }
+
+        boost::shared_ptr<MoldenWriter> molden( new MoldenWriter( wfn ) );
+        std::string filename = get_writer_file_prefix( wfn->molecule()->name() ) + ".pseudocanonical.molden";
+        outfile->Printf( "Write molden file to %s. \n", filename.c_str() );
+        molden->write( filename, wfn->Ca(), wfn->Ca(), sp_energies, sp_energies, occupation, occupation );
+
+    }
+
+    if ( dmrg_density_ao ){
+
+        (*outfile) << "############################" << endl;
+        (*outfile) << "###                      ###" << endl;
+        (*outfile) << "###   DMRG 1-RDM in AO   ###" << endl;
+        (*outfile) << "###                      ###" << endl;
+        (*outfile) << "############################" << endl;
+        (*outfile) << "Please check the molden file for AO basis function information." << endl;
+        SharedMatrix AO_RDM = print_rdm_ao( iHandler, DMRG1DM, work1, wfn->Ca(), wfn );
+        AO_RDM->print("outfile");
+
+    }
+
     if (( dmrg_caspt2 ) && ( nIterations > 0 )){
 
         (*outfile) << "###########################" << endl;
@@ -896,16 +1026,6 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
         (*outfile) << "###                     ###" << endl;
         (*outfile) << "###########################" << endl;
 
-        // Tmatrix, Qocc, and Qact are built in the while loop above
-        outfile->Printf("Rotating to pseudocanonical orbitals");
-        CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-        CheMPS2::CASSCF::block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
-        CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM );
-        CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
-
-        update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
-        buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
-        buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
         buildHamDMRG( ints, Aorbs_ptr, theTmatrix, theQmatOCC, iHandler, HamDMRG, psio, wfn );
 
         const int tot_dmrg_power6 = nOrbDMRG_pow4 * nOrbDMRG * nOrbDMRG;

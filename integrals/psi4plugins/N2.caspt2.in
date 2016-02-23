@@ -37,6 +37,9 @@ set dmrg dmrg_state_avg       false
 set dmrg dmrg_active_space    INPUT # INPUT; NO; LOC
 set dmrg dmrg_loc_random      false
 
+set dmrg dmrg_molden          true  # Converged DMRG-SCF pseudocanonical orbitals
+set dmrg dmrg_density_ao      true  # Converged DMRG-SCF density in the AO basis
+
 set dmrg dmrg_caspt2          true
 set dmrg dmrg_ipea            0.00
 set dmrg dmrg_imag_shift      0.00
