@@ -30,5 +30,8 @@ set dmrg dmrg_chkpt           false
 
 set dmrg dmrg_max_iter        1
 
+set dmrg dmrg_molden          true  # DMRG-CI pseudocanonical orbitals
+set dmrg dmrg_density_ao      true  # DMRG-CI density in the AO basis
+
 energy('dmrg')
 
