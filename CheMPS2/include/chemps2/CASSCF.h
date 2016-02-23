@@ -378,6 +378,9 @@ namespace CheMPS2{
          //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
          void PrintCoeff_C2(DMRG * theDMRG);
          
+         //Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
+         void coeff_fe2( DMRG * theDMRG );
+         
    };
 }
 

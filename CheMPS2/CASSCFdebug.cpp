@@ -152,4 +152,50 @@ void CheMPS2::CASSCF::PrintCoeff_C2(DMRG * theDMRG){
 
 }
 
+void CheMPS2::CASSCF::coeff_fe2( DMRG * theDMRG ){
+
+   /*
+      For the iron dimer:
+         int NOCC[]  = {  5,  0,  2,  2,  0,  5,  2,  2 }; // 36 core electrons
+         int NDMRG[] = {  6,  2,  3,  3,  2,  6,  3,  3 }; // 16 active space electrons, 28 active space orbitals
+   */
+
+   assert( nOrbDMRG == 28 );
+
+   // The largest component in ^9 Sigma_g^-
+   int largest[] = { 2, 2, 1, 0, 0, 0, // Ag
+                     1, 0,             // B1g
+                     1, 0, 0,          // B2g
+                     1, 0, 0,          // B3g
+                     1, 0,             // Au
+                     1, 1, 1, 0, 0, 0, // B1u
+                     2, 0, 0,          // B2u
+                     2, 0, 0 };        // B3u
+   // B1g^1 B2g^2 B3g^1 --> Ag^1 B2u^2 excitation
+   int coeff1[]  = { 2, 2, 2, 0, 0, 0, // Ag
+                     0, 0,             // B1g
+                     0, 0, 0,          // B2g
+                     0, 0, 0,          // B3g
+                     1, 0,             // Au
+                     1, 1, 1, 0, 0, 0, // B1u
+                     2, 2, 0,          // B2u = pi_y^2
+                     2, 0, 0 };        // B3u
+   // B1g^1 B2g^2 B3g^1 --> Ag^1 B3u^2 excitation
+   int coeff2[]  = { 2, 2, 2, 0, 0, 0, // Ag
+                     0, 0,             // B1g
+                     0, 0, 0,          // B2g
+                     0, 0, 0,          // B3g
+                     1, 0,             // Au
+                     1, 1, 1, 0, 0, 0, // B1u
+                     2, 0, 0,          // B2u
+                     2, 2, 0 };        // B3u = pi_x^2
+
+   const double value0 = theDMRG->getSpecificCoefficient( largest );
+   const double value1 = theDMRG->getSpecificCoefficient( coeff1  );
+   const double value2 = theDMRG->getSpecificCoefficient( coeff2  );
+   cout << "Coeff of main contribution     = " << value0 << endl;
+   cout << "Coeff of | pi_y^2 > excitation = " << value1 << endl;
+   cout << "Coeff of | pi_x^2 > excitation = " << value2 << endl;
+
+}
 
