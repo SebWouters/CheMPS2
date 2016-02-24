@@ -171,31 +171,31 @@ void CheMPS2::CASSCF::coeff_fe2( DMRG * theDMRG ){
                      1, 1, 1, 0, 0, 0, // B1u
                      2, 0, 0,          // B2u
                      2, 0, 0 };        // B3u
-   // B1g^1 B2g^2 B3g^1 --> Ag^1 B2u^2 excitation
-   int coeff1[]  = { 2, 2, 2, 0, 0, 0, // Ag
-                     0, 0,             // B1g
-                     0, 0, 0,          // B2g
-                     0, 0, 0,          // B3g
+
+   int coeff1[]  = { 2, 1, 1, 0, 0, 0, // Ag
+                     1, 0,             // B1g
+                     2, 0, 0,          // B2g
+                     1, 0, 0,          // B3g
                      1, 0,             // Au
-                     1, 1, 1, 0, 0, 0, // B1u
-                     2, 2, 0,          // B2u = pi_y^2
-                     2, 0, 0 };        // B3u
-   // B1g^1 B2g^2 B3g^1 --> Ag^1 B3u^2 excitation
-   int coeff2[]  = { 2, 2, 2, 0, 0, 0, // Ag
-                     0, 0,             // B1g
-                     0, 0, 0,          // B2g
-                     0, 0, 0,          // B3g
-                     1, 0,             // Au
-                     1, 1, 1, 0, 0, 0, // B1u
+                     2, 1, 1, 0, 0, 0, // B1u
                      2, 0, 0,          // B2u
-                     2, 2, 0 };        // B3u = pi_x^2
+                     1, 0, 0 };        // B3u
+
+   int coeff2[]  = { 2, 1, 1, 0, 0, 0, // Ag
+                     1, 0,             // B1g
+                     1, 0, 0,          // B2g
+                     2, 0, 0,          // B3g
+                     1, 0,             // Au
+                     2, 1, 1, 0, 0, 0, // B1u
+                     1, 0, 0,          // B2u
+                     2, 0, 0 };        // B3u
 
    const double value0 = theDMRG->getSpecificCoefficient( largest );
    const double value1 = theDMRG->getSpecificCoefficient( coeff1  );
    const double value2 = theDMRG->getSpecificCoefficient( coeff2  );
-   cout << "Coeff of main contribution     = " << value0 << endl;
-   cout << "Coeff of | pi_y^2 > excitation = " << value1 << endl;
-   cout << "Coeff of | pi_x^2 > excitation = " << value2 << endl;
+   cout << "Coeff of main contribution   ^9 Sigma_g^- = " << value0 << endl;
+   cout << "Coeff of | pi_x > excitation ^9 Sigma_g^- = " << value1 << endl;
+   cout << "Coeff of | pi_y > excitation ^9 Sigma_g^- = " << value2 << endl;
 
 }
 
