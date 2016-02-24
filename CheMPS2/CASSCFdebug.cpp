@@ -162,40 +162,27 @@ void CheMPS2::CASSCF::coeff_fe2( DMRG * theDMRG ){
 
    assert( nOrbDMRG == 28 );
 
-   // The largest component in ^9 Sigma_g^-
-   int largest[] = { 2, 2, 1, 0, 0, 0, // Ag
-                     1, 0,             // B1g
-                     1, 0, 0,          // B2g
-                     1, 0, 0,          // B3g
-                     1, 0,             // Au
-                     1, 1, 1, 0, 0, 0, // B1u
-                     2, 0, 0,          // B2u
-                     2, 0, 0 };        // B3u
+   //               Ag                   B1g      B2g         B3g         Au       B1u                  B2u         B3u
+   int coeff0[] = { 2, 2, 1, 0, 0, 0,    1, 0,    1, 0, 0,    1, 0, 0,    1, 0,    1, 1, 1, 0, 0, 0,    2, 0, 0,    2, 0, 0 };
+   int coeff1[] = { 2, 1, 1, 0, 0, 0,    1, 0,    2, 0, 0,    1, 0, 0,    1, 0,    2, 1, 1, 0, 0, 0,    2, 0, 0,    1, 0, 0 };
+   int coeff2[] = { 2, 1, 1, 0, 0, 0,    1, 0,    1, 0, 0,    2, 0, 0,    1, 0,    2, 1, 1, 0, 0, 0,    1, 0, 0,    2, 0, 0 };
 
-   int coeff1[]  = { 2, 1, 1, 0, 0, 0, // Ag
-                     1, 0,             // B1g
-                     2, 0, 0,          // B2g
-                     1, 0, 0,          // B3g
-                     1, 0,             // Au
-                     2, 1, 1, 0, 0, 0, // B1u
-                     2, 0, 0,          // B2u
-                     1, 0, 0 };        // B3u
+   int coeff3[] = { 2, 2, 1, 0, 0, 0,    2, 0,    1, 0, 0,    1, 0, 0,    1, 0,    1, 1, 0, 0, 0, 0,    2, 0, 0,    2, 0, 0 };
+   int coeff4[] = { 2, 1, 1, 0, 0, 0,    2, 0,    2, 0, 0,    1, 0, 0,    1, 0,    2, 1, 0, 0, 0, 0,    2, 0, 0,    1, 0, 0 };
+   int coeff5[] = { 2, 1, 1, 0, 0, 0,    2, 0,    1, 0, 0,    2, 0, 0,    1, 0,    2, 1, 0, 0, 0, 0,    1, 0, 0,    2, 0, 0 };
 
-   int coeff2[]  = { 2, 1, 1, 0, 0, 0, // Ag
-                     1, 0,             // B1g
-                     1, 0, 0,          // B2g
-                     2, 0, 0,          // B3g
-                     1, 0,             // Au
-                     2, 1, 1, 0, 0, 0, // B1u
-                     1, 0, 0,          // B2u
-                     2, 0, 0 };        // B3u
-
-   const double value0 = theDMRG->getSpecificCoefficient( largest );
-   const double value1 = theDMRG->getSpecificCoefficient( coeff1  );
-   const double value2 = theDMRG->getSpecificCoefficient( coeff2  );
+   const double value0 = theDMRG->getSpecificCoefficient( coeff0 );
+   const double value1 = theDMRG->getSpecificCoefficient( coeff1 );
+   const double value2 = theDMRG->getSpecificCoefficient( coeff2 );
    cout << "Coeff of main contribution   ^9 Sigma_g^- = " << value0 << endl;
    cout << "Coeff of | pi_x > excitation ^9 Sigma_g^- = " << value1 << endl;
    cout << "Coeff of | pi_y > excitation ^9 Sigma_g^- = " << value2 << endl;
+   const double value3 = theDMRG->getSpecificCoefficient( coeff3 );
+   const double value4 = theDMRG->getSpecificCoefficient( coeff4 );
+   const double value5 = theDMRG->getSpecificCoefficient( coeff5 );
+   cout << "Coeff of main contribution   ^7 Delta_u   = " << value3 << endl;
+   cout << "Coeff of | pi_x > excitation ^7 Delta_u   = " << value4 << endl;
+   cout << "Coeff of | pi_y > excitation ^7 Delta_u   = " << value5 << endl;
 
 }
 

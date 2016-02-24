@@ -572,7 +572,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta, const bool mpi_
       }
       // 2Sz can be -Prob->2S() ; -Prob->2S()+2 ; -Prob->2S()+4 ; ... ; Prob->2S()
       if ( ( Prob->gTwoS() < twoSz ) || ( twoSz < -Prob->gTwoS() ) || ( ( Prob->gTwoS() - twoSz ) % 2 != 0 ) ){
-         cout << "DMRG::getFCIcoefficient : 2Sdesired = " << Prob->gTwoS() << " and Sz in alpha and beta strings = " << twoSz << endl;
+         cout << "DMRG::getFCIcoefficient : 2Sdesired = " << Prob->gTwoS() << " and 2Sz in alpha and beta strings = " << twoSz << endl;
          return 0.0;
       }
       if ( Prob->gIrrep() != iTot ){
