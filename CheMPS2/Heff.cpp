@@ -28,10 +28,11 @@
 #include "Lapack.h"
 #include "MPIchemps2.h"
 
-CheMPS2::Heff::Heff(const SyBookkeeper * denBKIn, const Problem * ProbIn){
+CheMPS2::Heff::Heff(const SyBookkeeper * denBKIn, const Problem * ProbIn, const double dvdson_rtol_in){
 
    denBK = denBKIn;
    Prob = ProbIn;
+   dvdson_rtol = dvdson_rtol_in;
 
 }
 
@@ -334,7 +335,8 @@ double CheMPS2::Heff::SolveDAVIDSON_main(Sobject * denS, TensorL *** Ltensors, T
 
    Davidson deBoskabouter( veclength, CheMPS2::DAVIDSON_NUM_VEC,
                                       CheMPS2::DAVIDSON_NUM_VEC_KEEP,
-                                      CheMPS2::DAVIDSON_DMRG_RTOL,
+                                      // CheMPS2::DAVIDSON_DMRG_RTOL,
+                                      dvdson_rtol,
                                       CheMPS2::DAVIDSON_PRECOND_CUTOFF, CheMPS2::HEFF_debugPrint );
    double ** whichpointers = new double*[2];
 

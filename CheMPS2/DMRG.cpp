@@ -101,7 +101,7 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
 
 void CheMPS2::DMRG::setupBookkeeperAndMPS(){
    
-   denBK = new SyBookkeeper(Prob, OptScheme->getD(0));
+   denBK = new SyBookkeeper(Prob, OptScheme->get_D(0));
    assert( denBK->IsPossible() );
    
    std::stringstream sstream;
@@ -213,12 +213,12 @@ double CheMPS2::DMRG::Solve(){
       const bool am_i_master = true;
    #endif
    
-   for (int instruction=0; instruction < OptScheme->getNInstructions(); instruction++){
+   for (int instruction=0; instruction < OptScheme->get_number(); instruction++){
    
       int nIterations = 0;
-      double EnergyPrevious = Energy + 10 * OptScheme->getEconv(instruction); //Guarantees that there's always at least 1 left-right sweep
+      double EnergyPrevious = Energy + 10 * OptScheme->get_energy_conv(instruction); //Guarantees that there's always at least 1 left-right sweep
       
-      while ( (fabs(Energy-EnergyPrevious) > OptScheme->getEconv(instruction) ) && ( nIterations < OptScheme->getMaxSweeps(instruction) )){
+      while ( (fabs(Energy-EnergyPrevious) > OptScheme->get_energy_conv(instruction) ) && ( nIterations < OptScheme->get_max_sweeps(instruction) )){
       
          for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
          num_double_write_disk = 0;
@@ -271,7 +271,7 @@ double CheMPS2::DMRG::Solve(){
       
       if ( am_i_master ){
          cout << "***  Information on completed instruction " << instruction << ":" << endl;
-         cout << "***     The reduced virtual dimension DSU(2)               = " << OptScheme->getD(instruction) << endl;
+         cout << "***     The reduced virtual dimension DSU(2)               = " << OptScheme->get_D(instruction) << endl;
          cout << "***     Minimum energy encountered during all instructions = " << TotalMinEnergy << endl;
          cout << "***     Minimum energy encountered during the last sweep   = " << LastMinEnergy << endl;
          cout << "***     Maximum discarded weight during the last sweep     = " << MaxDiscWeightLastSweep << endl;
@@ -287,7 +287,8 @@ double CheMPS2::DMRG::Solve(){
 double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const bool am_i_master){
 
    double Energy = 0.0;
-   double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
+   const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
+   const double dvdson_rtol = OptScheme->get_dvdson_rtol( instruction );
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
    struct timeval start, end;
@@ -303,7 +304,7 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
       
       //Feed everything to the solver
       gettimeofday(&start, NULL);
-      Heff Solver(denBK, Prob);
+      Heff Solver(denBK, Prob, dvdson_rtol);
       double ** VeffTilde = NULL;
       if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
       //Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.
@@ -317,9 +318,9 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
       
       //Decompose the S-object
       gettimeofday(&start, NULL);
-      if (( NoiseLevel>0.0 ) && ( am_i_master )){ denS->addNoise(NoiseLevel); }
+      if (( noise_level > 0.0 ) && ( am_i_master )){ denS->addNoise( noise_level ); }
       //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->getD(instruction),false,change);
+      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->get_D(instruction),false,change);
       delete denS;
       if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
       gettimeofday(&end, NULL);
@@ -346,7 +347,8 @@ double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const 
 double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const bool am_i_master){
 
    double Energy=0.0;
-   double NoiseLevel = OptScheme->getNoisePrefactor(instruction) * MaxDiscWeightLastSweep;
+   const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
+   const double dvdson_rtol = OptScheme->get_dvdson_rtol( instruction );
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
    struct timeval start, end;
@@ -362,7 +364,7 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
       
       //Feed everything to solver
       gettimeofday(&start, NULL);
-      Heff Solver(denBK, Prob);
+      Heff Solver(denBK, Prob, dvdson_rtol);
       double ** VeffTilde = NULL;
       if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
       //Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.
@@ -376,9 +378,9 @@ double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const
       
       //Decompose the S-object
       gettimeofday(&start, NULL);
-      if (( NoiseLevel>0.0 ) && ( am_i_master )){ denS->addNoise(NoiseLevel); }
+      if (( noise_level > 0.0 ) && ( am_i_master )){ denS->addNoise( noise_level ); }
       //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->getD(instruction),true,change);
+      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->get_D(instruction),true,change);
       delete denS;
       if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
       gettimeofday(&end, NULL);

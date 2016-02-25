@@ -59,7 +59,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    const int edgeindex = L-2;
    Sobject * denS = new Sobject(edgeindex,denBK->gIrrep(edgeindex),denBK->gIrrep(edgeindex+1),denBK);
    denS->Join(MPS[edgeindex],MPS[edgeindex+1]); //Each MPI process performs this task.
-   Heff Solver(denBK, Prob);
+   Heff Solver( denBK, Prob, OptScheme->get_dvdson_rtol( OptScheme->get_number() - 1 ) );
    double Energy = 0.0;
    double ** VeffTilde = NULL;
    if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
@@ -69,7 +69,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    Energy += Prob->gEconst();
    if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
    //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-   denS->Split(MPS[edgeindex],MPS[edgeindex+1],OptScheme->getD(OptScheme->getNInstructions()-1),true,true);
+   denS->Split(MPS[edgeindex],MPS[edgeindex+1],OptScheme->get_D( OptScheme->get_number() - 1 ),true,true);
    delete denS;
    gettimeofday(&start_part, NULL);
    if ( am_i_master ){

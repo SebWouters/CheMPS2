@@ -45,8 +45,9 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param denBKIn The SyBookkeeper to get the dimensions
-             \param ProbIn The Problem that contains the Hamiltonian */
-         Heff(const SyBookkeeper * denBKIn, const Problem * ProbIn);
+             \param ProbIn The Problem that contains the Hamiltonian
+             \param dvdson_rtol_in The residual tolerance for the DMRG Davidson iterations */
+         Heff(const SyBookkeeper * denBKIn, const Problem * ProbIn, const double dvdson_rtol_in);
          
          //! Destructor
          virtual ~Heff();
@@ -80,6 +81,9 @@ namespace CheMPS2{
          
          //The Problem (and hence Hamiltonian)
          const Problem * Prob;
+         
+         //The Davidson residual tolerance
+         double dvdson_rtol;
       
          //Do Heff * memS -> memHeff
          void makeHeff(double * memS, double * memHeff, const Sobject * denS, TensorL *** Ltensors, TensorOperator **** Atensors, TensorOperator **** Btensors, TensorOperator **** Ctensors, TensorOperator **** Dtensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorQ *** Qtensors, TensorX ** Xtensors, int nLower, double ** VeffTilde) const;
