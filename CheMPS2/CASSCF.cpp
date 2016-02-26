@@ -45,10 +45,10 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc
    num_irreps = SymmInfo.getNumberOfIrreps();
 
    cout << "DOCC = [ ";
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ cout << docc[ irrep ] << " , "; }
+   for ( int irrep = 0; irrep < num_irreps-1; irrep++ ){ cout << docc[ irrep ] << " , "; }
    cout << docc[ num_irreps - 1 ] << " ]" << endl;
    cout << "SOCC = [ ";
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ cout << socc[ irrep ] << " , "; }
+   for ( int irrep = 0; irrep < num_irreps-1; irrep++ ){ cout << socc[ irrep ] << " , "; }
    cout << socc[ num_irreps - 1 ] << " ]" << endl;
 
    iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc_in, ndmrg_in, nvirt_in );
