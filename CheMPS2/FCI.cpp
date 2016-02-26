@@ -2219,8 +2219,8 @@ void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, cons
    // Check whether some stuff is OK
    assert( numLeft  > 0 );
    assert( numRight > 0 );
-   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ unsigned int orbl = orbsLeft[  cnt ]; assert((orbl < L) && (orbl >= 0)); }
-   for (unsigned int cnt = 0; cnt < numRight; cnt++){ unsigned int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
+   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ int orbl = orbsLeft[  cnt ]; assert((orbl < L) && (orbl >= 0)); }
+   for (unsigned int cnt = 0; cnt < numRight; cnt++){ int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
    assert( RePartsGF != NULL );
    assert( ImPartsGF != NULL );
    for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
@@ -2310,8 +2310,8 @@ void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const
    // Check whether some stuff is OK
    assert( numLeft  > 0 );
    assert( numRight > 0 );
-   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ unsigned int orbl = orbsLeft [ cnt ]; assert((orbl < L) && (orbl >= 0)); }
-   for (unsigned int cnt = 0; cnt < numRight; cnt++){ unsigned int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
+   for (unsigned int cnt = 0; cnt < numLeft;  cnt++){ int orbl = orbsLeft [ cnt ]; assert((orbl < L) && (orbl >= 0)); }
+   for (unsigned int cnt = 0; cnt < numRight; cnt++){ int orbr = orbsRight[ cnt ]; assert((orbr < L) && (orbr >= 0)); }
    assert( RePartsGF != NULL );
    assert( ImPartsGF != NULL );
    for ( unsigned int counter = 0; counter < numLeft * numRight; counter++ ){
