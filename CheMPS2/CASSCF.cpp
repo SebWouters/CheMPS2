@@ -51,6 +51,16 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc
    for ( int irrep = 0; irrep < num_irreps-1; irrep++ ){ cout << socc[ irrep ] << " , "; }
    cout << socc[ num_irreps - 1 ] << " ]" << endl;
 
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      const int norb_in  = nocc_in[ irrep ] + ndmrg_in[ irrep ] + nvirt_in[ irrep ];
+      const int norb_ham = VMAT_ORIG->get_irrep_size( irrep );
+      if ( norb_ham != norb_in ){
+         cout << "CASSCF::CASSCF : nocc[" << irrep << "] + ndmrg[" << irrep << "] + nvirt[" << irrep << "] = " << norb_in
+              << " and in the Hamiltonian norb[" << irrep << "] = " << norb_ham << "." << endl;
+         assert( norb_ham == norb_in );
+      }
+   }
+
    iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc_in, ndmrg_in, nvirt_in );
    unitary  = new DMRGSCFunitary( iHandler );
    theDIIS = NULL;
