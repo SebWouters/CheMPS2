@@ -171,6 +171,9 @@ void CheMPS2::CASSCF::coeff_fe2( DMRG * theDMRG ){
    int coeff4[] = { 2, 1, 1, 0, 0, 0,    2, 0,    2, 0, 0,    1, 0, 0,    1, 0,    2, 1, 0, 0, 0, 0,    2, 0, 0,    1, 0, 0 };
    int coeff5[] = { 2, 1, 1, 0, 0, 0,    2, 0,    1, 0, 0,    2, 0, 0,    1, 0,    2, 1, 0, 0, 0, 0,    1, 0, 0,    2, 0, 0 };
 
+   int coeff6[] = { 2, 2, 1, 0, 0, 0,    1, 0,    1, 0, 0,    1, 0, 0,    1, 0,    2, 1, 1, 0, 0, 0,    2, 0, 0,    2, 0, 0 };
+   int coeff7[] = { 2, 2, 1, 0, 0, 0,    1, 0,    1, 0, 0,    1, 0, 0,    1, 0,    1, 1, 0, 0, 0, 0,    2, 0, 0,    2, 0, 0 };
+
    const double value0 = theDMRG->getSpecificCoefficient( coeff0 );
    const double value1 = theDMRG->getSpecificCoefficient( coeff1 );
    const double value2 = theDMRG->getSpecificCoefficient( coeff2 );
@@ -183,6 +186,10 @@ void CheMPS2::CASSCF::coeff_fe2( DMRG * theDMRG ){
    cout << "Coeff of main contribution   ^7 Delta_u   = " << value3 << endl;
    cout << "Coeff of | pi_x > excitation ^7 Delta_u   = " << value4 << endl;
    cout << "Coeff of | pi_y > excitation ^7 Delta_u   = " << value5 << endl;
+   const double value6 = theDMRG->getSpecificCoefficient( coeff6 );
+   const double value7 = theDMRG->getSpecificCoefficient( coeff7 );
+   cout << "Coeff of main contrib  anion ^8 Sigma_u^- = " << value6 << endl;
+   cout << "Coeff of main contrib cation ^8 Sigma_u^- = " << value7 << endl;
 
 }
 
