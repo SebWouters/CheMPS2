@@ -52,13 +52,15 @@ cdef class PyConvergenceScheme:
     def setInstruction(self, int instruction, int D, double Econv, int nMax, double noisePrefactor):
         self.thisptr.setInstruction(instruction, D, Econv, nMax, noisePrefactor)
     def getD(self, int instruction):
-        return self.thisptr.getD(instruction)
+        return self.thisptr.get_D(instruction)
     def getEconv(self, int instruction):
-        return self.thisptr.getEconv(instruction)
+        return self.thisptr.get_energy_conv(instruction)
     def getMaxSweeps(self, int instruction):
-        return self.thisptr.getMaxSweeps(instruction)
+        return self.thisptr.get_max_sweeps(instruction)
     def getNoisePrefactor(self, int instruction):
-        return self.thisptr.getNoisePrefactor(instruction)
+        return self.thisptr.get_noise_prefactor(instruction)
+    def getDavidsonRTOL(self, int instruction):
+        return self.thisptr.get_dvdson_rtol(instruction)
 
 cdef class PyHamiltonian:
     cdef Ham.Hamiltonian * thisptr
