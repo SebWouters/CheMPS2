@@ -22,6 +22,7 @@
 
 #include "Options.h"
 #include "DMRGSCFindices.h"
+#include "DMRGSCFmatrix.h"
 #include "DIIS.h"
 
 namespace CheMPS2{
@@ -66,13 +67,13 @@ namespace CheMPS2{
     \f]
     with \f$\theta \in \left[ -\pi, \pi \right]\f$. The matrix \f$\log(\mathbf{D})\f$ can hence be easily calculated blockwise. The logarithm of \f$\mathbf{U}\f$ is then obtained as \f$\log(\mathbf{U}) = \mathbf{V}_{S} \log(\mathbf{D}) \mathbf{V}_{S}^T\f$. It is calculated by the function CheMPS2::DMRGSCFunitary::getLog.
 */
-   class DMRGSCFunitary{
+   class DMRGSCFunitary : public DMRGSCFmatrix{
 
       public:
       
          //! Constructor
-         /** \param iHandlerIn The DMRGSCF indices */
-         DMRGSCFunitary(DMRGSCFindices * iHandlerIn);
+         /** \param iHandler The DMRGSCF indices */
+         DMRGSCFunitary( const DMRGSCFindices * iHandler );
          
          //! Destructor
          virtual ~DMRGSCFunitary();
@@ -84,23 +85,12 @@ namespace CheMPS2{
          //! Get the first Hamiltonian index corresponding to linearindex
          /** \param linearindex The linear index of the x-parametrization
              \return The first Hamiltonian index corresponding to linearindex */
-         int getFirstIndex(const int linearindex) const;
+         int getFirstIndex( const int linearindex ) const;
          
          //! Get the second Hamiltonian index corresponding to linearindex
          /** \param linearindex The linear index of the x-parametrization
              \return The second Hamiltonian index corresponding to linearindex */
-         int getSecondIndex(const int linearindex) const;
-         
-         //! Get the start index for a certain block in the x-matrix
-         /** \param irrep The irrep of the block
-             \param geval If geval==0, the first and second indices are DMRG and OCC indices. If geval==1, the first and second indices are VIRT and DMRG indices. If geval==2, the first and second indices are VIRT and OCC indices.
-             \return The start index of the requested block in the x-matrix */
-         int getJumper(const int irrep, const int geval) const;
-         
-         //! Get the unitary rotation for block irrep
-         /** \param irrep The irreducible representation
-             \return Pointer to the desired unitary block */
-         double * getBlock(const int irrep);
+         int getSecondIndex( const int linearindex ) const;
          
          //! Update the unitary transformation
          /** \param workmem1 Work memory of at least 4*max(dim(irrep(Ham)))^2
@@ -108,73 +98,62 @@ namespace CheMPS2{
              \param vector The elements in X
              \param multiply Boolean whether exp(X)*U or exp(X) should become the new U. If multiply==true, U <-- exp(X)*U. If multiply==false, U <-- exp(X).
              \param compact Boolean which indicates how the elements X are stored */
-         void updateUnitary(double * workmem1, double * workmem2, double * vector, const bool multiply, const bool compact);
+         void updateUnitary( double * workmem1, double * workmem2, double * vector, const bool multiply, const bool compact );
          
          //! Rotate the unitary matrix
          /** \param eigenvecs The rotation vectors, in a memory block of size nOrbDMRG^2
              \param work Work memory, with size 2*max(dim(irrep(Ham)))^2 */
-         void rotateActiveSpaceVectors(double * eigenvecs, double * work);
+         void rotateActiveSpaceVectors( double * eigenvecs, double * work );
          
          //! Calculate the two-norm of U^T*U - I
          /** \param work Work memory */
-         void CheckDeviationFromUnitary(double * work) const;
+         void CheckDeviationFromUnitary( double * work ) const;
          
          //! Obtain the logarithm of the unitary matrix
          /** \param vector Where the logarithm should be stored
              \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
-         void getLog(double * vector, double * temp1, double * temp2) const;
-         
-         //! Obtain the logarithm of the current unitary matrix based on the BCH formula
-         /** \param Xprev The logarithm of the previous unitary matrix
-             \param step The update based on the gradient and the Hessian
-             \param Xnew The approximated logarithm of the current unitary matrix (write)
-             \param temp1 Work memory
-             \param temp2 Work memory */
-         void BCH(double * Xprev, double * step, double * Xnew, double * temp1, double * temp2) const;
+         void getLog( double * vector, double * temp1, double * temp2 ) const;
          
          //! Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1.
          /** \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
-         void makeSureAllBlocksDetOne(double * temp1, double * temp2);
+         void makeSureAllBlocksDetOne( double * temp1, double * temp2 );
          
          //! Save the unitary to disk
          /** \param filename Filename to store the unitary to */
-         void saveU(const string filename=DMRGSCF_unitaryStorageName) const;
+         void saveU( const string filename=DMRGSCF_unitaryStorageName ) const;
          
          //! Load the unitary from disk
          /** \param filename Filename to load the unitary from */
-         void loadU(const string filename=DMRGSCF_unitaryStorageName);
+         void loadU( const string filename=DMRGSCF_unitaryStorageName );
          
          //! Delete the stored unitary (on disk)
          /** \param filename Delete this file */
-         void deleteStoredUnitary(const string filename=DMRGSCF_unitaryStorageName) const;
+         void deleteStoredUnitary( const string filename=DMRGSCF_unitaryStorageName ) const;
 
       private:
-      
-         //Externally created and destroyed index handler
-         DMRGSCFindices * iHandler;
-         
+
          //Number of variables in the x-matrix
          int x_linearlength;
-         
+
          //Helper arrays to jump from linear x-matrix index to orbital indices and back
          int * x_firstindex;
          int * x_secondindex;
          int ** jumper;
-         
-         //The unitary matrix (e^x * previous unitary): unitary[irrep][row + size_irrep * col]
-         double ** unitary;
-         
+
          // Find the linear index corresponding to p and q
          /** \param p_index The first Hamiltonian index
              \param q_index The second Hamiltonian index
              \return The linear index corresponding to (p,q). If no index is found -1 is returned. */
-         int getLinearIndex(const int p_index, const int q_index) const;
-         
+         int getLinearIndex( const int p_index, const int q_index ) const;
+
          // Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.
-         void buildSkewSymmX(const int irrep, double * result, double * Xelem, const bool compact) const;
-         
+         void buildSkewSymmX( const int irrep, double * result, double * Xelem, const bool compact ) const;
+
+         // Get the determinant, and in the process fill work1 with eigvec( U[ irrep ] + U^T[ irrep ] ) and work2 with work1^T U work1 (TRIDIAGONAL matrix).
+         double get_determinant( const int irrep, double * work1, double * work2, double * work_eig, int lwork_eig ) const;
+
    };
 }
 

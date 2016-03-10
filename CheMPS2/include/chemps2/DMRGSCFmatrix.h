@@ -32,43 +32,60 @@ namespace CheMPS2{
    class DMRGSCFmatrix{
 
       public:
-      
+
          //! Constructor
-         /** \param iHandler_in The DMRGSCFindices which contain information on the occupied, active, and virtual spaces */
-         DMRGSCFmatrix(const DMRGSCFindices * iHandler_in);
-         
+         /** \param iHandler The DMRGSCFindices which contain information on the occupied, active, and virtual spaces */
+         DMRGSCFmatrix( const DMRGSCFindices * iHandler );
+
          //! Destructor
          virtual ~DMRGSCFmatrix();
-         
+
          //! Clear the matrix
          void clear();
-         
+
+         //! Make this matrix the identity matrix
+         void identity();
+
          //! Set an element
          /** \param irrep The irrep number of the indices
              \param p The first index (within the symmetry block)
              \param q The second index (within the symmetry block)
              \param val The value to which the element of the matrix should be set */
-         void set(const int irrep, const int p, const int q, const double val);
+         void set( const int irrep, const int p, const int q, const double val );
 
          //! Get an element
          /** \param irrep The irrep number of the indices
              \param p The first index (within the symmetry block)
              \param q The second index (within the symmetry block)
              \return The requested matrix element */
-         double get(const int irrep, const int p, const int q) const;
-         
+         double get( const int irrep, const int p, const int q ) const;
+
          //! Get a matrix block
          /** \param irrep The irrep number of the matrix block
              \return Pointer to the requested block */
-         double * getBlock(const int irrep);
-      
-      private:
-      
+         double * getBlock( const int irrep );
+
+         //! Get the RMS deviation with another DMRGSCFmatrix
+         /** \param other DMRGSCFmatrix to compare to
+             \return The RMS deviation */
+         double rms_deviation( const DMRGSCFmatrix * other ) const;
+
+         #ifdef CHEMPS2_MPI_COMPILATION
+         //! Broadcast this matrix to all processes
+         /** \param ROOT The process which should broadcast */
+         void broadcast( const int ROOT );
+         #endif
+
+      protected:
+
          // The information on the occupied, active, and virtual spaces
          const DMRGSCFindices * iHandler;
-         
+
          // The matrix entries
          double ** entries;
+
+         // The number of irreps
+         int num_irreps;
 
    };
 }
