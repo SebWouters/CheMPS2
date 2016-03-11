@@ -143,7 +143,7 @@ double CheMPS2::Hamiltonian::getVmat(const int index1, const int index2, const i
    
 }
 
-const CheMPS2::FourIndex * CheMPS2::Hamiltonian::getVmat(){ return Vmat; }
+CheMPS2::FourIndex * CheMPS2::Hamiltonian::getVmat(){ return Vmat; }
 
 void CheMPS2::Hamiltonian::save(const string file_parent, const string file_tmat, const string file_vmat) const{
 

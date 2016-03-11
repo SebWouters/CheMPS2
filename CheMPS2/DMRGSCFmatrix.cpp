@@ -108,7 +108,9 @@ void CheMPS2::DMRGSCFmatrix::broadcast( const int ROOT ){
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
       const int NORB = iHandler->getNORB( irrep );
       const int size = NORB * NORB;
-      MPIchemps2::broadcast_array_double( entries[ irrep ], size, ROOT );
+      if ( size > 0 ){
+         MPIchemps2::broadcast_array_double( entries[ irrep ], size, ROOT );
+      }
    }
 
 }

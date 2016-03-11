@@ -22,8 +22,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <math.h>
 #include <sstream>
+#include <math.h>
 
 #include "MyHDF5.h"
 #include "Lapack.h"
@@ -586,15 +586,5 @@ void CheMPS2::DMRGSCFunitary::loadU(const string filename){
    H5Fclose(file_id);
 
 }
-
-void CheMPS2::DMRGSCFunitary::deleteStoredUnitary(const string filename) const{
-
-   std::stringstream temp;
-   temp << "rm " << filename;
-   int info = system(temp.str().c_str());
-   cout << "Info on DMRGSCF::Unitary rm call to system: " << info << endl;
-
-}
-
 
 

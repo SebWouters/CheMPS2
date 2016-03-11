@@ -114,23 +114,19 @@ namespace CheMPS2{
              \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
          void getLog( double * vector, double * temp1, double * temp2 ) const;
-         
+
          //! Orbitals are defined up to a phase factor. Make sure that the logarithm of each block of the unitary has determinant 1.
          /** \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
          void makeSureAllBlocksDetOne( double * temp1, double * temp2 );
-         
+
          //! Save the unitary to disk
          /** \param filename Filename to store the unitary to */
-         void saveU( const string filename=DMRGSCF_unitaryStorageName ) const;
-         
+         void saveU( const string filename=DMRGSCF_unitary_storage_name ) const;
+
          //! Load the unitary from disk
          /** \param filename Filename to load the unitary from */
-         void loadU( const string filename=DMRGSCF_unitaryStorageName );
-         
-         //! Delete the stored unitary (on disk)
-         /** \param filename Delete this file */
-         void deleteStoredUnitary( const string filename=DMRGSCF_unitaryStorageName ) const;
+         void loadU( const string filename=DMRGSCF_unitary_storage_name );
 
       private:
 

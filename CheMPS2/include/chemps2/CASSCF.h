@@ -30,7 +30,6 @@
 #include "ConvergenceScheme.h"
 #include "DMRGSCFindices.h"
 #include "DMRGSCFunitary.h"
-#include "DIIS.h"
 #include "DMRGSCFoptions.h"
 #include "DMRGSCFwtilde.h"
 #include "DMRGSCFmatrix.h"
@@ -201,13 +200,15 @@ namespace CheMPS2{
              \param IMAG The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
              \return The CASPT2 variational correction energy */
          double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG);
-         
+
          //! CASSCF unitary rotation remove call
-         void deleteStoredUnitary(const string filename=CheMPS2::DMRGSCF_unitaryStorageName){ unitary->deleteStoredUnitary(filename); }
-         
+         /* \param filename File to delete */
+         static void deleteStoredUnitary( const string filename=CheMPS2::DMRGSCF_unitary_storage_name ){ delete_file( filename ); }
+
          //! CASSCF DIIS vectors remove call
-         void deleteStoredDIIS(const string filename=CheMPS2::DMRGSCF_DIISstorageName){ if (theDIIS!=NULL){ theDIIS->deleteStoredDIIS(filename); }}
-         
+         /* \param filename File to delete */
+         static void deleteStoredDIIS( const string filename=CheMPS2::DMRGSCF_diis_storage_name ){ delete_file( filename ); }
+
          //! Build the F-matrix (Eq. (11) in the Siegbahn paper [CAS3])
          /** \param localFmat Matrix where the result should be stored
              \param localTmat Matrix which contains the one-electron integrals
@@ -217,8 +218,8 @@ namespace CheMPS2{
              \param theInts The rotated two-electron integrals (at most 2 virtual indices)
              \param local2DM The DMRG 2-RDM
              \param local1DM The DMRG 1-RDM */
-         static void buildFmat(DMRGSCFmatrix * localFmat, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM);
-         
+         static void buildFmat( DMRGSCFmatrix * localFmat, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM );
+
          //! Build the Wtilde-matrix (Eq. (20b) in the Siegbahn paper [CAS3])
          /** \param localwtilde Where the result should be stored
              \param localTmat Matrix which contains the one-electron integrals
@@ -228,7 +229,7 @@ namespace CheMPS2{
              \param theInts The rotated two-electron integrals (at most 2 virtual indices)
              \param local2DM The DMRG 2-RDM
              \param local1DM The DMRG 1-RDM */
-         static void buildWtilde(DMRGSCFwtilde * localwtilde, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM);
+         static void buildWtilde( DMRGSCFwtilde * localwtilde, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM );
          
          //! Calculate the augmented Hessian Newton-Raphson update for the orthogonal orbital rotation matrix
          /** \param localFmat Matrix which contains the Fock operator (Eq. (11) in the Siegbahn paper [CAS3])
@@ -238,26 +239,26 @@ namespace CheMPS2{
              \param theupdate Where the augmented Hessian Newton-Raphson update will be stored
              \param updateNorm Pointer to one double to store the update norm
              \param gradNorm Pointer to one double to store the gradient norm */
-         static void augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm);
+         static void augmentedHessianNR( const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm );
          
          //! Copy over the DMRG 2-RDM
          /** \param theDMRG2DM The 2-RDM from the DMRG object
              \param totOrbDMRG The total number of DMRG orbitals
              \param localDMRG2DM The CASSCF 2-RDM */
-         static void copy2DMover(TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM);
+         static void copy2DMover( TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM );
          
          //! Copy over the DMRG 3-RDM
          /** \param theDMRG3DM The 3-RDM from the DMRG object
              \param numL The total number of DMRG orbitals
              \param three_dm The CASSCF 3-RDM */
-         static void copy3DMover(ThreeDM * theDMRG3DM, const int numL, double * three_dm);
+         static void copy3DMover( ThreeDM * theDMRG3DM, const int numL, double * three_dm );
          
          //! Construct the 1-RDM from the 2-RDM
          /** \param num_elec The number of DMRG active space electrons
              \param numL The total number of DMRG orbitals
              \param localDMRG1DM The CASSCF 1-RDM
              \param localDMRG2DM The CASSCF 2-RDM */
-         static void setDMRG1DM(const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM);
+         static void setDMRG1DM( const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM );
          
          //! Copy a one-orbital quantity from array format to DMRGSCFmatrix format
          /** \param origin Array to copy
@@ -276,7 +277,7 @@ namespace CheMPS2{
          /** \param unitary The Edmiston-Ruedenberg active space rotation
              \param localIdx Object which handles the index conventions for CASSCF
              \param eigenvecs Where the eigenvectors are stored */
-         static void fillLocalizedOrbitalRotations(CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindices * localIdx, double * eigenvecs);
+         static void fillLocalizedOrbitalRotations( DMRGSCFunitary * unitary, DMRGSCFindices * localIdx, double * eigenvecs );
 
          //! Block-diagonalize Mat
          /** \param space Can be 'O', 'A', or 'V' and denotes which block of Mat should be considered
@@ -296,29 +297,26 @@ namespace CheMPS2{
              \param Qact Matrix with the Coulomb and exchange contributions of the active space orbitals
              \param idx Object which handles the index conventions for CASSCF */
          static void construct_fock( DMRGSCFmatrix * Fock, const DMRGSCFmatrix * Tmat, const DMRGSCFmatrix * Qocc, const DMRGSCFmatrix * Qact, const DMRGSCFindices * idx );
-         
+
          //! Return the RMS deviation from block-diagonal
          /** \param matrix Matrix to be assessed
              \param idx Object which handles the index conventions for CASSCF
              \return RMS deviation from block-diagonal */
          static double deviation_from_blockdiag( DMRGSCFmatrix * matrix, const DMRGSCFindices * idx );
-         
+
       private:
-      
+
          //Index convention handler
          DMRGSCFindices * iHandler;
-         
+
          //Unitary matrix storage and manipulator
          DMRGSCFunitary * unitary;
-         
-         //DIIS object
-         DIIS * theDIIS;
-         
+
          //The original Hamiltonian
          double NUCL_ORIG;
          const TwoIndex  * TMAT_ORIG;
          const FourIndex * VMAT_ORIG;
-         
+
          //The rotated 2-body matrix elements with at most two virtual indices
          DMRGSCFintegrals * theRotatedTEI;
          
@@ -352,9 +350,6 @@ namespace CheMPS2{
          //Calculate the hessian
          static void calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump);
          
-         //Determine the block_size for orbital rotations
-         static int orbital_rotation_size( const int maxlinsize, const int CUTOFF, const DMRGSCFindices * idx );
-         
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          DMRGSCFmatrix * theFmatrix;
          
@@ -365,7 +360,7 @@ namespace CheMPS2{
          DMRGSCFmatrix * theTmatrix;
          void rotateOldToNew(DMRGSCFmatrix * myMatrix);
          void buildTmatrix();
-         void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix);
+         void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * density, DMRGSCFmatrix * result);
          void buildQmatOCC();
          void buildQmatACT();
          
@@ -381,6 +376,8 @@ namespace CheMPS2{
          //Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
          void coeff_fe2( DMRG * theDMRG );
          
+         static void delete_file( const string filename );
+
    };
 }
 

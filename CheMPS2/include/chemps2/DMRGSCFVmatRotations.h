@@ -35,75 +35,72 @@ namespace CheMPS2{
    class DMRGSCFVmatRotations{
 
       public:
-      
+
          //! Constructor
-         /** \param Vmat The original two-electron integrals
-             \param iHandler The DMRGSCF indices */
-         DMRGSCFVmatRotations( const FourIndex * Vmat, DMRGSCFindices * iHandler );
-         
+         DMRGSCFVmatRotations();
+
          //! Destructor
          virtual ~DMRGSCFVmatRotations();
-         
-         //! Fill the rotated two-body matrix elements of HamDMRG, based on Vmat and unitary. Do entire blocks at once.
-         /** \param HamDMRG The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to VmatRotated.
+
+         //! Fill the rotated two-body matrix elements for the space. Do entire blocks at once.
+         /** \param ORIG_VMAT The FourIndex object with the original ERI.
+             \param NEW_VMAT The FourIndex object where the new ERI should be stored.
+             \param space Which orbital space NEW_VMAT corresponds to. Should be 'A' (active) or 'F' (full).
+             \param idx The DMRGSCF indices.
+             \param umat The unitary matrix to rotate ORIG_VMAT to NEW_VMAT.
              \param mem1 Work memory with at least the size max(linsize of irreps)^4.
              \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         void fillVmatDMRG(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
-         
-         //! Fill the rotated two-body matrix elements, based on Vmat and unitary. Do entire blocks at once.
-         /** \param VmatRotated The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to VmatRotated.
+         static void full( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2 );
+
+         //! Fill the rotated two-body matrix elements needed for CASSCF and CASPT2. Do entire blocks at once.
+         /** \param ORIG_VMAT The FourIndex object with the original ERI.
+             \param ROT_TEI The rotated two-body matrix elements are stored here.
+             \param idx The DMRGSCF indices.
+             \param unitary The unitary matrix to rotate ORIG_VMAT to ROT_TEI.
              \param mem1 Work memory with at least the size max(linsize of irreps)^4.
              \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         void fillVmatRotated(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
-         
-         //! Fill the rotated two-body matrix elements with max. two virtual indices, based on Vmat and unitary. Do entire blocks at once.
-         /** \param theRotatedTEI The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to theRotatedTEI.
+         static void full( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2 );
+
+         //! Fill the rotated two-body matrix elements for the space. Do it blockwise and store intermediates on disk.
+         /** \param ORIG_VMAT The FourIndex object with the original ERI.
+             \param NEW_VMAT The FourIndex object where the new ERI should be stored.
+             \param space Which orbital space NEW_VMAT corresponds to. Should be 'A' (active) or 'F' (full).
+             \param idx The DMRGSCF indices.
+             \param umat The unitary matrix to rotate ORIG_VMAT to NEW_VMAT.
              \param mem1 Work memory with at least the size max(linsize of irreps)^4.
-             \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         void fillRotatedTEI(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * mem1, double * mem2) const;
-         
-         //! Fill the rotated two-body matrix elements of HamDMRG, based on Vmat and unitary. Cut the blocks into chunks with linear size maxBlockSize.
-         /** \param HamDMRG The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to Vmat(HamDMRG).
-             \param mem1 Work memory with at least the size maxBlockSize^4.
-             \param mem2 Work memory with at least the size maxBlockSize^4.
-             \param mem3 Work memory with at least the size maxBlockSize^4.
-             \param maxBlockSize Parameter which indicates the size of the work memories. */
-         void fillVmatDMRGBlockWise(Hamiltonian * HamDMRG, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize) const;
-         
-         //! Fill the rotated two-body matrix elements, based on Vmat and unitary. Cut the blocks into chunks with linear size maxBlockSize.
-         /** \param VmatRotated The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to VmatRotated.
-             \param mem1 Work memory with at least the size maxBlockSize^4.
-             \param mem2 Work memory with at least the size maxBlockSize^4.
-             \param mem3 Work memory with at least the size maxBlockSize^4.
-             \param maxBlockSize Parameter which indicates the size of the work memories.
-             \param cutCorners If false, all rotated two-body matrix elements are calculated. If true, at most two virtual indices are considered. */
-         void fillVmatRotatedBlockWise(FourIndex * VmatRotated, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize, const bool cutCorners) const;
-         
-         //! Fill the rotated two-body matrix elements with max. two virtual indices, based on Vmat and unitary. Cut the blocks into chunks with linear size maxBlockSize.
-         /** \param theRotatedTEI The rotated two-body matrix elements are stored here.
-             \param unitary The unitary matrix to rotate Vmat to theRotatedTEI.
-             \param mem1 Work memory with at least the size maxBlockSize^4.
-             \param mem2 Work memory with at least the size maxBlockSize^4.
-             \param mem3 Work memory with at least the size maxBlockSize^4.
-             \param maxBlockSize Parameter which indicates the size of the work memories. */
-         void fillRotatedTEIBlockWise(DMRGSCFintegrals * theRotatedTEI, DMRGSCFunitary * unitary, double * mem1, double * mem2, double * mem3, const int maxBlockSize) const;
-         
+             \param mem2 Work memory with at least the size max(linsize of irreps)^4.
+             \param mem_size Sizes of the work memories.
+             \param fileame Where to store the temporary intermediate objects. */
+         static void blockwise_disk( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
+
+         //! Fill the rotated two-body matrix elements needed for CASSCF and CASPT2.  Do it blockwise and store intermediates on disk.
+         /** \param ORIG_VMAT The FourIndex object with the original ERI.
+             \param ROT_TEI The rotated two-body matrix elements are stored here.
+             \param idx The DMRGSCF indices.
+             \param umat The unitary matrix to rotate ORIG_VMAT to NEW_VMAT.
+             \param mem1 Work memory with at least the size max(linsize of irreps)^4.
+             \param mem2 Work memory with at least the size max(linsize of irreps)^4.
+             \param mem_size Sizes of the work memories.
+             \param fileame Where to store the temporary intermediate objects. */
+         static void blockwise_disk( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
+
       private:
-      
-         //The original Hamiltonian
-         const FourIndex * VMAT_ORIG;
-         
-         //The indices bookkeeper
-         DMRGSCFindices * iHandler;
-         
-         //The number of irreps
-         int numberOfIrreps;
-         
+
+         // Perform the rotations 1,4,3,2 when it does not happen blockwise
+         static void full_base( double * eri, double * work, double * umat1, int new1, int orig1,
+                                                             double * umat2, int new2, int orig2,
+                                                             double * umat3, int new3, int orig3,
+                                                             double * umat4, int new4, int orig4 );
+
+         //Blockwise rotations
+         static void blockwise_first(  double * origin, double * target, int orig1, int dim2,  int dim3,  int dim4,  double * umat1, int new1, int lda1 );
+         static void blockwise_second( double * origin, double * target, int dim1,  int orig2, int dim3,  int dim4,  double * umat2, int new2, int lda2 );
+         static void blockwise_third(  double * origin, double * target, int dim1,  int dim2,  int orig3, int dim4,  double * umat3, int new3, int lda3 );
+         static void blockwise_fourth( double * origin, double * target, int dim1,  int dim2,  int dim3,  int orig4, double * umat4, int new4, int lda4 );
+
+         //Determine the block sizes
+         static int blocksize( const int total_size, const int max_block_size, int * num_blocks );
+
    };
 }
 

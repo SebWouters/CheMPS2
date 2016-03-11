@@ -91,8 +91,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
       for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] = 0.0; }
    }
 
-   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
-   theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+   DMRGSCFVmatRotations::full( VMAT_ORIG, VmatRotated, 'F', iHandler, unitary, temp1, temp2 );
 
    //Setting up the variables for the cost function
    double Icost = costFunction();
@@ -110,7 +109,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
    
       //Rotate the Vmat
       Icost_previous = Icost;
-      theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+      DMRGSCFVmatRotations::full( VMAT_ORIG, VmatRotated, 'F', iHandler, unitary, temp1, temp2 );
       Icost = costFunction();
       
       /* What if the cost function has dimished? Then make the rotation step a bit smaller!
@@ -124,7 +123,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
             nIterationsBACK++;
             for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] *= 0.5; }
             unitary->updateUnitary(temp1, temp2, gradient, true, false); //multiply = true; compact = false
-            theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+            DMRGSCFVmatRotations::full( VMAT_ORIG, VmatRotated, 'F', iHandler, unitary, temp1, temp2 );
             Icost = costFunction();
          }
          if (printLevel>1){ cout << "                                     WARNING : Rotated back a bit. Now Icost = " << Icost << endl; }
@@ -410,8 +409,7 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
    
    delete [] reorder;
    
-   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
-   theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+   DMRGSCFVmatRotations::full( VMAT_ORIG, VmatRotated, 'F', iHandler, unitary, temp1, temp2 );
    
    if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = " << FiedlerExchangeCost() << endl; }
 

@@ -63,28 +63,27 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc
 
    iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc_in, ndmrg_in, nvirt_in );
    unitary  = new DMRGSCFunitary( iHandler );
-   theDIIS = NULL;
    theRotatedTEI = new DMRGSCFintegrals( iHandler );
 
-   //Allocate space for the DMRG 1DM and 2DM
+   // Allocate space for the DMRG 1DM and 2DM
    nOrbDMRG = iHandler->getDMRGcumulative( num_irreps );
    DMRG1DM = new double[nOrbDMRG * nOrbDMRG];
    DMRG2DM = new double[nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG];
 
-   //To calculate the F-matrix and Q-matrix(occ,act) elements only once, and to store them for future access
+   // To store the F-matrix and Q-matrix(occ,act)
    theFmatrix = new DMRGSCFmatrix( iHandler );  theFmatrix->clear();
    theQmatOCC = new DMRGSCFmatrix( iHandler );  theQmatOCC->clear();
    theQmatACT = new DMRGSCFmatrix( iHandler );  theQmatACT->clear();
    theQmatWORK= new DMRGSCFmatrix( iHandler ); theQmatWORK->clear();
    theTmatrix = new DMRGSCFmatrix( iHandler );  theTmatrix->clear();
 
-   //To calculate the w_tilde elements only once, and store them for future access
+   // To store the w_tilde elements
    wmattilde = new DMRGSCFwtilde( iHandler );
 
-   //Print the MO info. This requires the indexHandler to be created...
+   // Print the MO info. This requires the iHandler to be created...
    checkHF( docc, socc );
 
-   //Print what we have just set up.
+   // Print what we have just set up.
    iHandler->Print();
 
    cout << "DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
@@ -108,7 +107,6 @@ CheMPS2::CASSCF::~CASSCF(){
    delete unitary;
    
    delete iHandler;
-   if (theDIIS!=NULL){ delete theDIIS; }
 
 }
 
@@ -210,7 +208,7 @@ void CheMPS2::CASSCF::rotateOldToNew(DMRGSCFmatrix * myMatrix){
 
 }
 
-void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * densityMatrix, DMRGSCFmatrix * resultMatrix){
+void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices( DMRGSCFmatrix * density, DMRGSCFmatrix * result ){
 
   for ( int irrepQ = 0; irrepQ < num_irreps; irrepQ++ ){
 
@@ -231,21 +229,21 @@ void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatr
             const int linearsizeN = iHandler->getNORB( irrepN );
             for (int rowN = 0; rowN < linearsizeN; rowN++){
 
-               theValue += densityMatrix->get(irrepN, rowN, rowN) * ( VMAT_ORIG->get( irrepQ, irrepN, irrepQ, irrepN, rowQ, rowN, colQ, rowN )
-                                                              - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, rowN, rowN ) );
+               theValue += density->get(irrepN, rowN, rowN) * ( VMAT_ORIG->get( irrepQ, irrepN, irrepQ, irrepN, rowQ, rowN, colQ, rowN )
+                                                        - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, rowN, rowN ) );
 
                for (int colN = rowN+1; colN < linearsizeN; colN++){
 
-                  theValue += densityMatrix->get(irrepN, rowN, colN) * ( 2 * VMAT_ORIG->get( irrepQ, irrepN, irrepQ, irrepN, rowQ, rowN, colQ, colN )
-                                                                     - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, rowN, colN )
-                                                                     - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, colN, rowN ) );
+                  theValue += density->get(irrepN, rowN, colN) * ( 2 * VMAT_ORIG->get( irrepQ, irrepN, irrepQ, irrepN, rowQ, rowN, colQ, colN )
+                                                               - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, rowN, colN )
+                                                               - 0.5 * VMAT_ORIG->get( irrepQ, irrepQ, irrepN, irrepN, rowQ, colQ, colN, rowN ) );
 
                }
             }
          }
 
-         resultMatrix->set( irrepQ, rowQ, colQ, theValue );
-         resultMatrix->set( irrepQ, colQ, rowQ, theValue );
+         result->set( irrepQ, rowQ, colQ, theValue );
+         result->set( irrepQ, colQ, rowQ, theValue );
 
       }
    }
@@ -255,7 +253,7 @@ void CheMPS2::CASSCF::constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatr
 void CheMPS2::CASSCF::buildQmatOCC(){
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-   
+
       int linsize = iHandler->getNORB(irrep);
       int NOCC    = iHandler->getNOCC(irrep);
       double alpha = 2.0;
@@ -265,9 +263,9 @@ void CheMPS2::CASSCF::buildQmatOCC(){
       double * Umat = unitary->getBlock(irrep);
       double * work = theQmatWORK->getBlock(irrep);
       dgemm_(&trans, &notrans, &linsize, &linsize, &NOCC, &alpha, Umat, &linsize, Umat, &linsize, &beta, work, &linsize);
-      
+
    }
-   
+
    constructCoulombAndExchangeMatrixInOrigIndices( theQmatWORK, theQmatOCC );
    rotateOldToNew( theQmatOCC );
 
@@ -276,7 +274,7 @@ void CheMPS2::CASSCF::buildQmatOCC(){
 void CheMPS2::CASSCF::buildQmatACT(){
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-   
+
       int linsize = iHandler->getNORB(irrep);
       int NDMRG   = iHandler->getNDMRG(irrep);
       double alpha = 1.0;
@@ -289,9 +287,9 @@ void CheMPS2::CASSCF::buildQmatACT(){
       double * RDM = DMRG1DM + iHandler->getDMRGcumulative(irrep) * ( 1 + nOrbDMRG );
       dgemm_(&trans,   &notrans, &linsize, &NDMRG,   &NDMRG, &alpha, Umat,  &linsize, RDM,  &nOrbDMRG, &beta, work2, &linsize);
       dgemm_(&notrans, &notrans, &linsize, &linsize, &NDMRG, &alpha, work2, &linsize, Umat, &linsize,  &beta, work,  &linsize);
-      
+
    }
-   
+
    constructCoulombAndExchangeMatrixInOrigIndices( theQmatWORK, theQmatACT );
    rotateOldToNew( theQmatACT );
 
@@ -312,25 +310,28 @@ void CheMPS2::CASSCF::buildTmatrix(){
 
 }
 
-void CheMPS2::CASSCF::fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const{
+void CheMPS2::CASSCF::fillConstAndTmatDMRG( Hamiltonian * HamDMRG ) const{
 
    //Constant part of the energy
-   double value = NUCL_ORIG;
+   double constant = NUCL_ORIG;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      for (int orb = 0; orb < iHandler->getNOCC(irrep); orb++){
-         value += 2 * theTmatrix->get(irrep, orb, orb) + theQmatOCC->get(irrep, orb, orb);
+      const int NOCC = iHandler->getNOCC( irrep );
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         constant += ( 2 * theTmatrix->get( irrep, occ, occ )
+                         + theQmatOCC->get( irrep, occ, occ ) );
       }
    }
-   HamDMRG->setEconst(value);
-   
+   HamDMRG->setEconst( constant );
+
    //One-body terms: diagonal in the irreps
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int passedDMRG  = iHandler->getDMRGcumulative(irrep);
-      const int linsizeDMRG = iHandler->getNDMRG(irrep);
-      const int NumOCC      = iHandler->getNOCC(irrep);
-      for (int cnt1=0; cnt1<linsizeDMRG; cnt1++){
-         for (int cnt2=cnt1; cnt2<linsizeDMRG; cnt2++){
-            HamDMRG->setTmat( passedDMRG+cnt1, passedDMRG+cnt2, theTmatrix->get(irrep, NumOCC+cnt1, NumOCC+cnt2) + theQmatOCC->get(irrep, NumOCC+cnt1, NumOCC+cnt2) );
+      const int JUMP = iHandler->getDMRGcumulative( irrep );
+      const int NACT = iHandler->getNDMRG( irrep );
+      const int NOCC = iHandler->getNOCC( irrep );
+      for ( int cnt1 = 0; cnt1 < NACT; cnt1++ ){
+         for ( int cnt2 = cnt1; cnt2 < NACT; cnt2++ ){
+            HamDMRG->setTmat( JUMP + cnt1, JUMP + cnt2, ( theTmatrix->get( irrep, NOCC + cnt1, NOCC + cnt2 )
+                                                        + theQmatOCC->get( irrep, NOCC + cnt1, NOCC + cnt2 ) ) );
          }
       }
    }

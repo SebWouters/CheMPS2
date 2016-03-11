@@ -23,6 +23,7 @@
 #include <math.h>
 #include <algorithm>
 #include <sys/stat.h>
+#include <sstream>
 #include <assert.h>
 
 #include "CASSCF.h"
@@ -38,147 +39,131 @@ using std::cout;
 using std::endl;
 using std::max;
 
-int CheMPS2::CASSCF::orbital_rotation_size( const int maxlinsize, const int CUTOFF, const DMRGSCFindices * idx ){
+void CheMPS2::CASSCF::delete_file( const string filename ){
 
-   const int n_irreps = idx->getNirreps();
-
-   int max_norb_ok = 0;
-   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
-      const int NORB = idx->getNORB( irrep );
-      if (( NORB > max_norb_ok ) && ( NORB <= CUTOFF )){ max_norb_ok = NORB; }
-   }
-   if ( max_norb_ok == maxlinsize ){ return maxlinsize; }
-
-   const int factor     = (int) ( ceil( ( 1.0 * maxlinsize ) / CUTOFF ) + 0.1 );
-   const int newlinsize = (int) ( ceil( ( 1.0 * maxlinsize ) / factor ) + 0.1 );
-   const int block_size = max( newlinsize, max_norb_ok ); // If a particular index can be rotated at once...
-
-   cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize  << endl;
-   cout << "              The size cutoff for 2-body transfo = " << CUTOFF      << endl;
-   cout << "              The max. # orb per irrep <= cutoff = " << max_norb_ok << endl;
-   cout << "              The blocksize for piecewise tfo    = " << block_size  << endl;
-
-   return block_size;
+   std::stringstream temp;
+   temp << "rm " << filename;
+   int info = system( temp.str().c_str() );
+   cout << "Info on system( " << temp.str() << " ) = " << info << endl;
 
 }
 
-double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
+double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options ){
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
+   assert(( OptScheme != NULL ) || (( OptScheme == NULL ) && ( rootNum == 1 )));
 
-   //Convergence variables
+   // Convergence variables
    double gradNorm = 1.0;
    double updateNorm = 1.0;
-   double * gradient = new double[unitary->getNumVariablesX()];
-   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
-   double * theDIISparameterVector = NULL;
-   const int linsizeDIIS = iHandler->getROTparamsize();
+   double * gradient = new double[ unitary->getNumVariablesX() ];
+   for ( int cnt = 0; cnt < unitary->getNumVariablesX(); cnt++ ){ gradient[ cnt ] = 0.0; }
+   double * diis_vec = NULL;
    double Energy = 1e8;
-   
-   //The CheMPS2::Problem for the inner DMRG calculation
+
+   // The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
    Problem * Prob = new Problem(HamDMRG, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
-   
-   //Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
-   const int  maxlinsize = iHandler->getNORBmax();
-   const bool block_wise = (( maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff ) ? false : true ); //Only if bigger, do we want to work blockwise
-   const int  block_size = (( block_wise ) ? orbital_rotation_size( maxlinsize, CheMPS2::DMRGSCF_maxlinsizeCutoff, iHandler ) : maxlinsize );
-   
-   //Allocate 2-body rotation memory: One array is approx (block_size/273.0)^4 * 42 GiB --> [block_size=100 --> 750 MB]
-   const int block_size_power4 = block_size * block_size * block_size * block_size; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int tot_dmrg_power4   = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
-   const int work_mem_size     = max( max( block_size_power4 , maxlinsize * maxlinsize * 4 ) , tot_dmrg_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+
+   // Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
+   const int  maxlinsize     = iHandler->getNORBmax();
+   const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );
+   const bool use_disk_tfo   = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? true : false );
+   const string tmp_filename = CheMPS2::defaultTMPpath + "/" + CheMPS2::DMRGSCF_eri_storage_name;
+
+   // Allocate 2-body rotation memory
+   const int linsize_power4  = (( use_disk_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
+   const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
+   const int work_mem_size   = max( max( linsize_power4 , maxlinsize*maxlinsize*4 ) , dmrgsize_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
    double * mem1 = new double[ work_mem_size ];
    double * mem2 = new double[ work_mem_size ];
-   double * mem3 = NULL;
-   if ( block_wise ){ mem3 = new double[ block_size_power4 ]; }
-   
+
    //The two-body rotator and Edmiston-Ruedenberg active space localizer
-   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
    EdmistonRuedenberg * theLocalizer = NULL;
-   if (theDMRGSCFoptions->getWhichActiveSpace()==2){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
-   
+   if ( scf_options->getWhichActiveSpace() == 2 ){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
+
    //Load unitary from disk
-   if (theDMRGSCFoptions->getStoreUnitary()){
-      struct stat stFileInfo;
-      int intStat = stat((theDMRGSCFoptions->getUnitaryStorageName()).c_str(),&stFileInfo);
-      if (intStat==0){ unitary->loadU(theDMRGSCFoptions->getUnitaryStorageName()); }
+   if ( scf_options->getStoreUnitary() ){
+      struct stat file_info;
+      int master_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
+      if ( master_stat == 0 ){ unitary->loadU( scf_options->getUnitaryStorageName() ); }
    }
-   
+
    //Load DIIS from disk
-   if ((theDMRGSCFoptions->getDoDIIS()) && (theDMRGSCFoptions->getStoreDIIS())){
-      struct stat stFileInfo;
-      int intStat = stat((theDMRGSCFoptions->getDIISStorageName()).c_str(),&stFileInfo);
-      if (intStat==0){
-         if (theDIIS == NULL){
-            theDIIS = new DIIS(linsizeDIIS, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-            theDIISparameterVector = new double[ linsizeDIIS ];
-         }
-         theDIIS->loadDIIS(theDMRGSCFoptions->getDIISStorageName());
+   DIIS * diis = NULL;
+   if (( scf_options->getDoDIIS() ) && ( scf_options->getStoreDIIS() )){
+      struct stat file_info;
+      int master_stat = stat( (scf_options->getDIISStorageName()).c_str(), &file_info );
+      if ( master_stat == 0 ){
+         const int diis_vec_size = iHandler->getROTparamsize();
+         diis = new DIIS( diis_vec_size, unitary->getNumVariablesX(), scf_options->getNumDIISVecs() );
+         diis->loadDIIS( scf_options->getDIISStorageName() );
+         diis_vec = new double[ diis_vec_size ];
       }
    }
-   
+
    int nIterations = 0;
 
    /*******************************
    ***   Actual DMRGSCF loops   ***
    *******************************/
-   while ((gradNorm > theDMRGSCFoptions->getGradientThreshold()) && (nIterations < theDMRGSCFoptions->getMaxIterations())){
-   
+   while (( gradNorm > scf_options->getGradientThreshold() ) && ( nIterations < scf_options->getMaxIterations() )){
+
       nIterations++;
-   
+
       //Update the unitary transformation
-      if (unitary->getNumVariablesX() > 0){
-      
-         unitary->updateUnitary(mem1, mem2, gradient, true, true); //multiply = compact = true
-         
-         if ((theDMRGSCFoptions->getDoDIIS()) && (updateNorm <= theDMRGSCFoptions->getDIISGradientBranch())){
-            if (theDMRGSCFoptions->getWhichActiveSpace()==1){
+      if ( unitary->getNumVariablesX() > 0 ){
+
+         unitary->updateUnitary( mem1, mem2, gradient, true, true ); //multiply = compact = true
+
+         if (( scf_options->getDoDIIS() ) && ( updateNorm <= scf_options->getDIISGradientBranch() )){
+            if ( scf_options->getWhichActiveSpace() == 1 ){
                cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to NOs anymore!" << endl;
             }
-            if (theDMRGSCFoptions->getWhichActiveSpace()==2){
+            if ( scf_options->getWhichActiveSpace() == 2 ){
                cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
-            if (theDIIS == NULL){
-               theDIIS = new DIIS( linsizeDIIS, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-               theDIISparameterVector = new double[ linsizeDIIS ];
-               unitary->makeSureAllBlocksDetOne(mem1, mem2);
+            if ( diis == NULL ){
+               const int diis_vec_size = iHandler->getROTparamsize();
+               diis = new DIIS( diis_vec_size, unitary->getNumVariablesX(), scf_options->getNumDIISVecs() );
+               diis_vec = new double[ diis_vec_size ];
+               unitary->makeSureAllBlocksDetOne( mem1, mem2 );
             }
-            unitary->getLog(theDIISparameterVector, mem1, mem2);
-            theDIIS->appendNew(gradient, theDIISparameterVector);
-            theDIIS->calculateParam(theDIISparameterVector);
-            unitary->updateUnitary(mem1, mem2, theDIISparameterVector, false, false); //multiply = compact = false
+            unitary->getLog( diis_vec, mem1, mem2 );
+            diis->appendNew( gradient, diis_vec );
+            diis->calculateParam( diis_vec );
+            unitary->updateUnitary( mem1, mem2, diis_vec, false, false ); //multiply = compact = false
          }
-         
       }
-      if ((theDMRGSCFoptions->getStoreUnitary()) && (gradNorm!=1.0)){ unitary->saveU( theDMRGSCFoptions->getUnitaryStorageName() ); }
-      if ((theDMRGSCFoptions->getStoreDIIS()) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
-   
+      if (( scf_options->getStoreUnitary() ) && ( gradNorm != 1.0 )){ unitary->saveU( scf_options->getUnitaryStorageName() ); }
+      if (( scf_options->getStoreDIIS() ) && ( updateNorm != 1.0 ) && ( diis != NULL )){ diis->saveDIIS( scf_options->getDIISStorageName() ); }
+      int master_diis = (( diis != NULL ) ? 1 : 0 );
+
       //Fill HamDMRG
       buildQmatOCC();
       buildTmatrix();
-      fillConstAndTmatDMRG(HamDMRG);
-      if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, block_size); }
-      else {             theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
-      
+      fillConstAndTmatDMRG( HamDMRG );
+      if ( use_disk_tfo ){ DMRGSCFVmatRotations::blockwise_disk( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename ); }
+      else {               DMRGSCFVmatRotations::full( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2 ); }
+
       //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
-      if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         theLocalizer->Optimize(mem1, mem2, theDMRGSCFoptions->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
+         theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
          fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);
          buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
          buildTmatrix();
-         fillConstAndTmatDMRG(HamDMRG);
-         if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, block_size); }
-         else {             theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
+         fillConstAndTmatDMRG( HamDMRG );
+         if ( use_disk_tfo ){ DMRGSCFVmatRotations::blockwise_disk( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename ); }
+         else {               DMRGSCFVmatRotations::full( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2 ); }
          cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
-      
+
       if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM
-      
+
          const int nalpha = ( num_elec + TwoS ) / 2;
          const int nbeta  = ( num_elec - TwoS ) / 2;
          const double workmem = 1000.0; // 1GB
@@ -191,38 +176,38 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
          theFCI->Fill2RDM( inoutput, DMRG2DM );
          delete theFCI;
          delete [] inoutput;
-         
+
       } else { //Do the DMRG sweeps, and calculate the 2DM
       
-         for ( int cnt = 0; cnt < tot_dmrg_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
+         for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
          DMRG * theDMRG = new DMRG(Prob, OptScheme);
          for (int state = 0; state < rootNum; state++){
             if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
             Energy = theDMRG->Solve();
-            if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+            if ( scf_options->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
                theDMRG->calc2DMandCorrelations();
                copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
             }
             if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
          }
-         if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
+         if ( !( scf_options->getStateAveraging() )){ // When SS-DMRGSCF: 2DM += last 2DM
             theDMRG->calc2DMandCorrelations();
             copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
-         if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
+         if (scf_options->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
          if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
          if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
          delete theDMRG;
-         if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
+         if ((scf_options->getStateAveraging()) && (rootNum > 1)){
             const double averagingfactor = 1.0 / rootNum;
-            for ( int cnt = 0; cnt < tot_dmrg_power4; cnt++ ){ DMRG2DM[ cnt ] *= averagingfactor; }
+            for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] *= averagingfactor; }
          }
          
       }
       setDMRG1DM(num_elec, nOrbDMRG, DMRG1DM, DMRG2DM);
 
       //Possibly rotate the active space to the natural orbitals
-      if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
+      if (( scf_options->getWhichActiveSpace() == 1 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
          copy_active( DMRG1DM, theQmatWORK, iHandler, true );
          block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM ); // Unitary is updated and DMRG2DM rotated
          setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
@@ -233,8 +218,8 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
 
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      if ( block_wise ){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, block_size); }
-      else {             theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
+      if ( use_disk_tfo ){ DMRGSCFVmatRotations::blockwise_disk( VMAT_ORIG, theRotatedTEI, iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename ); }
+      else {               DMRGSCFVmatRotations::full( VMAT_ORIG, theRotatedTEI, iHandler, unitary, mem1, mem2 ); }
       buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
       buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
 
@@ -242,17 +227,17 @@ double CheMPS2::CASSCF::solve(const int Nelectrons, const int TwoS, const int Ir
       augmentedHessianNR(theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm);
 
    }
-   
+
    delete [] mem1;
    delete [] mem2;
-   if ( block_wise ){ delete [] mem3; }
-   
+
    delete Prob;
    delete HamDMRG;
    delete [] gradient;
-   if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
-   if (theLocalizer!=NULL){ delete theLocalizer; }
-   
+   if ( diis_vec != NULL ){ delete [] diis_vec; }
+   if ( diis != NULL ){ delete diis; }
+   if ( theLocalizer != NULL ){ delete theLocalizer; }
+
    return Energy;
 
 }

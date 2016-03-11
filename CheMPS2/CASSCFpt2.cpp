@@ -45,19 +45,18 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    assert( num_elec >= 0 );
 
    //Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
-   const int  maxlinsize = iHandler->getNORBmax();
-   const bool block_wise = (( maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff ) ? false : true ); //Only if bigger, do we want to work blockwise
-   const int  block_size = (( block_wise ) ? orbital_rotation_size( maxlinsize, CheMPS2::DMRGSCF_maxlinsizeCutoff, iHandler ) : maxlinsize );
+   const int  maxlinsize     = iHandler->getNORBmax();
+   const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );
+   const bool use_disk_tfo   = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? true : false );
+   const string tmp_filename = CheMPS2::defaultTMPpath + "/" + CheMPS2::DMRGSCF_eri_storage_name;
 
    //Allocate 2-body rotation memory: One array is approx (block_size/273.0)^4 * 42 GiB --> [block_size=100 --> 750 MB]
-   const int block_size_power4 = block_size * block_size * block_size * block_size; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int tot_dmrg_power4   = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
-   const int tot_dmrg_power6   = tot_dmrg_power4 * nOrbDMRG * nOrbDMRG;
-   const int work_mem_size     = max( max( block_size_power4 , maxlinsize * maxlinsize * 4 ) , tot_dmrg_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+   const int linsize_power4  = (( use_disk_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
+   const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
+   const int work_mem_size   = max( max( linsize_power4 , maxlinsize*maxlinsize*4 ) , dmrgsize_power4 ); //For (ERI rotation, update unitary, block diagonalize, orbital localization)
    double * mem1 = new double[ work_mem_size ];
    double * mem2 = new double[ work_mem_size ];
-   double * mem3 = NULL;
-   if ( block_wise ){ mem3 = new double[ block_size_power4 ]; }
+   const int tot_dmrg_power6 = dmrgsize_power4 * nOrbDMRG * nOrbDMRG;
 
    // Rotate to pseudocanonical orbitals
    buildTmatrix();
@@ -75,9 +74,8 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    buildQmatOCC();
    buildTmatrix();
    fillConstAndTmatDMRG(HamAS);
-   DMRGSCFVmatRotations theRotator( VMAT_ORIG, iHandler );
-   if ( block_wise ){ theRotator.fillVmatDMRGBlockWise(HamAS, unitary, mem1, mem2, mem3, block_size); }
-   else {             theRotator.fillVmatDMRG(HamAS, unitary, mem1, mem2); }
+   if ( use_disk_tfo ){ DMRGSCFVmatRotations::blockwise_disk( VMAT_ORIG, HamAS->getVmat(), 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename ); }
+   else {               DMRGSCFVmatRotations::full( VMAT_ORIG, HamAS->getVmat(), 'A', iHandler, unitary, mem1, mem2 ); }
    double E_CASSCF = 0.0;
    double * three_dm = new double[ tot_dmrg_power6 ];
    double * contract = new double[ tot_dmrg_power6 ];
@@ -106,7 +104,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
    } else { // Do the DMRG sweeps
 
-      for ( int cnt = 0; cnt < tot_dmrg_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
+      for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
       CheMPS2::DMRG * theDMRG = new DMRG(Prob, OptScheme);
       for (int state = 0; state < rootNum; state++){
          if (state > 0){ theDMRG->newExcitation( fabs( E_CASSCF ) ); }
@@ -139,12 +137,11 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete HamAS;
 
    //Calculate the matrix elements needed to calculate the gradient and hessian
-   if ( block_wise ){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, block_size); }
-   else {             theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
+   if ( use_disk_tfo ){ DMRGSCFVmatRotations::blockwise_disk( VMAT_ORIG, theRotatedTEI, iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename ); }
+   else {               DMRGSCFVmatRotations::full( VMAT_ORIG, theRotatedTEI, iHandler, unitary, mem1, mem2 ); }
 
    delete [] mem1;
    delete [] mem2;
-   if ( block_wise ){ delete [] mem3; }
 
    cout << "CASPT2 : Norm F - F_pseudocan = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
    CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );

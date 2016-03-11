@@ -30,8 +30,9 @@ namespace CheMPS2{
    const int    DMRGSCF_maxIterations         = 100;
    const double DMRGSCF_gradientNormThreshold = 1e-6;
    const bool   DMRGSCF_storeUnitary          = true;
-   const string DMRGSCF_unitaryStorageName    = "CheMPS2_CASSCF.h5";
-   const int    DMRGSCF_maxlinsizeCutoff      = 100;
+   const string DMRGSCF_unitary_storage_name  = "CheMPS2_CASSCF.h5";
+   const string DMRGSCF_eri_storage_name      = "CheMPS2_eri_temp.h5";
+   const int    DMRGSCF_max_mem_eri_tfo       = 100 * 100 * 100 * 100; // Measured in number of doubles
    const bool   DMRGSCF_debugPrint            = false;
    const bool   DMRGSCF_stateAveraged         = true;
 
@@ -43,7 +44,7 @@ namespace CheMPS2{
    const double DMRGSCF_DIISgradientBranch    = 1e-2;
    const int    DMRGSCF_numDIISvecs           = 7;
    const bool   DMRGSCF_storeDIIS             = true;
-   const string DMRGSCF_DIISstorageName       = "CheMPS2_DIIS.h5";
+   const string DMRGSCF_diis_storage_name     = "CheMPS2_DIIS.h5";
 
    const double CASPT2_OVLP_CUTOFF            = 1e-8;
 

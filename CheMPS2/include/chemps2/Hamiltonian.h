@@ -138,7 +138,7 @@ namespace CheMPS2{
          
          //! Get the pointer to the two-electron integrals
          /** \return The pointer to the two-electron integrals */
-         const FourIndex * getVmat();
+         FourIndex * getVmat();
          
          //! Save the Hamiltonian
          /** \param file_parent The HDF5 Hamiltonian parent filename

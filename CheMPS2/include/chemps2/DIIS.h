@@ -75,19 +75,14 @@ namespace CheMPS2{
          
          //! Save the DIIS object to disk
          /** \param filename Filename to store the DIIS checkpoint to */
-         void saveDIIS(const string filename=DMRGSCF_DIISstorageName) const;
+         void saveDIIS(const string filename=DMRGSCF_diis_storage_name) const;
          
          //! Load the DIIS object from disk
          /** \param filename Filename to load the DIIS checkpoint from */
-         void loadDIIS(const string filename=DMRGSCF_DIISstorageName);
-         
-         //! Delete the stored DIIS object (on disk)
-         /** \param filename Delete this file */
-         void deleteStoredDIIS(const string filename=DMRGSCF_DIISstorageName) const;
+         void loadDIIS(const string filename=DMRGSCF_diis_storage_name);
 
-         
       private:
-      
+
          //The number of variables in the parameter vectors
          int numVarsParam;
          
