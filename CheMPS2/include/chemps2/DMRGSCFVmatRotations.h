@@ -42,26 +42,7 @@ namespace CheMPS2{
          //! Destructor
          virtual ~DMRGSCFVmatRotations();
 
-         //! Fill the rotated two-body matrix elements for the space. Do entire blocks at once.
-         /** \param ORIG_VMAT The FourIndex object with the original ERI.
-             \param NEW_VMAT The FourIndex object where the new ERI should be stored.
-             \param space Which orbital space NEW_VMAT corresponds to. Should be 'A' (active) or 'F' (full).
-             \param idx The DMRGSCF indices.
-             \param umat The unitary matrix to rotate ORIG_VMAT to NEW_VMAT.
-             \param mem1 Work memory with at least the size max(linsize of irreps)^4.
-             \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         static void full( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2 );
-
-         //! Fill the rotated two-body matrix elements needed for CASSCF and CASPT2. Do entire blocks at once.
-         /** \param ORIG_VMAT The FourIndex object with the original ERI.
-             \param ROT_TEI The rotated two-body matrix elements are stored here.
-             \param idx The DMRGSCF indices.
-             \param unitary The unitary matrix to rotate ORIG_VMAT to ROT_TEI.
-             \param mem1 Work memory with at least the size max(linsize of irreps)^4.
-             \param mem2 Work memory with at least the size max(linsize of irreps)^4. */
-         static void full( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2 );
-
-         //! Fill the rotated two-body matrix elements for the space. Do it blockwise and store intermediates on disk.
+         //! Fill the rotated two-body matrix elements for the space. If the blocks become too large, disk is used.
          /** \param ORIG_VMAT The FourIndex object with the original ERI.
              \param NEW_VMAT The FourIndex object where the new ERI should be stored.
              \param space Which orbital space NEW_VMAT corresponds to. Should be 'A' (active) or 'F' (full).
@@ -71,9 +52,9 @@ namespace CheMPS2{
              \param mem2 Work memory with at least the size max(linsize of irreps)^4.
              \param mem_size Sizes of the work memories.
              \param fileame Where to store the temporary intermediate objects. */
-         static void blockwise_disk( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
+         static void rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
 
-         //! Fill the rotated two-body matrix elements needed for CASSCF and CASPT2.  Do it blockwise and store intermediates on disk.
+         //! Fill the rotated two-body matrix elements needed for CASSCF and CASPT2. If the blocks become too large, disk is used.
          /** \param ORIG_VMAT The FourIndex object with the original ERI.
              \param ROT_TEI The rotated two-body matrix elements are stored here.
              \param idx The DMRGSCF indices.
@@ -82,7 +63,7 @@ namespace CheMPS2{
              \param mem2 Work memory with at least the size max(linsize of irreps)^4.
              \param mem_size Sizes of the work memories.
              \param fileame Where to store the temporary intermediate objects. */
-         static void blockwise_disk( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
+         static void rotate( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
 
       private:
 
