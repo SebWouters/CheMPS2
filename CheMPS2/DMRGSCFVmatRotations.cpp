@@ -234,23 +234,23 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_first( double * origin, double * target, int orig1, int dim2, int dim3, int dim4, double * umat1, int new1, int lda1 ){
+void CheMPS2::DMRGSCFVmatRotations::blockwise_first( double * origin, double * target, int orig1, int dim2, const int dim34, double * umat1, int new1, int lda1 ){
 
    char notrans = 'N';
    double one = 1.0;
    double set = 0.0;
-   int right_dim = dim2 * dim3 * dim4;
+   int right_dim = dim2 * dim34;
    dgemm_( &notrans, &notrans, &new1, &right_dim, &orig1, &one, umat1, &lda1, origin, &orig1, &set, target, &new1 );
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_second( double * origin, double * target, int dim1, int orig2, int dim3, int dim4, double * umat2, int new2, int lda2 ){
+void CheMPS2::DMRGSCFVmatRotations::blockwise_second( double * origin, double * target, int dim1, int orig2, const int dim34, double * umat2, int new2, int lda2 ){
 
    char trans = 'T';
    char notrans = 'N';
    double one = 1.0;
    double set = 0.0;
-   const int right_dim = dim3 * dim4;
+   const int right_dim = dim34;
    const int jump_old  = dim1 * orig2;
    const int jump_new  = dim1 * new2;
    for ( int index = 0; index < right_dim; index++ ){
@@ -259,28 +259,28 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_second( double * origin, double * 
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_third( double * origin, double * target, int dim1, int dim2, int orig3, int dim4, double * umat3, int new3, int lda3 ){
+void CheMPS2::DMRGSCFVmatRotations::blockwise_third( double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 ){
 
    char trans = 'T';
    char notrans = 'N';
    double one = 1.0;
    double set = 0.0;
-   int left_dim = dim1 * dim2;
-   const int jump_old = dim1 * dim2 * orig3;
-   const int jump_new = dim1 * dim2 * new3;
+   int left_dim = dim12;
+   const int jump_old = dim12 * orig3;
+   const int jump_new = dim12 * new3;
    for ( int index = 0; index < dim4; index++ ){
       dgemm_( &notrans, &trans, &left_dim, &new3, &orig3, &one, origin + jump_old * index, &left_dim, umat3, &lda3, &set, target + jump_new * index, &left_dim );
    }
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_fourth( double * origin, double * target, int dim1, int dim2, int dim3, int orig4, double * umat4, int new4, int lda4 ){
+void CheMPS2::DMRGSCFVmatRotations::blockwise_fourth( double * origin, double * target, const int dim12, int dim3, int orig4, double * umat4, int new4, int lda4 ){
 
    char trans = 'T';
    char notrans = 'N';
    double one = 1.0;
    double set = 0.0;
-   int left_dim = dim1 * dim2 * dim3;
+   int left_dim = dim12 * dim3;
    dgemm_( &notrans, &trans, &left_dim, &new4, &orig4, &one, origin, &left_dim, umat4, &lda4, &set, target, &left_dim );
 
 }
@@ -381,8 +381,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourInd
                      const int stop = min( start + block_size1, second_old );
                      const int size = stop - start;
                      fetch( mem1, ORIG_VMAT, irrep1, irrep2, irrep3, irrep4, idx, start, stop, false );
-                     blockwise_first(  mem1, mem2, ORIG1, ORIG2, size, 1, umat1, NEW1, ORIG1 );
-                     blockwise_second( mem2, mem1, NEW1,  ORIG2, size, 1, umat2, NEW2, ORIG2 );
+                     blockwise_first(  mem1, mem2, ORIG1, ORIG2, size, umat1, NEW1, ORIG1 );
+                     blockwise_second( mem2, mem1, NEW1,  ORIG2, size, umat2, NEW2, ORIG2 );
                      // pack first potentially
                      if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
                      start += size;
@@ -396,8 +396,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourInd
                      const int size = stop - start;
                      if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
                      // unpack second potentially
-                     blockwise_fourth( mem1, mem2, 1, size, ORIG3, ORIG4, umat4, NEW4, ORIG4 );
-                     blockwise_third(  mem2, mem1, 1, size, ORIG3, NEW4,  umat3, NEW3, ORIG3 );
+                     blockwise_fourth( mem1, mem2, size, ORIG3, ORIG4, umat4, NEW4, ORIG4 );
+                     blockwise_third(  mem2, mem1, size, ORIG3, NEW4,  umat3, NEW3, ORIG3 );
                      write( mem1, NEW_VMAT, NULL, space, irrep1, irrep2, irrep3, irrep4, idx, start, stop, false );
                      start += size;
                   }
@@ -461,8 +461,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCF
                      const int stop = min( start + block_size1, second_old );
                      const int size = stop - start;
                      fetch( mem1, ORIG_VMAT, Ic1, Ic2, Ia1, Ia2, idx, start, stop, false );
-                     blockwise_first(  mem1, mem2, NORB_C1, NORB_C2, size, 1, umat_C1, NEW_C1, NORB_C1 );
-                     blockwise_second( mem2, mem1,  NEW_C1, NORB_C2, size, 1, umat_C2, NEW_C2, NORB_C2 );
+                     blockwise_first(  mem1, mem2, NORB_C1, NORB_C2, size, umat_C1, NEW_C1, NORB_C1 );
+                     blockwise_second( mem2, mem1,  NEW_C1, NORB_C2, size, umat_C2, NEW_C2, NORB_C2 );
                      // pack first potentially
                      if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
                      start += size;
@@ -476,8 +476,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCF
                      const int size = stop - start;
                      if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
                      // unpack second potentially
-                     blockwise_fourth( mem1, mem2, 1, size, NORB_A1, NORB_A2, umat_A2, NEW_A2, NORB_A2 );
-                     blockwise_third(  mem2, mem1, 1, size, NORB_A1,  NEW_A2, umat_A1, NEW_A1, NORB_A1 );
+                     blockwise_fourth( mem1, mem2, size, NORB_A1, NORB_A2, umat_A2, NEW_A2, NORB_A2 );
+                     blockwise_third(  mem2, mem1, size, NORB_A1,  NEW_A2, umat_A1, NEW_A1, NORB_A1 );
                      write( mem1, NULL, ROT_TEI, 'C', Ic1, Ic2, Ia1, Ia2, idx, start, stop, false );
                      start += size;
                   }
@@ -537,8 +537,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCF
                   const int stop = min( start + block_size1, second_old );
                   const int size = stop - start;
                   fetch( mem1, ORIG_VMAT, Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
-                  blockwise_first(  mem1, mem2, NORB_C1, NORB_V1, size, 1, umat_C1, NEW_C1, NORB_C1 );
-                  blockwise_second( mem2, mem1,  NEW_C1, NORB_V1, size, 1, umat_V1, NEW_V1, NORB_V1 );
+                  blockwise_first(  mem1, mem2, NORB_C1, NORB_V1, size, umat_C1, NEW_C1, NORB_C1 );
+                  blockwise_second( mem2, mem1,  NEW_C1, NORB_V1, size, umat_V1, NEW_V1, NORB_V1 );
                   // do not pack first because EXCHANGE
                   if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
                   start += size;
@@ -552,8 +552,8 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCF
                   const int size = stop - start;
                   if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
                   // unpack second potentially --> is allowed for EXCHANGE
-                  blockwise_fourth( mem1, mem2, 1, size, NORB_C2, NORB_V2, umat_V2, NEW_V2, NORB_V2 );
-                  blockwise_third(  mem2, mem1, 1, size, NORB_C2,  NEW_V2, umat_C2, NEW_C2, NORB_C2 );
+                  blockwise_fourth( mem1, mem2, size, NORB_C2, NORB_V2, umat_V2, NEW_V2, NORB_V2 );
+                  blockwise_third(  mem2, mem1, size, NORB_C2,  NEW_V2, umat_C2, NEW_C2, NORB_C2 );
                   write( mem1, NULL, ROT_TEI, 'E', Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
                   start += size;
                }

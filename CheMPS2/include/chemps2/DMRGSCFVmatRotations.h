@@ -69,10 +69,10 @@ namespace CheMPS2{
       private:
 
          // Blockwise rotations
-         static void blockwise_first(  double * origin, double * target, int orig1, int dim2,  int dim3,  int dim4,  double * umat1, int new1, int lda1 );
-         static void blockwise_second( double * origin, double * target, int dim1,  int orig2, int dim3,  int dim4,  double * umat2, int new2, int lda2 );
-         static void blockwise_third(  double * origin, double * target, int dim1,  int dim2,  int orig3, int dim4,  double * umat3, int new3, int lda3 );
-         static void blockwise_fourth( double * origin, double * target, int dim1,  int dim2,  int dim3,  int orig4, double * umat4, int new4, int lda4 );
+         static void blockwise_first(  double * origin, double * target, int orig1, int dim2, const int dim34, double * umat1, int new1, int lda1 );
+         static void blockwise_second( double * origin, double * target, int dim1, int orig2, const int dim34, double * umat2, int new2, int lda2 );
+         static void blockwise_third(  double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 );
+         static void blockwise_fourth( double * origin, double * target, const int dim12, int dim3, int orig4, double * umat4, int new4, int lda4 );
 
          // Copy the required integrals from ORIG_VMAT to eri
          static void fetch( double * eri, const FourIndex * ORIG_VMAT, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack );
