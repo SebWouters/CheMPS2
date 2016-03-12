@@ -90,7 +90,7 @@ void CheMPS2::DMRGSCFVmatRotations::fetch( double * eri, const FourIndex * ORIG_
 
 void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
 
-   assert(( space == 'F' ) || ( space == 'A' ) || ( space == 'C' )); // || ( space == 'E' ));
+   assert(( space == 'F' ) || ( space == 'A' ) || ( space == 'C' ) || ( space == 'E' ));
 
    if (( space == 'A' ) || ( space =='F' )){
 
@@ -198,6 +198,36 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
                }
                counter++;
             }
+         }
+      }
+   }
+
+   if ( space == 'E' ){
+
+      assert( pack == false );
+      assert( Irreps::directProd( irrep1, irrep2 ) == Irreps::directProd( irrep3, irrep4 ) );
+
+      const int  NEW_C1 = idx->getNOCC( irrep1 ) + idx->getNDMRG( irrep1 );
+      const int  NEW_C3 = idx->getNOCC( irrep3 ) + idx->getNDMRG( irrep3 );
+      const int  NEW_V2 = idx->getNVIRT( irrep2 );
+      const int  NEW_V4 = idx->getNVIRT( irrep4 );
+      const int JUMP_V2 = idx->getNOCC( irrep2 ) + idx->getNDMRG( irrep2 );
+      const int JUMP_V4 = idx->getNOCC( irrep4 ) + idx->getNDMRG( irrep4 );
+      const int SIZE    = stop - start;
+
+      int counter = 0; // counter = cnt1 + NEW_C1 * cnt2
+      for ( int cnt2 = 0; cnt2 < NEW_V2; cnt2++ ){
+         for ( int cnt1 = 0; cnt1 < NEW_C1; cnt1++ ){
+            if (( start <= counter ) && ( counter < stop )){
+               for ( int cnt4 = 0; cnt4 < NEW_V4; cnt4++ ){
+                  for ( int cnt3 = 0; cnt3 < NEW_C3; cnt3++ ){
+                     ROT_TEI->set_exchange( irrep1, irrep3, irrep2, irrep4, cnt1, cnt3, JUMP_V2 + cnt2, JUMP_V4 + cnt4,
+                        eri[ ( counter - start ) + SIZE * ( cnt3 + NEW_C3 * cnt4 ) ] );
+                        // Indices (12) and indices (34) are Coulomb pairs
+                  }
+               }
+            }
+            counter++;
          }
       }
    }
@@ -486,133 +516,49 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCF
                double * umat_V1 = umat->getBlock( Iv1 ) + JUMP_V1;
                double * umat_V2 = umat->getBlock( Iv2 ) + JUMP_V2;
 
-               const int  first_new =  NEW_C1 * NEW_C2;
-               const int second_old = NORB_V1 * NORB_V2;
+               const int  first_new =  NEW_C1 * NEW_V1;
+               const int second_old = NORB_C2 * NORB_V2;
 
-               const int block_size1 = mem_size / ( NORB_C1 * NORB_C2 ); // Floor of amount of times first_old  fits in mem_size
+               const int block_size1 = mem_size / ( NORB_C1 * NORB_V1 ); // Floor of amount of times first_old  fits in mem_size
                const int block_size2 = mem_size / second_old;            // Floor of amount of times second_old fits in mem_size
                assert( block_size1 > 0 );
                assert( block_size2 > 0 );
 
-               if (( block_size1 >= second_old ) && ( block_size2 >= first_new )){ // Do everything in memory
+               const bool io_free = (( block_size1 >= second_old ) && ( block_size2 >= first_new ));
+               hid_t file_id, dspc_id, dset_id;
 
-                  for ( int c2 = 0; c2 < NORB_C2; c2++ ){
-                     for ( int v2 = 0; v2 < NORB_V2; v2++ ){
-                        for ( int v1 = 0; v1 < NORB_V1; v1++ ){
-                           for ( int c1 = 0; c1 < NORB_C1; c1++ ){
-                              // We try to make the Exchange elements !
-                              mem1[ c1 + NORB_C1 * ( v1 + NORB_V1 * ( v2 + NORB_V2 * c2 ) ) ]
-                                 = ORIG_VMAT->get( Ic1, Ic2, Iv1, Iv2, c1, c2, v1, v2 );
-                           }
-                        }
-                     }
-                  }
-
-                  blockwise_first(  mem1, mem2, NORB_C1, NORB_V1, NORB_V2, NORB_C2, umat_C1, NEW_C1, NORB_C1 );
-                  blockwise_fourth( mem2, mem1,  NEW_C1, NORB_V1, NORB_V2, NORB_C2, umat_C2, NEW_C2, NORB_C2 );
-                  blockwise_third(  mem1, mem2,  NEW_C1, NORB_V1, NORB_V2,  NEW_C2, umat_V2, NEW_V2, NORB_V2 );
-                  blockwise_second( mem2, mem1,  NEW_C1, NORB_V1,  NEW_V2,  NEW_C2, umat_V1, NEW_V1, NORB_V1 );
-
-                  for ( int c2 = 0; c2 < NEW_C2; c2++ ){
-                     for ( int v2 = 0; v2 < NEW_V2; v2++ ){
-                        for ( int v1 = 0; v1 < NEW_V1; v1++ ){
-                           for ( int c1 = 0; c1 < NEW_C1; c1++ ){
-                              ROT_TEI->set_exchange( Ic1, Ic2, Iv1, Iv2, c1, c2, JUMP_V1 + v1, JUMP_V2 + v2,
-                                 mem1[ c1 + NEW_C1 * ( v1 + NEW_V1 * ( v2 + NEW_V2 * c2 ) ) ] );
-                           }
-                        }
-                     }
-                  }
-
-               } else {
-
-                  hsize_t   fdim_h5[] = { second_old, first_new }; // C is row major: [ col + ncol * row ] is assumed
-                  hsize_t stride_h5[] = { 1, 1 };
-                  hsize_t  count_h5[] = { 1, 1 };
-                  hsize_t  start_h5[ 2 ];
-                  hsize_t  block_h5[ 2 ];
-
-                  const hid_t file_id = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-                  const hid_t dspc_id = H5Screate_simple( 2, fdim_h5, NULL );
-                  const hid_t dset_id = H5Dcreate( file_id, "storage", H5T_NATIVE_DOUBLE, dspc_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-
-                  // First half transformation
-                  int start = 0;
-                  while ( start < second_old ){
-
-                     const int stop = min( start + block_size1, second_old );
-                     const int size = stop - start;
-                     assert( size > 0 );
-
-                     for ( int count = start; count < stop; count++ ){
-                        const int cnt_V1 = count % NORB_V1;
-                        const int cnt_V2 = count / NORB_V1;
-                        const int rel  = count - start;
-                        for ( int cnt_C2 = 0; cnt_C2 < NORB_C2; cnt_C2++ ){
-                           for ( int cnt_C1 = 0; cnt_C1 < NORB_C1; cnt_C1++ ){
-                              mem1[ cnt_C1 + NORB_C1 * ( cnt_C2 + NORB_C2 * rel ) ]
-                                 = ORIG_VMAT->get( Ic1, Ic2, Iv1, Iv2, cnt_C1, cnt_C2, cnt_V1, cnt_V2 );
-                           }
-                        }
-                     }
-
-                     blockwise_first(  mem1, mem2, NORB_C1, NORB_C2, size, 1, umat_C1, NEW_C1, NORB_C1 );
-                     blockwise_second( mem2, mem1,  NEW_C1, NORB_C2, size, 1, umat_C2, NEW_C2, NORB_C2 );
-
-                     start_h5[ 0 ] = start;  start_h5[ 1 ] = 0;
-                     block_h5[ 0 ] = size;   block_h5[ 1 ] = first_new;
-                     H5Sselect_hyperslab( dspc_id, H5S_SELECT_SET, start_h5, stride_h5, count_h5, block_h5 );
-                     const hsize_t mem_h5 = size * fdim_h5[ 1 ];
-                     const hid_t   mem_id = H5Screate_simple( 1, &mem_h5, NULL );
-                     H5Dwrite( dset_id, H5T_NATIVE_DOUBLE, mem_id, dspc_id, H5P_DEFAULT, mem1 );
-                     H5Sclose( mem_id );
-
-                     start += size;
-
-                  }
-                  assert( start == second_old );
-
-                  // Do the second half transformation
-                  start = 0;
-                  while ( start < first_new ){
-
-                     const int stop = min( start + block_size2, first_new );
-                     const int size = stop - start;
-                     assert( size > 0 );
-
-                     start_h5[ 0 ] = 0;           start_h5[ 1 ] = start;
-                     block_h5[ 0 ] = second_old;  block_h5[ 1 ] = size;
-                     H5Sselect_hyperslab( dspc_id, H5S_SELECT_SET, start_h5, stride_h5, count_h5, block_h5 );
-                     const hsize_t mem_h5 = fdim_h5[ 0 ] * size;
-                     const hid_t   mem_id = H5Screate_simple( 1, &mem_h5, NULL );
-                     H5Dread( dset_id, H5T_NATIVE_DOUBLE, mem_id, dspc_id, H5P_DEFAULT, mem1 );
-                     H5Sclose( mem_id );
-
-                     blockwise_fourth( mem1, mem2, 1, size, NORB_V1, NORB_V2, umat_V2, NEW_V2, NORB_V2 );
-                     blockwise_third(  mem2, mem1, 1, size, NORB_V1,  NEW_V2, umat_V1, NEW_V1, NORB_V1 );
-
-                     for ( int count = start; count < stop; count++ ){
-                        const int cnt_C1 = count % NEW_C1;
-                        const int cnt_C2 = count / NEW_C1;
-                        const int rel  = count - start;
-                        for ( int cnt_V2 = 0; cnt_V2 < NEW_V2; cnt_V2++ ){
-                           for ( int cnt_V1 = 0; cnt_V1 < NEW_V1; cnt_V1++ ){
-                              ROT_TEI->set_exchange( Ic1, Ic2, Iv1, Iv2, cnt_C1, cnt_C2, JUMP_V1 + cnt_V1, JUMP_V2 + cnt_V2,
-                                 mem1[ rel + size * ( cnt_V1 + NEW_V1 * cnt_V2 ) ] );
-                           }
-                        }
-                     }
-
-                     start += size;
-
-                  }
-                  assert( start == first_new );
-
-                  H5Dclose( dset_id );
-                  H5Sclose( dspc_id );
-                  H5Fclose( file_id );
-
+               if ( io_free == false ){
+                  open_file( &file_id, &dspc_id, &dset_id, first_new, second_old, filename );
                }
+
+               // First half transformation
+               int start = 0;
+               while ( start < second_old ){
+                  const int stop = min( start + block_size1, second_old );
+                  const int size = stop - start;
+                  fetch( mem1, ORIG_VMAT, Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
+                  blockwise_first(  mem1, mem2, NORB_C1, NORB_V1, size, 1, umat_C1, NEW_C1, NORB_C1 );
+                  blockwise_second( mem2, mem1,  NEW_C1, NORB_V1, size, 1, umat_V1, NEW_V1, NORB_V1 );
+                  // do not pack first because EXCHANGE
+                  if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
+                  start += size;
+               }
+               assert( start == second_old );
+
+               // Do the second half transformation
+               start = 0;
+               while ( start < first_new ){
+                  const int stop = min( start + block_size2, first_new );
+                  const int size = stop - start;
+                  if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
+                  // unpack second potentially --> is allowed for EXCHANGE
+                  blockwise_fourth( mem1, mem2, 1, size, NORB_C2, NORB_V2, umat_V2, NEW_V2, NORB_V2 );
+                  blockwise_third(  mem2, mem1, 1, size, NORB_C2,  NEW_V2, umat_C2, NEW_C2, NORB_C2 );
+                  write( mem1, NULL, ROT_TEI, 'E', Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
+                  start += size;
+               }
+               assert( start == first_new );
+               if ( io_free == false ){ close_file( file_id, dspc_id, dset_id ); }
             }
          }
       }
