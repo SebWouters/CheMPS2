@@ -24,6 +24,7 @@
 #include "Hamiltonian.h"
 #include "DMRGSCFunitary.h"
 #include "DMRGSCFintegrals.h"
+#include "MyHDF5.h"
 
 namespace CheMPS2{
 /** DMRGSCFVmatRotations class.
@@ -67,20 +68,23 @@ namespace CheMPS2{
 
       private:
 
-         // Perform the rotations 1,4,3,2 when it does not happen blockwise
-         static void full_base( double * eri, double * work, double * umat1, int new1, int orig1,
-                                                             double * umat2, int new2, int orig2,
-                                                             double * umat3, int new3, int orig3,
-                                                             double * umat4, int new4, int orig4 );
-
-         //Blockwise rotations
+         // Blockwise rotations
          static void blockwise_first(  double * origin, double * target, int orig1, int dim2,  int dim3,  int dim4,  double * umat1, int new1, int lda1 );
          static void blockwise_second( double * origin, double * target, int dim1,  int orig2, int dim3,  int dim4,  double * umat2, int new2, int lda2 );
          static void blockwise_third(  double * origin, double * target, int dim1,  int dim2,  int orig3, int dim4,  double * umat3, int new3, int lda3 );
          static void blockwise_fourth( double * origin, double * target, int dim1,  int dim2,  int dim3,  int orig4, double * umat4, int new4, int lda4 );
 
-         //Determine the block sizes
-         static int blocksize( const int total_size, const int max_block_size, int * num_blocks );
+         // Copy the required integrals from ORIG_VMAT to eri
+         static void fetch( double * eri, const FourIndex * ORIG_VMAT, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack );
+         
+         // Copy the rotated integrals from eri to NEW_VMAT or ROT_TEI, depending on 'space'
+         static void write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack );
+         
+         // HDF5 file handling
+         static void open_file( hid_t * file_id, hid_t * dspc_id, hid_t * dset_id, const int first, const int second, const string filename );
+         static void write_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int first_write );
+         static void  read_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int second_read );
+         static void close_file( hid_t file_id, hid_t dspc_id, hid_t dset_id );
 
    };
 }
