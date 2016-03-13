@@ -147,7 +147,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
       buildQmatOCC();
       buildTmatrix();
       fillConstAndTmatDMRG( HamDMRG );
-      DMRGSCFVmatRotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      DMRGSCFVmatRotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
 
       //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
       if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
@@ -158,7 +158,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
          buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
          buildTmatrix();
          fillConstAndTmatDMRG( HamDMRG );
-         DMRGSCFVmatRotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+         DMRGSCFVmatRotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
          cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
 
@@ -218,7 +218,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      DMRGSCFVmatRotations::rotate( VMAT_ORIG, theRotatedTEI, iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      DMRGSCFVmatRotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      DMRGSCFVmatRotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
       buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
       buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
 

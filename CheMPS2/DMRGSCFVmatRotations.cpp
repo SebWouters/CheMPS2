@@ -37,8 +37,8 @@ void CheMPS2::DMRGSCFVmatRotations::fetch( double * eri, const FourIndex * ORIG_
 
    if ( pack ){
 
-      assert( irrep3 == irrep4 );
       assert( irrep1 == irrep2 );
+      assert( irrep3 == irrep4 );
 
       const int NORB12 = idx->getNORB( irrep1 );
       const int NORB34 = idx->getNORB( irrep3 );
@@ -88,19 +88,18 @@ void CheMPS2::DMRGSCFVmatRotations::fetch( double * eri, const FourIndex * ORIG_
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
+void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
 
-   assert(( space == 'F' ) || ( space == 'A' ) || ( space == 'C' ) || ( space == 'E' ));
-
-   if (( space == 'A' ) || ( space =='F' )){
+   bool written = false;
+   if (( space1 == space2 ) && ( space1 == space3 ) && ( space1 == space4 )){ // All four spaces equal
 
       if ( pack ){
 
          assert( irrep1 == irrep2 );
          assert( irrep3 == irrep4 );
 
-         const int NEW12 = (( space == 'A' ) ? idx->getNDMRG( irrep1 ) : idx->getNORB( irrep1 ));
-         const int NEW34 = (( space == 'A' ) ? idx->getNDMRG( irrep3 ) : idx->getNORB( irrep3 ));
+         const int NEW12 = dimension( idx, irrep1, space1 );
+         const int NEW34 = dimension( idx, irrep3, space3 );
          const int SIZE  = stop - start;
 
          int counter = 0; // counter = cnt1 + ( cnt2 * ( cnt2 + 1 )) / 2
@@ -118,15 +117,16 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
                counter++;
             }
          }
+         written = true;
 
       } else {
 
          assert( Irreps::directProd( irrep1, irrep2 ) == Irreps::directProd( irrep3, irrep4 ) );
 
-         const int NEW1 = (( space == 'A' ) ? idx->getNDMRG( irrep1 ) : idx->getNORB( irrep1 ));
-         const int NEW2 = (( space == 'A' ) ? idx->getNDMRG( irrep2 ) : idx->getNORB( irrep2 ));
-         const int NEW3 = (( space == 'A' ) ? idx->getNDMRG( irrep3 ) : idx->getNORB( irrep3 ));
-         const int NEW4 = (( space == 'A' ) ? idx->getNDMRG( irrep4 ) : idx->getNORB( irrep4 ));
+         const int NEW1 = dimension( idx, irrep1, space1 );
+         const int NEW2 = dimension( idx, irrep2, space2 );
+         const int NEW3 = dimension( idx, irrep3, space3 );
+         const int NEW4 = dimension( idx, irrep4, space4 );
          const int SIZE = stop - start;
 
          int counter = 0; // counter = cnt1 + NEW1 * cnt2
@@ -144,28 +144,30 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
                counter++;
             }
          }
+         written = true;
+
       }
    }
 
-   if ( space == 'C' ){
+   if (( space1 == 'C' ) && ( space2 == 'C' ) && ( space3 == 'F' ) && ( space4 == 'F' )){
 
       if ( pack ){
 
          assert( irrep1 == irrep2 );
          assert( irrep3 == irrep4 );
 
-         const int NEW_C12 = idx->getNOCC( irrep1 ) + idx->getNDMRG( irrep1 );
-         const int NEW_A34 = idx->getNORB( irrep3 );
-         const int SIZE    = stop - start;
+         const int NEW12 = dimension( idx, irrep1, space1 );
+         const int NEW34 = dimension( idx, irrep3, space3 );
+         const int SIZE  = stop - start;
 
          int counter = 0; // counter = cnt1 + ( cnt2 * ( cnt2 + 1 )) / 2
-         for ( int cnt2 = 0; cnt2 < NEW_C12; cnt2++ ){
+         for ( int cnt2 = 0; cnt2 < NEW12; cnt2++ ){
             for ( int cnt1 = 0; cnt1 <= cnt2; cnt1++ ){
                if (( start <= counter ) && ( counter < stop )){
-                  for ( int cnt4 = 0; cnt4 < NEW_A34; cnt4++ ){
+                  for ( int cnt4 = 0; cnt4 < NEW34; cnt4++ ){
                      for ( int cnt3 = 0; cnt3 <= cnt4; cnt3++ ){
                         ROT_TEI->set_coulomb( irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4,
-                           eri[ ( counter - start ) + SIZE * ( cnt3 + NEW_A34 * cnt4 ) ] );
+                           eri[ ( counter - start ) + SIZE * ( cnt3 + NEW34 * cnt4 ) ] );
                            // Indices (12) and indices (34) are Coulomb pairs
                      }
                   }
@@ -173,25 +175,26 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
                counter++;
             }
          }
+         written = true;
 
       } else {
 
          assert( Irreps::directProd( irrep1, irrep2 ) == Irreps::directProd( irrep3, irrep4 ) );
 
-         const int NEW_C1 = idx->getNOCC( irrep1 ) + idx->getNDMRG( irrep1 );
-         const int NEW_C2 = idx->getNOCC( irrep2 ) + idx->getNDMRG( irrep2 );
-         const int NEW_A3 = idx->getNORB( irrep3 );
-         const int NEW_A4 = idx->getNORB( irrep4 );
-         const int SIZE   = stop - start;
+         const int NEW1 = dimension( idx, irrep1, space1 );
+         const int NEW2 = dimension( idx, irrep2, space2 );
+         const int NEW3 = dimension( idx, irrep3, space3 );
+         const int NEW4 = dimension( idx, irrep4, space4 );
+         const int SIZE = stop - start;
 
-         int counter = 0; // counter = cnt1 + NEW_C1 * cnt2
-         for ( int cnt2 = 0; cnt2 < NEW_C2; cnt2++ ){
-            for ( int cnt1 = 0; cnt1 < NEW_C1; cnt1++ ){
+         int counter = 0; // counter = cnt1 + NEW1 * cnt2
+         for ( int cnt2 = 0; cnt2 < NEW2; cnt2++ ){
+            for ( int cnt1 = 0; cnt1 < NEW1; cnt1++ ){
                if (( start <= counter ) && ( counter < stop )){
-                  for ( int cnt4 = 0; cnt4 < NEW_A4; cnt4++ ){
-                     for ( int cnt3 = 0; cnt3 < NEW_A3; cnt3++ ){
+                  for ( int cnt4 = 0; cnt4 < NEW4; cnt4++ ){
+                     for ( int cnt3 = 0; cnt3 < NEW3; cnt3++ ){
                         ROT_TEI->set_coulomb( irrep1, irrep2, irrep3, irrep4, cnt1, cnt2, cnt3, cnt4,
-                           eri[ ( counter - start ) + SIZE * ( cnt3 + NEW_A3 * cnt4 ) ] );
+                           eri[ ( counter - start ) + SIZE * ( cnt3 + NEW3 * cnt4 ) ] );
                            // Indices (12) and indices (34) are Coulomb pairs
                      }
                   }
@@ -199,30 +202,32 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
                counter++;
             }
          }
+         written = true;
+
       }
    }
 
-   if ( space == 'E' ){
+   if (( space1 == 'C' ) && ( space2 == 'V' ) && ( space3 == 'C' ) && ( space4 == 'V' )){ // ( C V | C V )
 
       assert( pack == false );
       assert( Irreps::directProd( irrep1, irrep2 ) == Irreps::directProd( irrep3, irrep4 ) );
 
-      const int  NEW_C1 = idx->getNOCC( irrep1 ) + idx->getNDMRG( irrep1 );
-      const int  NEW_C3 = idx->getNOCC( irrep3 ) + idx->getNDMRG( irrep3 );
-      const int  NEW_V2 = idx->getNVIRT( irrep2 );
-      const int  NEW_V4 = idx->getNVIRT( irrep4 );
-      const int JUMP_V2 = idx->getNOCC( irrep2 ) + idx->getNDMRG( irrep2 );
-      const int JUMP_V4 = idx->getNOCC( irrep4 ) + idx->getNDMRG( irrep4 );
-      const int SIZE    = stop - start;
+      const int NEW1  = dimension( idx, irrep1, space1 );
+      const int NEW2  = dimension( idx, irrep2, space2 );
+      const int NEW3  = dimension( idx, irrep3, space3 );
+      const int NEW4  = dimension( idx, irrep4, space4 );
+      const int JUMP2 = jump( idx, irrep2, space2 );
+      const int JUMP4 = jump( idx, irrep4, space4 );
+      const int SIZE  = stop - start;
 
-      int counter = 0; // counter = cnt1 + NEW_C1 * cnt2
-      for ( int cnt2 = 0; cnt2 < NEW_V2; cnt2++ ){
-         for ( int cnt1 = 0; cnt1 < NEW_C1; cnt1++ ){
+      int counter = 0; // counter = cnt1 + NEW1 * cnt2
+      for ( int cnt2 = 0; cnt2 < NEW2; cnt2++ ){
+         for ( int cnt1 = 0; cnt1 < NEW1; cnt1++ ){
             if (( start <= counter ) && ( counter < stop )){
-               for ( int cnt4 = 0; cnt4 < NEW_V4; cnt4++ ){
-                  for ( int cnt3 = 0; cnt3 < NEW_C3; cnt3++ ){
-                     ROT_TEI->set_exchange( irrep1, irrep3, irrep2, irrep4, cnt1, cnt3, JUMP_V2 + cnt2, JUMP_V4 + cnt4,
-                        eri[ ( counter - start ) + SIZE * ( cnt3 + NEW_C3 * cnt4 ) ] );
+               for ( int cnt4 = 0; cnt4 < NEW4; cnt4++ ){
+                  for ( int cnt3 = 0; cnt3 < NEW3; cnt3++ ){
+                     ROT_TEI->set_exchange( irrep1, irrep3, irrep2, irrep4, cnt1, cnt3, JUMP2 + cnt2, JUMP4 + cnt4,
+                        eri[ ( counter - start ) + SIZE * ( cnt3 + NEW3 * cnt4 ) ] );
                         // Indices (12) and indices (34) are Coulomb pairs
                   }
                }
@@ -230,7 +235,11 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
             counter++;
          }
       }
+      written = true;
+
    }
+
+   assert( written == true );
 
 }
 
@@ -330,22 +339,76 @@ void CheMPS2::DMRGSCFVmatRotations::read_file( hid_t dspc_id, hid_t dset_id, dou
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, const char space, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename ){
+int CheMPS2::DMRGSCFVmatRotations::dimension( DMRGSCFindices * idx, const int irrep, const char space ){
 
-   assert(( space == 'A' ) || ( space == 'F' ));
+   if ( space == 'O' ){ return idx->getNOCC( irrep ); }
+   if ( space == 'A' ){ return idx->getNDMRG( irrep ); }
+   if ( space == 'V' ){ return idx->getNVIRT( irrep ); }
+   if ( space == 'C' ){ return ( idx->getNOCC( irrep ) + idx->getNDMRG( irrep ) ); }
+   if ( space == 'F' ){ return idx->getNORB( irrep ); }
+   return -1;
+
+}
+
+int CheMPS2::DMRGSCFVmatRotations::jump( DMRGSCFindices * idx, const int irrep, const char space ){
+
+   if ( space == 'A' ){ return idx->getNOCC( irrep ); }
+   if ( space == 'V' ){ return idx->getNOCC( irrep ) + idx->getNDMRG( irrep ); }
+   return 0; // O, F, C
+
+}
+
+void CheMPS2::DMRGSCFVmatRotations::unpackage_second( double * mem1, double * mem2, const int SIZE, const int ORIG ){
+
+   for ( int cnt4 = 0; cnt4 < ORIG; cnt4++ ){
+      for ( int cnt3 = 0; cnt3 < ORIG; cnt3++ ){
+         const int combined = (( cnt3 < cnt4 ) ? ( cnt3 + ( cnt4 * ( cnt4 + 1 )) / 2 )
+                                               : ( cnt4 + ( cnt3 * ( cnt3 + 1 )) / 2 ));
+         for ( int cnt12 = 0; cnt12 < SIZE; cnt12++ ){
+            mem2[ cnt12 + SIZE * ( cnt3 + ORIG * cnt4 ) ] = mem1[ cnt12 + SIZE * combined ];
+         }
+      }
+   }
+
+}
+
+void CheMPS2::DMRGSCFVmatRotations::package_first( double * mem1, double * mem2, const int NEW, const int PACKED, const int SIZE ){
+
+   for ( int cnt34 = 0; cnt34 < SIZE; cnt34++ ){
+      for ( int cnt2 = 0; cnt2 < NEW; cnt2++ ){
+         for ( int cnt1 = 0; cnt1 <= cnt2; cnt1++ ){
+            mem2[ cnt1 + ( cnt2 * ( cnt2 + 1 ))/2 + PACKED * cnt34 ] = mem1[ cnt1 + NEW * ( cnt2 + NEW * cnt34 ) ];
+         }
+      }
+   }
+
+}
+
+void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename ){
+
+   /* Matrix elements ( 1 2 | 3 4 ) */
+
+   assert(( space1 == 'O' ) || ( space1 == 'A' ) || ( space1 == 'V' ) || ( space1 == 'C' ) || ( space1 == 'F' ));
+   assert(( space2 == 'O' ) || ( space2 == 'A' ) || ( space2 == 'V' ) || ( space2 == 'C' ) || ( space2 == 'F' ));
+   assert(( space3 == 'O' ) || ( space3 == 'A' ) || ( space3 == 'V' ) || ( space3 == 'C' ) || ( space3 == 'F' ));
+   assert(( space4 == 'O' ) || ( space4 == 'A' ) || ( space4 == 'V' ) || ( space4 == 'C' ) || ( space4 == 'F' ));
+
    const int num_irreps = idx->getNirreps();
+   const bool equal12 = ( space1 == space2 );
+   const bool equal34 = ( space3 == space4 );
+   const bool eightfold = (( space1 == space3 ) && ( space2 == space4 ));
 
    for ( int irrep1 = 0; irrep1 < num_irreps; irrep1++ ){
-      for ( int irrep2 = irrep1; irrep2 < num_irreps; irrep2++ ){ // irrep2 >= irrep1
+      for ( int irrep2 = (( equal12 ) ? irrep1 : 0 ); irrep2 < num_irreps; irrep2++ ){ // irrep2 >= irrep1 if space1 == space2
          const int product_symm = Irreps::directProd( irrep1, irrep2 );
-         for ( int irrep3 = irrep1; irrep3 < num_irreps; irrep3++ ){
+         for ( int irrep3 = (( eightfold ) ? irrep1 : 0 ); irrep3 < num_irreps; irrep3++ ){
             const int irrep4 = Irreps::directProd( product_symm, irrep3 );
-            if ( irrep4 >= irrep3 ){ // irrep4 >= irrep3
+            if ( irrep4 >= (( equal34 ) ? irrep3 : 0 ) ){ // irrep4 >= irrep3 if space3 == space4
 
-               const int NEW1 = (( space == 'A' ) ? idx->getNDMRG( irrep1 ) : idx->getNORB( irrep1 ));
-               const int NEW2 = (( space == 'A' ) ? idx->getNDMRG( irrep2 ) : idx->getNORB( irrep2 ));
-               const int NEW3 = (( space == 'A' ) ? idx->getNDMRG( irrep3 ) : idx->getNORB( irrep3 ));
-               const int NEW4 = (( space == 'A' ) ? idx->getNDMRG( irrep4 ) : idx->getNORB( irrep4 ));
+               const int NEW1 = dimension( idx, irrep1, space1 );
+               const int NEW2 = dimension( idx, irrep2, space2 );
+               const int NEW3 = dimension( idx, irrep3, space3 );
+               const int NEW4 = dimension( idx, irrep4, space4 );
 
                if (( NEW1 > 0 ) && ( NEW2 > 0 ) && ( NEW3 > 0 ) && ( NEW4 > 0 )){
 
@@ -354,54 +417,66 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourInd
                   const int ORIG3 = idx->getNORB( irrep3 );
                   const int ORIG4 = idx->getNORB( irrep4 );
 
-                  double * umat1 = umat->getBlock( irrep1 ) + (( space == 'A' ) ? idx->getNOCC( irrep1 ) : 0 );
-                  double * umat2 = umat->getBlock( irrep2 ) + (( space == 'A' ) ? idx->getNOCC( irrep2 ) : 0 );
-                  double * umat3 = umat->getBlock( irrep3 ) + (( space == 'A' ) ? idx->getNOCC( irrep3 ) : 0 );
-                  double * umat4 = umat->getBlock( irrep4 ) + (( space == 'A' ) ? idx->getNOCC( irrep4 ) : 0 );
+                  double * umat1 = umat->getBlock( irrep1 ) + jump( idx, irrep1, space1 );
+                  double * umat2 = umat->getBlock( irrep2 ) + jump( idx, irrep2, space2 );
+                  double * umat3 = umat->getBlock( irrep3 ) + jump( idx, irrep3, space3 );
+                  double * umat4 = umat->getBlock( irrep4 ) + jump( idx, irrep4, space4 );
 
-                  const int  first_new =  NEW1 * NEW2;
-                  const int second_old = ORIG3 * ORIG4;
-
-                  const int block_size1 = mem_size / ( ORIG1 * ORIG2 ); // Floor of amount of times first_old  fits in mem_size
-                  const int block_size2 = mem_size / second_old;        // Floor of amount of times second_old fits in mem_size
+                  const int block_size1 = mem_size / ( ORIG1 * ORIG2 ); // Floor of amount of times orig( first  ) fits in mem_size
+                  const int block_size2 = mem_size / ( ORIG3 * ORIG4 ); // Floor of amount of times orig( second ) fits in mem_size
                   assert( block_size1 > 0 );
                   assert( block_size2 > 0 );
 
-                  const bool io_free = (( block_size1 >= second_old ) && ( block_size2 >= first_new ));
+                  const bool pack_first  = (( equal12 ) && ( irrep1 == irrep2 ));
+                  const bool pack_second = (( equal34 ) && ( irrep3 == irrep4 ));
+                  const int   first_size = (( pack_first  ) ? (  NEW1 * (  NEW1 + 1 )) / 2 :  NEW1 * NEW2  );
+                  const int  second_size = (( pack_second ) ? ( ORIG3 * ( ORIG3 + 1 )) / 2 : ORIG3 * ORIG4 );
+
+                  const bool io_free = (( block_size1 >= second_size ) && ( block_size2 >= first_size ));
                   hid_t file_id, dspc_id, dset_id;
 
                   if ( io_free == false ){
                      assert( filename.compare( "edmistonruedenberg" ) != 0 );
-                     open_file( &file_id, &dspc_id, &dset_id, first_new, second_old, filename );
+                     open_file( &file_id, &dspc_id, &dset_id, first_size, second_size, filename );
                   }
 
                   // First half transformation
                   int start = 0;
-                  while ( start < second_old ){
-                     const int stop = min( start + block_size1, second_old );
+                  while ( start < second_size ){
+                     const int stop = min( start + block_size1, second_size );
                      const int size = stop - start;
-                     fetch( mem1, ORIG_VMAT, irrep1, irrep2, irrep3, irrep4, idx, start, stop, false );
+                     fetch( mem1, ORIG_VMAT, irrep1, irrep2, irrep3, irrep4, idx, start, stop, pack_second );
                      blockwise_first(  mem1, mem2, ORIG1, ORIG2, size, umat1, NEW1, ORIG1 );
                      blockwise_second( mem2, mem1, NEW1,  ORIG2, size, umat2, NEW2, ORIG2 );
-                     // pack first potentially
-                     if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
+                     if ( pack_first ){
+                        package_first( mem1, mem2, NEW1, first_size, size );
+                        double * temp = mem1;
+                        mem1 = mem2;
+                        mem2 = temp;
+                     }
+                     if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_size ); }
                      start += size;
                   }
-                  assert( start == second_old );
+                  assert( start == second_size );
 
                   // Do the second half transformation
                   start = 0;
-                  while ( start < first_new ){
-                     const int stop = min( start + block_size2, first_new );
+                  while ( start < first_size ){
+                     const int stop = min( start + block_size2, first_size );
                      const int size = stop - start;
-                     if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
-                     // unpack second potentially
+                     if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_size ); }
+                     if ( pack_second ){
+                        unpackage_second( mem1, mem2, size, ORIG3 );
+                        double * temp = mem1;
+                        mem1 = mem2;
+                        mem2 = temp;
+                     }
                      blockwise_fourth( mem1, mem2, size, ORIG3, ORIG4, umat4, NEW4, ORIG4 );
                      blockwise_third(  mem2, mem1, size, ORIG3, NEW4,  umat3, NEW3, ORIG3 );
-                     write( mem1, NEW_VMAT, NULL, space, irrep1, irrep2, irrep3, irrep4, idx, start, stop, false );
+                     write( mem1, NEW_VMAT, ROT_TEI, space1, space2, space3, space4, irrep1, irrep2, irrep3, irrep4, idx, start, stop, pack_first );
                      start += size;
                   }
-                  assert( start == first_new );
+                  assert( start == first_size );
                   if ( io_free == false ){ close_file( file_id, dspc_id, dset_id ); }
                }
             }
@@ -410,161 +485,5 @@ void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourInd
    }
 
 }
-
-void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, DMRGSCFintegrals * ROT_TEI, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename ){
-
-   const int num_irreps = idx->getNirreps();
-
-   // First do Coulomb object : ( c1 <= c2 | a1 <= a2 )
-   for ( int Ic1 = 0; Ic1 < num_irreps; Ic1++){
-      for ( int Ic2 = Ic1; Ic2 < num_irreps; Ic2++){ // Ic2 >= Ic1
-         const int Icc = Irreps::directProd( Ic1, Ic2 );
-         for ( int Ia1 = 0; Ia1 < num_irreps; Ia1++ ){
-            const int Ia2 = Irreps::directProd( Ia1, Icc );
-            if ( Ia1 <= Ia2 ){ // Ia2 >= Ia1
-
-               const int NEW_C1 = idx->getNOCC( Ic1 ) + idx->getNDMRG( Ic1 );
-               const int NEW_C2 = idx->getNOCC( Ic2 ) + idx->getNDMRG( Ic2 );
-               const int NEW_A1 = idx->getNORB( Ia1 );
-               const int NEW_A2 = idx->getNORB( Ia2 );
-
-               if (( NEW_C1 > 0 ) && ( NEW_C2 > 0 ) && ( NEW_A1 > 0 ) && ( NEW_A2 > 0 )){
-
-                  const int NORB_C1 = idx->getNORB( Ic1 );
-                  const int NORB_C2 = idx->getNORB( Ic2 );
-                  const int NORB_A1 = idx->getNORB( Ia1 );
-                  const int NORB_A2 = idx->getNORB( Ia2 );
-
-                  double * umat_C1 = umat->getBlock( Ic1 );
-                  double * umat_C2 = umat->getBlock( Ic2 );
-                  double * umat_A1 = umat->getBlock( Ia1 );
-                  double * umat_A2 = umat->getBlock( Ia2 );
-
-                  const int  first_new =  NEW_C1 * NEW_C2;
-                  const int second_old = NORB_A1 * NORB_A2;
-
-                  const int block_size1 = mem_size / ( NORB_C1 * NORB_C2 ); // Floor of amount of times first_old  fits in mem_size
-                  const int block_size2 = mem_size / second_old;            // Floor of amount of times second_old fits in mem_size
-                  assert( block_size1 > 0 );
-                  assert( block_size2 > 0 );
-
-                  const bool io_free = (( block_size1 >= second_old ) && ( block_size2 >= first_new ));
-                  hid_t file_id, dspc_id, dset_id;
-
-                  if ( io_free == false ){
-                     open_file( &file_id, &dspc_id, &dset_id, first_new, second_old, filename );
-                  }
-
-                  // First half transformation
-                  int start = 0;
-                  while ( start < second_old ){
-                     const int stop = min( start + block_size1, second_old );
-                     const int size = stop - start;
-                     fetch( mem1, ORIG_VMAT, Ic1, Ic2, Ia1, Ia2, idx, start, stop, false );
-                     blockwise_first(  mem1, mem2, NORB_C1, NORB_C2, size, umat_C1, NEW_C1, NORB_C1 );
-                     blockwise_second( mem2, mem1,  NEW_C1, NORB_C2, size, umat_C2, NEW_C2, NORB_C2 );
-                     // pack first potentially
-                     if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
-                     start += size;
-                  }
-                  assert( start == second_old );
-
-                  // Do the second half transformation
-                  start = 0;
-                  while ( start < first_new ){
-                     const int stop = min( start + block_size2, first_new );
-                     const int size = stop - start;
-                     if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
-                     // unpack second potentially
-                     blockwise_fourth( mem1, mem2, size, NORB_A1, NORB_A2, umat_A2, NEW_A2, NORB_A2 );
-                     blockwise_third(  mem2, mem1, size, NORB_A1,  NEW_A2, umat_A1, NEW_A1, NORB_A1 );
-                     write( mem1, NULL, ROT_TEI, 'C', Ic1, Ic2, Ia1, Ia2, idx, start, stop, false );
-                     start += size;
-                  }
-                  assert( start == first_new );
-                  if ( io_free == false ){ close_file( file_id, dspc_id, dset_id ); }
-               }
-            }
-         }
-      }
-   }
-
-   // Now do Exchange object ( c1 v1 | c2 v2 ) with c1 <= c2
-   for ( int Ic1 = 0; Ic1 < num_irreps; Ic1++ ){
-      for ( int Ic2 = Ic1; Ic2 < num_irreps; Ic2++ ){
-         const int Icc = Irreps::directProd( Ic1, Ic2 );
-         for ( int Iv1 = 0; Iv1 < num_irreps; Iv1++ ){
-            const int Iv2 = Irreps::directProd( Iv1, Icc );
-
-            const int NEW_C1 = idx->getNOCC( Ic1 ) + idx->getNDMRG( Ic1 );
-            const int NEW_C2 = idx->getNOCC( Ic2 ) + idx->getNDMRG( Ic2 );
-            const int NEW_V1 = idx->getNVIRT( Iv1 );
-            const int NEW_V2 = idx->getNVIRT( Iv2 );
-
-            if (( NEW_C1 > 0 ) && ( NEW_C2 > 0 ) && ( NEW_V1 > 0 ) && ( NEW_V2 > 0 )){
-
-               const int NORB_C1 = idx->getNORB( Ic1 );
-               const int NORB_C2 = idx->getNORB( Ic2 );
-               const int NORB_V1 = idx->getNORB( Iv1 );
-               const int NORB_V2 = idx->getNORB( Iv2 );
-
-               const int JUMP_V1 = idx->getNOCC( Iv1 ) + idx->getNDMRG( Iv1 );
-               const int JUMP_V2 = idx->getNOCC( Iv2 ) + idx->getNDMRG( Iv2 );
-
-               double * umat_C1 = umat->getBlock( Ic1 );
-               double * umat_C2 = umat->getBlock( Ic2 );
-               double * umat_V1 = umat->getBlock( Iv1 ) + JUMP_V1;
-               double * umat_V2 = umat->getBlock( Iv2 ) + JUMP_V2;
-
-               const int  first_new =  NEW_C1 * NEW_V1;
-               const int second_old = NORB_C2 * NORB_V2;
-
-               const int block_size1 = mem_size / ( NORB_C1 * NORB_V1 ); // Floor of amount of times first_old  fits in mem_size
-               const int block_size2 = mem_size / second_old;            // Floor of amount of times second_old fits in mem_size
-               assert( block_size1 > 0 );
-               assert( block_size2 > 0 );
-
-               const bool io_free = (( block_size1 >= second_old ) && ( block_size2 >= first_new ));
-               hid_t file_id, dspc_id, dset_id;
-
-               if ( io_free == false ){
-                  open_file( &file_id, &dspc_id, &dset_id, first_new, second_old, filename );
-               }
-
-               // First half transformation
-               int start = 0;
-               while ( start < second_old ){
-                  const int stop = min( start + block_size1, second_old );
-                  const int size = stop - start;
-                  fetch( mem1, ORIG_VMAT, Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
-                  blockwise_first(  mem1, mem2, NORB_C1, NORB_V1, size, umat_C1, NEW_C1, NORB_C1 );
-                  blockwise_second( mem2, mem1,  NEW_C1, NORB_V1, size, umat_V1, NEW_V1, NORB_V1 );
-                  // do not pack first because EXCHANGE
-                  if ( io_free == false ){ write_file( dspc_id, dset_id, mem1, start, size, first_new ); }
-                  start += size;
-               }
-               assert( start == second_old );
-
-               // Do the second half transformation
-               start = 0;
-               while ( start < first_new ){
-                  const int stop = min( start + block_size2, first_new );
-                  const int size = stop - start;
-                  if ( io_free == false ){ read_file( dspc_id, dset_id, mem1, start, size, second_old ); }
-                  // unpack second potentially --> is allowed for EXCHANGE
-                  blockwise_fourth( mem1, mem2, size, NORB_C2, NORB_V2, umat_V2, NEW_V2, NORB_V2 );
-                  blockwise_third(  mem2, mem1, size, NORB_C2,  NEW_V2, umat_C2, NEW_C2, NORB_C2 );
-                  write( mem1, NULL, ROT_TEI, 'E', Ic1, Iv1, Ic2, Iv2, idx, start, stop, false );
-                  start += size;
-               }
-               assert( start == first_new );
-               if ( io_free == false ){ close_file( file_id, dspc_id, dset_id ); }
-            }
-         }
-      }
-   }
-
-}
-
 
 
