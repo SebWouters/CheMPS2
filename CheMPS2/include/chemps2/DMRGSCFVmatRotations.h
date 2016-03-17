@@ -56,7 +56,7 @@ namespace CheMPS2{
              \param mem1 Work memory with at least the size max(linsize of irreps)^4.
              \param mem2 Work memory with at least the size max(linsize of irreps)^4.
              \param mem_size Sizes of the work memories.
-             \param fileame Where to store the temporary intermediate objects. */
+             \param filename Where to store the temporary intermediate objects. */
          static void rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename );
 
       private:

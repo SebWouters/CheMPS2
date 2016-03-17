@@ -36,9 +36,16 @@ namespace CheMPS2{
     The TwoDM class stores the result of a converged DMRG calculation. With the 2DM \n
     \f$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } \f$\n
     we can define two spin-reduced versions of interest:\n
-    \f$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} \f$ \n
-    \f$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) \f$. \n
-    Because the wave-function belongs to a certain Abelian irrep, \f$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} \f$ must be valid before the corresponding element \f$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} \f$ is non-zero.
+    \f$ \Gamma^{2A}_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} \f$ \n
+    \f$ \Gamma^{2B}_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) \f$. \n
+    Because the wave-function belongs to a certain Abelian irrep, \f$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} \f$ must be valid before the corresponding element \f$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} \f$ is non-zero. \n
+\n
+    We can also define spin-densities in the spin-ensemble as:\n
+    \f{eqnarray*}{
+       \Gamma^{spin}_{ij} & = & \frac{3(1 - \delta_{S,0})}{(S+1)(2S+1)} \sum_{S^z} S^z \braket{ S S^z \mid a^{\dagger}_{i \uparrow} a_{j \uparrow} - a^{\dagger}_{i \downarrow} a_{j \downarrow} \mid S S^z } \\
+                          & = & \frac{3(1 - \delta_{S,0})}{2(S+1)} \left[ ( 2 - N_{elec} ) \Gamma^1_{ij} - \sum_r \Gamma^{2A}_{ir;rj} - \sum_r \Gamma^{2B}_{ir;rj} \right]
+    \f} \n
+    The normalization factor is chosen so that \f$ trace( \Gamma^{spin} ) = 2 S \f$.
 */
    class TwoDM{
 
@@ -74,6 +81,12 @@ namespace CheMPS2{
              \return the desired value */
          double get1RDM_DMRG(const int cnt1, const int cnt2) const;
          
+         //! Get a spin-density term, using the DMRG indices
+         /** \param cnt1 the first index
+             \param cnt2 the second index
+             \return the desired value  */
+         double spin_density_dmrg( const int cnt1, const int cnt2 ) const;
+         
          //! Get a 2DM_A term, using the HAM indices
          /** \param cnt1 the first index
              \param cnt2 the second index
@@ -95,6 +108,12 @@ namespace CheMPS2{
              \param cnt2 the second index
              \return the desired value */
          double get1RDM_HAM(const int cnt1, const int cnt2) const;
+         
+         //! Get a spin-density term, using the HAM indices
+         /** \param cnt1 the first index
+             \param cnt2 the second index
+             \return the desired value  */
+         double spin_density_ham( const int cnt1, const int cnt2 ) const;
          
          //! Fill the 2DM terms with as second site index denT->gIndex()
          /** \param denT DMRG site-matrices

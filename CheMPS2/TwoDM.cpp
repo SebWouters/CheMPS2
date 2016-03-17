@@ -140,6 +140,27 @@ double CheMPS2::TwoDM::get1RDM_DMRG(const int cnt1, const int cnt2) const{
 
 }
 
+double CheMPS2::TwoDM::spin_density_dmrg( const int cnt1, const int cnt2 ) const{
+
+   //Prob assumes you use DMRG orbs...
+   const int irrep1 = Prob->gIrrep(cnt1);
+   const int irrep2 = Prob->gIrrep(cnt2);
+   if ( irrep1 == irrep2 ){
+      const int two_s = Prob->gTwoS();
+      if ( two_s > 0 ){
+         double value = ( 2 - Prob->gN() ) * get1RDM_DMRG( cnt1, cnt2 );
+         for ( int orb = 0; orb < Prob->gL(); orb++ ){
+            value -= ( getTwoDMA_DMRG( cnt1, orb, orb, cnt2 ) + getTwoDMB_DMRG( cnt1, orb, orb, cnt2 ) );
+         }
+         value = 1.5 * value / ( 0.5 * two_s + 1 );
+         return value;
+      }
+   }
+
+   return 0.0;
+
+}
+
 double CheMPS2::TwoDM::getTwoDMA_HAM(const int cnt1, const int cnt2, const int cnt3, const int cnt4) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
@@ -167,6 +188,16 @@ double CheMPS2::TwoDM::get1RDM_HAM(const int cnt1, const int cnt2) const{
       return get1RDM_DMRG( Prob->gf1(cnt1), Prob->gf1(cnt2) );
    }
    return get1RDM_DMRG( cnt1, cnt2 );
+
+}
+
+double CheMPS2::TwoDM::spin_density_ham( const int cnt1, const int cnt2 ) const{
+
+   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
+   if ( Prob->gReorder() ){
+      return spin_density_dmrg( Prob->gf1(cnt1), Prob->gf1(cnt2) );
+   }
+   return spin_density_dmrg( cnt1, cnt2 );
 
 }
 

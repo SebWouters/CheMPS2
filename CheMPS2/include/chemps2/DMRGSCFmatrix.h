@@ -78,13 +78,13 @@ namespace CheMPS2{
 
       protected:
 
-         // The information on the occupied, active, and virtual spaces
+         //! The information on the occupied, active, and virtual spaces
          const DMRGSCFindices * iHandler;
 
-         // The matrix entries
+         //! The matrix entries
          double ** entries;
 
-         // The number of irreps
+         //! The number of irreps
          int num_irreps;
 
    };
