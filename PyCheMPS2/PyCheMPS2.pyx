@@ -291,7 +291,7 @@ cdef class PyFCI:
         assert ThreeRDM.flags['C_CONTIGUOUS']
         assert   output.flags['C_CONTIGUOUS']
         self.thisptr.Diag4RDM(&GSvector[0], &ThreeRDM[0], ham_orbz, &output[0])
-    def FillRandom(self, unsigned long long vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
+    def FillRandom(self, unsigned int vecLength, np.ndarray[double, ndim=1, mode="c"] vector not None):
         assert vector.flags['C_CONTIGUOUS']
         self.thisptr.FillRandom(vecLength, &vector[0])
     def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None, np.ndarray[double, ndim=1, mode="c"] GSvector not None):

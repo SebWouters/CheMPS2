@@ -24,9 +24,9 @@ cimport DMRGSCFopt
 cdef extern from "chemps2/FCI.h" namespace "CheMPS2":
     cdef cppclass FCI:
         FCI(Ham.Hamiltonian *, const unsigned int, const unsigned int, const int, const double, const int) except +
-        unsigned long long getVecLength(const int)
-        unsigned long long LowestEnergyDeterminant()
-        void FillRandom(const unsigned long long, double *)
+        unsigned int getVecLength(const int)
+        unsigned int LowestEnergyDeterminant()
+        void FillRandom(const unsigned int, double *)
         double GSDavidson(double *)
         double Fill2RDM(double *, double *)
         void Fill3RDM(double *, double *)

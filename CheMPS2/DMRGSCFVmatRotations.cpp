@@ -297,7 +297,7 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_fourth( double * origin, double * 
 void CheMPS2::DMRGSCFVmatRotations::open_file( hid_t * file_id, hid_t * dspc_id, hid_t * dset_id, const int first, const int second, const string filename ){
 
    file_id[0] = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-   hsize_t fdim_h5[] = { second, first }; // C is row major: [ col + ncol * row ] is assumed
+   hsize_t fdim_h5[] = { (hsize_t) second, (hsize_t) first }; // C is row major: [ col + ncol * row ] is assumed
    dspc_id[0] = H5Screate_simple( 2, fdim_h5, NULL );
    dset_id[0] = H5Dcreate( file_id[0], "storage", H5T_NATIVE_DOUBLE, dspc_id[0], H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
@@ -315,8 +315,8 @@ void CheMPS2::DMRGSCFVmatRotations::write_file( hid_t dspc_id, hid_t dset_id, do
 
    hsize_t stride_h5[] = { 1, 1 };
    hsize_t  count_h5[] = { 1, 1 };
-   hsize_t  start_h5[] = { start, 0 };
-   hsize_t  block_h5[] = { size, first_write };
+   hsize_t  start_h5[] = { (hsize_t) start, 0 };
+   hsize_t  block_h5[] = { (hsize_t) size, (hsize_t) first_write };
    H5Sselect_hyperslab( dspc_id, H5S_SELECT_SET, start_h5, stride_h5, count_h5, block_h5 );
    hsize_t mem_h5 = size * first_write; // Should be OK to multiply as integers as it is smaller than mem_size
    hid_t mem_id = H5Screate_simple( 1, &mem_h5, NULL );
@@ -329,8 +329,8 @@ void CheMPS2::DMRGSCFVmatRotations::read_file( hid_t dspc_id, hid_t dset_id, dou
 
    hsize_t stride_h5[] = { 1, 1 };
    hsize_t  count_h5[] = { 1, 1 };
-   hsize_t  start_h5[] = { 0, start };
-   hsize_t  block_h5[] = { second_read, size };
+   hsize_t  start_h5[] = { 0, (hsize_t) start };
+   hsize_t  block_h5[] = { (hsize_t) second_read, (hsize_t) size };
    H5Sselect_hyperslab( dspc_id, H5S_SELECT_SET, start_h5, stride_h5, count_h5, block_h5 );
    hsize_t mem_h5 = second_read * size; // Should be OK to multiply as integers as it is smaller than mem_size
    hid_t mem_id = H5Screate_simple( 1, &mem_h5, NULL );

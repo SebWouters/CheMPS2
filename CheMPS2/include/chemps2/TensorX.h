@@ -64,10 +64,7 @@ namespace CheMPS2{
          void update(TensorT * denT);
          
       private:
-      
-         //whether moving right or not
-         bool movingRight;
-         
+
          //Problem containing the matrix elements
          const Problem * Prob;
       

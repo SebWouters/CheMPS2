@@ -545,11 +545,11 @@ void CheMPS2::FCI::excite_alpha_omp( const unsigned int dim_new_up, const unsign
 void CheMPS2::FCI::excite_beta_omp( const unsigned int dim_up, const unsigned int dim_new_down, double * origin, double * result, int * signmap, int * countmap ){
 
    #pragma omp parallel for schedule(static)
-   for ( int cnt_new_down = 0; cnt_new_down < dim_new_down; cnt_new_down++ ){
+   for ( unsigned int cnt_new_down = 0; cnt_new_down < dim_new_down; cnt_new_down++ ){
       const int sign_down = signmap[ cnt_new_down ];
       if ( sign_down != 0 ){
          const int cnt_old_down = countmap[ cnt_new_down ];
-         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+         for ( unsigned int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
             result[ cnt_up + dim_up * cnt_new_down ] += sign_down * origin[ cnt_up + dim_up * cnt_old_down ];
          }
       }
@@ -573,11 +573,11 @@ void CheMPS2::FCI::excite_alpha_first( const unsigned int dim_new_up, const unsi
 
 void CheMPS2::FCI::excite_beta_first( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
 
-   for ( int cnt_new_down = start_down; cnt_new_down < stop_down; cnt_new_down++ ){
+   for ( unsigned int cnt_new_down = start_down; cnt_new_down < stop_down; cnt_new_down++ ){
       const int sign_down = signmap[ cnt_new_down ];
       if ( sign_down != 0 ){
          const int cnt_old_down = countmap[ cnt_new_down ];
-         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+         for ( unsigned int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
             result[ cnt_up + dim_up * ( cnt_new_down - start_down ) ] += sign_down * origin[ cnt_up + dim_up * cnt_old_down ];
          }
       }
@@ -603,11 +603,11 @@ void CheMPS2::FCI::excite_alpha_second_omp( const unsigned int dim_new_up, const
 void CheMPS2::FCI::excite_beta_second_omp( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
 
    #pragma omp parallel for schedule(static)
-   for ( int cnt_old_down = start_down; cnt_old_down < stop_down; cnt_old_down++ ){
+   for ( unsigned int cnt_old_down = start_down; cnt_old_down < stop_down; cnt_old_down++ ){
       const int sign_down = signmap[ cnt_old_down ];
       if ( sign_down != 0 ){ // Required for thread safety
          const int cnt_new_down = countmap[ cnt_old_down ];
-         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+         for ( unsigned int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
             result[ cnt_up + dim_up * cnt_new_down ] += sign_down * origin[ cnt_up + dim_up * ( cnt_old_down - start_down ) ];
          }
       }
@@ -633,7 +633,7 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
       const unsigned int * center_anni_orb = irrep_center_anni_orb[ irrep_center ];
       const unsigned int * zero_jumps = irrep_center_jumps[ 0 ];
 
-      for ( int irrep_center_up = 0; irrep_center_up < num_irreps; irrep_center_up++ ){
+      for ( unsigned int irrep_center_up = 0; irrep_center_up < num_irreps; irrep_center_up++ ){
          const int irrep_center_down = Irreps::directProd( irrep_target_center, irrep_center_up );
          const unsigned int dim_center_up   = numPerIrrep_up  [ irrep_center_up   ];
          const unsigned int dim_center_down = numPerIrrep_down[ irrep_center_down ];
@@ -774,7 +774,7 @@ void CheMPS2::FCI::apply_excitation( double * orig_vector, double * result_vecto
 
    ClearVector( getVecLength( result_irrep_center ) , result_vector );
 
-   for ( int result_irrep_up = 0; result_irrep_up < num_irreps; result_irrep_up++ ){
+   for ( unsigned int result_irrep_up = 0; result_irrep_up < num_irreps; result_irrep_up++ ){
 
       const int result_irrep_down = Irreps::directProd( result_irrep_up, result_target_irrep );
       const int orig_irrep_up     = Irreps::directProd( excitation_irrep, result_irrep_up );
