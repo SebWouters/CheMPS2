@@ -40,10 +40,9 @@ CheMPS2::TwoDM::TwoDM(const SyBookkeeper * denBKIn, const Problem * ProbIn){
    denBK = denBKIn;
    Prob = ProbIn;
    L = denBK->gL();
-   
-   const int max_integer = INT_MAX;
-   const long long size  = L*L*L*L;
-   assert( max_integer >= size );
+
+   const long long size = ((long long) L ) * ((long long) L ) * ((long long) L ) * ((long long) L );
+   assert( INT_MAX >= size );
    two_rdm_A = new double[ size ];
    two_rdm_B = new double[ size ];
    

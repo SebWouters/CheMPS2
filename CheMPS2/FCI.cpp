@@ -144,13 +144,13 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
    for (unsigned int orb = 0; orb < L; orb++){ TwoPowL *= 2; }
 
    // Create the required arrays to perform the conversions between counters and bitstrings
-   numPerIrrep_up     = new unsigned int[ num_irreps ];
-   numPerIrrep_down   = new unsigned int[ num_irreps ];
-   str2cnt_up         = new int*[ num_irreps ];
-   str2cnt_down       = new int*[ num_irreps ];
-   cnt2str_up         = new unsigned int*[ num_irreps ];
-   cnt2str_down       = new unsigned int*[ num_irreps ];
-   
+   numPerIrrep_up   = new unsigned int[ num_irreps ];
+   numPerIrrep_down = new unsigned int[ num_irreps ];
+   str2cnt_up       = new int*[ num_irreps ];
+   str2cnt_down     = new int*[ num_irreps ];
+   cnt2str_up       = new unsigned int*[ num_irreps ];
+   cnt2str_down     = new unsigned int*[ num_irreps ];
+
    for (unsigned int irrep = 0; irrep < num_irreps; irrep++){
       numPerIrrep_up  [ irrep ] = 0;
       numPerIrrep_down[ irrep ] = 0;
@@ -355,47 +355,37 @@ void CheMPS2::FCI::StartupIrrepCenter(){
       }
    
    }
-   
-   irrep_center_jumps = new unsigned long long*[ num_irreps ];
+
+   irrep_center_jumps = new unsigned int*[ num_irreps ];
    HXVsizeWorkspace = 0;
    for ( unsigned int irrep_center = 0; irrep_center < num_irreps; irrep_center++ ){
-   
-      irrep_center_jumps[ irrep_center ] = new unsigned long long[ num_irreps+1 ];
+      unsigned long long check = 0;
+      irrep_center_jumps[ irrep_center ] = new unsigned int[ num_irreps + 1 ];
       const int localTargetIrrep = Irreps::directProd( irrep_center, getTargetIrrep() );
       irrep_center_jumps[ irrep_center ][ 0 ] = 0;
       for ( unsigned int irrep_up = 0; irrep_up < num_irreps; irrep_up++ ){
          const int irrep_down = Irreps::directProd( irrep_up, localTargetIrrep );
-         unsigned long long temp  = numPerIrrep_up  [ irrep_up   ];
-                            temp *= numPerIrrep_down[ irrep_down ];
-         irrep_center_jumps[ irrep_center ][ irrep_up+1 ] = irrep_center_jumps[ irrep_center ][ irrep_up ] + temp;
-         if ( irrep_center_num[ irrep_center ] * temp > HXVsizeWorkspace ){
-            HXVsizeWorkspace = irrep_center_num[ irrep_center ] * temp;
-         }
+         check += ((unsigned long long) numPerIrrep_up[ irrep_up ] ) * ((unsigned long long) numPerIrrep_down[ irrep_down ] );
+         unsigned int temp = numPerIrrep_up[ irrep_up ] * numPerIrrep_down[ irrep_down ];
+         irrep_center_jumps[ irrep_center ][ irrep_up + 1 ] = irrep_center_jumps[ irrep_center ][ irrep_up ] + temp;
+         HXVsizeWorkspace = std::max( HXVsizeWorkspace, ((unsigned long long) irrep_center_num[ irrep_center ] ) * ((unsigned long long) temp ) );
       }
+      assert( check <= ((unsigned int) INT_MAX ) ); // Length of FCI vectors should be less then the SIGNED integer size (to be able to call lapack)
    }
-   if ( FCIverbose>0 ){
-      cout << "FCI::Startup : Number of variables in the FCI vector = " << getVecLength(0) << endl;
-      unsigned long long numberOfBytes = 2 * sizeof(double) * HXVsizeWorkspace;
-      
-      cout << "FCI::Startup : Without additional loops the FCI matrix-vector product requires a workspace of " << 1e-6 * numberOfBytes << " MB memory." << endl;
-      if ( maxMemWorkMB < 1e-6 * numberOfBytes ){
-         HXVsizeWorkspace = (unsigned long long) ceil( ( maxMemWorkMB * 1e6 ) / ( 2 * sizeof(double ) ) );
-         numberOfBytes = 2 * sizeof(double) * HXVsizeWorkspace;
-         cout << "               For practical purposes, the workspace is constrained to " << 1e-6 * numberOfBytes << " MB memory." << endl;
+   if ( FCIverbose > 0 ){
+      cout << "FCI::Startup : Number of variables in the FCI vector = " << getVecLength( 0 ) << endl;
+      double num_megabytes = ( 2.0 * sizeof(double) * HXVsizeWorkspace ) / 1048576;
+      cout << "FCI::Startup : Without additional loops the FCI matrix-vector product requires a workspace of " << num_megabytes << " MB memory." << endl;
+      if ( maxMemWorkMB < num_megabytes ){
+         HXVsizeWorkspace = (unsigned int) ceil( ( maxMemWorkMB * 1048576 ) / ( 2 * sizeof(double) ) );
+         num_megabytes = ( 2.0 * sizeof(double) * HXVsizeWorkspace ) / 1048576;
+         cout << "               For practical purposes, the workspace is constrained to " << num_megabytes << " MB memory." << endl;
       }
    }
    HXVworksmall = new double[ L * L * L * L ];
    HXVworkbig1  = new double[ HXVsizeWorkspace ];
    HXVworkbig2  = new double[ HXVsizeWorkspace ];
-   
-   // Check for the lapack routines { dgemm_ , daxpy_ , dscal_ , dcopy_ , ddot_ }
-   unsigned long long maxVecLength = 0;
-   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
-      if ( getVecLength( irrep ) > maxVecLength ){ maxVecLength = getVecLength( irrep ); }
-   }
-   const unsigned int max_integer = INT_MAX;
-   assert( max_integer >= maxVecLength );
-   
+
 }
 
 void CheMPS2::FCI::str2bits(const unsigned int Lval, const unsigned int bitstring, int * bits){
@@ -416,7 +406,7 @@ unsigned int CheMPS2::FCI::bits2str(const unsigned int Lval, int * bits){
 
 }
 
-int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned long long counter) const{
+int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned int counter) const{
 
    int irrep_up = num_irreps;
    while ( counter < irrep_center_jumps[ irrep_center ][ irrep_up-1 ] ){ irrep_up--; }
@@ -424,12 +414,12 @@ int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned lon
    
 }
 
-void CheMPS2::FCI::getBitsOfCounter(const int irrep_center, const unsigned long long counter, int * bits_up, int * bits_down) const{
+void CheMPS2::FCI::getBitsOfCounter(const int irrep_center, const unsigned int counter, int * bits_up, int * bits_down) const{
 
-   const int localTargetIrrep = Irreps::directProd( irrep_center , TargetIrrep );
+   const int localTargetIrrep = Irreps::directProd( irrep_center, TargetIrrep );
    
-   const int irrep_up   = getUpIrrepOfCounter( irrep_center , counter );
-   const int irrep_down = Irreps::directProd( irrep_up , localTargetIrrep );
+   const int irrep_up   = getUpIrrepOfCounter( irrep_center, counter );
+   const int irrep_down = Irreps::directProd( irrep_up, localTargetIrrep );
    
    const unsigned int count_up   = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
    const unsigned int count_down = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
@@ -465,12 +455,12 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
 
 /*void CheMPS2::FCI::CheckHamDEBUG() const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    
    // Building Ham by matvec
    double * HamHXV = new double[ vecLength * vecLength ];
    double * workspace = new double[ vecLength ];
-   for (unsigned long long count = 0; count < vecLength; count++){
+   for (unsigned int count = 0; count < vecLength; count++){
    
       ClearVector( vecLength , workspace );
       workspace[ count ] = 1.0;
@@ -481,7 +471,7 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    // Building Diag by HamDiag
    DiagHam( workspace );
    double RMSdiagdifference = 0.0;
-   for (unsigned long long row = 0; row < vecLength; row++){
+   for (unsigned int row = 0; row < vecLength; row++){
       double diff = workspace[ row ] - HamHXV[ row + vecLength * row ];
       RMSdiagdifference += diff * diff;
    }
@@ -495,8 +485,8 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    int * bra_up   = new int[ L ];
    int * bra_down = new int[ L ];
    double RMSconstructiondiff = 0.0;
-   for (unsigned long long row = 0; row < vecLength; row++){
-      for (unsigned long long col = 0; col < vecLength; col++){
+   for (unsigned int row = 0; row < vecLength; row++){
+      for (unsigned int col = 0; col < vecLength; col++){
          getBitsOfCounter( 0 , row , bra_up , bra_down );
          getBitsOfCounter( 0 , col , ket_up , ket_down );
          double tempvar = HamHXV[ row + vecLength * col ] - GetMatrixElement( bra_up , bra_down , ket_up , ket_down , work );
@@ -512,7 +502,7 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    
    // Building Ham^2 by matvec
    double * workspace2 = new double[ vecLength ];
-   for (unsigned long long count = 0; count < vecLength; count++){
+   for (unsigned int count = 0; count < vecLength; count++){
    
       ClearVector( vecLength , workspace );
       workspace[ count ] = 1.0;
@@ -524,7 +514,7 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    // Building diag( Ham^2 ) by DiagHamSquared
    DiagHamSquared( workspace );
    double RMSdiagdifference2 = 0.0;
-   for (unsigned long long row = 0; row < vecLength; row++){
+   for (unsigned int row = 0; row < vecLength; row++){
       double diff = workspace[ row ] - HamHXV[ row + vecLength * row ];
       RMSdiagdifference2 += diff * diff;
    }
@@ -639,9 +629,9 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
 
       const int irrep_target_center = Irreps::directProd( TargetIrrep, irrep_center );
       const unsigned int num_pairs  = irrep_center_num[ irrep_center ];
-      const unsigned int * center_crea_orb  = irrep_center_crea_orb[ irrep_center ];
-      const unsigned int * center_anni_orb  = irrep_center_anni_orb[ irrep_center ];
-      const unsigned long long * zero_jumps = irrep_center_jumps[ 0 ];
+      const unsigned int * center_crea_orb = irrep_center_crea_orb[ irrep_center ];
+      const unsigned int * center_anni_orb = irrep_center_anni_orb[ irrep_center ];
+      const unsigned int * zero_jumps = irrep_center_jumps[ 0 ];
 
       for ( int irrep_center_up = 0; irrep_center_up < num_irreps; irrep_center_up++ ){
          const int irrep_center_down = Irreps::directProd( irrep_target_center, irrep_center_up );
@@ -816,8 +806,8 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
    gettimeofday(&start, NULL);
    
    ClearVector( L*L*L*L, two_rdm );
-   const unsigned long long orig_length = getVecLength( 0 );
-   unsigned long long max_length = 0;
+   const unsigned int orig_length = getVecLength( 0 );
+   unsigned int max_length = 0;
    for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
@@ -934,8 +924,8 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
    */
    
    ClearVector( L*L*L*L*L*L*L*L, four_rdm );
-   const unsigned long long orig_length = getVecLength( 0 );
-   unsigned long long max_length = getVecLength( 0 );
+   const unsigned int orig_length = getVecLength( 0 );
+   unsigned int max_length = getVecLength( 0 );
    for ( unsigned int irrep = 1; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
@@ -1193,8 +1183,8 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
    gettimeofday(&start, NULL);
 
    ClearVector( L*L*L*L*L*L, output );
-   const unsigned long long orig_length = getVecLength( 0 );
-   unsigned long long max_length = getVecLength( 0 );
+   const unsigned int orig_length = getVecLength( 0 );
+   unsigned int max_length = getVecLength( 0 );
    for ( unsigned int irrep = 1; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
@@ -1410,11 +1400,11 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
 
 double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    double result = 0.0;
       
    #pragma omp parallel for schedule(static) reduction(+:result)
-   for ( unsigned long long counter = 0; counter < vecLength; counter++ ){
+   for ( unsigned int counter = 0; counter < vecLength; counter++ ){
       for ( unsigned int orbi = 0; orbi < L; orbi++ ){
          
          const int irrep_up     = getUpIrrepOfCounter( 0 , counter );
@@ -1472,7 +1462,7 @@ double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
 
 void CheMPS2::FCI::DiagHam(double * diag) const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
 
    #pragma omp parallel
    {
@@ -1481,7 +1471,7 @@ void CheMPS2::FCI::DiagHam(double * diag) const{
       int * bits_down = new int[ L ];
       
       #pragma omp for schedule(static)
-      for ( unsigned long long counter = 0; counter < vecLength; counter++ ){
+      for ( unsigned int counter = 0; counter < vecLength; counter++ ){
       
          double myResult = 0.0;
          getBitsOfCounter( 0 , counter , bits_up , bits_down ); // Fetch the corresponding bits
@@ -1512,7 +1502,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
    struct timeval start, end;
    gettimeofday(&start, NULL);
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    
    //
    //   Wick's theorem to evaluate the Hamiltonian squared:
@@ -1566,7 +1556,7 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
       }
       
       #pragma omp for schedule(static)
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for (unsigned int counter = 0; counter < vecLength; counter++){
       
          getBitsOfCounter( 0 , counter , bits_up , bits_down ); // Fetch the corresponding bits
          
@@ -1703,17 +1693,17 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
 }
 
 
-unsigned long long CheMPS2::FCI::LowestEnergyDeterminant() const{
+unsigned int CheMPS2::FCI::LowestEnergyDeterminant() const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    double * energies = new double[ vecLength ];
 
    // Fetch the Slater determinant energies
    DiagHam( energies );
    
    // Find the determinant with minimum energy
-   unsigned long long minEindex = 0;
-   for ( unsigned long long count = 1; count < vecLength; count++ ){
+   unsigned int minEindex = 0;
+   for ( unsigned int count = 1; count < vecLength; count++ ){
       if ( energies[ count ] < energies[ minEindex ] ){
          minEindex = count;
       }
@@ -1871,7 +1861,7 @@ double CheMPS2::FCI::GetMatrixElement(int * bits_bra_up, int * bits_bra_down, in
 
 }
 
-void CheMPS2::FCI::FCIdcopy(const unsigned long long vecLength, double * origin, double * target){
+void CheMPS2::FCI::FCIdcopy(const unsigned int vecLength, double * origin, double * target){
 
    int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
    int inc = 1;
@@ -1879,7 +1869,7 @@ void CheMPS2::FCI::FCIdcopy(const unsigned long long vecLength, double * origin,
 
 }
 
-double CheMPS2::FCI::FCIddot(const unsigned long long vecLength, double * vec1, double * vec2){
+double CheMPS2::FCI::FCIddot(const unsigned int vecLength, double * vec1, double * vec2){
 
    int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
    int inc = 1;
@@ -1887,13 +1877,13 @@ double CheMPS2::FCI::FCIddot(const unsigned long long vecLength, double * vec1, 
 
 }
 
-double CheMPS2::FCI::FCIfrobeniusnorm(const unsigned long long vecLength, double * vec){
+double CheMPS2::FCI::FCIfrobeniusnorm(const unsigned int vecLength, double * vec){
 
    return sqrt( FCIddot( vecLength , vec , vec ) );
 
 }
 
-void CheMPS2::FCI::FCIdaxpy(const unsigned long long vecLength, const double alpha, double * vec_x, double * vec_y){
+void CheMPS2::FCI::FCIdaxpy(const unsigned int vecLength, const double alpha, double * vec_x, double * vec_y){
 
    double factor = alpha;
    int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
@@ -1902,7 +1892,7 @@ void CheMPS2::FCI::FCIdaxpy(const unsigned long long vecLength, const double alp
 
 }
 
-void CheMPS2::FCI::FCIdscal(const unsigned long long vecLength, const double alpha, double * vec){
+void CheMPS2::FCI::FCIdscal(const unsigned int vecLength, const double alpha, double * vec){
 
    double factor = alpha;
    int length = vecLength; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
@@ -1911,15 +1901,15 @@ void CheMPS2::FCI::FCIdscal(const unsigned long long vecLength, const double alp
 
 }
 
-void CheMPS2::FCI::ClearVector(const unsigned long long vecLength, double * vec){
+void CheMPS2::FCI::ClearVector(const unsigned int vecLength, double * vec){
 
-   for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = 0.0; }
+   for ( unsigned int cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = 0.0; }
 
 }
 
-void CheMPS2::FCI::FillRandom(const unsigned long long vecLength, double * vec){
+void CheMPS2::FCI::FillRandom(const unsigned int vecLength, double * vec){
 
-   for ( unsigned long long cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = ( ( 2.0 * rand() ) / RAND_MAX ) - 1.0; }
+   for ( unsigned int cnt = 0; cnt < vecLength; cnt++ ){ vec[cnt] = ( ( 2.0 * rand() ) / RAND_MAX ) - 1.0; }
 
 }
 
@@ -1967,8 +1957,8 @@ void CheMPS2::FCI::ActWithNumberOperator(const unsigned int orbIndex, double * r
    int * bits_up    = new int[ L ];
    int * bits_down  = new int[ L ];
 
-   const unsigned long long vecLength = getVecLength( 0 );
-   for (unsigned long long counter = 0; counter < vecLength; counter++){
+   const unsigned int vecLength = getVecLength( 0 );
+   for (unsigned int counter = 0; counter < vecLength; counter++){
       getBitsOfCounter( 0 , counter , bits_up , bits_down );
       resultVector[ counter ] = ( bits_up[ orbIndex ] + bits_down[ orbIndex ] ) * sourceVector[ counter ];
    }
@@ -1984,7 +1974,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
    assert( orbIndex<L  );
    assert( L==otherFCI->getL() );
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
 
    if ( getTargetIrrep() != Irreps::directProd( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) )){
       ClearVector( vecLength , thisVector );
@@ -1995,7 +1985,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
    int * bits_down  = new int[ L ];
    
    if (( whichOperator=='C') && ( isUp )){
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for (unsigned int counter = 0; counter < vecLength; counter++){
          
          getBitsOfCounter( 0 , counter , bits_up , bits_down );
          
@@ -2013,7 +2003,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
    
    if (( whichOperator=='C') && ( !(isUp) )){
       const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for (unsigned int counter = 0; counter < vecLength; counter++){
 
          getBitsOfCounter( 0 , counter , bits_up , bits_down );
 
@@ -2030,7 +2020,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
    }
    
    if (( whichOperator=='A') && ( isUp )){
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for (unsigned int counter = 0; counter < vecLength; counter++){
 
          getBitsOfCounter( 0 , counter , bits_up , bits_down );
          
@@ -2048,7 +2038,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
    
    if (( whichOperator=='A') && ( !(isUp) )){
       const int startphase = (( Nel_up % 2 ) == 0) ? 1 : -1;
-      for (unsigned long long counter = 0; counter < vecLength; counter++){
+      for (unsigned int counter = 0; counter < vecLength; counter++){
 
          getBitsOfCounter( 0 , counter , bits_up , bits_down );
          
@@ -2071,7 +2061,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
 
 void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const double eta, double * RHS, double * RealSol, double * ImagSol, const bool checkError) const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
 
    // Calculate the diagonal of the CG operator
    double * temp = new double[ vecLength ];
@@ -2102,9 +2092,9 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
       ConjugateGradient CG( vecLength, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
       char instruction = CG.step( pointers );
       assert( instruction == 'A' );
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 0 ][ cnt ] = - eta * RHS[ cnt ] / diag[ cnt ]; } // Initial guess
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; }                      // Diagonal of the operator
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 2 ][ cnt ] = - eta * RHS[ cnt ]; }               // RHS of the problem
+      for (unsigned int cnt = 0; cnt < vecLength; cnt++){ pointers[ 0 ][ cnt ] = - eta * RHS[ cnt ] / diag[ cnt ]; } // Initial guess
+      for (unsigned int cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; }                      // Diagonal of the operator
+      for (unsigned int cnt = 0; cnt < vecLength; cnt++){ pointers[ 2 ][ cnt ] = - eta * RHS[ cnt ]; }               // RHS of the problem
       instruction = CG.step( pointers );
       assert( instruction == 'B' );
       while ( instruction == 'B' ){
@@ -2122,7 +2112,7 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
       char instruction = CG.step( pointers );
       assert( instruction == 'A' );
       CGAlphaPlusBetaHAM( - alpha / eta, - beta / eta, ImagSol, pointers[ 0 ] );                      // Initial guess real part can be obtained from the imaginary part
-      for (unsigned long long cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; } // Diagonal of the operator
+      for (unsigned int cnt = 0; cnt < vecLength; cnt++){ pointers[ 1 ][ cnt ] = diag[ cnt ]; } // Diagonal of the operator
       CGAlphaPlusBetaHAM( alpha, beta, RHS, pointers[ 2 ] );                                          // RHS of the problem
       instruction = CG.step( pointers );
       assert( instruction == 'B' );
@@ -2148,9 +2138,9 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const{
 
    matvec( in , out );
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    const double prefactor = alpha + beta * getEconst(); // matvec does only the parts with second quantized operators
-   for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
+   for (unsigned int cnt = 0; cnt < vecLength; cnt++){
       out[ cnt ] = prefactor * in[ cnt ] + beta * out[ cnt ]; // out = ( alpha + beta * H ) * in
    }
 
@@ -2158,7 +2148,7 @@ void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, dou
 
 void CheMPS2::FCI::CGoperator(const double alpha, const double beta, const double eta, double * in, double * temp, double * out) const{
 
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    CGAlphaPlusBetaHAM( alpha, beta, in,   temp ); // temp  = ( alpha + beta * H )   * in
    CGAlphaPlusBetaHAM( alpha, beta, temp, out  ); // out   = ( alpha + beta * H )^2 * in
    FCIdaxpy( vecLength, eta*eta, in, out );       // out   = [ ( alpha + beta * H )^2 + eta*eta ] * in
@@ -2172,19 +2162,19 @@ void CheMPS2::FCI::CGdiagonal(const double alpha, const double beta, const doubl
    DiagHam( diagonal );
    DiagHamSquared( workspace );
    
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    const double alpha_bis = alpha + beta * getEconst();
    const double factor1 = alpha_bis * alpha_bis + eta * eta;
    const double factor2 = 2 * alpha_bis * beta;
    const double factor3 = beta * beta;
-   for (unsigned long long row = 0; row < vecLength; row++){
+   for (unsigned int row = 0; row < vecLength; row++){
       diagonal[ row ] = factor1 + factor2 * diagonal[ row ] + factor3 * workspace[ row ];
    }
    
    if ( FCIverbose>1 ){
       double minval = diagonal[0];
       double maxval = diagonal[0];
-      for (unsigned long long cnt = 1; cnt < vecLength; cnt++){
+      for (unsigned int cnt = 1; cnt < vecLength; cnt++){
          if ( diagonal[ cnt ] > maxval ){ maxval = diagonal[ cnt ]; }
          if ( diagonal[ cnt ] < minval ){ minval = diagonal[ cnt ]; }
       }
@@ -2260,7 +2250,7 @@ void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, cons
          const int addIrrep = Irreps::directProd( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
          
          CheMPS2::FCI additionFCI( Ham, addNelUP, addNelDOWN, addIrrep, maxMemWorkMB, FCIverbose );
-         const unsigned long long addVecLength = additionFCI.getVecLength( 0 );
+         const unsigned int addVecLength = additionFCI.getVecLength( 0 );
          double * addVector = new double[ addVecLength ];
          additionFCI.ActWithSecondQuantizedOperator( 'C', isUp, orbitalRight, addVector, this, GSvector ); // | addVector > = a^+_right,spin | GSvector >
          
@@ -2351,7 +2341,7 @@ void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const
          const int removeIrrep = Irreps::directProd( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
          
          CheMPS2::FCI removalFCI( Ham, removeNelUP, removeNelDOWN, removeIrrep, maxMemWorkMB, FCIverbose );
-         const unsigned long long removeVecLength = removalFCI.getVecLength( 0 );
+         const unsigned int removeVecLength = removalFCI.getVecLength( 0 );
          double * removeVector = new double[ removeVecLength ];
          removalFCI.ActWithSecondQuantizedOperator( 'A', isUp, orbitalRight, removeVector, this, GSvector ); // | removeVector > = a_right,spin | GSvector >
          
@@ -2433,7 +2423,7 @@ void CheMPS2::FCI::DensityResponseGF_forward(const double omega, const double et
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    double * densityAlphaVector = new double[ vecLength ];
    double * densityBetaVector  = ( orb_alpha == orb_beta ) ? densityAlphaVector : new double[ vecLength ];
    ActWithNumberOperator( orb_alpha , densityAlphaVector , GSvector );             // densityAlphaVector = n_alpha |0>
@@ -2469,7 +2459,7 @@ void CheMPS2::FCI::DensityResponseGF_backward(const double omega, const double e
    assert( RePartGF != NULL );
    assert( ImPartGF != NULL );
    
-   const unsigned long long vecLength = getVecLength( 0 );
+   const unsigned int vecLength = getVecLength( 0 );
    double * densityAlphaVector = new double[ vecLength ];
    double * densityBetaVector  = ( orb_alpha == orb_beta ) ? densityAlphaVector : new double[ vecLength ];
    ActWithNumberOperator( orb_alpha , densityAlphaVector , GSvector );             // densityAlphaVector = n_alpha |0>

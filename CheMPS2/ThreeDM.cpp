@@ -40,9 +40,9 @@ CheMPS2::ThreeDM::ThreeDM(const SyBookkeeper * book_in, const Problem * prob_in)
    book = book_in;
    prob = prob_in;
    L = book->gL();
-   const int max_integer = INT_MAX;
-   const long long size  = L*L*L*L*L*L;
-   assert( max_integer >= size );
+   const long long size = (((long long) L ) * ((long long) L ) * ((long long) L )
+                         * ((long long) L ) * ((long long) L ) * ((long long) L ));
+   assert( INT_MAX >= size );
    elements = new double[ size ];
    for (int cnt = 0; cnt < size; cnt++){ elements[ cnt ] = 0.0; }
 

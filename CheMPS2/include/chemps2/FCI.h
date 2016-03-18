@@ -62,7 +62,7 @@ namespace CheMPS2{
          //! Getter for the number of variables in the vector " E_ij | FCI vector > " ; where irrep_center = I_i x I_j
          /** \param irrep_center The single electron excitation irrep I_i x I_j
              \return The number of variables in the corresponding vector */
-         unsigned long long getVecLength(const int irrep_center) const{ return irrep_center_jumps[ irrep_center ][ num_irreps ]; }
+         unsigned int getVecLength(const int irrep_center) const{ return irrep_center_jumps[ irrep_center ][ num_irreps ]; }
          
          //! Get the target irrep
          /** \return The target irrep */
@@ -101,7 +101,7 @@ namespace CheMPS2{
          
          //! Return the global counter of the Slater determinant with the lowest energy
          /** \return The global counter of the Slater determinant with the lowest energy */
-         unsigned long long LowestEnergyDeterminant() const;
+         unsigned int LowestEnergyDeterminant() const;
          
          //! Construct the (spin-summed) 2-RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau < a^+_i,sigma a^+_j,tau a_l,tau a_k,sigma > = TwoRDM[ i + L * ( j + L * ( k + L * l ) ) ]
          /** \param vector The FCI vector of length getVecLength(0)
@@ -141,12 +141,12 @@ namespace CheMPS2{
          //! Fill a vector with random numbers in the interval [-1,1[; used when output for GSDavidson is desired but no specific input can be given
          /** \param vecLength The length of the vector; when used for GSDavidson it should be getVecLength(0)
              \param vec The vector to fill with random numbers */
-         static void FillRandom(const unsigned long long vecLength, double * vec);
+         static void FillRandom(const unsigned int vecLength, double * vec);
          
          //! Set the entries of a vector to zero
          /** \param vecLength The vector length
              \param vec The vector which has to be set to zero */
-         static void ClearVector(const unsigned long long vecLength, double * vec);
+         static void ClearVector(const unsigned int vecLength, double * vec);
          
 //==========> Green's functions functionality
          
@@ -322,7 +322,7 @@ namespace CheMPS2{
              \param counter The given global counter corresponding to " E_ij | FCI vector > "
              \param bits_up Array of length L to store the bit representation of the up (alpha) electrons in
              \param bits_down Array of length L to store the bit representation of the down (beta) electrons in */
-         void getBitsOfCounter(const int irrep_center, const unsigned long long counter, int * bits_up, int * bits_down) const;
+         void getBitsOfCounter(const int irrep_center, const unsigned int counter, int * bits_up, int * bits_down) const;
          
          //! Convertor between two representations of a same spin-projection Slater determinant
          /** \param Lvalue The number of orbitals
@@ -340,41 +340,41 @@ namespace CheMPS2{
          /** \param irrep_center The single electron excitation irrep I_i x I_j
              \param counter The given global counter corresponding to " E_ij | FCI vector > "
              \return The corresponding irrep of the up Slater determinant */
-         int getUpIrrepOfCounter(const int irrep_center, const unsigned long long counter) const;
+         int getUpIrrepOfCounter(const int irrep_center, const unsigned int counter) const;
          
-//==========> Some lapack like routines which work with unsigned long long's (not necessary anymore as StartupIrrepCenter() checks "assert( max_integer >= maxVecLength );" )
+//==========> Some lapack like routines
 
          //! Take the inproduct of two vectors
          /** \param vecLength The vector length
              \param vec1 The first vector
              \param vec2 The second vector
              \return The inproduct < vec1 | vec2 > */
-         static double FCIddot(const unsigned long long vecLength, double * vec1, double * vec2);
+         static double FCIddot(const unsigned int vecLength, double * vec1, double * vec2);
          
          //! Copy a vector
          /** \param vecLength The vector length
              \param origin Vector to be copied
              \param target Where to copy the vector to */
-         static void FCIdcopy(const unsigned long long vecLength, double * origin, double * target);
+         static void FCIdcopy(const unsigned int vecLength, double * origin, double * target);
          
          //! Calculate the 2-norm of a vector
          /** \param vecLength The vector length
              \param vec The vector
              \return The 2-norm of vec */
-         static double FCIfrobeniusnorm(const unsigned long long vecLength, double * vec);
+         static double FCIfrobeniusnorm(const unsigned int vecLength, double * vec);
          
          //! Do lapack's daxpy vec_y += alpha * vec_x
          /** \param vecLength The vector length
              \param alpha The scalar factor
              \param vec_x The vector which has to be added to vec_y in rescaled form
              \param vec_y The target vector */
-         static void FCIdaxpy(const unsigned long long vecLength, const double alpha, double * vec_x, double * vec_y);
+         static void FCIdaxpy(const unsigned int vecLength, const double alpha, double * vec_x, double * vec_y);
          
          //! Do lapack's dscal vec *= alpha
          /** \param vecLength The vector length
              \param alpha The scalar factor
              \param vec The vector which has to be rescaled */
-         static void FCIdscal(const unsigned long long vecLength, const double alpha, double * vec);
+         static void FCIdscal(const unsigned int vecLength, const double alpha, double * vec);
          
 //==========> Protected functions regarding the Green's functions
          
@@ -515,7 +515,7 @@ namespace CheMPS2{
          unsigned int ** irrep_center_anni_orb;
          
          //! The global index corresponding to a vector " E_{ij} | FCI vector > " with irrep_center = irrep_i x irrep_j is given by irrep_center_jumps[ irrep_center ][ irrep_alpha ] + count_alpha + numPerIrrep_up[ irrep_alpha ] * cnt_beta where count_alpha and count_beta are the up (alpha) and down (beta) Slater determinants with resp. irreps irrep_alpha and irrep_beta = TargetIrrep x irrep_alpha x irrep_center
-         unsigned long long ** irrep_center_jumps;
+         unsigned int ** irrep_center_jumps;
          
          //! Number of doubles in each of the HVXworkbig arrays
          unsigned long long HXVsizeWorkspace;
