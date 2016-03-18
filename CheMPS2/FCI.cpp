@@ -105,22 +105,16 @@ CheMPS2::FCI::~FCI(){
       for ( unsigned int ij = 0; ij < L * L; ij++ ){
          delete [] lookup_cnt_alpha[irrep][ij];
          delete [] lookup_cnt_beta[irrep][ij];
-         delete [] lookup_irrep_alpha[irrep][ij];
-         delete [] lookup_irrep_beta[irrep][ij];
          delete [] lookup_sign_alpha[irrep][ij];
          delete [] lookup_sign_beta[irrep][ij];
       }
       delete [] lookup_cnt_alpha[irrep];
       delete [] lookup_cnt_beta[irrep];
-      delete [] lookup_irrep_alpha[irrep];
-      delete [] lookup_irrep_beta[irrep];
       delete [] lookup_sign_alpha[irrep];
       delete [] lookup_sign_beta[irrep];
    }
    delete [] lookup_cnt_alpha;
    delete [] lookup_cnt_beta;
-   delete [] lookup_irrep_alpha;
-   delete [] lookup_irrep_beta;
    delete [] lookup_sign_alpha;
    delete [] lookup_sign_beta;
 
@@ -172,11 +166,11 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
       // Find the number of particles and the irrep which correspond to each basis vector
       str2bits( L , bitstring , bits );
       unsigned int Nparticles = 0;
-      int Irrep = 0;
+      int irrep = 0;
       for (unsigned int orb=0; orb<L; orb++){
          if ( bits[orb] ){
             Nparticles++;
-            Irrep = Irreps::directProd( Irrep , getOrb2Irrep( orb ) );
+            irrep = Irreps::directProd( irrep, getOrb2Irrep( orb ) );
          }
       }
       
@@ -186,12 +180,12 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
          str2cnt_down[ irr ][ bitstring ] = -1;
       }
       if ( Nparticles == Nel_up ){
-         str2cnt_up[ Irrep ][ bitstring ] = numPerIrrep_up[ Irrep ];
-         numPerIrrep_up[ Irrep ]++;
+         str2cnt_up[ irrep ][ bitstring ] = numPerIrrep_up[ irrep ];
+         numPerIrrep_up[ irrep ]++;
       }
       if ( Nparticles == Nel_down ){
-         str2cnt_down[ Irrep ][ bitstring ] = numPerIrrep_down[ Irrep ];
-         numPerIrrep_down[ Irrep ]++;
+         str2cnt_down[ irrep ][ bitstring ] = numPerIrrep_down[ irrep ];
+         numPerIrrep_down[ irrep ]++;
       }
    
    }
@@ -220,12 +214,10 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
 void CheMPS2::FCI::StartupLookupTables(){
 
    // Create a bunch of stuff
-   lookup_cnt_alpha   = new int**[ num_irreps ];
-   lookup_cnt_beta    = new int**[ num_irreps ];
-   lookup_irrep_alpha = new int**[ num_irreps ];
-   lookup_irrep_beta  = new int**[ num_irreps ];
-   lookup_sign_alpha  = new int**[ num_irreps ];
-   lookup_sign_beta   = new int**[ num_irreps ];
+   lookup_cnt_alpha  = new int**[ num_irreps ];
+   lookup_cnt_beta   = new int**[ num_irreps ];
+   lookup_sign_alpha = new int**[ num_irreps ];
+   lookup_sign_beta  = new int**[ num_irreps ];
 
    int * bits = new int[ L ]; // Temporary helper array
 
@@ -235,33 +227,27 @@ void CheMPS2::FCI::StartupLookupTables(){
       const unsigned int num_up   = numPerIrrep_up  [ irrep ];
       const unsigned int num_down = numPerIrrep_down[ irrep ];
 
-      lookup_cnt_alpha  [ irrep ] = new int*[ L * L ];
-      lookup_irrep_alpha[ irrep ] = new int*[ L * L ];
-      lookup_sign_alpha [ irrep ] = new int*[ L * L ];
-      lookup_cnt_beta   [ irrep ] = new int*[ L * L ];
-      lookup_irrep_beta [ irrep ] = new int*[ L * L ];
-      lookup_sign_beta  [ irrep ] = new int*[ L * L ];
+      lookup_cnt_alpha [ irrep ] = new int*[ L * L ];
+      lookup_cnt_beta  [ irrep ] = new int*[ L * L ];
+      lookup_sign_alpha[ irrep ] = new int*[ L * L ];
+      lookup_sign_beta [ irrep ] = new int*[ L * L ];
 
       for ( unsigned int ij = 0; ij < L * L; ij++ ){
 
-         lookup_cnt_alpha  [ irrep ][ ij ] = new int[ num_up ];
-         lookup_irrep_alpha[ irrep ][ ij ] = new int[ num_up ];
-         lookup_sign_alpha [ irrep ][ ij ] = new int[ num_up ];
-         lookup_cnt_beta   [ irrep ][ ij ] = new int[ num_down ];
-         lookup_irrep_beta [ irrep ][ ij ] = new int[ num_down ];
-         lookup_sign_beta  [ irrep ][ ij ] = new int[ num_down ];
+         lookup_cnt_alpha [ irrep ][ ij ] = new int[ num_up ];
+         lookup_cnt_beta  [ irrep ][ ij ] = new int[ num_down ];
+         lookup_sign_alpha[ irrep ][ ij ] = new int[ num_up ];
+         lookup_sign_beta [ irrep ][ ij ] = new int[ num_down ];
 
          for ( unsigned int cnt_new_alpha = 0; cnt_new_alpha < num_up; cnt_new_alpha++ ){
             // Check for the sign. If no check for sign, you multiply with sign 0 and everything should be OK...
-            lookup_cnt_alpha  [ irrep ][ ij ][ cnt_new_alpha ] = 0;
-            lookup_irrep_alpha[ irrep ][ ij ][ cnt_new_alpha ] = 0;
-            lookup_sign_alpha [ irrep ][ ij ][ cnt_new_alpha ] = 0;
+            lookup_cnt_alpha [ irrep ][ ij ][ cnt_new_alpha ] = 0;
+            lookup_sign_alpha[ irrep ][ ij ][ cnt_new_alpha ] = 0;
          }
          for ( unsigned int cnt_new_beta = 0; cnt_new_beta < num_down; cnt_new_beta++ ){
             // Check for the sign. If no check for sign, you multiply with sign and everything should be OK...
-            lookup_cnt_beta  [ irrep ][ ij ][ cnt_new_beta ] = 0;
-            lookup_irrep_beta[ irrep ][ ij ][ cnt_new_beta ] = 0;
-            lookup_sign_beta [ irrep ][ ij ][ cnt_new_beta ] = 0;
+            lookup_cnt_beta [ irrep ][ ij ][ cnt_new_beta ] = 0;
+            lookup_sign_beta[ irrep ][ ij ][ cnt_new_beta ] = 0;
          }
       }
 
@@ -279,13 +265,12 @@ void CheMPS2::FCI::StartupLookupTables(){
                   if ( !(bits[ anni ]) ){
                      bits[ anni ] = 1;
 
-                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
+                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) ) );
                      const int cnt_old = str2cnt_up[ irrep_old ][ bits2str( L , bits ) ];
                      const int phase = phase_crea * phase_anni;
 
-                     lookup_cnt_alpha  [ irrep ][ crea + L * anni ][ cnt_new_alpha ] = cnt_old;
-                     lookup_irrep_alpha[ irrep ][ crea + L * anni ][ cnt_new_alpha ] = irrep_old;
-                     lookup_sign_alpha [ irrep ][ crea + L * anni ][ cnt_new_alpha ] = phase;
+                     lookup_cnt_alpha [ irrep ][ crea + L * anni ][ cnt_new_alpha ] = cnt_old;
+                     lookup_sign_alpha[ irrep ][ crea + L * anni ][ cnt_new_alpha ] = phase;
 
                      bits[ anni ] = 0;
                   } else {
@@ -313,12 +298,11 @@ void CheMPS2::FCI::StartupLookupTables(){
                   if ( !(bits[ anni ]) ){
                      bits[ anni ] = 1;
 
-                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
+                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) ) );
                      const int cnt_old = str2cnt_down[ irrep_old ][ bits2str( L , bits ) ];
                      const int phase = phase_crea * phase_anni;
 
                      lookup_cnt_beta  [ irrep ][ crea + L * anni ][ cnt_new_beta ] = cnt_old;
-                     lookup_irrep_beta[ irrep ][ crea + L * anni ][ cnt_new_beta ] = irrep_old;
                      lookup_sign_beta [ irrep ][ crea + L * anni ][ cnt_new_beta ] = phase;
 
                      bits[ anni ] = 0;
@@ -350,9 +334,9 @@ void CheMPS2::FCI::StartupIrrepCenter(){
       const int irrep_center_const_signed = irrep_center;
    
       irrep_center_num[ irrep_center ] = 0;
-      for ( unsigned int creator = 0; creator < L; creator++ ){
-         for ( unsigned int annihilator = creator; annihilator < L; annihilator++ ){
-            if ( Irreps::directProd( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
+      for ( unsigned int crea = 0; crea < L; crea++ ){
+         for ( unsigned int anni = crea; anni < L; anni++ ){
+            if ( Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) ) == irrep_center_const_signed ){
                irrep_center_num[ irrep_center ] += 1;
             }
          }
