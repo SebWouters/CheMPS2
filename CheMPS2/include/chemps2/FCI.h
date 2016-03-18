@@ -62,21 +62,11 @@ namespace CheMPS2{
          //! Getter for the number of variables in the vector " E_ij | FCI vector > " ; where irrep_center = I_i x I_j
          /** \param irrep_center The single electron excitation irrep I_i x I_j
              \return The number of variables in the corresponding vector */
-         unsigned long long getVecLength(const int irrep_center) const{ return irrep_center_jumps[ irrep_center ][ NumIrreps ]; }
-         
-         //! Get the number of irreps
-         /** \return The number of irreps */
-         unsigned int getNumIrreps() const{ return NumIrreps; }
+         unsigned long long getVecLength(const int irrep_center) const{ return irrep_center_jumps[ irrep_center ][ num_irreps ]; }
          
          //! Get the target irrep
          /** \return The target irrep */
          int getTargetIrrep() const{ return TargetIrrep; }
-         
-         //! Get the direct product of two irreps (Psi4's convention is used): product( irrep1 , irrep2 ) = irrep1 XOR irrep2.
-         /** \param Irrep1 The first irrep
-             \param Irrep2 The second irrep
-             \return The direct product Irrep1 x Irrep2 */
-         static int getIrrepProduct(const int Irrep1, const int Irrep2){ return Irrep1 ^ Irrep2; }
          
          //! Get an orbital irrep
          /** \param orb The orbital index
@@ -468,12 +458,12 @@ namespace CheMPS2{
          double * ERI;
          
          //! The number of irreps of the molecule's Abelian point group with real-valued character table
-         unsigned int NumIrreps;
+         unsigned int num_irreps;
          
-         //! The targeted irrep of the total FCI wavefunction ( 0 <= TargetIrrep < NumIrreps )
+         //! The targeted irrep of the total FCI wavefunction ( 0 <= TargetIrrep < num_irreps )
          int TargetIrrep;
          
-         //! Array of length L which contains for each orbital the irrep ( 0 <= orb < L : 0 <= orb2irrep[ orb ] < NumIrreps )
+         //! Array of length L which contains for each orbital the irrep ( 0 <= orb < L : 0 <= orb2irrep[ orb ] < num_irreps )
          int * orb2irrep;
          
          //! The number of orbitals ( Hubbard type orbitals with 4 possible occupations each )

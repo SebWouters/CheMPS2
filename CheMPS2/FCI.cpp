@@ -47,10 +47,9 @@ CheMPS2::FCI::FCI(Hamiltonian * Ham, const unsigned int theNel_up, const unsigne
    Nel_down = theNel_down;
    
    // Construct the irrep product table and the list with the orbitals irreps
-   CheMPS2::Irreps myIrreps( Ham->getNGroup() );
-   NumIrreps         = myIrreps.getNumberOfIrreps();
-   TargetIrrep       = TargetIrrep_in;
-   orb2irrep         = new int[ L ];
+   num_irreps  = Irreps::getNumberOfIrreps( Ham->getNGroup() );
+   TargetIrrep = TargetIrrep_in;
+   orb2irrep   = new int[ L ];
    for (unsigned int orb = 0; orb < L; orb++){ orb2irrep[ orb ] = Ham->getOrbitalIrrep( orb ); }
 
    /* Copy the Hamiltonian over:
@@ -88,7 +87,7 @@ CheMPS2::FCI::~FCI(){
    delete [] ERI;
    
    // FCI::StartupCountersVsBitstrings
-   for ( unsigned int irrep=0; irrep<NumIrreps; irrep++ ){
+   for ( unsigned int irrep=0; irrep<num_irreps; irrep++ ){
       delete [] str2cnt_up[irrep];
       delete [] str2cnt_down[irrep];
       delete [] cnt2str_up[irrep];
@@ -102,7 +101,7 @@ CheMPS2::FCI::~FCI(){
    delete [] numPerIrrep_down;
 
    // FCI::StartupLookupTables
-   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
       for ( unsigned int ij = 0; ij < L * L; ij++ ){
          delete [] lookup_cnt_alpha[irrep][ij];
          delete [] lookup_cnt_beta[irrep][ij];
@@ -126,7 +125,7 @@ CheMPS2::FCI::~FCI(){
    delete [] lookup_sign_beta;
 
    // FCI::StartupIrrepCenter
-   for ( unsigned int irrep=0; irrep<NumIrreps; irrep++ ){
+   for ( unsigned int irrep=0; irrep<num_irreps; irrep++ ){
       delete [] irrep_center_crea_orb[irrep];
       delete [] irrep_center_anni_orb[irrep];
       delete [] irrep_center_jumps[irrep];
@@ -151,14 +150,14 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
    for (unsigned int orb = 0; orb < L; orb++){ TwoPowL *= 2; }
 
    // Create the required arrays to perform the conversions between counters and bitstrings
-   numPerIrrep_up     = new unsigned int[ NumIrreps ];
-   numPerIrrep_down   = new unsigned int[ NumIrreps ];
-   str2cnt_up         = new int*[ NumIrreps ];
-   str2cnt_down       = new int*[ NumIrreps ];
-   cnt2str_up         = new unsigned int*[ NumIrreps ];
-   cnt2str_down       = new unsigned int*[ NumIrreps ];
+   numPerIrrep_up     = new unsigned int[ num_irreps ];
+   numPerIrrep_down   = new unsigned int[ num_irreps ];
+   str2cnt_up         = new int*[ num_irreps ];
+   str2cnt_down       = new int*[ num_irreps ];
+   cnt2str_up         = new unsigned int*[ num_irreps ];
+   cnt2str_down       = new unsigned int*[ num_irreps ];
    
-   for (unsigned int irrep = 0; irrep < NumIrreps; irrep++){
+   for (unsigned int irrep = 0; irrep < num_irreps; irrep++){
       numPerIrrep_up  [ irrep ] = 0;
       numPerIrrep_down[ irrep ] = 0;
       str2cnt_up  [ irrep ] = new int[ TwoPowL ];
@@ -177,12 +176,12 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
       for (unsigned int orb=0; orb<L; orb++){
          if ( bits[orb] ){
             Nparticles++;
-            Irrep = getIrrepProduct( Irrep , getOrb2Irrep( orb ) );
+            Irrep = Irreps::directProd( Irrep , getOrb2Irrep( orb ) );
          }
       }
       
       // If allowed: set the corresponding str2cnt to the correct counter and keep track of the number of allowed vectors
-      for ( unsigned int irr = 0; irr < NumIrreps; irr++ ){
+      for ( unsigned int irr = 0; irr < num_irreps; irr++ ){
          str2cnt_up  [ irr ][ bitstring ] = -1;
          str2cnt_down[ irr ][ bitstring ] = -1;
       }
@@ -198,7 +197,7 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
    }
    
    // Fill the reverse info array: cnt2str
-   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
    
       if ( FCIverbose>1 ){
          cout << "FCI::Startup : For irrep " << irrep << " there are " << numPerIrrep_up  [ irrep ] << " alpha Slater determinants and "
@@ -221,17 +220,17 @@ void CheMPS2::FCI::StartupCountersVsBitstrings(){
 void CheMPS2::FCI::StartupLookupTables(){
 
    // Create a bunch of stuff
-   lookup_cnt_alpha   = new int**[ NumIrreps ];
-   lookup_cnt_beta    = new int**[ NumIrreps ];
-   lookup_irrep_alpha = new int**[ NumIrreps ];
-   lookup_irrep_beta  = new int**[ NumIrreps ];
-   lookup_sign_alpha  = new int**[ NumIrreps ];
-   lookup_sign_beta   = new int**[ NumIrreps ];
+   lookup_cnt_alpha   = new int**[ num_irreps ];
+   lookup_cnt_beta    = new int**[ num_irreps ];
+   lookup_irrep_alpha = new int**[ num_irreps ];
+   lookup_irrep_beta  = new int**[ num_irreps ];
+   lookup_sign_alpha  = new int**[ num_irreps ];
+   lookup_sign_beta   = new int**[ num_irreps ];
 
    int * bits = new int[ L ]; // Temporary helper array
 
    // Quick lookup tables for " sign | new > = E^spinproj_{ij} | old >
-   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
 
       const unsigned int num_up   = numPerIrrep_up  [ irrep ];
       const unsigned int num_down = numPerIrrep_down[ irrep ];
@@ -280,7 +279,7 @@ void CheMPS2::FCI::StartupLookupTables(){
                   if ( !(bits[ anni ]) ){
                      bits[ anni ] = 1;
 
-                     const int irrep_old = getIrrepProduct( irrep , getIrrepProduct( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
+                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
                      const int cnt_old = str2cnt_up[ irrep_old ][ bits2str( L , bits ) ];
                      const int phase = phase_crea * phase_anni;
 
@@ -314,7 +313,7 @@ void CheMPS2::FCI::StartupLookupTables(){
                   if ( !(bits[ anni ]) ){
                      bits[ anni ] = 1;
 
-                     const int irrep_old = getIrrepProduct( irrep , getIrrepProduct( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
+                     const int irrep_old = Irreps::directProd( irrep , Irreps::directProd( getOrb2Irrep( crea ) , getOrb2Irrep( anni ) ) );
                      const int cnt_old = str2cnt_down[ irrep_old ][ bits2str( L , bits ) ];
                      const int phase = phase_crea * phase_anni;
 
@@ -343,17 +342,17 @@ void CheMPS2::FCI::StartupLookupTables(){
 void CheMPS2::FCI::StartupIrrepCenter(){
 
    // Find the orbital combinations which can form a center irrep
-   irrep_center_num      = new unsigned int [ NumIrreps ];
-   irrep_center_crea_orb = new unsigned int*[ NumIrreps ];
-   irrep_center_anni_orb = new unsigned int*[ NumIrreps ];
+   irrep_center_num      = new unsigned int [ num_irreps ];
+   irrep_center_crea_orb = new unsigned int*[ num_irreps ];
+   irrep_center_anni_orb = new unsigned int*[ num_irreps ];
    
-   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   for ( unsigned int irrep_center = 0; irrep_center < num_irreps; irrep_center++ ){
       const int irrep_center_const_signed = irrep_center;
    
       irrep_center_num[ irrep_center ] = 0;
       for ( unsigned int creator = 0; creator < L; creator++ ){
          for ( unsigned int annihilator = creator; annihilator < L; annihilator++ ){
-            if ( getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
+            if ( Irreps::directProd( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
                irrep_center_num[ irrep_center ] += 1;
             }
          }
@@ -363,7 +362,7 @@ void CheMPS2::FCI::StartupIrrepCenter(){
       irrep_center_num[ irrep_center ] = 0;
       for ( unsigned int creator = 0; creator < L; creator++ ){
          for ( unsigned int annihilator = creator; annihilator < L; annihilator++){
-            if ( getIrrepProduct( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
+            if ( Irreps::directProd( getOrb2Irrep( creator ) , getOrb2Irrep( annihilator ) ) == irrep_center_const_signed ){
                irrep_center_crea_orb[ irrep_center ][ irrep_center_num[ irrep_center ] ] = creator;
                irrep_center_anni_orb[ irrep_center ][ irrep_center_num[ irrep_center ] ] = annihilator;
                irrep_center_num[ irrep_center ] += 1;
@@ -373,21 +372,21 @@ void CheMPS2::FCI::StartupIrrepCenter(){
    
    }
    
-   irrep_center_jumps = new unsigned long long*[ NumIrreps ];
+   irrep_center_jumps = new unsigned long long*[ num_irreps ];
    HXVsizeWorkspace = 0;
-   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   for ( unsigned int irrep_center = 0; irrep_center < num_irreps; irrep_center++ ){
    
-      irrep_center_jumps[ irrep_center ] = new unsigned long long[ NumIrreps+1 ];
-      const int localTargetIrrep = getIrrepProduct( irrep_center , getTargetIrrep() );
+      irrep_center_jumps[ irrep_center ] = new unsigned long long[ num_irreps+1 ];
+      const int localTargetIrrep = Irreps::directProd( irrep_center, getTargetIrrep() );
       irrep_center_jumps[ irrep_center ][ 0 ] = 0;
-      for ( unsigned int irrep_up = 0; irrep_up < NumIrreps; irrep_up++ ){
-         const int irrep_down = getIrrepProduct( irrep_up , localTargetIrrep );
+      for ( unsigned int irrep_up = 0; irrep_up < num_irreps; irrep_up++ ){
+         const int irrep_down = Irreps::directProd( irrep_up, localTargetIrrep );
          unsigned long long temp  = numPerIrrep_up  [ irrep_up   ];
                             temp *= numPerIrrep_down[ irrep_down ];
          irrep_center_jumps[ irrep_center ][ irrep_up+1 ] = irrep_center_jumps[ irrep_center ][ irrep_up ] + temp;
-      }
-      if ( irrep_center_num[ irrep_center ] * irrep_center_jumps[ irrep_center ][ NumIrreps ] > HXVsizeWorkspace ){
-         HXVsizeWorkspace = irrep_center_num[ irrep_center ] * irrep_center_jumps[ irrep_center ][ NumIrreps ];
+         if ( irrep_center_num[ irrep_center ] * temp > HXVsizeWorkspace ){
+            HXVsizeWorkspace = irrep_center_num[ irrep_center ] * temp;
+         }
       }
    }
    if ( FCIverbose>0 ){
@@ -407,7 +406,7 @@ void CheMPS2::FCI::StartupIrrepCenter(){
    
    // Check for the lapack routines { dgemm_ , daxpy_ , dscal_ , dcopy_ , ddot_ }
    unsigned long long maxVecLength = 0;
-   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > maxVecLength ){ maxVecLength = getVecLength( irrep ); }
    }
    const unsigned int max_integer = INT_MAX;
@@ -435,7 +434,7 @@ unsigned int CheMPS2::FCI::bits2str(const unsigned int Lval, int * bits){
 
 int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned long long counter) const{
 
-   int irrep_up = NumIrreps;
+   int irrep_up = num_irreps;
    while ( counter < irrep_center_jumps[ irrep_center ][ irrep_up-1 ] ){ irrep_up--; }
    return irrep_up-1;
    
@@ -443,10 +442,10 @@ int CheMPS2::FCI::getUpIrrepOfCounter(const int irrep_center, const unsigned lon
 
 void CheMPS2::FCI::getBitsOfCounter(const int irrep_center, const unsigned long long counter, int * bits_up, int * bits_down) const{
 
-   const int localTargetIrrep = getIrrepProduct( irrep_center , TargetIrrep );
+   const int localTargetIrrep = Irreps::directProd( irrep_center , TargetIrrep );
    
    const int irrep_up   = getUpIrrepOfCounter( irrep_center , counter );
-   const int irrep_down = getIrrepProduct( irrep_up , localTargetIrrep );
+   const int irrep_down = Irreps::directProd( irrep_up , localTargetIrrep );
    
    const unsigned int count_up   = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
    const unsigned int count_down = ( counter - irrep_center_jumps[ irrep_center ][ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
@@ -467,8 +466,8 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    int irrep_up   = 0;
    int irrep_down = 0;
    for ( unsigned int orb = 0; orb < L; orb++ ){
-      if ( bits_up  [ orb ] ){ irrep_up   = getIrrepProduct( irrep_up   , getOrb2Irrep( orb ) ); }
-      if ( bits_down[ orb ] ){ irrep_down = getIrrepProduct( irrep_down , getOrb2Irrep( orb ) ); }
+      if ( bits_up  [ orb ] ){ irrep_up   = Irreps::directProd( irrep_up   , getOrb2Irrep( orb ) ); }
+      if ( bits_down[ orb ] ){ irrep_down = Irreps::directProd( irrep_down , getOrb2Irrep( orb ) ); }
    }
    
    const int counter_up   = str2cnt_up  [ irrep_up   ][ string_up   ];
@@ -652,16 +651,16 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
    // P.J. Knowles and N.C. Handy, A new determinant-based full configuration interaction method, Chemical Physics Letters 111 (4-5), 315-321 (1984)
 
    // irrep_center is the center irrep of the ERI : (ij|kl) --> irrep_center = I_i x I_j = I_k x I_l
-   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+   for ( unsigned int irrep_center = 0; irrep_center < num_irreps; irrep_center++ ){
 
-      const int irrep_target_center = getIrrepProduct( TargetIrrep, irrep_center );
+      const int irrep_target_center = Irreps::directProd( TargetIrrep, irrep_center );
       const unsigned int num_pairs  = irrep_center_num[ irrep_center ];
       const unsigned int * center_crea_orb  = irrep_center_crea_orb[ irrep_center ];
       const unsigned int * center_anni_orb  = irrep_center_anni_orb[ irrep_center ];
       const unsigned long long * zero_jumps = irrep_center_jumps[ 0 ];
 
-      for ( int irrep_center_up = 0; irrep_center_up < NumIrreps; irrep_center_up++ ){
-         const int irrep_center_down = getIrrepProduct( irrep_target_center, irrep_center_up );
+      for ( int irrep_center_up = 0; irrep_center_up < num_irreps; irrep_center_up++ ){
+         const int irrep_center_down = Irreps::directProd( irrep_target_center, irrep_center_up );
          const unsigned int dim_center_up   = numPerIrrep_up  [ irrep_center_up   ];
          const unsigned int dim_center_down = numPerIrrep_down[ irrep_center_down ];
          const unsigned int blocksize_beta  = HXVsizeWorkspace / ( dim_center_up * num_pairs ); assert( blocksize_beta > 0 );
@@ -678,8 +677,8 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
                double * target_space   = HXVworkbig1 + size_center * pair;
                const unsigned int crea = center_crea_orb[ pair ];
                const unsigned int anni = center_anni_orb[ pair ];
-               const int irrep_excited = getIrrepProduct( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
-               const int irrep_zero_up = getIrrepProduct( irrep_excited, irrep_center_up );
+               const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+               const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
                const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
                for ( unsigned int count = 0; count < size_center; count++ ){ target_space[ count ] = 0.0; }
 
@@ -749,8 +748,8 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
                double * origin_space   = HXVworkbig2 + size_center * pair;
                const unsigned int crea = center_crea_orb[ pair ];
                const unsigned int anni = center_anni_orb[ pair ];
-               const int irrep_excited = getIrrepProduct( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
-               const int irrep_zero_up = getIrrepProduct( irrep_excited, irrep_center_up );
+               const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+               const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
                const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
 
                excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
@@ -793,17 +792,17 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
 
 void CheMPS2::FCI::apply_excitation( double * orig_vector, double * result_vector, const int crea, const int anni, const int orig_target_irrep ) const{
 
-   const int    excitation_irrep = getIrrepProduct( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
-   const int result_target_irrep = getIrrepProduct( excitation_irrep, orig_target_irrep );
-   const int   orig_irrep_center = getIrrepProduct( TargetIrrep,   orig_target_irrep );
-   const int result_irrep_center = getIrrepProduct( TargetIrrep, result_target_irrep );
+   const int    excitation_irrep = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+   const int result_target_irrep = Irreps::directProd( excitation_irrep, orig_target_irrep );
+   const int   orig_irrep_center = Irreps::directProd( TargetIrrep,   orig_target_irrep );
+   const int result_irrep_center = Irreps::directProd( TargetIrrep, result_target_irrep );
 
    ClearVector( getVecLength( result_irrep_center ) , result_vector );
 
-   for ( int result_irrep_up = 0; result_irrep_up < NumIrreps; result_irrep_up++ ){
+   for ( int result_irrep_up = 0; result_irrep_up < num_irreps; result_irrep_up++ ){
 
-      const int result_irrep_down = getIrrepProduct( result_irrep_up, result_target_irrep );
-      const int orig_irrep_up     = getIrrepProduct( excitation_irrep, result_irrep_up );
+      const int result_irrep_down = Irreps::directProd( result_irrep_up, result_target_irrep );
+      const int orig_irrep_up     = Irreps::directProd( excitation_irrep, result_irrep_up );
 
       excite_alpha_omp( numPerIrrep_up  [ result_irrep_up   ], // dim_new_up
                         numPerIrrep_up  [   orig_irrep_up   ], // dim_old_up
@@ -834,7 +833,7 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
    ClearVector( L*L*L*L, two_rdm );
    const unsigned long long orig_length = getVecLength( 0 );
    unsigned long long max_length = 0;
-   for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
    double * workspace1 = new double[ max_length  ];
@@ -844,8 +843,8 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = l
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){ // crea1 = j >= l
       
-         const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
-         const int target_irrep1 = getIrrepProduct( TargetIrrep, irrep_center1 );
+         const int irrep_center1 = Irreps::directProd( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
+         const int target_irrep1 = Irreps::directProd( TargetIrrep, irrep_center1 );
          apply_excitation( vector, workspace1, crea1, anni1, TargetIrrep );
          
          if ( irrep_center1 == 0 ){
@@ -858,7 +857,7 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
          for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){ // crea2 = i >= l
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = k >= l
             
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
+               const int irrep_center2 = Irreps::directProd( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
                if ( irrep_center2 == irrep_center1 ){
                
                   apply_excitation( workspace1, workspace2, crea2, anni2, target_irrep1 );
@@ -875,10 +874,10 @@ double CheMPS2::FCI::Fill2RDM(double * vector, double * two_rdm) const{
    
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){
-         const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) );
+         const int irrep_center1 = Irreps::directProd( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) );
          for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ) , getOrb2Irrep( anni2 ) );
+               const int irrep_center2 = Irreps::directProd( getOrb2Irrep( crea2 ) , getOrb2Irrep( anni2 ) );
                if ( irrep_center2 == irrep_center1 ){
                   const double value = two_rdm[ crea2 + L * ( crea1 + L * ( anni2 + L * anni1 ) ) ];
                                        two_rdm[ crea1 + L * ( crea2 + L * ( anni1 + L * anni2 ) ) ] = value;
@@ -952,7 +951,7 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
    ClearVector( L*L*L*L*L*L*L*L, four_rdm );
    const unsigned long long orig_length = getVecLength( 0 );
    unsigned long long max_length = getVecLength( 0 );
-   for ( unsigned int irrep = 1; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 1; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
    double * workspace1 = new double[ max_length  ];
@@ -963,8 +962,8 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = t
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){ // crea1 = l >= t
 
-         const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
-         const int target_irrep1 = getIrrepProduct( TargetIrrep, irrep_center1 );
+         const int irrep_center1 = Irreps::directProd( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
+         const int target_irrep1 = Irreps::directProd( TargetIrrep, irrep_center1 );
          apply_excitation( vector, workspace1, crea1, anni1, TargetIrrep );
 
          if ( irrep_center1 == 0 ){
@@ -990,8 +989,8 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
          for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){ // crea2 = k >= t
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = r >= t
 
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
-               const int target_irrep2 = getIrrepProduct( target_irrep1, irrep_center2 );
+               const int irrep_center2 = Irreps::directProd( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
+               const int target_irrep2 = Irreps::directProd( target_irrep1, irrep_center2 );
                apply_excitation( workspace1, workspace2, crea2, anni2, target_irrep1 );
 
                if ( irrep_center1 == irrep_center2 ){
@@ -1020,9 +1019,9 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
                for ( unsigned int crea3 = anni1; crea3 < L; crea3++ ){ // crea3 = j >= t = anni1
                   for ( unsigned int anni3 = (( anni1 == anni2 ) ? anni1 + 1 : anni1 ); anni3 < L; anni3++ ){ // anni3 = q >= t
 
-                     const int irrep_center3 = getIrrepProduct( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
-                     const int target_irrep3 = getIrrepProduct( target_irrep2, irrep_center3 );
-                     const int irrep_center4 = getIrrepProduct( getIrrepProduct( irrep_center1 , irrep_center2 ), irrep_center3 );
+                     const int irrep_center3 = Irreps::directProd( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
+                     const int target_irrep3 = Irreps::directProd( target_irrep2, irrep_center3 );
+                     const int irrep_center4 = Irreps::directProd( Irreps::directProd( irrep_center1 , irrep_center2 ), irrep_center3 );
                      apply_excitation( workspace2, workspace3, crea3, anni3, target_irrep2 );
 
                      if ( irrep_center4 == 0 ){
@@ -1048,7 +1047,7 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
 
                               if ( (( anni2 == anni3 ) && ( anni3 == anni4 )) == false ){
 
-                                 const int irrep_product4 = getIrrepProduct( getOrb2Irrep( crea4 ), getOrb2Irrep( anni4 ) );
+                                 const int irrep_product4 = Irreps::directProd( getOrb2Irrep( crea4 ), getOrb2Irrep( anni4 ) );
                                  if ( irrep_product4 == irrep_center4 ){
 
                                     apply_excitation( workspace3, workspace4, crea4, anni4, target_irrep3 );
@@ -1075,18 +1074,18 @@ void CheMPS2::FCI::Fill4RDM(double * vector, double * four_rdm) const{
    // Make 48-fold permutation symmetric
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = t
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){ // crea1 = l >= t = anni1
-      const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
+      const int irrep_center1 = Irreps::directProd( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
          for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){ // crea2 = k >= t = anni1
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = r >= t = anni1
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
-               const int irrep_12 = getIrrepProduct( irrep_center1, irrep_center2 );
+               const int irrep_center2 = Irreps::directProd( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
+               const int irrep_12 = Irreps::directProd( irrep_center1, irrep_center2 );
                for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){ // crea3 = j >= k = crea2 >= t = anni1
                   for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){ // anni3 = q >= t = anni1
-                     const int irrep_center3 = getIrrepProduct( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
-                     const int irrep_123 = getIrrepProduct( irrep_12, irrep_center3 );
+                     const int irrep_center3 = Irreps::directProd( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
+                     const int irrep_123 = Irreps::directProd( irrep_12, irrep_center3 );
                      for ( unsigned int crea4 = crea3; crea4 < L; crea4++ ){ // crea4 = i >= j = crea3 >= k = crea2 >= t = anni1
                         for ( unsigned int anni4 = anni1; anni4 < L; anni4++ ){ // anni4 = p >= t = anni1
-                           const int irrep_center4 = getIrrepProduct( getOrb2Irrep( crea4 ), getOrb2Irrep( anni4 ) );
+                           const int irrep_center4 = Irreps::directProd( getOrb2Irrep( crea4 ), getOrb2Irrep( anni4 ) );
                            if ( irrep_123 == irrep_center4 ){
 
                               /* crea4 >= crea3 >= crea2 >= anni1
@@ -1211,7 +1210,7 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
    ClearVector( L*L*L*L*L*L, output );
    const unsigned long long orig_length = getVecLength( 0 );
    unsigned long long max_length = getVecLength( 0 );
-   for ( unsigned int irrep = 1; irrep < NumIrreps; irrep++ ){
+   for ( unsigned int irrep = 1; irrep < num_irreps; irrep++ ){
       if ( getVecLength( irrep ) > max_length ){ max_length = getVecLength( irrep ); }
    }
    double * workspace1 = new double[ max_length  ];
@@ -1285,8 +1284,8 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){ // anni1 = i ( works in on the bra ) ( smaller than j, k )
       for ( unsigned int crea1 = 0; crea1 < L; crea1++ ){ // crea1 = p ( can be anything )
 
-         const int irrep_center1 = getIrrepProduct( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
-         const int target_irrep1 = getIrrepProduct( TargetIrrep, irrep_center1 );
+         const int irrep_center1 = Irreps::directProd( getOrb2Irrep( crea1 ), getOrb2Irrep( anni1 ) );
+         const int target_irrep1 = Irreps::directProd( TargetIrrep, irrep_center1 );
          apply_excitation( vector, workspace1, crea1, anni1, TargetIrrep );
 
          if ( irrep_center1 == 0 ){
@@ -1306,9 +1305,9 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
          for ( unsigned int crea2 = 0; crea2 < L; crea2++ ){ // crea2 = q
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){ // anni2 = j >= ( i = anni1 )
 
-               const int irrep_center2 = getIrrepProduct( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
-               const int target_irrep2 = getIrrepProduct( target_irrep1, irrep_center2 );
-               const int irrep_center3 = getIrrepProduct( irrep_center1, irrep_center2 );
+               const int irrep_center2 = Irreps::directProd( getOrb2Irrep( crea2 ), getOrb2Irrep( anni2 ) );
+               const int target_irrep2 = Irreps::directProd( target_irrep1, irrep_center2 );
+               const int irrep_center3 = Irreps::directProd( irrep_center1, irrep_center2 );
                apply_excitation( workspace1, workspace2, crea2, anni2, target_irrep1 );
 
                if ( irrep_center1 == irrep_center2 ){
@@ -1329,7 +1328,7 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
                   for ( unsigned int crea3 = (( crea1 == crea2 ) ? crea2 + 1 : crea2 ); crea3 < L; crea3++ ){ // crea3 = r >= ( q = crea2 ) >= ( i = anni1 )
                      for ( unsigned int anni3 = (( anni1 == anni2 ) ? anni1 + 1 : anni1 ); anni3 < L; anni3++ ){ // anni3 = k >= ( i = anni1 )
 
-                        const int irrep_product3 = getIrrepProduct( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
+                        const int irrep_product3 = Irreps::directProd( getOrb2Irrep( crea3 ), getOrb2Irrep( anni3 ) );
 
                         if ( irrep_center3 == irrep_product3 ){ // I1 x I2 x I3 = Itrivial
 
@@ -1372,13 +1371,13 @@ double CheMPS2::FCI::Driver3RDM( double * vector, double * output, double * thre
    // Make 12-fold permutation symmetric
    for ( unsigned int anni1 = 0; anni1 < L; anni1++ ){
       for ( unsigned int crea1 = anni1; crea1 < L; crea1++ ){
-         const int irrep_prod1 = getIrrepProduct( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) ); // Ic1 x Ia1
+         const int irrep_prod1 = Irreps::directProd( getOrb2Irrep( crea1 ) , getOrb2Irrep( anni1 ) ); // Ic1 x Ia1
          for ( unsigned int crea2 = anni1; crea2 < L; crea2++ ){
-            const int irrep_prod2 = getIrrepProduct( irrep_prod1 , getOrb2Irrep( crea2 ) ); // Ic1 x Ia1 x Ic2
+            const int irrep_prod2 = Irreps::directProd( irrep_prod1 , getOrb2Irrep( crea2 ) ); // Ic1 x Ia1 x Ic2
             for ( unsigned int anni2 = anni1; anni2 < L; anni2++ ){
-               const int irrep_prod3 = getIrrepProduct( irrep_prod2 , getOrb2Irrep( anni2 ) ); // Ic1 x Ia1 x Ic2 x Ia2
+               const int irrep_prod3 = Irreps::directProd( irrep_prod2 , getOrb2Irrep( anni2 ) ); // Ic1 x Ia1 x Ic2 x Ia2
                for ( unsigned int crea3 = crea2; crea3 < L; crea3++ ){
-                  const int irrep_prod4 = getIrrepProduct( irrep_prod3 , getOrb2Irrep( crea3 ) ); // Ic1 x Ia1 x Ic2 x Ia2 x Ic3
+                  const int irrep_prod4 = Irreps::directProd( irrep_prod3 , getOrb2Irrep( crea3 ) ); // Ic1 x Ia1 x Ic2 x Ia2 x Ic3
                   for ( unsigned int anni3 = anni1; anni3 < L; anni3++ ){
                      if ( irrep_prod4 == getOrb2Irrep( anni3 )){ // Ic1 x Ia1 x Ic2 x Ia2 x Ic3 == Ia3
                      
@@ -1434,7 +1433,7 @@ double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
       for ( unsigned int orbi = 0; orbi < L; orbi++ ){
          
          const int irrep_up     = getUpIrrepOfCounter( 0 , counter );
-         const int irrep_down   = getIrrepProduct( irrep_up , TargetIrrep );
+         const int irrep_down   = Irreps::directProd( irrep_up , TargetIrrep );
          const int count_up     = ( counter - irrep_center_jumps[ 0 ][ irrep_up ] ) % numPerIrrep_up[ irrep_up ];
          const int count_down   = ( counter - irrep_center_jumps[ 0 ][ irrep_up ] ) / numPerIrrep_up[ irrep_up ];
          
@@ -1451,7 +1450,7 @@ double CheMPS2::FCI::CalcSpinSquared(double * vector) const{
                               - lookup_sign_beta [ irrep_down ][ orbj + L * orbj ][ count_down ]; //Signed integers so subtracting is OK
             result += 0.5 * diff_ii * diff_jj * vector_at_counter_squared;
             
-            const int irrep_up_bis = getIrrepProduct( irrep_up , getIrrepProduct( getOrb2Irrep( orbi ) , getOrb2Irrep( orbj ) ) );
+            const int irrep_up_bis = Irreps::directProd( irrep_up , Irreps::directProd( getOrb2Irrep( orbi ) , getOrb2Irrep( orbj ) ) );
             
             // - ( a_i,up^+ a_j,up )( a_j,down^+ a_i,down )
             const int sign_down_ji  = lookup_sign_beta [ irrep_down ][ orbj + L * orbi ][ count_down ];
@@ -1559,8 +1558,8 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
    #pragma omp parallel
    {
 
-      int * bits_up    = new int[ L ];
-      int * bits_down  = new int[ L ];
+      int * bits_up   = new int[ L ];
+      int * bits_down = new int[ L ];
       
       double * Jmat       = new double[ L * L ]; // (ij|kk)( n_k,up + n_k,down )
       double * K_reg_up   = new double[ L * L ]; // (ik|kj)( n_k,up )
@@ -1568,8 +1567,8 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
       double * K_bar_up   = new double[ L * L ]; // (ik|kj)( 1 - n_k,up )
       double * K_bar_down = new double[ L * L ]; // (ik|kj)( 1 - n_k,down )
       
-      int * specific_orbs_irrep = new int[ NumIrreps * ( L + 1 ) ];
-      for ( unsigned int irrep = 0; irrep < NumIrreps; irrep++ ){
+      int * specific_orbs_irrep = new int[ num_irreps * ( L + 1 ) ];
+      for ( unsigned int irrep = 0; irrep < num_irreps; irrep++ ){
          int count = 0;
          for ( unsigned int orb = 0; orb < L; orb++){
             specific_orbs_irrep[ orb + ( L + 1 ) * irrep ] = 0;
@@ -1668,12 +1667,12 @@ void CheMPS2::FCI::DiagHamSquared(double * output) const{
                
                   if ( ( special_ak > 0 ) || ( local_ak_up > 0 ) || ( local_ak_down > 0 ) ){
                   
-                     const int irrep_ak = getIrrepProduct( getOrb2Irrep(a), getOrb2Irrep(k) );
+                     const int irrep_ak = Irreps::directProd( getOrb2Irrep(a), getOrb2Irrep(k) );
                         
                      for ( unsigned int i = 0; i < L; i++ ){
                         if ( bits_up[i] + bits_down[i] < 2 ){
                   
-                           const int offset     = getIrrepProduct( irrep_ak, getOrb2Irrep(i) ) * ( L + 1 );
+                           const int offset     = Irreps::directProd( irrep_ak, getOrb2Irrep(i) ) * ( L + 1 );
                            const int bar_i_up   = 1 - bits_up[i];
                            const int bar_i_down = 1 - bits_down[i];
                            const int max_c_cnt  = specific_orbs_irrep[ L + offset ];
@@ -2002,7 +2001,7 @@ void CheMPS2::FCI::ActWithSecondQuantizedOperator(const char whichOperator, cons
 
    const unsigned long long vecLength = getVecLength( 0 );
 
-   if ( getTargetIrrep() != getIrrepProduct( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) )){
+   if ( getTargetIrrep() != Irreps::directProd( otherFCI->getTargetIrrep() , getOrb2Irrep( orbIndex ) )){
       ClearVector( vecLength , thisVector );
       return;
    }
@@ -2273,7 +2272,7 @@ void CheMPS2::FCI::GFmatrix_addition(const double alpha, const double beta, cons
       
          const unsigned int addNelUP   = getNel_up()   + ((isUp) ? 1 : 0);
          const unsigned int addNelDOWN = getNel_down() + ((isUp) ? 0 : 1);
-         const int addIrrep = getIrrepProduct( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
+         const int addIrrep = Irreps::directProd( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
          
          CheMPS2::FCI additionFCI( Ham, addNelUP, addNelDOWN, addIrrep, maxMemWorkMB, FCIverbose );
          const unsigned long long addVecLength = additionFCI.getVecLength( 0 );
@@ -2364,7 +2363,7 @@ void CheMPS2::FCI::GFmatrix_removal(const double alpha, const double beta, const
       
          const unsigned int removeNelUP   = getNel_up()   - ((isUp) ? 1 : 0);
          const unsigned int removeNelDOWN = getNel_down() - ((isUp) ? 0 : 1);
-         const int removeIrrep = getIrrepProduct( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
+         const int removeIrrep = Irreps::directProd( getTargetIrrep(), getOrb2Irrep( orbitalRight ) );
          
          CheMPS2::FCI removalFCI( Ham, removeNelUP, removeNelDOWN, removeIrrep, maxMemWorkMB, FCIverbose );
          const unsigned long long removeVecLength = removalFCI.getVecLength( 0 );
