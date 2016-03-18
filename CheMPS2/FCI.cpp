@@ -647,8 +647,9 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
          const int irrep_center_down = Irreps::directProd( irrep_target_center, irrep_center_up );
          const unsigned int dim_center_up   = numPerIrrep_up  [ irrep_center_up   ];
          const unsigned int dim_center_down = numPerIrrep_down[ irrep_center_down ];
-         const unsigned int blocksize_beta  = HXVsizeWorkspace / ( dim_center_up * num_pairs ); assert( blocksize_beta > 0 );
-               unsigned int num_block_beta  = dim_center_down / blocksize_beta;
+         const unsigned int blocksize_beta  = HXVsizeWorkspace / std::max( (unsigned int) 1, dim_center_up * num_pairs );
+         assert( blocksize_beta > 0 ); // At least one full column should fit in the workspaces...
+         unsigned int num_block_beta = dim_center_down / blocksize_beta;
          while ( blocksize_beta * num_block_beta < dim_center_down ){ num_block_beta++; }
          for ( unsigned int block = 0; block < num_block_beta; block++ ){
             const unsigned int start_center_down = block * blocksize_beta;
