@@ -314,7 +314,7 @@ namespace CheMPS2{
          //! Function which performs the Hamiltonian times Vector product (without Econstant!!) making use of the (ij|kl) = (ji|kl) = (ij|lk) = (ji|lk) symmetry of the electron repulsion integrals
          /** \param input The vector of length getVecLength(0) on which the Hamiltonian should act
              \param output Vector of length getVecLength(0) which contains on exit the Hamiltonian times input */
-         void HamTimesVec(double * input, double * output) const;
+         void matvec( double * input, double * output ) const;
          
          //! Sandwich the Hamiltonian between two Slater determinants (return a specific element) (without Econstant!!)
          /** \param bits_bra_up Bit representation of the <bra| Slater determinant of the up (alpha) electrons (length L)
@@ -557,11 +557,15 @@ namespace CheMPS2{
          //! Actual routine used by Fill3RDM, Fock4RDM, Diag4RDM
          double Driver3RDM(double * vector, double * output, double * three_rdm, double * fock, const unsigned int orbz) const;
 
-         //! Alpha excitation kernel
-         static void excite_alpha( const unsigned int dim_new, const unsigned int dim_old, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
+         //! Alpha excitation kernels
+         static void excite_alpha_omp( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int dim_down, double * origin, double * result, int * signmap, int * countmap );
+         static void excite_alpha_first( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
+         static void excite_alpha_second_omp( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
 
-         //! Beta excitation kernel
-         static void excite_beta( const unsigned int dim, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
+         //! Beta excitation kernels
+         static void excite_beta_omp( const unsigned int dim_up, const unsigned int dim_new_down, double * origin, double * result, int * signmap, int * countmap );
+         static void excite_beta_first( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
+         static void excite_beta_second_omp( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
 
    };
 

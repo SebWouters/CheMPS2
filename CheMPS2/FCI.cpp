@@ -23,6 +23,7 @@
 #include <math.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <algorithm>
 
 using std::cout;
 using std::endl;
@@ -483,14 +484,14 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
 
    const unsigned long long vecLength = getVecLength( 0 );
    
-   // Building Ham by HamTimesVec
+   // Building Ham by matvec
    double * HamHXV = new double[ vecLength * vecLength ];
    double * workspace = new double[ vecLength ];
    for (unsigned long long count = 0; count < vecLength; count++){
    
       ClearVector( vecLength , workspace );
       workspace[ count ] = 1.0;
-      HamTimesVec( workspace , HamHXV + count*vecLength );
+      matvec( workspace , HamHXV + count*vecLength );
    
    }
    
@@ -526,14 +527,14 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
    delete [] bra_up;
    delete [] bra_down;
    
-   // Building Ham^2 by HamTimesVec
+   // Building Ham^2 by matvec
    double * workspace2 = new double[ vecLength ];
    for (unsigned long long count = 0; count < vecLength; count++){
    
       ClearVector( vecLength , workspace );
       workspace[ count ] = 1.0;
-      HamTimesVec( workspace , workspace2 );
-      HamTimesVec( workspace2 , HamHXV + count*vecLength );
+      matvec( workspace , workspace2 );
+      matvec( workspace2 , HamHXV + count*vecLength );
    
    }
    
@@ -553,232 +554,240 @@ double CheMPS2::FCI::getFCIcoeff(int * bits_up, int * bits_down, double * vector
 
 }*/
 
-void CheMPS2::FCI::excite_alpha( const unsigned int dim_new, const unsigned int dim_old, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
+void CheMPS2::FCI::excite_alpha_omp( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int dim_down, double * origin, double * result, int * signmap, int * countmap ){
 
    #pragma omp parallel for schedule(static)
-   for ( unsigned int cnt_new_up = start_up; cnt_new_up < stop_up; cnt_new_up++ ){
+   for ( unsigned int cnt_new_up = 0; cnt_new_up < dim_new_up; cnt_new_up++ ){
+      const int sign_up = signmap[ cnt_new_up ];
+      if ( sign_up != 0 ){
+         const int cnt_old_up = countmap[ cnt_new_up ];
+         for ( unsigned int cnt_down = 0; cnt_down < dim_down; cnt_down++ ){
+            result[ cnt_new_up + dim_new_up * cnt_down ] += sign_up * origin[ cnt_old_up + dim_old_up * cnt_down ];
+         }
+      }
+   }
+
+}
+
+void CheMPS2::FCI::excite_beta_omp( const unsigned int dim_up, const unsigned int dim_new_down, double * origin, double * result, int * signmap, int * countmap ){
+
+   #pragma omp parallel for schedule(static)
+   for ( int cnt_new_down = 0; cnt_new_down < dim_new_down; cnt_new_down++ ){
+      const int sign_down = signmap[ cnt_new_down ];
+      if ( sign_down != 0 ){
+         const int cnt_old_down = countmap[ cnt_new_down ];
+         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+            result[ cnt_up + dim_up * cnt_new_down ] += sign_down * origin[ cnt_up + dim_up * cnt_old_down ];
+         }
+      }
+   }
+
+}
+
+void CheMPS2::FCI::excite_alpha_first( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
+
+   for ( unsigned int cnt_new_up = 0; cnt_new_up < dim_new_up; cnt_new_up++ ){
       const int sign_up = signmap[ cnt_new_up ];
       if ( sign_up != 0 ){
          const int cnt_old_up = countmap[ cnt_new_up ];
          for ( unsigned int cnt_down = start_down; cnt_down < stop_down; cnt_down++ ){
-            result[ cnt_new_up + dim_new * cnt_down ] += sign_up * origin[ cnt_old_up + dim_old * cnt_down ];
+            result[ cnt_new_up + dim_new_up * ( cnt_down - start_down ) ] += sign_up * origin[ cnt_old_up + dim_old_up * cnt_down ];
          }
       }
    }
 
 }
 
-void CheMPS2::FCI::excite_beta( const unsigned int dim, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
+void CheMPS2::FCI::excite_beta_first( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
 
-   #pragma omp parallel for schedule(static)
    for ( int cnt_new_down = start_down; cnt_new_down < stop_down; cnt_new_down++ ){
       const int sign_down = signmap[ cnt_new_down ];
       if ( sign_down != 0 ){
          const int cnt_old_down = countmap[ cnt_new_down ];
-         for ( int cnt_up = start_up; cnt_up < stop_up; cnt_up++ ){
-            result[ cnt_up + dim * cnt_new_down ] += sign_down * origin[ cnt_up + dim * cnt_old_down ];
+         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+            result[ cnt_up + dim_up * ( cnt_new_down - start_down ) ] += sign_down * origin[ cnt_up + dim_up * cnt_old_down ];
          }
       }
    }
 
 }
 
-void CheMPS2::FCI::HamTimesVec(double * input, double * output) const{
+void CheMPS2::FCI::excite_alpha_second_omp( const unsigned int dim_new_up, const unsigned int dim_old_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
 
-   struct timeval start, end;
-   gettimeofday(&start, NULL);
-
-   ClearVector( getVecLength( 0 ) , output );
-
-   // P.J. Knowles and N.C. Handy, A new determinant-based full configuration interaction method, Chemical Physics Letters 111 (4-5), 315-321 (1984)
-   
-   // irrep_center is the center irrep of the ERI : (ij|kl) --> irrep_center = I_i x I_j = I_k x I_l
-   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
-   
-      const unsigned long long localVecLength = getVecLength( irrep_center );
-      const int localTargetIrrep = getIrrepProduct( TargetIrrep , irrep_center );
-      const unsigned int numPairs = irrep_center_num[ irrep_center ];
-      const unsigned int * center_crea_orb = irrep_center_crea_orb[ irrep_center ];
-      const unsigned int * center_anni_orb = irrep_center_anni_orb[ irrep_center ];
-      const unsigned long long * center_jumps    = irrep_center_jumps[ irrep_center ];
-      const unsigned long long * zero_jumps      = irrep_center_jumps[ 0 ];
-
-      const unsigned int space_per_vectorpiece = (( numPairs == 0 ) ? HXVsizeWorkspace : (unsigned int) floor(( 1.0 * HXVsizeWorkspace ) / numPairs));
-      unsigned int numIterations = localVecLength / space_per_vectorpiece;
-      if ( localVecLength > numIterations * space_per_vectorpiece ){ numIterations++; }
-
-      for ( unsigned int iteration = 0; iteration < numIterations; iteration++ ){
-      
-         const unsigned long long veccounter_start = iteration * space_per_vectorpiece;
-         const unsigned long long guess_stop       = ( iteration + 1 ) * space_per_vectorpiece;
-         const unsigned long long veccounter_stop  = ( guess_stop > localVecLength ) ? localVecLength : guess_stop;
-   
-         /******************************************************************************************************************************
-          *   First build workbig1[ i<=j + size(i<=j) * veccounter ] = E_{i<=j} + ( 1 - delta_i==j ) E_{j>i} (irrep_center) | input >  *
-          ******************************************************************************************************************************/
-         const unsigned long long loopsize = numPairs * ( veccounter_stop - veccounter_start );
-         #pragma omp parallel for schedule(static)
-         for ( unsigned long long loopvariable = 0; loopvariable < loopsize; loopvariable++ ){
-         
-            const unsigned int pair               = loopvariable % numPairs;
-            const unsigned long long veccounter   = veccounter_start + ( loopvariable / numPairs );
-            const unsigned int creator            = center_crea_orb[ pair ];
-            const unsigned int annihilator        = center_anni_orb[ pair ];
-            const int irrep_new_up                = getUpIrrepOfCounter( irrep_center , veccounter );
-            const int irrep_new_down              = getIrrepProduct( irrep_new_up , localTargetIrrep );
-            const unsigned int count_new_up       = ( veccounter - center_jumps[ irrep_new_up ] ) % numPerIrrep_up[ irrep_new_up ];
-            const unsigned int count_new_down     = ( veccounter - center_jumps[ irrep_new_up ] ) / numPerIrrep_up[ irrep_new_up ];
-            
-            double myResult = 0.0;
-            
-            {
-               // E^{alpha}_{creator <= annihilator}
-               const int sign_up  = lookup_sign_alpha[ irrep_new_up ][ creator + L * annihilator ][ count_new_up ];
-               if ( sign_up != 0 ){ // Required for one-electron calculations
-                  const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ creator + L * annihilator ][ count_new_up ];
-                  const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ creator + L * annihilator ][ count_new_up ];
-                  myResult = sign_up * input[ zero_jumps[ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
-               }
-               
-               // E^{beta}_{creator <= annihilator}
-               const int sign_down  = lookup_sign_beta[ irrep_new_down ][ creator + L * annihilator ][ count_new_down ];
-               if ( sign_down != 0 ){ // Required for one-electron calculations
-                  const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ creator + L * annihilator ][ count_new_down ];
-                  myResult += sign_down * input[ zero_jumps[ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
-               }
-            }
-            
-            if ( annihilator > creator ){
-               // E^{alpha}_{annihilator > creator}
-               const int sign_up  = lookup_sign_alpha[ irrep_new_up ][ annihilator + L * creator ][ count_new_up ];
-               if ( sign_up != 0 ){ // Required for one-electron calculations
-                  const int irrep_old_up = lookup_irrep_alpha[ irrep_new_up ][ annihilator + L * creator ][ count_new_up ];
-                  const int cnt_old_up   = lookup_cnt_alpha  [ irrep_new_up ][ annihilator + L * creator ][ count_new_up ];
-                  myResult += sign_up * input[ zero_jumps[ irrep_old_up ] + cnt_old_up + numPerIrrep_up[ irrep_old_up ] * count_new_down ];
-               }
-               
-               // E^{beta}_{annihilator > creator}
-               const int sign_down  = lookup_sign_beta[ irrep_new_down ][ annihilator + L * creator ][ count_new_down ];
-               if ( sign_down != 0 ){ // Required for one-electron calculations
-                  const int cnt_old_down = lookup_cnt_beta[ irrep_new_down ][ annihilator + L * creator ][ count_new_down ];
-                  myResult += sign_down * input[ zero_jumps[ irrep_new_up ] + count_new_up + numPerIrrep_up[ irrep_new_up ] * cnt_old_down ];
-               }
-            }
-            
-            HXVworkbig1[ loopvariable ] = myResult;
-            
-         }
-         
-         /************************************************
-          *   If irrep_center==0, do the one-body terms  *
-          ************************************************/
-         if ( irrep_center==0 ){
-            for ( unsigned int pair = 0; pair < numPairs; pair++ ){
-               HXVworksmall[ pair ] = getGmat( center_crea_orb[ pair ] , center_anni_orb[ pair ] );
-            }
-            char trans  = 'T';
-            char notran = 'N';
-            double one  = 1.0;
-            int mdim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
-            int kdim = numPairs;
-            int ndim = 1;
-            dgemm_( &trans, &notran, &mdim, &ndim, &kdim, &one, HXVworkbig1, &kdim, HXVworksmall, &kdim, &one, output + veccounter_start, &mdim );
-         }
-         
-         /****************************************************************************************************************************
-          *   Now build workbig2[ i<=j + size(i<=j) * veccounter] = 0.5 * ( i<=j | k<=l ) * workbig1[ k<=l + size(k<=l) * counter ]  *
-          ****************************************************************************************************************************/
-         {
-            for ( unsigned int pair1 = 0; pair1 < numPairs; pair1++ ){
-               for ( unsigned int pair2 = 0; pair2 < numPairs; pair2++ ){
-                  HXVworksmall[ pair1 + numPairs * pair2 ]
-                     = 0.5 * getERI( center_crea_orb[ pair1 ] , center_anni_orb[ pair1 ] ,
-                                     center_crea_orb[ pair2 ] , center_anni_orb[ pair2 ] );
-               }
-            }
-            char notran = 'N';
-            double one  = 1.0;
-            double zero = 0.0;
-            int mdim = numPairs;
-            int kdim = numPairs;
-            int ndim = veccounter_stop - veccounter_start; // Checked "assert( max_integer >= maxVecLength );" at FCI::StartupIrrepCenter()
-            dgemm_( &notran , &notran , &mdim , &ndim , &kdim , &one , HXVworksmall , &mdim , HXVworkbig1 , &kdim , &zero , HXVworkbig2 , &mdim );
-         }
-         
-         /*************************************************************************************************************
-          *   Finally do output <-- E_{i<=j} + (1 - delta_{i==j}) E_{j>i} workbig2[ i<=j + size(i<=j) * veccounter ]  *
-          *************************************************************************************************************/
-         for ( unsigned int pair = 0; pair < numPairs; pair++ ){
-         
-            const unsigned int orbi = center_crea_orb[ pair ];
-            const unsigned int orbj = center_anni_orb[ pair ];
-
-            #pragma omp parallel for schedule(static) // The given E_{i<=j}^{alpha} connects exactly one veccounter with one location_new
-            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-               const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-               const unsigned int count_old_up   = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-               const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ orbj + L * orbi ][ count_old_up ];
-               if ( sign_up != 0 ){ // Required for thread safety
-                  const unsigned int count_old_down     = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-                  const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ orbj + L * orbi ][ count_old_up ];
-                  const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ orbj + L * orbi ][ count_old_up ];
-                  const unsigned long long location_new = zero_jumps[ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
-                  output[ location_new ] += sign_up * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
-               }
-            }
-            
-            #pragma omp parallel for schedule(static) // The given E_{i<=j}^{beta} connects exactly one veccounter with one location_new
-            for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-               const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-               const unsigned int count_old_down = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-               const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
-               const int sign_down               = lookup_sign_beta[ irrep_old_down ][ orbj + L * orbi ][ count_old_down ];
-               if ( sign_down != 0 ){ // Required for thread safety
-                  const unsigned int count_old_up       = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-                  const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ orbj + L * orbi ][ count_old_down ];
-                  const unsigned long long location_new = zero_jumps[ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
-                  output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
-               }
-            }
-            
-            if ( orbj > orbi ){
-            
-               #pragma omp parallel for schedule(static) // The given E_{j>i}^{alpha} connects exactly one veccounter with one location_new
-               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-                  const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-                  const unsigned int count_old_up   = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-                  const int sign_up                 = lookup_sign_alpha[ irrep_old_up ][ orbi + L * orbj ][ count_old_up ];
-                  if ( sign_up != 0 ){ // Required for thread safety
-                     const unsigned int count_old_down     = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-                     const int irrep_new_up                = lookup_irrep_alpha[ irrep_old_up ][ orbi + L * orbj ][ count_old_up ];
-                     const int cnt_new_up                  = lookup_cnt_alpha  [ irrep_old_up ][ orbi + L * orbj ][ count_old_up ];
-                     const unsigned long long location_new = zero_jumps[ irrep_new_up ] + cnt_new_up + numPerIrrep_up[ irrep_new_up ] * count_old_down;
-                     output[ location_new ] += sign_up * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
-                  }
-               }
-               
-               #pragma omp parallel for schedule(static) // The given E_{j>i}^{beta} connects exactly one veccounter with one location_new
-               for ( unsigned long long veccounter = veccounter_start; veccounter < veccounter_stop; veccounter++ ){
-                  const int irrep_old_up            = getUpIrrepOfCounter( irrep_center , veccounter );
-                  const unsigned int count_old_down = ( veccounter - center_jumps[ irrep_old_up ] ) / numPerIrrep_up[ irrep_old_up ];
-                  const int irrep_old_down          = getIrrepProduct( irrep_old_up , localTargetIrrep );
-                  const int sign_down               = lookup_sign_beta[ irrep_old_down ][ orbi + L * orbj ][ count_old_down ];
-                  if ( sign_down != 0 ){ // Required for thread safety
-                     const unsigned int count_old_up       = ( veccounter - center_jumps[ irrep_old_up ] ) % numPerIrrep_up[ irrep_old_up ];
-                     const int cnt_new_down                = lookup_cnt_beta[ irrep_old_down ][ orbi + L * orbj ][ count_old_down ];
-                     const unsigned long long location_new = zero_jumps[ irrep_old_up ] + count_old_up + numPerIrrep_up[ irrep_old_up ] * cnt_new_down;
-                     output[ location_new ] += sign_down * HXVworkbig2[ pair + numPairs * ( veccounter - veccounter_start ) ];
-                  }
-               }
-            }
-            
+   #pragma omp parallel for schedule(static)
+   for ( unsigned int cnt_old_up = 0; cnt_old_up < dim_old_up; cnt_old_up++ ){
+      const int sign_up = signmap[ cnt_old_up ];
+      if ( sign_up != 0 ){ // Required for thread safety
+         const int cnt_new_up = countmap[ cnt_old_up ];
+         for ( unsigned int cnt_down = start_down; cnt_down < stop_down; cnt_down++ ){
+            result[ cnt_new_up + dim_new_up * cnt_down ] += sign_up * origin[ cnt_old_up + dim_old_up * ( cnt_down - start_down ) ];
          }
       }
    }
-   
-   gettimeofday(&end, NULL);
-   const double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-   if ( FCIverbose >= 1 ){ cout << "FCI::HamTimesVec : Wall time = " << elapsed << " seconds" << endl; }
+
+}
+
+void CheMPS2::FCI::excite_beta_second_omp( const unsigned int dim_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap ){
+
+   #pragma omp parallel for schedule(static)
+   for ( int cnt_old_down = start_down; cnt_old_down < stop_down; cnt_old_down++ ){
+      const int sign_down = signmap[ cnt_old_down ];
+      if ( sign_down != 0 ){ // Required for thread safety
+         const int cnt_new_down = countmap[ cnt_old_down ];
+         for ( int cnt_up = 0; cnt_up < dim_up; cnt_up++ ){
+            result[ cnt_up + dim_up * cnt_new_down ] += sign_down * origin[ cnt_up + dim_up * ( cnt_old_down - start_down ) ];
+         }
+      }
+   }
+
+}
+
+void CheMPS2::FCI::matvec( double * input, double * output ) const{
+
+   struct timeval start, end;
+   gettimeofday( &start, NULL );
+
+   ClearVector( getVecLength( 0 ), output );
+
+   // P.J. Knowles and N.C. Handy, A new determinant-based full configuration interaction method, Chemical Physics Letters 111 (4-5), 315-321 (1984)
+
+   // irrep_center is the center irrep of the ERI : (ij|kl) --> irrep_center = I_i x I_j = I_k x I_l
+   for ( unsigned int irrep_center = 0; irrep_center < NumIrreps; irrep_center++ ){
+
+      const int irrep_target_center = getIrrepProduct( TargetIrrep, irrep_center );
+      const unsigned int num_pairs  = irrep_center_num[ irrep_center ];
+      const unsigned int * center_crea_orb  = irrep_center_crea_orb[ irrep_center ];
+      const unsigned int * center_anni_orb  = irrep_center_anni_orb[ irrep_center ];
+      const unsigned long long * zero_jumps = irrep_center_jumps[ 0 ];
+
+      for ( int irrep_center_up = 0; irrep_center_up < NumIrreps; irrep_center_up++ ){
+         const int irrep_center_down = getIrrepProduct( irrep_target_center, irrep_center_up );
+         const unsigned int dim_center_up   = numPerIrrep_up  [ irrep_center_up   ];
+         const unsigned int dim_center_down = numPerIrrep_down[ irrep_center_down ];
+         const unsigned int blocksize_beta  = HXVsizeWorkspace / ( dim_center_up * num_pairs ); assert( blocksize_beta > 0 );
+               unsigned int num_block_beta  = dim_center_down / blocksize_beta;
+         while ( blocksize_beta * num_block_beta < dim_center_down ){ num_block_beta++; }
+         for ( unsigned int block = 0; block < num_block_beta; block++ ){
+            const unsigned int start_center_down = block * blocksize_beta;
+            const unsigned int  stop_center_down = std::min( ( block + 1 ) * blocksize_beta, dim_center_down );
+            const unsigned int size_center = dim_center_up * ( stop_center_down - start_center_down );
+
+            // First build workbig1[ veccounter + size_center * pair ] = E_{i<=j} + ( 1 - delta_i==j ) E_{j>i} (irrep_center) | input >  */
+            #pragma omp parallel for schedule(static)
+            for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+               double * target_space   = HXVworkbig1 + size_center * pair;
+               const unsigned int crea = center_crea_orb[ pair ];
+               const unsigned int anni = center_anni_orb[ pair ];
+               const int irrep_excited = getIrrepProduct( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+               const int irrep_zero_up = getIrrepProduct( irrep_excited, irrep_center_up );
+               const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
+               for ( unsigned int count = 0; count < size_center; count++ ){ target_space[ count ] = 0.0; }
+
+               excite_alpha_first( dim_center_up, dim_zero_up, start_center_down, stop_center_down,
+                                   input + zero_jumps[ irrep_zero_up ],
+                                   target_space,
+                                   lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
+                                   lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
+
+               excite_beta_first( dim_center_up, start_center_down, stop_center_down,
+                                  input + zero_jumps[ irrep_center_up ],
+                                  target_space,
+                                  lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
+                                  lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
+
+               if ( anni > crea ){
+
+                  excite_alpha_first( dim_center_up, dim_zero_up, start_center_down, stop_center_down,
+                                      input + zero_jumps[ irrep_zero_up ],
+                                      target_space,
+                                      lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
+                                      lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
+
+                  excite_beta_first( dim_center_up, start_center_down, stop_center_down,
+                                     input + zero_jumps[ irrep_center_up ],
+                                     target_space,
+                                     lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
+                                     lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
+
+               }
+            }
+
+            // If irrep_center == 0, do the one-body terms
+            if ( irrep_center == 0 ){
+               for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+                  HXVworksmall[ pair ] = getGmat( center_crea_orb[ pair ], center_anni_orb[ pair ] );
+               }
+               char notrans = 'N';
+               double one = 1.0;
+               int mdim = size_center;
+               int kdim = num_pairs;
+               int ndim = 1;
+               double * target = output + zero_jumps[ irrep_center_up ] + dim_center_up * start_center_down;
+               dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &one, target, &mdim );
+            }
+
+            // Now build workbig2[ veccounter + size_center * new_pair ] = 0.5 * ( new_pair | old_pair ) * workbig1[ veccounter + size_center * old_pair ]
+            {
+               for ( unsigned int pair1 = 0; pair1 < num_pairs; pair1++ ){
+                  for ( unsigned int pair2 = 0; pair2 < num_pairs; pair2++ ){
+                     HXVworksmall[ pair1 + num_pairs * pair2 ]
+                        = 0.5 * getERI( center_crea_orb[ pair1 ], center_anni_orb[ pair1 ] ,
+                                        center_crea_orb[ pair2 ], center_anni_orb[ pair2 ] );
+                  }
+               }
+               char notrans = 'N';
+               double one = 1.0;
+               double set = 0.0;
+               int mdim = size_center;
+               int kdim = num_pairs;
+               int ndim = num_pairs;
+               dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &set, HXVworkbig2, &mdim );
+            }
+
+            // Finally do output <-- E_{i<=j} + (1 - delta_{i==j}) E_{j>i} workbig2[ veccounter + size_center * pair ]
+            for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+               double * origin_space   = HXVworkbig2 + size_center * pair;
+               const unsigned int crea = center_crea_orb[ pair ];
+               const unsigned int anni = center_anni_orb[ pair ];
+               const int irrep_excited = getIrrepProduct( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+               const int irrep_zero_up = getIrrepProduct( irrep_excited, irrep_center_up );
+               const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
+
+               excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
+                                        origin_space,
+                                        output + zero_jumps[ irrep_zero_up ],
+                                        lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
+                                        lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
+
+               excite_beta_second_omp( dim_center_up, start_center_down, stop_center_down,
+                                       origin_space,
+                                       output + zero_jumps[ irrep_center_up ],
+                                       lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
+                                       lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
+
+               if ( anni > crea ){
+
+                  excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
+                                           origin_space,
+                                           output + zero_jumps[ irrep_zero_up ],
+                                           lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
+                                           lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
+
+                  excite_beta_second_omp( dim_center_up, start_center_down, stop_center_down,
+                                          origin_space,
+                                          output + zero_jumps[ irrep_center_up ],
+                                          lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
+                                          lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
+
+               }
+            }
+         }
+      }
+   }
+
+   gettimeofday( &end, NULL );
+   const double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+   if ( FCIverbose >= 1 ){ cout << "FCI::matvec : Wall time = " << elapsed << " seconds" << endl; }
 
 }
 
@@ -796,26 +805,20 @@ void CheMPS2::FCI::apply_excitation( double * orig_vector, double * result_vecto
       const int result_irrep_down = getIrrepProduct( result_irrep_up, result_target_irrep );
       const int orig_irrep_up     = getIrrepProduct( excitation_irrep, result_irrep_up );
 
-      excite_alpha( numPerIrrep_up[ result_irrep_up ], // dim_new
-                    numPerIrrep_up[   orig_irrep_up ], // dim_old
-                    0,                                 // start_up
-                    numPerIrrep_up[ result_irrep_up ], // stop_up
-                    0,                                     // start_down
-                    numPerIrrep_down[ result_irrep_down ], // stop_down
-                    orig_vector   + irrep_center_jumps[   orig_irrep_center ][   orig_irrep_up ], // origin
-                    result_vector + irrep_center_jumps[ result_irrep_center ][ result_irrep_up ], // result
-                    lookup_sign_alpha[ result_irrep_up ][ crea + L * anni ],   // signmap
-                    lookup_cnt_alpha [ result_irrep_up ][ crea + L * anni ] ); // countmap
+      excite_alpha_omp( numPerIrrep_up  [ result_irrep_up   ], // dim_new_up
+                        numPerIrrep_up  [   orig_irrep_up   ], // dim_old_up
+                        numPerIrrep_down[ result_irrep_down ], // dim_down
+                        orig_vector   + irrep_center_jumps[   orig_irrep_center ][   orig_irrep_up ], // origin
+                        result_vector + irrep_center_jumps[ result_irrep_center ][ result_irrep_up ], // result
+                        lookup_sign_alpha[ result_irrep_up ][ crea + L * anni ],   // signmap
+                        lookup_cnt_alpha [ result_irrep_up ][ crea + L * anni ] ); // countmap
 
-      excite_beta( numPerIrrep_up[ result_irrep_up ], // dim
-                   0,                                 // start_up
-                   numPerIrrep_up[ result_irrep_up ], // stop_up
-                   0,                                     // start_down
-                   numPerIrrep_down[ result_irrep_down ], // stop_down
-                   orig_vector   + irrep_center_jumps[   orig_irrep_center ][ result_irrep_up ], // origin
-                   result_vector + irrep_center_jumps[ result_irrep_center ][ result_irrep_up ], // result
-                   lookup_sign_beta[ result_irrep_down ][ crea + L * anni ],   // signmap
-                   lookup_cnt_beta [ result_irrep_down ][ crea + L * anni ] ); // countmap
+      excite_beta_omp( numPerIrrep_up  [ result_irrep_up   ], // dim_up
+                       numPerIrrep_down[ result_irrep_down ], // dim_new_down
+                       orig_vector   + irrep_center_jumps[   orig_irrep_center ][ result_irrep_up ], // origin
+                       result_vector + irrep_center_jumps[ result_irrep_center ][ result_irrep_up ], // result
+                       lookup_sign_beta[ result_irrep_down ][ crea + L * anni ],   // signmap
+                       lookup_cnt_beta [ result_irrep_down ][ crea + L * anni ] ); // countmap
 
    }
 
@@ -1953,7 +1956,7 @@ double CheMPS2::FCI::GSDavidson(double * inoutput, const int DVDSN_NUM_VEC) cons
 
    instruction = deBoskabouter.FetchInstruction( whichpointers );
    while ( instruction == 'B' ){
-      HamTimesVec( whichpointers[0], whichpointers[1] );
+      matvec( whichpointers[0], whichpointers[1] );
       instruction = deBoskabouter.FetchInstruction( whichpointers );
    }
 
@@ -2160,9 +2163,9 @@ void CheMPS2::FCI::CGSolveSystem(const double alpha, const double beta, const do
 
 void CheMPS2::FCI::CGAlphaPlusBetaHAM(const double alpha, const double beta, double * in, double * out) const{
 
-   HamTimesVec( in , out );
+   matvec( in , out );
    const unsigned long long vecLength = getVecLength( 0 );
-   const double prefactor = alpha + beta * getEconst(); // HamTimesVec does only the parts with second quantized operators
+   const double prefactor = alpha + beta * getEconst(); // matvec does only the parts with second quantized operators
    for (unsigned long long cnt = 0; cnt < vecLength; cnt++){
       out[ cnt ] = prefactor * in[ cnt ] + beta * out[ cnt ]; // out = ( alpha + beta * H ) * in
    }
