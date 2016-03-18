@@ -504,22 +504,22 @@ namespace CheMPS2{
          unsigned int ** cnt2str_down;
          
          //! For irrep "irrep_result" and up (alpha) Slater determinant counter "result" lookup_cnt_alpha[ irrep_result ][ i + L * ( j + L * result ) ] returns the counter "origin" which corresponds to | result > = +/- E^{alpha}_ij | origin > or | origin > = +/- E^{alpha}_ji | result >
-         int ** lookup_cnt_alpha;
+         int *** lookup_cnt_alpha;
          
          //! For irrep "irrep_result" and down (beta) Slater determinant counter "result" lookup_cnt_beta[ irrep_result ][ i + L * ( j + L * result ) ] returns the counter "origin" which corresponds to | result > = +/- E^{beta}_ij | origin > or | origin > = +/- E^{beta}_ji | result >
-         int ** lookup_cnt_beta;
+         int *** lookup_cnt_beta;
          
          //! For irrep "irrep_result" and up (alpha) Slater determinant counter "result" lookup_irrep_alpha[ irrep_result ][ i + L * ( j + L * result ) ] returns the irrep "irrep_origin" which corresponds to | result > = +/- E^{alpha}_ij | origin >
-         int ** lookup_irrep_alpha;
+         int *** lookup_irrep_alpha;
          
          //! For irrep "irrep_result" and down (beta) Slater determinant counter "result" lookup_irrep_beta[ irrep_result ][ i + L * ( j + L * result ) ] returns the irrep "irrep_origin" which corresponds to | result > = +/- E^{beta}_ij | origin >
-         int ** lookup_irrep_beta;
+         int *** lookup_irrep_beta;
          
          //! For irrep "irrep_result" and up (alpha) Slater determinant counter "result" lookup_sign_alpha[ irrep_result ][ i + L * ( j + L * result ) ] returns the sign s which corresponds to | result > = s * E^{alpha}_ij | origin >
-         int ** lookup_sign_alpha;
+         int *** lookup_sign_alpha;
          
          //! For irrep "irrep_result" and down (beta) Slater determinant counter "result" lookup_sign_beta[ irrep_result ][ i + L * ( j + L * result ) ] returns the sign s which corresponds to | result > = s * E^{beta}_ij | origin >
-         int ** lookup_sign_beta;
+         int *** lookup_sign_beta;
          
          //! For irrep_center = irrep_creator x irrep_annihilator the number of corresponding excitation pairs E_{creator <= annihilator} is given by irrep_center_num[ irrep_center ]
          unsigned int *  irrep_center_num;
@@ -556,6 +556,12 @@ namespace CheMPS2{
          
          //! Actual routine used by Fill3RDM, Fock4RDM, Diag4RDM
          double Driver3RDM(double * vector, double * output, double * three_rdm, double * fock, const unsigned int orbz) const;
+
+         //! Alpha excitation kernel
+         static void excite_alpha( const unsigned int dim_new, const unsigned int dim_old, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
+
+         //! Beta excitation kernel
+         static void excite_beta( const unsigned int dim, const unsigned int start_up, const unsigned int stop_up, const unsigned int start_down, const unsigned int stop_down, double * origin, double * result, int * signmap, int * countmap );
 
    };
 
