@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "DMRGSCFmatrix.h"
+#include "MPIchemps2.h"
 
 CheMPS2::DMRGSCFmatrix::DMRGSCFmatrix( const DMRGSCFindices * iHandler ){
 
