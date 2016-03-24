@@ -125,9 +125,13 @@ void CheMPS2::Molden::read_molden( const string filename ){
       }
 
       Icounter[ psi4_irrep ] += 1;
-      
+
    }
-   
+
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      assert( Icounter[ irrep ] == Isizes[ irrep ] );
+   }
+
    delete [] Icounter;
    delete [] psi2molpro;
 
