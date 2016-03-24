@@ -4,6 +4,7 @@
 * Class ThreeDM: DMRG 3-RDM in O(L^4 D^3 + L^6 D^2)
 * Class Cumulant: Cumulant reconstruction of the DMRG 4-RDM
 * Class CASPT2: Internally contracted CASPT2
+* Class Molden: Rotate molpro/psi4 molden to CAS orbitals
 * DMRG diagonal 4-RDM in DMRG::Diag4RDM
 * Sweeps after RDM calculation allowed
 * FCI 3-RDM in FCI::Fill3RDM

@@ -18,9 +18,14 @@
 */
 
 #include <math.h>
+#include <string>
+#include <sstream>
 
+#include "MyHDF5.h"
 #include "DMRGSCFmatrix.h"
 #include "MPIchemps2.h"
+
+using std::string;
 
 CheMPS2::DMRGSCFmatrix::DMRGSCFmatrix( const DMRGSCFindices * iHandler ){
 
@@ -100,6 +105,53 @@ double CheMPS2::DMRGSCFmatrix::rms_deviation( const DMRGSCFmatrix * other ) cons
    }
    rms_diff = sqrt( rms_diff );
    return rms_diff;
+
+}
+
+void CheMPS2::DMRGSCFmatrix::write( const string filename, const DMRGSCFindices * idx, double ** storage ){
+
+   hid_t file_id  = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+   hid_t group_id = H5Gcreate( file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+   for ( int irrep = 0; irrep < idx->getNirreps(); irrep++ ){
+
+      std::stringstream irrepname;
+      irrepname << "irrep_" << irrep;
+
+      hsize_t dimarray   = idx->getNORB( irrep ) * idx->getNORB( irrep );
+      hid_t dataspace_id = H5Screate_simple( 1, &dimarray, NULL );
+      hid_t dataset_id   = H5Dcreate( group_id, irrepname.str().c_str(), H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      H5Dwrite( dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, storage[ irrep ] );
+
+      H5Dclose( dataset_id );
+      H5Sclose( dataspace_id );
+
+   }
+
+   H5Gclose( group_id );
+   H5Fclose( file_id );
+
+}
+
+void CheMPS2::DMRGSCFmatrix::read( const string filename, const int n_irreps, double ** storage ){
+
+   hid_t file_id  = H5Fopen( filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+   hid_t group_id = H5Gopen( file_id, "/Data", H5P_DEFAULT );
+
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      std::stringstream irrepname;
+      irrepname << "irrep_" << irrep;
+
+      hid_t dataset_id = H5Dopen( group_id, irrepname.str().c_str(), H5P_DEFAULT );
+      H5Dread( dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, storage[ irrep ] );
+
+      H5Dclose( dataset_id );
+
+   }
+
+   H5Gclose( group_id );
+   H5Fclose( file_id );
 
 }
 

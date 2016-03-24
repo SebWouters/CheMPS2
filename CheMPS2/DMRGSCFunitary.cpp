@@ -20,17 +20,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include <math.h>
 
-#include "MyHDF5.h"
 #include "Lapack.h"
 #include "DMRGSCFunitary.h"
 
-using std::string;
-using std::ifstream;
 using std::cout;
 using std::endl;
 
@@ -540,50 +534,15 @@ void CheMPS2::DMRGSCFunitary::makeSureAllBlocksDetOne( double * temp1, double * 
 
 }
 
-void CheMPS2::DMRGSCFunitary::saveU(const string filename) const{
+void CheMPS2::DMRGSCFunitary::saveU( const string filename ) const{
 
-   hid_t file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-   hid_t group_id = H5Gcreate(file_id, "/Data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-   
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-   
-      std::stringstream irrepname;
-      irrepname << "irrep_" << irrep;
-      
-      hsize_t dimarray      = iHandler->getNORB(irrep) * iHandler->getNORB(irrep);
-      hid_t dataspace_id    = H5Screate_simple(1, &dimarray, NULL);
-      hid_t dataset_id      = H5Dcreate(group_id, irrepname.str().c_str(), H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-      H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, entries[irrep]);
-
-      H5Dclose(dataset_id);
-      H5Sclose(dataspace_id);
-      
-   }
-
-   H5Gclose(group_id);
-   H5Fclose(file_id);
+   CheMPS2::DMRGSCFmatrix::write( filename, iHandler, entries );
 
 }
 
-void CheMPS2::DMRGSCFunitary::loadU(const string filename){
+void CheMPS2::DMRGSCFunitary::loadU( const string filename ){
 
-   hid_t file_id = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-   hid_t group_id = H5Gopen(file_id, "/Data",H5P_DEFAULT);
-       
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-   
-      std::stringstream irrepname;
-      irrepname << "irrep_" << irrep;
-
-      hid_t dataset_id = H5Dopen(group_id, irrepname.str().c_str(), H5P_DEFAULT);
-      H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, entries[irrep]);
-         
-      H5Dclose(dataset_id);
-      
-   }
-
-   H5Gclose(group_id);
-   H5Fclose(file_id);
+   CheMPS2::DMRGSCFmatrix::read( filename, num_irreps, entries );
 
 }
 

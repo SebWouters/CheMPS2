@@ -70,6 +70,18 @@ namespace CheMPS2{
              \return The RMS deviation */
          double rms_deviation( const DMRGSCFmatrix * other ) const;
 
+         //! Write a DMRGSCFmatrix to disk
+         /** \param filename Filename to store the DMRGSCFmatrix to
+             \param idx      DMRGSCFindices which contain the number of orbitals per irrep
+             \param storage  Where the entries of the DMRGSCFmatrix are currently stored */
+         static void write( const string filename, const DMRGSCFindices * idx, double ** storage );
+
+         //! Read the DMRGSCFmatrix from disk
+         /** \param filename Filename where the DMRGSCFmatrix is stored
+             \param n_irreps The number of irreps for the symmetry group under consideration
+             \param storage  Where the entries of the DMRGSCFmatrix should be loaded to */
+         static void read( const string filename, const int n_irreps, double ** storage );
+
          #ifdef CHEMPS2_MPI_COMPILATION
          //! Broadcast this matrix to all processes
          /** \param ROOT The process which should broadcast */
