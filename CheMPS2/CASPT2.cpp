@@ -6034,8 +6034,6 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
                         const double ipea_tu = 0.5 * IPEA * ( 2 + gamma_tt - gamma_uu );
                         const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
                         FDD[ irrep ][ ptr                          ] += ipea_tu * SDD[ irrep ][ ptr                          ];
-                        FDD[ irrep ][ ptr +          SIZE * D2JUMP ] += ipea_tu * SDD[ irrep ][ ptr +          SIZE * D2JUMP ];
-                        FDD[ irrep ][ ptr + D2JUMP                 ] += ipea_tu * SDD[ irrep ][ ptr + D2JUMP                 ];
                         FDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ] += ipea_tu * SDD[ irrep ][ ptr + D2JUMP + SIZE * D2JUMP ];
                      }
                   }
