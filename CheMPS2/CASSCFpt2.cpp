@@ -28,7 +28,7 @@
 #include "CASSCF.h"
 #include "DMRG.h"
 #include "FCI.h"
-#include "DMRGSCFVmatRotations.h"
+#include "DMRGSCFrotations.h"
 #include "Lapack.h"
 #include "Cumulant.h"
 #include "CASPT2.h"
@@ -72,7 +72,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    buildQmatOCC();
    buildTmatrix();
    fillConstAndTmatDMRG( HamAS );
-   DMRGSCFVmatRotations::rotate( VMAT_ORIG, HamAS->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+   DMRGSCFrotations::rotate( VMAT_ORIG, HamAS->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
    double E_CASSCF = 0.0;
    double * three_dm = new double[ tot_dmrg_power6 ];
    double * contract = new double[ tot_dmrg_power6 ];
@@ -134,8 +134,8 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete HamAS;
 
    //Calculate the matrix elements needed to calculate the CASPT2 V-vector
-   DMRGSCFVmatRotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
-   DMRGSCFVmatRotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+   DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+   DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
    delete_file( tmp_filename );
 
    delete [] mem1;

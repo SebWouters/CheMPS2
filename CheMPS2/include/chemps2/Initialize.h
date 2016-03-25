@@ -29,13 +29,7 @@ namespace CheMPS2{
    class Initialize{
 
       public:
-      
-         //! Constructor
-         Initialize();
-         
-         //! Destructor
-         virtual ~Initialize();
-         
+
          //! Initialize the random number generator and the cout.precision
          static void Init();
 

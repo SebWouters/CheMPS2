@@ -645,114 +645,116 @@ void CheMPS2::FCI::matvec( double * input, double * output ) const{
             const unsigned int start_center_down = block * blocksize_beta;
             const unsigned int  stop_center_down = std::min( ( block + 1 ) * blocksize_beta, dim_center_down );
             const unsigned int size_center = dim_center_up * ( stop_center_down - start_center_down );
+            if ( size_center > 0 ){
 
-            // First build workbig1[ veccounter + size_center * pair ] = E_{i<=j} + ( 1 - delta_i==j ) E_{j>i} (irrep_center) | input >  */
-            #pragma omp parallel for schedule(static)
-            for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
-               double * target_space   = HXVworkbig1 + size_center * pair;
-               const unsigned int crea = center_crea_orb[ pair ];
-               const unsigned int anni = center_anni_orb[ pair ];
-               const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
-               const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
-               const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
-               for ( unsigned int count = 0; count < size_center; count++ ){ target_space[ count ] = 0.0; }
-
-               excite_alpha_first( dim_center_up, dim_zero_up, start_center_down, stop_center_down,
-                                   input + zero_jumps[ irrep_zero_up ],
-                                   target_space,
-                                   lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
-                                   lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
-
-               excite_beta_first( dim_center_up, start_center_down, stop_center_down,
-                                  input + zero_jumps[ irrep_center_up ],
-                                  target_space,
-                                  lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
-                                  lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
-
-               if ( anni > crea ){
+               // First build workbig1[ veccounter + size_center * pair ] = E_{i<=j} + ( 1 - delta_i==j ) E_{j>i} (irrep_center) | input >  */
+               #pragma omp parallel for schedule(static)
+               for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+                  double * target_space   = HXVworkbig1 + size_center * pair;
+                  const unsigned int crea = center_crea_orb[ pair ];
+                  const unsigned int anni = center_anni_orb[ pair ];
+                  const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+                  const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
+                  const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
+                  for ( unsigned int count = 0; count < size_center; count++ ){ target_space[ count ] = 0.0; }
 
                   excite_alpha_first( dim_center_up, dim_zero_up, start_center_down, stop_center_down,
                                       input + zero_jumps[ irrep_zero_up ],
                                       target_space,
-                                      lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
-                                      lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
+                                      lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
+                                      lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
 
                   excite_beta_first( dim_center_up, start_center_down, stop_center_down,
                                      input + zero_jumps[ irrep_center_up ],
                                      target_space,
-                                     lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
-                                     lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
+                                     lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
+                                     lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
 
-               }
-            }
+                  if ( anni > crea ){
 
-            // If irrep_center == 0, do the one-body terms
-            if ( irrep_center == 0 ){
-               for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
-                  HXVworksmall[ pair ] = getGmat( center_crea_orb[ pair ], center_anni_orb[ pair ] );
-               }
-               char notrans = 'N';
-               double one = 1.0;
-               int mdim = size_center;
-               int kdim = num_pairs;
-               int ndim = 1;
-               double * target = output + zero_jumps[ irrep_center_up ] + dim_center_up * start_center_down;
-               dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &one, target, &mdim );
-            }
+                     excite_alpha_first( dim_center_up, dim_zero_up, start_center_down, stop_center_down,
+                                         input + zero_jumps[ irrep_zero_up ],
+                                         target_space,
+                                         lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
+                                         lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
 
-            // Now build workbig2[ veccounter + size_center * new_pair ] = 0.5 * ( new_pair | old_pair ) * workbig1[ veccounter + size_center * old_pair ]
-            {
-               for ( unsigned int pair1 = 0; pair1 < num_pairs; pair1++ ){
-                  for ( unsigned int pair2 = 0; pair2 < num_pairs; pair2++ ){
-                     HXVworksmall[ pair1 + num_pairs * pair2 ]
-                        = 0.5 * getERI( center_crea_orb[ pair1 ], center_anni_orb[ pair1 ] ,
-                                        center_crea_orb[ pair2 ], center_anni_orb[ pair2 ] );
+                     excite_beta_first( dim_center_up, start_center_down, stop_center_down,
+                                        input + zero_jumps[ irrep_center_up ],
+                                        target_space,
+                                        lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
+                                        lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
+
                   }
                }
-               char notrans = 'N';
-               double one = 1.0;
-               double set = 0.0;
-               int mdim = size_center;
-               int kdim = num_pairs;
-               int ndim = num_pairs;
-               dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &set, HXVworkbig2, &mdim );
-            }
 
-            // Finally do output <-- E_{i<=j} + (1 - delta_{i==j}) E_{j>i} workbig2[ veccounter + size_center * pair ]
-            for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
-               double * origin_space   = HXVworkbig2 + size_center * pair;
-               const unsigned int crea = center_crea_orb[ pair ];
-               const unsigned int anni = center_anni_orb[ pair ];
-               const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
-               const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
-               const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
+               // If irrep_center == 0, do the one-body terms
+               if ( irrep_center == 0 ){
+                  for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+                     HXVworksmall[ pair ] = getGmat( center_crea_orb[ pair ], center_anni_orb[ pair ] );
+                  }
+                  char notrans = 'N';
+                  double one = 1.0;
+                  int mdim = size_center;
+                  int kdim = num_pairs;
+                  int ndim = 1;
+                  double * target = output + zero_jumps[ irrep_center_up ] + dim_center_up * start_center_down;
+                  dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &one, target, &mdim );
+               }
 
-               excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
-                                        origin_space,
-                                        output + zero_jumps[ irrep_zero_up ],
-                                        lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
-                                        lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
+               // Now build workbig2[ veccounter + size_center * new_pair ] = 0.5 * ( new_pair | old_pair ) * workbig1[ veccounter + size_center * old_pair ]
+               {
+                  for ( unsigned int pair1 = 0; pair1 < num_pairs; pair1++ ){
+                     for ( unsigned int pair2 = 0; pair2 < num_pairs; pair2++ ){
+                        HXVworksmall[ pair1 + num_pairs * pair2 ]
+                           = 0.5 * getERI( center_crea_orb[ pair1 ], center_anni_orb[ pair1 ] ,
+                                           center_crea_orb[ pair2 ], center_anni_orb[ pair2 ] );
+                     }
+                  }
+                  char notrans = 'N';
+                  double one = 1.0;
+                  double set = 0.0;
+                  int mdim = size_center;
+                  int kdim = num_pairs;
+                  int ndim = num_pairs;
+                  dgemm_( &notrans, &notrans, &mdim, &ndim, &kdim, &one, HXVworkbig1, &mdim, HXVworksmall, &kdim, &set, HXVworkbig2, &mdim );
+               }
 
-               excite_beta_second_omp( dim_center_up, start_center_down, stop_center_down,
-                                       origin_space,
-                                       output + zero_jumps[ irrep_center_up ],
-                                       lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
-                                       lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
-
-               if ( anni > crea ){
+               // Finally do output <-- E_{i<=j} + (1 - delta_{i==j}) E_{j>i} workbig2[ veccounter + size_center * pair ]
+               for ( unsigned int pair = 0; pair < num_pairs; pair++ ){
+                  double * origin_space   = HXVworkbig2 + size_center * pair;
+                  const unsigned int crea = center_crea_orb[ pair ];
+                  const unsigned int anni = center_anni_orb[ pair ];
+                  const int irrep_excited = Irreps::directProd( getOrb2Irrep( crea ), getOrb2Irrep( anni ) );
+                  const int irrep_zero_up = Irreps::directProd( irrep_excited, irrep_center_up );
+                  const unsigned int dim_zero_up = numPerIrrep_up[ irrep_zero_up ];
 
                   excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
                                            origin_space,
                                            output + zero_jumps[ irrep_zero_up ],
-                                           lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
-                                           lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
+                                           lookup_sign_alpha[ irrep_center_up ][ anni + L * crea ],
+                                           lookup_cnt_alpha [ irrep_center_up ][ anni + L * crea ] );
 
                   excite_beta_second_omp( dim_center_up, start_center_down, stop_center_down,
                                           origin_space,
                                           output + zero_jumps[ irrep_center_up ],
-                                          lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
-                                          lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
+                                          lookup_sign_beta[ irrep_center_down ][ anni + L * crea ],
+                                          lookup_cnt_beta [ irrep_center_down ][ anni + L * crea ] );
 
+                  if ( anni > crea ){
+
+                     excite_alpha_second_omp( dim_zero_up, dim_center_up, start_center_down, stop_center_down,
+                                              origin_space,
+                                              output + zero_jumps[ irrep_zero_up ],
+                                              lookup_sign_alpha[ irrep_center_up ][ crea + L * anni ],
+                                              lookup_cnt_alpha [ irrep_center_up ][ crea + L * anni ] );
+
+                     excite_beta_second_omp( dim_center_up, start_center_down, stop_center_down,
+                                             origin_space,
+                                             output + zero_jumps[ irrep_center_up ],
+                                             lookup_sign_beta[ irrep_center_down ][ crea + L * anni ],
+                                             lookup_cnt_beta [ irrep_center_down ][ crea + L * anni ] );
+
+                  }
                }
             }
          }

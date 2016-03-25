@@ -23,17 +23,14 @@
 #include <assert.h>
 #include <string>
 
-#include "DMRGSCFVmatRotations.h"
+#include "DMRGSCFrotations.h"
 #include "Lapack.h"
 
 using std::min;
 using std::max;
 using std::string;
 
-CheMPS2::DMRGSCFVmatRotations::DMRGSCFVmatRotations(){ }
-CheMPS2::DMRGSCFVmatRotations::~DMRGSCFVmatRotations(){ }
-
-void CheMPS2::DMRGSCFVmatRotations::fetch( double * eri, const FourIndex * ORIG_VMAT, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
+void CheMPS2::DMRGSCFrotations::fetch( double * eri, const FourIndex * ORIG_VMAT, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
 
    if ( pack ){
 
@@ -88,7 +85,7 @@ void CheMPS2::DMRGSCFVmatRotations::fetch( double * eri, const FourIndex * ORIG_
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
+void CheMPS2::DMRGSCFrotations::write( double * eri, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, const int irrep1, const int irrep2, const int irrep3, const int irrep4, DMRGSCFindices * idx, const int start, const int stop, const bool pack ){
 
    bool written = false;
    if (( space1 == space2 ) && ( space1 == space3 ) && ( space1 == space4 )){ // All four spaces equal
@@ -243,7 +240,7 @@ void CheMPS2::DMRGSCFVmatRotations::write( double * eri, FourIndex * NEW_VMAT, D
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_first( double * origin, double * target, int orig1, int dim2, const int dim34, double * umat1, int new1, int lda1 ){
+void CheMPS2::DMRGSCFrotations::blockwise_first( double * origin, double * target, int orig1, int dim2, const int dim34, double * umat1, int new1, int lda1 ){
 
    char notrans = 'N';
    double one = 1.0;
@@ -253,7 +250,7 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_first( double * origin, double * t
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_second( double * origin, double * target, int dim1, int orig2, const int dim34, double * umat2, int new2, int lda2 ){
+void CheMPS2::DMRGSCFrotations::blockwise_second( double * origin, double * target, int dim1, int orig2, const int dim34, double * umat2, int new2, int lda2 ){
 
    char trans = 'T';
    char notrans = 'N';
@@ -268,7 +265,7 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_second( double * origin, double * 
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_third( double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 ){
+void CheMPS2::DMRGSCFrotations::blockwise_third( double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 ){
 
    char trans = 'T';
    char notrans = 'N';
@@ -283,7 +280,7 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_third( double * origin, double * t
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::blockwise_fourth( double * origin, double * target, const int dim12, int dim3, int orig4, double * umat4, int new4, int lda4 ){
+void CheMPS2::DMRGSCFrotations::blockwise_fourth( double * origin, double * target, const int dim12, int dim3, int orig4, double * umat4, int new4, int lda4 ){
 
    char trans = 'T';
    char notrans = 'N';
@@ -294,7 +291,7 @@ void CheMPS2::DMRGSCFVmatRotations::blockwise_fourth( double * origin, double * 
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::open_file( hid_t * file_id, hid_t * dspc_id, hid_t * dset_id, const int first, const int second, const string filename ){
+void CheMPS2::DMRGSCFrotations::open_file( hid_t * file_id, hid_t * dspc_id, hid_t * dset_id, const int first, const int second, const string filename ){
 
    file_id[0] = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
    hsize_t fdim_h5[] = { (hsize_t) second, (hsize_t) first }; // C is row major: [ col + ncol * row ] is assumed
@@ -303,7 +300,7 @@ void CheMPS2::DMRGSCFVmatRotations::open_file( hid_t * file_id, hid_t * dspc_id,
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::close_file( hid_t file_id, hid_t dspc_id, hid_t dset_id ){
+void CheMPS2::DMRGSCFrotations::close_file( hid_t file_id, hid_t dspc_id, hid_t dset_id ){
 
    H5Dclose( dset_id );
    H5Sclose( dspc_id );
@@ -311,7 +308,7 @@ void CheMPS2::DMRGSCFVmatRotations::close_file( hid_t file_id, hid_t dspc_id, hi
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::write_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int first_write ){
+void CheMPS2::DMRGSCFrotations::write_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int first_write ){
 
    hsize_t stride_h5[] = { 1, 1 };
    hsize_t  count_h5[] = { 1, 1 };
@@ -325,7 +322,7 @@ void CheMPS2::DMRGSCFVmatRotations::write_file( hid_t dspc_id, hid_t dset_id, do
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::read_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int second_read ){
+void CheMPS2::DMRGSCFrotations::read_file( hid_t dspc_id, hid_t dset_id, double * eri, const int start, const int size, const int second_read ){
 
    hsize_t stride_h5[] = { 1, 1 };
    hsize_t  count_h5[] = { 1, 1 };
@@ -339,7 +336,7 @@ void CheMPS2::DMRGSCFVmatRotations::read_file( hid_t dspc_id, hid_t dset_id, dou
 
 }
 
-int CheMPS2::DMRGSCFVmatRotations::dimension( DMRGSCFindices * idx, const int irrep, const char space ){
+int CheMPS2::DMRGSCFrotations::dimension( DMRGSCFindices * idx, const int irrep, const char space ){
 
    if ( space == 'O' ){ return idx->getNOCC( irrep ); }
    if ( space == 'A' ){ return idx->getNDMRG( irrep ); }
@@ -350,7 +347,7 @@ int CheMPS2::DMRGSCFVmatRotations::dimension( DMRGSCFindices * idx, const int ir
 
 }
 
-int CheMPS2::DMRGSCFVmatRotations::jump( DMRGSCFindices * idx, const int irrep, const char space ){
+int CheMPS2::DMRGSCFrotations::jump( DMRGSCFindices * idx, const int irrep, const char space ){
 
    if ( space == 'A' ){ return idx->getNOCC( irrep ); }
    if ( space == 'V' ){ return idx->getNOCC( irrep ) + idx->getNDMRG( irrep ); }
@@ -358,7 +355,7 @@ int CheMPS2::DMRGSCFVmatRotations::jump( DMRGSCFindices * idx, const int irrep, 
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::unpackage_second( double * mem1, double * mem2, const int SIZE, const int ORIG ){
+void CheMPS2::DMRGSCFrotations::unpackage_second( double * mem1, double * mem2, const int SIZE, const int ORIG ){
 
    for ( int cnt4 = 0; cnt4 < ORIG; cnt4++ ){
       for ( int cnt3 = 0; cnt3 < ORIG; cnt3++ ){
@@ -372,7 +369,7 @@ void CheMPS2::DMRGSCFVmatRotations::unpackage_second( double * mem1, double * me
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::package_first( double * mem1, double * mem2, const int NEW, const int PACKED, const int SIZE ){
+void CheMPS2::DMRGSCFrotations::package_first( double * mem1, double * mem2, const int NEW, const int PACKED, const int SIZE ){
 
    for ( int cnt34 = 0; cnt34 < SIZE; cnt34++ ){
       for ( int cnt2 = 0; cnt2 < NEW; cnt2++ ){
@@ -384,7 +381,7 @@ void CheMPS2::DMRGSCFVmatRotations::package_first( double * mem1, double * mem2,
 
 }
 
-void CheMPS2::DMRGSCFVmatRotations::rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename ){
+void CheMPS2::DMRGSCFrotations::rotate( const FourIndex * ORIG_VMAT, FourIndex * NEW_VMAT, DMRGSCFintegrals * ROT_TEI, const char space1, const char space2, const char space3, const char space4, DMRGSCFindices * idx, DMRGSCFunitary * umat, double * mem1, double * mem2, const int mem_size, const string filename ){
 
    /* Matrix elements ( 1 2 | 3 4 ) */
 

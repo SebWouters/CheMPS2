@@ -27,21 +27,15 @@
 #include "MyHDF5.h"
 
 namespace CheMPS2{
-/** DMRGSCFVmatRotations class.
+/** DMRGSCFrotations class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date August 14, 2014
     
-    The DMRGSCFVmatRotations class performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
+    The DMRGSCFrotations class performs the two-body matrix element rotations for the DMRGSCF and Edmiston-Ruedenberg classes.
 */
-   class DMRGSCFVmatRotations{
+   class DMRGSCFrotations{
 
       public:
-
-         //! Constructor
-         DMRGSCFVmatRotations();
-
-         //! Destructor
-         virtual ~DMRGSCFVmatRotations();
 
          //! Fill the rotated two-body matrix elements for the space. If the blocks become too large, disk is used.
          /** \param ORIG_VMAT The FourIndex object with the original ERI.

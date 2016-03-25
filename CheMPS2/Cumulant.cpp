@@ -24,10 +24,6 @@
 
 #include "Cumulant.h"
 
-CheMPS2::Cumulant::Cumulant(){ }
-
-CheMPS2::Cumulant::~Cumulant(){ }
-
 /*void CheMPS2::Cumulant::gamma4_fock_contract_ham_slow(const Problem * prob, const ThreeDM * the3DM, const TwoDM * the2DM, double * fock, double * result){
 
    struct timeval start, end;

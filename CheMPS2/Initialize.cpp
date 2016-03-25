@@ -23,10 +23,6 @@
 
 #include "Initialize.h"
 
-CheMPS2::Initialize::Initialize(){ }
-
-CheMPS2::Initialize::~Initialize(){ }
-
 void CheMPS2::Initialize::Init(){
 
    std::cout.precision(15);

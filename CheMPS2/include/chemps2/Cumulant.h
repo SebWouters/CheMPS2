@@ -120,13 +120,7 @@ namespace CheMPS2{
    class Cumulant{
 
       public:
-      
-         //! Constructor
-         Cumulant();
-         
-         //! Destructor
-         virtual ~Cumulant();
-         
+
          //! Get the cumulant approximation of \f$ \Gamma^4_{ijklpqrs} \f$, using HAM indices
          /** \param prob Pointer to the DMRG problem
              \param the3DM Pointer to the DMRG 3-RDM
