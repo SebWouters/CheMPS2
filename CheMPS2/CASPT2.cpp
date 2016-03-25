@@ -5896,26 +5896,25 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                         }
                      }
                   }
-
-                  if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-                     // A: E_ti E_uv | 0 >   --->   t: excitation into,   u: excitation into, v: excitation out of
-                     // C: E_at E_uv | 0 >   --->   t: excitation out of, u: excitation into, v: excitation out of
+                  jump_row += num_x * num_y * num_z;
+               }
+            }
+            if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+               // A: E_ti E_uv | 0 >   --->   t: excitation into,   u: excitation into, v: excitation out of
+               // C: E_at E_uv | 0 >   --->   t: excitation out of, u: excitation into, v: excitation out of
+               for ( int v = 0; v < num_v; v++ ){
+                  const double gamma_vv = one_rdm[ ( d_v + v ) * ( 1 + LAS ) ];
+                  for ( int u = 0; u < num_u; u++ ){
+                     const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
                      for ( int t = 0; t < num_t; t++ ){
                         const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
-                           for ( int v = 0; v < num_v; v++ ){
-                              const double gamma_vv = one_rdm[ ( d_v + v ) * ( 1 + LAS ) ];
-                              const double ipea_A_tuv = 0.5 * IPEA * ( 2.0 + gamma_tt + gamma_uu - gamma_vv );
-                              const double ipea_C_tuv = 0.5 * IPEA * ( 4.0 - gamma_tt + gamma_uu - gamma_vv );
-                              const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
-                              FAA[ irrep ][ ptr ] += ipea_A_tuv * SAA[ irrep ][ ptr ];
-                              FCC[ irrep ][ ptr ] += ipea_C_tuv * SCC[ irrep ][ ptr ];
-                           }
-                        }
+                        const double ipea_A_tuv = 0.5 * IPEA * ( 2.0 + gamma_tt + gamma_uu - gamma_vv );
+                        const double ipea_C_tuv = 0.5 * IPEA * ( 4.0 - gamma_tt + gamma_uu - gamma_vv );
+                        const int ptr = ( jump_col + t + num_t * ( u + num_u * v ) ) * ( 1 + SIZE );
+                        FAA[ irrep ][ ptr ] += ipea_A_tuv * SAA[ irrep ][ ptr ];
+                        FCC[ irrep ][ ptr ] += ipea_C_tuv * SCC[ irrep ][ ptr ];
                      }
                   }
-                  jump_row += num_x * num_y * num_z;
                }
             }
             jump_col += num_t * num_u * num_v;
@@ -6060,22 +6059,22 @@ void CheMPS2::CASPT2::make_DD( const bool OVLP, const double IPEA ){
                   }
                }
             }
-
-            if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-               // D1: E_ai E_tu | 0 >, D2: E_ti E_au | 0 >   --->   t: excitation into, u excitation out of
+            jump_row += num_x * num_y;
+         }
+         if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+            // D1: E_ai E_tu | 0 >   --->   t: excitation into, u excitation out of
+            // D2: E_ti E_au | 0 >   --->   t: excitation into, u excitation out of
+            for ( int u = 0; u < num_u; u++ ){
+               const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
                for ( int t = 0; t < num_t; t++ ){
                   const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
-                  for ( int u = 0; u < num_u; u++ ){
-                     const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
-                     const double ipea_tu = 0.5 * IPEA * ( 2.0 + gamma_tt - gamma_uu );
-                     const int ptr1 = (          jump_col + t + num_t * u ) * ( 1 + SIZE );
-                     const int ptr2 = ( D2JUMP + jump_col + t + num_t * u ) * ( 1 + SIZE );
-                     FDD[ irrep ][ ptr1 ] += ipea_tu * SDD[ irrep ][ ptr1 ];
-                     FDD[ irrep ][ ptr2 ] += ipea_tu * SDD[ irrep ][ ptr2 ];
-                  }
+                  const double ipea_tu = 0.5 * IPEA * ( 2.0 + gamma_tt - gamma_uu );
+                  const int ptr1 = (          jump_col + t + num_t * u ) * ( 1 + SIZE );
+                  const int ptr2 = ( D2JUMP + jump_col + t + num_t * u ) * ( 1 + SIZE );
+                  FDD[ irrep ][ ptr1 ] += ipea_tu * SDD[ irrep ][ ptr1 ];
+                  FDD[ irrep ][ ptr2 ] += ipea_tu * SDD[ irrep ][ ptr2 ];
                }
             }
-            jump_row += num_x * num_y;
          }
          jump_col += num_t * num_u;
       }
@@ -6307,23 +6306,22 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                   }
                }
             }
-
-            if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-               // B: E_ti E_uj | 0 >   --->   tu: excitation into
-               // F: E_at E_bu | 0 >   --->   tu: excitation out of
-               for ( int t = 0; t < num_ut; t++ ){
+            jump_row += ( num_xy * ( num_xy + 1 ) ) / 2;
+         }
+         if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+            // B: E_ti E_uj | 0 >   --->   tu: excitation into
+            // F: E_at E_bu | 0 >   --->   tu: excitation out of
+            for ( int u = 0; u < num_ut; u++ ){
+               const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
+               for ( int t = 0; t <= u; t++ ){ // 0 <= t <= u < num_ut
                   const double gamma_tt = one_rdm[ ( d_ut + t ) * ( 1 + LAS ) ];
-                  for ( int u = t; u < num_ut; u++ ){ // 0 <= t <= u < num_ut
-                     const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
-                     const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
-                     const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
-                     const int ptr = ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) * ( 1 + SIZE );
-                     FBB_singlet[ 0 ][ ptr ] += ipea_B_tu * SBB_singlet[ 0 ][ ptr ];
-                     FFF_singlet[ 0 ][ ptr ] += ipea_F_tu * SFF_singlet[ 0 ][ ptr ];
-                  }
+                  const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                  const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
+                  const int ptr = ( jump_col + t + ( u * ( u + 1 ) ) / 2 ) * ( 1 + SIZE );
+                  FBB_singlet[ 0 ][ ptr ] += ipea_B_tu * SBB_singlet[ 0 ][ ptr ];
+                  FFF_singlet[ 0 ][ ptr ] += ipea_F_tu * SFF_singlet[ 0 ][ ptr ];
                }
             }
-            jump_row += ( num_xy * ( num_xy + 1 ) ) / 2;
          }
          jump_col += ( num_ut * ( num_ut + 1 ) ) / 2;
       }
@@ -6466,23 +6464,22 @@ void CheMPS2::CASPT2::make_BB_FF_singlet( const bool OVLP, const double IPEA ){
                         }
                      }
                   }
-
-                  if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-                     // B: E_ti E_uj | 0 >   --->   tu: excitation into
-                     // F: E_at E_bu | 0 >   --->   tu: excitation out of
-                     for ( int t = 0; t < num_t; t++ ){
-                        const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
-                           const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
-                           const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
-                           const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
-                           FBB_singlet[ irrep ][ ptr ] += ipea_B_tu * SBB_singlet[ irrep ][ ptr ];
-                           FFF_singlet[ irrep ][ ptr ] += ipea_F_tu * SFF_singlet[ irrep ][ ptr ];
-                        }
-                     }
-                  }
                   jump_row += num_x * num_y;
+               }
+            }
+            if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+               // B: E_ti E_uj | 0 >   --->   tu: excitation into
+               // F: E_at E_bu | 0 >   --->   tu: excitation out of
+               for ( int u = 0; u < num_u; u++ ){
+                  const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
+                  for ( int t = 0; t < num_t; t++ ){
+                     const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                     const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                     const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
+                     const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
+                     FBB_singlet[ irrep ][ ptr ] += ipea_B_tu * SBB_singlet[ irrep ][ ptr ];
+                     FFF_singlet[ irrep ][ ptr ] += ipea_F_tu * SFF_singlet[ irrep ][ ptr ];
+                  }
                }
             }
             jump_col += num_t * num_u;
@@ -6716,23 +6713,22 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                   }
                }
             }
-
-            if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-               // B: E_ti E_uj | 0 >   --->   tu: excitation into
-               // F: E_at E_bu | 0 >   --->   tu: excitation out of
-               for ( int t = 0; t < num_ut; t++ ){
+            jump_row += ( num_xy * ( num_xy - 1 ) ) / 2;
+         }
+         if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+            // B: E_ti E_uj | 0 >   --->   tu: excitation into
+            // F: E_at E_bu | 0 >   --->   tu: excitation out of
+            for ( int u = 0; u < num_ut; u++ ){
+               const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
+               for ( int t = 0; t < u; t++ ){ // 0 <= t < u < num_ut
                   const double gamma_tt = one_rdm[ ( d_ut + t ) * ( 1 + LAS ) ];
-                  for ( int u = t+1; u < num_ut; u++ ){ // 0 <= t < u < num_ut
-                     const double gamma_uu = one_rdm[ ( d_ut + u ) * ( 1 + LAS ) ];
-                     const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
-                     const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
-                     const int ptr = ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) * ( 1 + SIZE );
-                     FBB_triplet[ 0 ][ ptr ] += ipea_B_tu * SBB_triplet[ 0 ][ ptr ];
-                     FFF_triplet[ 0 ][ ptr ] += ipea_F_tu * SFF_triplet[ 0 ][ ptr ];
-                  }
+                  const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                  const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
+                  const int ptr = ( jump_col + t + ( u * ( u - 1 ) ) / 2 ) * ( 1 + SIZE );
+                  FBB_triplet[ 0 ][ ptr ] += ipea_B_tu * SBB_triplet[ 0 ][ ptr ];
+                  FFF_triplet[ 0 ][ ptr ] += ipea_F_tu * SFF_triplet[ 0 ][ ptr ];
                }
             }
-            jump_row += ( num_xy * ( num_xy - 1 ) ) / 2;
          }
          jump_col += ( num_ut * ( num_ut - 1 ) ) / 2;
       }
@@ -6875,23 +6871,22 @@ void CheMPS2::CASPT2::make_BB_FF_triplet( const bool OVLP, const double IPEA ){
                         }
                      }
                   }
-
-                  if (( OVLP == false ) && ( jump_row == jump_col ) && ( fabs( IPEA ) > 0.0 )){
-                     // B: E_ti E_uj | 0 >   --->   tu: excitation into
-                     // F: E_at E_bu | 0 >   --->   tu: excitation out of
-                     for ( int t = 0; t < num_t; t++ ){
-                        const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
-                        for ( int u = 0; u < num_u; u++ ){
-                           const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
-                           const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
-                           const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
-                           const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
-                           FBB_triplet[ irrep ][ ptr ] += ipea_B_tu * SBB_triplet[ irrep ][ ptr ];
-                           FFF_triplet[ irrep ][ ptr ] += ipea_F_tu * SFF_triplet[ irrep ][ ptr ];
-                        }
-                     }
-                  }
                   jump_row += num_x * num_y;
+               }
+            }
+            if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
+               // B: E_ti E_uj | 0 >   --->   tu: excitation into
+               // F: E_at E_bu | 0 >   --->   tu: excitation out of
+               for ( int u = 0; u < num_u; u++ ){
+                  const double gamma_uu = one_rdm[ ( d_u + u ) * ( 1 + LAS ) ];
+                  for ( int t = 0; t < num_t; t++ ){
+                     const double gamma_tt = one_rdm[ ( d_t + t ) * ( 1 + LAS ) ];
+                     const double ipea_B_tu = 0.5 * IPEA * ( gamma_tt + gamma_uu );
+                     const double ipea_F_tu = 0.5 * IPEA * ( 4.0 - gamma_tt - gamma_uu );
+                     const int ptr = ( jump_col + t + num_t * u ) * ( 1 + SIZE );
+                     FBB_triplet[ irrep ][ ptr ] += ipea_B_tu * SBB_triplet[ irrep ][ ptr ];
+                     FFF_triplet[ irrep ][ ptr ] += ipea_F_tu * SFF_triplet[ irrep ][ ptr ];
+                  }
                }
             }
             jump_col += num_t * num_u;
