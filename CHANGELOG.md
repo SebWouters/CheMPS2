@@ -11,7 +11,7 @@
 * FCI 4-RDM in FCI::Fill4RDM
 * FCI diagonal 4-RDM in FCI::Diag4RDM
 * FCI 4-RDM contraction with Fock operator in FCI::Fock4RDM
-* Blockwise transformations with DMRGSCFVmatRotations use disk
+* Blockwise transformations with DMRGSCFrotations use disk
 * Break API: bump up SO version
 * Deprecate TwoDMstorage class
 * Deprecate TensorDiag class

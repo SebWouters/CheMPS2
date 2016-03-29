@@ -75,7 +75,7 @@ routine.
 storage and handling of the unitary matrix and its nonredundant skew-symmetric
 parametrization required for the DMRG-SCF algorithm.
 
-[CheMPS2/DMRGSCFVmatRotations.cpp](CheMPS2/DMRGSCFVmatRotations.cpp)
+[CheMPS2/DMRGSCFrotations.cpp](CheMPS2/DMRGSCFrotations.cpp)
 performs the two-body matrix element rotations for the DMRGSCF and
 Edmiston-Ruedenberg classes.
 
@@ -252,8 +252,8 @@ DMRGSCFoptions container class.
 [CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the
 DMRGSCFunitary class.
 
-[CheMPS2/include/chemps2/DMRGSCFVmatRotations.h](CheMPS2/include/chemps2/DMRGSCFVmatRotations.h) contains the definitions of the
-DMRGSCFVmatRotations class.
+[CheMPS2/include/chemps2/DMRGSCFrotations.h](CheMPS2/include/chemps2/DMRGSCFrotations.h) contains the definitions of the
+DMRGSCFrotations class.
 
 [CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the
 DMRGSCFwtilde class.
