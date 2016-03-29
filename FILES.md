@@ -71,13 +71,13 @@ class for orbital matrices which are blockdiagonal in the irreps.
 class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson
 routine.
 
-[CheMPS2/DMRGSCFunitary.cpp](CheMPS2/DMRGSCFunitary.cpp) contains the
-storage and handling of the unitary matrix and its nonredundant skew-symmetric
-parametrization required for the DMRG-SCF algorithm.
-
 [CheMPS2/DMRGSCFrotations.cpp](CheMPS2/DMRGSCFrotations.cpp)
 performs the two-body matrix element rotations for the DMRGSCF and
 Edmiston-Ruedenberg classes.
+
+[CheMPS2/DMRGSCFunitary.cpp](CheMPS2/DMRGSCFunitary.cpp) contains the
+storage and handling of the unitary matrix and its nonredundant skew-symmetric
+parametrization required for the DMRG-SCF algorithm.
 
 [CheMPS2/DMRGSCFwtilde.cpp](CheMPS2/DMRGSCFwtilde.cpp) is a container
 class to store a tensor which is required to compute the DMRG-SCF Hessian.
@@ -249,11 +249,11 @@ DMRGSCFmatrix class.
 [CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the
 DMRGSCFoptions container class.
 
-[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the
-DMRGSCFunitary class.
-
 [CheMPS2/include/chemps2/DMRGSCFrotations.h](CheMPS2/include/chemps2/DMRGSCFrotations.h) contains the definitions of the
 DMRGSCFrotations class.
+
+[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the
+DMRGSCFunitary class.
 
 [CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the
 DMRGSCFwtilde class.
