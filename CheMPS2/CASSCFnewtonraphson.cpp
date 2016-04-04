@@ -369,38 +369,36 @@ void CheMPS2::CASSCF::diag_hessian( DMRGSCFmatrix * Fmatrix, const DMRGSCFwtilde
       const int NVIR = idx->getNVIRT( irrep );
       const int N_OA = NOCC + NACT;
       double * FMAT = Fmatrix->getBlock( irrep );
-      const int ptr_AO = jump;
-      const int ptr_VA = jump + NACT * NOCC;
-      const int ptr_VO = jump + NACT * NOCC + NVIR * NACT;
 
       for ( int occ = 0; occ < NOCC; occ++ ){
          const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
          for ( int act = 0; act < NACT; act++ ){
             const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
-            diagonal[ ptr_AO + act + NACT * occ ] = - 2 * ( F_occ + F_act ) + ( Wtilde->get( irrep, irrep, NOCC + act, occ, NOCC + act, occ )
-                                                                              - Wtilde->get( irrep, irrep, NOCC + act, occ, occ, NOCC + act )
-                                                                              - Wtilde->get( irrep, irrep, occ, NOCC + act, NOCC + act, occ ) 
-                                                                              + Wtilde->get( irrep, irrep, occ, NOCC + act, occ, NOCC + act ) );
+            diagonal[ jump + act + NACT * occ ] = - 2 * ( F_occ + F_act ) + ( Wtilde->get( irrep, irrep, NOCC + act, occ, NOCC + act, occ )
+                                                                            - Wtilde->get( irrep, irrep, NOCC + act, occ, occ, NOCC + act )
+                                                                            - Wtilde->get( irrep, irrep, occ, NOCC + act, NOCC + act, occ ) 
+                                                                            + Wtilde->get( irrep, irrep, occ, NOCC + act, occ, NOCC + act ) );
          }
       }
+      jump += NOCC * NACT;
 
       for ( int act = 0; act < NACT; act++ ){
          const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
          for ( int vir = 0; vir < NVIR; vir++ ){
             const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
-            diagonal[ ptr_VA + vir + NVIR * act ] = - 2 * ( F_act + F_vir ) + Wtilde->get( irrep, irrep, NOCC + act, N_OA + vir, NOCC + act, N_OA + vir );
+            diagonal[ jump + vir + NVIR * act ] = - 2 * ( F_act + F_vir ) + Wtilde->get( irrep, irrep, NOCC + act, N_OA + vir, NOCC + act, N_OA + vir );
          }
       }
+      jump += NACT * NVIR;
 
       for ( int occ = 0; occ < NOCC; occ++ ){
          const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
          for ( int vir = 0; vir < NVIR; vir++ ){
             const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
-            diagonal[ ptr_VO + vir + NVIR * occ ] = - 2 * ( F_occ + F_vir ) + Wtilde->get( irrep, irrep, occ, N_OA + vir, occ, N_OA + vir );
+            diagonal[ jump + vir + NVIR * occ ] = - 2 * ( F_occ + F_vir ) + Wtilde->get( irrep, irrep, occ, N_OA + vir, occ, N_OA + vir );
          }
       }
-
-      jump += NACT * NOCC + NVIR * NACT + NVIR * NOCC;
+      jump += NOCC * NVIR;
    }
 
 }
@@ -577,50 +575,42 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
          }
 
          // VA - VA
-         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
-            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
-                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-                     const double factor = Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, NOCC_col + act_col, N_OA_col + vir_col );
-                     target[ ptr_VA_row + vir_row + NVIR_row * act_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
-                  }
-               }
+         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col ) + N_OA_row + NORB_row * N_OA_col;
+               double * vector = origin + ptr_VA_col + NVIR_col * act_col;
+               double * result = target + ptr_VA_row + NVIR_row * act_row;
+               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
             }
          }
 
          // VA - VO
-         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+         for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
             for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
-                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-                     const double factor = Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, occ_col, N_OA_col + vir_col );
-                     target[ ptr_VA_row + vir_row + NVIR_row * act_row ] += factor * origin[ ptr_VO_col + vir_col + NVIR_col * occ_col ];
-                  }
-               }
+               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col ) + N_OA_row + NORB_row * N_OA_col;
+               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
+               double * result = target + ptr_VA_row + NVIR_row * act_row;
+               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
             }
          }
 
          // VO - VA
-         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
-            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
-                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-                     const double factor = Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, NOCC_col + act_col, N_OA_col + vir_col );
-                     target[ ptr_VO_row + vir_row + NVIR_row * occ_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
-                  }
-               }
+         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col ) + N_OA_row + NORB_row * N_OA_col;
+               double * vector = origin + ptr_VA_col + NVIR_col * act_col;
+               double * result = target + ptr_VO_row + NVIR_row * occ_row;
+               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
             }
          }
 
          // VO - VO
-         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
-            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
-                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-                     const double factor = Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, occ_col, N_OA_col + vir_col );
-                     target[ ptr_VO_row + vir_row + NVIR_row * occ_row ] += factor * origin[ ptr_VO_col + vir_col + NVIR_col * occ_col ];
-                  }
-               }
+         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col ) + N_OA_row + NORB_row * N_OA_col;
+               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
+               double * result = target + ptr_VO_row + NVIR_row * occ_row;
+               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
             }
          }
 
@@ -629,6 +619,14 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
 
       jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
    }
+
+}
+
+void CheMPS2::CASSCF::DGEMV_WRAPPER( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec ){
+
+   char notrans = 'N';
+   double add = 1.0;
+   dgemv_( &notrans, &rowdim, &coldim, &prefactor, matrix, &ldmat, vector, &incvec, &add, result, &incres );
 
 }
 
