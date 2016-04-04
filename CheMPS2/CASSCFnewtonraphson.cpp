@@ -491,9 +491,9 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
       const int NACT_row = idx->getNDMRG( irrep_row );
       const int NVIR_row = idx->getNVIRT( irrep_row );
       const int N_OA_row = NOCC_row + NACT_row;
-      const int ptr_AO_row = jump_row;
-      const int ptr_VA_row = jump_row + NACT_row * NOCC_row;
-      const int ptr_VO_row = jump_row + NACT_row * NOCC_row + NVIR_row * NACT_row;
+      double * result_AO = target + jump_row;
+      double * result_VA = result_AO + NACT_row * NOCC_row;
+      double * result_VO = result_VA + NVIR_row * NACT_row;
 
       int jump_col = 0;
       for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
@@ -503,141 +503,51 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
          const int NACT_col = idx->getNDMRG( irrep_col );
          const int NVIR_col = idx->getNVIRT( irrep_col );
          const int N_OA_col = NOCC_col + NACT_col;
-         const int ptr_AO_col = jump_col;
-         const int ptr_VA_col = jump_col + NACT_col * NOCC_col;
-         const int ptr_VO_col = jump_col + NACT_col * NOCC_col + NVIR_col * NACT_col;
+         double * vector_AO = origin + jump_col;
+         double * vector_VA = vector_AO + NACT_col * NOCC_col;
+         double * vector_VO = vector_VA + NVIR_col * NACT_col;
 
-         // AO - AO
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-                     const double factor = ( + Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, NOCC_col + act_col, occ_col )
-                                             - Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, NOCC_col + act_col, occ_col )
-                                             - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, occ_col, NOCC_col + act_col )
-                                             + Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, occ_col, NOCC_col + act_col ) );
-                     target[ ptr_AO_row + act_row + NACT_row * occ_row ] += factor * origin[ ptr_AO_col + act_col + NACT_col * occ_col ];
-                  }
-               }
-            }
+         for ( int combined = 0; combined < NACT_row * NACT_col; combined++ ){
+            const int act_row = combined % NACT_row;
+            const int act_col = combined / NACT_row;
+            double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col );
+            DGEMV_WRAPPER(  1.0, mat,                                  result_AO + act_row,            vector_AO + act_col,            NOCC_row, NOCC_col, NORB_row, NACT_row, NACT_col );
+            DGEMV_WRAPPER( -1.0, mat            + NORB_row * N_OA_col, result_AO + act_row,            vector_VA + NVIR_col * act_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1        );
+            DGEMV_WRAPPER( -1.0, mat + N_OA_row,                       result_VA + NVIR_row * act_row, vector_AO + act_col,            NVIR_row, NOCC_col, NORB_row, 1,        NACT_col );
+            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VA + NVIR_row * act_row, vector_VA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1,        1        );
          }
 
-         // AO - VA
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
-                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-                     const double factor = ( - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, NOCC_col + act_col, N_OA_col + vir_col )
-                                             + Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, NOCC_col + act_col, N_OA_col + vir_col ) );
-                     target[ ptr_AO_row + act_row + NACT_row * occ_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
-                  }
-               }
-            }
+         for ( int combined = 0; combined < NOCC_row * NACT_col; combined++ ){
+            const int occ_row = combined % NOCC_row;
+            const int act_col = combined / NOCC_row;
+            double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col );
+            DGEMV_WRAPPER( -1.0, mat + NOCC_row,                       result_AO + NACT_row * occ_row, vector_AO + act_col,            NACT_row, NOCC_col, NORB_row, 1, NACT_col );
+            DGEMV_WRAPPER(  1.0, mat + NOCC_row + NORB_row * N_OA_col, result_AO + NACT_row * occ_row, vector_VA + NVIR_col * act_col, NACT_row, NVIR_col, NORB_row, 1, 1        );
+            DGEMV_WRAPPER( -1.0, mat + N_OA_row,                       result_VO + NVIR_row * occ_row, vector_AO + act_col,            NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
+            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VO + NVIR_row * occ_row, vector_VA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1, 1        );
          }
 
-         // AO - VO ( part 1 of 2 )
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col ) + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
-               double * result = target + ptr_AO_row + act_row;
-               DGEMV_WRAPPER( -1.0, matrix, result, vector, NOCC_row, NVIR_col, NORB_row, NACT_row, 1 );
-            }
-         }
-         
-         // AO - VO ( part 2 of 2 )
-         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col ) + NOCC_row + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
-               double * result = target + ptr_AO_row + NACT_row * occ_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NACT_row, NVIR_col, NORB_row, 1, 1 );
-            }
+         for ( int combined = 0; combined < NACT_row * NOCC_col; combined++ ){
+            const int act_row = combined % NACT_row;
+            const int occ_col = combined / NACT_row;
+            double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col );
+            DGEMV_WRAPPER( -1.0, mat +            NORB_row * NOCC_col, result_AO + act_row,            vector_AO + NACT_col * occ_col, NOCC_row, NACT_col, NORB_row, NACT_row, 1 );
+            DGEMV_WRAPPER( -1.0, mat +            NORB_row * N_OA_col, result_AO + act_row,            vector_VO + NVIR_col * occ_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1 );
+            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * NOCC_col, result_VA + NVIR_row * act_row, vector_AO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1,        1 );
+            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VA + NVIR_row * act_row, vector_VO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1,        1 );
          }
 
-         // VA - AO ( part 1 of 2 )
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col ) + N_OA_row;
-               double * vector = origin + ptr_AO_col + act_col;
-               double * result = target + ptr_VA_row + NVIR_row * act_row;
-               DGEMV_WRAPPER( -1.0, matrix, result, vector, NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
-            }
+         for ( int combined = 0; combined < NOCC_row * NOCC_col; combined++ ){
+            const int occ_row = combined % NOCC_row;
+            const int occ_col = combined / NOCC_row;
+            double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col );
+            DGEMV_WRAPPER( 1.0, mat + NOCC_row + NORB_row * NOCC_col, result_AO + NACT_row * occ_row, vector_AO + NACT_col * occ_col, NACT_row, NACT_col, NORB_row, 1, 1 );
+            DGEMV_WRAPPER( 1.0, mat + NOCC_row + NORB_row * N_OA_col, result_AO + NACT_row * occ_row, vector_VO + NVIR_col * occ_col, NACT_row, NVIR_col, NORB_row, 1, 1 );
+            DGEMV_WRAPPER( 1.0, mat + N_OA_row + NORB_row * NOCC_col, result_VO + NVIR_row * occ_row, vector_AO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1, 1 );
+            DGEMV_WRAPPER( 1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VO + NVIR_row * occ_row, vector_VO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1, 1 );
          }
-         
-         // VA - AO ( part 2 of 2 )
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col ) + N_OA_row + NORB_row * NOCC_col;
-               double * vector = origin + ptr_AO_col + NACT_col * occ_col;
-               double * result = target + ptr_VA_row + NVIR_row * act_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NACT_col, NORB_row, 1, 1 );
-            }
-         }
-
-         // VO - AO ( part 1 of 2 )
-         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col ) + N_OA_row;
-               double * vector = origin + ptr_AO_col + act_col;
-               double * result = target + ptr_VO_row + NVIR_row * occ_row;
-               DGEMV_WRAPPER( -1.0, matrix, result, vector, NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
-            }
-         }
-         
-         // VO - AO ( part 2 of 2 )
-         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col ) + N_OA_row + NORB_row * NOCC_col;
-               double * vector = origin + ptr_AO_col + NACT_col * occ_col;
-               double * result = target + ptr_VO_row + NVIR_row * occ_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NACT_col, NORB_row, 1, 1 );
-            }
-         }
-
-         // VA - VA
-         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col ) + N_OA_row + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VA_col + NVIR_col * act_col;
-               double * result = target + ptr_VA_row + NVIR_row * act_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
-            }
-         }
-
-         // VA - VO
-         for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col ) + N_OA_row + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
-               double * result = target + ptr_VA_row + NVIR_row * act_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
-            }
-         }
-
-         // VO - VA
-         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-            for ( int act_col = 0; act_col < NACT_col; act_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col ) + N_OA_row + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VA_col + NVIR_col * act_col;
-               double * result = target + ptr_VO_row + NVIR_row * occ_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
-            }
-         }
-
-         // VO - VO
-         for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
-            for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
-               double * matrix = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col ) + N_OA_row + NORB_row * N_OA_col;
-               double * vector = origin + ptr_VO_col + NVIR_col * occ_col;
-               double * result = target + ptr_VO_row + NVIR_row * occ_row;
-               DGEMV_WRAPPER( 1.0, matrix, result, vector, NVIR_row, NVIR_col, NORB_row, 1, 1 );
-            }
-         }
-
          jump_col += NACT_col * NOCC_col + NVIR_col * NACT_col + NVIR_col * NOCC_col;
       }
-
       jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
    }
 
