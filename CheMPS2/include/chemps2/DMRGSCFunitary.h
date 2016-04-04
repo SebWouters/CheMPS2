@@ -138,12 +138,6 @@ namespace CheMPS2{
          int * x_secondindex;
          int ** jumper;
 
-         // Find the linear index corresponding to p and q
-         /** \param p_index The first Hamiltonian index
-             \param q_index The second Hamiltonian index
-             \return The linear index corresponding to (p,q). If no index is found -1 is returned. */
-         int getLinearIndex( const int p_index, const int q_index ) const;
-
          // Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.
          void buildSkewSymmX( const int irrep, double * result, double * Xelem, const bool compact ) const;
 

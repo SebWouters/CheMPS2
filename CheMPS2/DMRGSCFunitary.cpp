@@ -102,65 +102,6 @@ CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
 
 int CheMPS2::DMRGSCFunitary::getNumVariablesX() const{ return x_linearlength; }
 
-int CheMPS2::DMRGSCFunitary::getLinearIndex( const int p_index, const int q_index ) const{
-
-   int irrep_p = num_irreps - 1;
-   int irrep_q = num_irreps - 1;
-   
-   while ( p_index < iHandler->getOrigNOCCstart( irrep_p ) ){ irrep_p--; }
-   while ( q_index < iHandler->getOrigNOCCstart( irrep_q ) ){ irrep_q--; }
-   
-   assert( irrep_p == irrep_q );
-   const int irrep = irrep_p;
-   
-   const bool p_virt = ( p_index >= iHandler->getOrigNVIRTstart( irrep )) ? true : false;
-   const bool p_dmrg = ((p_index >= iHandler->getOrigNDMRGstart( irrep )) && (!( p_virt ))) ? true : false;
-   
-   const bool q_occ  = ( q_index < iHandler->getOrigNDMRGstart( irrep )) ? true : false;
-   const bool q_dmrg = ((q_index < iHandler->getOrigNVIRTstart( irrep )) && (!( q_occ ))) ? true : false;
-   
-   // 0 : p DMRG q OCC
-   // 1 : p VIRT q DMRG
-   // 2 : p VIRT q OCC
-   
-   if ((p_dmrg) && (q_occ)){ // geval 0
-      
-      const int p_rel = p_index - iHandler->getOrigNDMRGstart( irrep );
-      const int q_rel = q_index - iHandler->getOrigNOCCstart(  irrep );
-      const int theLinIndex = jumper[ irrep ][ 0 ] + p_rel + iHandler->getNDMRG( irrep ) * q_rel;
-      assert( p_index == x_firstindex[  theLinIndex ] );
-      assert( q_index == x_secondindex[ theLinIndex ] );
-      return theLinIndex;
-      
-   }
-   
-   if ((p_virt) && (q_dmrg)){ // geval 1
-   
-      const int p_rel = p_index - iHandler->getOrigNVIRTstart( irrep );
-      const int q_rel = q_index - iHandler->getOrigNDMRGstart( irrep );
-      const int theLinIndex = jumper[ irrep ][ 1 ] + p_rel + iHandler->getNVIRT( irrep ) * q_rel;
-      assert( p_index == x_firstindex[  theLinIndex ] );
-      assert( q_index == x_secondindex[ theLinIndex ] );
-      return theLinIndex;
-   
-   }
-   
-   if ((p_virt) && (q_occ)){ // geval 2
-   
-      const int p_rel = p_index - iHandler->getOrigNVIRTstart( irrep );
-      const int q_rel = q_index - iHandler->getOrigNOCCstart(  irrep );
-      const int theLinIndex = jumper[ irrep ][ 2 ] + p_rel + iHandler->getNVIRT( irrep ) * q_rel;
-      assert( p_index == x_firstindex[  theLinIndex ] );
-      assert( q_index == x_secondindex[ theLinIndex ] );
-      return theLinIndex;
-   
-   }
-   
-   assert( 0 == 1 );
-   return -1;
-
-}
-
 int CheMPS2::DMRGSCFunitary::getFirstIndex( const int linearindex ) const{ return x_firstindex[ linearindex ]; }
 
 int CheMPS2::DMRGSCFunitary::getSecondIndex( const int linearindex ) const{ return x_secondindex[ linearindex ]; }

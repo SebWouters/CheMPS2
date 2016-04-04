@@ -243,7 +243,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
 }
 
-void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm){
+void CheMPS2::CASSCF::augmentedHessianNR( DMRGSCFmatrix * localFmat, DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm ){
 
    /* A good read to understand
             (1) how the augmented Hessian arises from a rational function optimization
@@ -251,143 +251,384 @@ void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const 
             (3) why the smallest algebraic eigenvalue + corresponding eigenvector should be retained for minimizations
       Banerjee, Adams, Simons, Shepard, "Search for stationary points on surfaces",
       J. Phys. Chem. 1985, volume 89, pages 52-57, doi:10.1021/j100247a015  */
-   
+
    //Calculate the gradient
    const int x_linearlength = localUmat->getNumVariablesX();
-   gradNorm[0] = calcGradient(localFmat, localIdx, localUmat, theupdate);
-   
-   //Calculate the Hessian
-   int dim = x_linearlength + 1;
-   int size = dim * dim;
-   double * hessian = new double[size];
-   calcHessian(localFmat, localwtilde, localIdx, localUmat, hessian, dim);
-   
-   //Augment the gradient into the Hessian matrix
-   for (int cnt=0; cnt<x_linearlength; cnt++){
-      hessian[cnt + x_linearlength*dim] = theupdate[cnt];
-      hessian[x_linearlength + dim*cnt] = theupdate[cnt];
-   }
-   hessian[x_linearlength + dim*x_linearlength] = 0.0;
+   gradNorm[ 0 ] = construct_gradient( localFmat, localIdx, theupdate );
 
    //Find the lowest eigenvalue and corresponding eigenvector of the augmented hessian
    {
-      Davidson deBoskabouter( dim, CheMPS2::DAVIDSON_NUM_VEC,
-                                   CheMPS2::DAVIDSON_NUM_VEC_KEEP,
-                                   CheMPS2::DAVIDSON_FCI_RTOL,
-                                   CheMPS2::DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing
-      double ** whichpointers = new double*[2];
-
+      Davidson deBoskabouter( x_linearlength + 1, CheMPS2::DAVIDSON_NUM_VEC,
+                                                  CheMPS2::DAVIDSON_NUM_VEC_KEEP,
+                                                  CheMPS2::DAVIDSON_FCI_RTOL,
+                                                  CheMPS2::DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing
+      double ** whichpointers = new double*[ 2 ];
       char instruction = deBoskabouter.FetchInstruction( whichpointers );
       assert( instruction == 'A' );
-      for (int cnt = 0; cnt < dim; cnt++){ whichpointers[1][cnt] = hessian[cnt*(1+dim)]; } // Preconditioner = diagonal elements of the augmented Hessian
-      for (int cnt = 0; cnt < x_linearlength; cnt++){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
-         const double denom = ( whichpointers[1][cnt] > CheMPS2::DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::DAVIDSON_PRECOND_CUTOFF;
-         whichpointers[0][cnt] = - theupdate[cnt] / denom;
+      diag_hessian( localFmat, localwtilde, localIdx, whichpointers[ 1 ] );
+      whichpointers[ 1 ][ x_linearlength ] = 0.0;
+      for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
+         const double denom = ( whichpointers[ 1 ][ cnt ] > CheMPS2::DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[ 1 ][ cnt ] : CheMPS2::DAVIDSON_PRECOND_CUTOFF;
+         whichpointers[ 0 ][ cnt ] = - theupdate[ cnt ] / denom;
       }
-      whichpointers[0][x_linearlength] = 1.0;
-
+      whichpointers[ 0 ][ x_linearlength ] = 1.0;
       instruction = deBoskabouter.FetchInstruction( whichpointers );
       while ( instruction == 'B' ){
-         char notrans = 'N';
-         int one = 1;
-         double alpha = 1.0;
-         double beta = 0.0;
-         dgemm_(&notrans, &notrans, &dim, &one, &dim, &alpha, hessian, &dim, whichpointers[0], &dim, &beta, whichpointers[1], &dim);
+         augmented_hessian( localFmat, localwtilde, localIdx, whichpointers[ 0 ], whichpointers[ 1 ], theupdate, x_linearlength );
          instruction = deBoskabouter.FetchInstruction( whichpointers );
       }
-
       assert( instruction == 'C' );
-      double scalar = 1.0 / whichpointers[0][x_linearlength];
+      double scalar = 1.0 / whichpointers[ 0 ][ x_linearlength ];
       cout << "DMRGSCF::augmentedHessianNR : Augmented Hessian update found with " << deBoskabouter.GetNumMultiplications() << " Davidson iterations." << endl;
-      if (CheMPS2::DMRGSCF_debugPrint){
-         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[1][0] << endl;
+      if ( CheMPS2::DMRGSCF_debugPrint ){
+         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[ 1 ][ 0 ] << endl;
          cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << scalar << endl;
       }
-      for (int cnt = 0; cnt < x_linearlength; cnt++){ theupdate[cnt] = scalar * whichpointers[0][cnt]; }
+      for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ theupdate[ cnt ] = scalar * whichpointers[ 0 ][ cnt ]; }
       delete [] whichpointers;
    }
-   
+
    //Calculate the update norm
-   updateNorm[0] = 0.0;
-   for (int cnt = 0; cnt < x_linearlength; cnt++){ updateNorm[0] += theupdate[cnt] * theupdate[cnt]; }
-   updateNorm[0] = sqrt(updateNorm[0]);
-   cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
-   
-   delete [] hessian;
+   updateNorm[ 0 ] = 0.0;
+   for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ updateNorm[ 0 ] += theupdate[ cnt ] * theupdate[ cnt ]; }
+   updateNorm[ 0 ] = sqrt( updateNorm[ 0 ] );
+   cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[ 0 ] << endl;
 
 }
 
-double CheMPS2::CASSCF::calcGradient(const DMRGSCFmatrix * localFmat, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * gradient){
+double CheMPS2::CASSCF::construct_gradient( DMRGSCFmatrix * Fmatrix, const DMRGSCFindices * idx, double * gradient ){
 
-   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){
-      const int index1 = localUmat->getFirstIndex(cnt);
-      const int index2 = localUmat->getSecondIndex(cnt);
-      // irrep1 == irrep2 due to construction DMRGSCFunitary
-      const int irrep  = localIdx->getOrbitalIrrep( index1 );
-      const int shift  = localIdx->getOrigNOCCstart( irrep );
-      const int relIndex1 = index1 - shift;
-      const int relIndex2 = index2 - shift;
-      gradient[cnt] = 2 * ( localFmat->get( irrep, relIndex1, relIndex2 ) - localFmat->get( irrep, relIndex2, relIndex1 ) );
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT  = Fmatrix->getBlock( irrep );
+
+      // Type 0: act-occ
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         for ( int act = 0; act < NACT; act++ ){
+            gradient[ jump + act + NACT * occ ] = 2 * ( FMAT[ NOCC + act + NORB * occ ] - FMAT[ occ + NORB * ( NOCC + act ) ] );
+         }
+      }
+      jump += NOCC * NACT;
+
+      // Type 1: vir-act
+      for ( int act = 0; act < NACT; act++ ){
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            gradient[ jump + vir + NVIR * act ] = 2 * ( FMAT[ N_OA + vir + NORB * ( NOCC + act ) ] - FMAT[ NOCC + act + NORB * ( N_OA + vir ) ] );
+         }
+      }
+      jump += NACT * NVIR;
+
+      // Type 2: vir-occ
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            gradient[ jump + vir + NVIR * occ ] = 2 * ( FMAT[ N_OA + vir + NORB * occ ] - FMAT[ occ + NORB * ( N_OA + vir ) ] );
+         }
+      }
+      jump += NOCC * NVIR;
    }
-   
-   double gradNorm = 0.0;
-   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
-   gradNorm = sqrt(gradNorm);
-   cout << "DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
-   return gradNorm;
+
+   double gradient_norm = 0.0;
+   for ( int cnt = 0; cnt < jump; cnt++ ){ gradient_norm += gradient[ cnt ] * gradient[ cnt ]; }
+   gradient_norm = sqrt( gradient_norm );
+   cout << "DMRGSCF::construct_gradient : Norm of the gradient = " << gradient_norm << endl;
+   return gradient_norm;
 
 }
 
-void CheMPS2::CASSCF::calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump){
+void CheMPS2::CASSCF::augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize ){
 
-   const int lindim = ( localUmat->getNumVariablesX() * ( localUmat->getNumVariablesX() + 1 ))/2;
-   
-   #pragma omp parallel for schedule(static)
-   for (int count=0; count<lindim; count++){
-   
-      int col = 1;
-      while ( (col*(col+1))/2 <= count ) col++;
-      col -= 1;
-      int row = count - (col*(col+1))/2;
-      
-      const int p_index = localUmat->getFirstIndex(row);
-      const int q_index = localUmat->getSecondIndex(row);
-      // irrep_p == irrep_q due to construction DMRGSCFunitary
-      const int irrep_pq = localIdx->getOrbitalIrrep( p_index );
-      
-      const int r_index = localUmat->getFirstIndex(col);
-      const int s_index = localUmat->getSecondIndex(col);
-      // irrep_r == irrep_s due to construction DMRGSCFunitary
-      const int irrep_rs = localIdx->getOrbitalIrrep( r_index );
-      
-      const int rel_p_index = p_index - localIdx->getOrigNOCCstart( irrep_pq );
-      const int rel_q_index = q_index - localIdx->getOrigNOCCstart( irrep_pq );
-      const int rel_r_index = r_index - localIdx->getOrigNOCCstart( irrep_rs );
-      const int rel_s_index = s_index - localIdx->getOrigNOCCstart( irrep_rs );
-      
-      hessian[row + rowjump * col] = Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_r_index, rel_s_index)
-                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_r_index, rel_s_index)
-                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_s_index, rel_r_index)
-                                   + Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_s_index, rel_r_index);
-      hessian[col + rowjump * row] = hessian[row + rowjump * col];
-      
+   for ( int cnt = 0; cnt < linsize; cnt++ ){
+      target[ cnt ] = gradient[ cnt ] * origin[ linsize ];
+   }
+   add_hessian( Fmatrix, Wtilde, idx, origin, target );
+   target[ linsize ] = 0.0;
+   for ( int cnt = 0; cnt < linsize; cnt++ ){
+      target[ linsize ] += gradient[ cnt ] * origin[ cnt ];
    }
 
 }
 
-double CheMPS2::CASSCF::Wmat(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS){
+void CheMPS2::CASSCF::diag_hessian( DMRGSCFmatrix * Fmatrix, const DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * diagonal ){
 
-   double value = 0.0;
-   
-   if ( ( irrep_pq == irrep_rs ) && ( relindexQ == relindexR ) ) {
-      value = localFmat->get(irrep_pq, relindexP, relindexS) + localFmat->get(irrep_pq, relindexS, relindexP);
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT = Fmatrix->getBlock( irrep );
+      const int ptr_AO = jump;
+      const int ptr_VA = jump + NACT * NOCC;
+      const int ptr_VO = jump + NACT * NOCC + NVIR * NACT;
+
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
+         for ( int act = 0; act < NACT; act++ ){
+            const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
+            diagonal[ ptr_AO + act + NACT * occ ] = - 2 * ( F_occ + F_act ) + ( Wtilde->get( irrep, irrep, NOCC + act, occ, NOCC + act, occ )
+                                                                              - Wtilde->get( irrep, irrep, NOCC + act, occ, occ, NOCC + act )
+                                                                              - Wtilde->get( irrep, irrep, occ, NOCC + act, NOCC + act, occ ) 
+                                                                              + Wtilde->get( irrep, irrep, occ, NOCC + act, occ, NOCC + act ) );
+         }
+      }
+
+      for ( int act = 0; act < NACT; act++ ){
+         const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
+            diagonal[ ptr_VA + vir + NVIR * act ] = - 2 * ( F_act + F_vir ) + Wtilde->get( irrep, irrep, NOCC + act, N_OA + vir, NOCC + act, N_OA + vir );
+         }
+      }
+
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
+            diagonal[ ptr_VO + vir + NVIR * occ ] = - 2 * ( F_occ + F_vir ) + Wtilde->get( irrep, irrep, occ, N_OA + vir, occ, N_OA + vir );
+         }
+      }
+
+      jump += NACT * NOCC + NVIR * NACT + NVIR * NOCC;
    }
-   
-   if (relindexP >= localIdx->getNOCC(irrep_pq) + localIdx->getNDMRG(irrep_pq)){ return value; }
-   if (relindexR >= localIdx->getNOCC(irrep_rs) + localIdx->getNDMRG(irrep_rs)){ return value; } //index1 and index3 are now certainly not virtual!
-   
-   value += localwtilde->get( irrep_pq, irrep_rs, relindexP, relindexQ, relindexR, relindexS );
-   return value;
+
+}
+
+void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target ){
+
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT = Fmatrix->getBlock( irrep );
+      const int ptr_AO = jump;
+      const int ptr_VA = jump + NACT * NOCC;
+      const int ptr_VO = jump + NACT * NOCC + NVIR * NACT;
+
+      for ( int vir = 0; vir < NVIR; vir++ ){
+         for ( int occ = 0; occ < NOCC; occ++ ){
+            const double factor = FMAT[ N_OA + vir + NORB * occ ] + FMAT[ occ + NORB * ( N_OA + vir ) ];
+            // + delta_jk ( F_il + F_li ) --->  ijkl = vir act act occ
+            // + delta_il ( F_jk + F_kj ) --->  ijkl = act occ vir act
+            for ( int act = 0; act < NACT; act++ ){ target[ ptr_VA + vir + NVIR * act ] += factor * origin[ ptr_AO + act + NACT * occ ]; }
+            for ( int act = 0; act < NACT; act++ ){ target[ ptr_AO + act + NACT * occ ] += factor * origin[ ptr_VA + vir + NVIR * act ]; }
+         }
+      }
+
+      for ( int occ1 = 0; occ1 < NOCC; occ1++ ){
+         for ( int occ2 = 0; occ2 < NOCC; occ2++ ){
+            const double factor = FMAT[ occ1 + NORB * occ2 ] + FMAT[ occ2 + NORB * occ1 ];
+            // - delta_ik ( F_jl + F_lj ) --->  ijkl = act occ act occ
+            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir occ vir occ
+            for ( int act = 0; act < NACT; act++ ){ target[ ptr_AO + act + NACT * occ1 ] -= factor * origin[ ptr_AO + act + NACT * occ2 ]; }
+            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VO + vir + NVIR * occ1 ] -= factor * origin[ ptr_VO + vir + NVIR * occ2 ]; }
+         }
+      }
+
+      for ( int act1 = 0; act1 < NACT; act1++ ){
+         for ( int act2 = 0; act2 < NACT; act2++ ){
+            const double factor = FMAT[ NOCC + act1 + NORB * ( NOCC + act2 ) ] + FMAT[ NOCC + act2 + NORB * ( NOCC + act1 ) ];
+            // - delta_jl ( F_ik + F_ki ) --->  ijkl = act occ act occ
+            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir act vir act
+            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_AO + act1 + NACT * occ ] -= factor * origin[ ptr_AO + act2 + NACT * occ ]; }
+            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VA + vir + NVIR * act1 ] -= factor * origin[ ptr_VA + vir + NVIR * act2 ]; }
+         }
+      }
+
+      for ( int act = 0; act < NACT; act++ ){
+         for ( int occ = 0; occ < NOCC; occ++ ){
+            const double factor = FMAT[ NOCC + act + NORB * occ ] + FMAT[ occ + NORB * ( NOCC + act ) ];
+            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir occ vir act
+            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir act vir occ
+            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VO + vir + NVIR * occ ] -= factor * origin[ ptr_VA + vir + NVIR * act ]; }
+            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VA + vir + NVIR * act ] -= factor * origin[ ptr_VO + vir + NVIR * occ ]; }
+         }
+      }
+
+      for ( int vir1 = 0; vir1 < NVIR; vir1++ ){
+         for ( int vir2 = 0; vir2 < NVIR; vir2++ ){
+            const double factor = FMAT[ N_OA + vir1 + NORB * ( N_OA + vir2 ) ] + FMAT[ N_OA + vir2 + NORB * ( N_OA + vir1 ) ];
+            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir occ vir occ
+            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir act vir act
+            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_VO + vir1 + NVIR * occ ] -= factor * origin[ ptr_VO + vir2 + NVIR * occ ]; }
+            for ( int act = 0; act < NACT; act++ ){ target[ ptr_VA + vir1 + NVIR * act ] -= factor * origin[ ptr_VA + vir2 + NVIR * act ]; }
+         }
+      }
+
+      for ( int vir = 0; vir < NVIR; vir++ ){
+         for ( int act = 0; act < NACT; act++ ){
+            const double factor = FMAT[ NOCC + act + NORB * ( N_OA + vir ) ] + FMAT[ N_OA + vir + NORB * ( NOCC + act ) ];
+            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir occ act occ
+            // - delta_jl ( F_ik + F_ki ) --->  ijkl = act occ vir occ
+            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_VO + vir + NVIR * occ ] -= factor * origin[ ptr_AO + act + NACT * occ ]; }
+            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_AO + act + NACT * occ ] -= factor * origin[ ptr_VO + vir + NVIR * occ ]; }
+         }
+      }
+
+      jump += NACT * NOCC + NVIR * NACT + NVIR * NOCC;
+   }
+
+   int jump_row = 0;
+   for ( int irrep_row = 0; irrep_row < n_irreps; irrep_row++ ){
+
+      const int NORB_row = idx->getNORB( irrep_row );
+      const int NOCC_row = idx->getNOCC( irrep_row );
+      const int NACT_row = idx->getNDMRG( irrep_row );
+      const int NVIR_row = idx->getNVIRT( irrep_row );
+      const int N_OA_row = NOCC_row + NACT_row;
+      const int ptr_AO_row = jump_row;
+      const int ptr_VA_row = jump_row + NACT_row * NOCC_row;
+      const int ptr_VO_row = jump_row + NACT_row * NOCC_row + NVIR_row * NACT_row;
+
+      int jump_col = 0;
+      for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
+
+         const int NORB_col = idx->getNORB( irrep_col );
+         const int NOCC_col = idx->getNOCC( irrep_col );
+         const int NACT_col = idx->getNDMRG( irrep_col );
+         const int NVIR_col = idx->getNVIRT( irrep_col );
+         const int N_OA_col = NOCC_col + NACT_col;
+         const int ptr_AO_col = jump_col;
+         const int ptr_VA_col = jump_col + NACT_col * NOCC_col;
+         const int ptr_VO_col = jump_col + NACT_col * NOCC_col + NVIR_col * NACT_col;
+
+         // AO - AO
+         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = ( + Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, NOCC_col + act_col, occ_col )
+                                             - Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, NOCC_col + act_col, occ_col )
+                                             - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, occ_col, NOCC_col + act_col )
+                                             + Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, occ_col, NOCC_col + act_col ) );
+                     target[ ptr_AO_row + act_row + NACT_row * occ_row ] += factor * origin[ ptr_AO_col + act_col + NACT_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         // AO - VA
+         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                     const double factor = ( - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, NOCC_col + act_col, N_OA_col + vir_col )
+                                             + Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, NOCC_col + act_col, N_OA_col + vir_col ) );
+                     target[ ptr_AO_row + act_row + NACT_row * occ_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
+                  }
+               }
+            }
+         }
+
+         // AO - VO
+         for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = ( - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, occ_row, occ_col, N_OA_col + vir_col )
+                                             + Wtilde->get( irrep_row, irrep_col, occ_row, NOCC_row + act_row, occ_col, N_OA_col + vir_col ) );
+                     target[ ptr_AO_row + act_row + NACT_row * occ_row ] += factor * origin[ ptr_VO_col + vir_col + NVIR_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         // VA - AO
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = ( - Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, NOCC_col + act_col, occ_col )
+                                             + Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, occ_col, NOCC_col + act_col ) );
+                     target[ ptr_VA_row + vir_row + NVIR_row * act_row ] += factor * origin[ ptr_AO_col + act_col + NACT_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         // VO - AO
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = ( - Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, NOCC_col + act_col, occ_col )
+                                             + Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, occ_col, NOCC_col + act_col ) );
+                     target[ ptr_VO_row + vir_row + NVIR_row * occ_row ] += factor * origin[ ptr_AO_col + act_col + NACT_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         // VA - VA
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                     const double factor = Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, NOCC_col + act_col, N_OA_col + vir_col );
+                     target[ ptr_VA_row + vir_row + NVIR_row * act_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
+                  }
+               }
+            }
+         }
+
+         // VA - VO
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = Wtilde->get( irrep_row, irrep_col, NOCC_row + act_row, N_OA_row + vir_row, occ_col, N_OA_col + vir_col );
+                     target[ ptr_VA_row + vir_row + NVIR_row * act_row ] += factor * origin[ ptr_VO_col + vir_col + NVIR_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         // VO - VA
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                     const double factor = Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, NOCC_col + act_col, N_OA_col + vir_col );
+                     target[ ptr_VO_row + vir_row + NVIR_row * occ_row ] += factor * origin[ ptr_VA_col + vir_col + NVIR_col * act_col ];
+                  }
+               }
+            }
+         }
+
+         // VO - VO
+         for ( int vir_row = 0; vir_row < NVIR_row; vir_row++ ){
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int vir_col = 0; vir_col < NVIR_col; vir_col++ ){
+                  for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                     const double factor = Wtilde->get( irrep_row, irrep_col, occ_row, N_OA_row + vir_row, occ_col, N_OA_col + vir_col );
+                     target[ ptr_VO_row + vir_row + NVIR_row * occ_row ] += factor * origin[ ptr_VO_col + vir_col + NVIR_col * occ_col ];
+                  }
+               }
+            }
+         }
+
+         jump_col += NACT_col * NOCC_col + NVIR_col * NACT_col + NVIR_col * NOCC_col;
+      }
+
+      jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
+   }
 
 }
 

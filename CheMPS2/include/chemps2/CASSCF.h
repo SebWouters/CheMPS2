@@ -239,7 +239,7 @@ namespace CheMPS2{
              \param theupdate Where the augmented Hessian Newton-Raphson update will be stored
              \param updateNorm Pointer to one double to store the update norm
              \param gradNorm Pointer to one double to store the gradient norm */
-         static void augmentedHessianNR( const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm );
+         static void augmentedHessianNR( DMRGSCFmatrix * localFmat, DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm );
          
          //! Copy over the DMRG 2-RDM
          /** \param theDMRG2DM The 2-RDM from the DMRG object
@@ -337,19 +337,26 @@ namespace CheMPS2{
 
          //Space for the DMRG 2DM
          double * DMRG2DM;
-         
+
          //Helper function to check HF
          void checkHF( int * docc, int * socc );
-         
+
          //Fill Econst and Tmat of HamDMRG
          void fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const;
-         
-         //Calculate the gradient, return function is the gradient 2-norm
-         static double calcGradient(const DMRGSCFmatrix * localFmat, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * gradient);
-         
-         //Calculate the hessian
-         static void calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump);
-         
+
+         // Calculate the gradient, return function is the gradient 2-norm
+         static double construct_gradient( DMRGSCFmatrix * Fmatrix, const DMRGSCFindices * idx, double * gradient );
+
+         // Add hessian * origin to target
+         static void add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target );
+
+         // Construct the diagonal of the hessian
+         static void diag_hessian( DMRGSCFmatrix * Fmatrix, const DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * diagonal );
+
+         // Apply augmented hessian
+         static void DGEMV_WRAPPER( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int lda );
+         static void augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize );
+
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          DMRGSCFmatrix * theFmatrix;
          
@@ -366,9 +373,6 @@ namespace CheMPS2{
          
          //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;
-         
-         //The Wmat function as defined by Eq. (21b) in the Siegbahn paper
-         static double Wmat(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS);
          
          //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
          void PrintCoeff_C2(DMRG * theDMRG);
