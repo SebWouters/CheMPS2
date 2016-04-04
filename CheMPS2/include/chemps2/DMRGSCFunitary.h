@@ -77,21 +77,11 @@ namespace CheMPS2{
          
          //! Destructor
          virtual ~DMRGSCFunitary();
-         
+
          //! Get the number of variables in the x-parametrization of the unitary update
          /** \return The number of unique variables in the x-matrix */
          int getNumVariablesX() const;
-         
-         //! Get the first Hamiltonian index corresponding to linearindex
-         /** \param linearindex The linear index of the x-parametrization
-             \return The first Hamiltonian index corresponding to linearindex */
-         int getFirstIndex( const int linearindex ) const;
-         
-         //! Get the second Hamiltonian index corresponding to linearindex
-         /** \param linearindex The linear index of the x-parametrization
-             \return The second Hamiltonian index corresponding to linearindex */
-         int getSecondIndex( const int linearindex ) const;
-         
+
          //! Update the unitary transformation
          /** \param workmem1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param workmem2 Work memory of at least 4*max(dim(irrep(Ham)))^2
@@ -134,8 +124,6 @@ namespace CheMPS2{
          int x_linearlength;
 
          //Helper arrays to jump from linear x-matrix index to orbital indices and back
-         int * x_firstindex;
-         int * x_secondindex;
          int ** jumper;
 
          // Build in result the skew symmetric matrix X for irrep block irrep based on the elements in Xelem. If compact==true, they are stored in gradient form.

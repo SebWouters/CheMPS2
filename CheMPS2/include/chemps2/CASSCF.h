@@ -354,7 +354,8 @@ namespace CheMPS2{
          static void diag_hessian( DMRGSCFmatrix * Fmatrix, const DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * diagonal );
 
          // Apply augmented hessian
-         static void DGEMV_WRAPPER( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec );
+         static void DGEMM_WRAP( double prefactor, char transA, char transB, double * A, double * B, double * C, int m, int n, int k, int lda, int ldb, int ldc );
+         static void DGEMV_WRAP( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec );
          static void augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize );
 
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.

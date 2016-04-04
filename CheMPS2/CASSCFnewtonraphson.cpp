@@ -420,141 +420,119 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
       const int ptr_VA = jump + NACT * NOCC;
       const int ptr_VO = jump + NACT * NOCC + NVIR * NACT;
 
-      for ( int vir = 0; vir < NVIR; vir++ ){
-         for ( int occ = 0; occ < NOCC; occ++ ){
-            const double factor = FMAT[ N_OA + vir + NORB * occ ] + FMAT[ occ + NORB * ( N_OA + vir ) ];
-            // + delta_jk ( F_il + F_li ) --->  ijkl = vir act act occ
-            // + delta_il ( F_jk + F_kj ) --->  ijkl = act occ vir act
-            for ( int act = 0; act < NACT; act++ ){ target[ ptr_VA + vir + NVIR * act ] += factor * origin[ ptr_AO + act + NACT * occ ]; }
-            for ( int act = 0; act < NACT; act++ ){ target[ ptr_AO + act + NACT * occ ] += factor * origin[ ptr_VA + vir + NVIR * act ]; }
-         }
-      }
+      // OpenMP parallelism via dgemm_
 
-      for ( int occ1 = 0; occ1 < NOCC; occ1++ ){
-         for ( int occ2 = 0; occ2 < NOCC; occ2++ ){
-            const double factor = FMAT[ occ1 + NORB * occ2 ] + FMAT[ occ2 + NORB * occ1 ];
-            // - delta_ik ( F_jl + F_lj ) --->  ijkl = act occ act occ
-            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir occ vir occ
-            for ( int act = 0; act < NACT; act++ ){ target[ ptr_AO + act + NACT * occ1 ] -= factor * origin[ ptr_AO + act + NACT * occ2 ]; }
-            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VO + vir + NVIR * occ1 ] -= factor * origin[ ptr_VO + vir + NVIR * occ2 ]; }
-         }
-      }
+      DGEMM_WRAP( +1.0, 'T', 'N', origin + ptr_VA,           FMAT + N_OA,        target + ptr_AO, NACT, NOCC, NVIR, NVIR, NORB, NACT );
+      DGEMM_WRAP( +1.0, 'T', 'T', origin + ptr_VA,           FMAT + NORB * N_OA, target + ptr_AO, NACT, NOCC, NVIR, NVIR, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_AO,           FMAT,               target + ptr_AO, NACT, NOCC, NOCC, NACT, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_AO,           FMAT,               target + ptr_AO, NACT, NOCC, NOCC, NACT, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + NOCC + NORB * NOCC, origin + ptr_AO,    target + ptr_AO, NACT, NOCC, NACT, NORB, NACT, NACT );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + NOCC + NORB * NOCC, origin + ptr_AO,    target + ptr_AO, NACT, NOCC, NACT, NORB, NACT, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + NOCC + NORB * N_OA, origin + ptr_VO,    target + ptr_AO, NACT, NOCC, NVIR, NORB, NVIR, NACT );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * NOCC, origin + ptr_VO,    target + ptr_AO, NACT, NOCC, NVIR, NORB, NVIR, NACT );
 
-      for ( int act1 = 0; act1 < NACT; act1++ ){
-         for ( int act2 = 0; act2 < NACT; act2++ ){
-            const double factor = FMAT[ NOCC + act1 + NORB * ( NOCC + act2 ) ] + FMAT[ NOCC + act2 + NORB * ( NOCC + act1 ) ];
-            // - delta_jl ( F_ik + F_ki ) --->  ijkl = act occ act occ
-            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir act vir act
-            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_AO + act1 + NACT * occ ] -= factor * origin[ ptr_AO + act2 + NACT * occ ]; }
-            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VA + vir + NVIR * act1 ] -= factor * origin[ ptr_VA + vir + NVIR * act2 ]; }
-         }
-      }
+      DGEMM_WRAP( +1.0, 'N', 'T', FMAT + N_OA,               origin + ptr_AO,           target + ptr_VA, NVIR, NACT, NOCC, NORB, NACT, NVIR );
+      DGEMM_WRAP( +1.0, 'T', 'T', FMAT + NORB * N_OA,        origin + ptr_AO,           target + ptr_VA, NVIR, NACT, NOCC, NORB, NACT, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VO,           FMAT + NORB * NOCC,        target + ptr_VA, NVIR, NACT, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VO,           FMAT + NOCC,               target + ptr_VA, NVIR, NACT, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VA,           FMAT + NOCC + NORB * NOCC, target + ptr_VA, NVIR, NACT, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VA,           FMAT + NOCC + NORB * NOCC, target + ptr_VA, NVIR, NACT, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VA,           target + ptr_VA, NVIR, NACT, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VA,           target + ptr_VA, NVIR, NACT, NVIR, NORB, NVIR, NVIR );
 
-      for ( int act = 0; act < NACT; act++ ){
-         for ( int occ = 0; occ < NOCC; occ++ ){
-            const double factor = FMAT[ NOCC + act + NORB * occ ] + FMAT[ occ + NORB * ( NOCC + act ) ];
-            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir occ vir act
-            // - delta_ik ( F_jl + F_lj ) --->  ijkl = vir act vir occ
-            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VO + vir + NVIR * occ ] -= factor * origin[ ptr_VA + vir + NVIR * act ]; }
-            for ( int vir = 0; vir < NVIR; vir++ ){ target[ ptr_VA + vir + NVIR * act ] -= factor * origin[ ptr_VO + vir + NVIR * occ ]; }
-         }
-      }
-
-      for ( int vir1 = 0; vir1 < NVIR; vir1++ ){
-         for ( int vir2 = 0; vir2 < NVIR; vir2++ ){
-            const double factor = FMAT[ N_OA + vir1 + NORB * ( N_OA + vir2 ) ] + FMAT[ N_OA + vir2 + NORB * ( N_OA + vir1 ) ];
-            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir occ vir occ
-            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir act vir act
-            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_VO + vir1 + NVIR * occ ] -= factor * origin[ ptr_VO + vir2 + NVIR * occ ]; }
-            for ( int act = 0; act < NACT; act++ ){ target[ ptr_VA + vir1 + NVIR * act ] -= factor * origin[ ptr_VA + vir2 + NVIR * act ]; }
-         }
-      }
-
-      for ( int vir = 0; vir < NVIR; vir++ ){
-         for ( int act = 0; act < NACT; act++ ){
-            const double factor = FMAT[ NOCC + act + NORB * ( N_OA + vir ) ] + FMAT[ N_OA + vir + NORB * ( NOCC + act ) ];
-            // - delta_jl ( F_ik + F_ki ) --->  ijkl = vir occ act occ
-            // - delta_jl ( F_ik + F_ki ) --->  ijkl = act occ vir occ
-            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_VO + vir + NVIR * occ ] -= factor * origin[ ptr_AO + act + NACT * occ ]; }
-            for ( int occ = 0; occ < NOCC; occ++ ){ target[ ptr_AO + act + NACT * occ ] -= factor * origin[ ptr_VO + vir + NVIR * occ ]; }
-         }
-      }
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VO,           FMAT,               target + ptr_VO, NVIR, NOCC, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VO,           FMAT,               target + ptr_VO, NVIR, NOCC, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VA,           FMAT + NOCC,        target + ptr_VO, NVIR, NOCC, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VA,           FMAT + NORB * NOCC, target + ptr_VO, NVIR, NOCC, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VO,    target + ptr_VO, NVIR, NOCC, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VO,    target + ptr_VO, NVIR, NOCC, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * NOCC, origin + ptr_AO,    target + ptr_VO, NVIR, NOCC, NACT, NORB, NACT, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + NOCC + NORB * N_OA, origin + ptr_AO,    target + ptr_VO, NVIR, NOCC, NACT, NORB, NACT, NVIR );
 
       jump += NACT * NOCC + NVIR * NACT + NVIR * NOCC;
    }
 
-   int jump_row = 0;
-   for ( int irrep_row = 0; irrep_row < n_irreps; irrep_row++ ){
+   #pragma omp parallel
+   {
 
-      const int NORB_row = idx->getNORB( irrep_row );
-      const int NOCC_row = idx->getNOCC( irrep_row );
-      const int NACT_row = idx->getNDMRG( irrep_row );
-      const int NVIR_row = idx->getNVIRT( irrep_row );
-      const int N_OA_row = NOCC_row + NACT_row;
-      double * result_AO = target + jump_row;
-      double * result_VA = result_AO + NACT_row * NOCC_row;
-      double * result_VO = result_VA + NVIR_row * NACT_row;
+      int jump_row = 0;
+      for ( int irrep_row = 0; irrep_row < n_irreps; irrep_row++ ){
 
-      int jump_col = 0;
-      for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
+         const int NORB_row = idx->getNORB( irrep_row );
+         const int NOCC_row = idx->getNOCC( irrep_row );
+         const int NACT_row = idx->getNDMRG( irrep_row );
+         const int NVIR_row = idx->getNVIRT( irrep_row );
+         const int N_OA_row = NOCC_row + NACT_row;
+         double * resAO = target + jump_row;
+         double * resVA = resAO  + NACT_row * NOCC_row;
+         double * resVO = resVA  + NVIR_row * NACT_row;
 
-         const int NORB_col = idx->getNORB( irrep_col );
-         const int NOCC_col = idx->getNOCC( irrep_col );
-         const int NACT_col = idx->getNDMRG( irrep_col );
-         const int NVIR_col = idx->getNVIRT( irrep_col );
-         const int N_OA_col = NOCC_col + NACT_col;
-         double * vector_AO = origin + jump_col;
-         double * vector_VA = vector_AO + NACT_col * NOCC_col;
-         double * vector_VO = vector_VA + NVIR_col * NACT_col;
+         int jump_col = 0;
+         for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
 
-         for ( int combined = 0; combined < NACT_row * NACT_col; combined++ ){
-            const int act_row = combined % NACT_row;
-            const int act_col = combined / NACT_row;
-            double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col );
-            DGEMV_WRAPPER(  1.0, mat,                                  result_AO + act_row,            vector_AO + act_col,            NOCC_row, NOCC_col, NORB_row, NACT_row, NACT_col );
-            DGEMV_WRAPPER( -1.0, mat            + NORB_row * N_OA_col, result_AO + act_row,            vector_VA + NVIR_col * act_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1        );
-            DGEMV_WRAPPER( -1.0, mat + N_OA_row,                       result_VA + NVIR_row * act_row, vector_AO + act_col,            NVIR_row, NOCC_col, NORB_row, 1,        NACT_col );
-            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VA + NVIR_row * act_row, vector_VA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1,        1        );
+            const int NORB_col = idx->getNORB( irrep_col );
+            const int NOCC_col = idx->getNOCC( irrep_col );
+            const int NACT_col = idx->getNDMRG( irrep_col );
+            const int NVIR_col = idx->getNVIRT( irrep_col );
+            const int N_OA_col = NOCC_col + NACT_col;
+            double * vecAO = origin + jump_col;
+            double * vecVA = vecAO  + NACT_col * NOCC_col;
+            double * vecVO = vecVA  + NVIR_col * NACT_col;
+
+            #pragma omp for schedule(static)
+            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+               for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col );
+                  DGEMV_WRAP( -1.0, mat +            NORB_row * NOCC_col, resAO + act_row,            vecAO + NACT_col * occ_col, NOCC_row, NACT_col, NORB_row, NACT_row, 1 );
+                  DGEMV_WRAP( -1.0, mat +            NORB_row * N_OA_col, resAO + act_row,            vecVO + NVIR_col * occ_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1 );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * NOCC_col, resVA + NVIR_row * act_row, vecAO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1,        1 );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVA + NVIR_row * act_row, vecVO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1,        1 );
+               }
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col );
+                  DGEMV_WRAP(  1.0, mat,                                  resAO + act_row,            vecAO + act_col,            NOCC_row, NOCC_col, NORB_row, NACT_row, NACT_col );
+                  DGEMV_WRAP( -1.0, mat            + NORB_row * N_OA_col, resAO + act_row,            vecVA + NVIR_col * act_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1        );
+                  DGEMV_WRAP( -1.0, mat + N_OA_row,                       resVA + NVIR_row * act_row, vecAO + act_col,            NVIR_row, NOCC_col, NORB_row, 1,        NACT_col );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVA + NVIR_row * act_row, vecVA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1,        1        );
+               }
+            }
+
+            #pragma omp for schedule(static)
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col );
+                  DGEMV_WRAP( 1.0, mat + NOCC_row + NORB_row * NOCC_col, resAO + NACT_row * occ_row, vecAO + NACT_col * occ_col, NACT_row, NACT_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + NOCC_row + NORB_row * N_OA_col, resAO + NACT_row * occ_row, vecVO + NVIR_col * occ_col, NACT_row, NVIR_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + N_OA_row + NORB_row * NOCC_col, resVO + NVIR_row * occ_row, vecAO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + N_OA_row + NORB_row * N_OA_col, resVO + NVIR_row * occ_row, vecVO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1, 1 );
+               }
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col );
+                  DGEMV_WRAP( -1.0, mat + NOCC_row,                       resAO + NACT_row * occ_row, vecAO + act_col,            NACT_row, NOCC_col, NORB_row, 1, NACT_col );
+                  DGEMV_WRAP(  1.0, mat + NOCC_row + NORB_row * N_OA_col, resAO + NACT_row * occ_row, vecVA + NVIR_col * act_col, NACT_row, NVIR_col, NORB_row, 1, 1        );
+                  DGEMV_WRAP( -1.0, mat + N_OA_row,                       resVO + NVIR_row * occ_row, vecAO + act_col,            NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVO + NVIR_row * occ_row, vecVA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1, 1        );
+               }
+            }
+            jump_col += NACT_col * NOCC_col + NVIR_col * NACT_col + NVIR_col * NOCC_col;
          }
-
-         for ( int combined = 0; combined < NOCC_row * NACT_col; combined++ ){
-            const int occ_row = combined % NOCC_row;
-            const int act_col = combined / NOCC_row;
-            double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col );
-            DGEMV_WRAPPER( -1.0, mat + NOCC_row,                       result_AO + NACT_row * occ_row, vector_AO + act_col,            NACT_row, NOCC_col, NORB_row, 1, NACT_col );
-            DGEMV_WRAPPER(  1.0, mat + NOCC_row + NORB_row * N_OA_col, result_AO + NACT_row * occ_row, vector_VA + NVIR_col * act_col, NACT_row, NVIR_col, NORB_row, 1, 1        );
-            DGEMV_WRAPPER( -1.0, mat + N_OA_row,                       result_VO + NVIR_row * occ_row, vector_AO + act_col,            NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
-            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VO + NVIR_row * occ_row, vector_VA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1, 1        );
-         }
-
-         for ( int combined = 0; combined < NACT_row * NOCC_col; combined++ ){
-            const int act_row = combined % NACT_row;
-            const int occ_col = combined / NACT_row;
-            double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col );
-            DGEMV_WRAPPER( -1.0, mat +            NORB_row * NOCC_col, result_AO + act_row,            vector_AO + NACT_col * occ_col, NOCC_row, NACT_col, NORB_row, NACT_row, 1 );
-            DGEMV_WRAPPER( -1.0, mat +            NORB_row * N_OA_col, result_AO + act_row,            vector_VO + NVIR_col * occ_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1 );
-            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * NOCC_col, result_VA + NVIR_row * act_row, vector_AO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1,        1 );
-            DGEMV_WRAPPER(  1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VA + NVIR_row * act_row, vector_VO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1,        1 );
-         }
-
-         for ( int combined = 0; combined < NOCC_row * NOCC_col; combined++ ){
-            const int occ_row = combined % NOCC_row;
-            const int occ_col = combined / NOCC_row;
-            double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col );
-            DGEMV_WRAPPER( 1.0, mat + NOCC_row + NORB_row * NOCC_col, result_AO + NACT_row * occ_row, vector_AO + NACT_col * occ_col, NACT_row, NACT_col, NORB_row, 1, 1 );
-            DGEMV_WRAPPER( 1.0, mat + NOCC_row + NORB_row * N_OA_col, result_AO + NACT_row * occ_row, vector_VO + NVIR_col * occ_col, NACT_row, NVIR_col, NORB_row, 1, 1 );
-            DGEMV_WRAPPER( 1.0, mat + N_OA_row + NORB_row * NOCC_col, result_VO + NVIR_row * occ_row, vector_AO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1, 1 );
-            DGEMV_WRAPPER( 1.0, mat + N_OA_row + NORB_row * N_OA_col, result_VO + NVIR_row * occ_row, vector_VO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1, 1 );
-         }
-         jump_col += NACT_col * NOCC_col + NVIR_col * NACT_col + NVIR_col * NOCC_col;
+         jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
       }
-      jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
    }
 
 }
 
-void CheMPS2::CASSCF::DGEMV_WRAPPER( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec ){
+void CheMPS2::CASSCF::DGEMM_WRAP( double prefactor, char transA, char transB, double * A, double * B, double * C, int m, int n, int k, int lda, int ldb, int ldc ){
 
+   if ( m * k * n == 0 ){ return; }
+   double add = 1.0;
+   dgemm_( &transA, &transB, &m, &n, &k, &prefactor, A, &lda, B, &ldb, &add, C, &ldc );
+
+}
+
+void CheMPS2::CASSCF::DGEMV_WRAP( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec ){
+
+   if ( rowdim * coldim == 0 ){ return; }
    char notrans = 'N';
    double add = 1.0;
    dgemv_( &notrans, &rowdim, &coldim, &prefactor, matrix, &ldmat, vector, &incvec, &add, result, &incres );

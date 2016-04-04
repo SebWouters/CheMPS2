@@ -31,69 +31,28 @@ using std::endl;
 CheMPS2::DMRGSCFunitary::DMRGSCFunitary( const DMRGSCFindices * iHandler ) : DMRGSCFmatrix( iHandler ){
 
    this->identity();
-   
+
    //Find the unique indices for OCC-ACT, OCC-VIRT, and ACT-VIRT rotations
    x_linearlength = 0;
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int NOCC = iHandler->getNOCC( irrep );
-      const int NACT = iHandler->getNDMRG( irrep );
-      const int NVIR = iHandler->getNVIRT( irrep );
-      x_linearlength += NOCC * NACT + NACT * NVIR + NOCC * NVIR;
-   }
-   if ( x_linearlength == 0 ){ return; }
-   x_firstindex  = new int[ x_linearlength ];
-   x_secondindex = new int[ x_linearlength ];
-
    jumper = new int*[ num_irreps ];
-   int x_linlength_new = 0;
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+      jumper[ irrep ] = new int[ 3 ];
       const int NOCC = iHandler->getNOCC( irrep );
       const int NACT = iHandler->getNDMRG( irrep );
       const int NVIR = iHandler->getNVIRT( irrep );
-      const int start_occ = iHandler->getOrigNOCCstart( irrep );
-      const int start_act = iHandler->getOrigNDMRGstart( irrep );
-      const int start_vir = iHandler->getOrigNVIRTstart( irrep );
-      jumper[ irrep ] = new int[ 3 ];
-      {
-         jumper[ irrep ][ 0 ] = x_linlength_new;
-         for ( int occ = 0; occ < NOCC; occ++ ){
-            for ( int act = 0; act < NACT; act++ ){ // act is the row index, hence fast moving one
-               x_firstindex[  x_linlength_new ] = start_act + act;
-               x_secondindex[ x_linlength_new ] = start_occ + occ;
-               x_linlength_new++;
-            }
-         }
-      }
-      {
-         jumper[ irrep ][ 1 ] = x_linlength_new;
-         for ( int act = 0; act < NACT; act++ ){
-            for ( int vir = 0; vir < NVIR; vir++ ){ // vir is the row index, hence fast moving one
-               x_firstindex[  x_linlength_new ] = start_vir + vir;
-               x_secondindex[ x_linlength_new ] = start_act + act;
-               x_linlength_new++;
-            }
-         }
-      }
-      {
-         jumper[ irrep ][ 2 ] = x_linlength_new;
-         for ( int occ = 0; occ < NOCC; occ++ ){
-            for ( int vir = 0; vir < NVIR; vir++ ){ // vir is the row index, hence fast moving one
-               x_firstindex[  x_linlength_new ] = start_vir + vir;
-               x_secondindex[ x_linlength_new ] = start_occ + occ;
-               x_linlength_new++;
-            }
-         }
-      }
+      jumper[ irrep ][ 0 ] = x_linearlength;
+      x_linearlength += NOCC * NACT;
+      jumper[ irrep ][ 1 ] = x_linearlength;
+      x_linearlength += NACT * NVIR;
+      jumper[ irrep ][ 2 ] = x_linearlength;
+      x_linearlength += NOCC * NVIR;
    }
-   assert( x_linearlength == x_linlength_new );
 
 }
 
 CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
 
    if ( x_linearlength != 0 ){
-      delete [] x_firstindex;
-      delete [] x_secondindex;
       for ( int irrep = 0; irrep < num_irreps; irrep++ ){ delete [] jumper[ irrep ]; }
       delete [] jumper;
    }
@@ -101,10 +60,6 @@ CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
 }
 
 int CheMPS2::DMRGSCFunitary::getNumVariablesX() const{ return x_linearlength; }
-
-int CheMPS2::DMRGSCFunitary::getFirstIndex( const int linearindex ) const{ return x_firstindex[ linearindex ]; }
-
-int CheMPS2::DMRGSCFunitary::getSecondIndex( const int linearindex ) const{ return x_secondindex[ linearindex ]; }
 
 void CheMPS2::DMRGSCFunitary::buildSkewSymmX( const int irrep, double * result, double * Xelem, const bool compact ) const{
 
