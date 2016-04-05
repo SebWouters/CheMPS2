@@ -198,8 +198,9 @@ namespace CheMPS2{
              \param theDMRGSCFoptions Contains the DMRGSCF options
              \param IPEA The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004)
              \param IMAG The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
+             \param PSEUDOCANONICAL If true, use the exact DMRG 4-RDM in the pseudocanonical basis. If false, use the cumulant approximated DMRG 4-RDM in the unrotated basis.
              \return The CASPT2 variational correction energy */
-         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG);
+         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL);
 
          //! CASSCF unitary rotation remove call
          /* \param filename File to delete */
@@ -287,8 +288,10 @@ namespace CheMPS2{
              \param work2 Workspace
              \param idx Object which handles the index conventions for CASSCF
              \param invert If true, the eigenvectors are sorted from large to small instead of the other way around
-             \param localDMRG2RDM If not NULL, this 2-RDM-type array will be rotated to the new eigenvecs */
-         static void block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * localDMRG2RDM );
+             \param two_dm   If not NULL, this 4-index array will be rotated to the new eigenvecs if space == 'A'
+             \param three_dm If not NULL, this 6-index array will be rotated to the new eigenvecs if space == 'A'
+             \param contract If not NULL, this 6-index array will be rotated to the new eigenvecs if space == 'A' */
+         static void block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * two_dm, double * three_dm, double * contract );
 
          //! Construct the Fock matrix
          /** \param Fock Matrix to store the Fock operator in
@@ -357,6 +360,9 @@ namespace CheMPS2{
          static void DGEMM_WRAP( double prefactor, char transA, char transB, double * A, double * B, double * C, int m, int n, int k, int lda, int ldb, int ldc );
          static void DGEMV_WRAP( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec );
          static void augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize );
+         
+         // Rotate an active space object
+         static void rotate_active_space_object( const int num_indices, double * object, double * work, double * rotation, const int LAS, const int NJUMP, const int NROTATE );
 
          //Fmat function as defined by Eq. (11) in the Siegbahn paper.
          DMRGSCFmatrix * theFmatrix;

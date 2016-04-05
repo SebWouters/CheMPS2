@@ -144,8 +144,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
       int master_diis = (( diis != NULL ) ? 1 : 0 );
 
       //Fill HamDMRG
-      buildQmatOCC();
       buildTmatrix();
+      buildQmatOCC();
       fillConstAndTmatDMRG( HamDMRG );
       DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
 
@@ -155,8 +155,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
          fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);
-         buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
-         buildTmatrix();
+         buildTmatrix(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
+         buildQmatOCC();
          fillConstAndTmatDMRG( HamDMRG );
          DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
          cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
@@ -209,10 +209,10 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
       //Possibly rotate the active space to the natural orbitals
       if (( scf_options->getWhichActiveSpace() == 1 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
          copy_active( DMRG1DM, theQmatWORK, iHandler, true );
-         block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM ); // Unitary is updated and DMRG2DM rotated
+         block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM, NULL, NULL ); // Unitary is updated and DMRG2DM rotated
          setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
-         buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
-         buildTmatrix();
+         buildTmatrix(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
+         buildQmatOCC();
          cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
 

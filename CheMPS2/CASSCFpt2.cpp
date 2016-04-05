@@ -39,7 +39,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG ){
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL ){
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
@@ -52,25 +52,27 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    //For (ERI rotation, update unitary, block diagonalize, orbital localization)
    const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
    const int work_mem_size  = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
-   double * mem1 = new double[ work_mem_size ];
-   double * mem2 = new double[ work_mem_size ];
    const int tot_dmrg_power6 = dmrgsize_power4 * nOrbDMRG * nOrbDMRG;
+   double * mem1 = new double[ work_mem_size ];
+   double * mem2 = new double[ ( PSEUDOCANONICAL == true ) ? work_mem_size : max( work_mem_size, tot_dmrg_power6 ) ];
 
    // Rotate to pseudocanonical orbitals
-   buildTmatrix();
-   buildQmatOCC();
-   buildQmatACT(); // DMRG1RDM needs to be set by CASSCF::solve
-   construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-   block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
-   block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM );
-   block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
+   if ( PSEUDOCANONICAL == true ){
+      buildTmatrix();
+      buildQmatOCC();
+      buildQmatACT(); // DMRG1RDM needs to be set by CASSCF::solve
+      construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
+      block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+      block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+      block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+   }
 
    // Fill active space Hamiltonian
    Hamiltonian * HamAS = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
    Problem * Prob = new Problem(HamAS, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
-   buildQmatOCC();
    buildTmatrix();
+   buildQmatOCC();
    fillConstAndTmatDMRG( HamAS );
    DMRGSCFrotations::rotate( VMAT_ORIG, HamAS->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
    double E_CASSCF = 0.0;
@@ -109,21 +111,24 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
          if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
       }
       theDMRG->calc_rdms_and_correlations( true );
-      copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM  );        // 2-RDM
-      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );          // 1-RDM
+      copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM  ); // 2-RDM
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM ); // 1-RDM
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      copy_active( theFmatrix, mem2, iHandler );                   // Fock
-      //CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
-      for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
-      for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-         theDMRG->Diag4RDM( three_dm, ham_orbz, false );
-         int size = tot_dmrg_power6;
-         double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-         int inc1 = 1;
-         daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+      copy_active( theFmatrix, mem2, iHandler ); // Fock
+      if ( PSEUDOCANONICAL == true ){
+         for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
+         for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
+            theDMRG->Diag4RDM( three_dm, ham_orbz, false );
+            int size = tot_dmrg_power6;
+            double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
+            int inc1 = 1;
+            daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+         }
+      } else {
+         CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract ); // trace( Fock * cu(4)-4-RDM )
       }
-      copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );        // 3-RDM --> three_dm was used as work space for the constracted 4-RDM
+      copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm ); // 3-RDM
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
       if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
@@ -133,6 +138,18 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete Prob;
    delete HamAS;
 
+   if ( PSEUDOCANONICAL == false ){
+      cout << "CASPT2 : Deviation from pseudocanonical = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
+      block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+      block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM, three_dm, contract ); // 2-RDM, 3-RDM, and trace( Fock * cu(4)-4-RDM )
+      block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM ); // 1-RDM
+      buildTmatrix();
+      buildQmatOCC();
+      buildQmatACT();
+      construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler ); // Fock
+   }
+
    //Calculate the matrix elements needed to calculate the CASPT2 V-vector
    DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
    DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
@@ -141,7 +158,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    delete [] mem1;
    delete [] mem2;
 
-   cout << "CASPT2 : Norm F - F_pseudocan = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
+   cout << "CASPT2 : Deviation from pseudocanonical = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
    CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );
    const double E_CASPT2 = myCASPT2->solve( IMAG );
 

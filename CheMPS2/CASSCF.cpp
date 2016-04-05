@@ -396,7 +396,7 @@ void CheMPS2::CASSCF::copy_active( const DMRGSCFmatrix * origin, double * result
 
 }
 
-void CheMPS2::CASSCF::block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * localDMRG2RDM ){
+void CheMPS2::CASSCF::block_diagonalize( const char space, const DMRGSCFmatrix * Mat, DMRGSCFunitary * Umat, double * work1, double * work2, const DMRGSCFindices * idx, const bool invert, double * two_dm, double * three_dm, double * contract ){
 
    const int n_irreps = idx->getNirreps();
    const int tot_dmrg = idx->getDMRGcumulative( n_irreps );
@@ -447,23 +447,41 @@ void CheMPS2::CASSCF::block_diagonalize( const char space, const DMRGSCFmatrix *
          double set = 0.0;
          dgemm_( &trans, &notrans, &NROTATE, &NTOTAL, &NROTATE, &one, work1, &NROTATE, work2, &NROTATE, &set, umatrix, &NTOTAL );
 
-         // Adjust the 2-RDM accordingly
-         if (( localDMRG2RDM != NULL ) && ( space == 'A' )){
-            int power[] = { 1,
-                            tot_dmrg,
-                            tot_dmrg * tot_dmrg,
-                            tot_dmrg * tot_dmrg * tot_dmrg,
-                            tot_dmrg * tot_dmrg * tot_dmrg * tot_dmrg };
-            for ( int index = 3; index >= 0; index-- ){
-               for ( int cnt = 0; cnt < power[ 3 - index ]; cnt++ ){
-                  double * two_dm_ptr = localDMRG2RDM + power[ index ] * NJUMP + power[ index + 1 ] * cnt;
-                  dgemm_( &notrans, &notrans, power + index, &NROTATE, &NROTATE, &one, two_dm_ptr, power + index, work1, &NROTATE, &set, work2, power + index );
-                  int size = power[ index ] * NROTATE;
-                  int inc1 = 1;
-                  dcopy_( &size, work2, &inc1, two_dm_ptr, &inc1 );
-               }
-            }
+         // Adjust the two_dm, three_dm, and contract objects accordingly
+         if ( space == 'A' ){
+            if (   two_dm != NULL ){ rotate_active_space_object( 4,   two_dm, work2, work1, tot_dmrg, NJUMP, NROTATE ); }
+            if ( three_dm != NULL ){ rotate_active_space_object( 6, three_dm, work2, work1, tot_dmrg, NJUMP, NROTATE ); }
+            if ( contract != NULL ){ rotate_active_space_object( 6, contract, work2, work1, tot_dmrg, NJUMP, NROTATE ); }
          }
+      }
+   }
+
+}
+
+void CheMPS2::CASSCF::rotate_active_space_object( const int num_indices, double * object, double * work, double * rotation, const int LAS, const int NJUMP, const int NROTATE ){
+
+   assert( num_indices >= 2 );
+   assert( num_indices <= 6 );
+
+   int power[] = { 1,
+                   LAS,
+                   LAS * LAS,
+                   LAS * LAS * LAS,
+                   LAS * LAS * LAS * LAS,
+                   LAS * LAS * LAS * LAS * LAS,
+                   LAS * LAS * LAS * LAS * LAS * LAS };
+
+   for ( int rot_index = num_indices - 1; rot_index >= 0; rot_index-- ){
+      for ( int block = 0; block < power[ num_indices - 1 - rot_index ]; block++ ){
+         double * mat = object + power[ rot_index ] * NJUMP + power[ rot_index + 1 ] * block;
+         int ROTDIM = NROTATE;
+         char notrans = 'N';
+         double one = 1.0;
+         double set = 0.0;
+         dgemm_( &notrans, &notrans, power + rot_index, &ROTDIM, &ROTDIM, &one, mat, power + rot_index, rotation, &ROTDIM, &set, work, power + rot_index );
+         int size = power[ rot_index ] * NROTATE;
+         int inc1 = 1;
+         dcopy_( &size, work, &inc1, mat, &inc1 );
       }
    }
 

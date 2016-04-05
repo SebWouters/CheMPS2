@@ -64,8 +64,9 @@ int main(void){
    scf_options->setDoDIIS( true );
    const double IPEA = 0.0;
    const double IMAG = 0.0;
+   const bool PSEUDOCANONICAL = false;
    double Energy1 = koekoek.solve( Nelec, TwoS, Irrep, NULL, root_num, scf_options);
-   double Energy2 = koekoek.caspt2(Nelec, TwoS, Irrep, NULL, root_num, scf_options, IPEA, IMAG);
+   double Energy2 = koekoek.caspt2(Nelec, TwoS, Irrep, NULL, root_num, scf_options, IPEA, IMAG, PSEUDOCANONICAL);
 
    //Clean up
    if (scf_options->getStoreUnitary()){ koekoek.deleteStoredUnitary( scf_options->getUnitaryStorageName() ); }
