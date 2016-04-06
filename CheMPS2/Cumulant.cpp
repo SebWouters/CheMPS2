@@ -29,38 +29,43 @@
    struct timeval start, end;
    gettimeofday(&start, NULL);
    const int L = prob->gL();
-   
+
+   for ( int cnt = 0; cnt < L*L*L*L*L*L; cnt++ ){ result[ cnt ] = 0.0; }
+
    int * irreps = new int[ L ];
    for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = prob->gIrrep(( prob->gReorder() ) ? prob->gf1( orb ) : orb ); }
-   
+
    #pragma omp parallel for schedule(dynamic)
    for ( int i = 0; i < L; i++ ){
       for ( int j = i; j < L; j++ ){
          for ( int k = i; k < L; k++ ){
+            const int irrep_ijk = Irreps::directProd( Irreps::directProd( irreps[ i ], irreps[ j ] ), irreps[ k ] );
             for ( int p = i; p < L; p++ ){
                for ( int q = i; q < L; q++ ){
                   for ( int r = q; r < L; r++ ){
-                     double value = 0.0;
-                     //#pragma omp parallel for schedule(static) reduction(+:value)
-                     for ( int ls = 0; ls < L*L; ls++ ){
-                        const int l_val = ls % L;
-                        const int s_val = ls / L;
-                        if ( irreps[ l_val ] == irreps[ s_val ] ){
-                           value += fock[ ls ] * gamma4_ham(prob, the3DM, the2DM, i, j, k, l_val, p, q, r, s_val);
+                     const int irrep_pqr = Irreps::directProd( Irreps::directProd( irreps[ p ], irreps[ q ] ), irreps[ r ] );
+                     if ( irrep_ijk == irrep_pqr ){
+                        double value = 0.0;
+                        for ( int l = 0; l < L; l++ ){
+                           for ( int s = 0; s < L; s++ ){
+                              if ( irreps[ l ] == irreps[ s ] ){
+                                 value += fock[ l + L * s ] * gamma4_ham(prob, the3DM, the2DM, i, j, k, l, p, q, r, s);
+                              }
+                           }
                         }
+                        result[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = value;
+                        result[ i + L * ( k + L * ( j + L * ( p + L * ( r + L * q )))) ] = value;
+                        result[ j + L * ( i + L * ( k + L * ( q + L * ( p + L * r )))) ] = value;
+                        result[ k + L * ( i + L * ( j + L * ( r + L * ( p + L * q )))) ] = value;
+                        result[ j + L * ( k + L * ( i + L * ( q + L * ( r + L * p )))) ] = value;
+                        result[ k + L * ( j + L * ( i + L * ( r + L * ( q + L * p )))) ] = value;
+                        result[ p + L * ( q + L * ( r + L * ( i + L * ( j + L * k )))) ] = value;
+                        result[ p + L * ( r + L * ( q + L * ( i + L * ( k + L * j )))) ] = value;
+                        result[ q + L * ( p + L * ( r + L * ( j + L * ( i + L * k )))) ] = value;
+                        result[ r + L * ( p + L * ( q + L * ( k + L * ( i + L * j )))) ] = value;
+                        result[ q + L * ( r + L * ( p + L * ( j + L * ( k + L * i )))) ] = value;
+                        result[ r + L * ( q + L * ( p + L * ( k + L * ( j + L * i )))) ] = value;
                      }
-                     result[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = value;
-                     result[ i + L * ( k + L * ( j + L * ( p + L * ( r + L * q )))) ] = value;
-                     result[ j + L * ( i + L * ( k + L * ( q + L * ( p + L * r )))) ] = value;
-                     result[ k + L * ( i + L * ( j + L * ( r + L * ( p + L * q )))) ] = value;
-                     result[ j + L * ( k + L * ( i + L * ( q + L * ( r + L * p )))) ] = value;
-                     result[ k + L * ( j + L * ( i + L * ( r + L * ( q + L * p )))) ] = value;
-                     result[ p + L * ( q + L * ( r + L * ( i + L * ( j + L * k )))) ] = value;
-                     result[ p + L * ( r + L * ( q + L * ( i + L * ( k + L * j )))) ] = value;
-                     result[ q + L * ( p + L * ( r + L * ( j + L * ( i + L * k )))) ] = value;
-                     result[ r + L * ( p + L * ( q + L * ( k + L * ( i + L * j )))) ] = value;
-                     result[ q + L * ( r + L * ( p + L * ( j + L * ( k + L * i )))) ] = value;
-                     result[ r + L * ( q + L * ( p + L * ( k + L * ( j + L * i )))) ] = value;
                   }
                }
             }
@@ -224,15 +229,13 @@ void CheMPS2::Cumulant::gamma4_fock_contract_ham(const Problem * prob, const Thr
    #pragma omp parallel for schedule(dynamic)
    for ( int i = 0; i < L; i++ ){
       for ( int j = i; j < L; j++ ){
-         const int irrep_ij = Irreps::directProd( irreps[ i ], irreps[ j ] );
          for ( int k = i; k < L; k++ ){
+            const int irrep_ijk = Irreps::directProd( Irreps::directProd( irreps[ i ], irreps[ j ] ), irreps[ k ] );
             for ( int p = i; p < L; p++ ){
-               const int irrep_kp   = Irreps::directProd( irreps[ k ], irreps[ p ] );
-               const int irrep_ijkp = Irreps::directProd( irrep_ij,    irrep_kp    );
                for ( int q = i; q < L; q++ ){
                   for ( int r = q; r < L; r++ ){
-                     const int irrep_qr = Irreps::directProd( irreps[ q ], irreps[ r ] );
-                     if ( irrep_ijkp == irrep_qr ){
+                     const int irrep_pqr = Irreps::directProd( Irreps::directProd( irreps[ p ], irreps[ q ] ), irreps[ r ] );
+                     if ( irrep_ijk == irrep_pqr ){
                      
                         double dm3_contribution = 0.0;
                         double gamma2_part1 = 0.0;
