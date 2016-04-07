@@ -128,11 +128,6 @@ namespace CheMPS2{
          //Set all twelve-fold permutation symmetric 3-RDM elements, using the DMRG indices.
          void set_dmrg_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6, const double value);
          
-         //Helper functions
-         static int trianglefunction(const int k, const int glob);
-         static void tripletrianglefunction(const int global, int * jkl);
-         static int phase(const int two_times_power){ return ((((two_times_power/2)%2)!=0)?-1:1); }
-         
          //Partitioning 2-4-0
          double diagram1(TensorT * denT, TensorF0 * denF0, double * workmem) const;
          

@@ -131,7 +131,8 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
          #ifdef CHEMPS2_MPI_COMPILATION
          if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){
          #endif
-            TensorOperator * diag = new TensorOperator(cnt+1, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+            // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+            TensorOperator * diag = new TensorOperator( cnt+1, 0, 0, 0, true, true, false, denBK, denBK );
             MPS[cnt]->random();
             MPS[cnt]->QR(diag);
             delete diag;

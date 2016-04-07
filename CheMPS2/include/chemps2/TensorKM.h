@@ -36,11 +36,11 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param indexIn The boundary index
-             \param identityIn The identity: K, or M (capitals!)
-             \param IdiffIn The irrep of the one creator ( sandwiched since TensorK )
-             \param denBKIn The symmetry bookkeeper of the problem to be solved */
-         TensorKM(const int indexIn, const char identityIn, const int IdiffIn, const SyBookkeeper * denBKIn);
+         /** \param boundary_index The boundary index
+             \param identity The identity: K, or M (capitals!)
+             \param Idiff The irrep of the one creator ( sandwiched since TensorK )
+             \param denBK The symmetry bookkeeper */
+         TensorKM(const int boundary_index, const char identity, const int Idiff, const SyBookkeeper * denBK);
          
          //! Destructor
          virtual ~TensorKM();

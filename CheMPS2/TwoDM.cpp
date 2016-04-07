@@ -30,6 +30,7 @@
 #include "Options.h"
 #include "MPIchemps2.h"
 #include "Gsl.h"
+#include "Special.h"
 
 using std::max;
 using std::cout;
@@ -401,15 +402,6 @@ void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
 
 }
 
-int CheMPS2::TwoDM::trianglefunction(const int k, const int glob){
-
-   int cnt2tilde = 1;
-   while(cnt2tilde*(cnt2tilde+1)/2 <= glob){ cnt2tilde++; }
-   return k - cnt2tilde;
-   
-}
-
-
 void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F0tens, TensorF1 **** F1tens, TensorS0 **** S0tens, TensorS1 **** S1tens){
 
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -451,15 +443,15 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
       }
       
       const int dimTriangle = L - theindex - 1;
-      const int upperboundTriangle = dimTriangle*(dimTriangle+1)/2;
+      const int upperboundTriangle = ( dimTriangle * ( dimTriangle + 1 ) ) / 2;
+      int result[ 2 ];
       #pragma omp for schedule(static) nowait
-      for (int global=0; global<upperboundTriangle; global++){
-         const int row = trianglefunction(dimTriangle, global);
-         const int col = global - (dimTriangle-row)*(dimTriangle-1-row)/2;
-         const int j_index = theindex + 1 + row;
-         const int k_index = j_index + col;
-         if (denBK->gIrrep(j_index) == denBK->gIrrep(k_index)){
-         
+      for ( int global = 0; global < upperboundTriangle; global++ ){
+         Special::invert_triangle_two( global, result );
+         const int j_index = L - 1 - result[ 1 ];
+         const int k_index = j_index + result[ 0 ];
+         if ( denBK->gIrrep( j_index ) == denBK->gIrrep( k_index )){
+
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_absigma( j_index, k_index ) )
             #endif
@@ -469,7 +461,7 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
                set_2rdm_A_DMRG(theindex,theindex,j_index,k_index, 2*d3);
                set_2rdm_B_DMRG(theindex,theindex,j_index,k_index,-2*d3);
             }
-            
+
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_cdf( L, j_index, k_index ) )
             #endif
@@ -531,16 +523,15 @@ void CheMPS2::TwoDM::FillSite(TensorT * denT, TensorL *** Ltens, TensorF0 **** F
 
       const int globalsize = theindex * upperboundTriangle;
       #pragma omp for schedule(static) nowait
-      for (int gjk_index=0; gjk_index<globalsize; gjk_index++){
+      for ( int gjk_index = 0; gjk_index < globalsize; gjk_index++ ){
          const int g_index = gjk_index % theindex;
          const int global  = gjk_index / theindex;
-         const int row = trianglefunction(dimTriangle, global);
-         const int col = global - (dimTriangle-row)*(dimTriangle-1-row)/2;
-         const int j_index = theindex + 1 + row;
-         const int k_index = j_index + col;
-         const int I_g = denBK->gIrrep(g_index);
-         const int cnt1 = k_index-j_index;
-         const int cnt2 = j_index-theindex-1;
+         Special::invert_triangle_two( global, result );
+         const int j_index = L - 1 - result[ 1 ];
+         const int k_index = j_index + result[ 0 ];
+         const int I_g = denBK->gIrrep( g_index );
+         const int cnt1 = k_index - j_index;
+         const int cnt2 = j_index - theindex - 1;
 
          if (Irreps::directProd(I_g, denBK->gIrrep(theindex)) == Irreps::directProd(denBK->gIrrep(j_index), denBK->gIrrep(k_index))){
             #ifdef CHEMPS2_MPI_COMPILATION

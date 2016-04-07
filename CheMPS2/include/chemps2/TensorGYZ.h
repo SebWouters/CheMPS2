@@ -36,10 +36,10 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param indexIn The boundary index
-             \param identityIn The identity: G, Y, Z (capitals!)
-             \param denBKIn The symmetry bookkeeper with symmetry sector virtual dimensions */
-         TensorGYZ(const int indexIn, const char identityIn, const SyBookkeeper * denBKIn);
+         /** \param boundary_index The boundary index
+             \param identity The identity: G, Y, Z (capitals!)
+             \param denBK The symmetry bookkeeper with symmetry sector virtual dimensions */
+         TensorGYZ(const int boundary_index, const char identity, const SyBookkeeper * denBK);
          
          //! Destructor
          virtual ~TensorGYZ();

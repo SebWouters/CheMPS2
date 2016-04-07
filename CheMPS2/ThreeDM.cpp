@@ -30,6 +30,7 @@
 #include "Options.h"
 #include "MPIchemps2.h"
 #include "Gsl.h"
+#include "Special.h"
 
 using std::max;
 using std::cout;
@@ -161,28 +162,6 @@ void CheMPS2::ThreeDM::read(){
 
 }
 
-int CheMPS2::ThreeDM::trianglefunction(const int k, const int glob){
-
-   int cnt2tilde = 1;
-   while(cnt2tilde*(cnt2tilde+1)/2 <= glob){ cnt2tilde++; }
-   return k - cnt2tilde;
-   
-}
-
-void CheMPS2::ThreeDM::tripletrianglefunction(const int global, int * jkl){
-
-   int cnt3 = 0;
-   while ( ((cnt3+1)*(cnt3+2)*(cnt3+3))/6 <= global ){ cnt3++; }
-   const int globalmin = global - (cnt3*(cnt3+1)*(cnt3+2))/6;
-   int cnt2 = 0;
-   while ( ((cnt2+1)*(cnt2+2))/2 <= globalmin ){ cnt2++; }
-   int cnt1 = globalmin - (cnt2*(cnt2+1))/2;
-   jkl[0] = cnt1;
-   jkl[1] = cnt2;
-   jkl[2] = cnt3;
-   
-}
-
 void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors,
                                   Tensor3RDM **** dm3_a_J0_doublet, Tensor3RDM **** dm3_a_J1_doublet, Tensor3RDM **** dm3_a_J1_quartet,
                                   Tensor3RDM **** dm3_b_J0_doublet, Tensor3RDM **** dm3_b_J1_doublet, Tensor3RDM **** dm3_b_J1_quartet,
@@ -196,22 +175,24 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
    const int orb_i = denT->gIndex();
    const int DIM = max(book->gMaxDimAtBound( orb_i ), book->gMaxDimAtBound( orb_i+1 ));
    const double sq3 = sqrt( 3.0 );
-   
+
    #pragma omp parallel
    {
-   
-      double * workmem  = new double[DIM*DIM];
-      double * workmem2 = new double[DIM*DIM];
-      
-      const int upperbound1 = ( orb_i * ( orb_i+1 )) / 2;
+
+      double * workmem  = new double[ DIM * DIM ];
+      double * workmem2 = new double[ DIM * DIM ];
+
+      const int upperbound1 = ( orb_i * ( orb_i + 1 )) / 2;
+      int jkl[] = { 0, 0, 0 };
       #ifdef CHEMPS2_MPI_COMPILATION
          #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
-      for (int global = 0; global < upperbound1; global++){
-         const int orb_k = orb_i - trianglefunction( orb_i, global ) - 1; // cnt2tilde - 1
-         const int orb_j = global - (orb_k*(orb_k+1))/2;
+      for ( int global = 0; global < upperbound1; global++ ){
+         Special::invert_triangle_two( global, jkl );
+         const int orb_j = jkl[ 0 ];
+         const int orb_k = jkl[ 1 ];
          if ( book->gIrrep( orb_j ) == book->gIrrep( orb_k )){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_cdf( L, orb_j, orb_k ) )
@@ -223,19 +204,18 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             }
          }
       }
-      
+
       const int triangle3   = L - orb_i - 1;
-      const int upperbound3 = (triangle3*(triangle3+1))/2;
+      const int upperbound3 = ( triangle3 * ( triangle3 + 1 ) ) / 2;
       #ifdef CHEMPS2_MPI_COMPILATION
          #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
-      for (int global = 0; global < upperbound3; global++){
-         const int row = trianglefunction( triangle3, global );
-         const int col = global - ((triangle3-row)*(triangle3-1-row))/2;
-         const int orb_j = orb_i + 1 + row;
-         const int orb_k = orb_j + col;
+      for ( int global = 0; global < upperbound3; global++ ){
+         Special::invert_triangle_two( global, jkl );
+         const int orb_j = L - 1 - jkl[ 1 ];
+         const int orb_k = orb_j + jkl[ 0 ];
          if ( book->gIrrep( orb_j ) == book->gIrrep( orb_k )){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_cdf( L, orb_j, orb_k ) )
@@ -248,19 +228,18 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
          }
       }
       
-      const int upperbound4 = ( orb_i * ( orb_i+1 ) * ( orb_i + 2 ) ) / 6;
-      int jkl[] = { 0, 0, 0 };
+      const int upperbound4 = ( orb_i * ( orb_i + 1 ) * ( orb_i + 2 ) ) / 6;
       #ifdef CHEMPS2_MPI_COMPILATION
          #pragma omp for schedule(dynamic) nowait
       #else
          #pragma omp for schedule(static) nowait
       #endif
-      for (int global = 0; global < upperbound4; global++){
-         tripletrianglefunction( global, jkl );
-         const int orb_j = jkl[0];
-         const int orb_k = jkl[1];
-         const int orb_l = jkl[2];
-         const int recalculate_global = orb_j + (orb_k*(orb_k+1))/2 + (orb_l*(orb_l+1)*(orb_l+2))/6;
+      for ( int global = 0; global < upperbound4; global++ ){
+         Special::invert_triangle_three( global, jkl );
+         const int orb_j = jkl[ 0 ];
+         const int orb_k = jkl[ 1 ];
+         const int orb_l = jkl[ 2 ];
+         const int recalculate_global = orb_j + ( orb_k * ( orb_k + 1 ) ) / 2 + ( orb_l * ( orb_l + 1 ) * ( orb_l + 2 ) ) / 6;
          assert( global == recalculate_global );
          if ( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ) == Irreps::directProd( book->gIrrep( orb_l ), book->gIrrep( orb_i ) ) ){
             #ifdef CHEMPS2_MPI_COMPILATION
@@ -303,9 +282,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       #endif
       for (int combined = 0; combined < upperbound10; combined++){
          const int global = combined % upperbound1;
-         const int orb_l  = orb_i + 1 + ( combined / upperbound1 );
-         const int orb_k  = orb_i - trianglefunction( orb_i, global ) - 1;
-         const int orb_j  = global - (orb_k*(orb_k+1))/2;
+         Special::invert_triangle_two( global, jkl );
+         const int orb_l = orb_i + 1 + ( combined / upperbound1 );
+         const int orb_j = jkl[ 0 ];
+         const int orb_k = jkl[ 1 ];
          if ( Irreps::directProd(book->gIrrep( orb_j ), book->gIrrep( orb_k )) == Irreps::directProd(book->gIrrep( orb_l ), book->gIrrep( orb_i )) ){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_absigma( orb_j, orb_k ) )
@@ -347,13 +327,12 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
       #else
          #pragma omp for schedule(static) nowait
       #endif
-      for (int combined = 0; combined < upperbound16; combined++){
+      for ( int combined = 0; combined < upperbound16; combined++ ){
          const int orb_j  = combined % orb_i;
          const int global = combined / orb_i;
-         const int row    = trianglefunction( triangle3, global );
-         const int col    = global - ((triangle3-row)*(triangle3-1-row))/2;
-         const int orb_m  = orb_i + 1 + row;
-         const int orb_n  = orb_m + col;
+         Special::invert_triangle_two( global, jkl );
+         const int orb_m = L - 1 - jkl[ 1 ];
+         const int orb_n = orb_m + jkl[ 0 ];
          if ( Irreps::directProd(book->gIrrep( orb_j ), book->gIrrep( orb_i )) == Irreps::directProd(book->gIrrep( orb_m ), book->gIrrep( orb_n )) ){
             #ifdef CHEMPS2_MPI_COMPILATION
             if ( MPIRANK == MPIchemps2::owner_absigma( orb_m, orb_n ) )
@@ -428,8 +407,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
             int counter_Fjk = 0;
             int counter_Sjk = 0;
             for (int global = 0; global < upperbound1; global++){
-               const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-               const int orb_j    = global - (orb_k*(orb_k+1))/2;
+               Special::invert_triangle_two( global, jkl );
+               const int orb_j = jkl[ 0 ];
+               const int orb_k = jkl[ 1 ];
                const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
                if ( irrep_jk == irrep_mn ){
                   #ifdef CHEMPS2_MPI_COMPILATION
@@ -464,9 +444,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                #else
                   #pragma omp for schedule(static) nowait
                #endif
-               for (int global = 0; global < upperbound1; global++){
-                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+               for ( int global = 0; global < upperbound1; global++ ){
+                  Special::invert_triangle_two( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
                   const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
                   if ( irrep_jk == irrep_mn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -530,9 +511,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                #else
                   #pragma omp for schedule(static) nowait
                #endif
-               for (int global = 0; global < upperbound1; global++){
-                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+               for ( int global = 0; global < upperbound1; global++ ){
+                  Special::invert_triangle_two( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
                   const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
                   if ( irrep_jk == irrep_mn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -582,8 +564,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound1; global++){
-                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+                  Special::invert_triangle_two( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
                   const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
                   if ( irrep_jk == irrep_mn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -637,8 +620,9 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound1; global++){
-                  const int orb_k    = orb_i - trianglefunction( orb_i, global ) - 1;
-                  const int orb_j    = global - (orb_k*(orb_k+1))/2;
+                  Special::invert_triangle_two( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
                   const int irrep_jk = Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) );
                   if ( irrep_jk == irrep_mn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -674,10 +658,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
              **************************************************************/
             int counter_jkl = 0;
             for (int global = 0; global < upperbound4; global++){
-               tripletrianglefunction( global, jkl );
-               const int orb_j     = jkl[0];
-               const int orb_k     = jkl[1];
-               const int orb_l     = jkl[2];
+               Special::invert_triangle_three( global, jkl );
+               const int orb_j = jkl[ 0 ];
+               const int orb_k = jkl[ 1 ];
+               const int orb_l = jkl[ 2 ];
                const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                if ( irrep_jkl == irrep_imn ){
                   #ifdef CHEMPS2_MPI_COMPILATION
@@ -705,10 +689,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound4; global++){
-                  tripletrianglefunction( global, jkl );
-                  const int orb_j     = jkl[0];
-                  const int orb_k     = jkl[1];
-                  const int orb_l     = jkl[2];
+                  Special::invert_triangle_three( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
+                  const int orb_l = jkl[ 2 ];
                   const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                   if ( irrep_jkl == irrep_imn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -758,10 +742,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound4; global++){
-                  tripletrianglefunction( global, jkl );
-                  const int orb_j     = jkl[0];
-                  const int orb_k     = jkl[1];
-                  const int orb_l     = jkl[2];
+                  Special::invert_triangle_three( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
+                  const int orb_l = jkl[ 2 ];
                   const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                   if ( irrep_jkl == irrep_imn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -836,10 +820,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound4; global++){
-                  tripletrianglefunction( global, jkl );
-                  const int orb_j     = jkl[0];
-                  const int orb_k     = jkl[1];
-                  const int orb_l     = jkl[2];
+                  Special::invert_triangle_three( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
+                  const int orb_l = jkl[ 2 ];
                   const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                   if ( irrep_jkl == irrep_imn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -914,10 +898,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                   #pragma omp for schedule(static) nowait
                #endif
                for (int global = 0; global < upperbound4; global++){
-                  tripletrianglefunction( global, jkl );
-                  const int orb_j     = jkl[0];
-                  const int orb_k     = jkl[1];
-                  const int orb_l     = jkl[2];
+                  Special::invert_triangle_three( global, jkl );
+                  const int orb_j = jkl[ 0 ];
+                  const int orb_k = jkl[ 1 ];
+                  const int orb_l = jkl[ 2 ];
                   const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                   if ( irrep_jkl == irrep_imn ){
                      #ifdef CHEMPS2_MPI_COMPILATION
@@ -1003,10 +987,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
           **************************************************************/
          int counter_jkl = 0;
          for (int global = 0; global < upperbound4; global++){
-            tripletrianglefunction( global, jkl );
-            const int orb_j     = jkl[0];
-            const int orb_k     = jkl[1];
-            const int orb_l     = jkl[2];
+            Special::invert_triangle_three( global, jkl );
+            const int orb_j = jkl[ 0 ];
+            const int orb_k = jkl[ 1 ];
+            const int orb_l = jkl[ 2 ];
             const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
             if ( irrep_jkl == irrep_m ){
                #ifdef CHEMPS2_MPI_COMPILATION
@@ -1033,10 +1017,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                #pragma omp for schedule(static) nowait
             #endif
             for ( int global = 0; global < upperbound4; global++ ){
-               tripletrianglefunction( global, jkl );
-               const int orb_j     = jkl[0];
-               const int orb_k     = jkl[1];
-               const int orb_l     = jkl[2];
+               Special::invert_triangle_three( global, jkl );
+               const int orb_j = jkl[ 0 ];
+               const int orb_k = jkl[ 1 ];
+               const int orb_l = jkl[ 2 ];
                const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                if ( irrep_jkl == irrep_m ){
                   #ifdef CHEMPS2_MPI_COMPILATION
@@ -1141,10 +1125,10 @@ void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0
                #pragma omp for schedule(static) nowait
             #endif
             for ( int global = 0; global < upperbound4; global++ ){
-               tripletrianglefunction( global, jkl );
-               const int orb_j     = jkl[0];
-               const int orb_k     = jkl[1];
-               const int orb_l     = jkl[2];
+               Special::invert_triangle_three( global, jkl );
+               const int orb_j = jkl[ 0 ];
+               const int orb_k = jkl[ 1 ];
+               const int orb_l = jkl[ 2 ];
                const int irrep_jkl = Irreps::directProd( Irreps::directProd( book->gIrrep( orb_j ), book->gIrrep( orb_k ) ), book->gIrrep( orb_l ) );
                if ( irrep_jkl == irrep_m ){
                   #ifdef CHEMPS2_MPI_COMPILATION
@@ -1354,7 +1338,7 @@ double CheMPS2::ThreeDM::diagram4_5_6_7_8_9(TensorT * denT, Tensor3RDM * d3tens,
                      int length = dimLdown * dimR;
                      int inc = 1;
                      const double factor = ((type =='D') ? ( sqrt( 0.5 * ( d3tens->get_two_j1() + 1 ) ) * ( TwoSLprime + 1 ) )
-                                                         : ( phase( TwoSL + 1 - TwoSLprime )
+                                                         : ( Special::phase( TwoSL + 1 - TwoSLprime )
                                                            * sqrt( 0.5 * ( d3tens->get_two_j1() + 1 ) * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) ));
                      total += factor * ddot_( &length, workmem, &inc, Tdown, &inc );
 
@@ -1471,7 +1455,7 @@ double CheMPS2::ThreeDM::diagram11(TensorT * denT, TensorS1 * denS1, TensorL * d
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                  * phase( TwoSR + 3 + TwoSLprime )
+                                  * Special::phase( TwoSR + 3 + TwoSLprime )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
@@ -1529,7 +1513,7 @@ double CheMPS2::ThreeDM::diagram12(TensorT * denT, TensorF0 * denF0, TensorL * d
                      int length = dimLdown * dimRdown;
                      int inc = 1;
                      total += sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSR + 1 ) )
-                            * phase( TwoSL + 3 - TwoSR )
+                            * Special::phase( TwoSL + 3 - TwoSR )
                             * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                   }
@@ -1589,7 +1573,7 @@ double CheMPS2::ThreeDM::diagram13(TensorT * denT, TensorF1 * denF1, TensorL * d
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSR + 1 ) * ( TwoSLprime + 1 ) )
-                                  * phase( 2 * TwoSR + 2 )
+                                  * Special::phase( 2 * TwoSR + 2 )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
@@ -1648,7 +1632,7 @@ double CheMPS2::ThreeDM::diagram14(TensorT * denT, TensorF0 * denF0, TensorL * d
                      int length = dimLdown * dimRdown;
                      int inc = 1;
                      total += sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSR + 1 ) )
-                            * phase( TwoSL + 3 - TwoSR )
+                            * Special::phase( TwoSL + 3 - TwoSR )
                             * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                   }
@@ -1709,7 +1693,7 @@ double CheMPS2::ThreeDM::diagram15(TensorT * denT, TensorF1 * denF1, TensorL * d
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
-                                  * phase( TwoSL + TwoSLprime )
+                                  * Special::phase( TwoSL + TwoSLprime )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
@@ -1827,7 +1811,7 @@ double CheMPS2::ThreeDM::diagram17(TensorT * denT, TensorL * denL, TensorS1 * de
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
-                                  * phase( TwoSL + TwoSLprime + 3 )
+                                  * Special::phase( TwoSL + TwoSLprime + 3 )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
@@ -1885,7 +1869,7 @@ double CheMPS2::ThreeDM::diagram18(TensorT * denT, TensorL * denL, TensorF0 * de
                      int length = dimLdown * dimRdown;
                      int inc = 1;
                      total += sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) )
-                            * phase( TwoSL + 1 - TwoSLprime )
+                            * Special::phase( TwoSL + 1 - TwoSLprime )
                             * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                   }
@@ -1946,7 +1930,7 @@ double CheMPS2::ThreeDM::diagram19(TensorT * denT, TensorL * denL, TensorF1 * de
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
-                                  * phase( 2 * TwoSR )
+                                  * Special::phase( 2 * TwoSR )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
                                   
@@ -2003,7 +1987,7 @@ double CheMPS2::ThreeDM::diagram20(TensorT * denT, TensorL * denL, TensorF0 * de
                      int length = dimLdown * dimRdown;
                      int inc = 1;
                      total += sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) )
-                            * phase( TwoSL + 1 - TwoSLprime )
+                            * Special::phase( TwoSL + 1 - TwoSLprime )
                             * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                   }
@@ -2063,7 +2047,7 @@ double CheMPS2::ThreeDM::diagram21(TensorT * denT, TensorL * denL, TensorF1 * de
                            int length = dimLdown * dimRdown;
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                  * phase( TwoSR + TwoSLprime )
+                                  * Special::phase( TwoSR + TwoSLprime )
                                   * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
                                   
@@ -2138,7 +2122,7 @@ void CheMPS2::ThreeDM::fill_a_S0( TensorT * denT, Tensor3RDM * tofill, TensorS0 
                   
                      char notrans = 'N';
                      char trans   = 'T';
-                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL + 1 - TwoSLprime );
+                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSL + 1 - TwoSLprime );
                      double beta  = 0.0; //SET
                      dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown, &dimLdown, Sblock, &dimRdown, &beta, workmem, &dimLdown );
                      alpha        = 1.0;
@@ -2191,7 +2175,7 @@ void CheMPS2::ThreeDM::fill_bcd_S0( TensorT * denT, Tensor3RDM * tofill, TensorS
                   
                      char notrans = 'N';
                      char trans   = 'T';
-                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL + 1 - TwoSLprime );
+                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSL + 1 - TwoSLprime );
                      double beta  = 0.0; //SET
                      dgemm_( &notrans, &notrans, &dimLup, &dimRdown, &dimRup, &alpha, Tup, &dimLup, Sblock, &dimRup, &beta, workmem, &dimLup );
                      alpha        = 1.0;
@@ -2275,7 +2259,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = doublet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSRprime + 1 ) ) * ( TwoSL + 1 )
-                                            * phase( TwoSL + TwoSLprime + 1 )
+                                            * Special::phase( TwoSL + TwoSLprime + 1 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2286,7 +2270,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = quartet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = 2 * sqrt( TwoSRprime + 1.0 ) * ( TwoSL + 1 )
-                                            * phase( TwoSL + TwoSLprime + 3 )
+                                            * Special::phase( TwoSL + TwoSLprime + 3 )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2318,7 +2302,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = doublet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                            * phase( TwoSR + TwoSLprime )
+                                            * Special::phase( TwoSR + TwoSLprime )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2329,7 +2313,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = quartet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = 2 * sqrt( TwoSL + 1.0 ) * ( TwoSR + 1 )
-                                            * phase( TwoSR + TwoSLprime )
+                                            * Special::phase( TwoSR + TwoSLprime )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2394,7 +2378,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                         
                            double * Wblock  = doublet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( 0.5 * ( TwoSLprime + 1 ) ) * ( TwoSRprime + 1 )
-                                            * phase( TwoSL + TwoSRprime )
+                                            * Special::phase( TwoSL + TwoSRprime )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2405,7 +2389,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                         
                            double * Wblock  = quartet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( TwoSLprime + 1.0 ) * ( TwoSRprime + 1 )
-                                            * phase( TwoSL + TwoSRprime )
+                                            * Special::phase( TwoSL + TwoSRprime )
                                             * gsl_sf_coupling_6j( 1, 2, 3, TwoSL, TwoSLprime, TwoSRprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2437,7 +2421,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                         
                            double * Wblock  = doublet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( 0.5 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
-                                            * phase( TwoSL + TwoSLprime + 3 )
+                                            * Special::phase( TwoSL + TwoSLprime + 3 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2448,7 +2432,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                         
                            double * Wblock  = quartet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( TwoSR + 1.0 ) * ( TwoSLprime + 1 )
-                                            * phase( TwoSL + TwoSLprime + 1 )
+                                            * Special::phase( TwoSL + TwoSLprime + 1 )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2524,7 +2508,7 @@ void CheMPS2::ThreeDM::fill_F0_T( TensorT * denT, Tensor3RDM * tofill, TensorF0 
                   
                      char notrans = 'N';
                      char trans   = 'T';
-                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSLprime + 1 - TwoSL );
+                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSLprime + 1 - TwoSL );
                      double beta  = 0.0; //SET
                      dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown, &dimLdown, Fblock, &dimRdown, &beta, workmem, &dimLdown );
                      alpha        = 1.0;
@@ -2587,7 +2571,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSRprime + 1 )
-                                            * phase( TwoSLprime + TwoSRprime + 3 )
+                                            * Special::phase( TwoSLprime + TwoSRprime + 3 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2598,7 +2582,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSL + 1.0 ) * ( TwoSRprime + 1 )
-                                            * phase( TwoSLprime + TwoSRprime + 3 )
+                                            * Special::phase( TwoSLprime + TwoSRprime + 3 )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2630,7 +2614,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
-                                            * phase( 2*TwoSLprime + 2 )
+                                            * Special::phase( 2*TwoSLprime + 2 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2641,7 +2625,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                         
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
-                                            * phase( 2*TwoSLprime )
+                                            * Special::phase( 2*TwoSLprime )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2717,7 +2701,7 @@ void CheMPS2::ThreeDM::fill_F0( TensorT * denT, Tensor3RDM * tofill, TensorF0 * 
                   
                      char notrans = 'N';
                      char trans   = 'T';
-                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSLprime + 1 - TwoSL );
+                     double alpha = 0.5 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSLprime + 1 - TwoSL );
                      double beta  = 0.0; //SET
                      dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &alpha, Tdown, &dimLdown, Fblock, &dimRup, &beta, workmem, &dimLdown );
                      alpha        = 1.0;
@@ -2780,7 +2764,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                         
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSRprime + 1 ) ) * ( TwoSL + 1 )
-                                            * phase( TwoSLprime + TwoSL + 3 )
+                                            * Special::phase( TwoSLprime + TwoSL + 3 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2791,7 +2775,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                         
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSRprime + 1.0 ) * ( TwoSL + 1 )
-                                            * phase( TwoSLprime + TwoSL + 3 )
+                                            * Special::phase( TwoSLprime + TwoSL + 3 )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2823,7 +2807,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                         
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                            * phase( TwoSLprime + TwoSR + 2 )
+                                            * Special::phase( TwoSLprime + TwoSR + 2 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2834,7 +2818,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                         
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSL + 1.0 ) * ( TwoSR + 1 )
-                                            * phase( TwoSLprime + TwoSR )
+                                            * Special::phase( TwoSLprime + TwoSR )
                                             * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
@@ -2948,7 +2932,7 @@ void CheMPS2::ThreeDM::fill_tens_30_32(TensorT * denT, TensorF1 * tofill, Tensor
                   double * right =  denF1->gStorage( NL+2, TwoSLprime, ILxImxIn, NL+2, TwoSL,      IL       );
                   double * left  = tofill->gStorage( NL,   TwoSLprime, ILxImxIn, NL,   TwoSL,      IL       );
                
-                  double factor = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL - TwoSLprime );
+                  double factor = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSL - TwoSLprime );
                   char notrans  = 'N';
                   char trans    = 'T';
                   double zero   = 0.0;
@@ -2998,7 +2982,7 @@ void CheMPS2::ThreeDM::fill_tens_36_42(TensorT * denT, TensorF1 * tofill, Tensor
                         double * left  = tofill->gStorage( NL,   TwoSLprime, ILxImxIn,    NL,   TwoSL, IL          );
                      
                         double factor = 0.5 * sqrt( 6.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                      * phase( TwoSR + TwoSLprime + 1 )
+                                      * Special::phase( TwoSR + TwoSLprime + 1 )
                                       * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
                         char notrans  = 'N';
                         char trans    = 'T';
@@ -3062,7 +3046,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                            {
                               double * left = fill34->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 0.5 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
-                                            * phase( TwoSL + TwoSR + 3 )
+                                            * Special::phase( TwoSL + TwoSR + 3 )
                                             * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
@@ -3071,7 +3055,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                            if ( TwoSL == TwoSLprime ){
                               double * left = fill35->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 0.5 * ( TwoSRprime + 1 ) * sqrt( 6.0 * ( TwoSR + 1 ) )
-                                            * phase( TwoSL + TwoSRprime + 3 )
+                                            * Special::phase( TwoSL + TwoSRprime + 3 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
@@ -3080,7 +3064,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                            {
                               double * left = fill37->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
-                                            * phase( 2*TwoSL + TwoSR + TwoSRprime )
+                                            * Special::phase( 2*TwoSL + TwoSR + TwoSRprime )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR      )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSLprime );
                               int length = dimLup * dimLdown;
@@ -3090,7 +3074,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                            {
                               double * left = fill38->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
-                                            * phase( 2*TwoSR + TwoSL + TwoSLprime )
+                                            * Special::phase( 2*TwoSR + TwoSL + TwoSLprime )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      );
                               int length = dimLup * dimLdown;
@@ -3293,7 +3277,7 @@ void CheMPS2::ThreeDM::fill_tens_28(TensorT * denT, TensorS1 * tofill, TensorS0 
                         double * left  = tofill->gStorage( NL-2, TwoSLprime, ILxImxIn,    NL,   TwoSL, IL          );
                      
                         double factor = sqrt( 1.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
-                                      * phase( TwoSLprime + TwoSR + 1 )
+                                      * Special::phase( TwoSLprime + TwoSR + 1 )
                                       * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
                         char notrans  = 'N';
                         char trans    = 'T';
@@ -3398,7 +3382,7 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                            {
                               double * left = fill25->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
-                                            * phase( TwoSL + TwoSRprime + 3 )
+                                            * Special::phase( TwoSL + TwoSRprime + 3 )
                                             * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
@@ -3407,7 +3391,7 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                            {
                               double * left = fill26->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
-                                            * phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 )
+                                            * Special::phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime );
                               int length = dimLup * dimLdown;
@@ -3417,7 +3401,7 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                            if ( TwoSLprime == TwoSL ){
                               double * left = fill27->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = ( TwoSR + 1 ) * sqrt( 1.5 * ( TwoSRprime + 1 ) )
-                                            * phase( TwoSL + TwoSR + 3 )
+                                            * Special::phase( TwoSL + TwoSR + 3 )
                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
@@ -3511,7 +3495,7 @@ void CheMPS2::ThreeDM::fill_tens_46_48(TensorT * denT, TensorS1 * tofill, Tensor
                      double zero   = 0.0;
                      double one    = 1.0;
                      if ( first ){
-                        double factor  = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL - TwoSLprime + 2 );
+                        double factor  = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSL - TwoSLprime + 2 );
                         double * right =  denF1->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                         dgemm_( &notrans, &notrans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRdown, &zero, workmem, &dimLdown );
                         dgemm_( &notrans, &trans,   &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup,   &one,  left,    &dimLdown );
@@ -3608,7 +3592,7 @@ void CheMPS2::ThreeDM::fill_55_to_60(TensorT * denT, Tensor3RDM * tofill, Tensor
                      char trans    = 'T';
                      double zero   = 0.0;
                      double one    = 1.0;
-                     double factor = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * phase( TwoSL + 1 - TwoSLprime );
+                     double factor = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) ) * Special::phase( TwoSL + 1 - TwoSLprime );
                      
                      dgemm_( &notrans, &trans, &dimLdown, &dimRup, &dimRdown, &factor, Tdown,   &dimLdown, right, &dimRup, &zero, workmem, &dimLdown );
                      dgemm_( &notrans, &trans, &dimLdown, &dimLup, &dimRup,   &one,    workmem, &dimLdown, Tup,   &dimLup, &one,  left,    &dimLdown );
@@ -3714,7 +3698,7 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                            
                            {
                               double factor  = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
-                                             * phase( TwoSL + TwoSRprime + 2 )
+                                             * Special::phase( TwoSL + TwoSRprime + 2 )
                                              * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 1 );
                               double * left  = fill63->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
@@ -3729,7 +3713,7 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
                            }
                            if ( TwoSR == TwoSLprime ){
-                              double factor  = sqrt( 0.5 * ( TwoSRprime + 1 ) * ( TwoSL + 1 ) ) * phase( TwoSL - TwoSRprime );
+                              double factor  = sqrt( 0.5 * ( TwoSRprime + 1 ) * ( TwoSL + 1 ) ) * Special::phase( TwoSL - TwoSRprime );
                               double * left  = fill67->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
@@ -3748,7 +3732,7 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                               double factor  = sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
                                              * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime )
                                              * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR      )
-                                             * phase( TwoSLprime + TwoSRprime + 2 - TwoSL - TwoSR );
+                                             * Special::phase( TwoSLprime + TwoSRprime + 2 - TwoSL - TwoSR );
                               double * left  = fill76->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
@@ -3827,7 +3811,7 @@ void CheMPS2::ThreeDM::fill_69_78_79(TensorT * denT, Tensor3RDM * fill69, Tensor
                            {
                               double factor  = prefactor * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR )
                                                          * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime )
-                                                         * phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 );
+                                                         * Special::phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 );
                               double * left  = fill78->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;

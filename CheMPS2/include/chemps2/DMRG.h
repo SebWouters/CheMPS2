@@ -281,15 +281,13 @@ namespace CheMPS2{
          void updateMovingLeftSafeFirstTime(const int cnt);
          void updateMovingLeftSafe2DM(const int cnt);
          void deleteAllBoundaryOperators();
-         static int trianglefunction(const int k, const int glob);
-         
+
          //Helper functions for making the 3-RDM boundary operators
          void update_safe_3rdm_operators(const int boundary);
          void allocate_3rdm_operators(const int boundary);
          void update_3rdm_operators(const int boundary);
          void delete_3rdm_operators(const int boundary);
-         static void tripletrianglefunction(const int global, int * jkl);
-         
+
          //Helper functions for making the Correlations boundary operators
          void update_correlations_tensors(const int siteindex);
          

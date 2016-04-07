@@ -22,17 +22,18 @@
 #include "TensorGYZ.h"
 #include "Lapack.h"
 
-CheMPS2::TensorGYZ::TensorGYZ(const int indexIn, const char identityIn, const SyBookkeeper * denBKIn) :
-TensorOperator(indexIn,
+CheMPS2::TensorGYZ::TensorGYZ(const int boundary_index, const char identity, const SyBookkeeper * denBK) :
+TensorOperator(boundary_index,
                0,     // two_j
                0,     // n_elec = 0
                0,     // n_irrep = I_trivial = 0
                true,  // TensorGYZ only exists moving left to right
                true,  // prime_last (doesn't matter for spin-0 tensors)
                false, // No jw_phase when updating (two-orbital mutual information!)
-               denBKIn){
+               denBK,
+               denBK){
 
-   identity = identityIn;
+   this->identity = identity;
 
 }
 
@@ -48,29 +49,29 @@ void CheMPS2::TensorGYZ::construct(TensorT * denT){
       double alpha = 1.0;
 
       if (identity=='Y'){
-         NL    = sectorN1[ikappa];
-         TwoSL = sectorTwoS1[ikappa];
-         IL    = sectorI1[ikappa];
+         NL    = sector_nelec_up[ikappa];
+         TwoSL = sector_spin_up[ikappa];
+         IL    = sector_irrep_up[ikappa];
       }
 
       if (identity=='Z'){
-         NL    = sectorN1[ikappa]-2;
-         TwoSL = sectorTwoS1[ikappa];
-         IL    = sectorI1[ikappa];
+         NL    = sector_nelec_up[ikappa]-2;
+         TwoSL = sector_spin_up[ikappa];
+         IL    = sector_irrep_up[ikappa];
       }
 
       if (identity=='G'){
-         NL    = sectorN1[ikappa]-1;
-         TwoSL = sectorTwoS1[ikappa]-1;
-         IL    = Irreps::directProd( sectorI1[ikappa] , denBK->gIrrep(index-1) );
+         NL    = sector_nelec_up[ikappa]-1;
+         TwoSL = sector_spin_up[ikappa]-1;
+         IL    = Irreps::directProd( sector_irrep_up[ikappa] , bk_up->gIrrep(index-1) );
          alpha = sqrt(0.5);
       }
 
-      int dimR = denBK->gCurrentDim(index,   sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
-      int dimL = denBK->gCurrentDim(index-1, NL,               TwoSL,               IL);
+      int dimR = bk_up->gCurrentDim(index,   sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa]);
+      int dimL = bk_up->gCurrentDim(index-1, NL,               TwoSL,               IL);
 
       if (dimL>0){
-         double * BlockT = denT->gStorage(NL, TwoSL, IL, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+         double * BlockT = denT->gStorage(NL, TwoSL, IL, sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa]);
          char trans = 'T';
          char notr = 'N';
          double beta = 0.0;
@@ -80,11 +81,11 @@ void CheMPS2::TensorGYZ::construct(TensorT * denT){
       }
 
       if (identity=='G'){
-         TwoSL = sectorTwoS1[ikappa]+1;
-         dimL  = denBK->gCurrentDim(index-1, NL, TwoSL, IL);
+         TwoSL = sector_spin_up[ikappa]+1;
+         dimL  = bk_up->gCurrentDim(index-1, NL, TwoSL, IL);
 
          if (dimL>0){
-            double * BlockT = denT->gStorage(NL, TwoSL, IL, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+            double * BlockT = denT->gStorage(NL, TwoSL, IL, sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa]);
             char trans = 'T';
             char notr = 'N';
             double beta = 1.0; //ADD NOW!!!

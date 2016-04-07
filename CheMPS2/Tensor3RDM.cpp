@@ -22,7 +22,7 @@
 #include <math.h>
 
 #include "Tensor3RDM.h"
-#include "Heff.h"
+#include "Special.h"
 #include "Lapack.h"
 #include "Gsl.h"
 
@@ -34,6 +34,7 @@ TensorOperator(boundary,
                true, // moving_right
                prime_last,
                true, // jw_phase
+               book,
                book){
                
    two_j1 = two_j1_in;
@@ -53,26 +54,26 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
    clear();
    assert( two_j1 == Sigma->get_2j() );
    assert( n_elec == 3 );
-   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), bk_up->gIrrep( index-1 ) ) );
    const int two_j2 = two_j;
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index, nr_up+3, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index, nr_up+3, two_jr_down, ir_down );
       
       { // Contribution 1
-         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up+2, two_jl_down, il_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up+2, two_jl_down, il_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
             
@@ -82,7 +83,7 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
-                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+                            * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -95,11 +96,11 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
          }
       }
       { // Contribution 2
-         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         const int il_up = Irreps::directProd( ir_up, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
             
@@ -109,7 +110,7 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
-                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 1 );
+                            * Special::phase( two_jl_up + two_jr_down + two_j2 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -129,26 +130,26 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
    clear();
    assert( two_j1 == Sigma->get_2j() );
    assert( n_elec == 1 );
-   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   assert( n_irrep == Irreps::directProd( Sigma->get_irrep(), bk_up->gIrrep( index-1 ) ) );
    const int two_j2 = two_j;
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
       
       { // Contribution 1
-         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         const int il_up = Irreps::directProd( ir_up, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
             
@@ -158,7 +159,7 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
-                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 3 );
+                            * Special::phase( two_jl_up + two_jr_down + two_j2 + 3 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -171,11 +172,11 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
          }
       }
       { // Contribution 2
-         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
             
@@ -185,7 +186,7 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
-                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+                            * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -205,26 +206,26 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
    clear();
    assert( two_j1 == denF->get_2j() );
    assert( n_elec == 1 );
-   assert( n_irrep == Irreps::directProd( denF->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   assert( n_irrep == Irreps::directProd( denF->get_irrep(), bk_up->gIrrep( index-1 ) ) );
    const int two_j2 = two_j;
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
       
       { // Contribution 1
-         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
             
@@ -234,7 +235,7 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
-                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+                            * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -247,11 +248,11 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
          }
       }
       { // Contribution 2
-         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         const int il_up = Irreps::directProd( ir_up, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
             
@@ -261,7 +262,7 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
-                            * Heff::phase( two_jl_up + two_jr_down + two_j2 + 1 );
+                            * Special::phase( two_jl_up + two_jr_down + two_j2 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -281,26 +282,26 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
    clear();
    assert( two_j1 == denF->get_2j() );
    assert( n_elec == 1 );
-   assert( n_irrep == Irreps::directProd( denF->get_irrep(), denBK->gIrrep( index-1 ) ) );
+   assert( n_irrep == Irreps::directProd( denF->get_irrep(), bk_up->gIrrep( index-1 ) ) );
    const int two_j2 = two_j;
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index, nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index, nr_up+1, two_jr_down, ir_down );
       
       { // Contribution 1
-         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up, two_jr_up,   ir_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up, two_jl_down, il_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_up - two_jl_down ) <= two_j1 )){
             
@@ -310,7 +311,7 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_down + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
-                            * Heff::phase( two_jr_up + two_jl_down + two_j2 + 3 );
+                            * Special::phase( two_jr_up + two_jl_down + two_j2 + 3 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -323,11 +324,11 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
          }
       }
       { // Contribution 2
-         const int il_up = Irreps::directProd( ir_up, denBK->gIrrep( index-1 ) );
+         const int il_up = Irreps::directProd( ir_up, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
          
-            int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
-            int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+            int dimLup   = bk_up->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+            int dimLdown = bk_up->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
             
             if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jr_down - two_jl_up ) <= two_j1 )){
             
@@ -337,7 +338,7 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_up + 1 ) )
                             * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
-                            * Heff::phase( two_jr_up + two_jr_down + two_j1 + 1 );
+                            * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
                char notrans = 'N';
@@ -356,28 +357,28 @@ void CheMPS2::Tensor3RDM::extra1(TensorT * denT){
 
    clear();
    assert( n_elec == 1 );
-   assert( n_irrep == denBK->gIrrep( index-1 ) );
+   assert( n_irrep == bk_up->gIrrep( index-1 ) );
    const int two_j2 = two_j;
    assert( two_j2 == 1 );
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
-      int dimL     = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      int dimL     = bk_up->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
       
       if ( dimL > 0 ){
       
          double * Tup   = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up,   two_jr_up,   ir_up   );
          double * Tdown = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
          
-         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 );
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Special::phase( two_j1 );
          double beta  = 0.0; //set --> only contribution to this symmetry sector
          char trans   = 'T';
          char notrans = 'N';
@@ -397,16 +398,16 @@ void CheMPS2::Tensor3RDM::extra2(TensorL * denL, TensorT * denT, double * workme
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index,   nr_up+3, two_jr_down, ir_down );
-      int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
-      int dimLdown = denBK->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index,   nr_up+3, two_jr_down, ir_down );
+      int dimLup   = bk_up->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+      int dimLdown = bk_up->gCurrentDim( index-1, nr_up+1, two_jr_down, ir_down );
       
       if (( dimLup > 0 ) && ( dimLdown > 0 )){
       
@@ -414,7 +415,7 @@ void CheMPS2::Tensor3RDM::extra2(TensorL * denL, TensorT * denT, double * workme
          double * Tdown  = denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+3, two_jr_down, ir_down );
          double * Lblock = denL->gStorage( nr_up,   two_jr_up,   ir_up,   nr_up+1, two_jr_down, ir_down );
          
-         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 + 2 );
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Special::phase( two_j1 + 2 );
          double beta  = 0.0; //set
          char trans   = 'T';
          char notrans = 'N';
@@ -436,16 +437,16 @@ void CheMPS2::Tensor3RDM::extra3(TensorL * denL, TensorT * denT, double * workme
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
-      int dimLup   = denBK->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
-      int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      int dimLup   = bk_up->gCurrentDim( index-1, nr_up,   two_jr_up,   ir_up   );
+      int dimLdown = bk_up->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
       
       if (( dimLup > 0 ) && ( dimLdown > 0 )){
       
@@ -453,7 +454,7 @@ void CheMPS2::Tensor3RDM::extra3(TensorL * denL, TensorT * denT, double * workme
          double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
          double * Lblock = denL->gStorage( nr_up-1, two_jr_down, ir_down, nr_up,   two_jr_up,   ir_up   );
          
-         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 );
+         double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Special::phase( two_j1 );
          double beta  = 0.0; //set
          char trans   = 'T';
          char notrans = 'N';
@@ -474,19 +475,19 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
 
    for ( int ikappa = 0; ikappa < nKappa; ikappa++ ){
        
-      const int two_jr_up   = sectorTwoS1[ ikappa ];
-      const int nr_up       = sectorN1[ ikappa ];
-      const int ir_up       = sectorI1[ ikappa ];
-      const int two_jr_down = sector_2S_down[ ikappa ];
+      const int two_jr_up   = sector_spin_up[ ikappa ];
+      const int nr_up       = sector_nelec_up[ ikappa ];
+      const int ir_up       = sector_irrep_up[ ikappa ];
+      const int two_jr_down = sector_spin_down[ ikappa ];
       const int ir_down     = Irreps::directProd( ir_up, n_irrep );
       
-      int dimRup   = denBK->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
-      int dimRdown = denBK->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
+      int dimRup   = bk_up->gCurrentDim( index,   nr_up,   two_jr_up,   ir_up   );
+      int dimRdown = bk_up->gCurrentDim( index,   nr_up+1, two_jr_down, ir_down );
       
       if ( two_j2 == 1 ){ // Contribution 2
       
-         int dimLup   = denBK->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
-         int dimLdown = denBK->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
+         int dimLup   = bk_up->gCurrentDim( index-1, nr_up-2, two_jr_up,   ir_up   );
+         int dimLdown = bk_up->gCurrentDim( index-1, nr_up-1, two_jr_down, ir_down );
          
          if (( dimLup > 0 ) && ( dimLdown > 0 )){
          
@@ -494,7 +495,7 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
             double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
             double * Lblock = denL->gStorage( nr_up-2, two_jr_up,   ir_up,   nr_up-1, two_jr_down, ir_down );
             
-            double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Heff::phase( two_j1 + 2 );
+            double alpha = sqrt( 0.5 * ( two_j1 + 1 ) ) * Special::phase( two_j1 + 2 );
             double beta  = 0.0; //set
             char trans   = 'T';
             char notrans = 'N';
@@ -506,13 +507,13 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
          }
       }
       { // Contribution 1
-         const int il_up   = Irreps::directProd( ir_up,   denBK->gIrrep( index-1 ) );
-         const int il_down = Irreps::directProd( ir_down, denBK->gIrrep( index-1 ) );
+         const int il_up   = Irreps::directProd( ir_up,   bk_up->gIrrep( index-1 ) );
+         const int il_down = Irreps::directProd( ir_down, bk_up->gIrrep( index-1 ) );
          for ( int two_jl_up = two_jr_up-1; two_jl_up <= two_jr_up+1; two_jl_up+=2 ){
             for ( int two_jl_down = two_jr_down-1; two_jl_down <= two_jr_down+1; two_jl_down+=2 ){
       
-               int dimLup   = denBK->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
-               int dimLdown = denBK->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
+               int dimLup   = bk_up->gCurrentDim( index-1, nr_up-1, two_jl_up,   il_up   );
+               int dimLdown = bk_up->gCurrentDim( index-1, nr_up,   two_jl_down, il_down );
                
                if (( dimLup > 0 ) && ( dimLdown > 0 ) && ( abs( two_jl_up - two_jl_down ) <= 1 )){
                
@@ -521,7 +522,7 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
                   double * Lblock = denL->gStorage( nr_up-1, two_jl_up,   il_up,   nr_up,   two_jl_down, il_down );
                   
                   double alpha = sqrt( 1.0 * ( two_j1 + 1 ) * ( two_j2 + 1 ) * ( two_jr_up + 1 ) * ( two_jl_down + 1 ) )
-                               * Heff::phase( two_jr_up + two_jr_down - two_jl_up - two_jl_down )
+                               * Special::phase( two_jr_up + two_jr_down - two_jl_up - two_jl_down )
                                * gsl_sf_coupling_6j( 1, 1, two_j1, two_jl_down, two_jr_up, two_jl_up )
                                * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down );
                   double beta  = 0.0; //set
@@ -563,8 +564,8 @@ double CheMPS2::Tensor3RDM::contract( Tensor3RDM * buddy ) const{
          int offset = kappa2index[ ikappa ];
          int length = kappa2index[ ikappa + 1 ] - offset;
          int inc    = 1;
-         double prefactor = sqrt( ( sectorTwoS1[ ikappa ] + 1.0 ) / ( sector_2S_down[ ikappa ] + 1.0 ) )
-                          * Heff::phase( sectorTwoS1[ ikappa ] + 1 - sector_2S_down[ ikappa ] );
+         double prefactor = sqrt( ( sector_spin_up[ ikappa ] + 1.0 ) / ( sector_spin_down[ ikappa ] + 1 ) )
+                          * Special::phase( sector_spin_up[ ikappa ] + 1 - sector_spin_down[ ikappa ] );
          value += prefactor * ddot_( &length, storage + offset, &inc, buddy->gStorage() + offset, &inc );
       
       }

@@ -171,7 +171,6 @@ namespace CheMPS2{
          void set_2rdm_B_DMRG(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const double value);
          
          //Helper functions
-         static int trianglefunction(const int k, const int glob);
          double doD1(TensorT * denT);
          double doD2(TensorT * denT, TensorL * Lright, double * workmem);
          double doD3(TensorT * denT, TensorS0 * S0right, double * workmem);

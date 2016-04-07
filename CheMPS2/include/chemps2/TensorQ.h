@@ -37,16 +37,16 @@ namespace CheMPS2{
    class TensorQ : public TensorOperator{
 
       public:
-      
+
          //! Constructor
-         /** \param indexIn The boundary index
-             \param IdiffIn The irrep of the one creator ( sandwiched if TensorL ; to sandwich if TensorQ )
-             \param movingRightIn If true: sweep from left to right. If false: sweep from right to left
-             \param denBKIn Symmetry bookkeeper of the problem at hand
-             \param ProbIn Problem containing the matrix elements
-             \param siteIn The site on which the last crea/annih should work */
-         TensorQ(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn, const Problem * ProbIn, const int siteIn);
-         
+         /** \param boundary_index The boundary index
+             \param Idiff The irrep of the one creator ( sandwiched if TensorL ; to sandwich if TensorQ )
+             \param moving_right If true: sweep from left to right. If false: sweep from right to left
+             \param denBK Symmetry bookkeeper of the problem at hand
+             \param Prob Problem containing the matrix elements
+             \param site The site on which the last crea/annih should work */
+         TensorQ(const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * denBK, const Problem * Prob, const int site);
+
          //! Destructor
          virtual ~TensorQ();
          

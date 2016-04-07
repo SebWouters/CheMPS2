@@ -32,6 +32,7 @@
 #include "Heff.h"
 #include "MPIchemps2.h"
 #include "Gsl.h"
+#include "Special.h"
 
 using std::cout;
 using std::endl;
@@ -73,7 +74,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
    delete denS;
    gettimeofday(&start_part, NULL);
    if ( am_i_master ){
-      TensorOperator * norm = new TensorOperator(L, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+      // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+      TensorOperator * norm = new TensorOperator( L, 0, 0, 0, true, true, false, denBK, denBK );
       MPS[L-1]->QR(norm);
       delete norm;
    }
@@ -127,7 +129,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
           ************************/
          gettimeofday(&start_part, NULL);
          if ( am_i_master ){
-            TensorOperator * left = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+            // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+            TensorOperator * left = new TensorOperator( siteindex, 0, 0, 0, true, true, false, denBK, denBK );
             MPS[siteindex]->LQ(left);
             MPS[siteindex-1]->RightMultiply(left);
             delete left;
@@ -215,7 +218,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations(const bool do_3rdm){
        ************************/
       gettimeofday(&start_part, NULL);
       if ( am_i_master ){
-         TensorOperator * right = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK); // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+         // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
+         TensorOperator * right = new TensorOperator( siteindex, 0, 0, 0, true, true, false, denBK, denBK );
          MPS[siteindex-1]->QR(right);
          MPS[siteindex]->LeftMultiply(right);
          delete right;
@@ -411,7 +415,7 @@ void CheMPS2::DMRG::diag_4rdm_helper( double * output, const int ham_orbz, const
 
       /* Change the MPS gauge */
       if ( am_i_master ){
-         TensorOperator * left = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK);
+         TensorOperator * left = new TensorOperator( siteindex, 0, 0, 0, true, true, false, denBK, denBK );
          MPS[siteindex]->LQ(left);
          MPS[siteindex-1]->RightMultiply(left);
          delete left;
@@ -448,7 +452,7 @@ void CheMPS2::DMRG::diag_4rdm_helper( double * output, const int ham_orbz, const
 
       /* Change the MPS gauge */
       if ( am_i_master ){
-         TensorOperator * right = new TensorOperator(siteindex, 0, 0, 0, true, true, false, denBK);
+         TensorOperator * right = new TensorOperator( siteindex, 0, 0, 0, true, true, false, denBK, denBK );
          MPS[siteindex-1]->QR(right);
          MPS[siteindex]->LeftMultiply(right);
          delete right;
@@ -667,7 +671,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta, const bool mpi_
                   double * Tblock = MPS[DMRGindex]->gStorage(NL,TwoSLvalue,IL,NR,TwoSRvalue,IR);
                   double prefactor = sqrt( TwoSRvalue + 1 )
                                    * gsl_sf_coupling_3j(TwoSLvalue, spread, TwoSRvalue, twoSLz, twoSzloc, -twoSRz)
-                                   * Heff::phase( -TwoSLvalue + spread - twoSRz );
+                                   * Special::phase( -TwoSLvalue + spread - twoSRz );
                   double add2array = 1.0;
                   char notrans = 'N';
                   dgemm_( &notrans, &notrans, &dimFirst, &dimR, &dimL, &prefactor, arrayL + jumpL[indexSL], &dimFirst, Tblock, &dimL, &add2array, arrayR + jumpR[cntSR], &dimFirst);
@@ -832,42 +836,42 @@ void CheMPS2::DMRG::calcVeffTilde(double * result, Sobject * currentS, int state
 
 void CheMPS2::DMRG::calcOverlapsWithLowerStates(){
 
-   for (int state=0; state<nStates-1; state++){
+   for ( int state = 0; state < nStates - 1; state++ ){
  
       //Don't do updatemovingRightSafe here, as with storeRenormOp some left boundary operators are stored and removed from mem.
       const int cnt = L-2;
-      if (isAllocated[cnt]==2){
-         deleteTensors(cnt, false);
-         isAllocated[cnt]=0;
+      if ( isAllocated[ cnt ] == 2 ){
+         deleteTensors( cnt, false );
+         isAllocated[ cnt ] = 0;
       }
-      if (isAllocated[cnt]==0){
-         allocateTensors(cnt, true);
-         isAllocated[cnt]=1;
+      if ( isAllocated[ cnt ] == 0 ){
+         allocateTensors( cnt, true );
+         isAllocated[ cnt ] = 1;
       }
-      updateMovingRight(cnt);
+      updateMovingRight( cnt );
 
       double overlap;
       #ifdef CHEMPS2_MPI_COMPILATION
       const int OWNER = MPIchemps2::owner_specific_excitation( L, state );
       if ( OWNER == MPIchemps2::mpi_rank() ){
       #endif
-         TensorO * Otemp = new TensorO(L, true, Exc_BKs[state], denBK, Prob);
-         Otemp->update(Exc_MPSs[state][L-1], MPS[L-1], Exc_Overlaps[state][L-2]);
-         overlap = Otemp->gStorage()[0];
+         TensorO * Otemp = new TensorO( L, true, denBK, Exc_BKs[state] );
+         Otemp->update( MPS[ L - 1 ], Exc_MPSs[ state ][ L - 1 ], Exc_Overlaps[ state ][ L - 2 ] );
+         overlap = Otemp->gStorage()[ 0 ];
          delete Otemp;
       #ifdef CHEMPS2_MPI_COMPILATION
       }
       MPIchemps2::broadcast_array_double( &overlap, 1, OWNER );
-      
+
       if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
       #endif
       { cout << "The overlap between the current state and state " << state << " is : " << overlap << endl; }
 
-      if (isAllocated[cnt]==1){
-         deleteTensors(cnt, true);
-         isAllocated[cnt]=0;
+      if ( isAllocated[ cnt ] == 1 ){
+         deleteTensors( cnt, true );
+         isAllocated[ cnt ] = 0;
       }
-   
+
    }
 
 }

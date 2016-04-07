@@ -37,11 +37,11 @@ namespace CheMPS2{
       public:
       
          //! Constructor
-         /** \param indexIn The boundary index
-             \param IdiffIn Direct product of irreps of the two 2nd quantized operators; both sandwiched & to sandwich
-             \param movingRightIn If true: sweep from left to right. If false: sweep from right to left
-             \param denBKIn The problem to be solved */
-         TensorS1(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
+         /** \param boundary_index The boundary index
+             \param Idiff Direct product of irreps of the two 2nd quantized operators; both sandwiched & to sandwich
+             \param moving_right If true: sweep from left to right. If false: sweep from right to left
+             \param denBK The symmetry sector partitioning */
+         TensorS1(const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * denBK);
          
          //! Destructor
          virtual ~TensorS1();

@@ -22,17 +22,18 @@
 #include "TensorKM.h"
 #include "Lapack.h"
 
-CheMPS2::TensorKM::TensorKM(const int indexIn, const char identityIn, const int IdiffIn, const SyBookkeeper * denBKIn) :
-TensorOperator(indexIn,
-               1, // two_j
-               1, // n_elec
-               IdiffIn,
-               true, // TensorKM only exists moving left to right
-               true, // prime_last
-               false, // No jw_phase when updating (two-orbital mutual information!)
-               denBKIn){
+CheMPS2::TensorKM::TensorKM( const int boundary_index, const char identity, const int Idiff, const SyBookkeeper * denBK ) :
+TensorOperator( boundary_index,
+                1, // two_j
+                1, // n_elec
+                Idiff,
+                true, // TensorKM only exists moving left to right
+                true, // prime_last
+                false, // No jw_phase when updating (two-orbital mutual information!)
+                denBK,
+                denBK ){
 
-   identity = identityIn;
+   this->identity = identity;
 
 }
 
@@ -46,15 +47,15 @@ void CheMPS2::TensorKM::construct(TensorT * denT){
 
       for (int ikappa=0; ikappa<nKappa; ikappa++){
 
-         const int IDR = Irreps::directProd( n_irrep, sectorI1[ikappa] );
-         int dimUR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa],    sectorI1[ikappa]);
-         int dimDR = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sector_2S_down[ikappa], IDR             );
-         int dimL = denBK->gCurrentDim(index-1, sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa]);
+         const int IDR = Irreps::directProd( n_irrep, sector_irrep_up[ikappa] );
+         int dimUR = bk_up->gCurrentDim(index,   sector_nelec_up[ikappa],   sector_spin_up[ikappa],    sector_irrep_up[ikappa]);
+         int dimDR = bk_up->gCurrentDim(index,   sector_nelec_up[ikappa]+1, sector_spin_down[ikappa], IDR             );
+         int dimL = bk_up->gCurrentDim(index-1, sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa]);
 
          if (dimL>0){
 
-            double * BlockTup   = denT->gStorage(sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa],   sectorTwoS1[ikappa],    sectorI1[ikappa]);
-            double * BlockTdown = denT->gStorage(sectorN1[ikappa], sectorTwoS1[ikappa], sectorI1[ikappa], sectorN1[ikappa]+1, sector_2S_down[ikappa], IDR);
+            double * BlockTup   = denT->gStorage(sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa], sector_nelec_up[ikappa],   sector_spin_up[ikappa],   sector_irrep_up[ikappa]);
+            double * BlockTdown = denT->gStorage(sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa], sector_nelec_up[ikappa]+1, sector_spin_down[ikappa], IDR);
 
             char trans = 'T';
             char notrans = 'N';
@@ -70,20 +71,20 @@ void CheMPS2::TensorKM::construct(TensorT * denT){
    
       for (int ikappa=0; ikappa<nKappa; ikappa++){
 
-         const int IDR = Irreps::directProd( n_irrep, sectorI1[ikappa] );
-         int dimUR = denBK->gCurrentDim(index,   sectorN1[ikappa],   sectorTwoS1[ikappa],    sectorI1[ikappa]);
-         int dimDR = denBK->gCurrentDim(index,   sectorN1[ikappa]+1, sector_2S_down[ikappa], IDR             );
-         int dimL = denBK->gCurrentDim(index-1, sectorN1[ikappa]-1,  sector_2S_down[ikappa], IDR);
+         const int IDR = Irreps::directProd( n_irrep, sector_irrep_up[ikappa] );
+         int dimUR = bk_up->gCurrentDim(index,   sector_nelec_up[ikappa],   sector_spin_up[ikappa],    sector_irrep_up[ikappa]);
+         int dimDR = bk_up->gCurrentDim(index,   sector_nelec_up[ikappa]+1, sector_spin_down[ikappa], IDR             );
+         int dimL = bk_up->gCurrentDim(index-1, sector_nelec_up[ikappa]-1,  sector_spin_down[ikappa], IDR);
 
          if (dimL>0){
 
-            double * BlockTup   = denT->gStorage(sectorN1[ikappa]-1, sector_2S_down[ikappa], IDR, sectorN1[ikappa],   sectorTwoS1[ikappa],    sectorI1[ikappa]);
-            double * BlockTdown = denT->gStorage(sectorN1[ikappa]-1, sector_2S_down[ikappa], IDR, sectorN1[ikappa]+1, sector_2S_down[ikappa], IDR);
+            double * BlockTup   = denT->gStorage(sector_nelec_up[ikappa]-1, sector_spin_down[ikappa], IDR, sector_nelec_up[ikappa],   sector_spin_up[ikappa],   sector_irrep_up[ikappa]);
+            double * BlockTdown = denT->gStorage(sector_nelec_up[ikappa]-1, sector_spin_down[ikappa], IDR, sector_nelec_up[ikappa]+1, sector_spin_down[ikappa], IDR);
 
             char trans = 'T';
             char notrans = 'N';
-            int fase = ((((sector_2S_down[ikappa] - sectorTwoS1[ikappa] + 1)/2)%2)!=0)?-1:1;
-            double alpha = fase * sqrt((sectorTwoS1[ikappa]+1.0)/(sector_2S_down[ikappa]+1));
+            int fase = ((((sector_spin_down[ikappa] - sector_spin_up[ikappa] + 1)/2)%2)!=0)?-1:1;
+            double alpha = fase * sqrt((sector_spin_up[ikappa]+1.0)/(sector_spin_down[ikappa]+1));
             double beta = 1.0; //add
             dgemm_(&trans,&notrans,&dimUR,&dimDR,&dimL,&alpha,BlockTup,&dimL,BlockTdown,&dimL,&beta,storage+kappa2index[ikappa],&dimUR);
 

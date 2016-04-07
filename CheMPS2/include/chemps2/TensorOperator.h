@@ -42,29 +42,30 @@ namespace CheMPS2{
    class TensorOperator : public Tensor{
 
       public:
-      
+
          //! Constructor
-         /** \param index The boundary index
+         /** \param boundary_index The boundary index
              \param two_j Twice the spin of the tensor operator
              \param n_elec How many electrons there are more in the symmetry sector of the lower leg compared to the upper leg
              \param n_irrep The (real-valued abelian) point group irrep difference between the symmetry sectors of the lower and upper legs (see Irreps.h)
              \param moving_right If true: sweep from left to right. If false: sweep from right to left.
              \param prime_last Convention in which the tensor operator is stored (see class information)
              \param jw_phase Whether or not to include a Jordan-Wigner phase due to the fermion anti-commutation relations
-             \param denBK Symmetry bookkeeper of the problem to be solved */
-         TensorOperator(const int index, const int two_j, const int n_elec, const int n_irrep, const bool moving_right, const bool prime_last, const bool jw_phase, const SyBookkeeper * denBK);
-         
+             \param bk_up   Symmetry bookkeeper of the upper MPS
+             \param bk_down Symmetry bookkeeper of the lower MPS */
+         TensorOperator( const int boundary_index, const int two_j, const int n_elec, const int n_irrep, const bool moving_right, const bool prime_last, const bool jw_phase, const SyBookkeeper * bk_up, const SyBookkeeper * bk_down );
+
          //! Destructor
          virtual ~TensorOperator();
-         
+
          //! Get the number of symmetry blocks
          /** \return The number of symmetry blocks */
          int gNKappa() const;
-         
+
          //! Get the pointer to the storage
          /** return pointer to the storage */
          double * gStorage();
-         
+
          //! Get the index corresponding to a certain tensor block
          /** \param N1 The up particle number sector
              \param TwoS1 The up spin symmetry sector
@@ -73,13 +74,13 @@ namespace CheMPS2{
              \param TwoS2 The down spin symmetry sector
              \param I2 The down irrep sector
              \return The kappa corresponding to the input parameters; -1 means no such block */
-         int gKappa(const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2) const;
-         
+         int gKappa( const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2 ) const;
+
          //! Get the storage jump corresponding to a certain tensor block
          /** \param kappa The symmetry block
              \return kappa2index[kappa], the memory jumper to a certain block */
-         int gKappa2index(const int kappa) const;
-         
+         int gKappa2index( const int kappa ) const;
+
          //! Get the pointer to the storage of a certain tensor block
          /** \param N1 The up particle number sector
              \param TwoS1 The up spin symmetry sector
@@ -88,86 +89,104 @@ namespace CheMPS2{
              \param TwoS2 The down spin symmetry sector
              \param I2 The down irrep sector
              \return Pointer to the storage of the specified tensor block; NULL means no such block */
-         double * gStorage(const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2);
-         
+         double * gStorage( const int N1, const int TwoS1, const int I1, const int N2, const int TwoS2, const int I2 );
+
          //! Get the boundary index
          /** \return the index */
          int gIndex() const;
-         
+
          //! Get twice the spin of the tensor operator
          /** \return Twice the spin of the tensor operatorg */
          int get_2j() const;
-         
+
          //! Get how many electrons there are more in the symmetry sector of the lower leg compared to the upper leg
          /** \return How many electrons there are more in the symmetry sector of the lower leg compared to the upper leg */
          int get_nelec() const;
-         
+
          //! Get the (real-valued abelian) point group irrep difference between the symmetry sectors of the lower and upper legs (see Irreps.h)
          /** \return The (real-valued abelian) point group irrep difference between the symmetry sectors of the lower and upper legs (see Irreps.h) */
          int get_irrep() const;
-         
+
          //! Clear and update
          /** \param previous The previous TensorOperator needed for the update
-             \param mps_tensor The MPS tensor needed for the update
+             \param mps_tensor_up   The upper MPS tensor needed for the update 
+             \param mps_tensor_down The lower MPS tensor needed for the update
              \param workmem Work memory */
-         void update(TensorOperator * previous, TensorT * mps_tensor, double * workmem);
-         
+         void update( TensorOperator * previous, TensorT * mps_tensor_up, TensorT * mps_tensor_down, double * workmem );
+
          //! daxpy for TensorOperator
          /** \param alpha The prefactor
              \param to_add The TensorOperator x which should be added: this <-- this + alpha * to_add */
-         void daxpy(double alpha, TensorOperator * to_add);
-         
+         void daxpy( double alpha, TensorOperator * to_add );
+
          //! daxpy_transpose for C- and D-tensors (with special spin-dependent factors)
          /** \param alpha The prefactor
              \param to_add The TensorOperator x which should be added: this <-- this + alpha * special_spin_dependent_factor * to_add^T */
-         void daxpy_transpose_tensorCD(const double alpha, TensorOperator * to_add);
-         
+         void daxpy_transpose_tensorCD( const double alpha, TensorOperator * to_add );
+
          //! Set all storage variables to 0.0
          void clear();
-         
+
          //! Make the in-product of two TensorOperator
          /** \param buddy The second tensor
              \param trans If trans == 'N' a regular ddot is taken. If trans == 'T' and n_elec==0, the in-product with buddy's transpose is made.
              \return The in-product */
          double inproduct( TensorOperator * buddy, const char trans ) const;
-         
+
       protected:
-      
-         //! Get twice the spin of the tensor operator
+
+         //! The bookkeeper of the upper MPS
+         const SyBookkeeper * bk_up;
+
+         //! The bookkeeper of the lower MPS
+         const SyBookkeeper * bk_down;
+
+         //! Twice the spin of the tensor operator
          int two_j;
-      
+
          //! How many electrons there are more in the symmetry sector of the lower leg compared to the upper leg
          int n_elec;
-      
+
          //! The (real-valued abelian) point group irrep difference between the symmetry sectors of the lower and upper legs (see Irreps.h)
          int n_irrep;
-        
+
          //! Whether or not moving right
          bool moving_right;
-         
+
+         //! The up particle number sector
+         int * sector_nelec_up;
+
+         //! The up spin symmetry sector
+         int * sector_irrep_up;
+
+         //! The up spin symmetry sector
+         int * sector_spin_up;
+
          //! The down spin symmetry sector (pointer points to sectorTwoS1 if two_j == 0)
-         int * sector_2S_down;
-         
+         int * sector_spin_down;
+
          //! Update moving right
          /** \param ikappa The tensor block which should be updated
              \param previous The previous TensorOperator needed for the update
-             \param mps_tensor The MPS tensor needed for the update
+             \param mps_tensor_up   The upper MPS tensor needed for the update 
+             \param mps_tensor_down The lower MPS tensor needed for the update
              \param workmem Work memory */
-         void update_moving_right(const int ikappa, TensorOperator * previous, TensorT * mps_tensor, double * workmem);
-         
+         void update_moving_right( const int ikappa, TensorOperator * previous, TensorT * mps_tensor_up, TensorT * mps_tensor_down, double * workmem );
+
          //! Update moving left
          /** \param ikappa The tensor block which should be updated
              \param previous The previous TensorOperator needed for the update
-             \param mps_tensor The MPS tensor needed for the update
+             \param mps_tensor_up   The upper MPS tensor needed for the update 
+             \param mps_tensor_down The lower MPS tensor needed for the update
              \param workmem Work memory */
-         void update_moving_left(const int ikappa, TensorOperator * previous, TensorT * mps_tensor, double * workmem);
-      
+         void update_moving_left( const int ikappa, TensorOperator * previous, TensorT * mps_tensor_up, TensorT * mps_tensor_down, double * workmem );
+
          //! Convention in which the tensor operator is stored (see class information)
          bool prime_last;
-         
+
          //! Whether or not to include a Jordan-Wigner phase due to the fermion anti-commutation relations
          bool jw_phase;
-         
+
       private:
 
    };

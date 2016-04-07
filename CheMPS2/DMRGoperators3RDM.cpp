@@ -23,6 +23,7 @@
 
 #include "DMRG.h"
 #include "MPIchemps2.h"
+#include "Special.h"
 
 void CheMPS2::DMRG::update_safe_3rdm_operators(const int boundary){
 
@@ -82,20 +83,6 @@ void CheMPS2::DMRG::update_safe_3rdm_operators(const int boundary){
    
 }
 
-void CheMPS2::DMRG::tripletrianglefunction(const int global, int * jkl){
-
-   int cnt3 = 0;
-   while ( ((cnt3+1)*(cnt3+2)*(cnt3+3))/6 <= global ){ cnt3++; }
-   const int globalmin = global - (cnt3*(cnt3+1)*(cnt3+2))/6;
-   int cnt2 = 0;
-   while ( ((cnt2+1)*(cnt2+2))/2 <= globalmin ){ cnt2++; }
-   int cnt1 = globalmin - (cnt2*(cnt2+1))/2;
-   jkl[0] = cnt1;
-   jkl[1] = cnt2;
-   jkl[2] = cnt3;
-   
-}
-
 void CheMPS2::DMRG::update_3rdm_operators(const int boundary){
 
    struct timeval start, end;
@@ -150,10 +137,10 @@ void CheMPS2::DMRG::update_3rdm_operators(const int boundary){
       int jkl[] = { 0, 0, 0 };
       #pragma omp for schedule(static)
       for ( int global = 0; global < upperbound; global++ ){
-         tripletrianglefunction( global, jkl );
-         const int orb_j = jkl[0];
-         const int orb_k = jkl[1];
-         const int orb_l = jkl[2];
+         Special::invert_triangle_three( global, jkl );
+         const int orb_j = jkl[ 0 ];
+         const int orb_k = jkl[ 1 ];
+         const int orb_l = jkl[ 2 ];
          const int recalculate_global = orb_j + (orb_k*(orb_k+1))/2 + (orb_l*(orb_l+1)*(orb_l+2))/6;
          assert( global == recalculate_global );
          const int cnt1 = orb_k - orb_j;
@@ -192,18 +179,18 @@ void CheMPS2::DMRG::update_3rdm_operators(const int boundary){
                }
             }
          } else { // Update tensors
-            if (cnt1+cnt2>0){ tensor_3rdm_a_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1>0)     { tensor_3rdm_a_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1*cnt2>0){ tensor_3rdm_a_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt2>0)     { tensor_3rdm_b_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1*cnt2>0){ tensor_3rdm_b_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1*cnt2>0){ tensor_3rdm_b_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1+cnt2>0){ tensor_3rdm_c_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1+cnt2>0){ tensor_3rdm_c_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-            if (cnt1+cnt2>0){ tensor_3rdm_c_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
-                              tensor_3rdm_d_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem);
-                              tensor_3rdm_d_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem);
-            if (cnt2>0)     { tensor_3rdm_d_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], workmem); }
+            if (cnt1+cnt2>0){ tensor_3rdm_a_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1>0)     { tensor_3rdm_a_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1*cnt2>0){ tensor_3rdm_a_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_a_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt2>0)     { tensor_3rdm_b_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1*cnt2>0){ tensor_3rdm_b_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1*cnt2>0){ tensor_3rdm_b_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_b_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1+cnt2>0){ tensor_3rdm_c_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1+cnt2>0){ tensor_3rdm_c_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+            if (cnt1+cnt2>0){ tensor_3rdm_c_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_c_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
+                              tensor_3rdm_d_J0_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J0_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem);
+                              tensor_3rdm_d_J1_doublet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J1_doublet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem);
+            if (cnt2>0)     { tensor_3rdm_d_J1_quartet[index][cnt1][cnt2][cnt3]->update(tensor_3rdm_d_J1_quartet[index-1][cnt1][cnt2][cnt3-1], MPS[index], MPS[index], workmem); }
          }
 
 #ifdef CHEMPS2_MPI_COMPILATION //######( close loop j<=k<=l MPI )######//
@@ -445,11 +432,11 @@ void CheMPS2::DMRG::update_correlations_tensors(const int siteindex){
       timings[ CHEMPS2_TIME_TENS_ALLOC ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
 
       gettimeofday(&start, NULL);
-      newG->update(Gtensors[previousindex], MPS[siteindex-1], workmemLR);
-      newY->update(Ytensors[previousindex], MPS[siteindex-1], workmemLR);
-      newZ->update(Ztensors[previousindex], MPS[siteindex-1], workmemLR);
-      newK->update(Ktensors[previousindex], MPS[siteindex-1], workmemLR);
-      newM->update(Mtensors[previousindex], MPS[siteindex-1], workmemLR);
+      newG->update(Gtensors[previousindex], MPS[siteindex-1], MPS[siteindex-1], workmemLR);
+      newY->update(Ytensors[previousindex], MPS[siteindex-1], MPS[siteindex-1], workmemLR);
+      newZ->update(Ztensors[previousindex], MPS[siteindex-1], MPS[siteindex-1], workmemLR);
+      newK->update(Ktensors[previousindex], MPS[siteindex-1], MPS[siteindex-1], workmemLR);
+      newM->update(Mtensors[previousindex], MPS[siteindex-1], MPS[siteindex-1], workmemLR);
       gettimeofday(&end, NULL);
       timings[ CHEMPS2_TIME_TENS_CALC ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
       

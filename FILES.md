@@ -298,6 +298,8 @@ as parameters related to memory usage and convergence.
 
 [CheMPS2/include/chemps2/Sobject.h](CheMPS2/include/chemps2/Sobject.h) contains the definitions of the Sobject class.
 
+[CheMPS2/include/chemps2/Special.h](CheMPS2/include/chemps2/Special.h) contains special functions needed in various parts of the library.
+
 [CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
 SyBookkeeper class.
 

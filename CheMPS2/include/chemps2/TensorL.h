@@ -20,44 +20,49 @@
 #ifndef TENSORL_CHEMPS2_H
 #define TENSORL_CHEMPS2_H
 
-#include "Tensor.h"
 #include "TensorT.h"
-#include "TensorOperator.h"
-#include "SyBookkeeper.h"
+#include "TensorO.h"
 
 namespace CheMPS2{
 /** TensorL class.
     \author Sebastian Wouters <sebastianwouters@gmail.com>
     \date February 20, 2013
-    
+
     The TensorL class is a storage and manipulation class for a single contracted creator/annihilitor. */
    class TensorL : public TensorOperator{
 
       public:
-      
+
          //! Constructor
-         /** \param indexIn The boundary index
-             \param IdiffIn The irrep of the one creator ( sandwiched if TensorL ; to sandwich if TensorQ )
-             \param movingRightIn If true: sweep from left to right. If false: sweep from right to left
-             \param denBKIn The problem to be solved */
-         TensorL(const int indexIn, const int IdiffIn, const bool movingRightIn, const SyBookkeeper * denBKIn);
-         
+         /** \param boundary_index The boundary index
+             \param Idiff          The irrep of the one creator ( sandwiched if TensorL ; to sandwich if TensorQ )
+             \param moving_right   If true: sweep from left to right. If false: sweep from right to left
+             \param book_up        Symmetry bookkeeper of the upper MPS
+             \param book_down      Symmetry bookkeeper of the lower MPS */
+         TensorL( const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * book_up, const SyBookkeeper * book_down );
+
          //! Destructor
          virtual ~TensorL();
-         
-         //Make new TensorL (vs update)
-         /** \param denT TensorT from which the new TensorL should be made. */
-         void makenew(TensorT * denT);
-         
+
+         //! Create a new TensorL
+         /** \param mps_tensor TensorT from which the new TensorL should be made. Please not that this function assumes book_up == book_down. */
+         void create( TensorT * mps_tensor );
+
+         //! Create a new TensorL
+         /** \param mps_tensor_up   Upper TensorT from which the new TensorL should be made
+             \param mps_tensor_down Lower TensorT from which the new TensorL should be made
+             \param previous        Overlap matrix on the previous edge
+             \param workmem         Work memory of size max(dimLup,down) * max(dimRup,down) */
+         void create( TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous, double * workmem );
+
       private:
-      
-         //makenew when movingright
-         void makenewRight(TensorT * denT);
-      
-         //makenew when movingleft
-         void makenewLeft(TensorT * denT);
-         
-         
+
+         //! Make new when moving_right == true
+         void create_right( const int ikappa, TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous, double * workmem );
+
+         //! Make new when moving_right == false
+         void create_left( const int ikappa, TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous, double * workmem );
+
    };
 }
 

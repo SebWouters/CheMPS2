@@ -470,7 +470,6 @@ void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtil
          int jump_col = 0;
          for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
 
-            const int NORB_col = idx->getNORB( irrep_col );
             const int NOCC_col = idx->getNOCC( irrep_col );
             const int NACT_col = idx->getNDMRG( irrep_col );
             const int NVIR_col = idx->getNVIRT( irrep_col );
