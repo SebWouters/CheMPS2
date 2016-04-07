@@ -41,7 +41,7 @@ namespace CheMPS2{
          static void invert_triangle_two( const int global, int * result ){
 
             int j = 0;
-            while ( (( j + 1 ) * ( j + 2 )) / 2 <= global ){ j++; }
+            while ((( j + 1 ) * ( j + 2 )) <= ( 2 * global )){ j++; }
             result[ 1 ] = j;
             result[ 0 ] = global - ( j * ( j + 1 ) ) / 2;
 
@@ -53,10 +53,10 @@ namespace CheMPS2{
          static void invert_triangle_three( const int global, int * result ){
 
             int k = 0;
-            while ( (( k + 1 ) * ( k + 2 ) * ( k + 3 )) / 6 <= global ){ k++; }
+            while ((( k + 1 ) * ( k + 2 ) * ( k + 3 )) <= ( 6 * global )){ k++; }
             const int remainder = global - ( k * ( k + 1 ) * ( k + 2 ) ) / 6;
             int j = 0;
-            while ( (( j + 1 ) * ( j + 2 )) / 2 <= remainder ){ j++; }
+            while ((( j + 1 ) * ( j + 2 )) <= ( 2 * remainder )){ j++; }
             result[ 2 ] = k;
             result[ 1 ] = j;
             result[ 0 ] = remainder - ( j * ( j + 1 ) ) / 2;
