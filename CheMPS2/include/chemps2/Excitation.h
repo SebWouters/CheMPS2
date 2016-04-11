@@ -46,13 +46,10 @@ namespace CheMPS2{
              \param gamma     Prefactor of operator 1
              \param S_up      Where the result should be stored
              \param S_down    The original S-object
-             \param Lregular  Left  regular    L-tensor
-             \param Ltrans    Left  transposed L-tensor
-             \param Lovlp     Left  overlap
-             \param Rregular  Right regular    L-tensor
-             \param Rtrans    Right transposed L-tensor
-             \param Rovlp     Right overlap */
-         static double matvec( const SyBookkeeper * book_up, const SyBookkeeper * book_down, const int orb1, const int orb2, const double alpha, const double beta, const double gamma, Sobject * S_up, Sobject * S_down, TensorL * Lregular, TensorL * Ltrans, TensorO * Lovlp, TensorL * Rregular, TensorL * Rtrans, TensorO * Rovlp );
+             \param overlaps  Overlap tensors
+             \param regular   Regular    renormalized single quantized operator
+             \param trans     Transposed renormalized single quantized operator */
+         static double matvec( const SyBookkeeper * book_up, const SyBookkeeper * book_down, const int orb1, const int orb2, const double alpha, const double beta, const double gamma, Sobject * S_up, Sobject * S_down, TensorO ** overlaps, TensorL ** regular, TensorL ** trans );
 
       private:
 

@@ -28,7 +28,7 @@
 #include "Special.h"
 #include "Gsl.h"
 
-double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookkeeper * book_down, const int orb1, const int orb2, const double alpha, const double beta, const double gamma, Sobject * S_up, Sobject * S_down, TensorL * Lregular, TensorL * Ltrans, TensorO * Lovlp, TensorL * Rregular, TensorL * Rtrans, TensorO * Rovlp ){
+double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookkeeper * book_down, const int orb1, const int orb2, const double alpha, const double beta, const double gamma, Sobject * S_up, Sobject * S_down, TensorO ** overlaps, TensorL ** regular, TensorL ** trans ){
 
    const int indx = S_up->gIndex();
    assert( orb1 < orb2 );
@@ -59,9 +59,9 @@ double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookke
             for ( int dummy = 0; dummy < S_up->gNKappa(); dummy++ ){
                const int ikappa = S_up->gReorder( dummy );
                clear( ikappa, S_up );
-                first_left( ikappa, book_up, book_down, alpha, S_up, S_down, Rtrans );
-               second_left( ikappa, book_up, book_down, beta,  S_up, S_down, Rregular );
-               inproduct += third_left( ikappa, book_up, book_down, gamma, S_up, S_down, Rovlp, workmem1 );
+                first_left( ikappa, book_up, book_down, alpha, S_up, S_down,   trans[ indx + 1 ] );
+               second_left( ikappa, book_up, book_down, beta,  S_up, S_down, regular[ indx + 1 ] );
+               inproduct += third_left( ikappa, book_up, book_down, gamma, S_up, S_down, overlaps[ indx + 1 ], workmem1 );
             }
          } else {
             if ( orb2 == indx + 1 ){ // All the way at the right
@@ -69,9 +69,9 @@ double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookke
                for ( int dummy = 0; dummy < S_up->gNKappa(); dummy++ ){
                   const int ikappa = S_up->gReorder( dummy );
                   clear( ikappa, S_up );
-                   first_right( ikappa, book_up, book_down, alpha, S_up, S_down, Ltrans );
-                  second_right( ikappa, book_up, book_down, beta,  S_up, S_down, Lregular );
-                  inproduct += third_right( ikappa, book_up, book_down, gamma, S_up, S_down, Lovlp, workmem1 );
+                   first_right( ikappa, book_up, book_down, alpha, S_up, S_down,   trans[ indx - 1 ] );
+                  second_right( ikappa, book_up, book_down, beta,  S_up, S_down, regular[ indx - 1 ] );
+                  inproduct += third_right( ikappa, book_up, book_down, gamma, S_up, S_down, overlaps[ indx - 1 ], workmem1 );
                }
             } else { // Somewhere in the middle
                double * workmem2 = new double[ DIM * DIM ];
@@ -79,9 +79,9 @@ double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookke
                for ( int dummy = 0; dummy < S_up->gNKappa(); dummy++ ){
                   const int ikappa = S_up->gReorder( dummy );
                   clear( ikappa, S_up );
-                   first_middle( ikappa, book_up, book_down, alpha, S_up, S_down, Ltrans,   Rtrans,   workmem1 );
-                  second_middle( ikappa, book_up, book_down, beta,  S_up, S_down, Lregular, Rregular, workmem1 );
-                  inproduct += third_middle( ikappa, book_up, book_down, gamma, S_up, S_down, Lovlp, Rovlp, workmem1, workmem2 );
+                   first_middle( ikappa, book_up, book_down, alpha, S_up, S_down,   trans[ indx - 1 ],   trans[ indx + 1 ], workmem1 );
+                  second_middle( ikappa, book_up, book_down, beta,  S_up, S_down, regular[ indx - 1 ], regular[ indx + 1 ], workmem1 );
+                  inproduct += third_middle( ikappa, book_up, book_down, gamma, S_up, S_down, overlaps[ indx - 1 ], overlaps[ indx + 1 ], workmem1, workmem2 );
                }
                delete [] workmem2;
             }
@@ -191,7 +191,7 @@ double CheMPS2::Excitation::neighbours( const int ikappa, const SyBookkeeper * b
       double factor = gamma;
       daxpy_( &size, &factor, block_down, &inc1, block_up, &inc1 );
    }
-   const double inproduct = ddot_( &size, block_down, &inc1, block_up, &inc1 );
+   const double inproduct = ( TwoSR + 1 ) * ddot_( &size, block_down, &inc1, block_up, &inc1 );
    return inproduct;
 
 }
@@ -376,7 +376,7 @@ double CheMPS2::Excitation::third_left( const int ikappa, const SyBookkeeper * b
          double factor = gamma;
          daxpy_( &size, &factor, workmem, &inc1, block_up, &inc1 );
       }
-      inproduct = ddot_( &size, workmem, &inc1, block_up, &inc1 );
+      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem, &inc1, block_up, &inc1 );
    }
    return inproduct;
 
@@ -561,7 +561,7 @@ double CheMPS2::Excitation::third_right( const int ikappa, const SyBookkeeper * 
          double factor = gamma;
          daxpy_( &size, &factor, workmem, &inc1, block_up, &inc1 );
       }
-      inproduct = ddot_( &size, workmem, &inc1, block_up, &inc1 );
+      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem, &inc1, block_up, &inc1 );
    }
    return inproduct;
 
@@ -708,7 +708,7 @@ double CheMPS2::Excitation::third_middle( const int ikappa, const SyBookkeeper *
          double factor = gamma;
          daxpy_( &size, &factor, workmem2, &inc1, block_up, &inc1 );
       }
-      inproduct = ddot_( &size, workmem2, &inc1, block_up, &inc1 );
+      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem2, &inc1, block_up, &inc1 );
    }
    return inproduct;
 
