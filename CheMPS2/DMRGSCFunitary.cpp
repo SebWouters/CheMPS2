@@ -52,10 +52,8 @@ CheMPS2::DMRGSCFunitary::DMRGSCFunitary( const DMRGSCFindices * iHandler ) : DMR
 
 CheMPS2::DMRGSCFunitary::~DMRGSCFunitary(){
 
-   if ( x_linearlength != 0 ){
-      for ( int irrep = 0; irrep < num_irreps; irrep++ ){ delete [] jumper[ irrep ]; }
-      delete [] jumper;
-   }
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){ delete [] jumper[ irrep ]; }
+   delete [] jumper;
 
 }
 
