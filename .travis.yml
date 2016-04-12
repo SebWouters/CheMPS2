@@ -1,0 +1,23 @@
+language: cpp
+dist: trusty
+compiler:
+    - clang
+    - gcc
+env:
+    # should be limited to 4 on travis
+    - OMP_NUM_THREADS=4
+addons:
+  apt:
+    packages:
+        - libhdf5-dev
+        - libhdf5-7
+        - liblapack3
+        - liblapack-dev
+        - libgsl0-dev
+        - libgsl0ldbl
+install:
+    - mkdir build
+    - cd build
+    - cmake ..
+script:
+    - make test
