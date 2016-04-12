@@ -1,6 +1,6 @@
 #
 #   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-#   Copyright (C) 2013-2015 Sebastian Wouters
+#   Copyright (C) 2013-2016 Sebastian Wouters
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,13 +17,16 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "ConvergenceScheme.h" namespace "CheMPS2":
+cdef extern from "chemps2/ConvergenceScheme.h" namespace "CheMPS2":
     cdef cppclass ConvergenceScheme:
         ConvergenceScheme(const int) except +
         int getNInstructions()
         void setInstruction(const int, const int, const double, const int, const double)
-        int getD(const int)
-        double getEconv(const int)
-        int getMaxSweeps(const int)
-        double getNoisePrefactor(const int)
+        void set_instruction(const int, const int, const double, const int, const double, const double)
+        int get_D(const int)
+        double get_energy_conv(const int)
+        int get_max_sweeps(const int)
+        double get_noise_prefactor(const int)
+        double get_dvdson_rtol(const int)
+
 

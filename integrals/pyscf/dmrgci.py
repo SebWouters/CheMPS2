@@ -32,6 +32,9 @@ def dmrgci( mf , TwoS , Nelec , Irrep , DSU2 , Econv , MaxSweeps , NoisePrefac ,
         mo_fro = mf.mo_coeff[:, frozen]
     mo_act = mf.mo_coeff[:, active]
     Orbsym = np.array(symm.label_orb_symm(mf.mol, mf.mol.irrep_id, mf.mol.symm_orb, mf.mo_coeff))[active] # Same conventions in PySCF and CheMPS2
+    for cnt in range( len( Orbsym ) ):
+        # https://github.com/sunqm/pyscf/blob/master/symm/basis.py#L128
+        Orbsym[ cnt ] = Orbsym[ cnt ] % 10
     
     ###  Get the JK matrix for the doubly occupied frozen orbitals  ###
     if (len(frozen) > 0):

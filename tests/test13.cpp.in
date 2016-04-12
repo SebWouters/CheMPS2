@@ -1,0 +1,115 @@
+/*
+   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+   Copyright (C) 2013-2016 Sebastian Wouters
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+#include <iostream>
+#include <math.h>
+
+#include "Initialize.h"
+#include "DMRG.h"
+#include "MPIchemps2.h"
+
+using namespace std;
+
+int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
+
+   CheMPS2::Initialize::Init();
+
+   const int L = 8; //Number of single-particle states
+   double eps[] = { -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5 };
+   const double g = -1.0;
+   const double power = 0.0;
+
+   const int N = L;     //Number of fermions in the model
+   const int TwoS = 0;  //Twice the total spin
+   const int Irrep = 0; //No point group is used, Irrep should ALWAYS be zero.
+
+   //The convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
+   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->setInstruction(0,  100, 1e-10, 10, 0.5 );
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0 );
+
+   /*
+   Model: h_ij = delta_ij eps[i]
+          v_ijkl = delta_ij delta_kl g ( eps[i] * eps[k] ) ^ {power}
+          h_ijkl = v_ijkl + ( delta_ik h_jl + delta_jl h_ik ) / ( N - 1 )
+          Ham = 0.5 sum_ijkl h_ijkl sum_sigma,tau a^+_{i,sigma} a^+_{j,tau} a_{l,tau} a_{k,sigma}
+   */
+
+   // C1 point group symmetry
+   const int group = 0;
+   int * irreps = new int[ L ];
+   for ( int orb = 0; orb < L; orb++ ){ irreps[ orb ] = 0; }
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( L, group, irreps ); // The Hamiltonian initializes all its matrix elements to zero
+   delete [] irreps;
+
+   CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
+   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme); // Prob->construct_mxelem() is called now
+   for ( int orb1 = 0; orb1 < L; orb1++ ){
+      for ( int orb2 = 0; orb2 < L; orb2++ ){
+         const double eri = g * pow( fabs( eps[ orb1 ] * eps[ orb2 ] ), power );
+         const double oei = ( eps[ orb1 ] + eps[ orb2 ] ) / ( N - 1 );
+         if ( orb1 == orb2 ){
+            Prob->setMxElement( orb1, orb1, orb2, orb2, eri + oei );
+         } else {
+            Prob->setMxElement( orb1, orb1, orb2, orb2, eri );
+            Prob->setMxElement( orb1, orb2, orb1, orb2, oei );
+         }
+      }
+   }
+   theDMRG->PreSolve(); // New matrix elements require reconstruction of complementary renormalized operators
+   const double Energy = theDMRG->Solve();
+   theDMRG->calc2DMandCorrelations();
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      theDMRG->getCorrelations()->Print();
+   }
+
+   //Clean up DMRG
+   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+   delete theDMRG;
+   delete OptScheme;
+   delete Prob;
+   delete Ham;
+
+   //Check succes
+   const bool success = ( fabs( Energy + 25.5134137600604 ) < 1e-8 ) ? true : false;
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+
+   cout << "================> Did test 13 succeed : ";
+   if (success){
+      cout << "yes" << endl;
+      return 0; //Success
+   }
+   cout << "no" << endl;
+   return 7; //Fail
+
+}
+
+

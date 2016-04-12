@@ -1,6 +1,6 @@
 #
 #   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-#   Copyright (C) 2013-2015 Sebastian Wouters
+#   Copyright (C) 2013-2016 Sebastian Wouters
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 cimport Ham
 
-cdef extern from "Problem.h" namespace "CheMPS2":
+cdef extern from "chemps2/Problem.h" namespace "CheMPS2":
     cdef cppclass Problem:
         Problem(const Ham.Hamiltonian *, const int, const int, const int) except +
         int gL()
@@ -30,5 +30,6 @@ cdef extern from "Problem.h" namespace "CheMPS2":
         int gIrrep()
         double gEconst()
         double gMxElement(const int, const int, const int, const int)
+        void setMxElement(const int, const int, const int, const int, const double)
         void SetupReorderD2h()
 

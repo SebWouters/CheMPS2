@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 #include "Correlations.h"
 #include "Lapack.h"
+#include "MPIchemps2.h"
 
 using std::cout;
 using std::cerr;
@@ -40,27 +41,24 @@ CheMPS2::Correlations::Correlations(const SyBookkeeper * denBKIn, const Problem 
    
    L = denBK->gL();
    
-   OneRDM    = new double[L*L];
    Cspin     = new double[L*L];
    Cdens     = new double[L*L];
    Cspinflip = new double[L*L];
    Cdirad    = new double[L*L];
    MutInfo   = new double[L*L];
    
-   for (int cnt=0; cnt<L*L; cnt++){ OneRDM[cnt]    = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cspin[cnt]     = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cdens[cnt]     = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cspinflip[cnt] = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ Cdirad[cnt]    = 0.0; }
    for (int cnt=0; cnt<L*L; cnt++){ MutInfo[cnt]   = 0.0; }
    
-   FillOneRDMSpinDensSpinflip();
+   FillSpinDensSpinflip();
 
 }
 
 CheMPS2::Correlations::~Correlations(){
 
-   delete [] OneRDM;
    delete [] Cspin;
    delete [] Cdens;
    delete [] Cspinflip;
@@ -69,33 +67,22 @@ CheMPS2::Correlations::~Correlations(){
 
 }
 
-void CheMPS2::Correlations::FillOneRDMSpinDensSpinflip(){
-
-   //OneRDM
-   const double prefactor = 1.0 / ( Prob->gN() - 1.0 );
-   for (int row=0; row<L; row++){
-      for (int col=row; col<L; col++){
-         OneRDM[row + L*col] = 0.0;
-         for (int third=0; third<L; third++){ OneRDM[row + L*col] += the2DM->getTwoDMA_DMRG(row,third,col,third); }
-         OneRDM[row + L*col] *= prefactor;
-         OneRDM[col + L*row] = OneRDM[row + L*col];
-      }
-   }
+void CheMPS2::Correlations::FillSpinDensSpinflip(){
    
    //Spin
    for (int row=0; row<L; row++){
       for (int col=0; col<L; col++){
          Cspin[row + L*col] = the2DM->getTwoDMB_DMRG(row,col,row,col);
       }
-      Cspin[row + L*row] += OneRDM[row + L*row];
+      Cspin[row + L*row] += the2DM->get1RDM_DMRG(row, row);
    }
    
    //Density
    for (int row=0; row<L; row++){
       for (int col=0; col<L; col++){
-         Cdens[row + L*col] = the2DM->getTwoDMA_DMRG(row,col,row,col) - OneRDM[row + L*row] * OneRDM[col + L*col];
+         Cdens[row + L*col] = the2DM->getTwoDMA_DMRG(row,col,row,col) - the2DM->get1RDM_DMRG(row, row) * the2DM->get1RDM_DMRG(col, col);
       }
-      Cdens[row + L*row] += OneRDM[row + L*row];
+      Cdens[row + L*row] += the2DM->get1RDM_DMRG(row, row);
    }
    
    //Spin-flip
@@ -103,14 +90,14 @@ void CheMPS2::Correlations::FillOneRDMSpinDensSpinflip(){
       for (int col=0; col<L; col++){
          Cspinflip[row + L*col] = 0.5 * ( the2DM->getTwoDMB_DMRG(row,col,col,row) - the2DM->getTwoDMA_DMRG(row,col,col,row) );
       }
-      Cspinflip[row + L*row] += OneRDM[row + L*row];
+      Cspinflip[row + L*row] += the2DM->get1RDM_DMRG(row, row);
    }
    
    //Singlet diradical: partial fill
    for (int row=0; row<L; row++){
       for (int col=0; col<L; col++){
-         Cdirad[row + L*col] = - 0.5 * ( OneRDM[row + L*row] - the2DM->getTwoDMA_DMRG(row,row,row,row) )
-                                     * ( OneRDM[col + L*col] - the2DM->getTwoDMA_DMRG(col,col,col,col) );
+         Cdirad[row + L*col] = - 0.5 * ( the2DM->get1RDM_DMRG(row, row) - the2DM->getTwoDMA_DMRG(row,row,row,row) )
+                                     * ( the2DM->get1RDM_DMRG(col, col) - the2DM->getTwoDMA_DMRG(col,col,col,col) );
       }
    }
 
@@ -121,7 +108,7 @@ double CheMPS2::Correlations::getCspin_DMRG(const int row, const int col) const{
 double CheMPS2::Correlations::getCspin_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCspin_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCspin_DMRG( row, col );
@@ -133,7 +120,7 @@ double CheMPS2::Correlations::getCdens_DMRG(const int row, const int col) const{
 double CheMPS2::Correlations::getCdens_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCdens_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCdens_DMRG( row, col );
@@ -145,7 +132,7 @@ double CheMPS2::Correlations::getCspinflip_DMRG(const int row, const int col) co
 double CheMPS2::Correlations::getCspinflip_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCspinflip_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCspinflip_DMRG( row, col );
@@ -157,7 +144,7 @@ double CheMPS2::Correlations::getCdirad_DMRG(const int row, const int col) const
 double CheMPS2::Correlations::getCdirad_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getCdirad_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getCdirad_DMRG( row, col );
@@ -169,7 +156,7 @@ double CheMPS2::Correlations::getMutualInformation_DMRG(const int row, const int
 double CheMPS2::Correlations::getMutualInformation_HAM(const int row, const int col) const{
 
    //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return getMutualInformation_DMRG( Prob->gf1(row), Prob->gf1(col) );
    }
    return getMutualInformation_DMRG( row, col );
@@ -179,7 +166,7 @@ double CheMPS2::Correlations::getMutualInformation_HAM(const int row, const int 
 double CheMPS2::Correlations::SingleOrbitalEntropy_DMRG(const int index) const{
 
    const double val4  = 0.5 * the2DM->getTwoDMA_DMRG(index,index,index,index);
-   const double val23 = 0.5 * ( OneRDM[index + L*index] - the2DM->getTwoDMA_DMRG(index,index,index,index) );
+   const double val23 = 0.5 * ( the2DM->get1RDM_DMRG(index, index) - the2DM->getTwoDMA_DMRG(index,index,index,index) );
    const double val1  = 1.0 - val4 - 2*val23;
    
    if (val1  < 0.0){ cerr << "   Correlations::SingleOrbitalEntropy : Warning : val1  for orbital " << index << " = " << val1  << endl; }
@@ -196,7 +183,7 @@ double CheMPS2::Correlations::SingleOrbitalEntropy_DMRG(const int index) const{
 
 double CheMPS2::Correlations::SingleOrbitalEntropy_HAM(const int index) const{
 
-   if ( Prob->gReorderD2h() ){
+   if ( Prob->gReorder() ){
       return SingleOrbitalEntropy_DMRG( Prob->gf1(index) );
    }
    return SingleOrbitalEntropy_DMRG( index );
@@ -209,7 +196,7 @@ double CheMPS2::Correlations::MutualInformationDistance(const double power) cons
    for (int row=0; row<L; row++){
       for (int col=0; col<L; col++){
          if (row != col){
-            Idist += MutInfo[row + L*col] * pow( fabs( row - col ) , power );
+            Idist += MutInfo[row + L*col] * pow(abs(row - col), power);
          }
       }
    }
@@ -217,7 +204,17 @@ double CheMPS2::Correlations::MutualInformationDistance(const double power) cons
 
 }
 
-void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorK ** Ktensors, TensorM ** Mtensors){
+#ifdef CHEMPS2_MPI_COMPILATION
+void CheMPS2::Correlations::mpi_broadcast(){
+
+   int size = L*L;
+   MPIchemps2::broadcast_array_double( MutInfo, size, MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_array_double( Cdirad,  size, MPI_CHEMPS2_MASTER );
+
+}
+#endif
+
+void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, TensorGYZ ** Ytensors, TensorGYZ ** Ztensors, TensorKM ** Ktensors, TensorKM ** Mtensors){
 
    const int theindex = denT->gIndex();
    const int MAXDIM = max(denBK->gMaxDimAtBound(theindex), denBK->gMaxDimAtBound(theindex+1));
@@ -300,12 +297,12 @@ void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, Tens
       
       if (CheMPS2::CORRELATIONS_debugPrint){
          const double RDM_1orb_prev_4  = 0.5 * the2DM->getTwoDMA_DMRG(previousindex,previousindex,previousindex,previousindex);
-         const double RDM_1orb_prev_23 = 0.5 * (   OneRDM[previousindex + L*previousindex]
+         const double RDM_1orb_prev_23 = 0.5 * (   the2DM->get1RDM_DMRG(previousindex, previousindex)
                                                  - the2DM->getTwoDMA_DMRG(previousindex,previousindex,previousindex,previousindex) );
          const double RDM_1orb_prev_1  = 1.0 - RDM_1orb_prev_4 - 2*RDM_1orb_prev_23;
          
          const double RDM_1orb_curr_4  = 0.5 * the2DM->getTwoDMA_DMRG(theindex,theindex,theindex,theindex);
-         const double RDM_1orb_curr_23 = 0.5 * ( OneRDM[theindex + L*theindex] - the2DM->getTwoDMA_DMRG(theindex,theindex,theindex,theindex) );
+         const double RDM_1orb_curr_23 = 0.5 * ( the2DM->get1RDM_DMRG(theindex, theindex) - the2DM->getTwoDMA_DMRG(theindex,theindex,theindex,theindex) );
          const double RDM_1orb_curr_1  = 1.0 - RDM_1orb_curr_4 - 2*RDM_1orb_curr_23;
          
          cout << "   Correlations::FillSite : Looking at DMRG sites (" << previousindex << "," << theindex << ")." << endl;
@@ -477,7 +474,7 @@ double CheMPS2::Correlations::diagram3(TensorT * denT, TensorGYZ * denG, double 
 
 }
 
-double CheMPS2::Correlations::diagram4(TensorT * denT, TensorSwap * denK, double * workmem) const{ //checked
+double CheMPS2::Correlations::diagram4(TensorT * denT, TensorKM * denK, double * workmem) const{ //checked
 
    const int theindex = denT->gIndex();
    
@@ -523,7 +520,7 @@ double CheMPS2::Correlations::diagram4(TensorT * denT, TensorSwap * denK, double
 
 }
 
-double CheMPS2::Correlations::diagram5(TensorT * denT, TensorSwap * denM, double * workmem) const{ //checked
+double CheMPS2::Correlations::diagram5(TensorT * denT, TensorKM * denM, double * workmem) const{ //checked
 
    const int theindex = denT->gIndex();
    
@@ -591,8 +588,8 @@ void CheMPS2::Correlations::PrintTableNice(const double * table, const int sPrec
                thestream << prefix << " 0 ";
                for (int cnt=0; cnt<sPrecision; cnt++){ thestream << " "; }
             } else {
-               int row2 = (Prob->gReorderD2h()) ? Prob->gf1(row) : row;
-               int col2 = (Prob->gReorderD2h()) ? Prob->gf1(col) : col;
+               int row2 = (Prob->gReorder()) ? Prob->gf1(row) : row;
+               int col2 = (Prob->gReorder()) ? Prob->gf1(col) : col;
                if (table[row2 + L*col2] < 0.0){
                   thestream << prefix        << table[row2 + L*col2];
                } else {

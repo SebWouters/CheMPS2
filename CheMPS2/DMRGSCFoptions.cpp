@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@ CheMPS2::DMRGSCFoptions::DMRGSCFoptions(){
    DIISGradientBranch = CheMPS2::DMRGSCF_DIISgradientBranch;
    NumDIISVecs        = CheMPS2::DMRGSCF_numDIISvecs;
    StoreDIIS          = CheMPS2::DMRGSCF_storeDIIS;
-   DIISStorageName    = CheMPS2::DMRGSCF_DIISstorageName;
+   DIISStorageName    = CheMPS2::DMRGSCF_diis_storage_name;
    
    MaxIterations      = CheMPS2::DMRGSCF_maxIterations;
    GradientThreshold  = CheMPS2::DMRGSCF_gradientNormThreshold;
    StoreUnitary       = CheMPS2::DMRGSCF_storeUnitary;
-   UnitaryStorageName = CheMPS2::DMRGSCF_unitaryStorageName;
+   UnitaryStorageName = CheMPS2::DMRGSCF_unitary_storage_name;
    StateAveraging     = CheMPS2::DMRGSCF_stateAveraged;
    
    WhichActiveSpace   = CheMPS2::DMRGSCF_whichActiveSpace;

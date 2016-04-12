@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -134,8 +134,8 @@ string CheMPS2::Irreps::getIrrepNamePrivate(const int nGroup, const int nIrrep){
    }
    
    if (nGroup == 3){
-      if (nIrrep == 0) return "A'";
-      if (nIrrep == 1) return "A\"";
+      if (nIrrep == 0) return "Ap";
+      if (nIrrep == 1) return "App";
    }
    
    if (nGroup == 4){
@@ -171,6 +171,47 @@ string CheMPS2::Irreps::getIrrepNamePrivate(const int nGroup, const int nIrrep){
    }
    
    return "error2";
+
+}
+
+void CheMPS2::Irreps::symm_psi2molpro( int * psi2molpro ) const{
+
+   if (!isActivated) return;
+   symm_psi2molpro( psi2molpro, getGroupName() );
+
+}
+
+void CheMPS2::Irreps::symm_psi2molpro( int * psi2molpro, const string SymmLabel ){
+
+   if ( SymmLabel.compare("c1")==0 ){
+      psi2molpro[0] = 1;
+   }
+   if ( ( SymmLabel.compare("ci")==0 ) || ( SymmLabel.compare("c2")==0 ) || ( SymmLabel.compare("cs")==0 ) ){
+      psi2molpro[0] = 1;
+      psi2molpro[1] = 2;
+   }
+   if ( ( SymmLabel.compare("d2")==0 ) ){
+      psi2molpro[0] = 1;
+      psi2molpro[1] = 4;
+      psi2molpro[2] = 3;
+      psi2molpro[3] = 2;
+   }
+   if ( ( SymmLabel.compare("c2v")==0 ) || ( SymmLabel.compare("c2h")==0 ) ){
+      psi2molpro[0] = 1;
+      psi2molpro[1] = 4;
+      psi2molpro[2] = 2;
+      psi2molpro[3] = 3;
+   }
+   if ( ( SymmLabel.compare("d2h")==0 ) ){
+      psi2molpro[0] = 1;
+      psi2molpro[1] = 4;
+      psi2molpro[2] = 6;
+      psi2molpro[3] = 7;
+      psi2molpro[4] = 8;
+      psi2molpro[5] = 5;
+      psi2molpro[6] = 3;
+      psi2molpro[7] = 2;
+   }
 
 }
 

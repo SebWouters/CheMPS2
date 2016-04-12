@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,9 +22,14 @@
 
 #include "Heff.h"
 #include "Lapack.h"
+#include "MPIchemps2.h"
 #include "Gsl.h"
 
 void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -49,7 +54,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5A1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A1 ) == MPIRANK ) && (N1==0) && (N2==0)){
+   #else
    if ((N1==0) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -90,8 +99,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -119,7 +128,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
 
    //5A2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A2 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -166,8 +179,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -194,7 +207,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
    
    //5A3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A3 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -241,8 +258,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -269,7 +286,11 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
    }
    
    //5A4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5A4 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -309,8 +330,8 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                              
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                 double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -338,6 +359,10 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -360,7 +385,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5B1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B1 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -400,8 +429,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                 double prefac =         factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                               + ((TwoJ==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -426,7 +455,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
 
    //5B2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B2 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -473,8 +506,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -501,7 +534,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
    
    //5B3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B3 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -547,8 +584,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                    double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta);
+                                    double prefac = factor1 * Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                  + factor2 * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -575,7 +612,11 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
    }
    
    //5B4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5B4 ) == MPIRANK ) && (N1==2) && (N2==2)){
+   #else
    if ((N1==2) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -616,8 +657,8 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                               
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
-                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, theindex, theindex+1, l_beta) );
+                                       double prefac =             factor * ( Prob->gMxElement(l_alpha, l_beta, theindex, theindex+1) 
+                                                     + ((TwoJdown==0)?1:-1) * Prob->gMxElement(l_alpha, l_beta, theindex+1, theindex) );
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -647,6 +688,10 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -670,7 +715,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5C1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C1 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -738,7 +787,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
 
    //5C2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C2 ) == MPIRANK ) && (N1==2) && (N2==0)){
+   #else
    if ((N1==2) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -808,7 +861,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
    
    //5C3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C3 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -875,7 +932,11 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
    }
    
    //5C4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5C4 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -945,6 +1006,10 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -968,7 +1033,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5D1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D1 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1037,7 +1106,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
 
    //5D2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D2 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1104,7 +1177,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
    
    //5D3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D3 ) == MPIRANK ) && (N1==0) && (N2==2)){
+   #else
    if ((N1==0) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1174,7 +1251,11 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
    }
    
    //5D4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5D4 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1244,6 +1325,10 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -1267,7 +1352,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5E1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E1 ) == MPIRANK ) && (N1==0) && (N2==1)){
+   #else
    if ((N1==0) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1308,7 +1397,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha,theindex+1,theindex,l_beta)
-                                                  + factor2 * Prob->gMxElement(l_alpha,theindex,l_beta,theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha,theindex+1,l_beta,theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1334,7 +1423,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
 
    //5E2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E2 ) == MPIRANK ) && (N1==0) && (N2==2)){
+   #else
    if ((N1==0) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1377,7 +1470,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                        double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                     + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -1404,7 +1497,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
    
    //5E3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E3 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1446,7 +1543,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                  double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                               + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -1471,7 +1568,11 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
    }
    
    //5E4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5E4 ) == MPIRANK ) && (N1==1) && (N2==2)){
+   #else
    if ((N1==1) && (N2==2)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1512,7 +1613,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR-1,TwoSRdown,IRdown,NR,TwoSR,IR);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1541,6 +1642,10 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
 
 void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
+
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
    int IL = denS->gIL(ikappa);
@@ -1564,7 +1669,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    int IprodMID = Irreps::directProd(denBK->gIrrep(theindex),denBK->gIrrep(theindex+1));
    
    //5F1
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F1 ) == MPIRANK ) && (N1==1) && (N2==0)){
+   #else
    if ((N1==1) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1605,7 +1714,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha,theindex+1,theindex,l_beta)
-                                                  + factor2 * Prob->gMxElement(l_alpha,theindex,l_beta,theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha,theindex+1,l_beta,theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }
@@ -1631,7 +1740,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
 
    //5F2
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F2 ) == MPIRANK ) && (N1==1) && (N2==1)){
+   #else
    if ((N1==1) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
@@ -1672,7 +1785,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                            for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                               if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                  double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                               + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                               + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                  double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                  daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                               }
@@ -1697,7 +1810,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
    
    //5F3
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F3 ) == MPIRANK ) && (N1==2) && (N2==0)){
+   #else
    if ((N1==2) && (N2==0)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1739,7 +1856,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                                  for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                     if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                        double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                     + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                     + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                        double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                        daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                     }
@@ -1766,7 +1883,11 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
    }
    
    //5F4
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( MPIchemps2::owner_specific_diagram( Prob->gL(), MPI_CHEMPS2_5F4 ) == MPIRANK ) && (N1==2) && (N2==1)){
+   #else
    if ((N1==2) && (N2==1)){
+   #endif
    
       for (int TwoSLdown=TwoSL-1; TwoSLdown<=TwoSL+1; TwoSLdown+=2){
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
@@ -1807,7 +1928,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
                               for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                                  if (denBK->gIrrep(l_beta) == IrrepTimesMid){
                                     double prefac = factor1 * Prob->gMxElement(l_alpha, theindex+1, theindex, l_beta) 
-                                                  + factor2 * Prob->gMxElement(l_alpha, theindex, l_beta, theindex+1);
+                                                  + factor2 * Prob->gMxElement(l_alpha, theindex+1, l_beta, theindex);
                                     double * LblockR = Lright[l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR+1,TwoSRdown,IRdown);
                                     daxpy_(&size,&prefac,LblockR,&inc,temp,&inc);
                                  }

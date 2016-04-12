@@ -1,15 +1,11 @@
-#include <libplugin/plugin.h>
 #include <psi4-dec.h>
-#include <libdpd/dpd.h>
-#include <psifiles.h>
-#include <libpsio/psio.hpp>
-#include <libiwl/iwl.hpp>
-#include <libtrans/integraltransform.h>
-#include <libmints/wavefunction.h>
-#include <libmints/mints.h>
-#include <libciomr/libciomr.h>
+#include <libparallel/parallel.h>
 #include <liboptions/liboptions.h>
-#include <libchkpt/chkpt.h>
+#include <libmints/mints.h>
+#include <libpsio/psio.hpp>
+#include <libdpd/dpd.h>
+#include <libtrans/integraltransform.h>
+#include <libiwl/iwl.hpp>
 
 #include <stdlib.h>
 #include <iostream>
@@ -18,17 +14,13 @@
 #include "chemps2/Hamiltonian.h"
 #include "chemps2/Problem.h"
 
-using namespace std;
-
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
 
-INIT_PLUGIN
-
 namespace psi{ namespace savehdf{
 
-extern "C" int
-read_options(std::string name, Options &options)
+extern "C"
+int read_options(std::string name, Options &options)
 {
     if (name == "SAVEHDF"|| options.read_globals()) {
         /*- The amount of information printed
@@ -40,28 +32,24 @@ read_options(std::string name, Options &options)
 }
 
 
-extern "C" PsiReturnType
-savehdf(Options &options)
+extern "C"
+SharedWavefunction savehdf(SharedWavefunction wfn, Options& options)
 {
     /*
      * This plugin shows a simple way of obtaining MO basis integrals, directly from a DPD buffer.  It is also
      * possible to generate integrals with labels (IWL) formatted files, but that's not shown here.
      */
     int print = options.get_int("PRINT");
-   
+
     // Grab the global (default) PSIO object, for file I/O
     boost::shared_ptr<PSIO> psio(_default_psio_lib_);
 
-    // Now we want the reference (SCF) wavefunction
-    boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
-    if(!wfn) throw PSIEXCEPTION("SCF has not been run yet!");
-    
     /*MoldenWriter mollie(wfn);
     mollie.write("infoForMolden.txt");*/ //Please call the MoldenWriter from the psi4 input file from now on.
-    
+
     // Quickly check that there are no open shell orbitals here...
     int nirrep  = wfn->nirrep();
-    
+
     // For now, we'll just transform for closed shells and generate all integrals.  For more elaborate use of the
     // LibTrans object, check out the plugin_mp2 example.
     std::vector<boost::shared_ptr<MOSpace> > spaces;
@@ -72,11 +60,11 @@ savehdf(Options &options)
     dpd_set_default(ints.get_dpd_id());
     
     //Readin the MO OEI in moOei & print everything
-    int nmo       = Process::environment.wavefunction()->nmo();
-    int nIrreps   = Process::environment.wavefunction()->nirrep();
-    int *orbspi   = Process::environment.wavefunction()->nmopi();
-    int *docc     = Process::environment.wavefunction()->doccpi();
-    int *socc     = Process::environment.wavefunction()->soccpi();
+    int nmo       = wfn->nmo();
+    int nIrreps   = wfn->nirrep();
+    int *orbspi   = wfn->nmopi();
+    int *docc     = wfn->doccpi();
+    int *socc     = wfn->soccpi();
     
     int nTriMo = nmo * (nmo + 1) / 2;
     double *temp = new double[nTriMo];
@@ -88,7 +76,7 @@ savehdf(Options &options)
 
     int SyGroup = 0;
     bool stopFindGN = false;
-    std::string SymmLabel = Process::environment.molecule()->sym_label();
+    std::string SymmLabel = wfn->molecule()->sym_label();
     do {
         if (SymmLabel.compare(CheMPS2::Irreps::getGroupName(SyGroup))==0) stopFindGN = true;
         else SyGroup += 1;
@@ -110,7 +98,7 @@ savehdf(Options &options)
     CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(nmo,SyGroup,orbitalIrreps);
     delete [] orbitalIrreps;
     
-    double NuclRepulsion =  Process::environment.molecule()->nuclear_repulsion_energy();
+    double NuclRepulsion = wfn->molecule()->nuclear_repulsion_energy();
     Ham->setEconst(NuclRepulsion);
     double EnergyHF = NuclRepulsion;
     
@@ -221,7 +209,7 @@ savehdf(Options &options)
     delete Ham;
     delete [] temp;
 
-    return Success;
+    return wfn;
 }
 
 }} // End Namespaces

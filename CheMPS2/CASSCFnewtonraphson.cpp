@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,9 +27,10 @@
 
 #include "CASSCF.h"
 #include "Lapack.h"
-#include "DMRGSCFVmatRotations.h"
+#include "DMRGSCFrotations.h"
 #include "EdmistonRuedenberg.h"
 #include "Davidson.h"
+#include "FCI.h"
 
 using std::string;
 using std::ifstream;
@@ -37,200 +38,212 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::doCASSCFnewtonraphson(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions){
+void CheMPS2::CASSCF::delete_file( const string filename ){
 
-   //Convergence variables
+   struct stat file_info;
+   const int thestat = stat( filename.c_str(), &file_info );
+   if ( thestat == 0 ){
+      const string temp = "rm " + filename;
+      int info = system( temp.c_str() );
+      cout << "Info on system( " << temp << " ) = " << info << endl;
+   } else {
+      cout << "No file " << filename << " found." << endl;
+   }
+
+}
+
+double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options ){
+
+   const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
+   assert( num_elec >= 0 );
+   assert(( OptScheme != NULL ) || (( OptScheme == NULL ) && ( rootNum == 1 )));
+
+   // Convergence variables
    double gradNorm = 1.0;
    double updateNorm = 1.0;
-   double * gradient = new double[unitary->getNumVariablesX()];
-   for (int cnt=0; cnt<unitary->getNumVariablesX(); cnt++){ gradient[cnt] = 0.0; }
-   double * theDIISparameterVector = NULL;
-   int theDIISvectorParamSize = 0;
+   double * gradient = new double[ unitary->getNumVariablesX() ];
+   for ( int cnt = 0; cnt < unitary->getNumVariablesX(); cnt++ ){ gradient[ cnt ] = 0.0; }
+   double * diis_vec = NULL;
    double Energy = 1e8;
-   
-   //The CheMPS2::Problem for the inner DMRG calculation
+
+   // The CheMPS2::Problem for the inner DMRG calculation
    Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
-   int N = Nelectrons;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){ N -= 2*iHandler->getNOCC(irrep); }
-   Problem * Prob = new Problem(HamDMRG, TwoS, N, Irrep);
+   Problem * Prob = new Problem(HamDMRG, TwoS, num_elec, Irrep);
    Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
-   
-   //Determine the maximum NORB(irrep); and the maximum NORB(irrep) which is OK according to the cutoff.
-   int maxlinsize   = 0;
-   int maxlinsizeOK = 0;
-   for (int irrep=0; irrep<numberOfIrreps; irrep++){
-      const int linsize_irrep = iHandler->getNORB(irrep);
-      theDIISvectorParamSize += linsize_irrep*(linsize_irrep-1)/2;
-      if  (linsize_irrep > maxlinsize  )                                                         {  maxlinsize  = linsize_irrep; }
-      if ((linsize_irrep > maxlinsizeOK) && (linsize_irrep <= CheMPS2::DMRGSCF_maxlinsizeCutoff)){ maxlinsizeOK = linsize_irrep; }
-   }
-   const bool doBlockWise = (maxlinsize <= CheMPS2::DMRGSCF_maxlinsizeCutoff) ? false : true; //Only if bigger, do we want to work blockwise
-   
-   //Determine the blocksize for the 2-body transformation
-   int maxBlockSize = maxlinsize;
-   if (doBlockWise){
-      int factor   = (int) (ceil( (1.0 * maxlinsize) / CheMPS2::DMRGSCF_maxlinsizeCutoff ) + 0.01);
-      maxBlockSize = max( (int) (ceil( (1.0 * maxlinsize) / factor ) + 0.01) , maxlinsizeOK ); //If a particular index can be rotated at once....
-      cout << "DMRGSCF info: The max. # orb per irrep           = " << maxlinsize << endl;
-      cout << "              The size cutoff for 2-body transfo = " << CheMPS2::DMRGSCF_maxlinsizeCutoff << endl;
-      cout << "              The max. # orb per irrep <= cutoff = " << maxlinsizeOK << endl;
-      cout << "              The blocksize for piecewise tfo    = " << maxBlockSize << endl;
-   }
-   
-   //Allocate 2-body rotation memory: One array is approx (maxBlockSize/273.0)^4 * 42 GiB --> [maxBlockSize=100 --> 750 MB]
-   const int maxBSpower4 = maxBlockSize * maxBlockSize * maxBlockSize * maxBlockSize; //Note that 273**4 overfloats the 32 bit integer!!!
-   const int nOrbDMRGpower4 = nOrbDMRG*nOrbDMRG*nOrbDMRG*nOrbDMRG;
-   const int sizeWorkmem = max( max( maxBSpower4 , maxlinsize*maxlinsize*4 ) , nOrbDMRGpower4 ); //For (2-body tfo, updateUnitary, calcNOON, rotate2DM, rotateUnitaryNOeigenvecs)
-   double * mem1 = new double[sizeWorkmem];
-   double * mem2 = new double[sizeWorkmem];
-   double * mem3 = NULL;
-   if (doBlockWise){ mem3 = new double[maxBSpower4]; }
-   
+
+   // Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
+   const int maxlinsize      = iHandler->getNORBmax();
+   const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );
+   const string tmp_filename = CheMPS2::defaultTMPpath + "/" + CheMPS2::DMRGSCF_eri_storage_name;
+   const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
+   //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+   const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
+   const int work_mem_size = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
+   double * mem1 = new double[ work_mem_size ];
+   double * mem2 = new double[ work_mem_size ];
+
    //The two-body rotator and Edmiston-Ruedenberg active space localizer
-   DMRGSCFVmatRotations theRotator(HamOrig, iHandler);
    EdmistonRuedenberg * theLocalizer = NULL;
-   if (theDMRGSCFoptions->getWhichActiveSpace()==2){ theLocalizer = new EdmistonRuedenberg(HamDMRG); }
-   
+   if ( scf_options->getWhichActiveSpace() == 2 ){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
+
    //Load unitary from disk
-   if (theDMRGSCFoptions->getStoreUnitary()){
-      struct stat stFileInfo;
-      int intStat = stat((theDMRGSCFoptions->getUnitaryStorageName()).c_str(),&stFileInfo);
-      if (intStat==0){ unitary->loadU(theDMRGSCFoptions->getUnitaryStorageName()); }
+   if ( scf_options->getStoreUnitary() ){
+      struct stat file_info;
+      int master_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
+      if ( master_stat == 0 ){ unitary->loadU( scf_options->getUnitaryStorageName() ); }
    }
-   
+
    //Load DIIS from disk
-   if ((theDMRGSCFoptions->getDoDIIS()) && (theDMRGSCFoptions->getStoreDIIS())){
-      struct stat stFileInfo;
-      int intStat = stat((theDMRGSCFoptions->getDIISStorageName()).c_str(),&stFileInfo);
-      if (intStat==0){
-         if (theDIIS == NULL){
-            theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-            theDIISparameterVector = new double[ theDIISvectorParamSize ];
-         }
-         theDIIS->loadDIIS(theDMRGSCFoptions->getDIISStorageName());
+   DIIS * diis = NULL;
+   if (( scf_options->getDoDIIS() ) && ( scf_options->getStoreDIIS() )){
+      struct stat file_info;
+      int master_stat = stat( (scf_options->getDIISStorageName()).c_str(), &file_info );
+      if ( master_stat == 0 ){
+         const int diis_vec_size = iHandler->getROTparamsize();
+         diis = new DIIS( diis_vec_size, unitary->getNumVariablesX(), scf_options->getNumDIISVecs() );
+         diis->loadDIIS( scf_options->getDIISStorageName() );
+         diis_vec = new double[ diis_vec_size ];
       }
    }
-   
+
    int nIterations = 0;
 
    /*******************************
    ***   Actual DMRGSCF loops   ***
    *******************************/
-   while ((gradNorm > theDMRGSCFoptions->getGradientThreshold()) && (nIterations < theDMRGSCFoptions->getMaxIterations())){
-   
+   while (( gradNorm > scf_options->getGradientThreshold() ) && ( nIterations < scf_options->getMaxIterations() )){
+
       nIterations++;
-   
+
       //Update the unitary transformation
-      if (unitary->getNumVariablesX() > 0){
-      
-         unitary->updateUnitary(mem1, mem2, gradient, true, true); //multiply = compact = true
-         
-         if ((theDMRGSCFoptions->getDoDIIS()) && (updateNorm <= theDMRGSCFoptions->getDIISGradientBranch())){
-            if (theDMRGSCFoptions->getWhichActiveSpace()==1){
-               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to NOs anymore!" << endl;
+      if ( unitary->getNumVariablesX() > 0 ){
+
+         unitary->updateUnitary( mem1, mem2, gradient, true, true ); //multiply = compact = true
+
+         if (( scf_options->getDoDIIS() ) && ( updateNorm <= scf_options->getDIISGradientBranch() )){
+            if ( scf_options->getWhichActiveSpace() == 1 ){
+               cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to NOs anymore!" << endl;
             }
-            if (theDMRGSCFoptions->getWhichActiveSpace()==2){
-               cout << "DMRGSCF::doCASSCFnewtonraphson : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
+            if ( scf_options->getWhichActiveSpace() == 2 ){
+               cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
-            if (theDIIS == NULL){
-               theDIIS = new DIIS(theDIISvectorParamSize, unitary->getNumVariablesX(), theDMRGSCFoptions->getNumDIISVecs());
-               theDIISparameterVector = new double[ theDIISvectorParamSize ];
-               unitary->makeSureAllBlocksDetOne(mem1, mem2);
+            if ( diis == NULL ){
+               const int diis_vec_size = iHandler->getROTparamsize();
+               diis = new DIIS( diis_vec_size, unitary->getNumVariablesX(), scf_options->getNumDIISVecs() );
+               diis_vec = new double[ diis_vec_size ];
+               unitary->makeSureAllBlocksDetOne( mem1, mem2 );
             }
-            unitary->getLog(theDIISparameterVector, mem1, mem2);
-            theDIIS->appendNew(gradient, theDIISparameterVector);
-            theDIIS->calculateParam(theDIISparameterVector);
-            unitary->updateUnitary(mem1, mem2, theDIISparameterVector, false, false); //multiply = compact = false
+            unitary->getLog( diis_vec, mem1, mem2 );
+            diis->appendNew( gradient, diis_vec );
+            diis->calculateParam( diis_vec );
+            unitary->updateUnitary( mem1, mem2, diis_vec, false, false ); //multiply = compact = false
          }
-         
       }
-      if ((theDMRGSCFoptions->getStoreUnitary()) && (gradNorm!=1.0)){ unitary->saveU( theDMRGSCFoptions->getUnitaryStorageName() ); }
-      if ((theDMRGSCFoptions->getStoreDIIS()) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
-   
+      if (( scf_options->getStoreUnitary() ) && ( gradNorm != 1.0 )){ unitary->saveU( scf_options->getUnitaryStorageName() ); }
+      if (( scf_options->getStoreDIIS() ) && ( updateNorm != 1.0 ) && ( diis != NULL )){ diis->saveDIIS( scf_options->getDIISStorageName() ); }
+      int master_diis = (( diis != NULL ) ? 1 : 0 );
+
       //Fill HamDMRG
-      buildQmatOCC();
       buildTmatrix();
-      fillConstAndTmatDMRG(HamDMRG);
-      if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
-      else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
-      
+      buildQmatOCC();
+      fillConstAndTmatDMRG( HamDMRG );
+      DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+
       //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
-      if ((theDMRGSCFoptions->getWhichActiveSpace()==2) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         theLocalizer->Optimize(mem1, mem2, theDMRGSCFoptions->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
+         theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
          theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
          fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
          unitary->rotateActiveSpaceVectors(mem1, mem2);
-         buildQmatOCC(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
-         buildTmatrix();
-         fillConstAndTmatDMRG(HamDMRG);
-         if (doBlockWise){ theRotator.fillVmatDMRGBlockWise(HamDMRG, unitary, mem1, mem2, mem3, maxBlockSize); }
-         else {            theRotator.fillVmatDMRG(HamDMRG, unitary, mem1, mem2); }
-         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+         buildTmatrix(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
+         buildQmatOCC();
+         fillConstAndTmatDMRG( HamDMRG );
+         DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+         cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
       }
+
+      if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM
+
+         const int nalpha = ( num_elec + TwoS ) / 2;
+         const int nbeta  = ( num_elec - TwoS ) / 2;
+         const double workmem = 1000.0; // 1GB
+         const int verbose = 2;
+         CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamDMRG, nalpha, nbeta, Irrep, workmem, verbose );
+         double * inoutput = new double[ theFCI->getVecLength(0) ];
+         theFCI->ClearVector( theFCI->getVecLength(0), inoutput );
+         inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+         Energy = theFCI->GSDavidson( inoutput );
+         theFCI->Fill2RDM( inoutput, DMRG2DM );
+         delete theFCI;
+         delete [] inoutput;
+
+      } else { //Do the DMRG sweeps, and calculate the 2DM
       
-      //Do the DMRG sweeps, and calculate the 2DM
-      for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
-      DMRG * theDMRG = new DMRG(Prob, OptScheme);
-      for (int state = 0; state < rootNum; state++){
-         if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
-         Energy = theDMRG->Solve();
-         if ( theDMRGSCFoptions->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+         for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
+         DMRG * theDMRG = new DMRG(Prob, OptScheme);
+         for (int state = 0; state < rootNum; state++){
+            if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
+            Energy = theDMRG->Solve();
+            if ( scf_options->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
+               theDMRG->calc2DMandCorrelations();
+               copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
+            }
+            if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
+         }
+         if ( !( scf_options->getStateAveraging() )){ // When SS-DMRGSCF: 2DM += last 2DM
             theDMRG->calc2DMandCorrelations();
             copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
-         if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
+         if (scf_options->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
+         if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
+         if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+         delete theDMRG;
+         if ((scf_options->getStateAveraging()) && (rootNum > 1)){
+            const double averagingfactor = 1.0 / rootNum;
+            for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] *= averagingfactor; }
+         }
+         
       }
-      if ( !(theDMRGSCFoptions->getStateAveraging()) ){ // When SS-DMRGSCF: 2DM += last 2DM
-         theDMRG->calc2DMandCorrelations();
-         copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
+      setDMRG1DM(num_elec, nOrbDMRG, DMRG1DM, DMRG2DM);
+
+      //Possibly rotate the active space to the natural orbitals
+      if (( scf_options->getWhichActiveSpace() == 1 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
+         copy_active( DMRG1DM, theQmatWORK, iHandler, true );
+         block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM, NULL, NULL ); // Unitary is updated and DMRG2DM rotated
+         setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
+         buildTmatrix(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
+         buildQmatOCC();
+         cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
       }
-      if (theDMRGSCFoptions->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
-      if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-      delete theDMRG;
-      if ((theDMRGSCFoptions->getStateAveraging()) && (rootNum > 1)){
-         const double averagingfactor = 1.0 / rootNum;
-         for (int cnt = 0; cnt < nOrbDMRGpower4; cnt++){ DMRG2DM[ cnt ] *= averagingfactor; }
-      }
-      setDMRG1DM(N, nOrbDMRG, DMRG1DM, DMRG2DM);
-      
-      //Calculate the NOON and possibly rotate the active space to the natural orbitals
-      calcNOON(iHandler, mem1, mem2, DMRG1DM);
-      if ((theDMRGSCFoptions->getWhichActiveSpace()==1) && (theDIIS==NULL)){ //When the DIIS has started: stop
-         rotate2DMand1DM(N, nOrbDMRG, mem1, mem2, DMRG1DM, DMRG2DM);
-         unitary->rotateActiveSpaceVectors(mem1, mem2); //This rotation can change the determinant from +1 to -1 !!!!
-         buildQmatOCC(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
-         buildTmatrix();
-         cout << "DMRGSCF::doCASSCFnewtonraphson : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
-      }
-      
+
       //Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      if (doBlockWise){ theRotator.fillRotatedTEIBlockWise(theRotatedTEI, unitary, mem1, mem2, mem3, maxBlockSize); }
-      else {            theRotator.fillRotatedTEI( theRotatedTEI, unitary, mem1, mem2 ); }
+      DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
       buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
       buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
 
       //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
       augmentedHessianNR(theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm);
-   
+
    }
-   
+
    delete [] mem1;
    delete [] mem2;
-   if (doBlockWise){ delete [] mem3; }
-   
+   delete_file( tmp_filename );
+
    delete Prob;
    delete HamDMRG;
    delete [] gradient;
-   if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
-   if (theLocalizer!=NULL){ delete theLocalizer; }
-   
+   if ( diis_vec != NULL ){ delete [] diis_vec; }
+   if ( diis != NULL ){ delete diis; }
+   if ( theLocalizer != NULL ){ delete theLocalizer; }
+
    return Energy;
 
 }
 
-void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm){
+void CheMPS2::CASSCF::augmentedHessianNR( DMRGSCFmatrix * localFmat, DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm ){
 
    /* A good read to understand
             (1) how the augmented Hessian arises from a rational function optimization
@@ -238,141 +251,290 @@ void CheMPS2::CASSCF::augmentedHessianNR(const DMRGSCFmatrix * localFmat, const 
             (3) why the smallest algebraic eigenvalue + corresponding eigenvector should be retained for minimizations
       Banerjee, Adams, Simons, Shepard, "Search for stationary points on surfaces",
       J. Phys. Chem. 1985, volume 89, pages 52-57, doi:10.1021/j100247a015  */
-   
+
    //Calculate the gradient
    const int x_linearlength = localUmat->getNumVariablesX();
-   gradNorm[0] = calcGradient(localFmat, localIdx, localUmat, theupdate);
-   
-   //Calculate the Hessian
-   int dim = x_linearlength + 1;
-   int size = dim * dim;
-   double * hessian = new double[size];
-   calcHessian(localFmat, localwtilde, localIdx, localUmat, hessian, dim);
-   
-   //Augment the gradient into the Hessian matrix
-   for (int cnt=0; cnt<x_linearlength; cnt++){
-      hessian[cnt + x_linearlength*dim] = theupdate[cnt];
-      hessian[x_linearlength + dim*cnt] = theupdate[cnt];
-   }
-   hessian[x_linearlength + dim*x_linearlength] = 0.0;
+   gradNorm[ 0 ] = construct_gradient( localFmat, localIdx, theupdate );
 
    //Find the lowest eigenvalue and corresponding eigenvector of the augmented hessian
    {
-      const double RTOL   = CheMPS2::HEFF_DAVIDSON_RTOL_BASE * sqrt( 1.0 * dim );
-      Davidson deBoskabouter(dim, CheMPS2::HEFF_DAVIDSON_NUM_VEC, CheMPS2::HEFF_DAVIDSON_NUM_VEC_KEEP, RTOL, CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF, false); // No debug printing
-      double ** whichpointers = new double*[2];
-
+      Davidson deBoskabouter( x_linearlength + 1, CheMPS2::DAVIDSON_NUM_VEC,
+                                                  CheMPS2::DAVIDSON_NUM_VEC_KEEP,
+                                                  CheMPS2::DAVIDSON_FCI_RTOL,
+                                                  CheMPS2::DAVIDSON_PRECOND_CUTOFF, false ); // No debug printing
+      double ** whichpointers = new double*[ 2 ];
       char instruction = deBoskabouter.FetchInstruction( whichpointers );
       assert( instruction == 'A' );
-      for (int cnt = 0; cnt < dim; cnt++){ whichpointers[1][cnt] = hessian[cnt*(1+dim)]; } // Preconditioner = diagonal elements of the augmented Hessian
-      for (int cnt = 0; cnt < x_linearlength; cnt++){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
-         const double denom = ( whichpointers[1][cnt] > CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[1][cnt] : CheMPS2::HEFF_DAVIDSON_PRECOND_CUTOFF;
-         whichpointers[0][cnt] = - theupdate[cnt] / denom;
+      diag_hessian( localFmat, localwtilde, localIdx, whichpointers[ 1 ] );
+      whichpointers[ 1 ][ x_linearlength ] = 0.0;
+      for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ // Initial guess = [ -gradient / diag(hessian) , 1 ]
+         const double denom = ( whichpointers[ 1 ][ cnt ] > CheMPS2::DAVIDSON_PRECOND_CUTOFF ) ? whichpointers[ 1 ][ cnt ] : CheMPS2::DAVIDSON_PRECOND_CUTOFF;
+         whichpointers[ 0 ][ cnt ] = - theupdate[ cnt ] / denom;
       }
-      whichpointers[0][x_linearlength] = 1.0;
-
+      whichpointers[ 0 ][ x_linearlength ] = 1.0;
       instruction = deBoskabouter.FetchInstruction( whichpointers );
       while ( instruction == 'B' ){
-         char notrans = 'N';
-         int one = 1;
-         double alpha = 1.0;
-         double beta = 0.0;
-         dgemm_(&notrans, &notrans, &dim, &one, &dim, &alpha, hessian, &dim, whichpointers[0], &dim, &beta, whichpointers[1], &dim);
+         augmented_hessian( localFmat, localwtilde, localIdx, whichpointers[ 0 ], whichpointers[ 1 ], theupdate, x_linearlength );
          instruction = deBoskabouter.FetchInstruction( whichpointers );
       }
-
       assert( instruction == 'C' );
-      double scalar = 1.0 / whichpointers[0][x_linearlength];
+      double scalar = 1.0 / whichpointers[ 0 ][ x_linearlength ];
       cout << "DMRGSCF::augmentedHessianNR : Augmented Hessian update found with " << deBoskabouter.GetNumMultiplications() << " Davidson iterations." << endl;
-      if (CheMPS2::DMRGSCF_debugPrint){
-         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[1][0] << endl;
+      if ( CheMPS2::DMRGSCF_debugPrint ){
+         cout << "DMRGSCF::augmentedHessianNR : Lowest eigenvalue = " << whichpointers[ 1 ][ 0 ] << endl;
          cout << "DMRGSCF::augmentedHessianNR : The last number of the eigenvector (which will be rescaled to one) = " << scalar << endl;
       }
-      for (int cnt = 0; cnt < x_linearlength; cnt++){ theupdate[cnt] = scalar * whichpointers[0][cnt]; }
+      for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ theupdate[ cnt ] = scalar * whichpointers[ 0 ][ cnt ]; }
       delete [] whichpointers;
    }
-   
+
    //Calculate the update norm
-   updateNorm[0] = 0.0;
-   for (int cnt = 0; cnt < x_linearlength; cnt++){ updateNorm[0] += theupdate[cnt] * theupdate[cnt]; }
-   updateNorm[0] = sqrt(updateNorm[0]);
-   cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[0] << endl;
-   
-   delete [] hessian;
+   updateNorm[ 0 ] = 0.0;
+   for ( int cnt = 0; cnt < x_linearlength; cnt++ ){ updateNorm[ 0 ] += theupdate[ cnt ] * theupdate[ cnt ]; }
+   updateNorm[ 0 ] = sqrt( updateNorm[ 0 ] );
+   cout << "DMRGSCF::augmentedHessianNR : Norm of the update = " << updateNorm[ 0 ] << endl;
 
 }
 
-double CheMPS2::CASSCF::calcGradient(const DMRGSCFmatrix * localFmat, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * gradient){
+double CheMPS2::CASSCF::construct_gradient( DMRGSCFmatrix * Fmatrix, const DMRGSCFindices * idx, double * gradient ){
 
-   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){
-      const int index1 = localUmat->getFirstIndex(cnt);
-      const int index2 = localUmat->getSecondIndex(cnt);
-      // irrep1 == irrep2 due to construction DMRGSCFunitary
-      const int irrep  = localIdx->getOrbitalIrrep( index1 );
-      const int shift  = localIdx->getOrigNOCCstart( irrep );
-      const int relIndex1 = index1 - shift;
-      const int relIndex2 = index2 - shift;
-      gradient[cnt] = 2 * ( localFmat->get( irrep, relIndex1, relIndex2 ) - localFmat->get( irrep, relIndex2, relIndex1 ) );
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT  = Fmatrix->getBlock( irrep );
+
+      // Type 0: act-occ
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         for ( int act = 0; act < NACT; act++ ){
+            gradient[ jump + act + NACT * occ ] = 2 * ( FMAT[ NOCC + act + NORB * occ ] - FMAT[ occ + NORB * ( NOCC + act ) ] );
+         }
+      }
+      jump += NOCC * NACT;
+
+      // Type 1: vir-act
+      for ( int act = 0; act < NACT; act++ ){
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            gradient[ jump + vir + NVIR * act ] = 2 * ( FMAT[ N_OA + vir + NORB * ( NOCC + act ) ] - FMAT[ NOCC + act + NORB * ( N_OA + vir ) ] );
+         }
+      }
+      jump += NACT * NVIR;
+
+      // Type 2: vir-occ
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            gradient[ jump + vir + NVIR * occ ] = 2 * ( FMAT[ N_OA + vir + NORB * occ ] - FMAT[ occ + NORB * ( N_OA + vir ) ] );
+         }
+      }
+      jump += NOCC * NVIR;
    }
-   
-   double gradNorm = 0.0;
-   for (int cnt=0; cnt<localUmat->getNumVariablesX(); cnt++){ gradNorm += gradient[cnt] * gradient[cnt]; }
-   gradNorm = sqrt(gradNorm);
-   cout << "DMRGSCF::calcGradient : Norm of the gradient = " << gradNorm << endl;
-   return gradNorm;
+
+   double gradient_norm = 0.0;
+   for ( int cnt = 0; cnt < jump; cnt++ ){ gradient_norm += gradient[ cnt ] * gradient[ cnt ]; }
+   gradient_norm = sqrt( gradient_norm );
+   cout << "DMRGSCF::construct_gradient : Norm of the gradient = " << gradient_norm << endl;
+   return gradient_norm;
 
 }
 
-void CheMPS2::CASSCF::calcHessian(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * hessian, const int rowjump){
+void CheMPS2::CASSCF::augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize ){
 
-   const int lindim = ( localUmat->getNumVariablesX() * ( localUmat->getNumVariablesX() + 1 ))/2;
-   
-   #pragma omp parallel for schedule(static)
-   for (int count=0; count<lindim; count++){
-   
-      int col = 1;
-      while ( (col*(col+1))/2 <= count ) col++;
-      col -= 1;
-      int row = count - (col*(col+1))/2;
-      
-      const int p_index = localUmat->getFirstIndex(row);
-      const int q_index = localUmat->getSecondIndex(row);
-      // irrep_p == irrep_q due to construction DMRGSCFunitary
-      const int irrep_pq = localIdx->getOrbitalIrrep( p_index );
-      
-      const int r_index = localUmat->getFirstIndex(col);
-      const int s_index = localUmat->getSecondIndex(col);
-      // irrep_r == irrep_s due to construction DMRGSCFunitary
-      const int irrep_rs = localIdx->getOrbitalIrrep( r_index );
-      
-      const int rel_p_index = p_index - localIdx->getOrigNOCCstart( irrep_pq );
-      const int rel_q_index = q_index - localIdx->getOrigNOCCstart( irrep_pq );
-      const int rel_r_index = r_index - localIdx->getOrigNOCCstart( irrep_rs );
-      const int rel_s_index = s_index - localIdx->getOrigNOCCstart( irrep_rs );
-      
-      hessian[row + rowjump * col] = Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_r_index, rel_s_index)
-                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_r_index, rel_s_index)
-                                   - Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_p_index, rel_q_index, rel_s_index, rel_r_index)
-                                   + Wmat(localFmat, localwtilde, localIdx, irrep_pq, irrep_rs, rel_q_index, rel_p_index, rel_s_index, rel_r_index);
-      hessian[col + rowjump * row] = hessian[row + rowjump * col];
-      
+   for ( int cnt = 0; cnt < linsize; cnt++ ){
+      target[ cnt ] = gradient[ cnt ] * origin[ linsize ];
+   }
+   add_hessian( Fmatrix, Wtilde, idx, origin, target );
+   target[ linsize ] = 0.0;
+   for ( int cnt = 0; cnt < linsize; cnt++ ){
+      target[ linsize ] += gradient[ cnt ] * origin[ cnt ];
    }
 
 }
 
-double CheMPS2::CASSCF::Wmat(const DMRGSCFmatrix * localFmat, const DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const int irrep_pq, const int irrep_rs, const int relindexP, const int relindexQ, const int relindexR, const int relindexS){
+void CheMPS2::CASSCF::diag_hessian( DMRGSCFmatrix * Fmatrix, const DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * diagonal ){
 
-   double value = 0.0;
-   
-   if ( ( irrep_pq == irrep_rs ) && ( relindexQ == relindexR ) ) {
-      value = localFmat->get(irrep_pq, relindexP, relindexS) + localFmat->get(irrep_pq, relindexS, relindexP);
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT = Fmatrix->getBlock( irrep );
+
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
+         for ( int act = 0; act < NACT; act++ ){
+            const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
+            diagonal[ jump + act + NACT * occ ] = - 2 * ( F_occ + F_act ) + ( Wtilde->get( irrep, irrep, NOCC + act, occ, NOCC + act, occ )
+                                                                            - Wtilde->get( irrep, irrep, NOCC + act, occ, occ, NOCC + act )
+                                                                            - Wtilde->get( irrep, irrep, occ, NOCC + act, NOCC + act, occ ) 
+                                                                            + Wtilde->get( irrep, irrep, occ, NOCC + act, occ, NOCC + act ) );
+         }
+      }
+      jump += NOCC * NACT;
+
+      for ( int act = 0; act < NACT; act++ ){
+         const double F_act = FMAT[ ( NOCC + act ) * ( NORB + 1 ) ];
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
+            diagonal[ jump + vir + NVIR * act ] = - 2 * ( F_act + F_vir ) + Wtilde->get( irrep, irrep, NOCC + act, N_OA + vir, NOCC + act, N_OA + vir );
+         }
+      }
+      jump += NACT * NVIR;
+
+      for ( int occ = 0; occ < NOCC; occ++ ){
+         const double F_occ = FMAT[ occ * ( NORB + 1 ) ];
+         for ( int vir = 0; vir < NVIR; vir++ ){
+            const double F_vir = FMAT[ ( N_OA + vir ) * ( NORB + 1 ) ];
+            diagonal[ jump + vir + NVIR * occ ] = - 2 * ( F_occ + F_vir ) + Wtilde->get( irrep, irrep, occ, N_OA + vir, occ, N_OA + vir );
+         }
+      }
+      jump += NOCC * NVIR;
    }
-   
-   if (relindexP >= localIdx->getNOCC(irrep_pq) + localIdx->getNDMRG(irrep_pq)){ return value; }
-   if (relindexR >= localIdx->getNOCC(irrep_rs) + localIdx->getNDMRG(irrep_rs)){ return value; } //index1 and index3 are now certainly not virtual!
-   
-   value += localwtilde->get( irrep_pq, irrep_rs, relindexP, relindexQ, relindexR, relindexS );
-   return value;
+
+}
+
+void CheMPS2::CASSCF::add_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target ){
+
+   const int n_irreps = idx->getNirreps();
+
+   int jump = 0;
+   for ( int irrep = 0; irrep < n_irreps; irrep++ ){
+
+      const int NORB = idx->getNORB( irrep );
+      const int NOCC = idx->getNOCC( irrep );
+      const int NACT = idx->getNDMRG( irrep );
+      const int NVIR = idx->getNVIRT( irrep );
+      const int N_OA = NOCC + NACT;
+      double * FMAT = Fmatrix->getBlock( irrep );
+      const int ptr_AO = jump;
+      const int ptr_VA = jump + NACT * NOCC;
+      const int ptr_VO = jump + NACT * NOCC + NVIR * NACT;
+
+      // OpenMP parallelism via dgemm_
+
+      DGEMM_WRAP( +1.0, 'T', 'N', origin + ptr_VA,           FMAT + N_OA,        target + ptr_AO, NACT, NOCC, NVIR, NVIR, NORB, NACT );
+      DGEMM_WRAP( +1.0, 'T', 'T', origin + ptr_VA,           FMAT + NORB * N_OA, target + ptr_AO, NACT, NOCC, NVIR, NVIR, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_AO,           FMAT,               target + ptr_AO, NACT, NOCC, NOCC, NACT, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_AO,           FMAT,               target + ptr_AO, NACT, NOCC, NOCC, NACT, NORB, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + NOCC + NORB * NOCC, origin + ptr_AO,    target + ptr_AO, NACT, NOCC, NACT, NORB, NACT, NACT );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + NOCC + NORB * NOCC, origin + ptr_AO,    target + ptr_AO, NACT, NOCC, NACT, NORB, NACT, NACT );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + NOCC + NORB * N_OA, origin + ptr_VO,    target + ptr_AO, NACT, NOCC, NVIR, NORB, NVIR, NACT );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * NOCC, origin + ptr_VO,    target + ptr_AO, NACT, NOCC, NVIR, NORB, NVIR, NACT );
+
+      DGEMM_WRAP( +1.0, 'N', 'T', FMAT + N_OA,               origin + ptr_AO,           target + ptr_VA, NVIR, NACT, NOCC, NORB, NACT, NVIR );
+      DGEMM_WRAP( +1.0, 'T', 'T', FMAT + NORB * N_OA,        origin + ptr_AO,           target + ptr_VA, NVIR, NACT, NOCC, NORB, NACT, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VO,           FMAT + NORB * NOCC,        target + ptr_VA, NVIR, NACT, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VO,           FMAT + NOCC,               target + ptr_VA, NVIR, NACT, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VA,           FMAT + NOCC + NORB * NOCC, target + ptr_VA, NVIR, NACT, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VA,           FMAT + NOCC + NORB * NOCC, target + ptr_VA, NVIR, NACT, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VA,           target + ptr_VA, NVIR, NACT, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VA,           target + ptr_VA, NVIR, NACT, NVIR, NORB, NVIR, NVIR );
+
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VO,           FMAT,               target + ptr_VO, NVIR, NOCC, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VO,           FMAT,               target + ptr_VO, NVIR, NOCC, NOCC, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', origin + ptr_VA,           FMAT + NOCC,        target + ptr_VO, NVIR, NOCC, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'T', origin + ptr_VA,           FMAT + NORB * NOCC, target + ptr_VO, NVIR, NOCC, NACT, NVIR, NORB, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VO,    target + ptr_VO, NVIR, NOCC, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + N_OA + NORB * N_OA, origin + ptr_VO,    target + ptr_VO, NVIR, NOCC, NVIR, NORB, NVIR, NVIR );
+      DGEMM_WRAP( -1.0, 'N', 'N', FMAT + N_OA + NORB * NOCC, origin + ptr_AO,    target + ptr_VO, NVIR, NOCC, NACT, NORB, NACT, NVIR );
+      DGEMM_WRAP( -1.0, 'T', 'N', FMAT + NOCC + NORB * N_OA, origin + ptr_AO,    target + ptr_VO, NVIR, NOCC, NACT, NORB, NACT, NVIR );
+
+      jump += NACT * NOCC + NVIR * NACT + NVIR * NOCC;
+   }
+
+   #pragma omp parallel
+   {
+
+      int jump_row = 0;
+      for ( int irrep_row = 0; irrep_row < n_irreps; irrep_row++ ){
+
+         const int NORB_row = idx->getNORB( irrep_row );
+         const int NOCC_row = idx->getNOCC( irrep_row );
+         const int NACT_row = idx->getNDMRG( irrep_row );
+         const int NVIR_row = idx->getNVIRT( irrep_row );
+         const int N_OA_row = NOCC_row + NACT_row;
+         double * resAO = target + jump_row;
+         double * resVA = resAO  + NACT_row * NOCC_row;
+         double * resVO = resVA  + NVIR_row * NACT_row;
+
+         int jump_col = 0;
+         for ( int irrep_col = 0; irrep_col < n_irreps; irrep_col++ ){
+
+            const int NOCC_col = idx->getNOCC( irrep_col );
+            const int NACT_col = idx->getNDMRG( irrep_col );
+            const int NVIR_col = idx->getNVIRT( irrep_col );
+            const int N_OA_col = NOCC_col + NACT_col;
+            double * vecAO = origin + jump_col;
+            double * vecVA = vecAO  + NACT_col * NOCC_col;
+            double * vecVO = vecVA  + NVIR_col * NACT_col;
+
+            #pragma omp for schedule(static)
+            for ( int act_row = 0; act_row < NACT_row; act_row++ ){
+               for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, occ_col );
+                  DGEMV_WRAP( -1.0, mat +            NORB_row * NOCC_col, resAO + act_row,            vecAO + NACT_col * occ_col, NOCC_row, NACT_col, NORB_row, NACT_row, 1 );
+                  DGEMV_WRAP( -1.0, mat +            NORB_row * N_OA_col, resAO + act_row,            vecVO + NVIR_col * occ_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1 );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * NOCC_col, resVA + NVIR_row * act_row, vecAO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1,        1 );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVA + NVIR_row * act_row, vecVO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1,        1 );
+               }
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, NOCC_row + act_row, NOCC_col + act_col );
+                  DGEMV_WRAP(  1.0, mat,                                  resAO + act_row,            vecAO + act_col,            NOCC_row, NOCC_col, NORB_row, NACT_row, NACT_col );
+                  DGEMV_WRAP( -1.0, mat            + NORB_row * N_OA_col, resAO + act_row,            vecVA + NVIR_col * act_col, NOCC_row, NVIR_col, NORB_row, NACT_row, 1        );
+                  DGEMV_WRAP( -1.0, mat + N_OA_row,                       resVA + NVIR_row * act_row, vecAO + act_col,            NVIR_row, NOCC_col, NORB_row, 1,        NACT_col );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVA + NVIR_row * act_row, vecVA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1,        1        );
+               }
+            }
+
+            #pragma omp for schedule(static)
+            for ( int occ_row = 0; occ_row < NOCC_row; occ_row++ ){
+               for ( int occ_col = 0; occ_col < NOCC_col; occ_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, occ_col );
+                  DGEMV_WRAP( 1.0, mat + NOCC_row + NORB_row * NOCC_col, resAO + NACT_row * occ_row, vecAO + NACT_col * occ_col, NACT_row, NACT_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + NOCC_row + NORB_row * N_OA_col, resAO + NACT_row * occ_row, vecVO + NVIR_col * occ_col, NACT_row, NVIR_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + N_OA_row + NORB_row * NOCC_col, resVO + NVIR_row * occ_row, vecAO + NACT_col * occ_col, NVIR_row, NACT_col, NORB_row, 1, 1 );
+                  DGEMV_WRAP( 1.0, mat + N_OA_row + NORB_row * N_OA_col, resVO + NVIR_row * occ_row, vecVO + NVIR_col * occ_col, NVIR_row, NVIR_col, NORB_row, 1, 1 );
+               }
+               for ( int act_col = 0; act_col < NACT_col; act_col++ ){
+                  double * mat = Wtilde->getBlock( irrep_row, irrep_col, occ_row, NOCC_col + act_col );
+                  DGEMV_WRAP( -1.0, mat + NOCC_row,                       resAO + NACT_row * occ_row, vecAO + act_col,            NACT_row, NOCC_col, NORB_row, 1, NACT_col );
+                  DGEMV_WRAP(  1.0, mat + NOCC_row + NORB_row * N_OA_col, resAO + NACT_row * occ_row, vecVA + NVIR_col * act_col, NACT_row, NVIR_col, NORB_row, 1, 1        );
+                  DGEMV_WRAP( -1.0, mat + N_OA_row,                       resVO + NVIR_row * occ_row, vecAO + act_col,            NVIR_row, NOCC_col, NORB_row, 1, NACT_col );
+                  DGEMV_WRAP(  1.0, mat + N_OA_row + NORB_row * N_OA_col, resVO + NVIR_row * occ_row, vecVA + NVIR_col * act_col, NVIR_row, NVIR_col, NORB_row, 1, 1        );
+               }
+            }
+            jump_col += NACT_col * NOCC_col + NVIR_col * NACT_col + NVIR_col * NOCC_col;
+         }
+         jump_row += NACT_row * NOCC_row + NVIR_row * NACT_row + NVIR_row * NOCC_row;
+      }
+   }
+
+}
+
+void CheMPS2::CASSCF::DGEMM_WRAP( double prefactor, char transA, char transB, double * A, double * B, double * C, int m, int n, int k, int lda, int ldb, int ldc ){
+
+   if ( m * k * n == 0 ){ return; }
+   double add = 1.0;
+   dgemm_( &transA, &transB, &m, &n, &k, &prefactor, A, &lda, B, &ldb, &add, C, &ldc );
+
+}
+
+void CheMPS2::CASSCF::DGEMV_WRAP( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec ){
+
+   if ( rowdim * coldim == 0 ){ return; }
+   char notrans = 'N';
+   double add = 1.0;
+   dgemv_( &notrans, &rowdim, &coldim, &prefactor, matrix, &ldmat, vector, &incvec, &add, result, &incres );
 
 }
 

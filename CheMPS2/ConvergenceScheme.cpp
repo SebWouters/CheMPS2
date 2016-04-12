@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,51 +22,56 @@
 
 #include "ConvergenceScheme.h"
 
-CheMPS2::ConvergenceScheme::ConvergenceScheme(const int nInstructions){
+CheMPS2::ConvergenceScheme::ConvergenceScheme( const int num_instructions ){
 
-   this->nInstructions = nInstructions;
-   
-   assert( nInstructions>0 );
-   nD              = new int[   nInstructions];
-   fEconv          = new double[nInstructions];
-   nMaxSweeps      = new int[   nInstructions];
-   fNoisePrefactor = new double[nInstructions];
+   this->num_instructions = num_instructions;
+
+   assert( num_instructions > 0 );
+   num_D              = new    int[ num_instructions ];
+   energy_convergence = new double[ num_instructions ];
+   num_max_sweeps     = new    int[ num_instructions ];
+   noise_prefac       = new double[ num_instructions ];
+   dvdson_rtol        = new double[ num_instructions ];
 
 }
 
 CheMPS2::ConvergenceScheme::~ConvergenceScheme(){
 
-   delete [] nD;
-   delete [] fEconv;
-   delete [] nMaxSweeps;
-   delete [] fNoisePrefactor;
+   delete [] num_D;
+   delete [] energy_convergence;
+   delete [] num_max_sweeps;
+   delete [] noise_prefac;
+   delete [] dvdson_rtol;
 
 }
 
-int CheMPS2::ConvergenceScheme::getNInstructions(){ return nInstructions; }
+int CheMPS2::ConvergenceScheme::get_number() const{ return num_instructions; }
          
-void CheMPS2::ConvergenceScheme::setInstruction(const int instruction, const int D, const double Econv, const int nMax, const double noisePrefactor){
+void CheMPS2::ConvergenceScheme::set_instruction( const int instruction, const int D, const double energy_conv, const int max_sweeps, const double noise_prefactor, const double davidson_rtol ){
 
-   assert( instruction>=0 );
-   assert( instruction<nInstructions );
-   assert( D>0 );
-   assert( Econv>0.0 );
-   assert( nMax>0 );
-   assert( noisePrefactor>=0.0 );
+   assert( instruction >= 0 );
+   assert( instruction < num_instructions );
+   assert( D > 0 );
+   assert( energy_conv > 0.0 );
+   assert( max_sweeps > 0 );
+   assert( davidson_rtol > 0.0 );
    
-                nD[instruction] = D;
-            fEconv[instruction] = Econv;
-        nMaxSweeps[instruction] = nMax;
-   fNoisePrefactor[instruction] = noisePrefactor;
+                num_D[ instruction ] = D;
+   energy_convergence[ instruction ] = energy_conv;
+       num_max_sweeps[ instruction ] = max_sweeps;
+         noise_prefac[ instruction ] = noise_prefactor;
+          dvdson_rtol[ instruction ] = davidson_rtol;
 
 }
 
-int CheMPS2::ConvergenceScheme::getD(const int instruction){ return nD[instruction]; }
+int CheMPS2::ConvergenceScheme::get_D( const int instruction ) const{ return num_D[ instruction ]; }
 
-double CheMPS2::ConvergenceScheme::getEconv(const int instruction){ return fEconv[instruction]; }
+double CheMPS2::ConvergenceScheme::get_energy_conv( const int instruction ) const{ return energy_convergence[ instruction ]; }
 
-int CheMPS2::ConvergenceScheme::getMaxSweeps(const int instruction){ return nMaxSweeps[instruction]; }
+int CheMPS2::ConvergenceScheme::get_max_sweeps( const int instruction ) const{ return num_max_sweeps[ instruction ]; }
 
-double CheMPS2::ConvergenceScheme::getNoisePrefactor(const int instruction){ return fNoisePrefactor[instruction]; }
+double CheMPS2::ConvergenceScheme::get_noise_prefactor( const int instruction ) const{ return noise_prefac[ instruction ]; }
+
+double CheMPS2::ConvergenceScheme::get_dvdson_rtol( const int instruction ) const{ return dvdson_rtol[ instruction ]; }
 
 

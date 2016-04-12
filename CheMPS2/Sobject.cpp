@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "TensorT.h"
 #include "SyBookkeeper.h"
 #include "Lapack.h"
+#include "MPIchemps2.h"
 #include "Gsl.h"
 
 using std::min;
@@ -251,6 +252,10 @@ void CheMPS2::Sobject::Join(TensorT * Tleft, TensorT * Tright){
 
 double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virtualdimensionD, const bool movingright, const bool change){
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #endif
+
    //Get the number of central sectors
    int nCenterSectors = 0;
    for (int NM=denBK->gNmin(index+1); NM<=denBK->gNmax(index+1); NM++){
@@ -283,14 +288,25 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       }
    }
    
-   //SVD each sector --> Allocate memory
-   double ** Lambdas = new double*[nCenterSectors];
-   double ** Us = new double*[nCenterSectors];
-   double ** VTs = new double*[nCenterSectors];
-   int * CenterDims = new int[nCenterSectors];
-   int * DimLtotal = new int[nCenterSectors];
-   int * DimRtotal = new int[nCenterSectors];
-   
+   // Only MPI_CHEMPS2_MASTER performs SVD --> Allocate memory
+   double ** Lambdas = NULL;
+   double ** Us = NULL;
+   double ** VTs = NULL;
+   int * CenterDims = NULL;
+   int * DimLtotal = NULL;
+   int * DimRtotal = NULL;
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( am_i_master ){
+   #endif
+
+   Lambdas = new double*[nCenterSectors];
+   Us = new double*[nCenterSectors];
+   VTs = new double*[nCenterSectors];
+   CenterDims = new int[nCenterSectors];
+   DimLtotal = new int[nCenterSectors];
+   DimRtotal = new int[nCenterSectors];
+
    //PARALLEL
    #pragma omp parallel for schedule(dynamic)
    for (int iCenter=0; iCenter<nCenterSectors; iCenter++){
@@ -391,12 +407,22 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       }
    }
    
+   #ifdef CHEMPS2_MPI_COMPILATION
+   }
+   #endif
+   
    double discardedWeight = 0.0; //Only if change==true; will the discardedWeight be meaningful and different from zero.
+   int updateSectors = 0;
+   int * NewDims = NULL;
 
    //If change: determine new virtual dimensions.
-   if (change){
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if (( change ) && ( am_i_master )){
+   #else
+   if ( change ){
+   #endif
    
-      int * NewDims = new int[nCenterSectors];
+      NewDims = new int[nCenterSectors];
       //First determine the total number of singular values
       int totalDimSVD = 0;
       int totalDimMPS = 0;
@@ -449,17 +475,35 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       }
       
       //Set NewDims only if relevant --> if totalDimSVD == totalDimMPS <= virtualdimensionD, no new symm sect virt D.
-      if ((totalDimSVD>virtualdimensionD) || (totalDimSVD!=totalDimMPS)){
-         for (int iCenter=0; iCenter<nCenterSectors; iCenter++){
-            denBK->SetDim(index+1,SplitSectNM[iCenter],SplitSectTwoJM[iCenter],SplitSectIM[iCenter],NewDims[iCenter]);
-         }
-         Tleft ->Reset();
-         Tright->Reset();
-      }
-      
-      delete [] NewDims;
+      updateSectors = ((totalDimSVD>virtualdimensionD) || (totalDimSVD!=totalDimMPS)) ? 1 : 0 ;
       
    }
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   MPIchemps2::broadcast_array_int(    &updateSectors,   1, MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_array_double( &discardedWeight, 1, MPI_CHEMPS2_MASTER );
+   #endif
+   
+   if ( updateSectors == 1 ){
+   
+      #ifdef CHEMPS2_MPI_COMPILATION
+      if ( NewDims == NULL ){ NewDims = new int[nCenterSectors]; }
+      MPIchemps2::broadcast_array_int( NewDims, nCenterSectors, MPI_CHEMPS2_MASTER );
+      #endif
+      
+      for (int iCenter=0; iCenter<nCenterSectors; iCenter++){
+         denBK->SetDim(index+1,SplitSectNM[iCenter],SplitSectTwoJM[iCenter],SplitSectIM[iCenter],NewDims[iCenter]);
+      }
+      Tleft ->Reset();
+      Tright->Reset();
+      
+   }
+   
+   if ( NewDims != NULL ){ delete [] NewDims; }
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( am_i_master ){
+   #endif
    
    //copy first gCurrentDimM per central symmetry sector to the relevant parts.
    //PARALLEL
@@ -521,21 +565,32 @@ double CheMPS2::Sobject::Split(TensorT * Tleft, TensorT * Tright, const int virt
       }
    }
    
+   #ifdef CHEMPS2_MPI_COMPILATION
+   }
+   MPIchemps2::broadcast_tensor( Tleft,  MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_tensor( Tright, MPI_CHEMPS2_MASTER );
+   #endif
+   
    //Clean up
    delete [] SplitSectNM;
    delete [] SplitSectTwoJM;
    delete [] SplitSectIM;
-   for (int iCenter=0; iCenter<nCenterSectors; iCenter++){
-      delete [] Us[iCenter];
-      delete [] Lambdas[iCenter];
-      delete [] VTs[iCenter];
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( am_i_master )
+   #endif
+   {
+      for (int iCenter=0; iCenter<nCenterSectors; iCenter++){
+         delete [] Us[iCenter];
+         delete [] Lambdas[iCenter];
+         delete [] VTs[iCenter];
+      }
+      delete [] Us;
+      delete [] Lambdas;
+      delete [] VTs;
+      delete [] CenterDims;
+      delete [] DimLtotal;
+      delete [] DimRtotal;
    }
-   delete [] Us;
-   delete [] Lambdas;
-   delete [] VTs;
-   delete [] CenterDims;
-   delete [] DimLtotal;
-   delete [] DimRtotal;
    
    return discardedWeight;
    

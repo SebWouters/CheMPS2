@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,15 @@
 #include "Initialize.h"
 #include "DMRG.h"
 #include "FCI.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
    
@@ -37,19 +42,9 @@ int main(void){
    const double T = -1.0;
    int * irreps = new int[L];
    for (int cnt=0; cnt<L; cnt++){ irreps[cnt] = 0; }
+   //The Hamiltonian initializes all its matrix elements to 0.0
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L, Group, irreps);
    delete [] irreps;
-   Ham->setEconst(0.0);
-   for (int cnt1=0; cnt1<L; cnt1++){
-      for (int cnt2=0; cnt2<L; cnt2++){
-         Ham->setTmat(cnt1,cnt2,0.0);
-         for (int cnt3=0; cnt3<L; cnt3++){
-            for (int cnt4=0; cnt4<L; cnt4++){
-               Ham->setVmat(cnt1,cnt2,cnt3,cnt4,0.0);
-            }
-         }
-      }
-   }
    for (int cnt=0; cnt<L; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }
    for (int cnt=0; cnt<L-1; cnt++){ Ham->setTmat(cnt,cnt+1,T); }
    
@@ -69,7 +64,12 @@ int main(void){
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
    const double EnergyDMRG = theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
-   theDMRG->getCorrelations()->Print();
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      theDMRG->getCorrelations()->Print();
+   }
    
    //Clean up DMRG
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
@@ -79,19 +79,33 @@ int main(void){
    delete Prob;
    
    //Calculate FCI reference energy
-   const int Nel_up   = ( N + TwoS ) / 2;
-   const int Nel_down = ( N - TwoS ) / 2;
-   const double maxMemWorkMB = 10.0;
-   const int FCIverbose = 1;
-   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
-   const double EnergyFCI = theFCI->GSDavidson(NULL);
+   double EnergyFCI = 0.0;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      const int Nel_up   = ( N + TwoS ) / 2;
+      const int Nel_down = ( N - TwoS ) / 2;
+      const double maxMemWorkMB = 10.0;
+      const int FCIverbose = 1;
+      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
+      EnergyFCI = theFCI->GSDavidson(NULL);
+      delete theFCI;
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI, 1, MPI_CHEMPS2_MASTER );
+   #endif
    
-   //Clean up FCI
-   delete theFCI;
+   //Clean up the Hamiltonian
    delete Ham;
    
    //Check succes
-   const bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) ? true : false;
+   const bool success = ( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 4 succeed : ";
    if (success){
       cout << "yes" << endl;

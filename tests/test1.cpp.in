@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,10 +24,31 @@
 #include "Initialize.h"
 #include "DMRG.h"
 #include "FCI.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
+void counter2bits(const int L, const int counter, int * bits, CheMPS2::Hamiltonian * Ham, int * numElec, int * theIrrep){
+
+   int Nel   = 0;
+   int Irrep = 0;
+   for (int orb=0; orb<L; orb++){
+      bits[orb] = (counter & ( 1 << orb )) >> orb;
+      if (bits[orb]==1){
+         Nel  += bits[orb];
+         Irrep = CheMPS2::Irreps::directProd(Irrep, Ham->getOrbitalIrrep(orb));
+      }
+   }
+   numElec[0]  = Nel;
+   theIrrep[0] = Irrep;
+
+}
+
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
   
@@ -42,66 +63,102 @@ int main(void){
    //Look at a few symmetry sectors
    const int Nelec    = 14;
    const int nSectors = 6;
-   int * TwoS     = new int[nSectors];
-   int * Irreps   = new int[nSectors];
-   double * EFCI  = new double[nSectors];
-   double * EDMRG = new double[nSectors];
-   TwoS[0] = 0; Irreps[0] = 0;
-   TwoS[1] = 2; Irreps[1] = 5;
-   TwoS[2] = 4; Irreps[2] = 0;
-   TwoS[3] = 4; Irreps[3] = 5;
-   TwoS[4] = 2; Irreps[4] = 2;
-   TwoS[5] = 2; Irreps[5] = 6;
+   int TwoS[]   = { 0, 2, 4, 4, 2, 2 };
+   int Irreps[] = { 0, 5, 0, 5, 2, 6 };
+   double EDMRG[6];
+   double EFCI[6];
+   double RMSdev[6];
    
    for (int counter=0; counter<nSectors; counter++){
       
-      //Perform full configuration interation
-      const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
-      const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
-      const double maxMemWorkMB = 10.0;
-      const int FCIverbose = 1;
-      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
-      double * inoutput = new double[theFCI->getVecLength(0)];
-      theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
-      inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
-      EFCI[counter] = theFCI->GSDavidson(inoutput);
-      theFCI->CalcSpinSquared(inoutput);
-      delete [] inoutput;
-      delete theFCI;
-      
       //The targeted symmetry sector and the Hamiltonian form together a FCI problem
       CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS[counter], Nelec, Irreps[counter]);
+      //Prob->SetupReorderD2h(); // Determinant coefficient comparison OK both with option ON and OFF
       
       //To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
       CheMPS2::ConvergenceScheme OptScheme(1);
-      //Instructions can be set with OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+      //OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
       OptScheme.setInstruction(0, 2000, 1e-10, 100, 0.0);
       
+      //Do DMRG calculation
       CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, &OptScheme);
       EDMRG[counter] = theDMRG->Solve();
       theDMRG->calc2DMandCorrelations();
-      if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+      
+      //Perform full configuration interation
+      #ifdef CHEMPS2_MPI_COMPILATION
+      if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+      #endif
+      {
+         const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
+         const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
+         const double maxMemWorkMB = 10.0;
+         const int FCIverbose = 1;
+         CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
+         double * GSvector = new double[theFCI->getVecLength(0)];
+         theFCI->ClearVector(theFCI->getVecLength(0), GSvector);
+         GSvector[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+         EFCI[counter] = theFCI->GSDavidson(GSvector);
+         theFCI->CalcSpinSquared(GSvector);
+         {  //Compare the FCI and DMRG determinant coefficients
+            int maxcount = 1;
+            for (int orb=0; orb<(Ham->getL()); orb++){ maxcount *= 2; }
+            int Nalpha;
+            int Nbeta;
+            int Ialpha;
+            int Ibeta;
+            int * alphastring = new int[ Ham->getL() ];
+            int *  betastring = new int[ Ham->getL() ];
+            double RMSerrorCoeff = 0.0;
+            for (int count_alpha=0; count_alpha<maxcount; count_alpha++){
+               counter2bits(Ham->getL(), count_alpha, alphastring, Ham, &Nalpha, &Ialpha);
+               if (Nalpha==Nel_up){
+                  for (int count_beta=0; count_beta<maxcount; count_beta++){
+                     counter2bits(Ham->getL(), count_beta, betastring, Ham, &Nbeta, &Ibeta);
+                     if ((Nbeta==Nel_down) && (CheMPS2::Irreps::directProd(Ialpha,Ibeta)==Irreps[counter])){
+                        const double coeff_dmrg = theDMRG->getFCIcoefficient(alphastring, betastring, false);
+                        const double coeff_fci = theFCI->getFCIcoeff(alphastring, betastring, GSvector);
+                        double temp = fabs(coeff_dmrg) - fabs(coeff_fci);
+                        RMSerrorCoeff += temp * temp;
+                     }
+                  }
+               }
+            }
+            RMSdev[counter] = sqrt(RMSerrorCoeff);
+            cout << "RMS difference FCI and DMRG determinant coefficients = " << RMSdev[counter] << endl;
+            delete [] alphastring;
+            delete []  betastring;
+         }
+         delete [] GSvector;
+         delete theFCI;
+      }
       
       //Clean up
+      if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
+      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
       delete Prob;
 
    }
    
-   //Clean up
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( EFCI,   nSectors, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( RMSdev, nSectors, MPI_CHEMPS2_MASTER );
+   #endif
+   
+   //Clean up the Hamiltonian
    delete Ham;
    
    //Check success
    bool success = true;
    for (int cnt=0; cnt<nSectors; cnt++){
-      success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-10 );
+      success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-8 );
+      success = ( success ) && ( RMSdev[cnt] < 1e-3 ); // Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
    }
    
-   delete [] EFCI;
-   delete [] EDMRG;
-   delete [] TwoS;
-   delete [] Irreps;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
    
    cout << "================> Did test 1 succeed : ";
    if (success){

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,27 +24,31 @@
 #include <algorithm>
 
 #include "EdmistonRuedenberg.h"
-#include "DMRGSCFVmatRotations.h"
+#include "DMRGSCFrotations.h"
 #include "Lapack.h"
 
 using std::cout;
 using std::endl;
 using std::max;
 
-CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg(Hamiltonian * HamIn, const int printLevelIn){
+CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg( const FourIndex * Vmat, const int group, const int printLevelIn ){
 
-   Ham = HamIn;
+   VMAT_ORIG = Vmat;
    printLevel = printLevelIn;
-   SymmInfo.setGroup(Ham->getNGroup());
+   SymmInfo.setGroup( group );
    
-   int * Isizes = new int[SymmInfo.getNumberOfIrreps()];
-   int * Zeroes = new int[SymmInfo.getNumberOfIrreps()];
-   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){ Isizes[irrep] = Zeroes[irrep] = 0; }
-   for (int orb=0; orb<Ham->getL(); orb++){ Isizes[Ham->getOrbitalIrrep(orb)]++; }
+   int * Isizes = new int[ SymmInfo.getNumberOfIrreps() ];
+   int * Zeroes = new int[ SymmInfo.getNumberOfIrreps() ];
+   int L = 0;
+   for ( int irrep = 0; irrep < SymmInfo.getNumberOfIrreps(); irrep++ ){
+      Isizes[ irrep ] = VMAT_ORIG->get_irrep_size( irrep );
+      Zeroes[ irrep ] = 0;
+      L += Isizes[ irrep ];
+   }
    
-   iHandler = new DMRGSCFindices(Ham->getL(), Ham->getNGroup(), Zeroes, Isizes, Zeroes); //Supposes all orbitals are active
-   unitary  = new DMRGSCFunitary(iHandler);
-   VmatRotated = new FourIndex(Ham->getNGroup(), Isizes);
+   iHandler = new DMRGSCFindices( L, group, Zeroes, Isizes, Zeroes ); //Supposes all orbitals are active
+   unitary  = new DMRGSCFunitary( iHandler );
+   VmatRotated = new FourIndex( group, Isizes );
    
    delete [] Zeroes;
    delete [] Isizes;
@@ -87,8 +91,8 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
       for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] = 0.0; }
    }
 
-   DMRGSCFVmatRotations theRotator(Ham, iHandler);
-   theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+   const int mem_size = iHandler->getL() * iHandler->getL() * iHandler->getL() * iHandler->getL();
+   DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
 
    //Setting up the variables for the cost function
    double Icost = costFunction();
@@ -106,7 +110,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
    
       //Rotate the Vmat
       Icost_previous = Icost;
-      theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+      DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
       Icost = costFunction();
       
       /* What if the cost function has dimished? Then make the rotation step a bit smaller!
@@ -120,7 +124,7 @@ double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, con
             nIterationsBACK++;
             for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] *= 0.5; }
             unitary->updateUnitary(temp1, temp2, gradient, true, false); //multiply = true; compact = false
-            theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
+            DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
             Icost = costFunction();
          }
          if (printLevel>1){ cout << "                                     WARNING : Rotated back a bit. Now Icost = " << Icost << endl; }
@@ -405,10 +409,10 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
    }
    
    delete [] reorder;
-   
-   DMRGSCFVmatRotations theRotator(Ham, iHandler);
-   theRotator.fillVmatRotated(VmatRotated, unitary, temp1, temp2);
-   
+
+   const int mem_size = iHandler->getL() * iHandler->getL() * iHandler->getL() * iHandler->getL();
+   DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
+
    if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = " << FiedlerExchangeCost() << endl; }
 
 }

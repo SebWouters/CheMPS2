@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "Heff.h"
 #include "Lapack.h"
+#include "MPIchemps2.h"
 #include "Gsl.h"
 
 void CheMPS2::Heff::addDiagonal1A(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorX * Xleft) const{
@@ -71,10 +72,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
 
    if ((denS->gN1(ikappa)==2)&&(denS->gN2(ikappa)==2)){ //2d3a
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 4 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - 2 * Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 4 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                          - 2 * Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -82,11 +84,12 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==1)&&(denS->gN2(ikappa)==1)){ //2d3b
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      int fase = (denS->gTwoJ(ikappa) == 2)? -1: 1;
-      double factor = Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) + fase * Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const int fase = (denS->gTwoJ(ikappa) == 2)? -1: 1;
+      const double factor = Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                   + fase * Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -94,10 +97,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==2)&&(denS->gN2(ikappa)==1)){ //2d3c
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                              - Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -105,10 +109,11 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
    if ((denS->gN1(ikappa)==1)&&(denS->gN2(ikappa)==2)){ //2d3d
    
-      int theindex = denS->gIndex();
-      int ptr = denS->gKappa2index(ikappa);
-      int dim = denS->gKappa2index(ikappa+1) - ptr;
-      double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1) - Prob->gMxElement(theindex,theindex,theindex+1,theindex+1);
+      const int theindex = denS->gIndex();
+      const int ptr = denS->gKappa2index(ikappa);
+      const int dim = denS->gKappa2index(ikappa+1) - ptr;
+      const double factor = 2 * Prob->gMxElement(theindex,theindex+1,theindex,theindex+1)
+                              - Prob->gMxElement(theindex,theindex+1,theindex+1,theindex);
       
       for (int cnt=0; cnt<dim; cnt++){ memHeffDiag[ptr + cnt] += factor; }
       
@@ -116,7 +121,7 @@ void CheMPS2::Heff::addDiagonal2d3all(const int ikappa, double * memHeffDiag, co
    
 }
 
-void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -145,7 +150,7 @@ void CheMPS2::Heff::addDiagonal2b3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -174,7 +179,7 @@ void CheMPS2::Heff::addDiagonal2c3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -203,7 +208,7 @@ void CheMPS2::Heff::addDiagonal2e3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC * Ctensor) const{
+void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Ctensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -232,7 +237,7 @@ void CheMPS2::Heff::addDiagonal2f3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -267,7 +272,7 @@ void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -302,7 +307,7 @@ void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N1 = denS->gN1(ikappa);
    
@@ -337,7 +342,7 @@ void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD * Dtensor) const{
+void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator * Dtensor) const{
 
    int N2 = denS->gN2(ikappa);
    
@@ -372,7 +377,11 @@ void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorC **** Ctensors, TensorF0 **** F0tensors) const{
+void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator **** Ctensors, TensorF0 **** F0tensors) const{
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -395,17 +404,21 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
       for (int l_gamma=0; l_gamma<theindex; l_gamma++){
          for (int l_alpha=l_gamma+1; l_alpha<theindex; l_alpha++){
          
-            if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_gamma, l_alpha ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
             
-               double * Cblock = Ctensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-               double * BlockF0 = F0tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * Cblock = Ctensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * BlockF0 = F0tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += BlockF0[(dimL+1)*cntL] * Cblock[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += BlockF0[(dimL+1)*cntL] * Cblock[(dimR+1)*cntR];
+                     }
                   }
                }
-            
             }
          }
       }
@@ -413,17 +426,21 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
       for (int l_alpha=0; l_alpha<theindex; l_alpha++){
          for (int l_gamma=l_alpha; l_gamma<theindex; l_gamma++){
          
-            if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_alpha, l_gamma ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
             
-               double * Cblock = Ctensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-               double * BlockF0 = F0tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * Cblock = Ctensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * BlockF0 = F0tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += BlockF0[(dimL+1)*cntL] * Cblock[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += BlockF0[(dimL+1)*cntL] * Cblock[(dimR+1)*cntR];
+                     }
                   }
                }
-            
             }
          }
       }
@@ -433,17 +450,21 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
       for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
          for (int l_beta=l_delta+1; l_beta<Prob->gL(); l_beta++){
          
-            if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_delta, l_beta ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
             
-               double * Cblock = Ctensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-               double * BlockF0 = F0tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * Cblock = Ctensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * BlockF0 = F0tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += Cblock[(dimL+1)*cntL] * BlockF0[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += Cblock[(dimL+1)*cntL] * BlockF0[(dimR+1)*cntR];
+                     }
                   }
                }
-               
             }
          }
       }
@@ -451,17 +472,21 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
       for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
          for (int l_delta=l_beta; l_delta<Prob->gL(); l_delta++){
          
-            if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_beta, l_delta ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
             
-               double * Cblock = Ctensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-               double * BlockF0 = F0tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * Cblock = Ctensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * BlockF0 = F0tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += Cblock[(dimL+1)*cntL] * BlockF0[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += Cblock[(dimL+1)*cntL] * BlockF0[(dimR+1)*cntR];
+                     }
                   }
                }
-               
             }
          }
       }
@@ -470,7 +495,11 @@ void CheMPS2::Heff::addDiagonal2a3spin0(const int ikappa, double * memHeffDiag, 
    
 }
 
-void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorD **** Dtensors, TensorF1 **** F1tensors) const{
+void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorOperator **** Dtensors, TensorF1 **** F1tensors) const{
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
 
    int NL = denS->gNL(ikappa);
    int TwoSL = denS->gTwoSL(ikappa);
@@ -497,17 +526,21 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
       for (int l_gamma=0; l_gamma<theindex; l_gamma++){
          for (int l_alpha=l_gamma+1; l_alpha<theindex; l_alpha++){
          
-            if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_gamma, l_alpha ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
             
-               double * Dblock = Dtensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-               double * BlockF1 = F1tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * Dblock = Dtensors[theindex+1][l_alpha-l_gamma][theindex+1-l_alpha]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * BlockF1 = F1tensors[theindex-1][l_alpha-l_gamma][theindex-1-l_alpha]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += alpha * BlockF1[(dimL+1)*cntL] * Dblock[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += alpha * BlockF1[(dimL+1)*cntL] * Dblock[(dimR+1)*cntR];
+                     }
                   }
                }
-            
             }
          }
       }
@@ -515,17 +548,22 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
       for (int l_alpha=0; l_alpha<theindex; l_alpha++){
          for (int l_gamma=l_alpha; l_gamma<theindex; l_gamma++){
          
-            if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_alpha, l_gamma ) == MPIRANK )
+            #endif
+            {
+         
+              if (denBK->gIrrep(l_alpha) == denBK->gIrrep(l_gamma)){
             
-               double * Dblock = Dtensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
-               double * BlockF1 = F1tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                 double * Dblock = Dtensors[theindex+1][l_gamma-l_alpha][theindex+1-l_gamma]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                 double * BlockF1 = F1tensors[theindex-1][l_gamma-l_alpha][theindex-1-l_gamma]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += alpha * BlockF1[(dimL+1)*cntL] * Dblock[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += alpha * BlockF1[(dimL+1)*cntL] * Dblock[(dimR+1)*cntR];
+                     }
                   }
                }
-            
             }
          }
       }
@@ -535,17 +573,21 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
       for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
          for (int l_beta=l_delta+1; l_beta<Prob->gL(); l_beta++){
          
-            if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_delta, l_beta ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
             
-               double * Dblock = Dtensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-               double * BlockF1 = F1tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * Dblock = Dtensors[theindex-1][l_beta-l_delta][l_delta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * BlockF1 = F1tensors[theindex+1][l_beta-l_delta][l_delta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += alpha * Dblock[(dimL+1)*cntL] * BlockF1[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += alpha * Dblock[(dimL+1)*cntL] * BlockF1[(dimR+1)*cntR];
+                     }
                   }
                }
-               
             }
          }
       }
@@ -553,17 +595,21 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
       for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
          for (int l_delta=l_beta; l_delta<Prob->gL(); l_delta++){
          
-            if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
+            #ifdef CHEMPS2_MPI_COMPILATION
+            if ( MPIchemps2::owner_cdf( Prob->gL(), l_beta, l_delta ) == MPIRANK )
+            #endif
+            {
+               if (denBK->gIrrep(l_delta) == denBK->gIrrep(l_beta)){
             
-               double * Dblock = Dtensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
-               double * BlockF1 = F1tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
+                  double * Dblock = Dtensors[theindex-1][l_delta-l_beta][l_beta-theindex]->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
+                  double * BlockF1 = F1tensors[theindex+1][l_delta-l_beta][l_beta-theindex-2]->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
                
-               for (int cntL=0; cntL<dimL; cntL++){
-                  for (int cntR=0; cntR<dimR; cntR++){
-                     memHeffDiag[ptr + cntL + dimL*cntR] += alpha * Dblock[(dimL+1)*cntL] * BlockF1[(dimR+1)*cntR];
+                  for (int cntL=0; cntL<dimL; cntL++){
+                     for (int cntR=0; cntR<dimR; cntR++){
+                        memHeffDiag[ptr + cntL + dimL*cntR] += alpha * Dblock[(dimL+1)*cntL] * BlockF1[(dimR+1)*cntR];
+                     }
                   }
                }
-               
             }
          }
       }
@@ -574,12 +620,20 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
 
 void CheMPS2::Heff::addDiagonalExcitations(const int ikappa, double * memHeffDiag, const Sobject * denS, int nLower, double ** VeffTilde) const{
 
-   int loc = denS->gKappa2index(ikappa);
-   int dim = denS->gKappa2index(ikappa+1) - loc;
+   const int loc = denS->gKappa2index(ikappa);
+   const int dim = denS->gKappa2index(ikappa+1) - loc;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   const int MPIRANK = MPIchemps2::mpi_rank();
+   #endif
    
    for (int state=0; state<nLower; state++){
-      for (int cnt=0; cnt<dim; cnt++){
-         memHeffDiag[loc + cnt] += VeffTilde[state][loc+cnt] * VeffTilde[state][loc+cnt];
+      #ifdef CHEMPS2_MPI_COMPILATION
+      if ( MPIchemps2::owner_specific_excitation( Prob->gL(), state ) == MPIRANK )
+      #endif
+      {
+         for (int cnt=0; cnt<dim; cnt++){
+            memHeffDiag[loc + cnt] += VeffTilde[state][loc+cnt] * VeffTilde[state][loc+cnt];
+         }
       }
    }
 

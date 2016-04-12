@@ -1,25 +1,19 @@
-#include <libplugin/plugin.h>
 #include <psi4-dec.h>
-#include <libdpd/dpd.h>
-#include <psifiles.h>
-#include <libpsio/psio.hpp>
-#include <libiwl/iwl.hpp>
-#include <libtrans/integraltransform.h>
-#include <libmints/wavefunction.h>
-#include <libmints/mints.h>
-#include <libciomr/libciomr.h>
+#include <libparallel/parallel.h>
 #include <liboptions/liboptions.h>
-#include <libchkpt/chkpt.h>
+#include <libmints/mints.h>
+#include <libpsio/psio.hpp>
+#include <libdpd/dpd.h>
+#include <libtrans/integraltransform.h>
+#include <libiwl/iwl.hpp>
 
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
 
-INIT_PLUGIN
-
 namespace psi{ namespace fcidump{
 
-extern "C" int
-read_options(std::string name, Options &options)
+extern "C"
+int read_options(std::string name, Options &options)
 {
     if (name == "FCIDUMP"|| options.read_globals()) {
 
@@ -30,43 +24,36 @@ read_options(std::string name, Options &options)
     return true;
 }
 
-extern "C" PsiReturnType
-fcidump(Options &options)
+extern "C"
+SharedWavefunction fcidump(SharedWavefunction wfn, Options& options)
 {
 
     const std::string filenamefcidump = options.get_str("DUMPFILENAME");
 
     // Grab the global (default) PSIO object, for file I/O
     boost::shared_ptr<PSIO> psio(_default_psio_lib_);
-
-    // Now we want the reference (SCF) wavefunction
-    boost::shared_ptr<Wavefunction> wfn = Process::environment.wavefunction();
-    if(!wfn) throw PSIEXCEPTION("SCF has not been run yet!");
-    
-    // Quickly check that there are no open shell orbitals here...
     const int nIrreps  = wfn->nirrep();
-    
+
     // For now, we'll just transform for closed shells and generate all integrals.  For more elaborate use of the
     // LibTrans object, check out the plugin_mp2 example.
     std::vector<boost::shared_ptr<MOSpace> > spaces;
     spaces.push_back(MOSpace::all);
     IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted);
     ints.transform_tei(MOSpace::all, MOSpace::all, MOSpace::all, MOSpace::all);
-    // Use the IntegralTransform object's DPD instance, for convenience
     dpd_set_default(ints.get_dpd_id());
-    
+
     //Readin the MO OEI in moOei & print everything
     int nmo       = wfn->nmo();
     int *orbspi   = wfn->nmopi();
     int *docc     = wfn->doccpi();
     int *socc     = wfn->soccpi();
-    
+
     int nTriMo = nmo * (nmo + 1) / 2;
     double *temp = new double[nTriMo];
     Matrix moOei("MO OEI", nIrreps, orbspi, orbspi);
     IWL::read_one(psio.get(), PSIF_OEI, PSIF_MO_OEI, temp, nTriMo, 0, 0, "outfile");
     moOei.set(temp);
-    
+
     int numElectrons = 0;
     int numMS2 = 0;
     int targetIrrep = 0;
@@ -106,7 +93,7 @@ fcidump(Options &options)
         symm_psi2molpro[6] = 3;
         symm_psi2molpro[7] = 2;
     }
-    
+
     FILE * capturing;
     capturing = fopen( filenamefcidump.c_str(), "w" ); // "w" with fopen means truncate file
     fprintf( capturing, " &FCI NORB= %d,NELEC= %d,MS2= %d,\n", nmo, numElectrons, numMS2 );
@@ -154,15 +141,15 @@ fcidump(Options &options)
        }
        jump += moOei.rowspi(h);
     }
-    
+
     delete [] temp;
-    
+
     fprintf( capturing, " % 23.16E %3d %3d %3d %3d", Process::environment.molecule()->nuclear_repulsion_energy(), 0, 0, 0, 0 );
     fclose( capturing );
 
     outfile->Printf( "Created the file %s", filenamefcidump.c_str() );
 
-    return Success;
+    return wfn;
 }
 
 }} // End Namespaces

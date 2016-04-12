@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <math.h>
 #include <sstream>
+#include <math.h>
 
 #include "MyHDF5.h"
 #include "Lapack.h"
@@ -285,15 +285,4 @@ void CheMPS2::DIIS::loadDIIS(const string filename){
    H5Fclose(file_id);
 
 }
-
-void CheMPS2::DIIS::deleteStoredDIIS(const string filename) const{
-
-   std::stringstream temp;
-   temp << "rm " << filename;
-   int info = system(temp.str().c_str());
-   cout << "Info on CASSCF::DIIS rm call to system: " << info << endl;
-
-}
-
-
 

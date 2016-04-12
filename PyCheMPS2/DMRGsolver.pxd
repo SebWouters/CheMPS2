@@ -1,6 +1,6 @@
 #
 #   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-#   Copyright (C) 2013-2015 Sebastian Wouters
+#   Copyright (C) 2013-2016 Sebastian Wouters
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,16 +21,24 @@ cimport ConvScheme
 cimport Prob
 cimport Corr
 cimport TwoRDM
+cimport ThreeRDM
+from libcpp.string cimport string
+from libcpp cimport bool
 
-cdef extern from "DMRG.h" namespace "CheMPS2":
+cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
     cdef cppclass DMRG:
-        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *) except +
+        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bool makechkpt, const string tmpfolder) except +
         double Solve()
+        void PreSolve()
         void calc2DMandCorrelations()
+        void calc_rdms_and_correlations(const bool do_3rdm)
+        void Symm4RDM(double * output, const int ham_orb1, const int ham_orb2, const bool last_case)
         TwoRDM.TwoDM * get2DM()
+        ThreeRDM.ThreeDM * get3DM()
         Corr.Correlations * getCorrelations()
         void deleteStoredMPS()
         void deleteStoredOperators()
         void activateExcitations(const int)
         void newExcitation(const double)
+        double getFCIcoefficient(int *, int *)
 

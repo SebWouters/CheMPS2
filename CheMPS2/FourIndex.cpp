@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,8 @@ CheMPS2::FourIndex::FourIndex(const int nGroup, const int * IrrepSizes){
    
    arrayLength = calcNumberOfUniqueElements(true); //true means allocate the storage!
    theElements = new double[arrayLength];
+   
+   Clear();
    
 }
 
@@ -148,6 +150,12 @@ CheMPS2::FourIndex::~FourIndex(){
    delete [] theElements;
    delete [] Isizes;
    
+}
+
+void CheMPS2::FourIndex::Clear(){
+
+   for (long long count = 0; count < arrayLength; count++){ theElements[ count ] = 0.0; }
+
 }
 
 void CheMPS2::FourIndex::set(const int irrep_i, const int irrep_j, const int irrep_k, const int irrep_l, const int i, const int j, const int k, const int l, const double val){
@@ -280,6 +288,8 @@ long long CheMPS2::FourIndex::getPtrIrrepOrderOK(const int irrep_i, const int ir
    return -1;
    
 }
+
+int CheMPS2::FourIndex::get_irrep_size( const int irrep ) const{ return Isizes[ irrep ]; }
 
 long long CheMPS2::FourIndex::getPtrAllOK1(const int Icent, const int irrep_i, const int irrep_k, const int i, const int j, const int k, const int l) const{
 

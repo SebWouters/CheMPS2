@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,15 @@
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
 
@@ -75,11 +80,16 @@ int main(void){
    delete Ham;
    
    //Check succes
-   bool OK1 = (fabs(Energy0 + 107.648250974014)<1e-10)? true : false;
-   bool OK2 = (fabs(Energy1 + 106.944757308768)<1e-10)? true : false;
-   bool OK3 = (fabs(Energy2 + 106.92314213886 )<1e-10)? true : false;
+   const bool OK1 = ( fabs( Energy0 + 107.648250974014 ) < 1e-8 )? true : false;
+   const bool OK2 = ( fabs( Energy1 + 106.944757308768 ) < 1e-8 )? true : false;
+   const bool OK3 = ( fabs( Energy2 + 106.92314213886  ) < 1e-8 )? true : false;
    
-   bool success = (OK1 && OK2 && OK3);
+   const bool success = (OK1 && OK2 && OK3);
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 5 succeed : ";
    if (success){
       cout << "yes" << endl;

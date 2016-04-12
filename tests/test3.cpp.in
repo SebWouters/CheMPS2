@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,10 +24,15 @@
 #include "Initialize.h"
 #include "DMRG.h"
 #include "FCI.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
 int main(void){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_init();
+   #endif
 
    CheMPS2::Initialize::Init();
    
@@ -57,47 +62,62 @@ int main(void){
    theDMRG->calc2DMandCorrelations();
    
    //Calculate FCI reference energy and compare the DMRG and FCI 2-RDMs
-   const int Nel_up   = ( N + TwoS ) / 2;
-   const int Nel_down = ( N - TwoS ) / 2;
-   const double maxMemWorkMB = 10.0;
-   const int FCIverbose = 1;
-   CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
-   double * inoutput = new double[theFCI->getVecLength(0)];
-   theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
-   inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
-   const double EnergyFCI = theFCI->GSDavidson(inoutput);
-   theFCI->CalcSpinSquared(inoutput);
-   const int L = Ham->getL();
-   double * TwoDMspace = new double[ L*L*L*L ];
-   theFCI->Fill2RDM(inoutput, TwoDMspace);
+   double EnergyFCI = 0.0;
    double RMSerror2DM = 0.0;
-   for (int orb1=0; orb1<L; orb1++){
-      for (int orb2=0; orb2<L; orb2++){
-         for (int orb3=0; orb3<L; orb3++){
-            for (int orb4=0; orb4<L; orb4++){
-               const double difference = TwoDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
-                                       - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
-               RMSerror2DM += difference * difference;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      const int Nel_up   = ( N + TwoS ) / 2;
+      const int Nel_down = ( N - TwoS ) / 2;
+      const double maxMemWorkMB = 10.0;
+      const int FCIverbose = 1;
+      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
+      double * inoutput = new double[theFCI->getVecLength(0)];
+      theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
+      inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+      EnergyFCI = theFCI->GSDavidson(inoutput);
+      theFCI->CalcSpinSquared(inoutput);
+      const int L = Ham->getL();
+      double * TwoDMspace = new double[ L*L*L*L ];
+      theFCI->Fill2RDM(inoutput, TwoDMspace);
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  const double difference = TwoDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
+                                          - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
+                  RMSerror2DM += difference * difference;
+               }
             }
          }
       }
+      delete [] TwoDMspace;
+      delete [] inoutput;
+      delete theFCI;
+      RMSerror2DM = sqrt(RMSerror2DM);
+      cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDMs = " << RMSerror2DM << endl;
    }
-   delete [] TwoDMspace;
-   delete [] inoutput;
-   RMSerror2DM = sqrt(RMSerror2DM);
-   cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDMs = " << RMSerror2DM << endl;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI,   1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror2DM, 1, MPI_CHEMPS2_MASTER );
+   #endif
    
-   //Clean up DMRG and FCI
+   //Clean up DMRG
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
    delete Prob;
-   delete theFCI;
    delete Ham;
 
    //Check success
-   bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-10 ) && ( RMSerror2DM < 1e-6 )) ? true : false;
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 )) ? true : false;
+   
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+   
    cout << "================> Did test 3 succeed : ";
    if (success){
       cout << "yes" << endl;

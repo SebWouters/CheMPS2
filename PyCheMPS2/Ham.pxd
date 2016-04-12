@@ -1,6 +1,6 @@
 #
 #   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-#   Copyright (C) 2013-2015 Sebastian Wouters
+#   Copyright (C) 2013-2016 Sebastian Wouters
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,9 +17,12 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
-cdef extern from "Hamiltonian.h" namespace "CheMPS2":
+from libcpp.string cimport string
+
+cdef extern from "chemps2/Hamiltonian.h" namespace "CheMPS2":
     cdef cppclass Hamiltonian:
         Hamiltonian(const int, const int, const int *) except +
+        Hamiltonian(const string filename, const int psi4groupnumber) except +
         int getL()
         int getNGroup()
         int getOrbitalIrrep(const int)
@@ -31,4 +34,5 @@ cdef extern from "Hamiltonian.h" namespace "CheMPS2":
         double getVmat(const int, const int, const int, const int)
         void save()
         void read()
+        void writeFCIDUMP(const string filename, const int Nelec, const int TwoS, const int TargetIrrep)
 

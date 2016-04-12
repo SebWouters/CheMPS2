@@ -15,6 +15,7 @@
 import sys
 import os
 import shlex
+from sphinx import version_info
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -51,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'CheMPS2'
-copyright = u'2013-2015, ${CheMPS2_AUTHORS}'
+copyright = u'2013-2016, ${CheMPS2_AUTHORS}'
 author = u'${CheMPS2_AUTHORS}'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -112,7 +113,10 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'classic'
+if isinstance(version_info, tuple) and (version_info[0]*100 + version_info[1]) > 102:
+    html_theme = 'classic'
+else:
+    html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

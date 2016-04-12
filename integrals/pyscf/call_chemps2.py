@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/home/seba/CheMPS2/build/PyCheMPS2') # Folder which contains PyCheMPS2.so
+sys.path.append('/usr/lib/python2.7/site-packages') # Folder which contains PyCheMPS2.so
 import PyCheMPS2
 import ctypes
 import numpy as np
@@ -10,7 +10,7 @@ def call_chemps2( Norbs, GroupName, Orbsym, CONST, OEINT, TEINT, TwoS, Nelec, Ir
     assert( len( DSU2 ) == len( MaxSweeps) )
     assert( len( DSU2 ) == len( NoisePrefac ) )
     
-    CheMPS2_groupnamemapping = {'C1' : 0, 'Ci' : 1, 'C2' : 2, 'Cs' : 3, 'D2' : 4, 'C2v': 5, 'C2h': 6, 'D2h': 7,}
+    CheMPS2_groupnamemapping = {'C1' : 0, 'Ci' : 1, 'C2' : 2, 'Cs' : 3, 'D2' : 4, 'C2v': 5, 'C2h': 6, 'D2h': 7, 'Dooh': 7}
     Group = CheMPS2_groupnamemapping[ GroupName ]
     print "Point group of the molecule =",GroupName
 

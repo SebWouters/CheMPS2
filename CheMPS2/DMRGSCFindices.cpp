@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2015 Sebastian Wouters
+   Copyright (C) 2013-2016 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,16 +20,17 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <iostream>
+#include <algorithm>
 
 #include "DMRGSCFindices.h"
 
 using std::cout;
 using std::endl;
+using std::max;
 
 CheMPS2::DMRGSCFindices::DMRGSCFindices(const int L, const int Group, int * NOCCin, int * NDMRGin, int * NVIRTin){
 
    this->L = L;
-   this->Group = Group;
    SymmInfo.setGroup(Group);
    this->Nirreps = SymmInfo.getNumberOfIrreps();
    
@@ -90,6 +91,8 @@ CheMPS2::DMRGSCFindices::~DMRGSCFindices(){
 
 int CheMPS2::DMRGSCFindices::getL() const{ return L; }
 
+int CheMPS2::DMRGSCFindices::getGroupNumber() const{ return SymmInfo.getGroupNumber(); }
+
 int CheMPS2::DMRGSCFindices::getNirreps() const{ return Nirreps; }
 
 int CheMPS2::DMRGSCFindices::getNORB(const int irrep) const{ return NORB[irrep]; }
@@ -111,6 +114,30 @@ int CheMPS2::DMRGSCFindices::getOrigNVIRTstart(const int irrep) const{ return NO
 int * CheMPS2::DMRGSCFindices::getIrrepOfEachDMRGorbital(){ return irrepOfEachDMRGorbital; }
 
 int CheMPS2::DMRGSCFindices::getOrbitalIrrep(const int index) const{ return irrepOfEachOrbital[index]; }
+
+int CheMPS2::DMRGSCFindices::getNOCCsum() const{
+
+   int total = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ total += getNOCC( irrep ); }
+   return total;
+
+}
+
+int CheMPS2::DMRGSCFindices::getNORBmax() const{
+
+   int the_max = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ the_max = max( the_max, getNORB( irrep ) ); }
+   return the_max;
+
+}
+
+int CheMPS2::DMRGSCFindices::getROTparamsize() const{
+
+   int paramsize = 0;
+   for ( int irrep = 0; irrep < getNirreps(); irrep++ ){ paramsize += ( getNORB( irrep ) * ( getNORB( irrep ) - 1 ) ) / 2; }
+   return paramsize;
+
+}
 
 void CheMPS2::DMRGSCFindices::Print() const{
 
