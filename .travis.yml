@@ -15,7 +15,6 @@ addons:
   apt:
     packages:
         - libhdf5-dev
-        - libhdf5-7
         - liblapack3
         - liblapack-dev
         - libgsl0-dev
@@ -26,4 +25,5 @@ install:
     - cmake ..
     - make
 script:
-    - travis_wait make test
+    # we put a timeout of 30 minues
+    - travis_wait 30 make test
