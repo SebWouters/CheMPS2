@@ -54,7 +54,7 @@ namespace CheMPS2{
          /** \param mps_tensor_up   Upper MPS tensor from which the update should be made
              \param mps_tensor_down Lower MPS tensor from which the update should be made
              \param previous        Previous TensorO from which the update should be made */
-         void update( TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous );
+         void update_ownmem( TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous );
 
       private:
 

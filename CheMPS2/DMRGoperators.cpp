@@ -562,7 +562,7 @@ void CheMPS2::DMRG::updateMovingRight( const int index ){
             if ( index == 0 ){
                Exc_Overlaps[ state ][ index ]->create( MPS[ index ], Exc_MPSs[ state ][ index ] );
             } else {
-               Exc_Overlaps[ state ][ index ]->update( MPS[ index ], Exc_MPSs[ state ][ index ], Exc_Overlaps[ state ][ index - 1 ] );
+               Exc_Overlaps[ state ][ index ]->update_ownmem( MPS[ index ], Exc_MPSs[ state ][ index ], Exc_Overlaps[ state ][ index - 1 ] );
             }
          }
       }
@@ -895,7 +895,7 @@ void CheMPS2::DMRG::updateMovingLeft( const int index ){
             if ( index == L - 2 ){
                Exc_Overlaps[ state ][ index ]->create( MPS[ index + 1 ], Exc_MPSs[ state ][ index + 1 ] );
             } else {
-               Exc_Overlaps[ state ][ index ]->update( MPS[ index + 1 ], Exc_MPSs[ state ][ index + 1 ], Exc_Overlaps[ state ][ index + 1 ] );
+               Exc_Overlaps[ state ][ index ]->update_ownmem( MPS[ index + 1 ], Exc_MPSs[ state ][ index + 1 ], Exc_Overlaps[ state ][ index + 1 ] );
             }
          }
       }

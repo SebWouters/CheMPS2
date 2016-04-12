@@ -236,7 +236,9 @@ void CheMPS2::TwoDM::print_noon() const{
    double * OneRDM = new double[ L * L ];
    double * work   = new double[ lwork ];
    double * eigs   = new double[ L ];
-   
+
+   Irreps my_irreps( Prob->gSy() );
+
    for ( int irrep = 0; irrep < denBK->getNumberOfIrreps(); irrep++ ){
    
       int jump1 = 0;
@@ -261,7 +263,7 @@ void CheMPS2::TwoDM::print_noon() const{
          int lda = L;
          int info;
          dsyev_(&jobz, &uplo, &jump1, OneRDM, &lda, eigs, work, &lwork, &info);
-         cout << "   NOON of irrep " << denBK->getIrrepName(irrep) << " = [ ";
+         cout << "   NOON of irrep " << my_irreps.getIrrepName( irrep ) << " = [ ";
          for ( int cnt = 0; cnt < jump1 - 1; cnt++ ){ cout << eigs[ jump1 - 1 - cnt ] << " , "; } // Print from large to small
          cout << eigs[ 0 ] << " ]." << endl;
       }
@@ -334,7 +336,8 @@ void CheMPS2::TwoDM::read(){
 void CheMPS2::TwoDM::write2DMAfile(const string filename) const{
 
    int * psi2molpro = new int[ denBK->getNumberOfIrreps() ];
-   denBK->symm_psi2molpro( psi2molpro );
+   Irreps my_irreps( Prob->gSy() );
+   my_irreps.symm_psi2molpro( psi2molpro );
    
    FILE * capturing;
    capturing = fopen( filename.c_str(), "w" ); // "w" with fopen means truncate file

@@ -41,6 +41,8 @@ double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookke
                                      book_down->gMaxDimAtBound( indx + 2 ) ) );
    assert( book_up->gIrrep( orb1 ) == book_up->gIrrep( orb2 ) );
 
+   S_down->prog2symm();
+
    double inproduct = 0.0;
 
    #pragma omp parallel reduction(+:inproduct)
@@ -89,6 +91,9 @@ double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookke
          delete [] workmem1;
       }
    }
+
+   S_up  ->symm2prog();
+   // S_down->symm2prog(); S_down is not used anymore afterwards
 
    return inproduct;
 
@@ -191,7 +196,7 @@ double CheMPS2::Excitation::neighbours( const int ikappa, const SyBookkeeper * b
       double factor = gamma;
       daxpy_( &size, &factor, block_down, &inc1, block_up, &inc1 );
    }
-   const double inproduct = ( TwoSR + 1 ) * ddot_( &size, block_down, &inc1, block_up, &inc1 );
+   const double inproduct = ddot_( &size, block_down, &inc1, block_up, &inc1 );
    return inproduct;
 
 }
@@ -376,7 +381,7 @@ double CheMPS2::Excitation::third_left( const int ikappa, const SyBookkeeper * b
          double factor = gamma;
          daxpy_( &size, &factor, workmem, &inc1, block_up, &inc1 );
       }
-      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem, &inc1, block_up, &inc1 );
+      inproduct = ddot_( &size, workmem, &inc1, block_up, &inc1 );
    }
    return inproduct;
 
@@ -561,7 +566,7 @@ double CheMPS2::Excitation::third_right( const int ikappa, const SyBookkeeper * 
          double factor = gamma;
          daxpy_( &size, &factor, workmem, &inc1, block_up, &inc1 );
       }
-      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem, &inc1, block_up, &inc1 );
+      inproduct = ddot_( &size, workmem, &inc1, block_up, &inc1 );
    }
    return inproduct;
 
@@ -708,7 +713,7 @@ double CheMPS2::Excitation::third_middle( const int ikappa, const SyBookkeeper *
          double factor = gamma;
          daxpy_( &size, &factor, workmem2, &inc1, block_up, &inc1 );
       }
-      inproduct = ( TwoSR + 1 ) * ddot_( &size, workmem2, &inc1, block_up, &inc1 );
+      inproduct = ddot_( &size, workmem2, &inc1, block_up, &inc1 );
    }
    return inproduct;
 

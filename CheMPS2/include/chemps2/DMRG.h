@@ -114,13 +114,14 @@ namespace CheMPS2{
          //! Get the pointer to the 3-RDM
          /** \return The 3-RDM. Returns a NULL pointer if not yet calculated. */
          ThreeDM * get3DM(){ return the3DM; }
-         
-         //! After the 3-RDM has been calculated, the 4-RDM terms Gamma4_ijkz,pqrz (with z fixed) can be obtained
-         /** \param output Array to store the 4-RDM terms: output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = Gamma4_ijkz,pqrz (with z fixed). (Hamiltonian indices are used.)
-             \param ham_orbz The fixed orbital (Hamiltonian index.)
-             \param last_case If true, everything will be set up to allow to continue sweeping */
-         void Diag4RDM( double * output, const int ham_orbz, const bool last_case );
-         
+
+         //! Obtain the symmetrized 4-RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed, after the 3-RDM has been calculated.
+         /** \param output    Array to store the symmetrized 4-RDM terms in Hamiltonian index notation: output[ i + L * ( j + L * ( k + L * ( p + L * ( q + L * r )))) ] = 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ).
+             \param ham_orb1  The Hamiltonian index of the first  fixed orbital.
+             \param ham_orb2  The Hamiltonian index of the second fixed orbital.
+             \param last_case If true, everything will be set up to allow to continue sweeping. */
+         void Symm4RDM( double * output, const int ham_orb1, const int ham_orb2, const bool last_case );
+
          //! Get the pointer to the Correlations
          /** \return The Correlations. Returns a NULL pointer if not yet calculated. */
          Correlations * getCorrelations(){ return theCorr; }
@@ -251,13 +252,12 @@ namespace CheMPS2{
          TensorGYZ ** Ztensors;
          TensorKM  ** Ktensors;
          TensorKM  ** Mtensors;
-         
-         //sweepleft
-         double sweepleft(const bool change, const int instruction, const bool am_i_master);
-         
-         //sweepright
-         double sweepright(const bool change, const int instruction, const bool am_i_master);
-         
+
+         // Sweeps
+         double sweepleft(  const bool change, const int instruction, const bool am_i_master );
+         double sweepright( const bool change, const int instruction, const bool am_i_master );
+         double solve_site( const int index, const double dvdson_rtol, const double noise_level, const int virtual_dimension, const bool am_i_master, const bool moving_right, const bool change );
+
          //Load and save functions
          void MY_HDF5_WRITE_BATCH(const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag);
          void MY_HDF5_READ_BATCH( const hid_t file_id, const int number, Tensor ** batch, const long long totalsize, const std::string tag);
@@ -282,18 +282,22 @@ namespace CheMPS2{
          void updateMovingLeftSafe2DM(const int cnt);
          void deleteAllBoundaryOperators();
 
-         //Helper functions for making the 3-RDM boundary operators
-         void update_safe_3rdm_operators(const int boundary);
-         void allocate_3rdm_operators(const int boundary);
-         void update_3rdm_operators(const int boundary);
-         void delete_3rdm_operators(const int boundary);
+         // Helper functions for making the 3-RDM boundary operators
+         void update_safe_3rdm_operators( const int boundary );
+         void allocate_3rdm_operators( const int boundary );
+         void update_3rdm_operators( const int boundary );
+         void delete_3rdm_operators( const int boundary );
+         
+         // Helper functions for making the symmetrized 4-RDM
+         void solve_fock( const int dmrg_orb1, const int dmrg_orb2, const double alpha, const double beta );
+         static void solve_fock_update_helper( const int index, const int dmrg_orb1, const int dmrg_orb2, const bool moving_right, TensorT ** new_mps, TensorT ** old_mps, SyBookkeeper * new_bk, SyBookkeeper * old_bk, TensorO ** overlaps, TensorL ** regular, TensorL ** trans );
+         void  left_normalize( const int siteindex, const bool am_i_master, const bool multiply_right );
+         void right_normalize( const int siteindex, const bool am_i_master, const bool multiply_left  );
+         void symm_4rdm_helper( double * output, const int ham_orb1, const int ham_orb2, const double alpha, const double beta, const bool add, const double factor );
 
          //Helper functions for making the Correlations boundary operators
          void update_correlations_tensors(const int siteindex);
-         
-         //Helper function for the diagonal 4-RDM
-         void diag_4rdm_helper( double * output, const int ham_orbz, const double alpha, const double beta, const bool add, const double factor );
-         
+
          //The storage and functions to handle excited states
          int nStates;
          bool Exc_activated;
@@ -305,7 +309,7 @@ namespace CheMPS2{
          double ** prepare_excitations(Sobject * denS);
          void cleanup_excitations(double ** VeffTilde) const;
          void calcVeffTilde(double * result, Sobject * currentS, int state_number);
-         void calcOverlapsWithLowerStates();
+         void calc_overlaps( const bool moving_right );
          
          // Performance counters
          double timings[ CHEMPS2_TIME_VECLENGTH ];

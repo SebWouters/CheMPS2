@@ -104,7 +104,7 @@ void CheMPS2::TensorL::create_right( const int ikappa, TensorT * mps_tensor_up, 
             char trans   = 'T';
             char notrans = 'N';
             double alpha = 1.0;
-            if ( geval >= 1 ){
+            if ( geval == 1 ){
                alpha = Special::phase( TwoSRdown - TwoSRup + 1 ) * sqrt( ( TwoSRup + 1.0 ) / ( TwoSRdown + 1 ) );
             }
             double add = 1.0;
@@ -121,7 +121,7 @@ void CheMPS2::TensorL::create_right( const int ikappa, TensorT * mps_tensor_up, 
             char trans   = 'T';
             char notrans = 'N';
             double alpha = 1.0;
-            if ( geval >= 1 ){
+            if ( geval == 1 ){
                alpha = Special::phase( TwoSRdown - TwoSRup + 1 ) * sqrt( ( TwoSRup + 1.0 ) / ( TwoSRdown + 1 ) );
             }
             double set = 0.0;
@@ -175,7 +175,7 @@ void CheMPS2::TensorL::create_left( const int ikappa, TensorT * mps_tensor_up, T
             char trans   = 'T';
             char notrans = 'N';
             double alpha = 1.0;
-            if ( geval >= 1 ){
+            if ( geval == 1 ){
                alpha = Special::phase( TwoSLup - TwoSLdown + 1 ) * sqrt( ( TwoSLup + 1.0 ) / ( TwoSLdown + 1 ) );
             }
             double add = 1.0;
@@ -192,7 +192,7 @@ void CheMPS2::TensorL::create_left( const int ikappa, TensorT * mps_tensor_up, T
             char trans   = 'T';
             char notrans = 'N';
             double alpha = 1.0;
-            if ( geval >= 1 ){
+            if ( geval == 1 ){
                alpha = Special::phase( TwoSLup - TwoSLdown + 1 ) * sqrt( ( TwoSLup + 1.0 ) / ( TwoSLdown + 1 ) );
             }
             double set = 0.0;

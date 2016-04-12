@@ -52,7 +52,6 @@ namespace CheMPS2{
    const double CONJ_GRADIENT_PRECOND_CUTOFF  = 1e-12;
 
    const string defaultTMPpath                = "/tmp";
-   const bool   DMRG_printDiscardedWeight     = false;
    const bool   DMRG_storeRenormOptrOnDisk    = true;
    const bool   DMRG_storeMpsOnDisk           = false;
    const string DMRG_MPS_storage_prefix       = "CheMPS2_MPS";
@@ -73,7 +72,6 @@ namespace CheMPS2{
    const double DAVIDSON_FCI_RTOL             = 1e-10;  // Base value for FCI and augmented Hessian diagonalization
    const double DAVIDSON_DMRG_RTOL            = 1e-5;   // Block's Davidson tolerance would correspond to HEFF_DAVIDSON_DMRG_RTOL^2
 
-   const bool   SYBK_debugPrint               = false;
    const int    SYBK_dimensionCutoff          = 262144;
 
    const double TENSORT_orthoComparison       = 1e-13;

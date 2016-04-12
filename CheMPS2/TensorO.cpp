@@ -37,7 +37,7 @@ TensorOperator( boundary_index,
 
 CheMPS2::TensorO::~TensorO(){ }
 
-void CheMPS2::TensorO::update( TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous ){
+void CheMPS2::TensorO::update_ownmem( TensorT * mps_tensor_up, TensorT * mps_tensor_down, TensorO * previous ){
 
    clear();
 

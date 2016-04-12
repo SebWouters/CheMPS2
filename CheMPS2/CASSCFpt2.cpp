@@ -116,17 +116,27 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       copy_active( theFmatrix, mem2, iHandler ); // Fock
-      if ( PSEUDOCANONICAL == true ){
-         for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
-         for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-            theDMRG->Diag4RDM( three_dm, ham_orbz, false );
-            int size = tot_dmrg_power6;
-            double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-            int inc1 = 1;
-            daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+      for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
+      for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
+         theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
+         int size = tot_dmrg_power6;
+         double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
+         int inc1 = 1;
+         daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+      }
+      if ( PSEUDOCANONICAL == false ){
+         for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
+            for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
+               if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
+                  theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
+                  int size = tot_dmrg_power6;
+                  double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
+                  int inc1 = 1;
+                  daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+               }
+            }
          }
-      } else {
-         CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract ); // trace( Fock * cu(4)-4-RDM )
+         // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       }
       copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm ); // 3-RDM
       if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }

@@ -75,7 +75,7 @@ int main(void){
    //Get a diagonal block of the 4-RDM
    const int ham_orbz = 3;
    double * dmrg_diag_4rdm = new double[ L*L*L*L*L*L ];
-   theDMRG->Diag4RDM( dmrg_diag_4rdm, ham_orbz, false );
+   theDMRG->Symm4RDM( dmrg_diag_4rdm, ham_orbz, ham_orbz, false );
    
    //Calculate FCI reference energy
    double EnergyFCI   = 0.0;
@@ -135,7 +135,7 @@ int main(void){
                   for (int orb5=0; orb5<L; orb5++){
                      for (int orb6=0; orb6<L; orb6++){
                         const double difference = fci_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
-                                               - dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
+                                         - 0.5 * dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
                         RMSerror4DM += difference * difference;
                      }
                   }

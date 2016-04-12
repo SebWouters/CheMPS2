@@ -34,14 +34,14 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder){
+CheMPS2::DMRG::DMRG( Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){ PrintLicense(); }
    #else
       PrintLicense();
    #endif
-   
+
    assert( ProbIn->checkConsistency() );
    Prob = ProbIn;
    L = Prob->gL();
@@ -50,19 +50,19 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    thePID = getpid(); //PID is unique for each MPI process
    nStates = 1;
 
-   Ltensors = new TensorL ** [L-1];
-   F0tensors = new TensorF0 *** [L-1];
-   F1tensors = new TensorF1 *** [L-1];
-   S0tensors = new TensorS0 *** [L-1];
-   S1tensors = new TensorS1 *** [L-1];
-   Atensors = new TensorOperator *** [L-1];
-   Btensors = new TensorOperator *** [L-1];
-   Ctensors = new TensorOperator *** [L-1];
-   Dtensors = new TensorOperator *** [L-1];
-   Qtensors = new TensorQ ** [L-1];
-   Xtensors = new TensorX * [L-1];
-   isAllocated = new int[L-1]; //0 not allocated, 1 allocated with movingRight true, 2 allocated with movingRight false
-   
+   Ltensors  = new TensorL ** [ L - 1 ];
+   F0tensors = new TensorF0 *** [ L - 1 ];
+   F1tensors = new TensorF1 *** [ L - 1 ];
+   S0tensors = new TensorS0 *** [ L - 1 ];
+   S1tensors = new TensorS1 *** [ L - 1 ];
+   Atensors  = new TensorOperator *** [ L - 1 ];
+   Btensors  = new TensorOperator *** [ L - 1 ];
+   Ctensors  = new TensorOperator *** [ L - 1 ];
+   Dtensors  = new TensorOperator *** [ L - 1 ];
+   Qtensors  = new TensorQ ** [ L - 1 ];
+   Xtensors  = new TensorX * [ L - 1 ];
+   isAllocated = new int[ L - 1 ]; // 0 not allocated; 1 moving right; 2 moving left
+
    tensor_3rdm_a_J0_doublet = NULL;
    tensor_3rdm_a_J1_doublet = NULL;
    tensor_3rdm_a_J1_quartet = NULL;
@@ -75,15 +75,15 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
    tensor_3rdm_d_J0_doublet = NULL;
    tensor_3rdm_d_J1_doublet = NULL;
    tensor_3rdm_d_J1_quartet = NULL;
-   
+
    Gtensors = NULL;
    Ytensors = NULL;
    Ztensors = NULL;
    Ktensors = NULL;
    Mtensors = NULL;
-   
-   for (int cnt=0; cnt<L-1; cnt++){ isAllocated[cnt] = 0; }
-   for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; } // Clear here so that valgrind can never complain :-)
+
+   for ( int cnt = 0; cnt < L - 1; cnt++ ){ isAllocated[ cnt ] = 0; }
+   for ( int timecnt = 0; timecnt < CHEMPS2_TIME_VECLENGTH; timecnt++ ){ timings[ timecnt ] = 0.0; }
    num_double_write_disk = 0;
    num_double_read_disk  = 0;
    
@@ -100,46 +100,41 @@ CheMPS2::DMRG::DMRG(Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const boo
 }
 
 void CheMPS2::DMRG::setupBookkeeperAndMPS(){
-   
-   denBK = new SyBookkeeper(Prob, OptScheme->get_D(0));
+
+   denBK = new SyBookkeeper( Prob, OptScheme->get_D( 0 ) );
    assert( denBK->IsPossible() );
-   
+
    std::stringstream sstream;
    sstream << CheMPS2::DMRG_MPS_storage_prefix << nStates-1 << ".h5";
    MPSstoragename.assign( sstream.str() );
    struct stat stFileInfo;
-   int intStat = stat(MPSstoragename.c_str(),&stFileInfo);
-   loadedMPS = ((makecheckpoints) && (intStat==0))? true : false ;
+   int intStat = stat( MPSstoragename.c_str(), &stFileInfo );
+   loadedMPS = (( makecheckpoints ) && ( intStat==0 )) ? true : false;
    #ifdef CHEMPS2_MPI_COMPILATION
    assert( MPIchemps2::all_booleans_equal( loadedMPS ) );
    #endif
-   
-   if (loadedMPS){ loadDIM(MPSstoragename,denBK); }
-   
-   MPS = new TensorT * [L];
-   for (int cnt=0; cnt<L; cnt++){ MPS[cnt] = new TensorT( cnt, denBK ); }
-   
-   if (loadedMPS){
+
+   if ( loadedMPS ){ loadDIM( MPSstoragename, denBK ); }
+
+   MPS = new TensorT * [ L ];
+   for ( int cnt = 0; cnt < L; cnt++ ){ MPS[ cnt ] = new TensorT( cnt, denBK ); }
+
+   if ( loadedMPS ){
       bool isConverged;
-      loadMPS(MPSstoragename, MPS, &isConverged);
+      loadMPS( MPSstoragename, MPS, &isConverged );
       #ifdef CHEMPS2_MPI_COMPILATION
       if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
       #endif
       { cout << "Loaded MPS " << MPSstoragename << " converged y/n? : " << isConverged << endl; }
    } else {
-      for (int cnt=0; cnt<L; cnt++){
-         #ifdef CHEMPS2_MPI_COMPILATION
-         if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){
-         #endif
-            // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
-            TensorOperator * diag = new TensorOperator( cnt+1, 0, 0, 0, true, true, false, denBK, denBK );
-            MPS[cnt]->random();
-            MPS[cnt]->QR(diag);
-            delete diag;
-         #ifdef CHEMPS2_MPI_COMPILATION
-         }
-         MPIchemps2::broadcast_tensor(MPS[cnt], MPI_CHEMPS2_MASTER);
-         #endif
+      #ifdef CHEMPS2_MPI_COMPILATION
+         const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+      #else
+         const bool am_i_master = true;
+      #endif
+      for ( int site = 0; site < L; site++ ){
+         if ( am_i_master ){ MPS[ site ]->random(); }
+         left_normalize( site, am_i_master, false );
       }
    }
 
@@ -150,9 +145,9 @@ CheMPS2::DMRG::~DMRG(){
    if ( the2DM  != NULL ){ delete the2DM;  }
    if ( the3DM  != NULL ){ delete the3DM;  }
    if ( theCorr != NULL ){ delete theCorr; }
-   
+
    deleteAllBoundaryOperators();
-   
+
    delete [] Ltensors;
    delete [] F0tensors;
    delete [] F1tensors;
@@ -165,28 +160,28 @@ CheMPS2::DMRG::~DMRG(){
    delete [] Qtensors;
    delete [] Xtensors;
    delete [] isAllocated;
-   
-   for (int site=0; site<L; site++){ delete MPS[site]; }
+
+   for ( int site = 0; site < L; site++ ){ delete MPS[ site ]; }
    delete [] MPS;
-   
-   if (Exc_activated){
+
+   if ( Exc_activated ){
       delete [] Exc_Eshifts;
-      for (int state = 0; state < nStates-1; state++){
+      for ( int state = 0; state < nStates - 1; state++ ){
          #ifdef CHEMPS2_MPI_COMPILATION
          if ( MPIchemps2::owner_specific_excitation( L, state ) == MPIchemps2::mpi_rank() )
          #endif
          {
-            for (int orb = 0; orb < L; orb++){ delete Exc_MPSs[ state ][ orb ]; }
+            for ( int orb = 0; orb < L; orb++ ){ delete Exc_MPSs[ state ][ orb ]; }
             delete [] Exc_MPSs[ state ];
             delete Exc_BKs[ state ];
-            delete [] Exc_Overlaps[ state ]; //The rest is allocated and deleted at DMRGoperators.cpp
+            delete [] Exc_Overlaps[ state ]; // The rest is allocated and deleted at DMRGoperators.cpp
          }
       }
       delete [] Exc_MPSs;
       delete [] Exc_BKs;
       delete [] Exc_Overlaps;
    }
-   
+
    delete denBK;
 
 }
@@ -194,9 +189,9 @@ CheMPS2::DMRG::~DMRG(){
 void CheMPS2::DMRG::PreSolve(){
 
    deleteAllBoundaryOperators();
-   
-   for (int cnt=0; cnt<L-2; cnt++){ updateMovingRightSafeFirstTime(cnt); }
-   
+
+   for ( int cnt = 0; cnt < L - 2; cnt++ ){ updateMovingRightSafeFirstTime( cnt ); }
+
    TotalMinEnergy = 1e8;
    MaxDiscWeightLastSweep = 0.0;
 
@@ -204,32 +199,32 @@ void CheMPS2::DMRG::PreSolve(){
 
 double CheMPS2::DMRG::Solve(){
 
-   bool change = (TotalMinEnergy<1e8) ? true : false; //1 sweep from right to left: fixed virtual dimensions
-   
+   bool change = ( TotalMinEnergy < 1e8 ) ? true : false; // 1 sweep from right to left: fixed virtual dimensions
+
    double Energy = 0.0;
-   
+
    #ifdef CHEMPS2_MPI_COMPILATION
       const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
    #endif
-   
-   for (int instruction=0; instruction < OptScheme->get_number(); instruction++){
-   
+
+   for ( int instruction = 0; instruction < OptScheme->get_number(); instruction++ ){
+
       int nIterations = 0;
-      double EnergyPrevious = Energy + 10 * OptScheme->get_energy_conv(instruction); //Guarantees that there's always at least 1 left-right sweep
-      
-      while ( (fabs(Energy-EnergyPrevious) > OptScheme->get_energy_conv(instruction) ) && ( nIterations < OptScheme->get_max_sweeps(instruction) )){
-      
-         for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
+      double EnergyPrevious = Energy + 10 * OptScheme->get_energy_conv( instruction ); // Guarantees that there's always at least 1 left-right sweep
+
+      while (( fabs( Energy - EnergyPrevious ) > OptScheme->get_energy_conv( instruction ) ) && ( nIterations < OptScheme->get_max_sweeps( instruction ) )){
+
+         for ( int timecnt = 0; timecnt < CHEMPS2_TIME_VECLENGTH; timecnt++ ){ timings[ timecnt ] = 0.0; }
          num_double_write_disk = 0;
          num_double_read_disk  = 0;
          struct timeval start, end;
          EnergyPrevious = Energy;
-         gettimeofday(&start, NULL);
-         Energy = sweepleft(change, instruction, am_i_master); // Only relevant call in this block of code
-         gettimeofday(&end, NULL);
-         double elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+         gettimeofday( &start, NULL );
+         Energy = sweepleft( change, instruction, am_i_master ); // Only relevant call in this block of code
+         gettimeofday( &end, NULL );
+         double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
          if ( am_i_master ){
             cout << "******************************************************************" << endl;
             cout << "***  Information on left sweep " << nIterations << " of instruction " << instruction << ":" << endl;
@@ -240,16 +235,17 @@ double CheMPS2::DMRG::Solve(){
             print_tensor_update_performance();
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
+            if ( Exc_activated ){ calc_overlaps( false ); }
             cout << "******************************************************************" << endl;
          }
-         if (!change) change = true; //rest of sweeps: variable virtual dimensions
-         for (int timecnt=0; timecnt<CHEMPS2_TIME_VECLENGTH; timecnt++){ timings[timecnt]=0.0; }
+         change = true; //rest of sweeps: variable virtual dimensions
+         for ( int timecnt = 0; timecnt < CHEMPS2_TIME_VECLENGTH; timecnt++ ){ timings[ timecnt ] = 0.0; }
          num_double_write_disk = 0;
          num_double_read_disk  = 0;
-         gettimeofday(&start, NULL);
-         Energy = sweepright(change, instruction, am_i_master); // Only relevant call in this block of code
-         gettimeofday(&end, NULL);
-         elapsed = (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+         gettimeofday( &start, NULL );
+         Energy = sweepright( change, instruction, am_i_master ); // Only relevant call in this block of code
+         gettimeofday( &end, NULL );
+         elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
          if ( am_i_master ){
             cout << "******************************************************************" << endl;
             cout << "***  Information on right sweep " << nIterations << " of instruction " << instruction << ":" << endl;
@@ -261,15 +257,15 @@ double CheMPS2::DMRG::Solve(){
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
             cout << "***     Energy difference with respect to previous leftright sweep = " << fabs(Energy-EnergyPrevious) << endl;
+            if ( Exc_activated ){ calc_overlaps( true ); }
             cout << "******************************************************************" << endl;
-            if ( makecheckpoints ){ saveMPS(MPSstoragename, MPS, denBK, false); } // Only the master proc makes MPS checkpoints !!
+            if ( makecheckpoints ){ saveMPS( MPSstoragename, MPS, denBK, false ); } // Only the master proc makes MPS checkpoints !!
          }
-         
+
          nIterations++;
-         if (Exc_activated){ calcOverlapsWithLowerStates(); }
-      
+
       }
-      
+
       if ( am_i_master ){
          cout << "***  Information on completed instruction " << instruction << ":" << endl;
          cout << "***     The reduced virtual dimension DSU(2)               = " << OptScheme->get_D(instruction) << endl;
@@ -278,171 +274,148 @@ double CheMPS2::DMRG::Solve(){
          cout << "***     Maximum discarded weight during the last sweep     = " << MaxDiscWeightLastSweep << endl;
          cout << "******************************************************************" << endl;
       }
-   
+
    }
-   
+
    return TotalMinEnergy;
 
 }
 
-double CheMPS2::DMRG::sweepleft(const bool change, const int instruction, const bool am_i_master){
+double CheMPS2::DMRG::sweepleft( const bool change, const int instruction, const bool am_i_master ){
 
    double Energy = 0.0;
    const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
    const double dvdson_rtol = OptScheme->get_dvdson_rtol( instruction );
+   const int vir_dimension  = OptScheme->get_D( instruction );
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
-   struct timeval start, end;
-   
-   for (int index = L-2; index>0; index--){
-      //Construct S
-      gettimeofday(&start, NULL);
-      Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
-      //Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
-      denS->Join(MPS[index],MPS[index+1]);
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Feed everything to the solver
-      gettimeofday(&start, NULL);
-      Heff Solver(denBK, Prob, dvdson_rtol);
-      double ** VeffTilde = NULL;
-      if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
-      //Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.
-      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);
-      if (Exc_activated){ cleanup_excitations(VeffTilde); }
-      Energy += Prob->gEconst();
-      if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
-      if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Decompose the S-object
-      gettimeofday(&start, NULL);
-      if (( noise_level > 0.0 ) && ( am_i_master )){ denS->addNoise( noise_level ); }
-      //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->get_D(instruction),false,change);
-      delete denS;
-      if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Print info
+
+   for ( int index = L - 2; index > 0; index-- ){
+
+      Energy = solve_site( index, dvdson_rtol, noise_level, vir_dimension, am_i_master, false, change );
+      if ( Energy < TotalMinEnergy ){ TotalMinEnergy = Energy; }
+      if ( Energy < LastMinEnergy  ){  LastMinEnergy = Energy; }
       if ( am_i_master ){
-         cout << "Energy at sites (" << index << ", " << (index+1) << ") is " << Energy << endl;
-         if (CheMPS2::DMRG_printDiscardedWeight && change){ cout << "   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = " << discWeight << endl; }
+         cout << "Energy at sites (" << index << ", " << index + 1 << ") is " << Energy << endl;
       }
-      
-      //Prepare for next step
-      gettimeofday(&start, NULL);
-      updateMovingLeftSafe(index);
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
+      // Prepare for next step
+      struct timeval start, end;
+      gettimeofday( &start, NULL );
+      updateMovingLeftSafe( index );
+      gettimeofday( &end, NULL );
+      timings[ CHEMPS2_TIME_TENS_TOTAL ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
 
    }
-   
+
    return Energy;
 
 }
 
-double CheMPS2::DMRG::sweepright(const bool change, const int instruction, const bool am_i_master){
+double CheMPS2::DMRG::sweepright( const bool change, const int instruction, const bool am_i_master ){
 
-   double Energy=0.0;
+   double Energy = 0.0;
    const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
    const double dvdson_rtol = OptScheme->get_dvdson_rtol( instruction );
+   const int vir_dimension  = OptScheme->get_D( instruction );
    MaxDiscWeightLastSweep = 0.0;
    LastMinEnergy = 1e8;
-   struct timeval start, end;
-   
-   for (int index = 0; index<L-2; index++){
-      //Construct S
-      gettimeofday(&start, NULL);
-      Sobject * denS = new Sobject(index,denBK->gIrrep(index),denBK->gIrrep(index+1),denBK);
-      //Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
-      denS->Join(MPS[index],MPS[index+1]);
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_JOIN ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Feed everything to solver
-      gettimeofday(&start, NULL);
-      Heff Solver(denBK, Prob, dvdson_rtol);
-      double ** VeffTilde = NULL;
-      if (Exc_activated){ VeffTilde = prepare_excitations(denS); }
-      //Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.
-      Energy = Solver.SolveDAVIDSON(denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates-1, VeffTilde);
-      if (Exc_activated){ cleanup_excitations(VeffTilde); }
-      Energy += Prob->gEconst();
-      if (Energy<TotalMinEnergy){ TotalMinEnergy = Energy; }
-      if (Energy<LastMinEnergy){  LastMinEnergy  = Energy; }
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_SOLVE ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Decompose the S-object
-      gettimeofday(&start, NULL);
-      if (( noise_level > 0.0 ) && ( am_i_master )){ denS->addNoise( noise_level ); }
-      //MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight and now has the new MPS tensors set.
-      double discWeight = denS->Split(MPS[index],MPS[index+1],OptScheme->get_D(instruction),true,change);
-      delete denS;
-      if (discWeight > MaxDiscWeightLastSweep){ MaxDiscWeightLastSweep = discWeight; }
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_S_SPLIT ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
-      
-      //Print info
+
+   for ( int index = 0; index < L - 2; index++ ){
+
+      Energy = solve_site( index, dvdson_rtol, noise_level, vir_dimension, am_i_master, true, change );
+      if ( Energy < TotalMinEnergy ){ TotalMinEnergy = Energy; }
+      if ( Energy < LastMinEnergy  ){  LastMinEnergy = Energy; }
       if ( am_i_master ){
-         cout << "Energy at sites (" << index << ", " << (index+1) << ") is " << Energy << endl;
-         if (CheMPS2::DMRG_printDiscardedWeight && change){ cout << "   Info(DMRG) : Discarded weight in SVD decomp. (non-reduced) = " << discWeight << endl; }
+         cout << "Energy at sites (" << index << ", " << index + 1 << ") is " << Energy << endl;
       }
-      
-      //Prepare for next step
-      gettimeofday(&start, NULL);
-      updateMovingRightSafe(index);
-      gettimeofday(&end, NULL);
-      timings[ CHEMPS2_TIME_TENS_TOTAL ] += (end.tv_sec - start.tv_sec) + 1e-6 * (end.tv_usec - start.tv_usec);
+
+      // Prepare for next step
+      struct timeval start, end;
+      gettimeofday( &start, NULL );
+      updateMovingRightSafe( index );
+      gettimeofday( &end, NULL );
+      timings[ CHEMPS2_TIME_TENS_TOTAL ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
 
    }
-   
+
    return Energy;
 
 }
 
-void CheMPS2::DMRG::activateExcitations(const int maxExcIn){
+double CheMPS2::DMRG::solve_site( const int index, const double dvdson_rtol, const double noise_level, const int virtual_dimension, const bool am_i_master, const bool moving_right, const bool change ){
+
+   struct timeval start, end;
+
+   // Construct two-site object S. Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
+   gettimeofday( &start, NULL );
+   Sobject * denS = new Sobject( index, denBK->gIrrep( index ), denBK->gIrrep( index + 1 ), denBK );
+   denS->Join( MPS[ index ], MPS[ index + 1 ] );
+   gettimeofday( &end, NULL );
+   timings[ CHEMPS2_TIME_S_JOIN ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+
+   // Feed everything to the solver. Each MPI process returns the correct energy. Only MPI_CHEMPS2_MASTER has the correct denS solution.
+   gettimeofday( &start, NULL );
+   Heff Solver( denBK, Prob, dvdson_rtol );
+   double ** VeffTilde = NULL;
+   if ( Exc_activated ){ VeffTilde = prepare_excitations( denS ); }
+   double Energy = Solver.SolveDAVIDSON( denS, Ltensors, Atensors, Btensors, Ctensors, Dtensors, S0tensors, S1tensors, F0tensors, F1tensors, Qtensors, Xtensors, nStates - 1, VeffTilde );
+   Energy += Prob->gEconst();
+   if ( Exc_activated ){ cleanup_excitations( VeffTilde ); }
+   gettimeofday( &end, NULL );
+   timings[ CHEMPS2_TIME_S_SOLVE ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+
+   // Decompose the S-object. MPI_CHEMPS2_MASTER decomposes denS. Each MPI process returns the correct discWeight. Each MPI process has the new MPS tensors set.
+   gettimeofday( &start, NULL );
+   if (( noise_level > 0.0 ) && ( am_i_master )){ denS->addNoise( noise_level ); }
+   const double discWeight = denS->Split( MPS[ index ], MPS[ index + 1 ], virtual_dimension, moving_right, change );
+   delete denS;
+   if ( discWeight > MaxDiscWeightLastSweep ){ MaxDiscWeightLastSweep = discWeight; }
+   gettimeofday( &end, NULL );
+   timings[ CHEMPS2_TIME_S_SPLIT ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+
+   return Energy;
+
+}
+
+void CheMPS2::DMRG::activateExcitations( const int maxExcIn ){
 
    Exc_activated = true;
    maxExc = maxExcIn;
-   Exc_Eshifts = new double[maxExc];
-   Exc_MPSs = new TensorT ** [maxExc];
-   Exc_BKs = new SyBookkeeper * [maxExc];
-   Exc_Overlaps = new TensorO ** [maxExc];
+   Exc_Eshifts = new double[ maxExc ];
+   Exc_MPSs = new TensorT ** [ maxExc ];
+   Exc_BKs = new SyBookkeeper * [ maxExc ];
+   Exc_Overlaps = new TensorO ** [ maxExc ];
 
 }
 
-void CheMPS2::DMRG::newExcitation(const double EshiftIn){
+void CheMPS2::DMRG::newExcitation( const double EshiftIn ){
 
    assert( Exc_activated );
-   assert( nStates-1 < maxExc );
-   
+   assert( nStates - 1 < maxExc );
+
    if ( the2DM  != NULL ){ delete the2DM;  the2DM  = NULL; }
    if ( the3DM  != NULL ){ delete the3DM;  the3DM  = NULL; }
    if ( theCorr != NULL ){ delete theCorr; theCorr = NULL; }
    deleteAllBoundaryOperators();
 
-   Exc_Eshifts[nStates-1] = EshiftIn;
+   Exc_Eshifts[ nStates - 1 ] = EshiftIn;
    #ifdef CHEMPS2_MPI_COMPILATION
-   if ( MPIchemps2::owner_specific_excitation( L, nStates-1 ) == MPIchemps2::mpi_rank() ){
+   if ( MPIchemps2::owner_specific_excitation( L, nStates - 1 ) == MPIchemps2::mpi_rank() ){
    #endif
-      Exc_MPSs[nStates-1] = MPS;
-      Exc_BKs[nStates-1] = denBK;
-      Exc_Overlaps[nStates-1] = new TensorO*[L-1];
+      Exc_MPSs[ nStates - 1 ] = MPS;
+      Exc_BKs[ nStates - 1 ] = denBK;
+      Exc_Overlaps[ nStates - 1 ] = new TensorO*[ L - 1 ];
    #ifdef CHEMPS2_MPI_COMPILATION
    } else {
-      for (int site=0; site<L; site++){ delete MPS[site]; }
+      for ( int site = 0; site < L; site++ ){ delete MPS[ site ]; }
       delete [] MPS;
       delete denBK;
    }
    #endif
-   
+
    nStates++;
-   
+
    setupBookkeeperAndMPS();
    PreSolve();
 
