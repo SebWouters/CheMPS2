@@ -26,4 +26,4 @@ install:
     - cmake ..
     - make
 script:
-    - make test
+    - travis_wait make test
