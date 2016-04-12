@@ -26,70 +26,49 @@ import ctypes
 Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
-#######################
-### BCS Hamiltonian ###
-#######################
+# Read in the FCIDUMP
+psi4group = 7 # d2h: see chemps2/Irreps.h
+filename  = '../../tests/matrixelements/N2.CCPVDZ.FCIDUMP'
+orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
+Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 
-eps = np.array([ -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5 ], dtype=ctypes.c_double)
-L = len( eps )
-g = -1.0
-power = 0.0
+# Define the symmetry sector
+TwoS = 0     # Two times the targeted spin
+Nelec = 14   # The number of electrons
+Irrep = 0    # The targeted irrep
 
-Nelec = L # Number of fermions in the model = Number of single-particle states
-TwoS = 0  # Twice the total spin
-Irrep = 0 # No point group is used, Irrep should ALWAYS be zero.
+# Define the CASSCF
+DOCC  = np.array([ 3, 0, 0, 0, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see N2.ccpvdz.out
+SOCC  = np.array([ 0, 0, 0, 0, 0, 0, 0, 0 ], dtype=ctypes.c_int)
+NOCC  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
+NDMRG = np.array([ 2, 0, 1, 1, 0, 2, 1, 1 ], dtype=ctypes.c_int)
+NVIRT = np.array([ 4, 1, 2, 2, 1, 4, 2, 2 ], dtype=ctypes.c_int)
+theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT)
 
-'''
-   Model: h_ij = delta_ij eps[i]
-          v_ijkl = delta_ij delta_kl g ( eps[i] * eps[k] ) ^ {power}
-          h_ijkl = v_ijkl + ( delta_ik h_jl + delta_jl h_ik ) / ( N - 1 )
-          Ham = 0.5 sum_ijkl h_ijkl sum_sigma,tau a^+_{i,sigma} a^+_{j,tau} a_{l,tau} a_{k,sigma}
-'''
-
-# The Hamiltonian initializes all its matrix elements to 0.0
-orbirreps = np.zeros( [ L ], dtype=ctypes.c_int )
-group = 0
-Ham = PyCheMPS2.PyHamiltonian( L, group, orbirreps )
-
-# Setting up the Problem
-Prob = PyCheMPS2.PyProblem( Ham, TwoS, Nelec, Irrep )
-
-# Setting up the ConvergenceScheme
-# setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
-OptScheme = PyCheMPS2.PyConvergenceScheme( 2 )
-OptScheme.setInstruction( 0,  100, 1e-10, 10, 0.5 )
-OptScheme.setInstruction( 1, 1000, 1e-10, 10, 0.0 )
-
-# Run ground state calculation
-theDMRG = PyCheMPS2.PyDMRG( Prob, OptScheme )
-###############################################################################################
-### Hack: overwrite the matrix elements with 4-fold symmetry directly in the Problem object ###
-###############################################################################################
-for orb1 in range( L ):
-   for orb2 in range( L ):
-      eri = g * ( abs( eps[ orb1 ] * eps[ orb2 ] )**power )
-      oei = ( eps[ orb1 ] + eps[ orb2 ] ) / ( Nelec - 1 )
-      if ( orb1 == orb2 ):
-         Prob.setMxElement( orb1, orb1, orb2, orb2, eri + oei )
-      else:
-         Prob.setMxElement( orb1, orb1, orb2, orb2, eri )
-         Prob.setMxElement( orb1, orb2, orb1, orb2, oei )
-theDMRG.PreSolve() # New matrix elements require reconstruction of complementary renormalized operators
-Energy = theDMRG.Solve()
-theDMRG.calc2DMandCorrelations()
-theDMRG.printCorrelations()
+# Setting the DMRGSCFoptions and run DMRGSCF
+root_num = 1 # Ground state only
+scf_options = PyCheMPS2.PyDMRGSCFoptions()
+scf_options.setDoDIIS( True )
+IPEA = 0.0
+IMAG = 0.0
+PSEUDOCANONICAL = False
+Energy1 = theDMRGSCF.solve_fci( Nelec, TwoS, Irrep, root_num, scf_options)
+Energy2 = theDMRGSCF.caspt2_fci(Nelec, TwoS, Irrep, root_num, scf_options, IPEA, IMAG, PSEUDOCANONICAL)
 
 # Clean-up
-# theDMRG.deleteStoredMPS()
-theDMRG.deleteStoredOperators()
-del theDMRG
-del OptScheme
-del Prob
+if scf_options.getStoreUnitary():
+    theDMRGSCF.deleteStoredUnitary()
+if scf_options.getStoreDIIS():
+    theDMRGSCF.deleteStoredDIIS()
+
+# The order of deallocation matters!
+del scf_options
+del theDMRGSCF
 del Ham
 del Initializer
 
 # Check whether the test succeeded
-if ( np.fabs( Energy + 25.5134137600604 ) < 1e-8 ):
+if (( np.fabs( Energy1 + 109.103502335253 ) < 1e-8 ) and ( np.fabs( Energy2 + 0.159997813112638 ) < 1e-8 )):
     print "================> Did test 13 succeed : yes"
 else:
     print "================> Did test 13 succeed : no"

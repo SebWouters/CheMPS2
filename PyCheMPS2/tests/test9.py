@@ -26,52 +26,99 @@ import ctypes
 Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
-# Read in the FCIDUMP
-psi4group = 7 # d2h: see chemps2/Irreps.h
-filename  = '../../tests/matrixelements/N2.CCPVDZ.FCIDUMP'
-orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
-Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
+########################################
+### Square 2D Hubbard model with PBC ###
+########################################
 
-# Define the symmetry sector
-TwoS = 0     # Two times the targeted spin
-N = 14       # The number of electrons
-Irrep = 0    # The targeted irrep
+L_linear = 3                    # Linear size
+L_square = L_linear * L_linear  # Number of orbitals
+group = 0                       # C1 symmetry
+U =  5.0                        # On-site repulsion
+T = -1.0                        # Hopping term
 
-# Define the CASSCF
-DOCC  = np.array([ 3, 0, 0, 0, 0, 2, 1, 1 ], dtype=ctypes.c_int) # see N2.ccpvdz.out
-SOCC  = np.array([ 0, 0, 0, 0, 0, 0, 0, 0 ], dtype=ctypes.c_int)
-NOCC  = np.array([ 1, 0, 0, 0, 0, 1, 0, 0 ], dtype=ctypes.c_int)
-NDMRG = np.array([ 4, 0, 1, 1, 0, 4, 1, 1 ], dtype=ctypes.c_int)
-NVIRT = np.array([ 2, 1, 2, 2, 1, 2, 2, 2 ], dtype=ctypes.c_int)
-theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT)
+Nelec = 9                       # Number of electrons
+TwoS = 1                        # Two times the spin
+Irrep = 0                       # Irrep = A (C1 symmetry)
+
+# The Hamiltonian initializes all its matrix elements to 0.0
+orbirreps = np.zeros([L_square], dtype=ctypes.c_int)
+Ham = PyCheMPS2.PyHamiltonian(L_square, group, orbirreps)
+
+# Fill with the site-basis matrix elements
+for orb in range(L_square):
+    Ham.setVmat(orb,orb,orb,orb,U)
+for ix in range(L_linear):
+    for iy in range(L_linear):
+        idx1 = ix + L_linear * iy                        # This site
+        idx2 = (( ix + 1 ) % L_linear) + L_linear * iy   # Right neighbour (PBC)
+        idx3 = ix + L_linear * ((( iy + 1 ) % L_linear)) # Upper neighbour (PBC)
+        Ham.setTmat(idx1,idx2,T)
+        Ham.setTmat(idx1,idx3,T)
+
+# Setting up the Problem
+Prob = PyCheMPS2.PyProblem(Ham, TwoS, Nelec, Irrep)
 
 # Setting up the ConvergenceScheme
 # setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
-OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
-OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
+OptScheme = PyCheMPS2.PyConvergenceScheme(2) # 2 instructions
+OptScheme.setInstruction(0,  500, 1e-10,  3, 0.05)
+OptScheme.setInstruction(1, 1000, 1e-10, 10, 0.0 )
 
-# Setting the DMRGSCFoptions and run DMRGSCF
-rootNum = 1 # Ground state only
-theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
-theDMRGSCFoptions.setDoDIIS(True)
-theDMRGSCFoptions.setWhichActiveSpace(2) # 2 means localized orbitals
-Energy = theDMRGSCF.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
+# Run ground state calculation
+theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
+EnergySite = theDMRG.Solve()
+theDMRG.calc2DMandCorrelations()
+
+# Clean-up DMRG
+# theDMRG.deleteStoredMPS()
+theDMRG.deleteStoredOperators()
+del theDMRG
+
+#################################################################################################################
+### Hack: overwrite the matrix elements in momentum space (4-fold symmetry!!!) directly in the Problem object ###
+#################################################################################################################
+theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme) # Prob->construct_mxelem() is called in DMRG constructor
+for orb1 in range(L_square):
+    k1x = orb1 % L_linear
+    k1y = orb1 / L_linear
+    Telem1 = 2*T*(np.cos((2*np.pi*k1x)/L_linear) + np.cos((2*np.pi*k1y)/L_linear))
+    for orb2 in range(L_square):
+        k2x = orb2 % L_linear
+        k2y = orb2 / L_linear
+        Telem2 = 2*T*(np.cos((2*np.pi*k2x)/L_linear) + np.cos((2*np.pi*k2y)/L_linear))
+        for orb3 in range(L_square):
+            k3x = orb3 % L_linear
+            k3y = orb3 / L_linear
+            for orb4 in range(L_square):
+                k4x = orb4 % L_linear
+                k4y = orb4 / L_linear
+                kx_conservation = False
+                if (((k1x+k2x) % L_linear) == ((k3x+k4x) % L_linear)):
+                    kx_conservation = True
+                ky_conservation = False
+                if (((k1y+k2y) % L_linear) == ((k3y+k4y) % L_linear)):
+                    ky_conservation = True
+                temp = 0.0
+                if ( kx_conservation and ky_conservation ):
+                    temp += U/L_square
+                if (( orb1 == orb3 ) and ( orb2 == orb4 )):
+                    temp += (Telem1+Telem2)/(Nelec-1)
+                Prob.setMxElement(orb1,orb2,orb3,orb4,temp)
+theDMRG.PreSolve() # New matrix elements require reconstruction of complementary renormalized operators
+EnergyMomentum = theDMRG.Solve()
+theDMRG.calc2DMandCorrelations()
 
 # Clean-up
-if theDMRGSCFoptions.getStoreUnitary():
-    theDMRGSCF.deleteStoredUnitary()
-if theDMRGSCFoptions.getStoreDIIS():
-    theDMRGSCF.deleteStoredDIIS()
-
-# The order of deallocation matters!
-del theDMRGSCFoptions
+# theDMRG.deleteStoredMPS()
+theDMRG.deleteStoredOperators()
+del theDMRG
 del OptScheme
-del theDMRGSCF
+del Prob
 del Ham
 del Initializer
 
 # Check whether the test succeeded
-if (np.fabs(Energy + 109.15104350802) < 1e-8):
+if (np.fabs(EnergySite - EnergyMomentum) < 1e-8):
     print "================> Did test 9 succeed : yes"
 else:
     print "================> Did test 9 succeed : no"

@@ -37,50 +37,58 @@ int main(void){
    #endif
 
    CheMPS2::Initialize::Init();
-
+   
    //The path to the matrix elements
    string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.CCPVDZ.FCIDUMP";
-
+   
    //Setup the Hamiltonian
    const int psi4groupnumber = 7; // d2h -- see Irreps.h and N2.ccpvdz.out
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
-
+   
    //Setup CASSCF --> number of irreps = 8
    int DOCC[]  = { 3, 0, 0, 0, 0, 2, 1, 1 }; // see N2.ccpvdz.out
    int SOCC[]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
    int NOCC[]  = { 1, 0, 0, 0, 0, 1, 0, 0 };
-   int NDMRG[] = { 2, 0, 1, 1, 0, 2, 1, 1 };
-   int NVIRT[] = { 4, 1, 2, 2, 1, 4, 2, 2 };
+   int NDMRG[] = { 4, 0, 1, 1, 0, 4, 1, 1 };
+   int NVIRT[] = { 2, 1, 2, 2, 1, 2, 2, 2 };
    CheMPS2::CASSCF koekoek( Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT );
-
+   
    //Setup symmetry sector
-   int Nelec = 14;
+   int N = 14;
    int TwoS = 0;
    int Irrep = 0;
+   
+   //Setup convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( 2 );
+   //OptScheme->setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
+   OptScheme->set_instruction( 0,  500, 1e-10,  3, 0.1, 1e-5 );
+   OptScheme->set_instruction( 1, 1000, 1e-10, 10, 0.0, 1e-9 );
 
    //Run CASSCF
    const int root_num = 1; //Ground state only
    CheMPS2::DMRGSCFoptions * scf_options = new CheMPS2::DMRGSCFoptions();
    scf_options->setDoDIIS( true );
+   scf_options->setWhichActiveSpace( 2 ); //Localized orbitals
    const double IPEA = 0.0;
    const double IMAG = 0.0;
    const bool PSEUDOCANONICAL = false;
-   double Energy1 = koekoek.solve( Nelec, TwoS, Irrep, NULL, root_num, scf_options);
-   double Energy2 = koekoek.caspt2(Nelec, TwoS, Irrep, NULL, root_num, scf_options, IPEA, IMAG, PSEUDOCANONICAL);
+   double Energy1 = koekoek.solve( N, TwoS, Irrep, OptScheme, root_num, scf_options);
+   double Energy2 = koekoek.caspt2(N, TwoS, Irrep, OptScheme, root_num, scf_options, IPEA, IMAG, PSEUDOCANONICAL);
 
    //Clean up
    if (scf_options->getStoreUnitary()){ koekoek.deleteStoredUnitary( scf_options->getUnitaryStorageName() ); }
    if (scf_options->getStoreDIIS()){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
+   delete OptScheme;
    delete scf_options;
    delete Ham;
-
+   
    //Check succes
-   const bool success = (( fabs( Energy1 + 109.103502335253 ) < 1e-8 ) && ( fabs( Energy2 + 0.159997813112638 ) < 1e-8 )) ? true : false;
-
+   const bool success = (( fabs( Energy1 + 109.15104350802 ) < 1e-8 ) && ( fabs( Energy2 + 0.116979484098865 ) < 1e-8 )) ? true : false;
+   
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
    #endif
-
+   
    cout << "================> Did test 14 succeed : ";
    if (success){
       cout << "yes" << endl;

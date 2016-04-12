@@ -19,9 +19,11 @@
 
 #include <iostream>
 #include <math.h>
+#include <string.h>
 
 #include "Initialize.h"
 #include "DMRG.h"
+#include "FCI.h"
 #include "MPIchemps2.h"
 
 using namespace std;
@@ -34,97 +36,138 @@ int main(void){
 
    CheMPS2::Initialize::Init();
    
-   //Square 2D Hubbard model with PBC
-   const int L_linear = 3;                    // Linear size
-   const int L_square = L_linear * L_linear;  // Number of orbitals
-   const int group = 0;                       // C1 symmetry
-   const double U =  5.0;                     // On-site repulsion
-   const double T = -1.0;                     // Hopping term
+   //The path to the matrix elements
+   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/CH4.STO3G.FCIDUMP";
    
-   const int N = 9;                           // Number of electrons
-   const int TwoS = 1;                        // Two times the spin
-   const int Irrep = 0;                       // Irrep = A (C1 symmetry)
+   //The Hamiltonian
+   const int psi4groupnumber = 5; // c2v -- see Irreps.h and CH4.sto3g.out
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
+   cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
    
-   //Create the Hamiltonian (eightfold permutation symmetry is OK for site basis)
-   int * irreps = new int[L_square];
-   for (int cnt=0; cnt<L_square; cnt++){ irreps[cnt] = 0; }
-   //The Hamiltonian initializes all its matrix elements to 0.0
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian(L_square, group, irreps);
-   delete [] irreps;
-   
-   //Fill with the site-basis matrix elements
-   for (int cnt=0; cnt<L_square; cnt++){ Ham->setVmat(cnt,cnt,cnt,cnt,U); }
-   for (int ix=0; ix<L_linear; ix++){
-      for (int iy=0; iy<L_linear; iy++){
-          const int idx1 = ix + L_linear * iy;                        // This site
-          const int idx2 = (( ix + 1 ) % L_linear) + L_linear * iy;   // Right neighbour (PBC)
-          const int idx3 = ix + L_linear * ((( iy + 1 ) % L_linear)); //Upper neighbour (PBC)
-          Ham->setTmat(idx1,idx2,T);
-          Ham->setTmat(idx1,idx3,T);
-      }
-   }
-   
-   //The problem object
+   //The targeted state
+   int TwoS = 0;
+   int N = 10;
+   int Irrep = 0;
    CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS, N, Irrep);
    
    //The convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(2);
    //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-   OptScheme->setInstruction(0,  500, 1e-10,  3, 0.05);
-   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0 );
+   OptScheme->setInstruction(0,   30, 1e-10,  3, 0.1);
+   OptScheme->setInstruction(1, 1000, 1e-10, 10, 0.0);
    
    //Run ground state calculation
    CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme);
-   const double EnergySite = theDMRG->Solve();
-   theDMRG->calc2DMandCorrelations();
+   const double EnergyDMRG = theDMRG->Solve();
+   const bool do_3rdm = true;
+   theDMRG->calc_rdms_and_correlations(do_3rdm);
    
-   //Clean up DMRG
-   if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
-   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-   delete theDMRG;
+   //Get a diagonal block of the 4-RDM
+   const int L = Ham->getL();
+   const int ham_orbz = 2;
+   double * dmrg_diag_4rdm = new double[ L*L*L*L*L*L ];
+   theDMRG->Symm4RDM( dmrg_diag_4rdm, ham_orbz, ham_orbz, true );
    
-   //Hack: overwrite the matrix elements in momentum space (4-fold symmetry!!!) directly in the Problem object
-   theDMRG = new CheMPS2::DMRG(Prob, OptScheme); // Prob->construct_mxelem() is called now
-   for (int orb1=0; orb1<L_square; orb1++){
-      const int k1x = orb1 % L_linear;
-      const int k1y = orb1 / L_linear;
-      const double Telem1 = 2*T*( cos((2*M_PI*k1x)/L_linear)
-                                + cos((2*M_PI*k1y)/L_linear) );
-      for (int orb2=0; orb2<L_square; orb2++){
-         const int k2x = orb2 % L_linear;
-         const int k2y = orb2 / L_linear;
-         const double Telem2 = 2*T*( cos((2*M_PI*k2x)/L_linear)
-                                   + cos((2*M_PI*k2y)/L_linear) );
-         for (int orb3=0; orb3<L_square; orb3++){
-            const int k3x = orb3 % L_linear;
-            const int k3y = orb3 / L_linear;
-            for (int orb4=0; orb4<L_square; orb4++){
-               const int k4x = orb4 % L_linear;
-               const int k4y = orb4 / L_linear;
-               const bool kx_conservation = (((k1x+k2x) % L_linear) == ((k3x+k4x) % L_linear))?true:false;
-               const bool ky_conservation = (((k1y+k2y) % L_linear) == ((k3y+k4y) % L_linear))?true:false;
-               double temp = 0.0;
-               if ( kx_conservation && ky_conservation ){ temp += U/L_square; }
-               if (( orb1 == orb3 ) && ( orb2 == orb4 )){ temp += (Telem1+Telem2)/(N-1); }
-               Prob->setMxElement(orb1,orb2,orb3,orb4,temp);
+   //Calculate FCI reference energy and compare the DMRG and FCI 2-RDMs
+   double EnergyFCI = 0.0;
+   double RMSerror2DM = 0.0;
+   double RMSerror3DM = 0.0;
+   double RMSerror4DM = 0.0;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   {
+      const int Nel_up   = ( N + TwoS ) / 2;
+      const int Nel_down = ( N - TwoS ) / 2;
+      const double maxMemWorkMB = 10.0;
+      const int FCIverbose = 1;
+      CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose);
+      double * inoutput = new double[theFCI->getVecLength(0)];
+      theFCI->ClearVector(theFCI->getVecLength(0), inoutput);
+      inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+      EnergyFCI = theFCI->GSDavidson(inoutput);
+      theFCI->CalcSpinSquared(inoutput);
+      double * RDMspace = new double[ L*L*L*L*L*L ];
+      theFCI->Fill2RDM(inoutput, RDMspace);
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  const double difference = RDMspace[orb1 + L*(orb2 + L*(orb3 + L*orb4))]
+                                          - theDMRG->get2DM()->getTwoDMA_HAM(orb1, orb2, orb3, orb4);
+                  RMSerror2DM += difference * difference;
+               }
             }
          }
       }
+      theFCI->Fill3RDM(inoutput, RDMspace);
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  for (int orb5=0; orb5<L; orb5++){
+                     for (int orb6=0; orb6<L; orb6++){
+                        const double difference = RDMspace[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
+                                                - theDMRG->get3DM()->get_ham_index(orb1, orb2, orb3, orb4, orb5, orb6);
+                        RMSerror3DM += difference * difference;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      double * fci_diag_4rdm = new double[ L*L*L*L*L*L ];
+      theFCI->Diag4RDM( inoutput, RDMspace, ham_orbz, fci_diag_4rdm );
+      for (int orb1=0; orb1<L; orb1++){
+         for (int orb2=0; orb2<L; orb2++){
+            for (int orb3=0; orb3<L; orb3++){
+               for (int orb4=0; orb4<L; orb4++){
+                  for (int orb5=0; orb5<L; orb5++){
+                     for (int orb6=0; orb6<L; orb6++){
+                        const double difference = fci_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))]
+                                         - 0.5 * dmrg_diag_4rdm[orb1 + L*(orb2 + L*(orb3 + L*(orb4 + L*(orb5 + L * orb6))))];
+                        RMSerror4DM += difference * difference;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      delete [] fci_diag_4rdm;
+      delete [] RDMspace;
+      delete [] inoutput;
+      delete theFCI;
+      RMSerror2DM = sqrt(RMSerror2DM);
+      RMSerror3DM = sqrt(RMSerror3DM);
+      RMSerror4DM = sqrt(RMSerror4DM);
+      cout << "Frobenius norm of the difference of the DMRG and FCI 2-RDM = " << RMSerror2DM << endl;
+      cout << "Frobenius norm of the difference of the DMRG and FCI 3-RDM = " << RMSerror3DM << endl;
+      cout << "Frobenius norm of the difference of the DMRG and FCI diag(4-RDM) for fixed orbital " << ham_orbz << " = " << RMSerror4DM << endl;
+      cout << "******************************************************************" << endl;
    }
-   theDMRG->PreSolve(); // New matrix elements require reconstruction of complementary renormalized operators
-   const double EnergyMomentum = theDMRG->Solve();
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::broadcast_array_double( &EnergyFCI,   1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror2DM, 1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror3DM, 1, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( &RMSerror4DM, 1, MPI_CHEMPS2_MASTER );
+   #endif
+   
+   OptScheme->setInstruction(0, 1500, 1e-10,  3, 0.0);
+   OptScheme->setInstruction(1, 2000, 1e-10, 10, 0.0);
+   theDMRG->Solve();
    theDMRG->calc2DMandCorrelations();
    
-   //Clean up
+   //Clean up DMRG
+   delete [] dmrg_diag_4rdm;
    if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
    if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
    delete theDMRG;
    delete OptScheme;
    delete Prob;
    delete Ham;
-   
-   //Check succes
-   const bool success = ( fabs( EnergySite - EnergyMomentum ) < 1e-8 ) ? true : false;
+
+   //Check success
+   const bool success = (( fabs( EnergyDMRG - EnergyFCI ) < 1e-8 ) && ( RMSerror2DM < 1e-3 ) && ( RMSerror3DM < 1e-3 ) && ( RMSerror4DM < 1e-3 )) ? true : false;
    
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();

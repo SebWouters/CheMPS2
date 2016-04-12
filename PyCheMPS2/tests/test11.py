@@ -26,16 +26,26 @@ import ctypes
 Initializer = PyCheMPS2.PyInitialize()
 Initializer.Init()
 
-# Read in the FCIDUMP
-psi4group = 5 # c2v: see chemps2/Irreps.h
-filename  = '../../tests/matrixelements/CH4.STO3G.FCIDUMP'
-orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
-Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
+########################
+### 1D Hubbard model ###
+########################
 
-# Define the symmetry sector
-TwoS  = 0    # Two times the targeted spin
-Nelec = 10   # The number of electrons
+L = 10       # Number of lattice sites
+Group = 0    # C1 symmetry
+U = 2.0      # On-site repulsion
+T = -1.0     # Hopping term
+
+TwoS  = 5    # Two times the targeted spin
+Nelec = 9    # The number of electrons
 Irrep = 0    # The targeted irrep
+
+# The Hamiltonian initializes all its matrix elements to 0.0
+orbirreps = np.zeros([L], dtype=ctypes.c_int)
+Ham = PyCheMPS2.PyHamiltonian(L, Group, orbirreps)
+for cnt in range(0, L):
+    Ham.setVmat(cnt, cnt, cnt, cnt, U)
+for cnt in range(0, L-1):
+    Ham.setTmat(cnt, cnt+1, T)
 
 # Setting up the Problem
 Prob = PyCheMPS2.PyProblem(Ham, TwoS, Nelec, Irrep)
@@ -46,15 +56,15 @@ OptScheme = PyCheMPS2.PyConvergenceScheme(2) # 2 instructions
 OptScheme.setInstruction(0,   30, 1e-10,  3, 0.1)
 OptScheme.setInstruction(1, 1000, 1e-10, 10, 0.0)
 
-# Do DMRG calculation
+# Do DMRG calculation and print the correlations
 theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
 EnergyDMRG = theDMRG.Solve()
 do_3rdm = True
 theDMRG.calc_rdms_and_correlations( do_3rdm )
+theDMRG.printCorrelations()
 
 # Get a diagonal part of the 4-RDM from DMRG
-L = Ham.getL()
-ham_orbz = 2
+ham_orbz = 3
 dmrg_diag_4rdm = np.zeros([ L**6 ], dtype=ctypes.c_double)
 theDMRG.Symm4RDM( dmrg_diag_4rdm, ham_orbz, ham_orbz, True )
 
@@ -65,9 +75,10 @@ maxMemWorkMB = 10.0
 FCIverbose = 1
 theFCI = PyCheMPS2.PyFCI(Ham, Nel_up, Nel_down, Irrep, maxMemWorkMB, FCIverbose)
 GSvector = np.zeros([ theFCI.getVecLength() ], dtype=ctypes.c_double)
-GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
+theFCI.FillRandom( theFCI.getVecLength() , GSvector )
 EnergyFCI = theFCI.GSDavidson(GSvector)
 theFCI.CalcSpinSquared(GSvector)
+L = Ham.getL()
 TwoRDM = np.zeros([ L**4 ], dtype=ctypes.c_double)
 theFCI.Fill2RDM(GSvector, TwoRDM)
 RMSerror2DM = 0.0
@@ -96,16 +107,11 @@ RMSerror3DM = np.sqrt(RMSerror3DM)
 print "Frobenius norm of the difference of the DMRG and FCI 2-RDM =", RMSerror2DM
 print "Frobenius norm of the difference of the DMRG and FCI 3-RDM =", RMSerror3DM
 print "Frobenius norm of the difference of the DMRG and FCI diag(4-RDM) for fixed orbital", ham_orbz, "=", RMSerror4DM
-del theFCI
-
-OptScheme.setInstruction(0, 1500, 1e-10,  3, 0.0)
-OptScheme.setInstruction(1, 2000, 1e-10, 10, 0.0)
-EnergyDMRG = theDMRG.Solve()
-theDMRG.calc2DMandCorrelations()
 
 # Clean-up
 # theDMRG.deleteStoredMPS()
 theDMRG.deleteStoredOperators()
+del theFCI
 del theDMRG
 del OptScheme
 del Prob
