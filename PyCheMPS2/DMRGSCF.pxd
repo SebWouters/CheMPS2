@@ -20,12 +20,13 @@
 cimport Ham
 cimport ConvScheme
 cimport DMRGSCFopt
+from libcpp cimport bool
 
 cdef extern from "chemps2/CASSCF.h" namespace "CheMPS2":
     cdef cppclass CASSCF:
         CASSCF( Ham.Hamiltonian *, int *, int *, int *, int *, int * ) except +
         double  solve( const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions * )
-        double caspt2( const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions *, const double, const double )
+        double caspt2( const int, const int, const int, ConvScheme.ConvergenceScheme *, const int, DMRGSCFopt.DMRGSCFoptions *, const double, const double, const bool )
         void deleteStoredUnitary()
         void deleteStoredDIIS()
 

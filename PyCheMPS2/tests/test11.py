@@ -56,7 +56,7 @@ theDMRG.calc_rdms_and_correlations( do_3rdm )
 L = Ham.getL()
 ham_orbz = 2
 dmrg_diag_4rdm = np.zeros([ L**6 ], dtype=ctypes.c_double)
-theDMRG.Diag4RDM( dmrg_diag_4rdm, ham_orbz, True )
+theDMRG.Symm4RDM( dmrg_diag_4rdm, ham_orbz, ham_orbz, True )
 
 # Do FCI calculation
 Nel_up   = ( Nelec + TwoS ) / 2
@@ -90,7 +90,7 @@ for i in range(L):
                         RMSerror3DM += temp*temp
 fci_diag_4rdm = np.zeros([ L**6 ], dtype=ctypes.c_double)
 theFCI.Diag4RDM( GSvector, ThreeRDM, ham_orbz, fci_diag_4rdm )
-RMSerror4DM = np.linalg.norm( dmrg_diag_4rdm - fci_diag_4rdm )
+RMSerror4DM = np.linalg.norm( 0.5 * dmrg_diag_4rdm - fci_diag_4rdm )
 RMSerror2DM = np.sqrt(RMSerror2DM)
 RMSerror3DM = np.sqrt(RMSerror3DM)
 print "Frobenius norm of the difference of the DMRG and FCI 2-RDM =", RMSerror2DM

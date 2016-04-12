@@ -22,6 +22,7 @@ cdef extern from "chemps2/ConvergenceScheme.h" namespace "CheMPS2":
         ConvergenceScheme(const int) except +
         int getNInstructions()
         void setInstruction(const int, const int, const double, const int, const double)
+        void set_instruction(const int, const int, const double, const int, const double, const double)
         int get_D(const int)
         double get_energy_conv(const int)
         int get_max_sweeps(const int)

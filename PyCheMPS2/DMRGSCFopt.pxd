@@ -17,27 +17,29 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+from libcpp cimport bool
+
 cdef extern from "chemps2/DMRGSCFoptions.h" namespace "CheMPS2":
     cdef cppclass DMRGSCFoptions:
         DMRGSCFoptions() except +
-        bint getDoDIIS()
+        bool getDoDIIS()
         double getDIISGradientBranch()
         int getNumDIISVecs()
-        bint getStoreDIIS()
+        bool getStoreDIIS()
         int getMaxIterations()
         double getGradientThreshold()
-        bint getStoreUnitary()
+        bool getStoreUnitary()
         int getWhichActiveSpace()
-        bint getDumpCorrelations()
-        bint getStateAveraging()
-        void setDoDIIS(const bint)
+        bool getDumpCorrelations()
+        bool getStateAveraging()
+        void setDoDIIS(const bool)
         void setDIISGradientBranch(const double)
         void setNumDIISVecs(const int)
-        void setStoreDIIS(const bint)
+        void setStoreDIIS(const bool)
         void setMaxIterations(const int)
         void setGradientThreshold(const double)
-        void setStoreUnitary(const bint)
+        void setStoreUnitary(const bool)
         void setWhichActiveSpace(const int)
-        void setDumpCorrelations(const bint)
-        void setStateAveraging(const bint)
+        void setDumpCorrelations(const bool)
+        void setStateAveraging(const bool)
 

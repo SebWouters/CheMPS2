@@ -23,15 +23,16 @@ cimport Corr
 cimport TwoRDM
 cimport ThreeRDM
 from libcpp.string cimport string
+from libcpp cimport bool
 
 cdef extern from "chemps2/DMRG.h" namespace "CheMPS2":
     cdef cppclass DMRG:
-        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bint makechkpt, const string tmpfolder) except +
+        DMRG(const Prob.Problem *, const ConvScheme.ConvergenceScheme *, const bool makechkpt, const string tmpfolder) except +
         double Solve()
         void PreSolve()
         void calc2DMandCorrelations()
-        void calc_rdms_and_correlations(const bint do_3rdm)
-        void Diag4RDM(double * output, const int ham_orbz, const bint last_case)
+        void calc_rdms_and_correlations(const bool do_3rdm)
+        void Symm4RDM(double * output, const int ham_orb1, const int ham_orb2, const bool last_case)
         TwoRDM.TwoDM * get2DM()
         ThreeRDM.ThreeDM * get3DM()
         Corr.Correlations * getCorrelations()

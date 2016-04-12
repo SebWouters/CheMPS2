@@ -20,6 +20,7 @@
 cimport Ham
 cimport ConvScheme
 cimport DMRGSCFopt
+from libcpp cimport bool
 
 cdef extern from "chemps2/FCI.h" namespace "CheMPS2":
     cdef cppclass FCI:
@@ -34,11 +35,11 @@ cdef extern from "chemps2/FCI.h" namespace "CheMPS2":
         void Diag4RDM(double * vector, double * three_rdm, const unsigned int orbz, double * output)
         double CalcSpinSquared(double *)
         double getFCIcoeff(int *, int *, double *)
-        void RetardedGF(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *)
-        void RetardedGF_addition(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
-        void RetardedGF_removal(const double, const double, const unsigned int, const unsigned int, const bint, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
-        void GFmatrix_addition(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bint, double *, Ham.Hamiltonian *, double *, double *)
-        void GFmatrix_removal(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bint, double *, Ham.Hamiltonian *, double *, double *)
+        void RetardedGF(const double, const double, const unsigned int, const unsigned int, const bool, const double, double *, Ham.Hamiltonian *, double *, double *)
+        void RetardedGF_addition(const double, const double, const unsigned int, const unsigned int, const bool, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
+        void RetardedGF_removal(const double, const double, const unsigned int, const unsigned int, const bool, const double, double *, Ham.Hamiltonian *, double *, double *, double *, double *, double *)
+        void GFmatrix_addition(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bool, double *, Ham.Hamiltonian *, double *, double *)
+        void GFmatrix_removal(const double, const double, const double, int *, const unsigned int, int *, const unsigned int, const bool, double *, Ham.Hamiltonian *, double *, double *)
         void DensityResponseGF(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *)
         void DensityResponseGF_forward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *, double *, double *, double *)
         void DensityResponseGF_backward(const double, const double, const unsigned int, const unsigned int, const double, double *, double *, double *, double *, double *, double *)

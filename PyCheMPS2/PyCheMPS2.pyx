@@ -20,6 +20,7 @@
 import numpy as np
 cimport numpy as np
 from libcpp.string cimport string
+from libcpp cimport bool
 np.import_array()
 
 cimport Init
@@ -51,6 +52,8 @@ cdef class PyConvergenceScheme:
         del self.thisptr
     def setInstruction(self, int instruction, int D, double Econv, int nMax, double noisePrefactor):
         self.thisptr.setInstruction(instruction, D, Econv, nMax, noisePrefactor)
+    def set_instruction(self, int instruction, int D, double Econv, int nMax, double noisePrefactor, double dvdson_rtol):
+        self.thisptr.set_instruction(instruction, D, Econv, nMax, noisePrefactor, dvdson_rtol)
     def getD(self, int instruction):
         return self.thisptr.get_D(instruction)
     def getEconv(self, int instruction):
@@ -127,7 +130,7 @@ cdef class PyProblem:
         
 cdef class PyDMRG:
     cdef DMRGsolver.DMRG * thisptr
-    def __cinit__(self, PyProblem Probl, PyConvergenceScheme OptScheme, bint makechkpt=False, string tmpfolder='/tmp'):
+    def __cinit__(self, PyProblem Probl, PyConvergenceScheme OptScheme, bool makechkpt=False, string tmpfolder='/tmp'):
         self.thisptr = new DMRGsolver.DMRG(Probl.thisptr, OptScheme.thisptr, makechkpt, tmpfolder)
     def __dealloc__(self):
         del self.thisptr
@@ -137,7 +140,7 @@ cdef class PyDMRG:
         self.thisptr.PreSolve()
     def calc2DMandCorrelations(self):
         self.thisptr.calc2DMandCorrelations()
-    def calc_rdms_and_correlations(self, bint do_3rdm):
+    def calc_rdms_and_correlations(self, bool do_3rdm):
         self.thisptr.calc_rdms_and_correlations( do_3rdm )
     def deleteStoredMPS(self):
         self.thisptr.deleteStoredMPS()
@@ -176,9 +179,9 @@ cdef class PyDMRG:
     #Access functions of the ThreeDM class
     def get3DM(self, int i1, int i2, int i3, int i4, int i5, int i6):
         return self.thisptr.get3DM().get_ham_index(i1, i2, i3, i4, i5, i6)
-    def Diag4RDM(self, np.ndarray[double, ndim=1, mode="c"] output not None, unsigned int ham_orbz, bint last_case):
+    def Symm4RDM(self, np.ndarray[double, ndim=1, mode="c"] output not None, int ham_orb1, int ham_orb2, bool last_case):
         assert output.flags['C_CONTIGUOUS']
-        self.thisptr.Diag4RDM(&output[0], ham_orbz, last_case)
+        self.thisptr.Symm4RDM(&output[0], ham_orb1, ham_orb2, last_case)
     def getFCIcoefficient(self, np.ndarray[int, ndim=1, mode="c"] alpha not None, np.ndarray[int, ndim=1, mode="c"] beta not None):
         assert alpha.flags['C_CONTIGUOUS']
         assert  beta.flags['C_CONTIGUOUS']
@@ -210,25 +213,25 @@ cdef class PyDMRGSCFoptions:
         return self.thisptr.getDumpCorrelations()
     def getStateAveraging(self):
         return self.thisptr.getStateAveraging()
-    def setDoDIIS(self, bint val):
+    def setDoDIIS(self, bool val):
         self.thisptr.setDoDIIS(val)
     def setDIISGradientBranch(self, double val):
         self.thisptr.setDIISGradientBranch(val)
     def setNumDIISVecs(self, int val):
         self.thisptr.setNumDIISVecs(val)
-    def setStoreDIIS(self, bint val):
+    def setStoreDIIS(self, bool val):
         self.thisptr.setStoreDIIS(val)
     def setMaxIterations(self, int val):
         self.thisptr.setMaxIterations(val)
     def setGradientThreshold(self, double val):
         self.thisptr.setGradientThreshold(val)
-    def setStoreUnitary(self, bint val):
+    def setStoreUnitary(self, bool val):
         self.thisptr.setStoreUnitary(val)
     def setWhichActiveSpace(self, int val):
         self.thisptr.setWhichActiveSpace(val)
-    def setDumpCorrelations(self, bint val):
+    def setDumpCorrelations(self, bool val):
         self.thisptr.setDumpCorrelations(val)
-    def setStateAveraging(self, bint val):
+    def setStateAveraging(self, bool val):
         self.thisptr.setStateAveraging(val)
         
 cdef class PyCASSCF:
@@ -244,12 +247,12 @@ cdef class PyCASSCF:
         del self.thisptr
     def solve(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
         return self.thisptr.solve(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr)
-    def caspt2(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG):
-        return self.thisptr.caspt2(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG)
+    def caspt2(self, int Nel, int TwoS, int Irrep, PyConvergenceScheme OptScheme, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG, bool PSEUDOCANONICAL):
+        return self.thisptr.caspt2(Nel, TwoS, Irrep, OptScheme.thisptr, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG, PSEUDOCANONICAL)
     def solve_fci(self, int Nel, int TwoS, int Irrep, int rootNum, PyDMRGSCFoptions theDMRGSCFopts):
         return self.thisptr.solve(Nel, TwoS, Irrep, NULL, rootNum, theDMRGSCFopts.thisptr)
-    def caspt2_fci(self, int Nel, int TwoS, int Irrep, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG):
-        return self.thisptr.caspt2(Nel, TwoS, Irrep, NULL, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG)
+    def caspt2_fci(self, int Nel, int TwoS, int Irrep, int rootNum, PyDMRGSCFoptions theDMRGSCFopts, double IPEA, double IMAG, bool PSEUDOCANONICAL):
+        return self.thisptr.caspt2(Nel, TwoS, Irrep, NULL, rootNum, theDMRGSCFopts.thisptr, IPEA, IMAG, PSEUDOCANONICAL)
     def deleteStoredUnitary(self):
         self.thisptr.deleteStoredUnitary()
     def deleteStoredDIIS(self):
@@ -299,7 +302,7 @@ cdef class PyFCI:
         assert     beta.flags['C_CONTIGUOUS']
         assert GSvector.flags['C_CONTIGUOUS']
         return self.thisptr.getFCIcoeff(&alpha[0], &beta[0], &GSvector[0])
-    def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+    def RetardedGF(self, double omega, double eta, int orb_alpha, int orb_beta, bool isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
@@ -307,7 +310,7 @@ cdef class PyFCI:
         assert   ImPart.flags['C_CONTIGUOUS']
         self.thisptr.RetardedGF(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0])
         return (RePart[0], ImPart[0])
-    def RetardedGF_addition(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Add2RDM not None):
+    def RetardedGF_addition(self, double omega, double eta, int orb_alpha, int orb_beta, bool isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Add2RDM not None):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
@@ -318,7 +321,7 @@ cdef class PyFCI:
         assert  Add2RDM.flags['C_CONTIGUOUS']
         self.thisptr.RetardedGF_addition(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Add2RDM[0])
         return (RePart[0], ImPart[0])
-    def RetardedGF_removal(self, double omega, double eta, int orb_alpha, int orb_beta, bint isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Rem2RDM not None):
+    def RetardedGF_removal(self, double omega, double eta, int orb_alpha, int orb_beta, bool isUp, double GSenergy, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami, np.ndarray[double, ndim=1, mode="c"] Re2RDM not None, np.ndarray[double, ndim=1, mode="c"] Im2RDM not None, np.ndarray[double, ndim=1, mode="c"] Rem2RDM not None):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([1])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([1])
         assert GSvector.flags['C_CONTIGUOUS']
@@ -329,7 +332,7 @@ cdef class PyFCI:
         assert  Rem2RDM.flags['C_CONTIGUOUS']
         self.thisptr.RetardedGF_removal(omega, eta, orb_alpha, orb_beta, isUp, GSenergy, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0], &Re2RDM[0], &Im2RDM[0], &Rem2RDM[0])
         return (RePart[0], ImPart[0])
-    def GFmatrix_add(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bint isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+    def GFmatrix_add(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bool isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([len(orbsLeft)*len(orbsRight)])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([len(orbsLeft)*len(orbsRight)])
         assert  GSvector.flags['C_CONTIGUOUS']
@@ -339,7 +342,7 @@ cdef class PyFCI:
         assert orbsRight.flags['C_CONTIGUOUS']
         self.thisptr.GFmatrix_addition(alpha, beta, eta, &orbsLeft[0], len(orbsLeft), &orbsRight[0], len(orbsRight), isUp, &GSvector[0], Hami.thisptr, &RePart[0], &ImPart[0])
         return ( RePart, ImPart )
-    def GFmatrix_rem(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bint isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
+    def GFmatrix_rem(self, double alpha, double beta, double eta, np.ndarray[int, ndim=1, mode="c"] orbsLeft not None, np.ndarray[int, ndim=1, mode="c"] orbsRight not None, bool isUp, np.ndarray[double, ndim=1, mode="c"] GSvector not None, PyHamiltonian Hami):
         cdef np.ndarray[double, ndim=1, mode="c"] RePart = np.zeros([len(orbsLeft)*len(orbsRight)])
         cdef np.ndarray[double, ndim=1, mode="c"] ImPart = np.zeros([len(orbsLeft)*len(orbsRight)])
         assert  GSvector.flags['C_CONTIGUOUS']
