@@ -1,4 +1,6 @@
 language: cpp
+# these lines are required to use the trusty beta
+sudo: required
 dist: trusty
 compiler:
     - clang
