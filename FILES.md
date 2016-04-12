@@ -47,6 +47,10 @@ speed-up for DMRG-SCF.
 [CheMPS2/DMRG.cpp](CheMPS2/DMRG.cpp) contains the constructor and
 destructor of the DMRG class, as well as the top-level sweep functions.
 
+[CheMPS2/DMRGfock.cpp](CheMPS2/DMRGfock.cpp) contains the functionality to
+express a symmetry (spin, particle number, and point group) conserving
+single-particle excitation on top of an MPS as a new MPS.
+
 [CheMPS2/DMRGmpsio.cpp](CheMPS2/DMRGmpsio.cpp) contains the store and
 load functions for the DMRG checkpoint file (the MPS).
 
@@ -88,6 +92,9 @@ functions related to the RDM and excited-state calculations.
 [CheMPS2/EdmistonRuedenberg.cpp](CheMPS2/EdmistonRuedenberg.cpp) contains
 an orbital localization function based on the Edmiston-Ruedenberg cost function
 and an augmented Hessian Newton-Raphson optimizer.
+
+[CheMPS2/Excitation.cpp](CheMPS2/Excitation.cpp) contains matrix-vector
+multiplication routines for spin-conserving single-particle excitations.
 
 [CheMPS2/FCI.cpp](CheMPS2/FCI.cpp) contains a full configuration
 interaction solver based on Davidson's algorithm. It also contains the
@@ -260,6 +267,9 @@ DMRGSCFwtilde class.
 
 [CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the
 EdmistonRuedenberg class.
+
+[CheMPS2/include/chemps2/Excitation.h](CheMPS2/include/chemps2/Excitation.h) contains the definitions of the
+Excitation class.
 
 [CheMPS2/include/chemps2/FCI.h](CheMPS2/include/chemps2/FCI.h) contains the definitions of the FCI class.
 
