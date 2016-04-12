@@ -20,7 +20,7 @@ matrix:
         - libhdf5-serial-dev
         - libgsl0-dev
         - libgsl0ldbl
-    env: OUR_CXX='clang++-3.8' OUR_CC='clang-3.8' BUILD_TYPE='release'
+    env: OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
   - os: linux
     compiler: gcc
     addons:
