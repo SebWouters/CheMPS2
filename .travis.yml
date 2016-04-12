@@ -6,6 +6,7 @@ compiler:
     - clang
     - gcc
 env:
+    global:
     # should be limited to 4 on travis
     - OMP_NUM_THREADS=4
     # make cmake verbose
