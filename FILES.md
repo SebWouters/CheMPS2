@@ -423,6 +423,11 @@ permutation symmetry.
 calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with in addition
 the calculation of the CASPT2 variational second order correction energy.
 
+[tests/test15.cpp.in](tests/test15.cpp.in) is a copy of the CASSCF
+calculation in [tests/test9.cpp.in](tests/test9.cpp.in) with in addition
+the calculation of the CASPT2 variational second order correction energy
+in the localized (i.e. not pseudocanonical) basis.
+
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
 contains the matrix elements for test3 and test11.
 
