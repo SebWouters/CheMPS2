@@ -8,6 +8,8 @@ compiler:
 env:
     # should be limited to 4 on travis
     - OMP_NUM_THREADS=4
+    # make cmake verbose
+    - VERBOSE=1
 addons:
   apt:
     packages:
@@ -21,5 +23,6 @@ install:
     - mkdir build
     - cd build
     - cmake ..
+    - make
 script:
     - make test
