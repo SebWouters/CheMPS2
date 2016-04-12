@@ -1,24 +1,47 @@
 language: cpp
-# these lines are required to use the trusty beta
-sudo: required
-dist: trusty
-compiler:
-    - clang
-    - gcc
+matrix:
+  include:
+  - os: linux
+    compiler: clang
+    addons:
+      apt:
+        sources:
+        # Clang 3.8
+        - llvm-toolchain-precise-3.8
+        # Newer CMake
+        - george-edison55-precise-backports
+        packages:
+        - cmake
+        - cmake-data
+        - liblapack-dev
+        - clang-3.8
+        - libhdf5-serial-dev
+        - libgsl0-dev
+        - libgsl0ldbl
+    env: CXX='clang++-3.8' CC='clang-3.8' BUILD_TYPE='release'
+  - os: linux
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        # Newer GCC
+        - ubuntu-toolchain-r-test
+        - george-edison55-precise-backports
+        packages:
+        - cmake
+        - cmake-data
+        - libhdf5-serial-dev
+        - liblapack-dev
+        - g++-5
+        - libgsl0-dev
+        - libgsl0ldbl
+    env: CXX='g++-5' CC='gcc-5' BUILD_TYPE='release'
 env:
     global:
     # should be limited to 4 on travis
     - OMP_NUM_THREADS=4
     # make cmake verbose
     - VERBOSE=1
-addons:
-  apt:
-    packages:
-        - libhdf5-dev
-        - liblapack3
-        - liblapack-dev
-        - libgsl0-dev
-        - libgsl0ldbl
 install:
     - mkdir build
     - cd build
