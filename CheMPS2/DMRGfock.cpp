@@ -260,7 +260,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
 
       SyBookkeeper * oldBK = denBK;
       denBK = new SyBookkeeper( *oldBK );
-      denBK->restart( OptScheme->get_D( OptScheme->get_number() - 1 ), dmrg_orb1 + 1, dmrg_orb2 );
+      denBK->restart( dmrg_orb1 + 1, dmrg_orb2, OptScheme->get_D( OptScheme->get_number() - 1 ) );
       TensorT ** old_mps = new TensorT * [ L ];
       for ( int orbital = dmrg_orb1; orbital <= dmrg_orb2; orbital++ ){
          old_mps[ orbital ] = MPS[ orbital ];
