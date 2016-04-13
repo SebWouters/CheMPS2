@@ -1,41 +1,27 @@
 language: cpp
-matrix:
-  include:
-  - os: linux
-    compiler: clang
-    addons:
-      apt:
-        sources:
+compiler: gcc
+addons:
+  apt:
+    sources:
         # Clang 3.8
         - llvm-toolchain-precise-3.7
         # Newer CMake
         - george-edison55-precise-backports
         # Newer GCC
         - ubuntu-toolchain-r-test
-        packages:
+    packages:
         - cmake
         - cmake-data
         - liblapack-dev
-        - clang-3.7
         - libhdf5-serial-dev
         - libgsl0-dev
         - libgsl0ldbl
-    env: OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
-  - os: linux
-    compiler: gcc
-    addons:
-      apt:
-        sources:
-        - ubuntu-toolchain-r-test
-        - george-edison55-precise-backports
-        packages:
-        - cmake
-        - cmake-data
-        - libhdf5-serial-dev
-        - liblapack-dev
+        - gcc-4.8
+        - g++-4.8
+        - gcc-5
         - g++-5
-        - libgsl0-dev
-        - libgsl0ldbl
+        - clang-3.7
+    env: OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
     env: OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
 env:
     global:
@@ -43,6 +29,10 @@ env:
     - OMP_NUM_THREADS=4
     # make cmake verbose
     - VERBOSE=1
+    matrix:
+    - OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
+    - OUR_CXX='g++-4.8' OUR_CC='gcc-4.8' BUILD_TYPE='release'
+    - OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
 install:
     - mkdir build
     - cd build
