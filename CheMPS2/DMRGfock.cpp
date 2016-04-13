@@ -336,7 +336,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                }
             }
             #ifdef CHEMPS2_MPI_COMPILATION
-            CheMPS2::MPIchemps2::broadcast_array_double( &inproduct, 1, MPI_CHEMPS2_MASTER );
+            CheMPS2::MPIchemps2::broadcast_array_double( &sweep_inproduct, 1, MPI_CHEMPS2_MASTER );
             #endif
             previous_inproduct = sweep_inproduct;
             num_iterations++;
@@ -360,8 +360,10 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
 
    }
 
-   const double rdm_inproduct = 2 * alpha * the2DM->get1RDM_DMRG( dmrg_orb1, dmrg_orb2 ) + beta;
-   cout << "DMRG::solve_fock : Accuracy = " << fabs( sweep_inproduct - rdm_inproduct ) << endl;
+   if ( am_i_master ){
+      const double rdm_inproduct = 2 * alpha * the2DM->get1RDM_DMRG( dmrg_orb1, dmrg_orb2 ) + beta;
+      cout << "DMRG::solve_fock : Accuracy = " << fabs( sweep_inproduct - rdm_inproduct ) << endl;
+   }
 
 }
 

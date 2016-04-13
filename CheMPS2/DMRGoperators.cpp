@@ -787,7 +787,7 @@ void CheMPS2::DMRG::updateMovingLeft( const int index ){
                   // Everyone creates his/her piece
                   double * workmemBIS = new double[ dimR * dimR ];
                   if ( owner_q == MPIRANK ){
-                     tempQ->update( Qtensors[ index + 1 ][ cnt2 + 1 ], MPS[ index + 1 ], workmem );
+                     tempQ->update( Qtensors[ index + 1 ][ cnt2 + 1 ], MPS[ index + 1 ], MPS[ index + 1 ], workmem );
                      tempQ->AddTermSimple( MPS[ index + 1 ] );
                      tempQ->AddTermsL( Ltensors[ index + 1 ], MPS[ index + 1 ], workmemBIS, workmem );
                   }
