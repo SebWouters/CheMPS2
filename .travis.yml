@@ -1,5 +1,4 @@
 language: cpp
-compiler: gcc
 addons:
   apt:
     sources:
@@ -21,8 +20,6 @@ addons:
         - gcc-5
         - g++-5
         - clang-3.7
-    env: OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
-    env: OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
 env:
     global:
     # should be limited to 4 on travis
@@ -30,6 +27,7 @@ env:
     # make cmake verbose
     - VERBOSE=1
     matrix:
+    # test three different compilers
     - OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
     - OUR_CXX='g++-4.8' OUR_CC='gcc-4.8' BUILD_TYPE='release'
     - OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
