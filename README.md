@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SebWouters/CheMPS2.svg?branch=master)](https://travis-ci.org/SebWouters/CheMPS2)
+
 ![CheMPS2 Logo](https://raw.githubusercontent.com/sebwouters/CheMPS2/master/CheMPS2/CheMPS2logo.png?raw=true)
 
 CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
