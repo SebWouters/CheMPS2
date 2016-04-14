@@ -35,19 +35,6 @@ CheMPS2::TensorT::TensorT( const int site_index, const SyBookkeeper * denBK ) : 
 
 }
 
-CheMPS2::TensorT::TensorT( TensorT & tocopy ) : Tensor(){
-
-   index = tocopy.gIndex();
-   denBK = tocopy.gBK();
-
-   AllocateAllArrays();
-
-   int totalsize = kappa2index[ nKappa ];
-   int inc1 = 1;
-   dcopy_( &totalsize, tocopy.gStorage(), &inc1, storage, &inc1 );
-
-}
-
 void CheMPS2::TensorT::AllocateAllArrays(){
 
    nKappa = 0;

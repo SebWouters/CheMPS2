@@ -101,14 +101,15 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
    const int dmrg_orb2 = (( first_dmrg_orb <= second_dmrg_orb ) ? second_dmrg_orb :  first_dmrg_orb );
 
    // Make a back-up of the entirely left-normalized MPS and the corresponding bookkeeper
+   SyBookkeeper * oldBK = denBK;
+   if ( dmrg_orb1 != dmrg_orb2 ){ denBK = new SyBookkeeper( *oldBK ); }
    TensorT ** backup_mps = new TensorT * [ L ];
    for ( int orbital = 0; orbital < L; orbital++ ){
       backup_mps[ orbital ] = MPS[ orbital ];
-      MPS[ orbital ] = new TensorT( *( backup_mps[ orbital ] ) );
-   }
-   SyBookkeeper * oldBK = denBK;
-   if ( dmrg_orb1 != dmrg_orb2 ){
-      denBK = new SyBookkeeper( *oldBK );
+      MPS[ orbital ] = new TensorT( orbital, denBK ); // denBK is now a DIFFERENT pointer than backup_mps[ orbital ]->gBK()
+      int totalsize = MPS[ orbital ]->gKappa2index( MPS[ orbital ]->gNKappa() );
+      int inc1 = 1;
+      dcopy_( &totalsize, backup_mps[ orbital ]->gStorage(), &inc1, MPS[ orbital ]->gStorage(), &inc1 );
    }
    deleteAllBoundaryOperators();
 

@@ -38,10 +38,6 @@ namespace CheMPS2{
              \param denBK The symmetry bookkeeper of the MPS */
          TensorT( const int site_index, const SyBookkeeper * denBK );
 
-         //! Copy constructor
-         /** \param tocopy MPS tensor to be copied */
-         TensorT( TensorT & tocopy );
-
          //! Destructor
          virtual ~TensorT();
 
