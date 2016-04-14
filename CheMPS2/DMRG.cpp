@@ -349,7 +349,7 @@ double CheMPS2::DMRG::solve_site( const int index, const double dvdson_rtol, con
 
    // Construct two-site object S. Each MPI process joins the MPS tensors. Before a matrix-vector multiplication the vector is broadcasted anyway.
    gettimeofday( &start, NULL );
-   Sobject * denS = new Sobject( index, denBK->gIrrep( index ), denBK->gIrrep( index + 1 ), denBK );
+   Sobject * denS = new Sobject( index, denBK );
    denS->Join( MPS[ index ], MPS[ index + 1 ] );
    gettimeofday( &end, NULL );
    timings[ CHEMPS2_TIME_S_JOIN ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );

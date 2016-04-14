@@ -532,7 +532,7 @@ void CheMPS2::DMRG::calcVeffTilde(double * result, Sobject * currentS, int state
    double * workmem = new double[dimL * dimR];
    
    //Construct Sup
-   Sobject * Sup = new Sobject(index,Exc_BKs[state_number]->gIrrep(index),Exc_BKs[state_number]->gIrrep(index+1),Exc_BKs[state_number]);
+   Sobject * Sup = new Sobject( index, Exc_BKs[ state_number ] );
    Sup->Join(Exc_MPSs[state_number][index],Exc_MPSs[state_number][index+1]);
    
    //Construct VeffTilde

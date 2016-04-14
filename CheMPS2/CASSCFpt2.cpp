@@ -39,7 +39,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL ){
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL ){
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
@@ -54,17 +54,26 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    const int work_mem_size  = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
    const int tot_dmrg_power6 = dmrgsize_power4 * nOrbDMRG * nOrbDMRG;
    double * mem1 = new double[ work_mem_size ];
-   double * mem2 = new double[ ( PSEUDOCANONICAL == true ) ? work_mem_size : max( work_mem_size, tot_dmrg_power6 ) ];
+   double * mem2 = new double[ ( PSEUDOCANONICAL ) ? work_mem_size : max( work_mem_size, tot_dmrg_power6 ) ];
 
    // Rotate to pseudocanonical orbitals
-   if ( PSEUDOCANONICAL == true ){
+   if ( PSEUDOCANONICAL ){
+      assert( successful_solve ); // DMRG1RDM needs to be set by CASSCF::solve for buildQmatACT()
       buildTmatrix();
       buildQmatOCC();
-      buildQmatACT(); // DMRG1RDM needs to be set by CASSCF::solve
+      buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
       block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
       block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+   } else {
+      if ( successful_solve == false ){
+         assert( scf_options->getStoreUnitary() );
+         struct stat file_info;
+         const int file_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
+         assert( file_stat == 0 );
+         unitary->loadU( scf_options->getUnitaryStorageName() );
+      }
    }
 
    // Fill active space Hamiltonian
@@ -103,6 +112,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
    } else { // Do the DMRG sweeps
 
+      assert( OptScheme != NULL );
       for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
       CheMPS2::DMRG * theDMRG = new DMRG(Prob, OptScheme);
       for (int state = 0; state < rootNum; state++){

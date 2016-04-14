@@ -43,6 +43,7 @@ CheMPS2::CASSCF::CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc
    L = ham_in->getL();
    SymmInfo.setGroup( ham_in->getNGroup() );
    num_irreps = SymmInfo.getNumberOfIrreps();
+   successful_solve = false;
 
    cout << "DOCC = [ ";
    for ( int irrep = 0; irrep < num_irreps-1; irrep++ ){ cout << docc[ irrep ] << " , "; }

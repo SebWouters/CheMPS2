@@ -5,13 +5,14 @@
 * Class Cumulant: Cumulant reconstruction of the DMRG 4-RDM
 * Class CASPT2: Internally contracted CASPT2
 * Class Molden: Rotate molpro/psi4 molden to CAS orbitals
-* DMRG diagonal 4-RDM in DMRG::Diag4RDM
-* Sweeps after RDM calculation allowed
+* Class Excitation: Build |1> = ( b + a * ( E_ij + E_ji )) |0>
+* Part of DMRG 4-RDM via DMRG::Symm4RDM
+* DMRG sweeps after RDM calculation allowed
 * FCI 3-RDM in FCI::Fill3RDM
 * FCI 4-RDM in FCI::Fill4RDM
 * FCI diagonal 4-RDM in FCI::Diag4RDM
 * FCI 4-RDM contraction with Fock operator in FCI::Fock4RDM
-* Blockwise transformations with DMRGSCFrotations use disk
+* Blockwise ERI rotations with DMRGSCFrotations using disk
 * Break API: bump up SO version
 * Deprecate TwoDMstorage class
 * Deprecate TensorDiag class

@@ -244,9 +244,9 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
    double sweep_inproduct = 0.0;
 
    if ( dmrg_orb1 + 1 == dmrg_orb2 ){
-      Sobject * newS = new Sobject( dmrg_orb1, denBK->gIrrep( dmrg_orb1 ), denBK->gIrrep( dmrg_orb2 ), denBK );
+      Sobject * newS = new Sobject( dmrg_orb1, denBK );
       if ( am_i_master ){
-         Sobject * oldS = new Sobject( dmrg_orb1, denBK->gIrrep( dmrg_orb1 ), denBK->gIrrep( dmrg_orb2 ), denBK );
+         Sobject * oldS = new Sobject( dmrg_orb1, denBK );
          oldS->Join( MPS[ dmrg_orb1 ], MPS[ dmrg_orb2 ] );
          sweep_inproduct = Excitation::matvec( denBK, denBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, NULL, NULL, NULL );
          delete oldS;
@@ -296,9 +296,9 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
                MaxDiscWeightLastSweep   = 0.0;
                for ( int index = dmrg_orb2 - 1; index > dmrg_orb1; index-- ){
-                  Sobject * newS = new Sobject( index, denBK->gIrrep( index ), denBK->gIrrep( index + 1 ), denBK );
+                  Sobject * newS = new Sobject( index, denBK );
                   if ( am_i_master ){
-                     Sobject * oldS = new Sobject( index, oldBK->gIrrep( index ), oldBK->gIrrep( index + 1 ), oldBK );
+                     Sobject * oldS = new Sobject( index, oldBK );
                      oldS->Join( old_mps[ index ], old_mps[ index + 1 ] );
                      sweep_inproduct = Excitation::matvec( denBK, oldBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
                      delete oldS;
@@ -318,9 +318,9 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
                MaxDiscWeightLastSweep   = 0.0;
                for ( int index = dmrg_orb1; index < dmrg_orb2 - 1; index++ ){
-                  Sobject * newS = new Sobject( index, denBK->gIrrep( index ), denBK->gIrrep( index + 1 ), denBK );
+                  Sobject * newS = new Sobject( index, denBK );
                   if ( am_i_master ){
-                     Sobject * oldS = new Sobject( index, oldBK->gIrrep( index ), oldBK->gIrrep( index + 1 ), oldBK );
+                     Sobject * oldS = new Sobject( index, oldBK );
                      oldS->Join( old_mps[ index ], old_mps[ index + 1 ] );
                      sweep_inproduct = Excitation::matvec( denBK, oldBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
                      delete oldS;

@@ -178,7 +178,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
          delete [] inoutput;
 
       } else { //Do the DMRG sweeps, and calculate the 2DM
-      
+
+         assert( OptScheme != NULL );
          for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
          DMRG * theDMRG = new DMRG(Prob, OptScheme);
          for (int state = 0; state < rootNum; state++){
@@ -239,6 +240,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
    if ( diis != NULL ){ delete diis; }
    if ( theLocalizer != NULL ){ delete theLocalizer; }
 
+   successful_solve = true;
    return Energy;
 
 }

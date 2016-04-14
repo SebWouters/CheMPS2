@@ -185,9 +185,9 @@ namespace CheMPS2{
              \param Irrep Desired wave-function irrep
              \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
-             \param theDMRGSCFoptions Contains the DMRGSCF options
+             \param scf_options Contains the DMRGSCF options
              \return The converged DMRGSCF energy */
-         double solve(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions);
+         double solve( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options );
 
          //! Calculate the caspt2 correction energy for a converged casscf wavefunction
          /** \param Nelectrons Total number of electrons in the system: occupied HF orbitals + active space
@@ -195,12 +195,12 @@ namespace CheMPS2{
              \param Irrep Desired wave-function irrep
              \param OptScheme The optimization scheme to run the inner DMRG loop. If NULL: use FCI instead of DMRG.
              \param rootNum Denotes the targeted state in state-specific CASSCF; 1 means ground state, 2 first excited state etc.
-             \param theDMRGSCFoptions Contains the DMRGSCF options
+             \param scf_options Contains the DMRGSCF options
              \param IPEA The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004)
              \param IMAG The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
              \param PSEUDOCANONICAL If true, use the exact DMRG 4-RDM in the pseudocanonical basis. If false, use the cumulant approximated DMRG 4-RDM in the unrotated basis.
              \return The CASPT2 variational correction energy */
-         double caspt2(const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * theDMRGSCFoptions, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL);
+         double caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL );
 
          //! CASSCF unitary rotation remove call
          /* \param filename File to delete */
@@ -309,43 +309,46 @@ namespace CheMPS2{
 
       private:
 
-         //Index convention handler
+         // Index convention handler
          DMRGSCFindices * iHandler;
 
-         //Unitary matrix storage and manipulator
+         // Unitary matrix storage and manipulator
          DMRGSCFunitary * unitary;
 
-         //The original Hamiltonian
+         // Whether CheMPS2::CASSCF::solve has been successfully terminated
+         bool successful_solve;
+
+         // The original Hamiltonian
          double NUCL_ORIG;
          const TwoIndex  * TMAT_ORIG;
          const FourIndex * VMAT_ORIG;
 
-         //The rotated 2-body matrix elements with at most two virtual indices
+         // The rotated 2-body matrix elements with at most two virtual indices
          DMRGSCFintegrals * theRotatedTEI;
-         
-         //Irreps controller
+
+         // Irreps controller
          Irreps SymmInfo;
-         
-         //The number of orbitals
+
+         // The number of orbitals
          int L;
-         
-         //The number of irreps
+
+         // The number of irreps
          int num_irreps;
-         
-         //Number of DMRG orbitals
+
+         // Number of DMRG orbitals
          int nOrbDMRG;
-         
-         //Space for the DMRG 1DM
+
+         // Space for the DMRG 1DM
          double * DMRG1DM;
 
-         //Space for the DMRG 2DM
+         // Space for the DMRG 2DM
          double * DMRG2DM;
 
-         //Helper function to check HF
+         // Helper function to check HF
          void checkHF( int * docc, int * socc );
 
-         //Fill Econst and Tmat of HamDMRG
-         void fillConstAndTmatDMRG(Hamiltonian * HamDMRG) const;
+         // Fill Econst and Tmat of HamDMRG
+         void fillConstAndTmatDMRG( Hamiltonian * HamDMRG ) const;
 
          // Calculate the gradient, return function is the gradient 2-norm
          static double construct_gradient( DMRGSCFmatrix * Fmatrix, const DMRGSCFindices * idx, double * gradient );
@@ -360,33 +363,33 @@ namespace CheMPS2{
          static void DGEMM_WRAP( double prefactor, char transA, char transB, double * A, double * B, double * C, int m, int n, int k, int lda, int ldb, int ldc );
          static void DGEMV_WRAP( double prefactor, double * matrix, double * result, double * vector, int rowdim, int coldim, int ldmat, int incres, int incvec );
          static void augmented_hessian( DMRGSCFmatrix * Fmatrix, DMRGSCFwtilde * Wtilde, const DMRGSCFindices * idx, double * origin, double * target, double * gradient, const int linsize );
-         
+
          // Rotate an active space object
          static void rotate_active_space_object( const int num_indices, double * object, double * work, double * rotation, const int LAS, const int NJUMP, const int NROTATE );
 
-         //Fmat function as defined by Eq. (11) in the Siegbahn paper.
+         // Fmat function as defined by Eq. (11) in the Siegbahn paper.
          DMRGSCFmatrix * theFmatrix;
-         
-         //The Coulomb and exchange interaction with the occupied and active electrons respectively
+
+         // The Coulomb and exchange interaction with the occupied and active electrons respectively
          DMRGSCFmatrix * theQmatOCC;
          DMRGSCFmatrix * theQmatACT;
          DMRGSCFmatrix * theQmatWORK;
          DMRGSCFmatrix * theTmatrix;
          void rotateOldToNew(DMRGSCFmatrix * myMatrix);
          void buildTmatrix();
-         void constructCoulombAndExchangeMatrixInOrigIndices(DMRGSCFmatrix * density, DMRGSCFmatrix * result);
+         void constructCoulombAndExchangeMatrixInOrigIndices( DMRGSCFmatrix * density, DMRGSCFmatrix * result );
          void buildQmatOCC();
          void buildQmatACT();
-         
-         //The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
+
+         // The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;
-         
-         //Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
-         void PrintCoeff_C2(DMRG * theDMRG);
-         
-         //Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
+
+         // Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
+         void PrintCoeff_C2( DMRG * theDMRG );
+
+         // Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
          void coeff_fe2( DMRG * theDMRG );
-         
+
          static void delete_file( const string filename );
 
    };
