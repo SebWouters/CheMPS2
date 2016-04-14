@@ -20,6 +20,7 @@ set dmrg dmrg_states          [   500,  1000,  1000 ]
 set dmrg dmrg_e_convergence   [ 1e-10, 1e-10, 1e-10 ]
 set dmrg dmrg_maxsweeps       [     5,     5,    10 ]
 set dmrg dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrg dmrg_dvdson_rtol     [  1e-5,  1e-5,  1e-9 ]
 set dmrg dmrg_print_corr      false
 set dmrg dmrg_chkpt           false
 

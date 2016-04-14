@@ -66,6 +66,9 @@ int read_options(std::string name, Options &options)
         /*- The noiseprefactors for successive DMRG instructions -*/
         options.add_array("DMRG_NOISEPREFACTORS");
         
+        /*- The residual tolerances for the Davidson diagonalization during DMRG instructions -*/
+        options.add_array("DMRG_DVDSON_RTOL");
+        
         /*- Whether or not to print the correlation functions after the DMRG calculation -*/
         options.add_bool("DMRG_PRINT_CORR", false);
         
@@ -114,6 +117,9 @@ int read_options(std::string name, Options &options)
         
         /*- Whether to calculate the DMRG-CASPT2 energy after the DMRGSCF calculations are done. -*/
         options.add_bool("DMRG_CASPT2", false);
+        
+        /*- Whether to calculate the DMRG-CASPT2 energy after the DMRGSCF calculations are done. -*/
+        options.add_str("DMRG_CASPT2_ORB", "PSEUDOCANONICAL", "PSEUDOCANONICAL ACTIVE");
         
         /*- CASPT2 IPEA shift -*/
         options.add_double("DMRG_IPEA", 0.0);
@@ -522,6 +528,8 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     const int ndmrg_maxsweeps         = options["DMRG_MAXSWEEPS"].size();
     double * dmrg_noiseprefactors     = options.get_double_array("DMRG_NOISEPREFACTORS");
     const int ndmrg_noiseprefactors   = options["DMRG_NOISEPREFACTORS"].size();
+    double * dmrg_dvdson_rtol         = options.get_double_array("DMRG_DVDSON_RTOL");
+    const int ndmrg_dvdson_rtol       = options["DMRG_DVDSON_RTOL"].size();
     const bool dmrg_print_corr        = options.get_bool("DMRG_PRINT_CORR");
     const bool mps_chkpt              = options.get_bool("DMRG_CHKPT");
     int * frozen_docc                 = options.get_int_array("FROZEN_DOCC");
@@ -537,6 +545,8 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     const string dmrg_active_space    = options.get_str("DMRG_ACTIVE_SPACE");
     const bool dmrg_loc_random        = options.get_bool("DMRG_LOC_RANDOM");
     const bool dmrg_caspt2            = options.get_bool("DMRG_CASPT2");
+    const string dmrg_caspt2_orb      = options.get_str("DMRG_CASPT2_ORB");
+    const bool PSEUDOCANONICAL        = ( dmrg_caspt2_orb.compare("PSEUDOCANONICAL") == 0 ) ? true : false;
     const double dmrg_ipea            = options.get_double("DMRG_IPEA");
     const double dmrg_imag_shift      = options.get_double("DMRG_IMAG_SHIFT");
     const bool dmrg_molden            = options.get_bool("DMRG_MOLDEN");
@@ -564,11 +574,21 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     if ( ndmrg_states!=ndmrg_econv )              { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_ECONV (double array) should contain the same number of elements!"); }
     if ( ndmrg_states!=ndmrg_maxsweeps )          { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_MAXSWEEPS (integer array) should contain the same number of elements!"); }
     if ( ndmrg_states!=ndmrg_noiseprefactors )    { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_NOISEPREFACTORS (double array) should contain the same number of elements!"); }
+    if ( ndmrg_states!=ndmrg_dvdson_rtol )        { throw PSIEXCEPTION("Options DMRG_STATES (integer array) and DMRG_DVDSON_RTOL (double array) should contain the same number of elements!"); }
     if ( options["FROZEN_DOCC"].size() != nirrep ){ throw PSIEXCEPTION("Option FROZEN_DOCC (integer array) should contain as many elements as there are irreps!"); }
     if ( options["ACTIVE"].size()      != nirrep ){ throw PSIEXCEPTION("Option ACTIVE (integer array) should contain as many elements as there are irreps!"); }
     for ( int cnt=0; cnt<ndmrg_states; cnt++ ){
        if ( dmrg_states[cnt] < 2 ){
           throw PSIEXCEPTION("Entries in DMRG_STATES (integer array) should be larger than 1!");
+       }
+       if ( dmrg_econv[cnt] <= 0.0 ){
+          throw PSIEXCEPTION("Entries in DMRG_ECONV (double array) should be positive!");
+       }
+       if ( dmrg_maxsweeps[cnt] < 1 ){
+          throw PSIEXCEPTION("Entries in DMRG_MAXSWEEPS (integer array) should be positive!");
+       }
+       if ( dmrg_dvdson_rtol[cnt] <= 0.0 ){
+          throw PSIEXCEPTION("Entries in DMRG_DVDSON_RTOL (double array) should be positive!");
        }
     }
     if ( d_convergence<=0.0 )                     { throw PSIEXCEPTION("Option D_CONVERGENCE (double) must be larger than zero!"); }
@@ -576,7 +596,10 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     if ( dmrg_max_iter<1 )                        { throw PSIEXCEPTION("Option DMRG_MAX_ITER (integer) must be larger than zero!"); }
     if ( dmrg_which_root<1 )                      { throw PSIEXCEPTION("Option DMRG_WHICH_ROOT (integer) must be larger than zero!"); }
     if (( dmrg_caspt2 ) && ( dmrg_ipea < 0.0 ))   { throw PSIEXCEPTION("Option DMRG_IPEA (double) must be larger than zero!"); }
-    
+    if (( dmrg_molden ) && (( dmrg_caspt2 ) && ( PSEUDOCANONICAL == false ))){
+       throw PSIEXCEPTION("Conflicting options: the molden file requires pseudocanonical orbitals, and caspt2 is requested in the active space orbitals.");
+    }
+
     /*******************************************
      *   Create a CheMPS2::ConvergenceScheme   *
      *******************************************/
@@ -584,7 +607,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     CheMPS2::Initialize::Init();
     CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( ndmrg_states );
     for (int cnt=0; cnt<ndmrg_states; cnt++){
-       OptScheme->setInstruction( cnt, dmrg_states[cnt], dmrg_econv[cnt], dmrg_maxsweeps[cnt], dmrg_noiseprefactors[cnt] );
+       OptScheme->set_instruction( cnt, dmrg_states[cnt], dmrg_econv[cnt], dmrg_maxsweeps[cnt], dmrg_noiseprefactors[cnt], dmrg_dvdson_rtol[cnt] );
     }
 
     /******************************************************************************
@@ -736,8 +759,9 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     const int nOrbDMRG_pow4    = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
     const int unitary_worksize = 4 * maxlinsize * maxlinsize;
     const int sizeWorkMem      = ( nOrbDMRG_pow4 > unitary_worksize ) ? nOrbDMRG_pow4 : unitary_worksize;
-    double * mem1 = new double[sizeWorkMem];
-    double * mem2 = new double[sizeWorkMem];
+    const int tot_dmrg_power6  = nOrbDMRG_pow4 * nOrbDMRG * nOrbDMRG;
+    double * mem1 = new double[ sizeWorkMem ];
+    double * mem2 = new double[ ( PSEUDOCANONICAL ) ? sizeWorkMem : max( sizeWorkMem, tot_dmrg_power6 ) ];
 
     CheMPS2::EdmistonRuedenberg * theLocalizer = NULL;
     if ( dmrg_active_space.compare("LOC")==0 ){ theLocalizer = new CheMPS2::EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
@@ -903,7 +927,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
 
         if (( dmrg_active_space.compare("NO")==0 ) && (theDIIS==NULL)){ //When the DIIS has started: stop
             CheMPS2::CASSCF::copy_active( DMRG1DM, theFmatrix, iHandler, true );
-            CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, true, DMRG2DM ); // Unitary is updated and DMRG2DM rotated
+            CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, true, DMRG2DM, NULL, NULL ); // Unitary is updated and DMRG2DM rotated
             CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM );     
             update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
             buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
@@ -949,7 +973,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     Process::environment.globals["CURRENT ENERGY"] = Energy;
     Process::environment.globals["DMRGSCF ENERGY"] = Energy;
 
-    if ((( dmrg_molden ) || ( dmrg_caspt2 )) && ( nIterations > 0 )){
+    if ((( dmrg_molden ) || (( dmrg_caspt2 ) && ( PSEUDOCANONICAL ))) && ( nIterations > 0 )){
 
         (*outfile) << "################################################" << endl;
         (*outfile) << "###                                          ###" << endl;
@@ -957,9 +981,9 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
         (*outfile) << "###                                          ###" << endl;
         (*outfile) << "################################################" << endl;
         CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-        CheMPS2::CASSCF::block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
-        CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM );
-        CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL );
+        CheMPS2::CASSCF::block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+        CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM, NULL, NULL );
+        CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
         CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM );
         update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
         buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
@@ -1028,7 +1052,6 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
 
         buildHamDMRG( ints, Aorbs_ptr, theTmatrix, theQmatOCC, iHandler, HamDMRG, psio, wfn );
 
-        const int tot_dmrg_power6 = nOrbDMRG_pow4 * nOrbDMRG * nOrbDMRG;
         double * contract = new double[ tot_dmrg_power6 ];
         double * three_dm = new double[ tot_dmrg_power6 ];
 
@@ -1054,14 +1077,27 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
             buildQmatACT( theQmatACT, iHandler, DMRG1DM, work1, work2, wfn->Ca(), myJK, wfn );
             CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
             CheMPS2::CASSCF::copy_active( theFmatrix, mem2, iHandler );                   // Fock
-            //CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
             for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
             for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-                theDMRG->Diag4RDM( three_dm, ham_orbz, false );
-                int size = tot_dmrg_power6;
-                double f_zz = mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-                int inc1 = 1;
-                daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+               theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
+               int size = tot_dmrg_power6;
+               double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
+               int inc1 = 1;
+               daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+            }
+            if ( PSEUDOCANONICAL == false ){
+               for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
+                  for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
+                     if ( HamDMRG->getOrbitalIrrep( ham_orb1 ) == HamDMRG->getOrbitalIrrep( ham_orb2 ) ){
+                        theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
+                        int size = tot_dmrg_power6;
+                        double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
+                        int inc1 = 1;
+                        daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+                     }
+                  }
+               }
+               // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
             }
             CheMPS2::CASSCF::copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );        // 3-RDM --> three_dm was used as work space for the constracted 4-RDM
             if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
@@ -1078,6 +1114,19 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
                 copying.close();
             }
             system(("rm " + chemps2filename).c_str());
+       }
+       
+       if ( PSEUDOCANONICAL == false ){
+           (*outfile) << "CASPT2 : Deviation from pseudocanonical = " << CheMPS2::CASSCF::deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
+           CheMPS2::CASSCF::block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+           CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM, three_dm, contract ); // 2-RDM, 3-RDM, and trace( Fock * cu(4)-4-RDM )
+           CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+           CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM ); // 1-RDM
+           update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+           buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
+           buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
+           buildQmatACT( theQmatACT, iHandler, DMRG1DM, work1, work2, wfn->Ca(), myJK, wfn );
+           CheMPS2::CASSCF::construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler ); // Fock
        }
 
        fillRotatedTEI_coulomb(  ints, OAorbs_ptr, theRotatedTEI, iHandler, psio, wfn );
