@@ -216,7 +216,7 @@ void copyPSIMXtoCHEMPS2MX( SharedMatrix source, CheMPS2::DMRGSCFindices * iHandl
 }
 
 
-void copyCHEMPS2MXtoPSIMX( CheMPS2::DMRGSCFmatrix * source, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target ){
+/*void copyCHEMPS2MXtoPSIMX( CheMPS2::DMRGSCFmatrix * source, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix target ){
 
     for (int irrep = 0; irrep < iHandler->getNirreps(); irrep++){
         for (int orb1 = 0; orb1 < iHandler->getNORB(irrep); orb1++){
@@ -226,7 +226,7 @@ void copyCHEMPS2MXtoPSIMX( CheMPS2::DMRGSCFmatrix * source, CheMPS2::DMRGSCFindi
         }
     }
     
-}
+}*/
 
 
 void buildQmatOCC( CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK, boost::shared_ptr<Wavefunction> wfn ){
@@ -492,11 +492,10 @@ void copyUNITARYtoPSIMX( CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindi
 }
 
 
-void update_WFNco( CheMPS2::DMRGSCFmatrix * Coeff_orig, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, boost::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2 ){
+void update_WFNco( SharedMatrix orig_coeff, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, boost::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2 ){
 
-    copyCHEMPS2MXtoPSIMX( Coeff_orig, iHandler, work1 );
     copyUNITARYtoPSIMX( unitary, iHandler, work2 );
-    wfn->Ca()->gemm(false, true, 1.0, work1, work2, 0.0);
+    wfn->Ca()->gemm(false, true, 1.0, orig_coeff, work2, 0.0);
     wfn->Cb()->copy(wfn->Ca());
 
 }
@@ -695,8 +694,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     boost::shared_ptr<JK> myJK; myJK = boost::shared_ptr<JK>(new DiskJK(wfn->basisset(), options));
     myJK->set_cutoff(0.0);
     myJK->initialize();
-    CheMPS2::DMRGSCFmatrix * Coeff_orig  = new CheMPS2::DMRGSCFmatrix( iHandler );
-    copyPSIMXtoCHEMPS2MX(wfn->Ca(), iHandler, Coeff_orig);
+    SharedMatrix orig_coeff; orig_coeff = SharedMatrix( new Matrix( wfn->Ca() ) );
 
     std::vector<int> OAorbs; // Occupied + active
     std::vector<int> Aorbs;  // Only active
@@ -840,7 +838,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
         if (( dmrg_store_diis ) && (updateNorm!=1.0) && (theDIIS!=NULL)){ theDIIS->saveDIIS( diisname ); }
 
         //Fill HamDMRG
-        update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+        update_WFNco( orig_coeff, iHandler, unitary, wfn, work1, work2 );
         buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
         buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
         buildHamDMRG( ints, Aorbs_ptr, theTmatrix, theQmatOCC, iHandler, HamDMRG, psio, wfn );
@@ -871,7 +869,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
             }
             system(("rm " + chemps2filename).c_str());
 
-            update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+            update_WFNco( orig_coeff, iHandler, unitary, wfn, work1, work2 );
             buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
             buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
             buildHamDMRG( ints, Aorbs_ptr, theTmatrix, theQmatOCC, iHandler, HamDMRG, psio, wfn );
@@ -929,7 +927,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
             CheMPS2::CASSCF::copy_active( DMRG1DM, theFmatrix, iHandler, true );
             CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, true, DMRG2DM, NULL, NULL ); // Unitary is updated and DMRG2DM rotated
             CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM );     
-            update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+            update_WFNco( orig_coeff, iHandler, unitary, wfn, work1, work2 );
             buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
             buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
             (*outfile) << "Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
@@ -985,7 +983,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
         CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM, NULL, NULL );
         CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
         CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM );
-        update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+        update_WFNco( orig_coeff, iHandler, unitary, wfn, work1, work2 );
         buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
         buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
         buildQmatACT( theQmatACT, iHandler, DMRG1DM, work1, work2, wfn->Ca(), myJK, wfn );
@@ -1122,7 +1120,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
            CheMPS2::CASSCF::block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, DMRG2DM, three_dm, contract ); // 2-RDM, 3-RDM, and trace( Fock * cu(4)-4-RDM )
            CheMPS2::CASSCF::block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
            CheMPS2::CASSCF::setDMRG1DM( nDMRGelectrons, nOrbDMRG, DMRG1DM, DMRG2DM ); // 1-RDM
-           update_WFNco( Coeff_orig, iHandler, unitary, wfn, work1, work2 );
+           update_WFNco( orig_coeff, iHandler, unitary, wfn, work1, work2 );
            buildTmatrix( theTmatrix, iHandler, psio, wfn->Ca(), wfn );
            buildQmatOCC( theQmatOCC, iHandler, work1, work2, wfn->Ca(), myJK, wfn );
            buildQmatACT( theQmatACT, iHandler, DMRG1DM, work1, work2, wfn->Ca(), myJK, wfn );
@@ -1175,7 +1173,6 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     if (theDIISparameterVector!=NULL){ delete [] theDIISparameterVector; }
     if (theLocalizer!=NULL){ delete theLocalizer; }
     if (theDIIS!=NULL){ delete theDIIS; }
-    delete Coeff_orig;
 
     delete wmattilde;
     delete theTmatrix;
