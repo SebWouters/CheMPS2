@@ -38,4 +38,4 @@ install:
     - make
 script:
     # we put a timeout of 30 minutes
-    - travis_wait 30 make test
+    - travis_wait 30 make test ARGS="-V"
