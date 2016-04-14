@@ -162,6 +162,8 @@ int CheMPS2::TensorT::gIndex() const { return index; }
 
 const CheMPS2::SyBookkeeper * CheMPS2::TensorT::gBK() const{ return denBK; }
 
+void CheMPS2::TensorT::sBK( const SyBookkeeper * newBK ){ denBK = newBK; }
+
 void CheMPS2::TensorT::random(){
 
    for ( int cnt = 0; cnt < kappa2index[ nKappa ]; cnt++ ){

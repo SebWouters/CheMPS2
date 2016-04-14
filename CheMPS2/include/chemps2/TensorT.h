@@ -82,6 +82,10 @@ namespace CheMPS2{
          /** \return the pointer to the symmetry bookkeeper */
          const SyBookkeeper * gBK() const;
 
+         //! Set the pointer to the symmetry bookkeeper
+         /** \param newBK The pointer to the symmetry bookkeeper */
+         void sBK( const SyBookkeeper * newBK );
+
          //! Fill storage with random numbers 0 < val < 1.
          void random();
 

@@ -259,13 +259,14 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
 
    if ( dmrg_orb1 + 1 < dmrg_orb2 ){
 
-      SyBookkeeper * oldBK = denBK;
-      denBK = new SyBookkeeper( *oldBK );
-      denBK->restart( dmrg_orb1 + 1, dmrg_orb2, OptScheme->get_D( OptScheme->get_number() - 1 ) );
+      SyBookkeeper * newBK = denBK;
+      denBK = new SyBookkeeper( *newBK );
+      newBK->restart( dmrg_orb1 + 1, dmrg_orb2, OptScheme->get_D( OptScheme->get_number() - 1 ) );
       TensorT ** old_mps = new TensorT * [ L ];
       for ( int orbital = dmrg_orb1; orbital <= dmrg_orb2; orbital++ ){
          old_mps[ orbital ] = MPS[ orbital ];
-         MPS[ orbital ] = new TensorT( orbital, denBK );
+         old_mps[ orbital ]->sBK( denBK );
+         MPS[ orbital ] = new TensorT( orbital, newBK );
          MPS[ orbital ]->random();
          left_normalize( orbital, am_i_master, false ); // MPI_CHEMPS2_MASTER broadcasts MPS[ orbital ] ( left-normalized ).
       }
@@ -283,7 +284,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                trans[ cnt ] = NULL;
          }
          for ( int orbital = dmrg_orb1; orbital < dmrg_orb2 - 1; orbital++ ){
-            solve_fock_update_helper( orbital, dmrg_orb1, dmrg_orb2, true, MPS, old_mps, denBK, oldBK, overlaps, regular, trans );
+            solve_fock_update_helper( orbital, dmrg_orb1, dmrg_orb2, true, MPS, old_mps, newBK, denBK, overlaps, regular, trans );
          }
       }
 
@@ -297,11 +298,11 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
                MaxDiscWeightLastSweep   = 0.0;
                for ( int index = dmrg_orb2 - 1; index > dmrg_orb1; index-- ){
-                  Sobject * newS = new Sobject( index, denBK );
+                  Sobject * newS = new Sobject( index, newBK );
                   if ( am_i_master ){
-                     Sobject * oldS = new Sobject( index, oldBK );
+                     Sobject * oldS = new Sobject( index, denBK );
                      oldS->Join( old_mps[ index ], old_mps[ index + 1 ] );
-                     sweep_inproduct = Excitation::matvec( denBK, oldBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
+                     sweep_inproduct = Excitation::matvec( newBK, denBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
                      delete oldS;
                      if ( noise_level > 0.0 ){ newS->addNoise( noise_level ); }
                   }
@@ -310,7 +311,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                   if ( discarded_weight > MaxDiscWeightLastSweep ){ MaxDiscWeightLastSweep = discarded_weight; }
                   delete newS;
                   if ( am_i_master ){
-                     solve_fock_update_helper( index, dmrg_orb1, dmrg_orb2, false, MPS, old_mps, denBK, oldBK, overlaps, regular, trans );
+                     solve_fock_update_helper( index, dmrg_orb1, dmrg_orb2, false, MPS, old_mps, newBK, denBK, overlaps, regular, trans );
                   }
                }
             }
@@ -319,11 +320,11 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                const double noise_level = fabs( OptScheme->get_noise_prefactor( instruction ) ) * MaxDiscWeightLastSweep;
                MaxDiscWeightLastSweep   = 0.0;
                for ( int index = dmrg_orb1; index < dmrg_orb2 - 1; index++ ){
-                  Sobject * newS = new Sobject( index, denBK );
+                  Sobject * newS = new Sobject( index, newBK );
                   if ( am_i_master ){
-                     Sobject * oldS = new Sobject( index, oldBK );
+                     Sobject * oldS = new Sobject( index, denBK );
                      oldS->Join( old_mps[ index ], old_mps[ index + 1 ] );
-                     sweep_inproduct = Excitation::matvec( denBK, oldBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
+                     sweep_inproduct = Excitation::matvec( newBK, denBK, dmrg_orb1, dmrg_orb2, alpha, alpha, beta, newS, oldS, overlaps, regular, trans );
                      delete oldS;
                      if ( noise_level > 0.0 ){ newS->addNoise( noise_level ); }
                   }
@@ -332,7 +333,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
                   if ( discarded_weight > MaxDiscWeightLastSweep ){ MaxDiscWeightLastSweep = discarded_weight; }
                   delete newS;
                   if ( am_i_master ){
-                     solve_fock_update_helper( index, dmrg_orb1, dmrg_orb2, true, MPS, old_mps, denBK, oldBK, overlaps, regular, trans );
+                     solve_fock_update_helper( index, dmrg_orb1, dmrg_orb2, true, MPS, old_mps, newBK, denBK, overlaps, regular, trans );
                   }
                }
             }
@@ -357,7 +358,8 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
 
       for ( int orbital = dmrg_orb1; orbital <= dmrg_orb2; orbital++ ){ delete old_mps[ orbital ]; }
       delete [] old_mps;
-      delete oldBK;
+      delete denBK;
+      denBK = newBK;
 
    }
 
