@@ -1,0 +1,41 @@
+language: cpp
+addons:
+  apt:
+    sources:
+        # Clang 3.8
+        - llvm-toolchain-precise-3.7
+        # Newer CMake
+        - george-edison55-precise-backports
+        # Newer GCC
+        - ubuntu-toolchain-r-test
+    packages:
+        - cmake
+        - cmake-data
+        - liblapack-dev
+        - libhdf5-serial-dev
+        - libgsl0-dev
+        - libgsl0ldbl
+        - gcc-4.8
+        - g++-4.8
+        - gcc-5
+        - g++-5
+        - clang-3.7
+env:
+    global:
+    # should be limited to 4 on travis
+    - OMP_NUM_THREADS=4
+    # make cmake verbose
+    - VERBOSE=1
+    matrix:
+    # test three different compilers
+    - OUR_CXX='clang++-3.7' OUR_CC='clang-3.7' BUILD_TYPE='release'
+    - OUR_CXX='g++-4.8' OUR_CC='gcc-4.8' BUILD_TYPE='release'
+    - OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
+install:
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_C_COMPILER=$OUR_CC -DCMAKE_CXX_COMPILER=$OUR_CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+    - make
+script:
+    # we put a timeout of 30 minues
+    - travis_wait 30 make test
