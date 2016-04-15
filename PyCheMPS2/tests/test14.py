@@ -47,8 +47,8 @@ theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT)
 
 # Setting up the ConvergenceScheme
 OptScheme = PyCheMPS2.PyConvergenceScheme( 2 ) # 2 instructions
-OptScheme.set_instruction( 0,  500, 1e-10,  3, 0.1, 1e-5 )
-OptScheme.set_instruction( 1, 1000, 1e-10, 10, 0.0, 1e-9 )
+OptScheme.set_instruction( 0,  500, 1e-10,  3, 0.1, 1e-5  )
+OptScheme.set_instruction( 1, 1000, 1e-10, 10, 0.0, 1e-10 )
 
 # Setting the DMRGSCFoptions and run DMRGSCF
 root_num = 1 # Ground state only

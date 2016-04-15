@@ -61,8 +61,8 @@ int main(void){
    //Setup convergence scheme
    CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( 2 );
    //OptScheme->setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-   OptScheme->set_instruction( 0,  500, 1e-10,  3, 0.1, 1e-5 );
-   OptScheme->set_instruction( 1, 1000, 1e-10, 10, 0.0, 1e-9 );
+   OptScheme->set_instruction( 0,  500, 1e-10,  3, 0.1, 1e-5  );
+   OptScheme->set_instruction( 1, 1000, 1e-10, 10, 0.0, 1e-10 );
 
    //Run CASSCF
    const int root_num = 1; //Ground state only

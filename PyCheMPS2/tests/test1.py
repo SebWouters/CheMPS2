@@ -29,94 +29,110 @@ Initializer.Init()
 # Read in the FCIDUMP
 psi4group = 7 # d2h: see chemps2/Irreps.h
 filename  = '../../tests/matrixelements/N2.STO3G.FCIDUMP'
-orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
+orbirreps = np.array( [ -1, -1 ], dtype=ctypes.c_int ) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 
 # Define the symmetry sector
-Nelec = 14 # The number of electrons
-TwoS  = np.array([0, 2, 4, 4, 2, 2], dtype=ctypes.c_int) # Two times the targeted spin
-Irrep = np.array([0, 5, 0, 5, 2, 6], dtype=ctypes.c_int) # The targeted irreps (Ag, B1u, Ag, ... )
-FCIenergies  = np.zeros([len(TwoS)] ,dtype=ctypes.c_double)
-DMRGenergies = np.ones( [len(TwoS)] ,dtype=ctypes.c_double)
-RMS_detcoeff = np.ones( [len(TwoS)] ,dtype=ctypes.c_double)
+Nelec  = 14 # The number of electrons
+TwoS   = np.array( [ 0, 2, 4, 4, 2, 2 ], dtype=ctypes.c_int ) # Two times the targeted spin
+Irrep  = np.array( [ 0, 5, 0, 5, 2, 6 ], dtype=ctypes.c_int ) # The targeted irreps (Ag, B1u, Ag, ... )
+E_FCI  = np.zeros( [ len( TwoS ) ] ,dtype=ctypes.c_double )
+E_DMRG = np.zeros( [ len( TwoS ) ] ,dtype=ctypes.c_double )
+C_dev  = np.zeros( [ len( TwoS ) ] ,dtype=ctypes.c_double )
+S_FCI  = np.zeros( [ len( TwoS ) ] ,dtype=ctypes.c_double )
 
 # Obtain a list of single species Slater determinants and their irrep
-def stringlist(theHam, theNel):
+def stringlist( local_ham, num_elec ):
     arrays = []
     irreps = []
-    for counter in range(2**theHam.getL()):
-        thestring = np.array(list(bin(counter)[2:]))
-        theints   = map(int, thestring)
-        if (np.sum(theints) == theNel):
-            thearray = np.zeros([theHam.getL()], dtype=ctypes.c_int)
-            thearray[theHam.getL() - len(theints):] = theints
+    for counter in range( 2**local_ham.getL() ):
+        thestring = np.array( list( bin( counter )[ 2 : ] ) )
+        theints   = map( int, thestring )
+        if ( np.sum( theints ) == num_elec ):
+            thearray = np.zeros( [ local_ham.getL() ], dtype=ctypes.c_int )
+            thearray[ local_ham.getL() - len( theints ): ] = theints
             theirrep = 0
-            for orb in range(theHam.getL()):
-                if (thearray[ orb ] == 1):
-                    theirrep = theirrep ^ theHam.getOrbitalIrrep(orb) # XOR
-            arrays.append(thearray)
-            irreps.append(theirrep)
-    return (arrays, irreps)
+            for orb in range( local_ham.getL() ):
+                if ( thearray[ orb ] == 1 ):
+                    theirrep = theirrep ^ local_ham.getOrbitalIrrep( orb )
+            arrays.append( thearray )
+            irreps.append( theirrep )
+    return ( arrays, irreps )
 
-for cnt in range(0, len(TwoS)):
+def relative_phase( L, string_up, string_down ):
+
+    phase = 1
+    for orb_down in range( L - 1 ):
+        if ( string_down[ orb_down ] == 1 ):
+            sum_up = np.sum( string_up[ orb_down + 1 : ] )
+            if (( sum_up % 2 ) == 1 ):
+                phase *= -1
+    return phase
+
+for sector in range( len( TwoS ) ):
+
+    # Setting up the Problem
+    prob = PyCheMPS2.PyProblem( Ham, TwoS[ sector ], Nelec, Irrep[ sector ] )
+
+    # To perform DMRG, a set of convergence instructions should be provided
+    opt_scheme = PyCheMPS2.PyConvergenceScheme( 2 ) # 2 instructions
+    # setInstruction( counter, virtual_dimension, energy_convergence, max_sweeps, noise_prefactor, dvdson_rtol )
+    opt_scheme.set_instruction( 0,  500, 1e-10,  2, 0.0, 1e-5  )
+    opt_scheme.set_instruction( 1, 1000, 1e-10, 30, 0.0, 1e-10 ) # Tight convergence for accurate FCI coefficients
+
+    # Do DMRG calculation
+    dmrg_solver = PyCheMPS2.PyDMRG( prob, opt_scheme )
+    E_DMRG[ sector ] = dmrg_solver.Solve()
+    dmrg_solver.calc2DMandCorrelations()
 
     # Do FCI calculation
-    Nel_up   = ( Nelec + TwoS[cnt] ) / 2
-    Nel_down = ( Nelec - TwoS[cnt] ) / 2
-    maxMemWorkMB = 10.0
-    FCIverbose = 1
-    theFCI = PyCheMPS2.PyFCI(Ham, Nel_up, Nel_down, Irrep[cnt], maxMemWorkMB, FCIverbose)
-    GSvector = np.zeros([ theFCI.getVecLength() ], dtype=ctypes.c_double)
-    GSvector[ theFCI.LowestEnergyDeterminant() ] = 1.0
-    FCIenergies[cnt] = theFCI.GSDavidson(GSvector)
-    theFCI.CalcSpinSquared(GSvector)
-    
-    # Setting up the Problem
-    Prob = PyCheMPS2.PyProblem(Ham, TwoS[cnt], Nelec, Irrep[cnt])
-    # Prob.SetupReorderD2h() # Determinant coefficient comparison OK both with option ON and OFF
-    
-    # To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
-    OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
-    # setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
-    OptScheme.setInstruction(0, 2000, 1e-10, 100, 0.0)
-    
-    # Do DMRG calculation
-    theDMRG = PyCheMPS2.PyDMRG(Prob, OptScheme)
-    DMRGenergies[cnt] = theDMRG.Solve()
-    theDMRG.calc2DMandCorrelations()
-    
+    nelec_up   = ( Nelec + TwoS[ sector ] ) / 2
+    nelec_down = ( Nelec - TwoS[ sector ] ) / 2
+    workmem_mb = 10.0
+    verbose    = 1
+    fci_solver = PyCheMPS2.PyFCI( Ham, nelec_up, nelec_down, Irrep[ sector ], workmem_mb, verbose )
+    GSvector   = np.zeros( [ fci_solver.getVecLength() ], dtype=ctypes.c_double )
+    GSvector[ fci_solver.LowestEnergyDeterminant() ] = 1.0
+    E_FCI[ sector ] = fci_solver.GSDavidson( GSvector )
+    S_FCI[ sector ] = fci_solver.CalcSpinSquared( GSvector )
+
     # Compare the FCI and DMRG determinant coefficients
-    list_alpha, irrep_alpha = stringlist(Ham, Nel_up  )
-    list_beta,  irrep_beta  = stringlist(Ham, Nel_down)
-    rms_abs = 0.0
-    for count_alpha in range(len(irrep_alpha)):
-        for count_beta in range(len(irrep_beta)):
-            if ((irrep_alpha[count_alpha] ^ irrep_beta[count_beta]) == Irrep[cnt]):
-                dmrg_coeff = theDMRG.getFCIcoefficient(list_alpha[count_alpha], list_beta[count_beta])
-                fci_coeff  =  theFCI.getFCIcoefficient(list_alpha[count_alpha], list_beta[count_beta], GSvector)
-                temp       = abs(dmrg_coeff) - abs(fci_coeff)
-                rms_abs   += temp * temp
-    RMS_detcoeff[cnt] = np.sqrt(rms_abs)
-    print "RMS difference FCI and DMRG determinant coefficients =", RMS_detcoeff[cnt]
+    list_up,   irrep_up   = stringlist( Ham, nelec_up   )
+    list_down, irrep_down = stringlist( Ham, nelec_down )
+    rms_error1 = 0.0
+    rms_error2 = 0.0
+    for count_up in range( len( irrep_up ) ):
+        for count_down in range( len( irrep_down ) ):
+            if (( irrep_up[ count_up ] ^ irrep_down[ count_down ] ) == Irrep[ sector ] ):
+                dmrg_coeff = dmrg_solver.getFCIcoefficient( list_up[ count_up ], list_down[ count_down ] )
+                fci_coeff  =  fci_solver.getFCIcoefficient( list_up[ count_up ], list_down[ count_down ], GSvector )
+                phase_diff = relative_phase( Ham.getL(), list_up[ count_up ], list_down[ count_down ] )
+                temp1      = dmrg_coeff - phase_diff * fci_coeff
+                temp2      = dmrg_coeff + phase_diff * fci_coeff
+                rms_error1 += temp1 * temp1
+                rms_error2 += temp2 * temp2
+    C_dev[ sector ] = np.sqrt( min( rms_error1, rms_error2 ) ) # The global phase of the wavefunction is arbitrary, hence.
+    print "RMS difference FCI and DMRG determinant coefficients =", C_dev[ sector ]
 
     # Clean-up
-    # theDMRG.deleteStoredMPS()
-    theDMRG.deleteStoredOperators()
-    del theFCI
-    del theDMRG
-    del OptScheme
-    del Prob
-    
+    # dmrg_solver.deleteStoredMPS()
+    dmrg_solver.deleteStoredOperators()
+    del fci_solver
+    del dmrg_solver
+    del opt_scheme
+    del prob
+
 # Clean up
 del Ham
 del Initializer
 
 # Check whether the test succeeded
 success = True
-for cnt in range(len(TwoS)):
-    success = success and (np.fabs(FCIenergies[cnt] - DMRGenergies[cnt]) < 1e-8)
-    success = success and (RMS_detcoeff[cnt] < 1e-3) # Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
-if (success):
+for sector in range( len( TwoS ) ):
+    success = success and ( np.fabs( E_FCI[ sector ] - E_DMRG[ sector ] ) < 1e-8 )
+    success = success and ( C_dev[ sector ] < 1e-5 )
+    success = success and ( np.fabs( S_FCI[ sector ] - 0.25 * TwoS[ sector ] * ( TwoS[ sector ] + 2 ) ) < 1e-8 )
+if ( success ):
     print "================> Did test 1 succeed : yes"
 else:
     print "================> Did test 1 succeed : no"

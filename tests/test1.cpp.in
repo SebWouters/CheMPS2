@@ -28,19 +28,33 @@
 
 using namespace std;
 
-void counter2bits(const int L, const int counter, int * bits, CheMPS2::Hamiltonian * Ham, int * numElec, int * theIrrep){
+void counter2bits( const int L, const int counter, int * bits, CheMPS2::Hamiltonian * ham, int * nelec, int * irrep ){
 
-   int Nel   = 0;
-   int Irrep = 0;
-   for (int orb=0; orb<L; orb++){
-      bits[orb] = (counter & ( 1 << orb )) >> orb;
-      if (bits[orb]==1){
-         Nel  += bits[orb];
-         Irrep = CheMPS2::Irreps::directProd(Irrep, Ham->getOrbitalIrrep(orb));
+   nelec[ 0 ] = 0;
+   irrep[ 0 ] = 0;
+   for ( int orb = 0; orb < L; orb++ ){
+      bits[ orb ] = ( counter & ( 1 << orb ) ) >> orb;
+      if ( bits[ orb ] == 1 ){
+         nelec[ 0 ] += bits[ orb ];
+         irrep[ 0 ] = CheMPS2::Irreps::directProd( irrep[ 0 ], ham->getOrbitalIrrep( orb ) );
       }
    }
-   numElec[0]  = Nel;
-   theIrrep[0] = Irrep;
+
+}
+
+int relative_phase( const int L, int * string_up, int * string_down ){
+
+   int phase = 1;
+   for ( int orb_down = 0; orb_down < L - 1; orb_down++ ){
+      if ( string_down[ orb_down ] == 1 ){
+         for ( int orb_up = orb_down + 1; orb_up < L; orb_up++ ){
+            if ( string_up[ orb_up ] == 1 ){
+               phase *= -1;
+            }
+         }
+      }
+   }
+   return phase;
 
 }
 
@@ -51,117 +65,121 @@ int main(void){
    #endif
 
    CheMPS2::Initialize::Init();
-  
-   //The path to the matrix elements
-   string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.STO3G.FCIDUMP";
- 
-   //The Hamiltonian
-   const int psi4groupnumber = 7; // d2h -- see Irreps.h and N2.sto3g.out
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
-   cout << "The group was found to be " << CheMPS2::Irreps::getGroupName(Ham->getNGroup()) << endl;
 
-   //Look at a few symmetry sectors
-   const int Nelec    = 14;
-   const int nSectors = 6;
+   // The Hamiltonian
+   const int psi4groupnumber = 7; // d2h -- see Irreps.h and N2.sto3g.out
+   const string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/N2.STO3G.FCIDUMP";
+   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
+   cout << "The group was found to be " << CheMPS2::Irreps::getGroupName( Ham->getNGroup() ) << endl;
+
+   // Look at six symmetry sectors
+   const int Nelec = 14;
+   const int num_sectors = 6;
    int TwoS[]   = { 0, 2, 4, 4, 2, 2 };
    int Irreps[] = { 0, 5, 0, 5, 2, 6 };
-   double EDMRG[6];
-   double EFCI[6];
-   double RMSdev[6];
-   
-   for (int counter=0; counter<nSectors; counter++){
-      
-      //The targeted symmetry sector and the Hamiltonian form together a FCI problem
-      CheMPS2::Problem * Prob = new CheMPS2::Problem(Ham, TwoS[counter], Nelec, Irreps[counter]);
-      //Prob->SetupReorderD2h(); // Determinant coefficient comparison OK both with option ON and OFF
-      
-      //To perform DMRG, a set of convergence instructions should be added as well (normally more than 1 instruction should be used)
-      CheMPS2::ConvergenceScheme OptScheme(1);
-      //OptScheme.setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-      OptScheme.setInstruction(0, 2000, 1e-10, 100, 0.0);
-      
-      //Do DMRG calculation
-      CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, &OptScheme);
-      EDMRG[counter] = theDMRG->Solve();
-      theDMRG->calc2DMandCorrelations();
-      
+   double E_dmrg[ 6 ]; // DMRG energy
+   double E_fci [ 6 ]; // FCI  energy
+   double C_dev [ 6 ]; // RMS difference of DMRG and FCI coefficients
+   double S_fci [ 6 ]; // FCI spin squared
+
+   for ( int sector = 0; sector < num_sectors; sector++ ){
+
+      // The targeted symmetry sector and the Hamiltonian form together a FCI problem
+      CheMPS2::Problem * prob = new CheMPS2::Problem( Ham, TwoS[ sector ], Nelec, Irreps[ sector ] );
+
+      // To perform DMRG, a set of convergence instructions should be provided
+      CheMPS2::ConvergenceScheme opt_scheme( 2 );
+      // ConvergenceScheme::set_instruction( counter, virtual_dimension, energy_convergence, max_sweeps, noise_prefactor, dvdson_rtol );
+      opt_scheme.set_instruction( 0,  500, 1e-10,  2, 0.0, 1e-5  );
+      opt_scheme.set_instruction( 1, 1000, 1e-10, 30, 0.0, 1e-10 ); // Tight convergence for accurate FCI coefficients
+
+      // Do DMRG calculation
+      CheMPS2::DMRG * dmrg_solver = new CheMPS2::DMRG( prob, &opt_scheme );
+      E_dmrg[ sector ] = dmrg_solver->Solve();
+      dmrg_solver->calc2DMandCorrelations();
+
       //Perform full configuration interation
       #ifdef CHEMPS2_MPI_COMPILATION
       if ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
       #endif
       {
-         const int Nel_up   = ( Nelec + TwoS[counter] ) / 2;
-         const int Nel_down = ( Nelec - TwoS[counter] ) / 2;
-         const double maxMemWorkMB = 10.0;
-         const int FCIverbose = 1;
-         CheMPS2::FCI * theFCI = new CheMPS2::FCI(Ham, Nel_up, Nel_down, Irreps[counter], maxMemWorkMB, FCIverbose);
-         double * GSvector = new double[theFCI->getVecLength(0)];
-         theFCI->ClearVector(theFCI->getVecLength(0), GSvector);
-         GSvector[ theFCI->LowestEnergyDeterminant() ] = 1.0;
-         EFCI[counter] = theFCI->GSDavidson(GSvector);
-         theFCI->CalcSpinSquared(GSvector);
+         const int nelec_up   = ( Nelec + TwoS[ sector ] ) / 2;
+         const int nelec_down = ( Nelec - TwoS[ sector ] ) / 2;
+         const double workmem_mb = 10.0;
+         const int verbose = 1;
+         CheMPS2::FCI * fci_solver = new CheMPS2::FCI( Ham, nelec_up, nelec_down, Irreps[ sector ], workmem_mb, verbose );
+         double * GSvector = new double[ fci_solver->getVecLength( 0 ) ];
+         fci_solver->ClearVector( fci_solver->getVecLength( 0 ), GSvector );
+         GSvector[ fci_solver->LowestEnergyDeterminant() ] = 1.0;
+         E_fci[ sector ] = fci_solver->GSDavidson( GSvector );
+         S_fci[ sector ] = fci_solver->CalcSpinSquared( GSvector );
          {  //Compare the FCI and DMRG determinant coefficients
             int maxcount = 1;
-            for (int orb=0; orb<(Ham->getL()); orb++){ maxcount *= 2; }
-            int Nalpha;
-            int Nbeta;
-            int Ialpha;
-            int Ibeta;
-            int * alphastring = new int[ Ham->getL() ];
-            int *  betastring = new int[ Ham->getL() ];
-            double RMSerrorCoeff = 0.0;
-            for (int count_alpha=0; count_alpha<maxcount; count_alpha++){
-               counter2bits(Ham->getL(), count_alpha, alphastring, Ham, &Nalpha, &Ialpha);
-               if (Nalpha==Nel_up){
-                  for (int count_beta=0; count_beta<maxcount; count_beta++){
-                     counter2bits(Ham->getL(), count_beta, betastring, Ham, &Nbeta, &Ibeta);
-                     if ((Nbeta==Nel_down) && (CheMPS2::Irreps::directProd(Ialpha,Ibeta)==Irreps[counter])){
-                        const double coeff_dmrg = theDMRG->getFCIcoefficient(alphastring, betastring, false);
-                        const double coeff_fci = theFCI->getFCIcoeff(alphastring, betastring, GSvector);
-                        double temp = fabs(coeff_dmrg) - fabs(coeff_fci);
-                        RMSerrorCoeff += temp * temp;
+            for ( int orb = 0; orb < Ham->getL(); orb++ ){ maxcount *= 2; }
+            int n_up;
+            int n_down;
+            int irrep_up;
+            int irrep_down;
+            int * string_up   = new int[ Ham->getL() ];
+            int * string_down = new int[ Ham->getL() ];
+            double rms_error1 = 0.0;
+            double rms_error2 = 0.0;
+            for ( int count_up = 0; count_up < maxcount; count_up++ ){
+               counter2bits( Ham->getL(), count_up, string_up, Ham, &n_up, &irrep_up );
+               if ( n_up == nelec_up ){
+                  for ( int count_down = 0; count_down < maxcount; count_down++ ){
+                     counter2bits( Ham->getL(), count_down, string_down, Ham, &n_down, &irrep_down );
+                     if (( n_down == nelec_down ) && ( CheMPS2::Irreps::directProd( irrep_up, irrep_down ) == Irreps[ sector ] )){
+                        const double coeff_dmrg = dmrg_solver->getFCIcoefficient( string_up, string_down, false );
+                        const double coeff_fci  =  fci_solver->getFCIcoeff( string_up, string_down, GSvector );
+                        const double phase_diff = relative_phase( Ham->getL(), string_up, string_down );
+                        const double temp1      = coeff_dmrg - phase_diff * coeff_fci;
+                        const double temp2      = coeff_dmrg + phase_diff * coeff_fci;
+                        rms_error1 += temp1 * temp1;
+                        rms_error2 += temp2 * temp2;
                      }
                   }
                }
             }
-            RMSdev[counter] = sqrt(RMSerrorCoeff);
-            cout << "RMS difference FCI and DMRG determinant coefficients = " << RMSdev[counter] << endl;
-            delete [] alphastring;
-            delete []  betastring;
+            C_dev[ sector ] = sqrt( ( rms_error1 < rms_error2 ) ? rms_error1 : rms_error2 ); // The global phase of the wavefunction is arbitrary, hence.
+            cout << "RMS difference FCI and DMRG determinant coefficients = " << C_dev[ sector ] << endl;
+            delete [] string_up;
+            delete [] string_down;
          }
          delete [] GSvector;
-         delete theFCI;
+         delete fci_solver;
       }
-      
+
       //Clean up
-      if (CheMPS2::DMRG_storeMpsOnDisk){ theDMRG->deleteStoredMPS(); }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-      delete theDMRG;
-      delete Prob;
+      if ( CheMPS2::DMRG_storeMpsOnDisk ){ dmrg_solver->deleteStoredMPS(); }
+      if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ dmrg_solver->deleteStoredOperators(); }
+      delete dmrg_solver;
+      delete prob;
 
    }
-   
+
    #ifdef CHEMPS2_MPI_COMPILATION
-   CheMPS2::MPIchemps2::broadcast_array_double( EFCI,   nSectors, MPI_CHEMPS2_MASTER );
-   CheMPS2::MPIchemps2::broadcast_array_double( RMSdev, nSectors, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( E_fci, nSectors, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( C_dev, nSectors, MPI_CHEMPS2_MASTER );
    #endif
-   
-   //Clean up the Hamiltonian
+
+   // Clean up the Hamiltonian
    delete Ham;
-   
-   //Check success
+
+   // Check success
    bool success = true;
-   for (int cnt=0; cnt<nSectors; cnt++){
-      success = ( success ) && ( fabs( EDMRG[cnt] - EFCI[cnt] ) < 1e-8 );
-      success = ( success ) && ( RMSdev[cnt] < 1e-3 ); // Energy converges quadratically in wfn error, cfr. EPJD 68 (9), 272 (2014)
+   for ( int sector = 0; sector < num_sectors; sector++ ){
+      success = ( success ) && ( fabs( E_dmrg[ sector ] - E_fci[ sector ] ) < 1e-8 );
+      success = ( success ) && ( C_dev[ sector ] < 1e-5 );
+      success = ( success ) && ( fabs( S_fci[ sector ] - 0.25 * TwoS[ sector ] * ( TwoS[ sector ] + 2 ) ) < 1e-8 );
    }
-   
+
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
    #endif
-   
+
    cout << "================> Did test 1 succeed : ";
-   if (success){
+   if ( success ){
       cout << "yes" << endl;
       return 0; //Success
    }
