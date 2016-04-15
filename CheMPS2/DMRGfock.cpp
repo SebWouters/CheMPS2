@@ -115,7 +115,7 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
 
    // Change the gauge so that the non-orthonormal MPS tensor is on site dmrg_orb2
    for ( int siteindex = L - 1; siteindex > dmrg_orb2; siteindex-- ){
-      right_normalize( siteindex, am_i_master, true );
+      right_normalize( MPS[ siteindex - 1 ], MPS[ siteindex ] );
       updateMovingLeftSafeFirstTime( siteindex - 1 );
    }
 
@@ -124,7 +124,7 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
 
    // Further right normalize the wavefunction except for the first MPS tensor ( contains the norm )
    for ( int siteindex = dmrg_orb2; siteindex > 0; siteindex-- ){
-      right_normalize( siteindex, am_i_master, true );
+      right_normalize( MPS[ siteindex - 1 ], MPS[ siteindex ] );
       updateMovingLeftSafeFirstTime( siteindex - 1 );
    }
 
@@ -149,7 +149,7 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
    for ( int siteindex = 1; siteindex < L; siteindex++ ){
 
       /* Change the MPS gauge */
-      left_normalize( siteindex - 1, am_i_master, true );
+      left_normalize( MPS[ siteindex - 1 ], MPS[ siteindex ] );
 
       /* Update the required renormalized operators */
       update_safe_3rdm_operators( siteindex );
@@ -268,7 +268,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
          old_mps[ orbital ]->sBK( denBK );
          MPS[ orbital ] = new TensorT( orbital, newBK );
          MPS[ orbital ]->random();
-         left_normalize( orbital, am_i_master, false ); // MPI_CHEMPS2_MASTER broadcasts MPS[ orbital ] ( left-normalized ).
+         left_normalize( MPS[ orbital ], NULL ); // MPI_CHEMPS2_MASTER broadcasts MPS[ orbital ] ( left-normalized ).
       }
 
       TensorO ** overlaps = NULL;

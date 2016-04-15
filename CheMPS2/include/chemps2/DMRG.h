@@ -291,8 +291,8 @@ namespace CheMPS2{
          // Helper functions for making the symmetrized 4-RDM
          void solve_fock( const int dmrg_orb1, const int dmrg_orb2, const double alpha, const double beta );
          static void solve_fock_update_helper( const int index, const int dmrg_orb1, const int dmrg_orb2, const bool moving_right, TensorT ** new_mps, TensorT ** old_mps, SyBookkeeper * new_bk, SyBookkeeper * old_bk, TensorO ** overlaps, TensorL ** regular, TensorL ** trans );
-         void  left_normalize( const int siteindex, const bool am_i_master, const bool multiply_right );
-         void right_normalize( const int siteindex, const bool am_i_master, const bool multiply_left  );
+         static void  left_normalize( TensorT * left_mps, TensorT * right_mps );
+         static void right_normalize( TensorT * left_mps, TensorT * right_mps );
          void symm_4rdm_helper( double * output, const int ham_orb1, const int ham_orb2, const double alpha, const double beta, const bool add, const double factor );
 
          //Helper functions for making the Correlations boundary operators

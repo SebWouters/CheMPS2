@@ -134,7 +134,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
       #endif
       for ( int site = 0; site < L; site++ ){
          if ( am_i_master ){ MPS[ site ]->random(); }
-         left_normalize( site, am_i_master, false );
+         left_normalize( MPS[ site ], NULL );
       }
    }
 

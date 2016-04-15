@@ -54,8 +54,8 @@ void CheMPS2::DMRG::calc_rdms_and_correlations( const bool do_3rdm ){
 
    // Get the whole MPS into left-canonical form
    gettimeofday( &start_part, NULL );
-   left_normalize( L - 2, am_i_master, true  );
-   left_normalize( L - 1, am_i_master, false );
+   left_normalize( MPS[ L - 2 ], MPS[ L - 1 ] );
+   left_normalize( MPS[ L - 1 ], NULL         );
    gettimeofday( &end_part, NULL );
    timings[ CHEMPS2_TIME_S_SPLIT ] += ( end_part.tv_sec - start_part.tv_sec ) + 1e-6 * ( end_part.tv_usec - start_part.tv_usec );
 
@@ -92,7 +92,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations( const bool do_3rdm ){
       if ( siteindex > 0 ){
 
          gettimeofday( &start_part, NULL );
-         right_normalize( siteindex, am_i_master, true );
+         right_normalize( MPS[ siteindex - 1 ], MPS[ siteindex ] );
          gettimeofday( &end_part, NULL );
          timings[ CHEMPS2_TIME_S_SPLIT ] += ( end_part.tv_sec - start_part.tv_sec ) + 1e-6 * ( end_part.tv_usec - start_part.tv_usec );
 
@@ -158,7 +158,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations( const bool do_3rdm ){
 
       // Change MPS gauge
       gettimeofday( &start_part, NULL );
-      left_normalize( siteindex - 1, am_i_master, true );
+      left_normalize( MPS[ siteindex - 1 ], MPS[ siteindex ] );
       gettimeofday( &end_part, NULL );
       timings[ CHEMPS2_TIME_S_SPLIT ] += ( end_part.tv_sec - start_part.tv_sec ) + 1e-6 * ( end_part.tv_usec - start_part.tv_usec );
 
@@ -273,34 +273,50 @@ void CheMPS2::DMRG::print_tensor_update_performance() const{
 
 }
 
-void CheMPS2::DMRG::left_normalize( const int siteindex, const bool am_i_master, const bool multiply_right ){
+void CheMPS2::DMRG::left_normalize( TensorT * left_mps, TensorT * right_mps ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
 
    if ( am_i_master ){
+      const int siteindex = left_mps->gIndex();
+      const SyBookkeeper * theBK = left_mps->gBK();
       // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
-      TensorOperator * right = new TensorOperator( siteindex + 1, 0, 0, 0, true, true, false, denBK, denBK );
-      MPS[ siteindex ]->QR( right );
-      if ( multiply_right ){ MPS[ siteindex + 1 ]->LeftMultiply( right ); }
-      delete right;
+      TensorOperator * temp = new TensorOperator( siteindex + 1, 0, 0, 0, true, true, false, theBK, theBK );
+      left_mps->QR( temp );
+      if ( right_mps != NULL ){ right_mps->LeftMultiply( temp ); }
+      delete temp;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
-   MPIchemps2::broadcast_tensor( MPS[ siteindex ], MPI_CHEMPS2_MASTER );
-   if ( multiply_right ){ MPIchemps2::broadcast_tensor( MPS[ siteindex + 1 ], MPI_CHEMPS2_MASTER ); }
+   MPIchemps2::broadcast_tensor( left_mps, MPI_CHEMPS2_MASTER );
+   if ( right_mps != NULL ){ MPIchemps2::broadcast_tensor( right_mps, MPI_CHEMPS2_MASTER ); }
    #endif
 
 }
 
-void CheMPS2::DMRG::right_normalize( const int siteindex, const bool am_i_master, const bool multiply_left ){
+void CheMPS2::DMRG::right_normalize( TensorT * left_mps, TensorT * right_mps ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
 
    if ( am_i_master ){
+      const int siteindex = right_mps->gIndex();
+      const SyBookkeeper * theBK = right_mps->gBK();
       // (J,N,I) = (0,0,0) and (moving_right, prime_last, jw_phase) = (true, true, false)
-      TensorOperator * left = new TensorOperator( siteindex, 0, 0, 0, true, true, false, denBK, denBK );
-      MPS[ siteindex ]->LQ( left );
-      if ( multiply_left ){ MPS[ siteindex - 1 ]->RightMultiply( left ); }
-      delete left;
+      TensorOperator * temp = new TensorOperator( siteindex, 0, 0, 0, true, true, false, theBK, theBK );
+      right_mps->LQ( temp );
+      if ( left_mps != NULL ){ left_mps->RightMultiply( temp ); }
+      delete temp;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
-   MPIchemps2::broadcast_tensor( MPS[ siteindex ], MPI_CHEMPS2_MASTER );
-   if ( multiply_left ){ MPIchemps2::broadcast_tensor( MPS[ siteindex - 1 ], MPI_CHEMPS2_MASTER ); }
+   MPIchemps2::broadcast_tensor( right_mps, MPI_CHEMPS2_MASTER );
+   if ( left_mps != NULL ){ MPIchemps2::broadcast_tensor( left_mps, MPI_CHEMPS2_MASTER ); }
    #endif
 
 }
