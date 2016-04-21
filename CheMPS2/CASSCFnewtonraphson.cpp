@@ -31,6 +31,7 @@
 #include "EdmistonRuedenberg.h"
 #include "Davidson.h"
 #include "FCI.h"
+#include "MPIchemps2.h"
 
 using std::string;
 using std::ifstream;
@@ -54,6 +55,12 @@ void CheMPS2::CASSCF::delete_file( const string filename ){
 
 double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options ){
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
    assert(( OptScheme != NULL ) || (( OptScheme == NULL ) && ( rootNum == 1 )));
@@ -61,41 +68,49 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
    // Convergence variables
    double gradNorm = 1.0;
    double updateNorm = 1.0;
-   double * gradient = new double[ unitary->getNumVariablesX() ];
-   for ( int cnt = 0; cnt < unitary->getNumVariablesX(); cnt++ ){ gradient[ cnt ] = 0.0; }
+   double * gradient = NULL;
+   if ( am_i_master ){
+      gradient = new double[ unitary->getNumVariablesX() ];
+      for ( int cnt = 0; cnt < unitary->getNumVariablesX(); cnt++ ){ gradient[ cnt ] = 0.0; }
+   }
    double * diis_vec = NULL;
    double Energy = 1e8;
 
    // The CheMPS2::Problem for the inner DMRG calculation
-   Hamiltonian * HamDMRG = new Hamiltonian(nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital());
-   Problem * Prob = new Problem(HamDMRG, TwoS, num_elec, Irrep);
-   Prob->SetupReorderD2h(); //Doesn't matter if the group isn't D2h, Prob checks it.
+   Hamiltonian * HamDMRG = new Hamiltonian( nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital() );
+   Problem * Prob = new Problem( HamDMRG, TwoS, num_elec, Irrep );
+   Prob->SetupReorderD2h(); // Doesn't matter if the group isn't D2h, Prob checks it.
 
-   // Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
+   // Determine the maximum NORB( irrep ) and the max_block_size for the ERI orbital rotation
    const int maxlinsize      = iHandler->getNORBmax();
    const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );
    const string tmp_filename = CheMPS2::defaultTMPpath + "/" + CheMPS2::DMRGSCF_eri_storage_name;
    const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
-   //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+   // For ( ERI rotation, update unitary, block diagonalize, orbital localization )
    const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
    const int work_mem_size = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
    double * mem1 = new double[ work_mem_size ];
    double * mem2 = new double[ work_mem_size ];
 
-   //The two-body rotator and Edmiston-Ruedenberg active space localizer
+   // Only MASTER process has Edmiston-Ruedenberg active space localizer
    EdmistonRuedenberg * theLocalizer = NULL;
-   if ( scf_options->getWhichActiveSpace() == 2 ){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
+   if (( scf_options->getWhichActiveSpace() == 2 ) && ( am_i_master )){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
 
-   //Load unitary from disk
+   // Load unitary from disk
    if ( scf_options->getStoreUnitary() ){
-      struct stat file_info;
-      int master_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
-      if ( master_stat == 0 ){ unitary->loadU( scf_options->getUnitaryStorageName() ); }
+      if ( am_i_master ){
+         struct stat file_info;
+         int master_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
+         if ( master_stat == 0 ){ unitary->loadU( scf_options->getUnitaryStorageName() ); }
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      unitary->broadcast( MPI_CHEMPS2_MASTER ); // Unitary was set to the identity at construction
+      #endif
    }
 
-   //Load DIIS from disk
+   // Only master has DIIS; load DIIS from disk
    DIIS * diis = NULL;
-   if (( scf_options->getDoDIIS() ) && ( scf_options->getStoreDIIS() )){
+   if (( scf_options->getDoDIIS() ) && ( scf_options->getStoreDIIS() ) && ( am_i_master )){
       struct stat file_info;
       int master_stat = stat( (scf_options->getDIISStorageName()).c_str(), &file_info );
       if ( master_stat == 0 ){
@@ -115,8 +130,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
       nIterations++;
 
-      //Update the unitary transformation
-      if ( unitary->getNumVariablesX() > 0 ){
+      // Update the unitary transformation
+      if (( unitary->getNumVariablesX() > 0 ) && ( am_i_master )){
 
          unitary->updateUnitary( mem1, mem2, gradient, true, true ); //multiply = compact = true
 
@@ -139,103 +154,132 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
             unitary->updateUnitary( mem1, mem2, diis_vec, false, false ); //multiply = compact = false
          }
       }
-      if (( scf_options->getStoreUnitary() ) && ( gradNorm != 1.0 )){ unitary->saveU( scf_options->getUnitaryStorageName() ); }
-      if (( scf_options->getStoreDIIS() ) && ( updateNorm != 1.0 ) && ( diis != NULL )){ diis->saveDIIS( scf_options->getDIISStorageName() ); }
+      if (( am_i_master ) && ( scf_options->getStoreUnitary() ) && ( gradNorm != 1.0 )){ unitary->saveU( scf_options->getUnitaryStorageName() ); }
+      if (( am_i_master ) && ( scf_options->getStoreDIIS() ) && ( updateNorm != 1.0 ) && ( diis != NULL )){ diis->saveDIIS( scf_options->getDIISStorageName() ); }
       int master_diis = (( diis != NULL ) ? 1 : 0 );
+      #ifdef CHEMPS2_MPI_COMPILATION
+      MPIchemps2::broadcast_array_int( &master_diis, 1, MPI_CHEMPS2_MASTER );
+      unitary->broadcast( MPI_CHEMPS2_MASTER );
+      #endif
 
-      //Fill HamDMRG
+      // Fill HamDMRG
       buildTmatrix();
       buildQmatOCC();
       fillConstAndTmatDMRG( HamDMRG );
-      DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      if ( am_i_master ){
+         DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      HamDMRG->getVmat()->broadcast( MPI_CHEMPS2_MASTER );
+      #endif
 
-      //Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
-      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
-         theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); //Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
-         theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
-         fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
-         unitary->rotateActiveSpaceVectors(mem1, mem2);
+      // Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
+      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
+         if ( am_i_master ){
+            theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); // Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+            theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
+            fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
+            unitary->rotateActiveSpaceVectors(mem1, mem2);
+         }
+         #ifdef CHEMPS2_MPI_COMPILATION
+         unitary->broadcast( MPI_CHEMPS2_MASTER );
+         #endif
          buildTmatrix(); //With an updated unitary, the Qocc, Tmat, and HamDMRG objects need to be updated as well.
          buildQmatOCC();
          fillConstAndTmatDMRG( HamDMRG );
-         DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
-         cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+         if ( am_i_master ){
+            DMRGSCFrotations::rotate( VMAT_ORIG, HamDMRG->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+            cout << "DMRGSCF::solve : Rotated the active space to localized orbitals, sorted according to the exchange matrix." << endl;
+         }
+         #ifdef CHEMPS2_MPI_COMPILATION
+         HamDMRG->getVmat()->broadcast( MPI_CHEMPS2_MASTER );
+         #endif
       }
 
       if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM
 
-         const int nalpha = ( num_elec + TwoS ) / 2;
-         const int nbeta  = ( num_elec - TwoS ) / 2;
-         const double workmem = 1000.0; // 1GB
-         const int verbose = 2;
-         CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamDMRG, nalpha, nbeta, Irrep, workmem, verbose );
-         double * inoutput = new double[ theFCI->getVecLength(0) ];
-         theFCI->ClearVector( theFCI->getVecLength(0), inoutput );
-         inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
-         Energy = theFCI->GSDavidson( inoutput );
-         theFCI->Fill2RDM( inoutput, DMRG2DM );
-         delete theFCI;
-         delete [] inoutput;
+         if ( am_i_master ){
+            const int nalpha = ( num_elec + TwoS ) / 2;
+            const int nbeta  = ( num_elec - TwoS ) / 2;
+            const double workmem = 1000.0; // 1GB
+            const int verbose = 2;
+            CheMPS2::FCI * theFCI = new CheMPS2::FCI( HamDMRG, nalpha, nbeta, Irrep, workmem, verbose );
+            double * inoutput = new double[ theFCI->getVecLength(0) ];
+            theFCI->ClearVector( theFCI->getVecLength(0), inoutput );
+            inoutput[ theFCI->LowestEnergyDeterminant() ] = 1.0;
+            Energy = theFCI->GSDavidson( inoutput );
+            theFCI->Fill2RDM( inoutput, DMRG2DM );
+            delete theFCI;
+            delete [] inoutput;
+         }
+         #ifdef CHEMPS2_MPI_COMPILATION
+         MPIchemps2::broadcast_array_double( &Energy, 1, MPI_CHEMPS2_MASTER );
+         MPIchemps2::broadcast_array_double( DMRG2DM, dmrgsize_power4, MPI_CHEMPS2_MASTER );
+         #endif
 
-      } else { //Do the DMRG sweeps, and calculate the 2DM
+      } else { // Do the DMRG sweeps, and calculate the 2DM
 
          assert( OptScheme != NULL );
-         for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } //Clear the 2-RDM (to allow for state-averaged calculations)
-         DMRG * theDMRG = new DMRG(Prob, OptScheme);
-         for (int state = 0; state < rootNum; state++){
-            if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
+         for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM ( to allow for state-averaged calculations )
+         DMRG * theDMRG = new DMRG( Prob, OptScheme );
+         for ( int state = 0; state < rootNum; state++ ){
+            if ( state > 0 ){ theDMRG->newExcitation( fabs( Energy ) ); }
             Energy = theDMRG->Solve();
             if ( scf_options->getStateAveraging() ){ // When SA-DMRGSCF: 2DM += current 2DM
                theDMRG->calc2DMandCorrelations();
                copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
             }
-            if ((state == 0) && (rootNum > 1)){ theDMRG->activateExcitations( rootNum-1 ); }
+            if (( state == 0 ) && ( rootNum > 1 )){ theDMRG->activateExcitations( rootNum - 1 ); }
          }
          if ( !( scf_options->getStateAveraging() )){ // When SS-DMRGSCF: 2DM += last 2DM
             theDMRG->calc2DMandCorrelations();
             copy2DMover( theDMRG->get2DM(), nOrbDMRG, DMRG2DM );
          }
-         if (scf_options->getDumpCorrelations()){ theDMRG->getCorrelations()->Print(); } // Correlations have been calculated in the loop (SA) or outside of the loop (SS)
+         if (( scf_options->getDumpCorrelations() ) && ( am_i_master )){ theDMRG->getCorrelations()->Print(); }
          if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
          if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
          delete theDMRG;
-         if ((scf_options->getStateAveraging()) && (rootNum > 1)){
+         if (( scf_options->getStateAveraging() ) && ( rootNum > 1 )){
             const double averagingfactor = 1.0 / rootNum;
             for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] *= averagingfactor; }
          }
-         
-      }
-      setDMRG1DM(num_elec, nOrbDMRG, DMRG1DM, DMRG2DM);
 
-      //Possibly rotate the active space to the natural orbitals
-      if (( scf_options->getWhichActiveSpace() == 1 ) && ( master_diis == 0 )){ //When the DIIS has started: stop
+      }
+      setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
+
+      // Possibly rotate the active space to the natural orbitals
+      if (( scf_options->getWhichActiveSpace() == 1 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
          copy_active( DMRG1DM, theQmatWORK, iHandler, true );
          block_diagonalize( 'A', theQmatWORK, unitary, mem1, mem2, iHandler, true, DMRG2DM, NULL, NULL ); // Unitary is updated and DMRG2DM rotated
          setDMRG1DM( num_elec, nOrbDMRG, DMRG1DM, DMRG2DM );
-         buildTmatrix(); //With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
+         buildTmatrix(); // With an updated unitary, the Qocc and Tmat matrices need to be updated as well.
          buildQmatOCC();
-         cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl;
+         if ( am_i_master ){ cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl; }
       }
 
-      //Calculate the matrix elements needed to calculate the gradient and hessian
+      // Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
-      DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
-      DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
-      buildFmat( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
-      buildWtilde(wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM);
-
-      //Calculate the gradient, hessian and corresponding update. On return, gradient contains the rescaled gradient == the update.
-      augmentedHessianNR(theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm);
+      if ( am_i_master ){
+         DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'C', 'F', 'F', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+         DMRGSCFrotations::rotate( VMAT_ORIG, NULL, theRotatedTEI, 'C', 'V', 'C', 'V', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+         buildFmat(  theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM );
+         buildWtilde( wmattilde, theTmatrix, theQmatOCC, theQmatACT, iHandler, theRotatedTEI, DMRG2DM, DMRG1DM );
+         augmentedHessianNR( theFmatrix, wmattilde, iHandler, unitary, gradient, &updateNorm, &gradNorm ); // On return the gradient contains the update
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      MPIchemps2::broadcast_array_double( &updateNorm, 1, MPI_CHEMPS2_MASTER );
+      MPIchemps2::broadcast_array_double( &gradNorm,   1, MPI_CHEMPS2_MASTER );
+      #endif
 
    }
 
    delete [] mem1;
    delete [] mem2;
-   delete_file( tmp_filename );
+   if ( am_i_master ){ delete_file( tmp_filename ); }
 
    delete Prob;
    delete HamDMRG;
-   delete [] gradient;
+   if ( gradient != NULL ){ delete [] gradient; }
    if ( diis_vec != NULL ){ delete [] diis_vec; }
    if ( diis != NULL ){ delete diis; }
    if ( theLocalizer != NULL ){ delete theLocalizer; }

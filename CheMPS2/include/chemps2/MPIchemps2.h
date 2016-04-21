@@ -247,7 +247,7 @@ namespace CheMPS2{
              \param length The length of the array
              \param ROOT The MPI process which should broadcast */
          static void broadcast_array_double(double * array, int length, int ROOT){
-               MPI_Bcast(array, length, MPI_DOUBLE, ROOT, MPI_COMM_WORLD);
+            MPI_Bcast(array, length, MPI_DOUBLE, ROOT, MPI_COMM_WORLD);
          }
          #endif
          

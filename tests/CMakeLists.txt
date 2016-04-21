@@ -4,11 +4,7 @@ link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
 
 file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/tests)
 
-if (WITH_MPI)
-    set (TESTLIST "test1" "test2" "test3" "test4" "test5" "test7" "test9" "test10" "test11" "test12")
-else (WITH_MPI)
-    set (TESTLIST "test1" "test2" "test3" "test4" "test5" "test6" "test7" "test8" "test9" "test10" "test11" "test12" "test13" "test14")
-endif (WITH_MPI)
+set (TESTLIST "test1" "test2" "test3" "test4" "test5" "test6" "test7" "test8" "test9" "test10" "test11" "test12" "test13" "test14")
 
 foreach (ITEM ${TESTLIST})
     configure_file (${CMAKE_SOURCE_DIR}/tests/${ITEM}.cpp.in ${CMAKE_BINARY_DIR}/tests/tests/${ITEM}.cpp)

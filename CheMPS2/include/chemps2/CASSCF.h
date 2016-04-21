@@ -165,12 +165,12 @@ namespace CheMPS2{
       
          //! Constructor
          /** \param ham_in Hamiltonian containing the matrix elements of the Hamiltonian for which a CASSCF calculation is desired
-             \param docc Array containing the number of doubly occupied HF orbitals per irrep
-             \param socc Array containing the number of singly occupied HF orbitals per irrep
-             \param nocc_in Array containing the number of doubly occupied (inactive) orbitals per irrep
-             \param ndmrg_in Array containing the number of active orbitals per irrep
-             \param nvirt_in Array containing the number of virtual (secondary) orbitals per irrep */
-         CASSCF(Hamiltonian * ham_in, int * docc, int * socc, int * nocc_in, int * ndmrg_in, int * nvirt_in);
+             \param docc  Array containing the number of doubly occupied HF orbitals per irrep
+             \param socc  Array containing the number of singly occupied HF orbitals per irrep
+             \param nocc  Array containing the number of doubly occupied (inactive) orbitals per irrep
+             \param ndmrg Array containing the number of active orbitals per irrep
+             \param nvirt Array containing the number of virtual (secondary) orbitals per irrep */
+         CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt );
          
          //! Destructor
          virtual ~CASSCF();
@@ -231,7 +231,7 @@ namespace CheMPS2{
              \param local2DM The DMRG 2-RDM
              \param local1DM The DMRG 1-RDM */
          static void buildWtilde( DMRGSCFwtilde * localwtilde, const DMRGSCFmatrix * localTmat, const DMRGSCFmatrix * localJKocc, const DMRGSCFmatrix * localJKact, const DMRGSCFindices * localIdx, const DMRGSCFintegrals * theInts, double * local2DM, double * local1DM );
-         
+
          //! Calculate the augmented Hessian Newton-Raphson update for the orthogonal orbital rotation matrix
          /** \param localFmat Matrix which contains the Fock operator (Eq. (11) in the Siegbahn paper [CAS3])
              \param localwtilde Object which contains the second order derivative of the energy with respect to the unitary (Eq. (20b) in the Siegbahn paper [CAS3])
@@ -241,44 +241,44 @@ namespace CheMPS2{
              \param updateNorm Pointer to one double to store the update norm
              \param gradNorm Pointer to one double to store the gradient norm */
          static void augmentedHessianNR( DMRGSCFmatrix * localFmat, DMRGSCFwtilde * localwtilde, const DMRGSCFindices * localIdx, const DMRGSCFunitary * localUmat, double * theupdate, double * updateNorm, double * gradNorm );
-         
+
          //! Copy over the DMRG 2-RDM
          /** \param theDMRG2DM The 2-RDM from the DMRG object
-             \param totOrbDMRG The total number of DMRG orbitals
-             \param localDMRG2DM The CASSCF 2-RDM */
-         static void copy2DMover( TwoDM * theDMRG2DM, const int totOrbDMRG, double * localDMRG2DM );
-         
+             \param LAS The total number of DMRG orbitals
+             \param two_dm The CASSCF 2-RDM */
+         static void copy2DMover( TwoDM * theDMRG2DM, const int LAS, double * two_dm );
+
          //! Copy over the DMRG 3-RDM
          /** \param theDMRG3DM The 3-RDM from the DMRG object
-             \param numL The total number of DMRG orbitals
+             \param LAS The total number of DMRG orbitals
              \param three_dm The CASSCF 3-RDM */
-         static void copy3DMover( ThreeDM * theDMRG3DM, const int numL, double * three_dm );
-         
+         static void copy3DMover( ThreeDM * theDMRG3DM, const int LAS, double * three_dm );
+
          //! Construct the 1-RDM from the 2-RDM
          /** \param num_elec The number of DMRG active space electrons
-             \param numL The total number of DMRG orbitals
-             \param localDMRG1DM The CASSCF 1-RDM
-             \param localDMRG2DM The CASSCF 2-RDM */
-         static void setDMRG1DM( const int num_elec, const int numL, double * localDMRG1DM, double * localDMRG2DM );
-         
+             \param LAS The total number of DMRG orbitals
+             \param one_dm The CASSCF 1-RDM
+             \param two_dm The CASSCF 2-RDM */
+         static void setDMRG1DM( const int num_elec, const int LAS, double * one_dm, double * two_dm );
+
          //! Copy a one-orbital quantity from array format to DMRGSCFmatrix format
          /** \param origin Array to copy
              \param result DMRGSCFmatrix to store the copy
              \param idx Object which handles the index conventions for CASSCF
              \param one_rdm If true, the occupied orbitals get occupation 2 */
          static void copy_active( double * origin, DMRGSCFmatrix * result, const DMRGSCFindices * idx, const bool one_rdm );
-         
+
          //! Copy a one-orbital quantity from DMRGSCFmatrix format to array format
          /** \param origin DMRGSCFmatrix to copy
              \param result Array to store the copy
              \param idx Object which handles the index conventions for CASSCF */
          static void copy_active( const DMRGSCFmatrix * origin, double * result, const DMRGSCFindices * idx );
-         
+
          //! From an Edmiston-Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs
-         /** \param unitary The Edmiston-Ruedenberg active space rotation
-             \param localIdx Object which handles the index conventions for CASSCF
+         /** \param umat The Edmiston-Ruedenberg active space rotation
+             \param idx Object which handles the index conventions for CASSCF
              \param eigenvecs Where the eigenvectors are stored */
-         static void fillLocalizedOrbitalRotations( DMRGSCFunitary * unitary, DMRGSCFindices * localIdx, double * eigenvecs );
+         static void fillLocalizedOrbitalRotations( DMRGSCFunitary * umat, DMRGSCFindices * idx, double * eigenvecs );
 
          //! Block-diagonalize Mat
          /** \param space Can be 'O', 'A', or 'V' and denotes which block of Mat should be considered
@@ -383,9 +383,6 @@ namespace CheMPS2{
 
          // The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
          DMRGSCFwtilde * wmattilde;
-
-         // Function to get the occupancies to obtain coefficients of certain Slater determinants for neutral C2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry. The function is not basis set and active space dependent (at least if no B2g, B3g, B2u and B3u orbitals are condensed).
-         void PrintCoeff_C2( DMRG * theDMRG );
 
          // Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
          void coeff_fe2( DMRG * theDMRG );

@@ -46,17 +46,16 @@ NVIRT = np.array([ 4, 1, 1, 1, 1, 4, 1, 1 ], dtype=ctypes.c_int)
 theDMRGSCF = PyCheMPS2.PyCASSCF(Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT)
 
 # Setting up the ConvergenceScheme
-# setInstruction(instruction, D, Econst, maxSweeps, noisePrefactor)
-OptScheme = PyCheMPS2.PyConvergenceScheme(1) # 1 instruction
-OptScheme.setInstruction(0, 1000, 1e-8, 20, 0.0)
+OptScheme = PyCheMPS2.PyConvergenceScheme( 1 ) # 1 instruction
+OptScheme.set_instruction( 0, 1000, 1e-8, 20, 0.0, 1e-8 )
 
 # Setting the DMRGSCFoptions and run DMRGSCF
-rootNum = 2 # Do the first excited state
+root_num = 2 # Do the first excited state
 theDMRGSCFoptions = PyCheMPS2.PyDMRGSCFoptions()
 theDMRGSCFoptions.setDoDIIS(True)
 theDMRGSCFoptions.setWhichActiveSpace(1) # 1 means natural orbitals
 theDMRGSCFoptions.setStateAveraging(True)
-Energy = theDMRGSCF.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions)
+Energy = theDMRGSCF.solve(N, TwoS, Irrep, OptScheme, root_num, theDMRGSCFoptions)
 
 # Clean-up
 if theDMRGSCFoptions.getStoreUnitary():

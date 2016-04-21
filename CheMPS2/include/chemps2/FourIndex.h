@@ -89,11 +89,17 @@ namespace CheMPS2{
          //! Save the FourIndex object
          /** \param name filename */
          void save(const std::string name) const;
-         
+
          //! Load the FourIndex object
          /** \param name filename */
          void read(const std::string name);
-      
+
+         #ifdef CHEMPS2_MPI_COMPILATION
+         //! Broadcast the ERI to all processes
+         /** \param ROOT The process which should broadcast */
+         void broadcast( const int ROOT );
+         #endif
+
       private:
       
          //Contains the group number, the number of irreps, and the multiplication table

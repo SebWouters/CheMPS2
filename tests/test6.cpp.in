@@ -31,60 +31,56 @@ using namespace std;
 int main(void){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-   cout << "CheMPS2::CASSCF does not work with MPI yet." << endl;
-   return 7;
    CheMPS2::MPIchemps2::mpi_init();
    #endif
 
    CheMPS2::Initialize::Init();
-   
-   //The path to the matrix elements
+
+   // Setup the Hamiltonian
    string matrixelements = "${CMAKE_SOURCE_DIR}/tests/matrixelements/O2.CCPVDZ.FCIDUMP";
-   
-   //Setup the Hamiltonian
    const int psi4groupnumber = 7; // d2h -- see Irreps.h and O2.ccpvdz.out
    CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( matrixelements, psi4groupnumber );
-   
-   //Setup CASSCF --> number of irreps = 8
+
+   // Setup CASSCF --> number of irreps = 8
    int DOCC[]  = { 2, 0, 1, 1, 0, 2, 1, 1 }; // see O2.ccpvdz.out
    int SOCC[]  = { 0, 0, 0, 0, 0, 0, 0, 0 };
    int NOCC[]  = { 1, 0, 0, 0, 0, 1, 0, 0 };
    int NDMRG[] = { 2, 0, 2, 2, 0, 2, 2, 2 };
    int NVIRT[] = { 4, 1, 1, 1, 1, 4, 1, 1 };
    CheMPS2::CASSCF koekoek( Ham, DOCC, SOCC, NOCC, NDMRG, NVIRT );
-   
-   //Setup symmetry sector
-   int N = 16;
-   int TwoS = 0;
-   int Irrep = 0;
-   
-   //Setup convergence scheme
-   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(1);
-   //OptScheme->setInstruction(instruction_counter, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-   OptScheme->setInstruction(0, 1000, 1e-8, 20, 0.0);
 
-   //Run CASSCF
-   int rootNum = 2; //Do the first excited state
+   // Setup symmetry sector
+   int N     = 16;
+   int TwoS  = 0;
+   int Irrep = 0;
+
+   // Setup convergence scheme
+   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme( 1 );
+   // ConvergenceScheme::set_instruction( counter, virtual_dimension, energy_convergence, max_sweeps, noise_prefactor, dvdson_rtol );
+   OptScheme->set_instruction( 0, 1000, 1e-8, 20, 0.0, 1e-8 );
+
+   // Run CASSCF
+   const int root_num = 2; // Do the first excited state
    CheMPS2::DMRGSCFoptions * theDMRGSCFoptions = new CheMPS2::DMRGSCFoptions();
-   theDMRGSCFoptions->setDoDIIS(true);
-   theDMRGSCFoptions->setWhichActiveSpace(1); //1 means natural orbitals
-   theDMRGSCFoptions->setStateAveraging(true);
-   double Energy = koekoek.solve(N, TwoS, Irrep, OptScheme, rootNum, theDMRGSCFoptions);
-   
-   //Clean up
+   theDMRGSCFoptions->setDoDIIS( true );
+   theDMRGSCFoptions->setWhichActiveSpace( 1 ); // 1 means natural orbitals
+   theDMRGSCFoptions->setStateAveraging( true );
+   const double Energy = koekoek.solve( N, TwoS, Irrep, OptScheme, root_num, theDMRGSCFoptions );
+
+   // Clean up
    if (theDMRGSCFoptions->getStoreUnitary()){ koekoek.deleteStoredUnitary( theDMRGSCFoptions->getUnitaryStorageName() ); }
    if (theDMRGSCFoptions->getStoreDIIS()){ koekoek.deleteStoredDIIS( theDMRGSCFoptions->getDIISStorageName() ); }
    delete OptScheme;
    delete theDMRGSCFoptions;
    delete Ham;
-   
-   //Check succes
+
+   // Check succes
    const bool success = ( fabs( Energy + 149.6802657522 ) < 1e-8 ) ? true : false;
-   
+
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
    #endif
-   
+
    cout << "================> Did test 6 succeed : ";
    if (success){
       cout << "yes" << endl;

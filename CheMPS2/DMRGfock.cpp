@@ -84,12 +84,6 @@ void CheMPS2::DMRG::Symm4RDM( double * output, const int Y, const int Z, const b
 
 void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const int ham_orb2, const double alpha, const double beta, const bool add, const double factor ){
 
-   #ifdef CHEMPS2_MPI_COMPILATION
-      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
-   #else
-      const bool am_i_master = true;
-   #endif
-
    // Figure out the DMRG orbitals, in order
    assert( ham_orb1 >= 0 );
    assert( ham_orb2 >= 0 );

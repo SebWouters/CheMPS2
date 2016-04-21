@@ -22,10 +22,12 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <climits>
 
 #include "FourIndex.h"
 #include "Lapack.h"
 #include "MyHDF5.h"
+#include "MPIchemps2.h"
 
 using namespace std;
 
@@ -424,4 +426,16 @@ void CheMPS2::FourIndex::read(const std::string name){
    std::cout << "FourIndex::read : everything loaded!" << std::endl;
 
 }
+
+#ifdef CHEMPS2_MPI_COMPILATION
+void CheMPS2::FourIndex::broadcast( const int ROOT ){
+
+   assert( arrayLength <= INT_MAX ); // To be able to broadcast
+   const int size = ( int )( arrayLength );
+   if ( size > 0 ){
+      MPIchemps2::broadcast_array_double( theElements, size, ROOT );
+   }
+
+}
+#endif
 
