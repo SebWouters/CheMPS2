@@ -235,7 +235,9 @@ double CheMPS2::DMRG::Solve(){
             print_tensor_update_performance();
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
-            if ( Exc_activated ){ calc_overlaps( false ); }
+         }
+         if ( Exc_activated ){ calc_overlaps( false ); }
+         if ( am_i_master ){
             cout << "******************************************************************" << endl;
          }
          change = true; //rest of sweeps: variable virtual dimensions
@@ -257,7 +259,9 @@ double CheMPS2::DMRG::Solve(){
             cout << "***     Minimum energy           = " << LastMinEnergy << endl;
             cout << "***     Maximum discarded weight = " << MaxDiscWeightLastSweep << endl;
             cout << "***     Energy difference with respect to previous leftright sweep = " << fabs(Energy-EnergyPrevious) << endl;
-            if ( Exc_activated ){ calc_overlaps( true ); }
+         }
+         if ( Exc_activated ){ calc_overlaps( true ); }
+         if ( am_i_master ){
             cout << "******************************************************************" << endl;
             if ( makecheckpoints ){ saveMPS( MPSstoragename, MPS, denBK, false ); } // Only the master proc makes MPS checkpoints !!
          }
