@@ -199,8 +199,9 @@ namespace CheMPS2{
              \param IPEA The CASPT2 IPEA shift from Ghigo, Roos and Malmqvist, Chemical Physics Letters 396, 142-149 (2004)
              \param IMAG The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
              \param PSEUDOCANONICAL If true, use the exact DMRG 4-RDM in the pseudocanonical basis. If false, use the cumulant approximated DMRG 4-RDM in the unrotated basis.
+             \param CHECKPOINT If true, write checkpoints to disk and read them back in again in order to perform the contraction of the generalized Fock operator with the 4-RDM in multiple runs.
              \return The CASPT2 variational correction energy */
-         double caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL );
+         double caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT = false );
 
          //! CASSCF unitary rotation remove call
          /* \param filename File to delete */
@@ -306,6 +307,23 @@ namespace CheMPS2{
              \param idx Object which handles the index conventions for CASSCF
              \return RMS deviation from block-diagonal */
          static double deviation_from_blockdiag( DMRGSCFmatrix * matrix, const DMRGSCFindices * idx );
+
+         //! Write the checkpoint file for the contraction of the generalized Fock operator with the 4-RDM to disk
+         /** \param f4rdm_file The filename
+             \param hamorb1 The next hamiltonian orbital 1
+             \param hamorb2 The next hamiltonian orbital 2
+             \param tot_dmrg_power6 The size of the array contract
+             \param contract The current partial contraction */
+         static void write_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract );
+
+         //! Read the checkpoint file for the contraction of the generalized Fock operator with the 4-RDM from disk
+         /** \param f4rdm_file The filename
+             \param hamorb1 The next hamiltonian orbital 1
+             \param hamorb2 The next hamiltonian orbital 2
+             \param tot_dmrg_power6 The size of the array contract
+             \param contract The current partial contraction
+             \return Whether the file was found and read */
+         static bool read_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract );
 
       private:
 

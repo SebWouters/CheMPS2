@@ -32,6 +32,7 @@ namespace CheMPS2{
    const bool   DMRGSCF_storeUnitary          = true;
    const string DMRGSCF_unitary_storage_name  = "CheMPS2_CASSCF.h5";
    const string DMRGSCF_eri_storage_name      = "CheMPS2_eri_temp.h5";
+   const string DMRGSCF_f4rdm_name            = "CheMPS2_f4rdm.h5";
    const int    DMRGSCF_max_mem_eri_tfo       = 100 * 100 * 100 * 100; // Measured in number of doubles
    const bool   DMRGSCF_debugPrint            = false;
    const bool   DMRGSCF_stateAveraged         = true;

@@ -78,7 +78,10 @@ void CheMPS2::DMRG::Symm4RDM( double * output, const int Y, const int Z, const b
 
    gettimeofday( &end, NULL );
    const double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
-   cout << "CheMPS2::DMRG::Symm4RDM( " << Y << " , " << Z << " ) : Elapsed wall time = " << elapsed << " seconds." << endl;
+   #ifdef CHEMPS2_MPI_COMPILATION
+   if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER )
+   #endif
+   { cout << "CheMPS2::DMRG::Symm4RDM( " << Y << " , " << Z << " ) : Elapsed wall time = " << elapsed << " seconds." << endl; }
 
 }
 

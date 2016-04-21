@@ -40,7 +40,103 @@ using std::cout;
 using std::endl;
 using std::max;
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL ){
+void CheMPS2::CASSCF::write_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   if ( am_i_master ){
+
+      hid_t file_id  = H5Fcreate( f4rdm_file.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+      hid_t group_id = H5Gcreate( file_id, "/F4RDM", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+      hsize_t dimarray1   = 1;
+      hid_t dataspace1_id = H5Screate_simple( 1, &dimarray1, NULL );
+      hid_t dataset1_id   = H5Dcreate( group_id, "hamorb1", H5T_NATIVE_INT, dataspace1_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      H5Dwrite( dataset1_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, hamorb1 );
+      H5Dclose( dataset1_id );
+      H5Sclose( dataspace1_id );
+
+      hsize_t dimarray2   = 1;
+      hid_t dataspace2_id = H5Screate_simple( 1, &dimarray2, NULL );
+      hid_t dataset2_id   = H5Dcreate( group_id, "hamorb2", H5T_NATIVE_INT, dataspace2_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      H5Dwrite( dataset2_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, hamorb2 );
+      H5Dclose( dataset2_id );
+      H5Sclose( dataspace2_id );
+
+      hsize_t dimarray3   = tot_dmrg_power6;
+      hid_t dataspace3_id = H5Screate_simple( 1, &dimarray3, NULL );
+      hid_t dataset3_id   = H5Dcreate( group_id, "contract", H5T_NATIVE_DOUBLE, dataspace3_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      H5Dwrite( dataset3_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, contract );
+      H5Dclose( dataset3_id );
+      H5Sclose( dataspace3_id );
+
+      H5Gclose( group_id );
+      H5Fclose( file_id );
+
+      cout << "Created F.4-RDM checkpoint file " << f4rdm_file << " at next orbitals ( " << hamorb1[ 0 ] << " , " << hamorb2[ 0 ] << " )." << endl;
+
+   }
+
+}
+
+bool CheMPS2::CASSCF::read_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   // Check whether the file exists
+   int exists = 0;
+   if ( am_i_master ){
+      struct stat file_info;
+      const int file_stat = stat( f4rdm_file.c_str(), &file_info );
+      if ( file_stat == 0 ){ exists = 1; }
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   MPIchemps2::broadcast_array_int( &exists, 1, MPI_CHEMPS2_MASTER );
+   #endif
+   if ( exists == 0 ){
+      return false; // Not loaded
+   }
+
+   if ( am_i_master ){
+
+      hid_t file_id  = H5Fopen( f4rdm_file.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+      hid_t group_id = H5Gopen( file_id, "/F4RDM", H5P_DEFAULT );
+
+      hid_t dataset1_id = H5Dopen( group_id, "hamorb1", H5P_DEFAULT );
+      H5Dread( dataset1_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, hamorb1 );
+      H5Dclose( dataset1_id );
+
+      hid_t dataset2_id = H5Dopen( group_id, "hamorb2", H5P_DEFAULT );
+      H5Dread( dataset2_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, hamorb2 );
+      H5Dclose( dataset2_id );
+
+      hid_t dataset3_id = H5Dopen( group_id, "contract", H5P_DEFAULT );
+      H5Dread( dataset3_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, contract );
+      H5Dclose( dataset3_id );
+
+      H5Gclose( group_id );
+      H5Fclose( file_id );
+
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   MPIchemps2::broadcast_array_int( hamorb1, 1, MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_array_int( hamorb2, 1, MPI_CHEMPS2_MASTER );
+   MPIchemps2::broadcast_array_double( contract, tot_dmrg_power6, MPI_CHEMPS2_MASTER );
+   #endif
+
+   return true; // Loaded
+
+}
+
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
@@ -105,6 +201,15 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    double E_CASSCF = 0.0;
    double * three_dm = new double[ tot_dmrg_power6 ];
    double * contract = new double[ tot_dmrg_power6 ];
+   for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
+
+   int next_hamorb1 = 0;
+   int next_hamorb2 = 0;
+   bool checkpt_loaded = false;
+   if ( CHECKPOINT ){
+      assert(( OptScheme != NULL ) || ( rootNum > 1 ));
+      checkpt_loaded = read_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
+   }
 
    // Solve the active space problem
    if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI
@@ -141,10 +246,10 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
       assert( OptScheme != NULL );
       for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
-      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme );
+      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme, CHECKPOINT );
       for ( int state = 0; state < rootNum; state++ ){
          if ( state > 0 ){ theDMRG->newExcitation( fabs( E_CASSCF ) ); }
-         E_CASSCF = theDMRG->Solve();
+         if ( checkpt_loaded == false ){ E_CASSCF = theDMRG->Solve(); }
          if (( state == 0 ) && ( rootNum > 1 )){ theDMRG->activateExcitations( rootNum - 1 ); }
       }
       theDMRG->calc_rdms_and_correlations( true );
@@ -153,31 +258,51 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       copy_active( theFmatrix, mem2, iHandler ); // Fock
-      for ( int cnt = 0; cnt < tot_dmrg_power6; cnt++ ){ contract[ cnt ] = 0.0; }
       for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-         theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
-         int size = tot_dmrg_power6;
-         double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-         int inc1 = 1;
-         daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+         if (( next_hamorb1 == ham_orbz ) && ( next_hamorb2 == ham_orbz )){
+            theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
+            int size = tot_dmrg_power6;
+            double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
+            int inc1 = 1;
+            daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+            if ( ham_orbz == nOrbDMRG - 1 ){
+               next_hamorb1 = 0;
+               next_hamorb2 = 1;
+            } else {
+               next_hamorb1 = ham_orbz + 1;
+               next_hamorb2 = ham_orbz + 1;
+            }
+            if ( CHECKPOINT ){ write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract ); }
+         }
       }
       if ( PSEUDOCANONICAL == false ){
          for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
             for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
-               if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
-                  theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
-                  int size = tot_dmrg_power6;
-                  double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
-                  int inc1 = 1;
-                  daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+               if (( next_hamorb1 == ham_orb1 ) && ( next_hamorb2 == ham_orb2 )){
+                  if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
+                     theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
+                     int size = tot_dmrg_power6;
+                     double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
+                     int inc1 = 1;
+                     daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+                  }
+                  if ( ham_orb2 == nOrbDMRG - 1 ){
+                     next_hamorb1 = next_hamorb1 + 1;
+                     next_hamorb2 = next_hamorb1 + 1;
+                  } else {
+                     next_hamorb2 = next_hamorb2 + 1;
+                  }
+                  if (( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ) && ( CHECKPOINT )){
+                     write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
+                  }
                }
             }
          }
          // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       }
       copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm ); // 3-RDM
-      if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
-      if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
+      if (( CheMPS2::DMRG_storeMpsOnDisk ) && ( CHECKPOINT == false )){ theDMRG->deleteStoredMPS(); }
+      if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
 
    }
