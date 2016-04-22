@@ -44,7 +44,7 @@ namespace CheMPS2{
              \param moving_right If true: sweep from left to right. If false: sweep from right to left
              \param denBK The symmetry bookkeeper with symmetry sector virtual dimensions
              \param Prob The Problem containing the Hamiltonian matrix elements */
-         TensorX(const int boundary_index, const bool movingRightIn, const SyBookkeeper * denBK, const Problem * Prob);
+         TensorX(const int boundary_index, const bool moving_right, const SyBookkeeper * denBK, const Problem * Prob);
          
          //! Destructor
          virtual ~TensorX();

@@ -38,8 +38,7 @@ namespace CheMPS2{
          /** \param boundary_index The boundary index
              \param moving_right If true: sweep from left to right. If false: sweep from right to left
              \param book_up   The symmetry bookkeeper with the upper symmetry sector virtual dimensions
-             \param book_down The symmetry bookkeeper with the lower symmetry sector virtual dimensions
-             \param Prob The Problem containing the Hamiltonian matrix elements */
+             \param book_down The symmetry bookkeeper with the lower symmetry sector virtual dimensions */
          TensorO( const int boundary_index, const bool moving_right, const SyBookkeeper * book_up, const SyBookkeeper * book_down );
 
          //! Destructor
