@@ -256,16 +256,16 @@ void CheMPS2::DMRGSCFrotations::blockwise_second( double * origin, double * targ
    char notrans = 'N';
    double one = 1.0;
    double set = 0.0;
-   const int right_dim = dim34;
    const int jump_old  = dim1 * orig2;
    const int jump_new  = dim1 * new2;
-   for ( int index = 0; index < right_dim; index++ ){
+   #pragma omp parallel for schedule(static)
+   for ( int index = 0; index < dim34; index++ ){
       dgemm_( &notrans, &trans, &dim1, &new2, &orig2, &one, origin + jump_old * index, &dim1, umat2, &lda2, &set, target + jump_new * index, &dim1 );
    }
 
 }
 
-void CheMPS2::DMRGSCFrotations::blockwise_third( double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 ){
+void CheMPS2::DMRGSCFrotations::blockwise_third( double * origin, double * target, const int dim12, int orig3, const int dim4, double * umat3, int new3, int lda3 ){
 
    char trans = 'T';
    char notrans = 'N';
@@ -274,6 +274,7 @@ void CheMPS2::DMRGSCFrotations::blockwise_third( double * origin, double * targe
    int left_dim = dim12;
    const int jump_old = dim12 * orig3;
    const int jump_new = dim12 * new3;
+   #pragma omp parallel for schedule(static)
    for ( int index = 0; index < dim4; index++ ){
       dgemm_( &notrans, &trans, &left_dim, &new3, &orig3, &one, origin + jump_old * index, &left_dim, umat3, &lda3, &set, target + jump_new * index, &left_dim );
    }
@@ -357,10 +358,12 @@ int CheMPS2::DMRGSCFrotations::jump( DMRGSCFindices * idx, const int irrep, cons
 
 void CheMPS2::DMRGSCFrotations::unpackage_second( double * mem1, double * mem2, const int SIZE, const int ORIG ){
 
+   #pragma omp parallel for schedule(static)
    for ( int cnt4 = 0; cnt4 < ORIG; cnt4++ ){
       for ( int cnt3 = 0; cnt3 < ORIG; cnt3++ ){
          const int combined = (( cnt3 < cnt4 ) ? ( cnt3 + ( cnt4 * ( cnt4 + 1 )) / 2 )
                                                : ( cnt4 + ( cnt3 * ( cnt3 + 1 )) / 2 ));
+         #pragma omp simd
          for ( int cnt12 = 0; cnt12 < SIZE; cnt12++ ){
             mem2[ cnt12 + SIZE * ( cnt3 + ORIG * cnt4 ) ] = mem1[ cnt12 + SIZE * combined ];
          }
@@ -371,8 +374,10 @@ void CheMPS2::DMRGSCFrotations::unpackage_second( double * mem1, double * mem2, 
 
 void CheMPS2::DMRGSCFrotations::package_first( double * mem1, double * mem2, const int NEW, const int PACKED, const int SIZE ){
 
+   #pragma omp parallel for schedule(static)
    for ( int cnt34 = 0; cnt34 < SIZE; cnt34++ ){
       for ( int cnt2 = 0; cnt2 < NEW; cnt2++ ){
+         #pragma omp simd
          for ( int cnt1 = 0; cnt1 <= cnt2; cnt1++ ){
             mem2[ cnt1 + ( cnt2 * ( cnt2 + 1 ))/2 + PACKED * cnt34 ] = mem1[ cnt1 + NEW * ( cnt2 + NEW * cnt34 ) ];
          }

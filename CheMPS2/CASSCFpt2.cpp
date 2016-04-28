@@ -150,7 +150,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    //Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
    const int maxlinsize      = iHandler->getNORBmax();
    const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );
-   const string tmp_filename = CheMPS2::defaultTMPpath + "/" + CheMPS2::DMRGSCF_eri_storage_name;
+   const string tmp_filename = tmp_folder + "/" + CheMPS2::DMRGSCF_eri_storage_name;
    const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
    //For (ERI rotation, update unitary, block diagonalize, orbital localization)
    const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
@@ -246,7 +246,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
       assert( OptScheme != NULL );
       for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
-      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme, CHECKPOINT );
+      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme, CHECKPOINT, tmp_folder );
       for ( int state = 0; state < rootNum; state++ ){
          if ( state > 0 ){ theDMRG->newExcitation( fabs( E_CASSCF ) ); }
          if ( checkpt_loaded == false ){ E_CASSCF = theDMRG->Solve(); }

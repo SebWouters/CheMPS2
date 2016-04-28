@@ -13,6 +13,7 @@
 * FCI diagonal 4-RDM in FCI::Diag4RDM
 * FCI 4-RDM contraction with Fock operator in FCI::Fock4RDM
 * Blockwise ERI rotations with DMRGSCFrotations using disk
+* Update binary for DMRG-CASPT2
 * Break API: bump up SO version
 * Deprecate TwoDMstorage class
 * Deprecate TensorDiag class

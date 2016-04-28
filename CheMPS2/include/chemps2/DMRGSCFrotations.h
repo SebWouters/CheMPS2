@@ -58,7 +58,7 @@ namespace CheMPS2{
          // Blockwise rotations
          static void blockwise_first(  double * origin, double * target, int orig1, int dim2, const int dim34, double * umat1, int new1, int lda1 );
          static void blockwise_second( double * origin, double * target, int dim1, int orig2, const int dim34, double * umat2, int new2, int lda2 );
-         static void blockwise_third(  double * origin, double * target, const int dim12, int orig3, int dim4, double * umat3, int new3, int lda3 );
+         static void blockwise_third(  double * origin, double * target, const int dim12, int orig3, const int dim4, double * umat3, int new3, int lda3 );
          static void blockwise_fourth( double * origin, double * target, const int dim12, int dim3, int orig4, double * umat4, int new4, int lda4 );
 
          // Space sizes

@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 
 #include "Initialize.h"
-#include "DMRG.h"
+#include "CASSCF.h"
 #include "MPIchemps2.h"
 
 using namespace std;
@@ -38,7 +38,7 @@ void fetch_ints( const string rawdata, int * result, const int num ){
    for ( int no = 0; no < num; no++ ){
       pos2 = rawdata.find( ",", pos );
       if ( pos2 == string::npos ){ pos2 = rawdata.length(); }
-      result[ no ] = atoi(rawdata.substr( pos, pos2-pos ).c_str());
+      result[ no ] = atoi( rawdata.substr( pos, pos2-pos ).c_str() );
       pos = pos2 + 1;
    }
 
@@ -51,9 +51,150 @@ void fetch_doubles( const string rawdata, double * result, const int num ){
    for ( int no = 0; no < num; no++ ){
       pos2 = rawdata.find( ",", pos );
       if ( pos2 == string::npos ){ pos2 = rawdata.length(); }
-      result[ no ] = atof(rawdata.substr( pos, pos2-pos ).c_str());
+      result[ no ] = atof( rawdata.substr( pos, pos2-pos ).c_str() );
       pos = pos2 + 1;
    }
+
+}
+
+bool file_exists( const string filename, const string tag ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      CheMPS2::MPIchemps2::mpi_init();
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   struct stat file_info;
+   const bool on_disk = (( filename.length() > 0 ) && ( stat( filename.c_str(), &file_info ) == 0 ));
+   if (( on_disk == false ) && ( am_i_master )){
+      cerr << "Unable to retrieve file " << filename << "!" << endl;
+      cerr << "Invalid option for " << tag << "!" << endl;
+   }
+   return on_disk;
+
+}
+
+bool find_integer( int * result, const string line, const string tag, const bool lower_bound, const int val_lower, const bool upper_bound, const int val_upper ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      CheMPS2::MPIchemps2::mpi_init();
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   if ( line.find( tag ) != string::npos ){
+
+      const int pos = line.find( "=" ) + 1;
+      result[ 0 ] = atoi( line.substr( pos, line.length() - pos ).c_str() );
+
+      const bool lower_ok = (( lower_bound == false ) || ( result[ 0 ] >= val_lower ));
+      const bool upper_ok = (( upper_bound == false ) || ( result[ 0 ] <= val_upper ));
+
+      if (( lower_ok == false ) || ( upper_ok == false )){
+         if ( am_i_master ){
+            cerr << line << endl;
+            cerr << "Invalid option for " << tag << "!" << endl;
+         }
+         return false;
+      }
+   }
+
+   return true;
+
+}
+
+bool find_double( double * result, const string line, const string tag, const bool lower_bound, const double val_lower ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      CheMPS2::MPIchemps2::mpi_init();
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   if ( line.find( tag ) != string::npos ){
+
+      const int pos = line.find( "=" ) + 1;
+      result[ 0 ] = atof( line.substr( pos, line.length() - pos ).c_str() );
+
+      const bool lower_ok = (( lower_bound == false ) || ( result[ 0 ] >= val_lower ));
+
+      if ( lower_ok == false ){
+         if ( am_i_master ){
+            cerr << line << endl;
+            cerr << "Invalid option for " << tag << "!" << endl;
+         }
+         return false;
+      }
+   }
+
+   return true;
+
+}
+
+bool find_character( char * result, const string line, const string tag, char * options, const int num_options ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      CheMPS2::MPIchemps2::mpi_init();
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   if ( line.find( tag ) != string::npos ){
+
+      const int pos = line.find( "=" ) + 1;
+      string temp = line.substr( pos, line.length() - pos );
+      temp.erase( std::remove( temp.begin(), temp.end(), ' ' ), temp.end() );
+      result[ 0 ] = temp.c_str()[ 0 ];
+
+      bool encountered = false;
+      for ( int cnt = 0; cnt < num_options; cnt++ ){
+         if ( options[ cnt ] == result[ 0 ] ){ encountered = true; }
+      }
+
+      if ( encountered == false ){
+         if ( am_i_master ){
+            cerr << line << endl;
+            cerr << "Invalid option for " << tag << "!" << endl;
+         }
+         return false;
+      }
+   }
+
+   return true;
+
+}
+
+bool find_boolean( bool * result, const string line, const string tag ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+      CheMPS2::MPIchemps2::mpi_init();
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+   #else
+      const bool am_i_master = true;
+   #endif
+
+   if ( line.find( tag ) != string::npos ){
+
+      const int pos       = line.find( "=" ) + 1;
+      const int pos_true  = line.substr( pos, line.length() - pos ).find( "TRUE" );
+      const int pos_false = line.substr( pos, line.length() - pos ).find( "FALSE" );
+      result[ 0 ] = ( pos_true != string::npos );
+
+      if (( pos_true == string::npos ) && ( pos_false == string::npos )){
+         if ( am_i_master ){
+            cerr << line << endl;
+            cerr << "Invalid option for " << tag << "!" << endl;
+         }
+         return false;
+      }
+   }
+
+   return true;
 
 }
 
@@ -67,7 +208,7 @@ cout << "\n"
 "\n"
 
 /**************************************************
-* The following is copied directly from manpage.1 *
+* The following is copied directly from chemps2.1 *
 **************************************************/
 
 "   SYMMETRY\n"
@@ -85,236 +226,274 @@ cout << "\n"
 "               7 : d2h  |  Ag   B1g  B2g  B3g  Au   B1u  B2u  B3u\n"
 "\n"
 "   ARGUMENTS\n"
-"       -f, --fcidump=filename\n"
-"              Set the fcidump filename. Note that orbital irreps in this file follow molpro convention!\n"
-"\n"
-"       -g, --group=int\n"
-"              Set the psi4 symmetry group number [0-7] which corresponds to the fcidump file.\n"
-"\n"
-"       -m, --multiplicity=int\n"
-"              Overwrite the spin multiplicity [2S+1] of the fcidump file.\n"
-"\n"
-"       -n, --nelectrons=int\n"
-"              Overwrite the number of electrons of the fcidump file.\n"
-"\n"
-"       -i, --irrep=int\n"
-"              Overwrite the target wavefunction irrep [0-7] of the fcidump file (psi4 convention).\n"
-"\n"
-"       -D, --sweep_d=int,int,int\n"
-"              Set the bond dimensions for the successive sweep instructions (positive integers).\n"
-"\n"
-"       -E, --sweep_econv=flt,flt,flt\n"
-"              Set the energy convergence to stop sweep instructions (positive floats).\n"
-"\n"
-"       -M, --sweep_maxit=int,int,int\n"
-"              Set the maximum number of sweeps for the sweep instructions (positive integers).\n"
-"\n"
-"       -N, --sweep_noise=flt,flt,flt\n"
-"              Set the noise prefactors for the successive sweep instructions (floats).\n"
-"\n"
-"       -e, --excitation=int\n"
-"              Set which excitation should be calculated (positive integer). If not set, the ground state is calculated.\n"
-"\n"
-"       -o, --twodmfile=filename\n"
-"              Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.\n"
-"\n"
-"       -c, --checkpoint\n"
-"              Read and create MPS checkpoints.\n"
-"\n"
-"       -p, --print_corr\n"
-"              Print correlation functions.\n"
-"\n"
-"       -t, --tmpfolder=path\n"
-"              Overwrite the tmp folder for the renormalized operators (default /tmp).\n"
-"\n"
-"       -r, --reorder=int,int,int\n"
-"              Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).\n"
+"       -f, --file=inputfile\n"
+"              Specify the input file.\n"
 "\n"
 "       -h, --help\n"
 "              Display this help.\n"
 "\n"
+"   INPUT FILE\n"
+"       FCIDUMP = /path/to/fcidump\n"
+"              Note that orbital irreps in this file follow molpro convention!\n"
+"\n"
+"       GROUP = int\n"
+"              Set the psi4 symmetry group number [0-7] which corresponds to the fcidump file.\n"
+"\n"
+"       MULTIPLICITY = int\n"
+"              Overwrite the spin multiplicity [2S+1] of the fcidump file.\n"
+"\n"
+"       NELECTRONS = int\n"
+"              Overwrite the number of electrons of the fcidump file.\n"
+"\n"
+"       IRREP = int\n"
+"              Overwrite the target wavefunction irrep [0-7] of the fcidump file (psi4 convention).\n"
+"\n"
+"       EXCITATION = int\n"
+"              Set which excitation should be calculated. If zero, the ground state is calculated (default 0).\n"
+"\n"
+"       SWEEP_STATES = int, int, int\n"
+"              Set the number of reduced renormalized basis states for the successive sweep instructions (positive integers).\n"
+"\n"
+"       SWEEP_ENERGY_CONV = flt, flt, flt\n"
+"              Set the energy convergence to stop the successive sweep instructions (positive floats).\n"
+"\n"
+"       SWEEP_MAX_SWEEPS = int, int, int\n"
+"              Set the maximum number of sweeps for the successive sweep instructions (positive integers).\n"
+"\n"
+"       SWEEP_NOISE_PREFAC = flt, flt, flt\n"
+"              Set the noise prefactors for the successive sweep instructions (floats).\n"
+"\n"
+"       SWEEP_DVDSON_RTOL = flt, flt, flt\n"
+"              Set the residual norm tolerance for the Davidson algorithm for the successive sweep instructions (positive floats).\n"
+"\n"
+"       NOCC = int, int, int, int\n"
+"              Set the number of occupied (external core) orbitals per irrep (psi4 irrep ordering).\n"
+"\n"
+"       NACT = int, int, int, int\n"
+"              Set the number of active orbitals per irrep (psi4 irrep ordering).\n"
+"\n"
+"       NVIR = int, int, int, int\n"
+"              Set the number of virtual (secondary) orbitals per irrep (psi4 irrep ordering).\n"
+"\n"
+"       SCF_STATE_AVG = bool\n"
+"              Switch on state-averaging (TRUE or FALSE; default FALSE).\n"
+"\n"
+"       SCF_DIIS_THR = flt\n"
+"              Switch on DIIS when the update norm is smaller than the given threshold (default 0.0).\n"
+"\n"
+"       SCF_GRAD_THR = flt\n"
+"              Gradient norm threshold for convergence of the DMRG-SCF orbital rotations (default 1e-6).\n"
+"\n"
+"       SCF_MAX_ITER = int\n"
+"              Specify the maximum number of DMRG-SCF iterations (default 100).\n"
+"\n"
+"       SCF_ACTIVE_SPACE = char\n"
+"              Rotate the active space orbitals: no additional rotations (I), natural orbitals (N), or localized and ordered orbitals (L) (default I).\n"
+"\n"
+"       CASPT2_CALC = bool\n"
+"              Switch on the CASPT2 calculation (TRUE or FALSE; default FALSE).\n"
+"\n"
+"       CASPT2_ORBS = char\n"
+"              Perform the DMRG calculation for the 4-RDM in the SCF_ACTIVE_SPACE orbitals (A) or in the pseudocanonical orbitals (P) (default A).\n"
+"\n"
+"       CASPT2_IPEA = flt\n"
+"              Ionization potential - electron affinity shift (default 0.0).\n"
+"\n"
+"       CASPT2_IMAG = flt\n"
+"              Imaginary level shift (default 0.0).\n"
+"\n"
+"       CASPT2_CHECKPT = bool\n"
+"              Create checkpoints to continue the CASPT2 4-RDM calculation over multiple runs (TRUE or FALSE; default FALSE).\n"
+"\n"
+"       PRINT_CORR = bool\n"
+"              Print correlation functions (TRUE or FALSE; default FALSE).\n"
+"\n"
+"       TMP_FOLDER = /path/to/tmp/folder\n"
+"              Overwrite the tmp folder for the renormalized operators. With MPI, separate folders per process can (but do not have to) be used (default /tmp).\n"
+"\n"
 "   EXAMPLE\n"
-"        $ cd /tmp\n"
-"        $ wget \'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/H2O.631G.FCIDUMP\'\n"
-"        $ ls -al H2O.631G.FCIDUMP\n"
-"        $ chemps2 --fcidump=H2O.631G.FCIDUMP \\\n"
-"                  --group=5 \\\n"
-"                  --sweep_d=200,1000 \\\n"
-"                  --sweep_econv=1e-8,1e-8 \\\n"
-"                  --sweep_maxit=2,10 \\\n"
-"                  --sweep_noise=0.05,0.0 \\\n"
-"                  --twodmfile=2dm.out \\\n"
-"                  --print_corr \\\n"
-"                  --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12\n"
+"       $ cd /tmp\n"
+"       $ wget \'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/N2.CCPVDZ.FCIDUMP\'\n"
+"       $ ls -al N2.CCPVDZ.FCIDUMP\n"
+"       $ wget \'https://github.com/SebWouters/CheMPS2/raw/master/tests/test14.input\'\n"
+"       $ sed -i \"s/path\\/to/tmp/\" test14.input\n"
+"       $ cat test14.input\n"
+"       $ chemps2 --file=test14.input\n"
 " " << endl;
-
 
 }
 
-int main(int argc, char **argv){
+int main( int argc, char ** argv ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       CheMPS2::MPIchemps2::mpi_init();
-      const bool output = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
+      const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
-      const bool output = true;
+      const bool am_i_master = true;
    #endif
 
-   /*****************************
-   *  Reading in the arguments  *
-   *****************************/
+   /************************
+   *  Read in the options  *
+   *************************/
 
-   string fcidump     = "";
-   int group          = -1;
-   int multiplicity   = -1;
-   int nelectrons     = -1;
-   int irrep          = -1;
-   string sweep_d     = "";
-   string sweep_econv = "";
-   string sweep_maxit = "";
-   string sweep_noise = "";
-   int excitation     = 0; // If nothing is passed the ground state is calculated
-   string twodmfile   = "";
-   bool checkpoint    = false;
-   bool print_corr    = false;
-   string tmpfolder   = CheMPS2::defaultTMPpath;
-   string reorder     = "";
+   string inputfile = "";
+   string fcidump   = "";
+
+   int group        = -1;
+   int multiplicity = -1;
+   int nelectrons   = -1;
+   int irrep        = -1;
+   int excitation   = 0;
+
+   string sweep_states = "";
+   string sweep_econv  = "";
+   string sweep_maxit  = "";
+   string sweep_noise  = "";
+   string sweep_rtol   = "";
+
+   string nocc = "";
+   string nact = "";
+   string nvir = "";
+
+   bool   scf_state_avg    = false;
+   double scf_diis_thr     = 0.0;
+   double scf_grad_thr     = 1e-6;
+   int    scf_max_iter     = 100;
+   char   scf_active_space = 'I';
+
+   bool   caspt2_calc    = false;
+   char   caspt2_orbs    = 'A';
+   double caspt2_ipea    = 0.0;
+   double caspt2_imag    = 0.0;
+   bool   caspt2_checkpt = false;
+
+   bool   print_corr = false;
+   string tmp_folder = "/tmp";
 
    struct option long_options[] =
    {
-      {"fcidump",      required_argument, 0, 'f'},
-      {"group",        required_argument, 0, 'g'},
-      {"multiplicity", required_argument, 0, 'm'},
-      {"nelectrons",   required_argument, 0, 'n'},
-      {"irrep",        required_argument, 0, 'i'},
-      {"sweep_d",      required_argument, 0, 'D'},
-      {"sweep_econv",  required_argument, 0, 'E'},
-      {"sweep_maxit",  required_argument, 0, 'M'},
-      {"sweep_noise",  required_argument, 0, 'N'},
-      {"excitation",   required_argument, 0, 'e'},
-      {"twodmfile",    required_argument, 0, 'o'},
-      {"checkpoint",   no_argument,       0, 'c'},
-      {"print_corr",   no_argument,       0, 'p'},
-      {"tmpfolder",    required_argument, 0, 't'},
-      {"reorder",      required_argument, 0, 'r'},
-      {"help",         no_argument,       0, 'h'},
+      {"file", required_argument, 0, 'f'},
+      {"help", no_argument,       0, 'h'},
       {0, 0, 0, 0}
    };
 
    int option_index = 0;
    int c;
-   while((c = getopt_long(argc, argv, "hf:g:m:n:i:D:E:M:N:e:o:cpt:r:", long_options, &option_index)) != -1){
-      switch(c){
+   while (( c = getopt_long( argc, argv, "hf:", long_options, &option_index )) != -1 ){
+      switch( c ){
          case 'h':
          case '?':
-            if ( output ){ print_help(); }
+            if ( am_i_master ){ print_help(); }
             return 0;
             break;
          case 'f':
-            fcidump = optarg;
-            {
-               struct stat file_info;
-               const bool file_exists = ( stat( fcidump.c_str(), &file_info ) == 0 );
-               if ( file_exists == false ){
-                  if ( output ){ cerr << "fcidump file " << fcidump << " does not exist!" << endl; }
-                  return -1;
-               }
-            }
-            break;
-         case 'g':
-            group = atoi(optarg);
-            if (( group < 0 ) || ( group > 7 )){
-               if ( output ){ cerr << "Invalid group number!" << endl; }
-               return -1;
-            }
-            break;
-         case 'm':
-            multiplicity = atoi(optarg);
-            if ( multiplicity < 1 ){
-               if ( output ){ cerr << "Invalid multiplicity!" << endl; }
-               return -1;
-            }
-            break;
-         case 'n':
-            nelectrons = atoi(optarg);
-            if ( nelectrons < 2 ){
-               if ( output ){ cerr << "Invalid number of electrons!" << endl; }
-               return -1;
-            }
-            break;
-         case 'i':
-            irrep = atoi(optarg);
-            if (( irrep < 0 ) || ( irrep > 7 )){
-               if ( output ){ cerr << "Invalid irrep!" << endl; }
-               return -1;
-            }
-            break;
-         case 'D':
-            sweep_d = optarg;
-            break;
-         case 'E':
-            sweep_econv = optarg;
-            break;
-         case 'M':
-            sweep_maxit = optarg;
-            break;
-         case 'N':
-            sweep_noise = optarg;
-            break;
-         case 'e':
-            excitation = atoi(optarg);
-            if ( excitation < 1 ){
-               if ( output ){ cerr << "Invalid excitation number!" << endl; }
-               return -1;
-            }
-            break;
-         case 'o':
-            twodmfile = optarg;
-            break;
-         case 'c':
-            checkpoint = true;
-            break;
-         case 'p':
-            print_corr = true;
-            break;
-         case 't':
-            tmpfolder = optarg;
-            if ( tmpfolder.length()==0 ){
-               if ( output ){ cerr << "Invalid tmp path!" << endl; }
-               return -1;
-            }
-            {
-               struct stat file_info;
-               const bool file_exists = ( stat( tmpfolder.c_str(), &file_info ) == 0 );
-               if ( file_exists == false ){
-                  if ( output ){ cerr << "tmp folder " << tmpfolder << " does not exist!" << endl; }
-                  return -1;
-               }
-            }
-            break;
-         case 'r':
-            reorder = optarg;
+            inputfile = optarg;
+            if ( file_exists( inputfile, "--file" ) == false ){ return -1; }
             break;
       }
    }
-   
-   /*******************************************
-   *  Checking argument consistency (part 1)  *
-   *******************************************/
-   
-   if ( fcidump.length()==0 ){
-      if ( output ){ cerr << "The fcidump file should be specified!" << endl; }
+
+   if ( inputfile.length() == 0 ){
+      if ( am_i_master ){ cerr << "The input file should be specified!" << endl; }
       return -1;
    }
+
+   ifstream input( inputfile.c_str() );
+   string line;
+   while ( input.eof() == false ){
+
+      getline( input, line );
+
+      if ( line.find( "FCIDUMP" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         fcidump = line.substr( pos, line.length() - pos );
+         fcidump.erase( remove( fcidump.begin(), fcidump.end(), ' ' ), fcidump.end() );
+         if ( file_exists( fcidump, "FCIDUMP" ) == false ){ return -1; }
+      }
+
+      if ( line.find( "TMP_FOLDER" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         tmp_folder = line.substr( pos, line.length() - pos );
+         tmp_folder.erase( remove( tmp_folder.begin(), tmp_folder.end(), ' ' ), tmp_folder.end() );
+         if ( file_exists( tmp_folder, "TMP_FOLDER" ) == false ){ return -1; }
+      }
+
+      if ( find_integer( &group,        line, "GROUP",        true, 0, true,   7 ) == false ){ return -1; }
+      if ( find_integer( &multiplicity, line, "MULTIPLICITY", true, 1, false, -1 ) == false ){ return -1; }
+      if ( find_integer( &nelectrons,   line, "NELECTRONS",   true, 2, false, -1 ) == false ){ return -1; }
+      if ( find_integer( &irrep,        line, "IRREP",        true, 0, true,   7 ) == false ){ return -1; }
+      if ( find_integer( &excitation,   line, "EXCITATION",   true, 0, false, -1 ) == false ){ return -1; }
+      if ( find_integer( &scf_max_iter, line, "SCF_MAX_ITER", true, 1, false, -1 ) == false ){ return -1; }
+
+      if ( find_double( &scf_diis_thr, line, "SCF_DIIS_THR", true, 0.0 ) == false ){ return -1; }
+      if ( find_double( &scf_grad_thr, line, "SCF_GRAD_THR", true, 0.0 ) == false ){ return -1; }
+      if ( find_double( &caspt2_ipea,  line, "CASPT2_IPEA",  true, 0.0 ) == false ){ return -1; }
+      if ( find_double( &caspt2_imag,  line, "CASPT2_IMAG",  true, 0.0 ) == false ){ return -1; }
+
+      char options1[] = { 'I', 'N', 'L' };
+      char options2[] = { 'A', 'P' };
+      if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 3 ) == false ){ return -1; }
+      if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return -1; }
+
+      if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return -1; }
+      if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return -1; }
+      if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return -1; }
+      if ( find_boolean( &print_corr,     line, "PRINT_CORR"     ) == false ){ return -1; }
+
+      if ( line.find( "SWEEP_STATES" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         sweep_states = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "SWEEP_ENERGY_CONV" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         sweep_econv = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "SWEEP_MAX_SWEEPS" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         sweep_maxit = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "SWEEP_NOISE_PREFAC" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         sweep_noise = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "SWEEP_DVDSON_RTOL" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         sweep_rtol = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "NOCC" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         nocc = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "NACT" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         nact = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "NVIR" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         nvir = line.substr( pos, line.length() - pos );
+      }
+
+   }
+   input.close();
+
+  /*******************************
+   *  Check the target symmetry  *
+   *******************************/
+
    if ( group == -1 ){
-      if ( output ){ cerr << "The group number should be specified!" << endl; }
+      if ( am_i_master ){ cerr << "GROUP is a mandatory option!" << endl; }
       return -1;
    }
-   
-   /******************************************
-   *  Fetching unset arguments from FCIDUMP  *
-   ******************************************/
-   
+   CheMPS2::Irreps Symmhelper( group );
+   const int num_irreps = Symmhelper.getNumberOfIrreps();
+
    int fcidump_norb  = -1;
    int fcidump_nelec = -1;
    int fcidump_two_s = -1;
@@ -326,7 +505,7 @@ int main(int argc, char **argv){
       getline( thefcidump, line ); // &FCI NORB= X,NELEC= Y,MS2= Z,
       pos = line.find( "FCI" );
       if ( pos == string::npos ){
-         if ( output ){ cerr << "The file " << fcidump << " is not a fcidump file!" << endl; }
+         if ( am_i_master ){ cerr << "The file " << fcidump << " is not a fcidump file!" << endl; }
          return -1;
       }
       pos = line.find( "NORB"  ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
@@ -339,16 +518,14 @@ int main(int argc, char **argv){
       pos = line.find( "ISYM"  ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
       const int molpro_wfn_irrep = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
       thefcidump.close();
-      
-      CheMPS2::Irreps Symmhelper(group);
-      const int nIrreps = Symmhelper.getNumberOfIrreps();
-      int * psi2molpro = new int[ nIrreps ];
+
+      int * psi2molpro = new int[ num_irreps ];
       Symmhelper.symm_psi2molpro( psi2molpro );
-      for ( int irrep = 0; irrep < nIrreps; irrep++ ){
-         if ( molpro_wfn_irrep == psi2molpro[ irrep ] ){ fcidump_irrep = irrep; }
+      for ( int cnt = 0; cnt < num_irreps; cnt++ ){
+         if ( molpro_wfn_irrep == psi2molpro[ cnt ] ){ fcidump_irrep = cnt; }
       }
       if ( fcidump_irrep == -1 ){
-         if ( output ){ cerr << "Could not find the molpro wavefunction symmetry (ISYM) in the fcidump file!" << endl; }
+         if ( am_i_master ){ cerr << "Could not find the molpro wavefunction symmetry (ISYM) in the fcidump file!" << endl; }
          return -1;
       }
       delete [] psi2molpro;
@@ -356,132 +533,153 @@ int main(int argc, char **argv){
    if ( multiplicity == -1 ){ multiplicity = fcidump_two_s + 1; }
    if ( nelectrons   == -1 ){   nelectrons = fcidump_nelec;     }
    if ( irrep        == -1 ){        irrep = fcidump_irrep;     }
-   
-   /*******************************************
-   *  Checking argument consistency (part 2)  *
-   *******************************************/
-   
-   if (( sweep_d.length() == 0 ) || ( sweep_econv.length() == 0 ) || ( sweep_maxit.length() == 0 ) || ( sweep_noise.length() == 0 )){
-      if ( output ){ cerr << "All sweep instructions should be specified!" << endl; }
+
+   /*********************************
+   *  Check the sweep instructions  *
+   **********************************/
+
+   if (( sweep_states.length() == 0 ) || ( sweep_econv.length() == 0 ) || ( sweep_maxit.length() == 0 ) || ( sweep_noise.length() == 0 ) || ( sweep_rtol.length() == 0 )){
+      if ( am_i_master ){ cerr << "SWEEP_* are mandatory options!" << endl; }
       return -1;
    }
-   
-   const int ni_d     = count(sweep_d.begin(),     sweep_d.end(),     ',') + 1;
-   const int ni_econv = count(sweep_econv.begin(), sweep_econv.end(), ',') + 1;
-   const int ni_maxit = count(sweep_maxit.begin(), sweep_maxit.end(), ',') + 1;
-   const int ni_noise = count(sweep_noise.begin(), sweep_noise.end(), ',') + 1;
-   const bool num_eq  = (( ni_d == ni_econv ) && ( ni_d == ni_maxit ) && ( ni_d == ni_noise ));
-   
+   const int ni_d     = count( sweep_states.begin(), sweep_states.end(), ',' ) + 1;
+   const int ni_econv = count( sweep_econv.begin(),  sweep_econv.end(),  ',' ) + 1;
+   const int ni_maxit = count( sweep_maxit.begin(),  sweep_maxit.end(),  ',' ) + 1;
+   const int ni_noise = count( sweep_noise.begin(),  sweep_noise.end(),  ',' ) + 1;
+   const int ni_rtol  = count( sweep_rtol.begin(),   sweep_rtol.end(),   ',' ) + 1;
+   const bool num_eq  = (( ni_d == ni_econv ) && ( ni_d == ni_maxit ) && ( ni_d == ni_noise ) && ( ni_d == ni_rtol ));
+
    if ( num_eq == false ){
-      if ( output ){ cerr << "The number of instruction lines in sweep_* should be equal!" << endl; }
+      if ( am_i_master ){ cerr << "The number of instructions in SWEEP_* should be equal!" << endl; }
       return -1;
    }
-   
-   int    * value_d     = new int[ni_d];       fetch_ints( sweep_d,     value_d,     ni_d );
-   double * value_econv = new double[ni_d]; fetch_doubles( sweep_econv, value_econv, ni_d );
-   int    * value_maxit = new int[ni_d];       fetch_ints( sweep_maxit, value_maxit, ni_d );
-   double * value_noise = new double[ni_d]; fetch_doubles( sweep_noise, value_noise, ni_d );
-   
-   int * val_reorder = NULL;
-   int ni_reo = -1;
-   if ( reorder.length() > 0 ){
-      ni_reo = count( reorder.begin(), reorder.end(), ',') + 1;
-      val_reorder = new int[ ni_reo ];
-      fetch_ints( reorder, val_reorder, ni_reo );
-      if ( fcidump_norb != ni_reo ){
-         if ( output ){ cerr << "The orbital reordering should contain as many elements as there are orbitals in the fcidump!" << endl; }
-         return -1;
-      }
-      int * doublecheck = new int[ ni_reo ];
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ doublecheck[ cnt ] = 0; }
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){
-         if (( val_reorder[ cnt ] >= 0 ) && ( val_reorder[ cnt ] < ni_reo )){ doublecheck[ val_reorder[ cnt ] ] += 1; }
-      }
-      bool is_ok = true;
-      for ( int cnt = 0; cnt < ni_reo; cnt++ ){ if ( doublecheck[ cnt ] != 1 ){ is_ok = false; } }
-      delete [] doublecheck;
-      if ( is_ok == false ){
-         if ( output ){ cerr << "The orbital reordering should have all orbitals from 0 to " << fcidump_norb - 1 << " exactly once!" << endl; }
-         return -1;
-      }
+
+   int    * value_states = new int   [ ni_d ];    fetch_ints( sweep_states, value_states, ni_d );
+   double * value_econv  = new double[ ni_d ]; fetch_doubles( sweep_econv,  value_econv,  ni_d );
+   int    * value_maxit  = new int   [ ni_d ];    fetch_ints( sweep_maxit,  value_maxit,  ni_d );
+   double * value_noise  = new double[ ni_d ]; fetch_doubles( sweep_noise,  value_noise,  ni_d );
+   double * value_rtol   = new double[ ni_d ]; fetch_doubles( sweep_rtol,   value_rtol,   ni_d );
+
+   /*****************************************
+   *  Check the active space specification  *
+   ******************************************/
+
+   if (( nocc.length() == 0 ) || ( nact.length() == 0 ) || ( nvir.length() == 0 )){
+      if ( am_i_master ){ cerr << "NOCC, NACT, and NVIR are mandatory options!" << endl; }
+      return -1;
    }
-   
-   if ( output ){
-      CheMPS2::Irreps Symmhelper(group);
+
+   const int ni_occ  = count( nocc.begin(), nocc.end(), ',' ) + 1;
+   const int ni_act  = count( nact.begin(), nact.end(), ',' ) + 1;
+   const int ni_vir  = count( nvir.begin(), nvir.end(), ',' ) + 1;
+   const bool cas_ok = (( ni_occ == ni_act ) && ( ni_occ == ni_vir ) && ( ni_occ == num_irreps ));
+
+   if ( cas_ok == false ){
+      if ( am_i_master ){ cerr << "There should be " << num_irreps << " numbers in NOCC, NACT, and NVIR!" << endl; }
+      return -1;
+   }
+
+   int * nocc_parsed = new int[ ni_occ ]; fetch_ints( nocc, nocc_parsed, ni_occ );
+   int * nact_parsed = new int[ ni_act ]; fetch_ints( nact, nact_parsed, ni_act );
+   int * nvir_parsed = new int[ ni_vir ]; fetch_ints( nvir, nvir_parsed, ni_vir );
+
+   /**********************
+   *  Print the options  *
+   ***********************/
+
+   if ( am_i_master ){
+
       cout << "\nRunning chemps2 with the following options:\n" << endl;
-      cout << "  --fcidump = "      << fcidump      << endl;
-      cout << "  --group = "        << Symmhelper.getGroupName() << endl;
-      cout << "  --multiplicity = " << multiplicity << endl;
-      cout << "  --nelectrons = "   << nelectrons   << endl;
-      cout << "  --irrep = "        << Symmhelper.getIrrepName(irrep) << endl;
-      cout << "  --sweep_d     = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_d[cnt]     << " ; "; } cout << value_d[ni_d-1]     << " ]" << endl;
-      cout << "  --sweep_econv = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_econv[cnt] << " ; "; } cout << value_econv[ni_d-1] << " ]" << endl;
-      cout << "  --sweep_maxit = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_maxit[cnt] << " ; "; } cout << value_maxit[ni_d-1] << " ]" << endl;
-      cout << "  --sweep_noise = [ "; for (int cnt=0; cnt<ni_d-1; cnt++){ cout << value_noise[cnt] << " ; "; } cout << value_noise[ni_d-1] << " ]" << endl;
-      if ( excitation > 0 ){           cout << "  --excitation = "   << excitation   << endl; }
-      if ( twodmfile.length() > 0 ){   cout << "  --twodmfile = "    << twodmfile    << endl; }
-      if ( checkpoint ){               cout << "  --checkpoint"      << endl; }
-      if ( print_corr ){               cout << "  --print_corr"      << endl; }
-      cout << "  --tmpfolder = "    << tmpfolder    << endl;
-      if ( ni_reo > 0 ){ cout << "  --reorder = [ "; for (int cnt=0; cnt<ni_reo-1; cnt++){ cout << val_reorder[cnt] << " ; "; } cout << val_reorder[ni_reo-1] << " ]" << endl; }
+      cout << "   FCIDUMP            = " << fcidump << endl;
+      cout << "   GROUP              = " << Symmhelper.getGroupName() << endl;
+      cout << "   MULTIPLICITY       = " << multiplicity << endl;
+      cout << "   NELECTRONS         = " << nelectrons << endl;
+      cout << "   IRREP              = " << Symmhelper.getIrrepName( irrep ) << endl;
+      cout << "   EXCITATION         = " << excitation << endl;
+      cout << "   SWEEP_STATES       = [ " << value_states[ 0 ]; for ( int cnt = 1; cnt < ni_d; cnt++ ){ cout << " ; " << value_states[ cnt ]; } cout << " ]" << endl;
+      cout << "   SWEEP_ENERGY_CONV  = [ " << value_econv [ 0 ]; for ( int cnt = 1; cnt < ni_d; cnt++ ){ cout << " ; " << value_econv [ cnt ]; } cout << " ]" << endl;
+      cout << "   SWEEP_MAX_SWEEPS   = [ " << value_maxit [ 0 ]; for ( int cnt = 1; cnt < ni_d; cnt++ ){ cout << " ; " << value_maxit [ cnt ]; } cout << " ]" << endl;
+      cout << "   SWEEP_NOISE_PREFAC = [ " << value_noise [ 0 ]; for ( int cnt = 1; cnt < ni_d; cnt++ ){ cout << " ; " << value_noise [ cnt ]; } cout << " ]" << endl;
+      cout << "   SWEEP_DVDSON_RTOL  = [ " << value_rtol  [ 0 ]; for ( int cnt = 1; cnt < ni_d; cnt++ ){ cout << " ; " << value_rtol  [ cnt ]; } cout << " ]" << endl;
+      cout << "   NOCC               = [ " << nocc_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nocc_parsed[ cnt ]; } cout << " ]" << endl;
+      cout << "   NACT               = [ " << nact_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nact_parsed[ cnt ]; } cout << " ]" << endl;
+      cout << "   NVIR               = [ " << nvir_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nvir_parsed[ cnt ]; } cout << " ]" << endl;
+      cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
+      cout << "   SCF_GRAD_THR       = " << scf_grad_thr << endl;
+      cout << "   SCF_MAX_ITER       = " << scf_max_iter << endl;
+      cout << "   SCF_ACTIVE_SPACE   = " << (( scf_active_space == 'I' ) ? "no additional rotations" :
+                                            (( scf_active_space == 'N' ) ? "natural orbitals" : "localized and ordered orbitals" )) << endl;
+      cout << "   CASPT2_CALC        = " << (( caspt2_calc ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   CASPT2_ORBS        = " << (( caspt2_orbs == 'A' ) ? "as specified in SCF_ACTIVE_SPACE" : "pseudocanonical orbitals" ) << endl;
+      cout << "   CASPT2_IPEA        = " << caspt2_ipea << endl;
+      cout << "   CASPT2_IMAG        = " << caspt2_imag << endl;
+      cout << "   CASPT2_CHECKPT     = " << (( caspt2_checkpt ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   PRINT_CORR         = " << (( print_corr     ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   TMP_FOLDER         = " << tmp_folder << endl;
       cout << " " << endl;
    }
-   
+
    /********************************
    *  Running the DMRG calculation *
    ********************************/
 
-   //Initialize a bunch of stuff
    CheMPS2::Initialize::Init();
-   CheMPS2::Hamiltonian * Ham = new CheMPS2::Hamiltonian( fcidump, group );
-   CheMPS2::Problem * Prob = new CheMPS2::Problem( Ham, multiplicity-1, nelectrons, irrep );
-   if ( ni_reo > 0 ){
-      Prob->setup_reorder_custom( val_reorder );
-      delete [] val_reorder;
+   CheMPS2::Hamiltonian * ham = new CheMPS2::Hamiltonian( fcidump, group );
+   CheMPS2::CASSCF koekoek( ham, NULL, NULL, nocc_parsed, nact_parsed, nvir_parsed );
+   koekoek.set_tmp( tmp_folder );
+   delete [] nocc_parsed;
+   delete [] nact_parsed;
+   delete [] nvir_parsed;
+
+   CheMPS2::ConvergenceScheme * opt_scheme = new CheMPS2::ConvergenceScheme( ni_d );
+   for ( int count = 0; count < ni_d; count++ ){
+      opt_scheme->set_instruction( count, value_states[ count ],
+                                          value_econv [ count ],
+                                          value_maxit [ count ],
+                                          value_noise [ count ],
+                                          value_rtol  [ count ] );
    }
-   
-   //The convergence scheme
-   CheMPS2::ConvergenceScheme * OptScheme = new CheMPS2::ConvergenceScheme(ni_d);
-   //OptScheme->setInstruction(instruction, DSU(2), Econvergence, maxSweeps, noisePrefactor);
-   for ( int instruction = 0; instruction < ni_d; instruction++ ){
-      OptScheme->setInstruction( instruction, value_d[ instruction ],
-                                          value_econv[ instruction ],
-                                          value_maxit[ instruction ],
-                                          value_noise[ instruction ] );
-   }
-   
-   delete [] value_d;
+   delete [] value_states;
    delete [] value_econv;
    delete [] value_maxit;
    delete [] value_noise;
-   
-   //Run the DMRG calculations
-   CheMPS2::DMRG * theDMRG = new CheMPS2::DMRG(Prob, OptScheme, checkpoint, tmpfolder);
-   double Energy = 0.0;
-   for (int state = 0; state <= excitation; state++){
-      if (state > 0){ theDMRG->newExcitation( fabs( Energy ) ); }
-      Energy = theDMRG->Solve();
-      if ((state == 0) && (excitation >= 1)){ theDMRG->activateExcitations( excitation ); }
+   delete [] value_rtol;
+
+   const int root_num = excitation + 1;
+   CheMPS2::DMRGSCFoptions * scf_options = new CheMPS2::DMRGSCFoptions();
+   scf_options->setDoDIIS( true );
+   scf_options->setDIISGradientBranch( scf_diis_thr );
+   scf_options->setStoreDIIS( true );
+   scf_options->setMaxIterations( scf_max_iter );
+   scf_options->setGradientThreshold( scf_grad_thr );
+   scf_options->setStoreUnitary( true );
+   scf_options->setStateAveraging( scf_state_avg );
+   if ( scf_active_space == 'I' ){ scf_options->setWhichActiveSpace( 0 ); }
+   if ( scf_active_space == 'N' ){ scf_options->setWhichActiveSpace( 1 ); }
+   if ( scf_active_space == 'L' ){ scf_options->setWhichActiveSpace( 2 ); }
+   scf_options->setDumpCorrelations( print_corr );
+   scf_options->setStartLocRandom( true );
+
+   const double E_CASSCF = koekoek.solve(  nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options );
+   double E_CASPT2 = 0.0;
+   if ( caspt2_calc ){
+      E_CASPT2 = koekoek.caspt2( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options, caspt2_ipea, caspt2_imag, ( caspt2_orbs == 'P' ), caspt2_checkpt );
+      if ( am_i_master ){
+         cout << "E_CASSCF + E_CASPT2 = E_0 + E_1 + E_2 = " << E_CASSCF + E_CASPT2 << endl;
+      }
    }
-   
-   //Calculate the 2-RDM and correlation functions
-   if (( twodmfile.length() > 0 ) || ( print_corr == true )){
-      theDMRG->calc2DMandCorrelations();
-      if (( twodmfile.length() > 0 ) && ( output )){ theDMRG->get2DM()->write2DMAfile( twodmfile ); }
-      if (( print_corr == true ) && ( output )){ theDMRG->getCorrelations()->Print(); }
-   }
-   
-   //Clean up DMRG
-   if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
-   delete theDMRG;
-   delete OptScheme;
-   delete Prob;
-   delete Ham;
-   
+
+   // Clean up
+   if ( scf_options->getStoreDIIS() ){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
+   delete scf_options;
+   delete opt_scheme;
+   delete ham;
+
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::mpi_finalize();
    #endif
-   
+
    return 0;
 
 }

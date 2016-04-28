@@ -1,6 +1,6 @@
 .\" Manpage for chemps2 executable
 .\" Contact sebastianwouters [at] gmail.com
-.TH CHEMPS2 1 "24 August 2015" "version 1.7" "chemps2 v1.7"
+.TH CHEMPS2 1 "28 April 2016" "version 1.7" "chemps2 v1.7"
 
 .SH NAME
 chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
@@ -11,7 +11,7 @@ chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
 .RI "..."
 
 .SH DESCRIPTION
-\fBchemps2\fR is a scientific code to perform spin-adapted density matrix renormalization group (DMRG) calculations for ab initio quantum chemistry fcidump files. This method allows one to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI) and can return the active space 2-RDM. The method is therefore ideal to replace the FCI solver in the complete active space configuration interaction (CASCI) and complete active space self consistent field (CASSCF) methods. The link to the user manual can be found in the section \fBSEE ALSO\fR.
+\fBchemps2\fR is a scientific code to perform spin-adapted density matrix renormalization group (DMRG) calculations for ab initio quantum chemistry fcidump files. This method allows one to obtain numerical accuracy in active spaces beyond the capabilities of full configuration interaction (FCI) and can return the active space 2-, 3-, and 4-RDM. The method is therefore ideal to replace the FCI solver in the complete active space self consistent field (CASSCF) and complete active space second order perturbation theory (CASPT2) methods. The link to the user manual can be found in the section \fBSEE ALSO\fR.
 
 .SH OPTIONS
 .SS SYMMETRY
@@ -31,68 +31,100 @@ Conventions for the symmetry group and irrep numbers (same as psi4):
 .EE
 .SS ARGUMENTS
 .TP
-.BR "\-f" ", " "\-\-fcidump=\fIfilename\fB"
-Set the fcidump filename. Note that orbital irreps in this file follow molpro convention!
-.TP
-.BR "\-g" ", " "\-\-group=\fIint\fB"
-Set the psi4 symmetry group number [\fI0-7\fR] which corresponds to the fcidump file.
-.TP
-.BR "\-m" ", " "\-\-multiplicity=\fIint\fB"
-Overwrite the spin multiplicity [\fI2S+1\fR] of the fcidump file.
-.TP
-.BR "\-n" ", " "\-\-nelectrons=\fIint\fB"
-Overwrite the number of electrons of the fcidump file.
-.TP
-.BR "\-i" ", " "\-\-irrep=\fIint\fB"
-Overwrite the target wavefunction irrep [\fI0-7\fR] of the fcidump file (psi4 convention).
-.TP
-.BR "\-D" ", " "\-\-sweep_d=\fIint,int,int\fB"
-Set the bond dimensions for the successive sweep instructions (positive integers).
-.TP
-.BR "\-E" ", " "\-\-sweep_econv=\fIflt,flt,flt\fB"
-Set the energy convergence to stop sweep instructions (positive floats).
-.TP
-.BR "\-M" ", " "\-\-sweep_maxit=\fIint,int,int\fB"
-Set the maximum number of sweeps for the sweep instructions (positive integers).
-.TP
-.BR "\-N" ", " "\-\-sweep_noise=\fIflt,flt,flt\fB"
-Set the noise prefactors for the successive sweep instructions (floats).
-.TP
-.BR "\-e" ", " "\-\-excitation=\fIint\fB"
-Set which excitation should be calculated (positive integer). If not set, the ground state is calculated.
-.TP
-.BR "\-o" ", " "\-\-twodmfile=\fIfilename\fB"
-Set the filename to dump the 2-RDM. If not set, the 2-RDM is not dumped.
-.TP
-.BR "\-c" ", " "\-\-checkpoint"
-Read and create MPS checkpoints.
-.TP
-.BR "\-p" ", " "\-\-print_corr"
-Print correlation functions.
-.TP
-.BR "\-t" ", " "\-\-tmpfolder=\fIpath\fB"
-Overwrite the tmp folder for the renormalized operators (default \fI/tmp\fR).
-.TP
-.BR "\-r" ", " "\-\-reorder=\fIint,int,int\fB"
-Specify an orbital reordering w.r.t. the fcidump file (counting starts at 0).
+.BR "\-f" ", " "\-\-file=\fIinputfile\fB"
+Specify the input file.
 .TP
 .BR "\-h" ", " "\-\-help"
 Display this help.
+.SS INPUT FILE
+.TP
+.BR "FCIDUMP = \fI/path/to/fcidump\fB"
+Note that orbital irreps in this file follow molpro convention!
+.TP
+.BR "GROUP = \fIint\fB"
+Set the psi4 symmetry group number [0\-7] which corresponds to the fcidump file.
+.TP
+.BR "MULTIPLICITY = \fIint\fB"
+Overwrite the spin multiplicity [2S+1] of the fcidump file.
+.TP
+.BR "NELECTRONS = \fIint\fB"
+Overwrite the number of electrons of the fcidump file.
+.TP
+.BR "IRREP = \fIint\fB"
+Overwrite the target wavefunction irrep [0\-7] of the fcidump file (psi4 convention).
+.TP
+.BR "EXCITATION = \fIint\fB"
+Set which excitation should be calculated. If zero, the ground state is calculated (default 0).
+.TP
+.BR "SWEEP_STATES = \fIint,int,int\fB"
+Set the number of reduced renormalized basis states for the successive sweep instructions (positive integers).
+.TP
+.BR "SWEEP_ENERGY_CONV = \fIflt,flt,flt\fB"
+Set the energy convergence to stop the successive sweep instructions (positive floats).
+.TP
+.BR "SWEEP_MAX_SWEEPS = \fIint,int,int\fB"
+Set the maximum number of sweeps for the successive sweep instructions (positive integers).
+.TP
+.BR "SWEEP_NOISE_PREFAC = \fIflt,flt,flt\fB"
+Set the noise prefactors for the successive sweep instructions (floats).
+.TP
+.BR "SWEEP_DVDSON_RTOL = \fIflt,flt,flt\fB"
+Set the residual norm tolerance for the Davidson algorithm for the successive sweep instructions (positive floats).
+.TP
+.BR "NOCC = \fIint,int,int,int\fB"
+Set the number of occupied (external core) orbitals per irrep (psi4 irrep ordering).
+.TP
+.BR "NACT = \fIint,int,int,int\fB"
+Set the number of active orbitals per irrep (psi4 irrep ordering).
+.TP
+.BR "NVIR = \fIint,int,int,int\fB"
+Set the number of virtual (secondary) orbitals per irrep (psi4 irrep ordering).
+.TP
+.BR "SCF_STATE_AVG = \fIbool\fB"
+Switch on state\-averaging (TRUE or FALSE; default FALSE).
+.TP
+.BR "SCF_DIIS_THR = \fIflt\fB"
+Switch on DIIS when the update norm is smaller than the given threshold (default 0.0).
+.TP
+.BR "SCF_GRAD_THR = \fIflt\fB"
+Gradient norm threshold for convergence of the DMRG\-SCF orbital rotations (default 1e\-6).
+.TP
+.BR "SCF_MAX_ITER = \fIint\fB"
+Specify the maximum number of DMRG\-SCF iterations (default 100).
+.TP
+.BR "SCF_ACTIVE_SPACE = \fIchar\fB"
+Rotate the active space orbitals: no additional rotations (I), natural orbitals (N), or localized and ordered orbitals (L) (default I).
+.TP
+.BR "CASPT2_CALC = \fIbool\fB"
+Switch on the CASPT2 calculation (TRUE or FALSE; default FALSE).
+.TP
+.BR "CASPT2_ORBS = \fIchar\fB"
+Perform the DMRG calculation for the 4\-RDM in the SCF_ACTIVE_SPACE orbitals (A) or in the pseudocanonical orbitals (P) (default A).
+.TP
+.BR "CASPT2_IPEA = \fIflt\fB"
+Ionization potential \- electron affinity shift (default 0.0).
+.TP
+.BR "CASPT2_IMAG = \fIflt\fB"
+Imaginary level shift (default 0.0).
+.TP
+.BR "CASPT2_CHECKPT = \fIbool\fB"
+Create checkpoints to continue the CASPT2 4\-RDM calculation over multiple runs (TRUE or FALSE; default FALSE).
+.TP
+.BR "PRINT_CORR = \fIbool\fB"
+Print correlation functions (TRUE or FALSE; default FALSE).
+.TP
+.BR "TMP_FOLDER = \fI/path/to/tmp/folder\fB"
+Overwrite the tmp folder for the renormalized operators. With MPI, separate folders per process can (but do not have to) be used (default /tmp).
 .SS EXAMPLE
 .PP
 .EX
  $ cd /tmp
- $ wget 'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/H2O.631G.FCIDUMP'
- $ ls \-al H2O.631G.FCIDUMP
- $ chemps2 \-\-fcidump=H2O.631G.FCIDUMP \\
-           \-\-group=5 \\
-           \-\-sweep_d=200,1000 \\
-           \-\-sweep_econv=1e-8,1e-8 \\
-           \-\-sweep_maxit=2,10 \\
-           \-\-sweep_noise=0.05,0.0 \\
-           \-\-twodmfile=2dm.out \\
-           \-\-print_corr \\
-           \-\-reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
+ $ wget 'https://github.com/SebWouters/CheMPS2/raw/master/tests/matrixelements/N2.CCPVDZ.FCIDUMP'
+ $ ls \-al N2.CCPVDZ.FCIDUMP
+ $ wget 'https://github.com/SebWouters/CheMPS2/raw/master/tests/test14.input'
+ $ sed \-i "s/path\\/to/tmp/" test14.input
+ $ cat test14.input
+ $ chemps2 \-\-file=test14.input
 .EE
 
 .SH AUTHOR

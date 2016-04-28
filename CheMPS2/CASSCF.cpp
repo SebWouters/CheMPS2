@@ -36,7 +36,7 @@ using std::cout;
 using std::endl;
 using std::max;
 
-CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt ){
+CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt, const string new_tmp_folder ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
@@ -53,7 +53,7 @@ CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * noc
    num_irreps = SymmInfo.getNumberOfIrreps();
    successful_solve = false;
 
-   if ( am_i_master ){
+   if (( am_i_master ) && ( docc != NULL ) && ( socc != NULL )){
       cout << "DOCC = [ ";
       for ( int irrep = 0; irrep < num_irreps-1; irrep++ ){ cout << docc[ irrep ] << " , "; }
       cout << docc[ num_irreps - 1 ] << " ]" << endl;
@@ -92,10 +92,12 @@ CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * noc
    wmattilde = new DMRGSCFwtilde( iHandler );
 
    if ( am_i_master ){
-      checkHF( docc, socc ); // Print the MO info. This requires the iHandler to be created...
+      if (( docc != NULL ) && ( socc != NULL )){ checkHF( docc, socc ); } // Print the MO info. This requires the iHandler to be created...
       iHandler->Print();
       cout << "DMRGSCF::setupStart : Number of variables in the x-matrix = " << unitary->getNumVariablesX() << endl;
    }
+
+   this->tmp_folder = new_tmp_folder;
 
 }
 

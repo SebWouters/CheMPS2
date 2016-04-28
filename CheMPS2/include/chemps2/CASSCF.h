@@ -20,6 +20,8 @@
 #ifndef CASSCF_CHEMPS2_H
 #define CASSCF_CHEMPS2_H
 
+#include <string>
+
 #include "Hamiltonian.h"
 #include "Irreps.h"
 #include "TwoDM.h"
@@ -169,8 +171,9 @@ namespace CheMPS2{
              \param socc  Array containing the number of singly occupied HF orbitals per irrep
              \param nocc  Array containing the number of doubly occupied (inactive) orbitals per irrep
              \param ndmrg Array containing the number of active orbitals per irrep
-             \param nvirt Array containing the number of virtual (secondary) orbitals per irrep */
-         CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt );
+             \param nvirt Array containing the number of virtual (secondary) orbitals per irrep
+             \param tmp_folder Temporary work folder for the DMRG renormalized operators and the ERI rotations */
+         CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt, const string tmp_folder=CheMPS2::defaultTMPpath );
          
          //! Destructor
          virtual ~CASSCF();
@@ -326,6 +329,9 @@ namespace CheMPS2{
          static bool read_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract );
 
       private:
+
+         // CASSCF tmp folder
+         string tmp_folder;
 
          // Index convention handler
          DMRGSCFindices * iHandler;
