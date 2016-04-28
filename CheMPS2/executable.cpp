@@ -626,8 +626,7 @@ int main( int argc, char ** argv ){
 
    CheMPS2::Initialize::Init();
    CheMPS2::Hamiltonian * ham = new CheMPS2::Hamiltonian( fcidump, group );
-   CheMPS2::CASSCF koekoek( ham, NULL, NULL, nocc_parsed, nact_parsed, nvir_parsed );
-   koekoek.set_tmp( tmp_folder );
+   CheMPS2::CASSCF koekoek( ham, NULL, NULL, nocc_parsed, nact_parsed, nvir_parsed, tmp_folder );
    delete [] nocc_parsed;
    delete [] nact_parsed;
    delete [] nvir_parsed;
