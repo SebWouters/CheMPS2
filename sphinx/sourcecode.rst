@@ -157,7 +157,7 @@ PyCheMPS2 is a python interface to libchemps2, for compilation **without MPI**. 
 
     $ export CPATH=${CPATH}:/option3/include
     
-where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
+where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
 
 .. code-block:: bash
 

@@ -262,8 +262,8 @@ To test the chemps2 binary for compilation **without MPI**, run:
 Note that when you use the CASPT2 checkpoint, and want to restart a
 calculation at a later point, you should
 
-    1. switch the option `SCF_ACTIVE_SPACE` to `I`
-    2. remove the `CheMPS2_DIIS.h5` checkpoint
+ 1. switch the option `SCF_ACTIVE_SPACE` to `I`
+ 2. remove the `CheMPS2_DIIS.h5` checkpoint
 
 in order to ensure that **exactly** the same orbitals are used in the
 different runs.
@@ -286,9 +286,10 @@ to `CPATH`:
     > export CPATH=${CPATH}:/option3/include
 
 where `/option3` is the option provided to CMake with
-`-DCMAKE_INSTALL_PREFIX=/option3` above. For debian/sid, the HDF5
-headers are located in the folder `/usr/include/hdf5/serial`. If it
-was explicitly passed to CMake, it should also be appended to `CPATH`:
+`-DCMAKE_INSTALL_PREFIX=/option3` above. For operating systems based
+on debian, the HDF5 headers are located in the folder
+`/usr/include/hdf5/serial`. If it was explicitly passed to CMake, it
+should also be appended to `CPATH`:
 
     > export CPATH=${CPATH}:/option3/include:/usr/include/hdf5/serial
 
