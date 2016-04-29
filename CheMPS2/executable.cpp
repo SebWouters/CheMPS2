@@ -675,7 +675,7 @@ int main( int argc, char ** argv ){
    }
 
    // Clean up
-   if ( scf_options->getStoreDIIS() ){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
+   if (( scf_options->getStoreDIIS() ) && ( am_i_master )){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
    delete scf_options;
    delete opt_scheme;
    delete ham;
