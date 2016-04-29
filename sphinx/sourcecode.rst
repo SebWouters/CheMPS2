@@ -130,7 +130,7 @@ To test the chemps2 binary for compilation **without MPI**, run:
     $ cd /sourcefolder/chemps2/build/CheMPS2
     $ ./chemps2 --help
     $ cp /sourcefolder/chemps2/tests/test14.input .
-    $ sed -i "s/path\/to/sourcefolder\/chemps2\/tests\/matrixelements\/N2.CCPVDZ.FCIDUMP/" test14.input
+    $ sed -i "s/path\/to/sourcefolder\/chemps2\/tests\/matrixelements/" test14.input
     $ cat test14.input
     $ ./chemps2 --file=test14.input
 
