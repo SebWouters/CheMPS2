@@ -60,7 +60,6 @@ void fetch_doubles( const string rawdata, double * result, const int num ){
 bool file_exists( const string filename, const string tag ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-      CheMPS2::MPIchemps2::mpi_init();
       const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
@@ -79,7 +78,6 @@ bool file_exists( const string filename, const string tag ){
 bool find_integer( int * result, const string line, const string tag, const bool lower_bound, const int val_lower, const bool upper_bound, const int val_upper ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-      CheMPS2::MPIchemps2::mpi_init();
       const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
@@ -109,7 +107,6 @@ bool find_integer( int * result, const string line, const string tag, const bool
 bool find_double( double * result, const string line, const string tag, const bool lower_bound, const double val_lower ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-      CheMPS2::MPIchemps2::mpi_init();
       const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
@@ -138,7 +135,6 @@ bool find_double( double * result, const string line, const string tag, const bo
 bool find_character( char * result, const string line, const string tag, char * options, const int num_options ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-      CheMPS2::MPIchemps2::mpi_init();
       const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
@@ -172,7 +168,6 @@ bool find_character( char * result, const string line, const string tag, char * 
 bool find_boolean( bool * result, const string line, const string tag ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
-      CheMPS2::MPIchemps2::mpi_init();
       const bool am_i_master = ( CheMPS2::MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
    #else
       const bool am_i_master = true;
@@ -195,6 +190,16 @@ bool find_boolean( bool * result, const string line, const string tag ){
    }
 
    return true;
+
+}
+
+int clean_exit( const int return_code ){
+
+   #ifdef CHEMPS2_MPI_COMPILATION
+   CheMPS2::MPIchemps2::mpi_finalize();
+   #endif
+
+   return return_code;
 
 }
 
@@ -384,18 +389,18 @@ int main( int argc, char ** argv ){
          case 'h':
          case '?':
             if ( am_i_master ){ print_help(); }
-            return 0;
+            return clean_exit( 0 );
             break;
          case 'f':
             inputfile = optarg;
-            if ( file_exists( inputfile, "--file" ) == false ){ return -1; }
+            if ( file_exists( inputfile, "--file" ) == false ){ return clean_exit( -1 ); }
             break;
       }
    }
 
    if ( inputfile.length() == 0 ){
       if ( am_i_master ){ cerr << "The input file should be specified!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
 
    ifstream input( inputfile.c_str() );
@@ -408,37 +413,37 @@ int main( int argc, char ** argv ){
          const int pos = line.find( "=" ) + 1;
          fcidump = line.substr( pos, line.length() - pos );
          fcidump.erase( remove( fcidump.begin(), fcidump.end(), ' ' ), fcidump.end() );
-         if ( file_exists( fcidump, "FCIDUMP" ) == false ){ return -1; }
+         if ( file_exists( fcidump, "FCIDUMP" ) == false ){ return clean_exit( -1 ); }
       }
 
       if ( line.find( "TMP_FOLDER" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
          tmp_folder = line.substr( pos, line.length() - pos );
          tmp_folder.erase( remove( tmp_folder.begin(), tmp_folder.end(), ' ' ), tmp_folder.end() );
-         if ( file_exists( tmp_folder, "TMP_FOLDER" ) == false ){ return -1; }
+         if ( file_exists( tmp_folder, "TMP_FOLDER" ) == false ){ return clean_exit( -1 ); }
       }
 
-      if ( find_integer( &group,        line, "GROUP",        true, 0, true,   7 ) == false ){ return -1; }
-      if ( find_integer( &multiplicity, line, "MULTIPLICITY", true, 1, false, -1 ) == false ){ return -1; }
-      if ( find_integer( &nelectrons,   line, "NELECTRONS",   true, 2, false, -1 ) == false ){ return -1; }
-      if ( find_integer( &irrep,        line, "IRREP",        true, 0, true,   7 ) == false ){ return -1; }
-      if ( find_integer( &excitation,   line, "EXCITATION",   true, 0, false, -1 ) == false ){ return -1; }
-      if ( find_integer( &scf_max_iter, line, "SCF_MAX_ITER", true, 1, false, -1 ) == false ){ return -1; }
+      if ( find_integer( &group,        line, "GROUP",        true, 0, true,   7 ) == false ){ return clean_exit( -1 ); }
+      if ( find_integer( &multiplicity, line, "MULTIPLICITY", true, 1, false, -1 ) == false ){ return clean_exit( -1 ); }
+      if ( find_integer( &nelectrons,   line, "NELECTRONS",   true, 2, false, -1 ) == false ){ return clean_exit( -1 ); }
+      if ( find_integer( &irrep,        line, "IRREP",        true, 0, true,   7 ) == false ){ return clean_exit( -1 ); }
+      if ( find_integer( &excitation,   line, "EXCITATION",   true, 0, false, -1 ) == false ){ return clean_exit( -1 ); }
+      if ( find_integer( &scf_max_iter, line, "SCF_MAX_ITER", true, 1, false, -1 ) == false ){ return clean_exit( -1 ); }
 
-      if ( find_double( &scf_diis_thr, line, "SCF_DIIS_THR", true, 0.0 ) == false ){ return -1; }
-      if ( find_double( &scf_grad_thr, line, "SCF_GRAD_THR", true, 0.0 ) == false ){ return -1; }
-      if ( find_double( &caspt2_ipea,  line, "CASPT2_IPEA",  true, 0.0 ) == false ){ return -1; }
-      if ( find_double( &caspt2_imag,  line, "CASPT2_IMAG",  true, 0.0 ) == false ){ return -1; }
+      if ( find_double( &scf_diis_thr, line, "SCF_DIIS_THR", true, 0.0 ) == false ){ return clean_exit( -1 ); }
+      if ( find_double( &scf_grad_thr, line, "SCF_GRAD_THR", true, 0.0 ) == false ){ return clean_exit( -1 ); }
+      if ( find_double( &caspt2_ipea,  line, "CASPT2_IPEA",  true, 0.0 ) == false ){ return clean_exit( -1 ); }
+      if ( find_double( &caspt2_imag,  line, "CASPT2_IMAG",  true, 0.0 ) == false ){ return clean_exit( -1 ); }
 
       char options1[] = { 'I', 'N', 'L' };
       char options2[] = { 'A', 'P' };
-      if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 3 ) == false ){ return -1; }
-      if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return -1; }
+      if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 3 ) == false ){ return clean_exit( -1 ); }
+      if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
-      if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return -1; }
-      if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return -1; }
-      if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return -1; }
-      if ( find_boolean( &print_corr,     line, "PRINT_CORR"     ) == false ){ return -1; }
+      if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &print_corr,     line, "PRINT_CORR"     ) == false ){ return clean_exit( -1 ); }
 
       if ( line.find( "SWEEP_STATES" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
@@ -489,7 +494,7 @@ int main( int argc, char ** argv ){
 
    if ( group == -1 ){
       if ( am_i_master ){ cerr << "GROUP is a mandatory option!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
    CheMPS2::Irreps Symmhelper( group );
    const int num_irreps = Symmhelper.getNumberOfIrreps();
@@ -506,7 +511,7 @@ int main( int argc, char ** argv ){
       pos = line.find( "FCI" );
       if ( pos == string::npos ){
          if ( am_i_master ){ cerr << "The file " << fcidump << " is not a fcidump file!" << endl; }
-         return -1;
+         return clean_exit( -1 );
       }
       pos = line.find( "NORB"  ); pos = line.find( "=", pos ); pos2 = line.find( ",", pos );
       fcidump_norb = atoi( line.substr( pos+1, pos2-pos-1 ).c_str() );
@@ -526,7 +531,7 @@ int main( int argc, char ** argv ){
       }
       if ( fcidump_irrep == -1 ){
          if ( am_i_master ){ cerr << "Could not find the molpro wavefunction symmetry (ISYM) in the fcidump file!" << endl; }
-         return -1;
+         return clean_exit( -1 );
       }
       delete [] psi2molpro;
    }
@@ -540,7 +545,7 @@ int main( int argc, char ** argv ){
 
    if (( sweep_states.length() == 0 ) || ( sweep_econv.length() == 0 ) || ( sweep_maxit.length() == 0 ) || ( sweep_noise.length() == 0 ) || ( sweep_rtol.length() == 0 )){
       if ( am_i_master ){ cerr << "SWEEP_* are mandatory options!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
    const int ni_d     = count( sweep_states.begin(), sweep_states.end(), ',' ) + 1;
    const int ni_econv = count( sweep_econv.begin(),  sweep_econv.end(),  ',' ) + 1;
@@ -551,7 +556,7 @@ int main( int argc, char ** argv ){
 
    if ( num_eq == false ){
       if ( am_i_master ){ cerr << "The number of instructions in SWEEP_* should be equal!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
 
    int    * value_states = new int   [ ni_d ];    fetch_ints( sweep_states, value_states, ni_d );
@@ -566,7 +571,7 @@ int main( int argc, char ** argv ){
 
    if (( nocc.length() == 0 ) || ( nact.length() == 0 ) || ( nvir.length() == 0 )){
       if ( am_i_master ){ cerr << "NOCC, NACT, and NVIR are mandatory options!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
 
    const int ni_occ  = count( nocc.begin(), nocc.end(), ',' ) + 1;
@@ -576,7 +581,7 @@ int main( int argc, char ** argv ){
 
    if ( cas_ok == false ){
       if ( am_i_master ){ cerr << "There should be " << num_irreps << " numbers in NOCC, NACT, and NVIR!" << endl; }
-      return -1;
+      return clean_exit( -1 );
    }
 
    int * nocc_parsed = new int[ ni_occ ]; fetch_ints( nocc, nocc_parsed, ni_occ );
@@ -675,11 +680,7 @@ int main( int argc, char ** argv ){
    delete opt_scheme;
    delete ham;
 
-   #ifdef CHEMPS2_MPI_COMPILATION
-   CheMPS2::MPIchemps2::mpi_finalize();
-   #endif
-
-   return 0;
+   return clean_exit( 0 );
 
 }
 
