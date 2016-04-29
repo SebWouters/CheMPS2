@@ -26,50 +26,60 @@ Information
 
 CheMPS2 is a scientific library which contains a spin-adapted implementation 
 of the density matrix renormalization group (DMRG) for ab initio quantum 
-chemistry. This method allows to obtain numerical accuracy in active spaces 
-beyond the capabilities of full configuration interaction (FCI):
+chemistry. This wavefunction method allows to obtain numerical accuracy in
+active spaces beyond the capabilities of full configuration interaction (FCI),
+and allows to extract the 2-, 3-, and 4-particle reduced density matrices
+(2-, 3- and 4-RDM) of the active space.
 
-* up to 40 electrons in 40 orbitals for general active spaces
-* up to 100 electrons in 100 orbitals for one-dimensional active spaces, such as the pi-system of all-trans polyenes
+For general active spaces up to 40 electrons in 40 orbitals can be handled
+with DMRG, and for one-dimensional active spaces up to 100 electrons in 100
+orbitals. The 2-RDM of these active spaces can also be easily extracted,
+while the 3- and 4-RDM are limited to about 28 orbitals.
 
-In addition, DMRG allows to obtain the 2-RDM of the active space efficiently. 
-The method is therefore ideal to replace the FCI solver in the complete active 
-space self consistent field (CASSCF) method, when the active space size becomes 
-prohibitively expensive for FCI. The corresponding method is called DMRG-SCF. 
-Because DMRG can handle the abovementioned active space sizes, it allows to
-obtain FCI energies for small systems such as dimers, while for larger systems
-it is ideal to treat the static/strong correlation in a large active space.
+When the active space size becomes prohibitively expensive for FCI, DMRG can
+be used to replace the FCI solver in the complete active space self consistent
+field (CASSCF) method and the corresponding complete active space second order
+perturbation theory (CASPT2). The corresponding methods are called DMRG-SCF
+and DMRG-CASPT2, respectively. For DMRG-SCF the active space 2-RDM is required,
+and for DMRG-CASPT2 the active space 4-RDM.
 
-CheMPS2 is designed to be a high-performance library. For an input
-Hamiltonian and targeted symmetry sector, the library performs successive
-DMRG sweeps according to a user-defined convergence scheme. As output,
-the library returns the minimal encountered energy as well as the 2-RDM,
-3-RDM and various orbital correlation functions in the active space. With 
-the 2-RDM, various molecular properties can be calculated, as well as the 
-gradient and Hessian for orbital rotations or nuclear displacements.
+CheMPS2 is designed for high-performance computers, with a hybrid
+parallelization for mixed distributed and shared memory architectures,
+realized with the Message Passing Interface ([MPI](http://www.mpi-forum.org/))
+and the Open Multi-Processing ([OpenMP](http://openmp.org/wp/)) API.
 
-CheMPS2 is parallelized for shared memory architectures with the Open
-Multi-Processing ([OpenMP](http://openmp.org/wp/)) API and for distributed 
-memory architectures with the Message Passing Interface
-([MPI](http://www.mpi-forum.org/)). A hybrid combination of both
-parallelization strategies is supported.
+The CheMPS2 library can be interfaced with quantum chemistry codes which
+can handle R(O)HF calculations and molecular orbital matrix elements. This
+has been done for [psi4](http://www.psicode.org) and
+[pyscf](https://github.com/sunqm/pyscf), as described in the
+[user manual](http://sebwouters.github.io/CheMPS2/index.html). Usage of the
+library is illustrated in the [c++](#4-test-libchemps2) and
+[python](#7-test-pychemps2) tests.
 
-To gain a better understanding of how to perform DMRG calculations for
-large active spaces, you are encouraged to read the
-[user manual](http://sebwouters.github.io/CheMPS2/index.html) and the
-[three papers](#how-to-acknowledge-chemps2) listed below.
+The CheMPS2 binary allows to perform DMRG-SCF and DMRG-CASPT2 calculations
+based on input files. Molecular orbital matrix elements should then be
+provided in FCIDUMP format. Usage of the binary is illustrated in the
+[binary](#5-test-the-chemps2-binary) example.
 
-Incorporation of the library into other codes is very simple due a
-minimal API, as well as a python interface. Direct usage of the
-library is illustrated in
 
-* the [c++](#4-test-libchemps2) tests
-* the [python](#7-test-pychemps2) tests
-* the [binary](#5-test-the-chemps2-binary) example
+User manual
+-----------
 
-The interfaces to [psi4](http://www.psicode.org)
-and [pyscf](https://github.com/sunqm/pyscf) are described in the
-[user manual](http://sebwouters.github.io/CheMPS2/index.html).
+Information on CheMPS2 can be found in the following documents:
+
+1. [publications](#how-to-acknowledge-chemps2)
+2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
+3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
+
+The [user manual](http://sebwouters.github.io/CheMPS2/index.html) contains
+elaborate information on
+
+* the installation of CheMPS2
+* the DMRG, DMRG-SCF, and DMRG-CASPT2 algorithms
+* the symmetries which are exploited in CheMPS2
+* how to generate matrix elements with plugins to [psi4](http://www.psicode.org)
+* how to perform DMRG, DMRG-SCF, and DMRG-CASPT2 calculations
+* the interfaces to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
 
 
 How to acknowledge CheMPS2
@@ -203,9 +213,9 @@ colon-separated include and library paths:
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
     
-For debian/sid, the HDF5 headers are located in the folder
-`/usr/include/hdf5/serial`. If CMake complains about the HDF5 headers,
-try to pass it with the option
+For operating systems based on debian, the HDF5 headers are located in
+the folder `/usr/include/hdf5/serial`. If CMake complains about the HDF5
+headers, try to pass it with the option
 `-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial`.
 
 To compile, run:
@@ -232,8 +242,6 @@ To test libchemps2 for compilation **with MPI**, run:
     > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test1
     > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test2
     ...
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test11
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test12
 
 `YYY` specifies the number of threads per process and `ZZZ` the number of
 processes. Note that the tests are too small to see (near) linear scaling
@@ -246,19 +254,23 @@ To test the chemps2 binary for compilation **without MPI**, run:
     > man /sourcefolder/chemps2/chemps2.1
     > cd /sourcefolder/chemps2/build/CheMPS2
     > ./chemps2 --help
-    > ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \
-                --group=5 \
-                --sweep_d=200,1000 \
-                --sweep_econv=1e-8,1e-8 \
-                --sweep_maxit=2,10 \
-                --sweep_noise=0.05,0.0 \
-                --twodmfile=2dm.out \
-                --print_corr \
-                --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
+    > cp /sourcefolder/chemps2/tests/test14.input .
+    > sed -i "s/path\/to/sourcefolder\/chemps2\/tests\/matrixelements\/N2.CCPVDZ.FCIDUMP/" test14.input
+    > cat test14.input
+    > ./chemps2 --file=test14.input
+    
+Note that when you use the CASPT2 checkpoint, and want to restart a
+calculation at a later point, you should
+
+    1. switch the option `SCF_ACTIVE_SPACE` to `I`
+    2. remove the `CheMPS2_DIIS.h5` checkpoint
+
+in order to ensure that **exactly** the same orbitals are used in the
+different runs.
     
 To test the chemps2 binary for compilation **with MPI**, prepend the binary with:
 
-    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./chemps2 [OPTIONS]
+    > OMP_NUM_THREADS=YYY mpirun -np ZZZ ./chemps2 --file=test14.input
 
 ### 6. Build PyCheMPS2
 
@@ -307,8 +319,6 @@ by running (remember that the python site-packages folder can vary):
     > python test1.py
     > python test2.py
     ...
-    > python test11.py
-    > python test12.py
 
 If you compiled the `c++` library with `-DMKL=ON`, you might get the error
 
@@ -325,26 +335,6 @@ illustrate the usage of the python interface to libchemps2. The tests
 should end with a line stating whether or not they succeeded. Note that the
 tests are too small to see (near) linear scaling with the number of cores,
 although improvement should still be noticeable.
-
-
-User manual
------------
-
-For information on how to perform DMRG and DMRG-SCF calculations with CheMPS2,
-please consult the
-
-1. [publications](#how-to-acknowledge-chemps2)
-2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
-3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
-
-The [user manual](http://sebwouters.github.io/CheMPS2/index.html) contains
-elaborate information on
-
-* the DMRG and DMRG-SCF algorithms
-* the symmetries which are exploited in CheMPS2
-* how to generate matrix elements with plugins to [psi4](http://www.psicode.org)
-* how to perform DMRG and DMRG-SCF calculations
-* the interfaces of CheMPS2 to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
 
 
 List of files in CheMPS2
