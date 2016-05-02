@@ -83,6 +83,11 @@ namespace CheMPS2{
              \return The CASPT2 variational correction energy */
          double solve( const double imag_shift ) const;
 
+         //! Return the vector length for the CASPT2 first order wavefunction (before diagonalization of the overlap matrix)
+         /** \param idx The number of core, active, and virtual orbitals per irrep
+             \return The vector length for the CASPT2 first order wavefunction (before diagonalization of the overlap matrix) */
+         static long long vector_length( const DMRGSCFindices * idx );
+
       private:
 
          // The number of occupied, active, and virtual orbitals per irrep (externally allocated and deleted)
@@ -120,7 +125,6 @@ namespace CheMPS2{
 
          // Calculate the total vector length and the partitioning of the vector in blocks
          int vector_helper();
-         long long debug_total_length() const;
 
          // Once make_S**() has been calles, these overlap matrices can be used to contruct the RHS of the linear problem
          void construct_rhs( const DMRGSCFmatrix * oei, const DMRGSCFintegrals * integrals );

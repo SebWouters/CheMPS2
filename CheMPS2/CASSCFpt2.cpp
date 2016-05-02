@@ -147,6 +147,13 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
 
+   if ( CASPT2::vector_length( iHandler ) == 0 ){
+      if ( am_i_master ){
+         cout << "CheMPS2::CASSCF::caspt2 : There are no CASPT2 excitations between the CORE, ACTIVE, and VIRTUAL orbital spaces." << endl;
+      }
+      return 0.0;
+   }
+
    //Determine the maximum NORB(irrep) and the max_block_size for the ERI orbital rotation
    const int maxlinsize      = iHandler->getNORBmax();
    const long long fullsize  = ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize ) * ((long long) maxlinsize );

@@ -753,29 +753,30 @@ int CheMPS2::CASPT2::vector_helper(){
    for ( int cnt = 0; cnt < CHEMPS2_CASPT2_NUM_CASES * num_irreps; cnt++ ){ jump[ cnt+1 ] = jump[ cnt ] + helper[ cnt ]; }
    delete [] helper;
    const int total_size = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
-   assert( total_size == debug_total_length() );
+   assert( total_size == vector_length( indices ) );
    cout << "CASPT2 : Old size V_SD space  = " << total_size << endl;
    return total_size;
 
 }
 
-long long CheMPS2::CASPT2::debug_total_length() const{
+long long CheMPS2::CASPT2::vector_length( const DMRGSCFindices * idx ){
 
+   const int NUM_IRREPS = idx->getNirreps();
    long long length = 0;
-   for ( int i1 = 0; i1 < num_irreps; i1++ ){
-      const long long nocc1 = indices->getNOCC( i1 );
-      const long long nact1 = indices->getNDMRG( i1 );
-      const long long nvir1 = indices->getNVIRT( i1 );
-      for ( int i2 = 0; i2 < num_irreps; i2++ ){
-         const long long nocc2 = indices->getNOCC( i2 );
-         const long long nact2 = indices->getNDMRG( i2 );
-         for ( int i3 = 0; i3 < num_irreps; i3++ ){
+   for ( int i1 = 0; i1 < NUM_IRREPS; i1++ ){
+      const long long nocc1 = idx->getNOCC( i1 );
+      const long long nact1 = idx->getNDMRG( i1 );
+      const long long nvir1 = idx->getNVIRT( i1 );
+      for ( int i2 = 0; i2 < NUM_IRREPS; i2++ ){
+         const long long nocc2 = idx->getNOCC( i2 );
+         const long long nact2 = idx->getNDMRG( i2 );
+         for ( int i3 = 0; i3 < NUM_IRREPS; i3++ ){
             const int i4 = Irreps::directProd( Irreps::directProd( i1, i2 ), i3 );
-            const long long nact3 = indices->getNDMRG( i3 );
-            const long long nvir3 = indices->getNVIRT( i3 );
-            const long long nocc4 = indices->getNOCC( i4 );
-            const long long nact4 = indices->getNDMRG( i4 );
-            const long long nvir4 = indices->getNVIRT( i4 );
+            const long long nact3 = idx->getNDMRG( i3 );
+            const long long nvir3 = idx->getNVIRT( i3 );
+            const long long nocc4 = idx->getNOCC( i4 );
+            const long long nact4 = idx->getNDMRG( i4 );
+            const long long nvir4 = idx->getNVIRT( i4 );
 
             length +=     nocc1 * nact2 * nact3 * nact4; // A:  E_ti E_uv | 0 >
             length +=     nact1 * nact2 * nact3 * nvir4; // C:  E_at E_uv | 0 >
