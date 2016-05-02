@@ -216,17 +216,18 @@ void CheMPS2::CASSCF::rotateOldToNew( DMRGSCFmatrix * myMatrix ){
 
    for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
-      int linsize = iHandler->getNORB( irrep );
-      double * Umat = unitary->getBlock( irrep );
-      double * work = theQmatWORK->getBlock( irrep );
-      double * block = myMatrix->getBlock( irrep );
-      double alpha = 1.0;
-      double beta  = 0.0;
-      char trans   = 'T';
-      char notrans = 'N';
-      dgemm_( &notrans, &notrans, &linsize, &linsize, &linsize, &alpha, Umat, &linsize, block, &linsize, &beta, work,  &linsize );
-      dgemm_( &notrans, &trans,   &linsize, &linsize, &linsize, &alpha, work, &linsize, Umat,  &linsize, &beta, block, &linsize );
-
+      int NORB = iHandler->getNORB( irrep );
+      if ( NORB > 0 ){
+         double * Umat = unitary->getBlock( irrep );
+         double * work = theQmatWORK->getBlock( irrep );
+         double * block = myMatrix->getBlock( irrep );
+         double one = 1.0;
+         double set = 0.0;
+         char trans   = 'T';
+         char notrans = 'N';
+         dgemm_( &notrans, &notrans, &NORB, &NORB, &NORB, &one, Umat, &NORB, block, &NORB, &set, work,  &NORB );
+         dgemm_( &notrans, &trans,   &NORB, &NORB, &NORB, &one, work, &NORB, Umat,  &NORB, &set, block, &NORB );
+      }
    }
 
 }
@@ -284,16 +285,17 @@ void CheMPS2::CASSCF::buildQmatOCC(){
    if ( am_i_master ){
       for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
-         int linsize = iHandler->getNORB( irrep );
-         int NOCC    = iHandler->getNOCC( irrep );
-         double alpha = 2.0;
-         double set   = 0.0;
-         char trans   = 'T';
-         char notrans = 'N';
-         double * Umat = unitary->getBlock( irrep );
-         double * work = theQmatWORK->getBlock( irrep );
-         dgemm_( &trans, &notrans, &linsize, &linsize, &NOCC, &alpha, Umat, &linsize, Umat, &linsize, &set, work, &linsize );
-
+         int NORB = iHandler->getNORB( irrep );
+         if ( NORB > 0 ){
+            int NOCC = iHandler->getNOCC( irrep );
+            double two = 2.0;
+            double set = 0.0;
+            char trans   = 'T';
+            char notrans = 'N';
+            double * Umat = unitary->getBlock( irrep );
+            double * work = theQmatWORK->getBlock( irrep );
+            dgemm_( &trans, &notrans, &NORB, &NORB, &NOCC, &two, Umat, &NORB, Umat, &NORB, &set, work, &NORB );
+         }
       }
       constructCoulombAndExchangeMatrixInOrigIndices( theQmatWORK, theQmatOCC );
       rotateOldToNew( theQmatOCC );
@@ -316,19 +318,20 @@ void CheMPS2::CASSCF::buildQmatACT(){
    if ( am_i_master ){
       for ( int irrep = 0; irrep < num_irreps; irrep++ ){
 
-         int linsize = iHandler->getNORB( irrep );
-         int NDMRG   = iHandler->getNDMRG( irrep );
-         double alpha = 1.0;
-         double beta  = 0.0;
-         char trans   = 'T';
-         char notrans = 'N';
-         double * Umat  =     unitary->getBlock( irrep ) + iHandler->getNOCC( irrep );
-         double * work  = theQmatWORK->getBlock( irrep );
-         double * work2 =  theQmatACT->getBlock( irrep );
-         double * RDM = DMRG1DM + iHandler->getDMRGcumulative( irrep ) * ( 1 + nOrbDMRG );
-         dgemm_( &trans,   &notrans, &linsize, &NDMRG,   &NDMRG, &alpha, Umat,  &linsize, RDM,  &nOrbDMRG, &beta, work2, &linsize );
-         dgemm_( &notrans, &notrans, &linsize, &linsize, &NDMRG, &alpha, work2, &linsize, Umat, &linsize,  &beta, work,  &linsize );
-
+         int NORB = iHandler->getNORB( irrep );
+         if ( NORB > 0 ){
+            int NACT = iHandler->getNDMRG( irrep );
+            double one = 1.0;
+            double set = 0.0;
+            char trans   = 'T';
+            char notrans = 'N';
+            double * Umat  =     unitary->getBlock( irrep ) + iHandler->getNOCC( irrep );
+            double * work  = theQmatWORK->getBlock( irrep );
+            double * work2 =  theQmatACT->getBlock( irrep );
+            double * RDM = DMRG1DM + iHandler->getDMRGcumulative( irrep ) * ( 1 + nOrbDMRG );
+            dgemm_( &trans,   &notrans, &NORB, &NACT, &NACT, &one, Umat,  &NORB, RDM,  &nOrbDMRG, &set, work2, &NORB );
+            dgemm_( &notrans, &notrans, &NORB, &NORB, &NACT, &one, work2, &NORB, Umat, &NORB,     &set, work,  &NORB );
+         }
       }
       constructCoulombAndExchangeMatrixInOrigIndices( theQmatWORK, theQmatACT );
       rotateOldToNew( theQmatACT );
