@@ -28,6 +28,7 @@
 #include "Lapack.h"
 #include "Options.h"
 #include "ConjugateGradient.h"
+#include "Special.h"
 
 using std::cout;
 using std::endl;
@@ -43,6 +44,9 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    three_rdm  = three_dm;
    f_dot_4dm  = contract_4dm;
    num_irreps = indices->getNirreps();
+
+   struct timeval start, end;
+   gettimeofday( &start, NULL );
 
    create_f_dots();
    vector_helper();
@@ -71,7 +75,16 @@ CheMPS2::CASPT2::CASPT2( DMRGSCFindices * idx, DMRGSCFintegrals * ints, DMRGSCFm
    delete [] f_dot_3dm;
    delete [] f_dot_2dm;
 
+   gettimeofday( &end, NULL );
+   double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+   cout << "CASPT2 : Wall time tensors    = " << elapsed << " seconds" << endl;
+   gettimeofday( &start, NULL );
+
    recreate();
+
+   gettimeofday( &end, NULL );
+   elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+   cout << "CASPT2 : Wall time diag(ovlp) = " << elapsed << " seconds" << endl;
 
 }
 
@@ -191,6 +204,9 @@ CheMPS2::CASPT2::~CASPT2(){
 
 double CheMPS2::CASPT2::solve( const double imag_shift ) const{
 
+   struct timeval start, end;
+   gettimeofday( &start, NULL );
+
    // Normalizations of sectors   A  Bs Bt C  D  Es Et Fs Ft Gs Gt Hs Ht
    const int normalizations[] = { 1, 2, 2, 1, 1, 2, 6, 2, 2, 2, 6, 4, 12 };
    const bool apply_shift = (( fabs( imag_shift ) > 0.0 ) ? true : false );
@@ -232,6 +248,10 @@ double CheMPS2::CASPT2::solve( const double imag_shift ) const{
    cout << "CASPT2 : Reference weight     = " << reference_weight << endl;
    //energy_per_sector( pointers[ 0 ] );
    delete [] pointers;
+
+   gettimeofday( &end, NULL );
+   double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
+   cout << "CASPT2 : Wall time solution   = " << elapsed << " seconds" << endl;
 
    cout << "CASPT2 : E2 [DIAGONAL]        = " << E2_DIAGONAL << endl;
    cout << "CASPT2 : E2 [NON-VARIATIONAL] = " << E2_NONVARIATIONAL << endl;
@@ -1195,1088 +1215,555 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
    */
 
    const int vectorlength = jump[ CHEMPS2_CASPT2_NUM_CASES * num_irreps ];
+   #pragma omp simd
    for ( int elem = 0; elem < vectorlength; elem++ ){ result[ elem ] = diag_fock[ elem ] * vector[ elem ]; }
-
    const int maxlinsize = get_maxsize();
-   double * workspace = new double[ maxlinsize * maxlinsize ];
    const double SQRT2 = sqrt( 2.0 );
 
-   // FAD: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii == Ij == Ix x Iy x Iz
-      const int SIZE_L = size_A[ IL ];
-      const int nocc_ij = indices->getNOCC( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
-         const int SIZE_R = size_D[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Ia == Ic == Iw == IL x IR
-         const int shift = shift_D_nonactive( indices, IL, Iw );
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nocc_ij * nact_w * nvir_w > 0 ){
-            for ( int ac = 0; ac < nvir_w; ac++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FAD[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ij = 0; ij < nocc_ij; ij++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * ij;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_R * ( shift + ij + nocc_ij * ac );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-               }
-            }
-         }
-      }
-   }
+   #pragma omp parallel
+   {
 
-   // FCD: < C(bxyz) E_kw D(aitu) > = delta_ik delta_ab FCD[ Ib ][ Ii x Ia ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia == Ib
-      const int SIZE_L = size_C[ IL ];
-      const int nvir_ab = indices->getNVIRT( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
-         const int SIZE_R = size_D[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Ii == Ik == Iw == IL x IR
-         const int shift = shift_D_nonactive( indices, Iw, IL );
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nvir_ab * nact_w * nocc_w > 0 ){
-            for ( int ik = 0; ik < nocc_w; ik++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, ik, nocc_w + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FCD[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ab = 0; ab < nvir_ab; ab++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * ab;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_R * ( shift + ik + nocc_w * ab );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-               }
-            }
-         }
-      }
-   }
+      double * workspace = new double[ maxlinsize * maxlinsize ];
+      double * result_private = new double[ vectorlength ];
+      #pragma omp simd
+      for ( int elem = 0; elem < vectorlength; elem++ ){ result_private[ elem ] = 0.0; }
 
-   // FAB singlet: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
-      const int SIZE_L = size_A[ IL ];
-      const int nocc_l = indices->getNOCC( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
-         const int SIZE_R = size_B_singlet[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
-         const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, +1 ) : shift_B_nonactive( indices, IL, Iw, +1 ));
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
-            for ( int k = 0; k < nocc_w; k++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, k, nocc_w + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FAB_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
-                  for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
-                     const double factor = (( k == l ) ? SQRT2 : 1.0 );
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+      // FAD: < A(xjyz) E_wc D(aitu) > = delta_ac delta_ij FAD[ Ij ][ Ii x Ia ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ii == Ij == Ix x Iy x Iz
+         const int SIZE_L = size_A[ IL ];
+         const int nocc_ij = indices->getNOCC( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
+            const int SIZE_R = size_D[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Ia == Ic == Iw == IL x IR
+            const int shift = shift_D_nonactive( indices, IL, Iw );
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            const int n_oa_w = nocc_w + nact_w;
+            const int nvir_w = indices->getNVIRT( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nocc_ij * nact_w * nvir_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int ac = 0; ac < nvir_w; ac++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FAD[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                   }
-               } else {
-                  for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                  for ( int ij = 0; ij < nocc_ij; ij++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A ] + SIZE_L * ij;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_R * ( shift + ij + nocc_ij * ac );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
                   }
                }
             }
          }
       }
-   }
 
-   // FAB triplet: < A(xlyz) E_kw TB_tiuj > = ( delta_ik delta_jl - delta_jk delta_il ) * FAB_triplet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
-      const int SIZE_L = size_A[ IL ];
-      const int nocc_l = indices->getNOCC( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
-         const int SIZE_R = size_B_triplet[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
-         const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, -1 ) : shift_B_nonactive( indices, IL, Iw, -1 ));
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
-            for ( int k = 0; k < nocc_w; k++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, k, nocc_w + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FAB_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
-                  for ( int l = 0; l < k; l++ ){
-                     const int count = shift + l + ( k * ( k - 1 ) ) / 2;
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -1.0, 'N' ); // ( k > l  --->  - delta_jk delta_il )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -1.0, 'T' );
+      // FCD: < C(bxyz) E_kw D(aitu) > = delta_ik delta_ab FCD[ Ib ][ Ii x Ia ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ia == Ib
+         const int SIZE_L = size_C[ IL ];
+         const int nvir_ab = indices->getNVIRT( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ia
+            const int SIZE_R = size_D[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Ii == Ik == Iw == IL x IR
+            const int shift = shift_D_nonactive( indices, Iw, IL );
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nvir_ab * nact_w * nocc_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int ik = 0; ik < nocc_w; ik++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_kw = fock->get( Iw, ik, nocc_w + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FCD[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                   }
-                  for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count = shift + k + ( l * ( l - 1 ) ) / 2;
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( k < l  --->  + delta_ik delta_jl )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-                  }
-               } else {
-                  const double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( k < l  --->  + delta_ik delta_jl ) and ( k > l  --->  - delta_jk delta_il )
-                  for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                  for ( int ab = 0; ab < nvir_ab; ab++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C ] + SIZE_L * ab;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_R * ( shift + ik + nocc_w * ab );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
                   }
                }
             }
          }
       }
-   }
 
-   // FCF singlet: < C(dxyz) E_wc SF_atbu > = ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_singlet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
-      const int SIZE_L = size_C[ IL ];
-      const int nvir_d = indices->getNVIRT( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
-         const int SIZE_R = size_F_singlet[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
-         const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, +1 ) : shift_F_nonactive( indices, IL, Iw, +1 ));
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
-            for ( int c = 0; c < nvir_w; c++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FCF_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
-                  for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
-                     const double factor = (( c == d ) ? SQRT2 : 1.0 );
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+      // FAB singlet: < A(xlyz) E_kw SB_tiuj > = ( delta_ik delta_jl + delta_jk delta_il ) / sqrt( 1 + delta_ij ) * FAB_singlet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
+         const int SIZE_L = size_A[ IL ];
+         const int nocc_l = indices->getNOCC( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
+            const int SIZE_R = size_B_singlet[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
+            const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, +1 ) : shift_B_nonactive( indices, IL, Iw, +1 ));
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int k = 0; k < nocc_w; k++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_kw = fock->get( Iw, k, nocc_w + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FAB_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                   }
-               } else {
-                  for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FCF triplet: < C(dxyz) E_wc TF_atbu > = ( delta_ac delta_bd - delta_ad delta_bc ) * FCF_triplet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
-      const int SIZE_L = size_C[ IL ];
-      const int nvir_d = indices->getNVIRT( IL );
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
-         const int SIZE_R = size_F_triplet[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
-         const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, -1 ) : shift_F_nonactive( indices, IL, Iw, -1 ));
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
-            for ( int c = 0; c < nvir_w; c++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FCF_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
-                  for ( int d = 0; d < c; d++ ){
-                     const int count = shift + d + ( c * ( c - 1 ) ) / 2;
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -1.0, 'N' ); // ( c > d  --->  - delta_ad delta_bc )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -1.0, 'T' );
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count = shift + c + ( d * ( d - 1 ) ) / 2;
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( c < d  --->  + delta_ac delta_bd )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-                  }
-               } else {
-                  const double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( c < d  --->  + delta_ac delta_bd ) and ( c > d  --->  - delta_ad delta_bc )
-                  for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
-                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FBE singlet: < SB_xkyl E_wc SE_tiaj > = 2 delta_ac delta_ik delta_jl FBE_singlet[ Ik x Il ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iik x Ijl == Ix x Iy
-      const int SIZE_L = size_B_singlet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iik x Ijl x Iac
-         const int SIZE_R = size_E[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Iac
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int linsize = 0;
-         for ( int Iik = 0; Iik < num_irreps; Iik++ ){
-            const int Ijl = Irreps::directProd( Iik, IL );
-            if ( Iik <= Ijl ){
-               const int nocc_ik = indices->getNOCC( Iik );
-               linsize += (( IL == 0 ) ? ( nocc_ik * ( nocc_ik + 1 ) ) / 2 : nocc_ik * indices->getNOCC( Ijl ) );
-            }
-         }
-         const int size_ij = linsize;
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nact_w * nvir_w * size_ij > 0 ){
-            const int shift_E = shift_E_nonactive( indices, Iw, 0, IL, +1 );
-            for ( int ac = 0; ac < nvir_w; ac++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FBE_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ij = 0; ij < size_ij; ij++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_L * ij;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * ( shift_E + ac + nvir_w * ij );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
-               }
-            }
-         }
-      }
-   }
-
-   // FBE triplet: < TB_xkyl E_wc TE_tiaj > = 2 delta_ac delta_ik delta_jl FBE_triplet[ Ik x Il ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iik x Ijl == Ix x Iy
-      const int SIZE_L = size_B_triplet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iik x Ijl x Iac
-         const int SIZE_R = size_E[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Iac
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         const int n_oa_w = nocc_w + nact_w;
-         const int nvir_w = indices->getNVIRT( Iw );
-         int linsize = 0;
-         for ( int Iik = 0; Iik < num_irreps; Iik++ ){
-            const int Ijl = Irreps::directProd( Iik, IL );
-            if ( Iik <= Ijl ){
-               const int nocc_ik = indices->getNOCC( Iik );
-               linsize += (( IL == 0 ) ? ( nocc_ik * ( nocc_ik - 1 ) ) / 2 : nocc_ik * indices->getNOCC( Ijl ) );
-            }
-         }
-         const int size_ij = linsize;
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nact_w * nvir_w * size_ij > 0 ){
-            const int shift_E = shift_E_nonactive( indices, Iw, 0, IL, -1 );
-            for ( int ac = 0; ac < nvir_w; ac++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FBE_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ij = 0; ij < size_ij; ij++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_L * ij;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * ( shift_E + ac + nvir_w * ij );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
-               }
-            }
-         }
-      }
-   }
-
-   // FFG singlet: < SF_cxdy E_kw SG_aibt > = 2 delta_ac delta_bd delta_ik FFG_singlet[ Ic x Id ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iac x Ibd == Ix x Iy
-      const int SIZE_L = size_F_singlet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iac x Ibd x Iik
-         const int SIZE_R = size_G[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Iik
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         int linsize = 0;
-         for ( int Iac = 0; Iac < num_irreps; Iac++ ){
-            const int Ibd = Irreps::directProd( Iac, IL );
-            if ( Iac <= Ibd ){
-               const int nvir_ac = indices->getNVIRT( Iac );
-               linsize += (( IL == 0 ) ? ( nvir_ac * ( nvir_ac + 1 ) ) / 2 : nvir_ac * indices->getNVIRT( Ibd ) );
-            }
-         }
-         const int size_ab = linsize;
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nact_w * nocc_w * size_ab > 0 ){
-            const int shift_G = shift_G_nonactive( indices, Iw, 0, IL, +1 );
-            for ( int ik = 0; ik < nocc_w; ik++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, ik, nocc_w + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FFG_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ab = 0; ab < size_ab; ab++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_L * ab;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * ( shift_G + ik + nocc_w * ab );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
-               }
-            }
-         }
-      }
-   }
-   
-   // FFG triplet: < TF_cxdy E_kw TG_aibt > = 2 delta_ac delta_bd delta_ik FFG_triplet[ Ic x Id ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iac x Ibd == Ix x Iy
-      const int SIZE_L = size_F_triplet[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iac x Ibd x Iik
-         const int SIZE_R = size_G[ IR ];
-         const int Iw = Irreps::directProd( IL, IR ); // Iw == Iik
-         const int nocc_w = indices->getNOCC( Iw );
-         const int nact_w = indices->getNDMRG( Iw );
-         int linsize = 0;
-         for ( int Iac = 0; Iac < num_irreps; Iac++ ){
-            const int Ibd = Irreps::directProd( Iac, IL );
-            if ( Iac <= Ibd ){
-               const int nvir_ac = indices->getNVIRT( Iac );
-               linsize += (( IL == 0 ) ? ( nvir_ac * ( nvir_ac - 1 ) ) / 2 : nvir_ac * indices->getNVIRT( Ibd ) );
-            }
-         }
-         const int size_ab = linsize;
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nact_w * nocc_w * size_ab > 0 ){
-            const int shift_G = shift_G_nonactive( indices, Iw, 0, IL, -1 );
-            for ( int ik = 0; ik < nocc_w; ik++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_w; w++ ){
-                  double f_kw = fock->get( Iw, ik, nocc_w + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FFG_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int ab = 0; ab < size_ab; ab++ ){
-                  const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_L * ab;
-                  const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * ( shift_G + ik + nocc_w * ab );
-                  matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
-                  matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
-               }
-            }
-         }
-      }
-   }
-
-   // FEH singlet: < SE_xkdl E_wc SH_aibj > = 2 delta_ik delta_jl ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FEH[ Ix ][ w ][ x ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ic == Iik x Ijl x Id
-      int SIZE = size_E[ IL ];
-      const int nocc_w = indices->getNOCC( IL );
-      const int nact_w = indices->getNDMRG( IL );
-      const int n_oa_w = nocc_w + nact_w;
-      const int nvir_w = indices->getNVIRT( IL );
-      for ( int c = 0; c < nvir_w; c++ ){
-
-         // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
-
-         for ( int Id = 0; Id < num_irreps; Id++ ){
-
-            const int Icenter = Irreps::directProd( IL, Id );
-            const int nvir_d = indices->getNVIRT( Id );
-
-            if ( IL < Id ){ // Ic < Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, +1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 2 * value;
-                        }
-                     }
-                  }
-               }
-            }
-
-            if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, +1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, +1 );
-                  const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) + 1 ) ) / 2;
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c + 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 2 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = c; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = factor * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c + 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += 2 * value;
-                     }
-                  }
-                  for ( int d = c; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += factor * value;
-                     }
-                  }
-               }
-            }
-
-            if ( IL > Id ){ // Ic > Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, +1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] += 2 * value; // ( d + nvir_d * c ) because Id < Ic
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FEH triplet: < TE_xkdl E_wc TH_aibj > = 6 delta_ik delta_jl ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FEH[ Ix ][ w ][ x ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ic == Iik x Ijl x Id
-      int SIZE = size_E[ IL ];
-      const int nocc_w = indices->getNOCC( IL );
-      const int nact_w = indices->getNDMRG( IL );
-      const int n_oa_w = nocc_w + nact_w;
-      const int nvir_w = indices->getNVIRT( IL );
-      for ( int c = 0; c < nvir_w; c++ ){
-
-         // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
-
-         for ( int Id = 0; Id < num_irreps; Id++ ){
-
-            const int Icenter = Irreps::directProd( IL, Id );
-            const int nvir_d = indices->getNVIRT( Id );
-
-            if ( IL < Id ){ // Ic < Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, -1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 6 * value;
-                        }
-                     }
-                  }
-               }
-            }
-
-            if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, -1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, -1 );
-                  const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) - 1 ) ) / 2;
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] -= 6 * value;
-                     }
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += 6 * value;
-                     }
-                  }
-               }
-            }
-
-            if ( IL > Id ){ // Ic > Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, -1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] -= 6 * value; // ( d + nvir_d * c ) because Id < Ic
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FGH singlet: < SG_cldx E_kw SH_aibj > = 2 delta_ac delta_bd ( delta_il delta_jk + delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ik == Iac x Ibd x Il
-      int SIZE = size_G[ IL ];
-      const int nocc_w = indices->getNOCC( IL );
-      const int nact_w = indices->getNDMRG( IL );
-      for ( int k = 0; k < nocc_w; k++ ){
-
-         // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_kw = fock->get( IL, k, nocc_w + w );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
-
-         for ( int Il = 0; Il < num_irreps; Il++ ){
-
-            const int Icenter = Irreps::directProd( IL, Il );
-            const int nocc_l = indices->getNOCC( Il );
-
-            if ( IL < Il ){ // Ik < Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, +1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                  if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
                      for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 2 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + k + nocc_w * l + size_ij * ab ] += 2 * value;
-                        }
-                     }
-                  }
-               }
-            }
-
-            if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, +1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, +1 );
-                  const int size_ij = ( nocc_w * ( nocc_w + 1 ) ) / 2;
-                  const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) + 1 ) ) / 2;
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k + 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 2 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = k; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = factor * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k + 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += 2 * value;
-                     }
-                  }
-                  for ( int l = k; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += factor * value;
-                     }
-                  }
-               }
-            }
-
-            if ( IL > Il ){ // Ik > Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, +1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 2 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + l + nocc_l * k + size_ij * ab ] += 2 * value; // ( l + nocc_l * k ) because Il < Ik
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FGH triplet: < TG_cldx E_kw TH_aibj > = 6 delta_ac delta_bd ( delta_il delta_jk - delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ik == Iac x Ibd x Il
-      int SIZE = size_G[ IL ];
-      const int nocc_w = indices->getNOCC( IL );
-      const int nact_w = indices->getNDMRG( IL );
-      for ( int k = 0; k < nocc_w; k++ ){
-
-         // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_kw = fock->get( IL, k, nocc_w + w );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
-
-         for ( int Il = 0; Il < num_irreps; Il++ ){
-
-            const int Icenter = Irreps::directProd( IL, Il );
-            const int nocc_l = indices->getNOCC( Il );
-
-            if ( IL < Il ){ // Ik < Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, -1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 6 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + k + nocc_w * l + size_ij * ab ] -= 6 * value;
-                        }
-                     }
-                  }
-               }
-            }
-
-            if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, -1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, -1 );
-                  const int size_ij = ( nocc_w * ( nocc_w - 1 ) ) / 2;
-                  const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) - 1 ) ) / 2;
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += 6 * value;
-                     }
-                  }
-                  for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] -= 6 * value;
-                     }
-                  }
-               }
-            }
-
-            if ( IL > Il ){ // Ik > Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, -1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 6 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + l + nocc_l * k + size_ij * ab ] += 6 * value; // ( l + nocc_l * k ) because Il < Ik
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   // FDE singlet: < D(blxy) E_kw SE_tiaj > = 1 delta_ab ( delta_ik delta_jl + delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_singlet[ Ib x Il ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Ib x Il
-      const int SIZE_L = size_D[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ii x Ij
-         const int SIZE_R = size_E[ IR ];
-         const int Ikw = Irreps::directProd( IL, IR ); // Ikw == Ik == Iw
-         const int nocc_kw = indices->getNOCC( Ikw );
-         const int nact_kw = indices->getNDMRG( Ikw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nocc_kw * nact_kw > 0 ){
-            for ( int k = 0; k < nocc_kw; k++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_kw; w++ ){
-                  double f_kw = fock->get( Ikw, k, nocc_kw + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FDE_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int nvir_ab = indices->getNVIRT( Iab );
-                  const int Il = Irreps::directProd( Iab, IL );
-                  const int nocc_l = indices->getNOCC( Il );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
-                                                                                                                  : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
-                  if ( Ikw == Il ){ // irrep_k == irrep_l
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                        const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
                         const double factor = (( k == l ) ? SQRT2 : 1.0 );
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
-                        }
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
                      }
-                  } else { // irrep_k != irrep_l
+                  } else {
                      for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
-                        }
+                        const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
                      }
                   }
                }
             }
          }
       }
-   }
 
-   // FDE triplet: < D(blxy) E_kw TE_tiaj > = 3 delta_ab ( delta_ik delta_jl - delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_triplet[ Ib x Il ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Ib x Il
-      const int SIZE_L = size_D[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ii x Ij
-         const int SIZE_R = size_E[ IR ];
-         const int Ikw = Irreps::directProd( IL, IR ); // Ikw == Ik == Iw
-         const int nocc_kw = indices->getNOCC( Ikw );
-         const int nact_kw = indices->getNDMRG( Ikw );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nocc_kw * nact_kw > 0 ){
-            for ( int k = 0; k < nocc_kw; k++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_kw; w++ ){
-                  double f_kw = fock->get( Ikw, k, nocc_kw + w );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_kw, FDE_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int nvir_ab = indices->getNVIRT( Iab );
-                  const int Il = Irreps::directProd( Iab, IL );
-                  const int nocc_l = indices->getNOCC( Il );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
-                                                                                                                  : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
-                  if ( Ikw == Il ){ // irrep_k == irrep_l
+      // FAB triplet: < A(xlyz) E_kw TB_tiuj > = ( delta_ik delta_jl - delta_jk delta_il ) * FAB_triplet[ Il ][ Ii x Ij ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Il == Ix x Iy x Iz
+         const int SIZE_L = size_A[ IL ];
+         const int nocc_l = indices->getNOCC( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ii x Ij
+            const int SIZE_R = size_B_triplet[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Ik
+            const int shift = (( Iw < IL ) ? shift_B_nonactive( indices, Iw, IL, -1 ) : shift_B_nonactive( indices, IL, Iw, -1 ));
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nocc_l * nact_w * nocc_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int k = 0; k < nocc_w; k++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_kw = fock->get( Iw, k, nocc_w + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FAB_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
                      for ( int l = 0; l < k; l++ ){
-                        const int cnt_kl = l + ( k * ( k - 1 ) ) / 2;
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
-                        }
+                        const int count = shift + l + ( k * ( k - 1 ) ) / 2;
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, -1.0, 'N' ); // ( k > l  --->  - delta_jk delta_il )
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, -1.0, 'T' );
                      }
                      for ( int l = k+1; l < nocc_l; l++ ){
-                        const int cnt_kl = k + ( l * ( l - 1 ) ) / 2;
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
-                        }
+                        const int count = shift + k + ( l * ( l - 1 ) ) / 2;
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( k < l  --->  + delta_ik delta_jl )
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
                      }
-                  } else { // irrep_k != irrep_l
+                  } else {
+                     const double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( k < l  --->  + delta_ik delta_jl ) and ( k > l  --->  - delta_jk delta_il )
                      for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
-                        const double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
-                        }
+                        const int count = shift + (( Iw < IL ) ? ( k + nocc_w * l ) : ( l + nocc_l * k ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
                      }
                   }
                }
             }
          }
       }
-   }
 
-   // FDG singlet: < D(djxy) E_wc SG_aibt > = 1 delta_ij ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_singlet[ Ij x Id ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Id x Ij
-      const int SIZE_L = size_D[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ib x Ii
-         const int SIZE_R = size_E[ IR ];
-         const int Iwc = Irreps::directProd( IL, IR ); // Iwc == Ic == Iw
-         const int nocc_wc = indices->getNOCC( Iwc );
-         const int nact_wc = indices->getNDMRG( Iwc );
-         const int n_oa_wc = nocc_wc + nact_wc;
-         const int nvir_wc = indices->getNVIRT( Iwc );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nvir_wc * nact_wc > 0 ){
-            for ( int c = 0; c < nvir_wc; c++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_wc; w++ ){
-                  double f_wc = fock->get( Iwc, nocc_wc + w, n_oa_wc + c );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FDG_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
-               }
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int nocc_ij = indices->getNOCC( Iij );
-                  const int Id = Irreps::directProd( Iij, IL );
-                  const int nvir_d = indices->getNVIRT( Id );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
-                                                                                                                  : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
-                  if ( Iwc == Id ){ // irrep_c == irrep_d
+      // FCF singlet: < C(dxyz) E_wc SF_atbu > = ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) * FCF_singlet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
+         const int SIZE_L = size_C[ IL ];
+         const int nvir_d = indices->getNVIRT( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
+            const int SIZE_R = size_F_singlet[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
+            const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, +1 ) : shift_F_nonactive( indices, IL, Iw, +1 ));
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            const int n_oa_w = nocc_w + nact_w;
+            const int nvir_w = indices->getNVIRT( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int c = 0; c < nvir_w; c++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FCF_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
                      for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
+                        const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
                         const double factor = (( c == d ) ? SQRT2 : 1.0 );
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     }
+                  } else {
+                     for ( int d = 0; d < nvir_d; d++ ){
+                        const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FCF triplet: < C(dxyz) E_wc TF_atbu > = ( delta_ac delta_bd - delta_ad delta_bc ) * FCF_triplet[ Id ][ Ia x Ib ][ w ][ (xyz),(tu) ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Id == Ix x Iy x Iz
+         const int SIZE_L = size_C[ IL ];
+         const int nvir_d = indices->getNVIRT( IL );
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It x Iu == Ia x Ib
+            const int SIZE_R = size_F_triplet[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Ic
+            const int shift = (( Iw < IL ) ? shift_F_nonactive( indices, Iw, IL, -1 ) : shift_F_nonactive( indices, IL, Iw, -1 ));
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            const int n_oa_w = nocc_w + nact_w;
+            const int nvir_w = indices->getNVIRT( Iw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nvir_d * nact_w * nvir_w > 0 ){
+               #pragma omp for schedule(static)
+               for ( int c = 0; c < nvir_w; c++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + c );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FCF_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
+                     for ( int d = 0; d < c; d++ ){
+                        const int count = shift + d + ( c * ( c - 1 ) ) / 2;
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, -1.0, 'N' ); // ( c > d  --->  - delta_ad delta_bc )
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, -1.0, 'T' );
+                     }
+                     for ( int d = c+1; d < nvir_d; d++ ){
+                        const int count = shift + c + ( d * ( d - 1 ) ) / 2;
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( c < d  --->  + delta_ac delta_bd )
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                     }
+                  } else {
+                     const double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( c < d  --->  + delta_ac delta_bd ) and ( c > d  --->  - delta_ad delta_bc )
+                     for ( int d = 0; d < nvir_d; d++ ){
+                        const int count = shift + (( Iw < IL ) ? ( c + nvir_w * d ) : ( d + nvir_d * c ));
+                        const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
+                        const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
+                        matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                        matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FBE singlet: < SB_xkyl E_wc SE_tiaj > = 2 delta_ac delta_ik delta_jl FBE_singlet[ Ik x Il ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iik x Ijl == Ix x Iy
+         const int SIZE_L = size_B_singlet[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iik x Ijl x Iac
+            const int SIZE_R = size_E[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Iac
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            const int n_oa_w = nocc_w + nact_w;
+            const int nvir_w = indices->getNVIRT( Iw );
+            int linsize = 0;
+            for ( int Iik = 0; Iik < num_irreps; Iik++ ){
+               const int Ijl = Irreps::directProd( Iik, IL );
+               if ( Iik <= Ijl ){
+                  const int nocc_ik = indices->getNOCC( Iik );
+                  linsize += (( IL == 0 ) ? ( nocc_ik * ( nocc_ik + 1 ) ) / 2 : nocc_ik * indices->getNOCC( Ijl ) );
+               }
+            }
+            const int size_ij = linsize;
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nact_w * nvir_w * size_ij > 0 ){
+               const int shift_E = shift_E_nonactive( indices, Iw, 0, IL, +1 );
+               #pragma omp for schedule(static)
+               for ( int ac = 0; ac < nvir_w; ac++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FBE_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int ij = 0; ij < size_ij; ij++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_L * ij;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * ( shift_E + ac + nvir_w * ij );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
+                  }
+               }
+            }
+         }
+      }
+
+      // FBE triplet: < TB_xkyl E_wc TE_tiaj > = 2 delta_ac delta_ik delta_jl FBE_triplet[ Ik x Il ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iik x Ijl == Ix x Iy
+         const int SIZE_L = size_B_triplet[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iik x Ijl x Iac
+            const int SIZE_R = size_E[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Iac
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            const int n_oa_w = nocc_w + nact_w;
+            const int nvir_w = indices->getNVIRT( Iw );
+            int linsize = 0;
+            for ( int Iik = 0; Iik < num_irreps; Iik++ ){
+               const int Ijl = Irreps::directProd( Iik, IL );
+               if ( Iik <= Ijl ){
+                  const int nocc_ik = indices->getNOCC( Iik );
+                  linsize += (( IL == 0 ) ? ( nocc_ik * ( nocc_ik - 1 ) ) / 2 : nocc_ik * indices->getNOCC( Ijl ) );
+               }
+            }
+            const int size_ij = linsize;
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nact_w * nvir_w * size_ij > 0 ){
+               const int shift_E = shift_E_nonactive( indices, Iw, 0, IL, -1 );
+               #pragma omp for schedule(static)
+               for ( int ac = 0; ac < nvir_w; ac++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_wc = fock->get( Iw, nocc_w + w, n_oa_w + ac );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FBE_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int ij = 0; ij < size_ij; ij++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_L * ij;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * ( shift_E + ac + nvir_w * ij );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
+                  }
+               }
+            }
+         }
+      }
+
+      // FFG singlet: < SF_cxdy E_kw SG_aibt > = 2 delta_ac delta_bd delta_ik FFG_singlet[ Ic x Id ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iac x Ibd == Ix x Iy
+         const int SIZE_L = size_F_singlet[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iac x Ibd x Iik
+            const int SIZE_R = size_G[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Iik
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            int linsize = 0;
+            for ( int Iac = 0; Iac < num_irreps; Iac++ ){
+               const int Ibd = Irreps::directProd( Iac, IL );
+               if ( Iac <= Ibd ){
+                  const int nvir_ac = indices->getNVIRT( Iac );
+                  linsize += (( IL == 0 ) ? ( nvir_ac * ( nvir_ac + 1 ) ) / 2 : nvir_ac * indices->getNVIRT( Ibd ) );
+               }
+            }
+            const int size_ab = linsize;
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nact_w * nocc_w * size_ab > 0 ){
+               const int shift_G = shift_G_nonactive( indices, Iw, 0, IL, +1 );
+               #pragma omp for schedule(static)
+               for ( int ik = 0; ik < nocc_w; ik++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_kw = fock->get( Iw, ik, nocc_w + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FFG_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int ab = 0; ab < size_ab; ab++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_L * ab;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * ( shift_G + ik + nocc_w * ab );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
+                  }
+               }
+            }
+         }
+      }
+
+      // FFG triplet: < TF_cxdy E_kw TG_aibt > = 2 delta_ac delta_bd delta_ik FFG_triplet[ Ic x Id ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Iac x Ibd == Ix x Iy
+         const int SIZE_L = size_F_triplet[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR == It == Iac x Ibd x Iik
+            const int SIZE_R = size_G[ IR ];
+            const int Iw = Irreps::directProd( IL, IR ); // Iw == Iik
+            const int nocc_w = indices->getNOCC( Iw );
+            const int nact_w = indices->getNDMRG( Iw );
+            int linsize = 0;
+            for ( int Iac = 0; Iac < num_irreps; Iac++ ){
+               const int Ibd = Irreps::directProd( Iac, IL );
+               if ( Iac <= Ibd ){
+                  const int nvir_ac = indices->getNVIRT( Iac );
+                  linsize += (( IL == 0 ) ? ( nvir_ac * ( nvir_ac - 1 ) ) / 2 : nvir_ac * indices->getNVIRT( Ibd ) );
+               }
+            }
+            const int size_ab = linsize;
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nact_w * nocc_w * size_ab > 0 ){
+               const int shift_G = shift_G_nonactive( indices, Iw, 0, IL, -1 );
+               #pragma omp for schedule(static)
+               for ( int ik = 0; ik < nocc_w; ik++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_w; w++ ){
+                     double f_kw = fock->get( Iw, ik, nocc_w + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FFG_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int ab = 0; ab < size_ab; ab++ ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_L * ab;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * ( shift_G + ik + nocc_w * ab );
+                     matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 2.0, 'N' );
+                     matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 2.0, 'T' );
+                  }
+               }
+            }
+         }
+      }
+
+      // FEH singlet: < SE_xkdl E_wc SH_aibj > = 2 delta_ik delta_jl ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FEH[ Ix ][ w ][ x ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ic == Iik x Ijl x Id
+         int SIZE = size_E[ IL ];
+         const int nocc_w = indices->getNOCC( IL );
+         const int nact_w = indices->getNDMRG( IL );
+         const int n_oa_w = nocc_w + nact_w;
+         const int nvir_w = indices->getNVIRT( IL );
+         #pragma omp for schedule(static)
+         for ( int c = 0; c < nvir_w; c++ ){
+
+            // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
+
+            for ( int Id = 0; Id < num_irreps; Id++ ){
+
+               const int Icenter = Irreps::directProd( IL, Id );
+               const int nvir_d = indices->getNVIRT( Id );
+
+               if ( IL < Id ){ // Ic < Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, +1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 2 * value;
+                           }
                         }
                      }
-                  } else { // irrep_c != irrep_d
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                  }
+               }
+
+               if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, +1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, +1 );
+                     const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) + 1 ) ) / 2;
+                     for ( int d = 0; d < c; d++ ){
+                        const int count_cd = d + ( c * ( c + 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           const double prefactor = 2 * vector[ jump_H + ij + size_ij * count_cd ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int d = c; d < nvir_d; d++ ){
+                        const int count_cd = c + ( d * ( d + 1 ) ) / 2;
+                        const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           const double prefactor = factor * vector[ jump_H + ij + size_ij * count_cd ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int d = 0; d < c; d++ ){
+                        const int count_cd = d + ( c * ( c + 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + ij + size_ij * count_cd ] += 2 * value;
+                        }
+                     }
+                     for ( int d = c; d < nvir_d; d++ ){
+                        const int count_cd = c + ( d * ( d + 1 ) ) / 2;
+                        const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + ij + size_ij * count_cd ] += factor * value;
+                        }
+                     }
+                  }
+               }
+
+               if ( IL > Id ){ // Ic > Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, +1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] += 2 * value; // ( d + nvir_d * c ) because Id < Ic
+                           }
                         }
                      }
                   }
@@ -2284,62 +1771,127 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
             }
          }
       }
-   }
-   
-   // FDG triplet: < D(djxy) E_wc TG_aibt > = 3 delta_ij ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_triplet[ Ij x Id ][ It ][ w ][ xy, t ]
-   for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Id x Ij
-      const int SIZE_L = size_D[ IL ];
-      for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ib x Ii
-         const int SIZE_R = size_E[ IR ];
-         const int Iwc = Irreps::directProd( IL, IR ); // Iwc == Ic == Iw
-         const int nocc_wc = indices->getNOCC( Iwc );
-         const int nact_wc = indices->getNDMRG( Iwc );
-         const int n_oa_wc = nocc_wc + nact_wc;
-         const int nvir_wc = indices->getNVIRT( Iwc );
-         int total_size = SIZE_L * SIZE_R;
-         if ( total_size * nvir_wc * nact_wc > 0 ){
-            for ( int c = 0; c < nvir_wc; c++ ){
-               for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
-               for ( int w = 0; w < nact_wc; w++ ){
-                  double f_wc = fock->get( Iwc, nocc_wc + w, n_oa_wc + c );
-                  int inc1 = 1;
-                  daxpy_( &total_size, &f_wc, FDG_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+
+      // FEH triplet: < TE_xkdl E_wc TH_aibj > = 6 delta_ik delta_jl ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FEH[ Ix ][ w ][ x ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ic == Iik x Ijl x Id
+         int SIZE = size_E[ IL ];
+         const int nocc_w = indices->getNOCC( IL );
+         const int nact_w = indices->getNDMRG( IL );
+         const int n_oa_w = nocc_w + nact_w;
+         const int nvir_w = indices->getNVIRT( IL );
+         #pragma omp for schedule(static)
+         for ( int c = 0; c < nvir_w; c++ ){
+
+            // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
+
+            for ( int Id = 0; Id < num_irreps; Id++ ){
+
+               const int Icenter = Irreps::directProd( IL, Id );
+               const int nvir_d = indices->getNVIRT( Id );
+
+               if ( IL < Id ){ // Ic < Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, -1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 6 * value;
+                           }
+                        }
+                     }
+                  }
                }
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int nocc_ij = indices->getNOCC( Iij );
-                  const int Id = Irreps::directProd( Iij, IL );
-                  const int nvir_d = indices->getNVIRT( Id );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
-                                                                                                                  : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
-                  if ( Iwc == Id ){ // irrep_c == irrep_d
+
+               if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, -1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, -1 );
+                     const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) - 1 ) ) / 2;
                      for ( int d = 0; d < c; d++ ){
-                        const int cnt_cd = d + ( c * ( c - 1 ) ) / 2;
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
+                        const int count_cd = d + ( c * ( c - 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
+                           }
                         }
                      }
                      for ( int d = c+1; d < nvir_d; d++ ){
-                        const int cnt_cd = c + ( d * ( d - 1 ) ) / 2;
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
+                        const int count_cd = c + ( d * ( d - 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
+                           }
                         }
                      }
-                  } else { // irrep_c != irrep_d
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
-                        const double factor = (( Iwc < Id ) ? 3.0 : -3.0 );
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     for ( int d = 0; d < c; d++ ){
+                        const int count_cd = d + ( c * ( c - 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + ij + size_ij * count_cd ] -= 6 * value;
+                        }
+                     }
+                     for ( int d = c+1; d < nvir_d; d++ ){
+                        const int count_cd = c + ( d * ( d - 1 ) ) / 2;
+                        for ( int ij = 0; ij < size_ij; ij++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + ij + size_ij * count_cd ] += 6 * value;
+                        }
+                     }
+                  }
+               }
+
+               if ( IL > Id ){ // Ic > Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, -1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           for ( int ij = 0; ij < size_ij; ij++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] -= 6 * value; // ( d + nvir_d * c ) because Id < Ic
+                           }
                         }
                      }
                   }
@@ -2347,9 +1899,512 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
             }
          }
       }
-   }
 
-   delete [] workspace;
+      // FGH singlet: < SG_cldx E_kw SH_aibj > = 2 delta_ac delta_bd ( delta_il delta_jk + delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ik == Iac x Ibd x Il
+         int SIZE = size_G[ IL ];
+         const int nocc_w = indices->getNOCC( IL );
+         const int nact_w = indices->getNDMRG( IL );
+         #pragma omp for schedule(static)
+         for ( int k = 0; k < nocc_w; k++ ){
+
+            // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_kw = fock->get( IL, k, nocc_w + w );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
+
+            for ( int Il = 0; Il < num_irreps; Il++ ){
+
+               const int Icenter = Irreps::directProd( IL, Il );
+               const int nocc_l = indices->getNOCC( Il );
+
+               if ( IL < Il ){ // Ik < Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, +1 );
+                        const int size_ij = nocc_w * nocc_l;
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              const double prefactor = 2 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + k + nocc_w * l + size_ij * ab ] += 2 * value;
+                           }
+                        }
+                     }
+                  }
+               }
+
+               if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, +1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, +1 );
+                     const int size_ij = ( nocc_w * ( nocc_w + 1 ) ) / 2;
+                     const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) + 1 ) ) / 2;
+                     for ( int l = 0; l < k; l++ ){
+                        const int count_kl = l + ( k * ( k + 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           const double prefactor = 2 * vector[ jump_H + count_kl + size_ij * ab ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int l = k; l < nocc_l; l++ ){
+                        const int count_kl = k + ( l * ( l + 1 ) ) / 2;
+                        const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           const double prefactor = factor * vector[ jump_H + count_kl + size_ij * ab ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int l = 0; l < k; l++ ){
+                        const int count_kl = l + ( k * ( k + 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + count_kl + size_ij * ab ] += 2 * value;
+                        }
+                     }
+                     for ( int l = k; l < nocc_l; l++ ){
+                        const int count_kl = k + ( l * ( l + 1 ) ) / 2;
+                        const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + count_kl + size_ij * ab ] += factor * value;
+                        }
+                     }
+                  }
+               }
+
+               if ( IL > Il ){ // Ik > Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, +1 );
+                        const int size_ij = nocc_w * nocc_l;
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              const double prefactor = 2 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + l + nocc_l * k + size_ij * ab ] += 2 * value; // ( l + nocc_l * k ) because Il < Ik
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FGH triplet: < TG_cldx E_kw TH_aibj > = 6 delta_ac delta_bd ( delta_il delta_jk - delta_ik delta_jl ) / sqrt( 1 + delta_ij ) FGH[ Ix ][ w ][ x ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ixw == Ik == Iac x Ibd x Il
+         int SIZE = size_G[ IL ];
+         const int nocc_w = indices->getNOCC( IL );
+         const int nact_w = indices->getNDMRG( IL );
+         #pragma omp for schedule(static)
+         for ( int k = 0; k < nocc_w; k++ ){
+
+            // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_kw = fock->get( IL, k, nocc_w + w );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
+
+            for ( int Il = 0; Il < num_irreps; Il++ ){
+
+               const int Icenter = Irreps::directProd( IL, Il );
+               const int nocc_l = indices->getNOCC( Il );
+
+               if ( IL < Il ){ // Ik < Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, -1 );
+                        const int size_ij = nocc_w * nocc_l;
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              const double prefactor = 6 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + k + nocc_w * l + size_ij * ab ] -= 6 * value;
+                           }
+                        }
+                     }
+                  }
+               }
+
+               if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, -1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, -1 );
+                     const int size_ij = ( nocc_w * ( nocc_w - 1 ) ) / 2;
+                     const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) - 1 ) ) / 2;
+                     for ( int l = 0; l < k; l++ ){
+                        const int count_kl = l + ( k * ( k - 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int l = k+1; l < nocc_l; l++ ){
+                        const int count_kl = k + ( l * ( l - 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
+                           for ( int x = 0; x < nact_w; x++ ){
+                              result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
+                           }
+                        }
+                     }
+                     for ( int l = 0; l < k; l++ ){
+                        const int count_kl = l + ( k * ( k - 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + count_kl + size_ij * ab ] += 6 * value;
+                        }
+                     }
+                     for ( int l = k+1; l < nocc_l; l++ ){
+                        const int count_kl = k + ( l * ( l - 1 ) ) / 2;
+                        for ( int ab = 0; ab < size_ab; ab++ ){
+                           double value = 0.0;
+                           for ( int x = 0; x < nact_w; x++ ){
+                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                           }
+                           result_private[ jump_H + count_kl + size_ij * ab ] -= 6 * value;
+                        }
+                     }
+                  }
+               }
+
+               if ( IL > Il ){ // Ik > Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, -1 );
+                        const int size_ij = nocc_w * nocc_l;
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              const double prefactor = 6 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 result_private[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
+                              }
+                           }
+                        }
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           for ( int ab = 0; ab < size_ab; ab++ ){
+                              double value = 0.0;
+                              for ( int x = 0; x < nact_w; x++ ){
+                                 value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
+                              }
+                              result_private[ jump_H + l + nocc_l * k + size_ij * ab ] += 6 * value; // ( l + nocc_l * k ) because Il < Ik
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FDE singlet: < D(blxy) E_kw SE_tiaj > = 1 delta_ab ( delta_ik delta_jl + delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_singlet[ Ib x Il ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Ib x Il
+         const int SIZE_L = size_D[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ii x Ij
+            const int SIZE_R = size_E[ IR ];
+            const int Ikw = Irreps::directProd( IL, IR ); // Ikw == Ik == Iw
+            const int nocc_kw = indices->getNOCC( Ikw );
+            const int nact_kw = indices->getNDMRG( Ikw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nocc_kw * nact_kw > 0 ){
+               #pragma omp for schedule(static)
+               for ( int k = 0; k < nocc_kw; k++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_kw; w++ ){
+                     double f_kw = fock->get( Ikw, k, nocc_kw + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FDE_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int nvir_ab = indices->getNVIRT( Iab );
+                     const int Il = Irreps::directProd( Iab, IL );
+                     const int nocc_l = indices->getNOCC( Il );
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+                     const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
+                                                                                                                     : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
+                     if ( Ikw == Il ){ // irrep_k == irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const int cnt_kl = (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                           const double factor = (( k == l ) ? SQRT2 : 1.0 );
+                           for ( int ab = 0; ab < nvir_ab; ab++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
+                              const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                           }
+                        }
+                     } else { // irrep_k != irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
+                           for ( int ab = 0; ab < nvir_ab; ab++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
+                              const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FDE triplet: < D(blxy) E_kw TE_tiaj > = 3 delta_ab ( delta_ik delta_jl - delta_il delta_jk ) / sqrt( 1 + delta_ij ) FDE_triplet[ Ib x Il ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Ib x Il
+         const int SIZE_L = size_D[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ii x Ij
+            const int SIZE_R = size_E[ IR ];
+            const int Ikw = Irreps::directProd( IL, IR ); // Ikw == Ik == Iw
+            const int nocc_kw = indices->getNOCC( Ikw );
+            const int nact_kw = indices->getNDMRG( Ikw );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nocc_kw * nact_kw > 0 ){
+               #pragma omp for schedule(static)
+               for ( int k = 0; k < nocc_kw; k++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_kw; w++ ){
+                     double f_kw = fock->get( Ikw, k, nocc_kw + w );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_kw, FDE_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int nvir_ab = indices->getNVIRT( Iab );
+                     const int Il = Irreps::directProd( Iab, IL );
+                     const int nocc_l = indices->getNOCC( Il );
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+                     const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
+                                                                                                                     : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
+                     if ( Ikw == Il ){ // irrep_k == irrep_l
+                        for ( int l = 0; l < k; l++ ){
+                           const int cnt_kl = l + ( k * ( k - 1 ) ) / 2;
+                           for ( int ab = 0; ab < nvir_ab; ab++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
+                              const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
+                           }
+                        }
+                        for ( int l = k+1; l < nocc_l; l++ ){
+                           const int cnt_kl = k + ( l * ( l - 1 ) ) / 2;
+                           for ( int ab = 0; ab < nvir_ab; ab++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
+                              const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
+                           }
+                        }
+                     } else { // irrep_k != irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
+                           const double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
+                           for ( int ab = 0; ab < nvir_ab; ab++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
+                              const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FDG singlet: < D(djxy) E_wc SG_aibt > = 1 delta_ij ( delta_ac delta_bd + delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_singlet[ Ij x Id ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Id x Ij
+         const int SIZE_L = size_D[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ib x Ii
+            const int SIZE_R = size_E[ IR ];
+            const int Iwc = Irreps::directProd( IL, IR ); // Iwc == Ic == Iw
+            const int nocc_wc = indices->getNOCC( Iwc );
+            const int nact_wc = indices->getNDMRG( Iwc );
+            const int n_oa_wc = nocc_wc + nact_wc;
+            const int nvir_wc = indices->getNVIRT( Iwc );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nvir_wc * nact_wc > 0 ){
+               #pragma omp for schedule(static)
+               for ( int c = 0; c < nvir_wc; c++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_wc; w++ ){
+                     double f_wc = fock->get( Iwc, nocc_wc + w, n_oa_wc + c );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FDG_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int nocc_ij = indices->getNOCC( Iij );
+                     const int Id = Irreps::directProd( Iij, IL );
+                     const int nvir_d = indices->getNVIRT( Id );
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+                     const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
+                                                                                                                     : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
+                     if ( Iwc == Id ){ // irrep_c == irrep_d
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int cnt_cd = (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
+                           const double factor = (( c == d ) ? SQRT2 : 1.0 );
+                           for ( int ij = 0; ij < nocc_ij; ij++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
+                              const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                           }
+                        }
+                     } else { // irrep_c != irrep_d
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
+                           for ( int ij = 0; ij < nocc_ij; ij++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
+                              const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      // FDG triplet: < D(djxy) E_wc TG_aibt > = 3 delta_ij ( delta_ac delta_bd - delta_ad delta_bc ) / sqrt( 1 + delta_ab ) FDG_triplet[ Ij x Id ][ It ][ w ][ xy, t ]
+      for ( int IL = 0; IL < num_irreps; IL++ ){ // IL == Ix x Iy == Id x Ij
+         const int SIZE_L = size_D[ IL ];
+         for ( int IR = 0; IR < num_irreps; IR++ ){ // IR = It = Ia x Ib x Ii
+            const int SIZE_R = size_E[ IR ];
+            const int Iwc = Irreps::directProd( IL, IR ); // Iwc == Ic == Iw
+            const int nocc_wc = indices->getNOCC( Iwc );
+            const int nact_wc = indices->getNDMRG( Iwc );
+            const int n_oa_wc = nocc_wc + nact_wc;
+            const int nvir_wc = indices->getNVIRT( Iwc );
+            int total_size = SIZE_L * SIZE_R;
+            if ( total_size * nvir_wc * nact_wc > 0 ){
+               #pragma omp for schedule(static)
+               for ( int c = 0; c < nvir_wc; c++ ){
+                  for ( int cnt = 0; cnt < total_size; cnt++ ){ workspace[ cnt ] = 0.0; }
+                  for ( int w = 0; w < nact_wc; w++ ){
+                     double f_wc = fock->get( Iwc, nocc_wc + w, n_oa_wc + c );
+                     int inc1 = 1;
+                     daxpy_( &total_size, &f_wc, FDG_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
+                  }
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int nocc_ij = indices->getNOCC( Iij );
+                     const int Id = Irreps::directProd( Iij, IL );
+                     const int nvir_d = indices->getNVIRT( Id );
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+                     const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
+                                                                                                                     : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
+                     if ( Iwc == Id ){ // irrep_c == irrep_d
+                        for ( int d = 0; d < c; d++ ){
+                           const int cnt_cd = d + ( c * ( c - 1 ) ) / 2;
+                           for ( int ij = 0; ij < nocc_ij; ij++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
+                              const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
+                           }
+                        }
+                        for ( int d = c+1; d < nvir_d; d++ ){
+                           const int cnt_cd = c + ( d * ( d - 1 ) ) / 2;
+                           for ( int ij = 0; ij < nocc_ij; ij++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
+                              const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
+                           }
+                        }
+                     } else { // irrep_c != irrep_d
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
+                           const double factor = (( Iwc < Id ) ? 3.0 : -3.0 );
+                           for ( int ij = 0; ij < nocc_ij; ij++ ){
+                              const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
+                              const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
+                              matvec_helper_offdiag( vector + ptr_R, result_private + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
+                              matvec_helper_offdiag( vector + ptr_L, result_private + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      delete [] workspace;
+
+      #pragma omp critical
+      {
+         #pragma omp simd
+         for ( int elem = 0; elem < vectorlength; elem++ ){ result[ elem ] += result_private[ elem ]; }
+      }
+
+      delete [] result_private;
+
+   }
 
 }
 
@@ -2552,577 +2607,586 @@ int CheMPS2::CASPT2::shift_D_nonactive( const DMRGSCFindices * idx, const int ir
 
 void CheMPS2::CASPT2::diagonal( double * result ) const{
 
-   // FAA: < E_zy E_jx | F | E_ti E_uv > = delta_ij * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_A[ irrep ];
-      if ( SIZE > 0 ){
-         const int NOCC = indices->getNOCC( irrep );
-         for ( int count = 0; count < NOCC; count++ ){
-            const double beta = - f_dot_1dm - fock->get( irrep, count, count );
-            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
-            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FAA[ irrep ][ elem ] + beta; }
+   #pragma omp parallel
+   {
+
+      // FAA: < E_zy E_jx | F | E_ti E_uv > = delta_ij * ( FAA[ Ii ][ xyztuv ] + ( 2 sum_k f_kk - f_ii ) SAA[ Ii ][ xyztuv ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_A[ irrep ];
+         if ( SIZE > 0 ){
+            const int NOCC = indices->getNOCC( irrep );
+            #pragma omp for schedule(static)
+            for ( int count = 0; count < NOCC; count++ ){
+               const double beta = - f_dot_1dm - fock->get( irrep, count, count );
+               double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_A ] + SIZE * count;
+               #pragma omp simd
+               for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FAA[ irrep ][ elem ] + beta; }
+            }
          }
       }
-   }
 
-   // FCC: < E_zy E_xb | F | E_at E_uv > = delta_ab * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_C[ irrep ];
-      if ( SIZE > 0 ){
-         const int NVIR = indices->getNVIRT( irrep );
-         const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
-         for ( int count = 0; count < NVIR; count++ ){
-            const double beta = - f_dot_1dm + fock->get( irrep, N_OA + count, N_OA + count );
-            double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
-            for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FCC[ irrep ][ elem ] + beta; }
+      // FCC: < E_zy E_xb | F | E_at E_uv > = delta_ab * ( FCC[ Ia ][ xyztuv ] + ( 2 sum_k f_kk + f_aa ) SCC[ Ia ][ xyztuv ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_C[ irrep ];
+         if ( SIZE > 0 ){
+            const int NVIR = indices->getNVIRT( irrep );
+            const int N_OA = indices->getNOCC( irrep ) + indices->getNDMRG( irrep );
+            #pragma omp for schedule(static)
+            for ( int count = 0; count < NVIR; count++ ){
+               const double beta = - f_dot_1dm + fock->get( irrep, N_OA + count, N_OA + count );
+               double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_C ] + SIZE * count;
+               #pragma omp simd
+               for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FCC[ irrep ][ elem ] + beta; }
+            }
          }
       }
-   }
 
-   // FDD: < E_yx E_jb | F | E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_D[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_a = Irreps::directProd( irrep_i, irrep );
-            assert( shift == shift_D_nonactive( indices, irrep_i, irrep_a ) );
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            for ( int i = 0; i < NOCC_i; i++ ){
-               const double f_ii = fock->get( irrep_i, i, i );
-               for ( int a = 0; a < NVIR_a; a++ ){
+      // FDD: < E_yx E_jb | F | E_ai E_tu > = delta_ab delta_ij ( FDD[ xytu] + ( 2 sum_k f_kk + f_aa - f_ii ) SDD[ xytu ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_D[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_a = Irreps::directProd( irrep_i, irrep );
+               const int NOCC_i  = indices->getNOCC( irrep_i );
+               const int N_OA_a  = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+               const int SIZE_ia = NOCC_i * indices->getNVIRT( irrep_a );
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < SIZE_ia; combined++ ){
+                  const int i = combined % NOCC_i;
+                  const int a = combined / NOCC_i;
+                  const double f_ii = fock->get( irrep_i, i, i );
                   const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
                   const double beta = - f_dot_1dm + f_aa - f_ii;
-                  const int count = shift + i + NOCC_i * a;
-                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * count;
+                  double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_D ] + SIZE * ( shift + combined );
+                  #pragma omp simd
                   for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = FDD[ irrep ][ elem ] + beta; }
                }
+               shift += SIZE_ia;
             }
-            shift += NOCC_i * NVIR_a;
          }
       }
-   }
 
-   // FBB singlet: < SB_xkyl | F | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
-   {
-      const int SIZE = size_B_singlet[ 0 ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-            assert( shift == shift_B_nonactive( indices, irrep_ij, irrep_ij, +1 ) );
-            const int nocc_ij = indices->getNOCC( irrep_ij );
-            for ( int i = 0; i < nocc_ij; i++ ){
-               const double f_ii = fock->get( irrep_ij, i, i );
-               for ( int j = i; j < nocc_ij; j++ ){
+      int triangle_idx[] = { 0, 0 };
+
+      // FBB singlet: < SB_xkyl | F | SB_tiuj > = 2 delta_ik delta_jl ( FBB_singlet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_singlet[ Iij ][ xytu ] )
+      {
+         const int SIZE = size_B_singlet[ 0 ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+               const int nocc_ij = indices->getNOCC( irrep_ij );
+               const int size_ij = ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < size_ij; combined++ ){
+                  Special::invert_triangle_two( combined, triangle_idx );
+                  const int i = triangle_idx[ 0 ];
+                  const int j = triangle_idx[ 1 ];
+                  const double f_ii = fock->get( irrep_ij, i, i );
                   const double f_jj = fock->get( irrep_ij, j, j );
                   const double beta = - f_dot_1dm - f_ii - f_jj;
-                  const int count = shift + i + ( j * ( j + 1 ) ) / 2;
-                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * ( shift + combined );
+                  #pragma omp simd
                   for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_singlet[ 0 ][ elem ] + beta ); }
                }
+               shift += size_ij;
             }
-            shift += ( nocc_ij * ( nocc_ij + 1 ) ) / 2;
          }
       }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_B_singlet[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_j = Irreps::directProd( irrep, irrep_i );
-            if ( irrep_i < irrep_j ){
-               assert( shift == shift_B_nonactive( indices, irrep_i, irrep_j, +1 ) );
-               const int nocc_i = indices->getNOCC( irrep_i );
-               const int nocc_j = indices->getNOCC( irrep_j );
-               for ( int i = 0; i < nocc_i; i++ ){
-                  const double f_ii = fock->get( irrep_i, i, i );
-                  for ( int j = 0; j < nocc_j; j++ ){
+      for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_B_singlet[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep, irrep_i );
+               if ( irrep_i < irrep_j ){
+                  const int nocc_i  = indices->getNOCC( irrep_i );
+                  const int size_ij = nocc_i * indices->getNOCC( irrep_j );
+                  #pragma omp for schedule(static)
+                  for ( int combined = 0; combined < size_ij; combined++ ){
+                     const int i = combined % nocc_i;
+                     const int j = combined / nocc_i;
+                     const double f_ii = fock->get( irrep_i, i, i );
                      const double f_jj = fock->get( irrep_j, j, j );
                      const double beta = - f_dot_1dm - f_ii - f_jj;
-                     const int count = shift + i + nocc_i * j;
-                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * count;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE * ( shift + combined );
+                     #pragma omp simd
                      for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_singlet[ irrep ][ elem ] + beta ); }
                   }
+                  shift += size_ij;
                }
-               shift += nocc_i * nocc_j;
             }
          }
       }
-   }
 
-   // FBB triplet: < TB_xkyl | F | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
-   {
-      const int SIZE = size_B_triplet[ 0 ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-            assert( shift == shift_B_nonactive( indices, irrep_ij, irrep_ij, -1 ) );
-            const int nocc_ij = indices->getNOCC( irrep_ij );
-            for ( int i = 0; i < nocc_ij; i++ ){
-               const double f_ii = fock->get( irrep_ij, i, i );
-               for ( int j = i+1; j < nocc_ij; j++ ){
+      // FBB triplet: < TB_xkyl | F | TB_tiuj > = 2 delta_ik delta_jl ( FBB_triplet[ Iij ][ xytu ] + ( 2 sum_n f_nn - f_ii - f_jj ) * SBB_triplet[ Iij ][ xytu ] )
+      {
+         const int SIZE = size_B_triplet[ 0 ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+               const int nocc_ij = indices->getNOCC( irrep_ij );
+               const int size_ij = ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < size_ij; combined++ ){
+                  Special::invert_lower_triangle_two( combined, triangle_idx );
+                  const int i = triangle_idx[ 0 ];
+                  const int j = triangle_idx[ 1 ];
+                  const double f_ii = fock->get( irrep_ij, i, i );
                   const double f_jj = fock->get( irrep_ij, j, j );
                   const double beta = - f_dot_1dm - f_ii - f_jj;
-                  const int count = shift + i + ( j * ( j - 1 ) ) / 2;
-                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * ( shift + combined );
+                  #pragma omp simd
                   for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ 0 ][ elem ] + beta ); }
                }
+               shift += size_ij;
             }
-            shift += ( nocc_ij * ( nocc_ij - 1 ) ) / 2;
          }
       }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_B_triplet[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int irrep_j = Irreps::directProd( irrep, irrep_i );
-            if ( irrep_i < irrep_j ){
-               assert( shift == shift_B_nonactive( indices, irrep_i, irrep_j, -1 ) );
-               const int nocc_i = indices->getNOCC( irrep_i );
-               const int nocc_j = indices->getNOCC( irrep_j );
-               for ( int i = 0; i < nocc_i; i++ ){
-                  const double f_ii = fock->get( irrep_i, i, i );
-                  for ( int j = 0; j < nocc_j; j++ ){
+      for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_B_triplet[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int irrep_j = Irreps::directProd( irrep, irrep_i );
+               if ( irrep_i < irrep_j ){
+                  const int nocc_i  = indices->getNOCC( irrep_i );
+                  const int size_ij = nocc_i * indices->getNOCC( irrep_j );
+                  #pragma omp for schedule(static)
+                  for ( int combined = 0; combined < size_ij; combined++ ){
+                     const int i = combined % nocc_i;
+                     const int j = combined / nocc_i;
+                     const double f_ii = fock->get( irrep_i, i, i );
                      const double f_jj = fock->get( irrep_j, j, j );
                      const double beta = - f_dot_1dm - f_ii - f_jj;
-                     const int count = shift + i + nocc_i * j;
-                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * count;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE * ( shift + combined );
+                     #pragma omp simd
                      for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FBB_triplet[ irrep ][ elem ] + beta ); }
                   }
+                  shift += size_ij;
                }
-               shift += nocc_i * nocc_j;
             }
          }
       }
-   }
 
-   // FFF singlet: < SF_cxdy | F | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
-   {
-      const int SIZE = size_F_singlet[ 0 ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            assert( shift == shift_F_nonactive( indices, irrep_ab, irrep_ab, +1 ) );
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a; b < NVIR_ab; b++ ){
+      // FFF singlet: < SF_cxdy | F | SF_atbu > = 2 delta_ac delta_bd ( FFF_singlet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_singlet[ Iab ][ xytu ] )
+      {
+         const int SIZE = size_F_singlet[ 0 ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int NVIR_ab = indices->getNVIRT( irrep_ab );
+               const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               const int SIZE_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < SIZE_ab; combined++ ){
+                  Special::invert_triangle_two( combined, triangle_idx );
+                  const int a = triangle_idx[ 0 ];
+                  const int b = triangle_idx[ 1 ];
+                  const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
                   const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
                   const double beta = - f_dot_1dm + f_aa + f_bb;
-                  const int count = shift + a + ( b * ( b + 1 ) ) / 2;
-                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * ( shift + combined );
+                  #pragma omp simd
                   for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ 0 ][ elem ] + beta ); }
                }
-            }
-            shift += ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_F_singlet[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int irrep_b = Irreps::directProd( irrep, irrep_a );
-            if ( irrep_a < irrep_b ){
-               assert( shift == shift_F_nonactive( indices, irrep_a, irrep_b, +1 ) );
-               const int NVIR_a = indices->getNVIRT( irrep_a );
-               const int NVIR_b = indices->getNVIRT( irrep_b );
-               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-               for ( int a = 0; a < NVIR_a; a++ ){
-                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                  for ( int b = 0; b < NVIR_b; b++ ){
-                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                     const double beta = - f_dot_1dm + f_aa + f_bb;
-                     const int count = shift + a + NVIR_a * b;
-                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ irrep ][ elem ] + beta ); }
-                  }
-               }
-               shift += NVIR_a * NVIR_b;
+               shift += SIZE_ab;
             }
          }
       }
-   }
-
-   // FFF triplet: < TF_cxdy | F | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
-   {
-      const int SIZE = size_F_triplet[ 0 ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            assert( shift == shift_F_nonactive( indices, irrep_ab, irrep_ab, -1 ) );
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a+1; b < NVIR_ab; b++ ){
-                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  const double beta = - f_dot_1dm + f_aa + f_bb;
-                  const int count = shift + a + ( b * ( b - 1 ) ) / 2;
-                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ 0 ][ elem ] + beta ); }
-               }
-            }
-            shift += ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_F_triplet[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int irrep_b = Irreps::directProd( irrep, irrep_a );
-            if ( irrep_a < irrep_b ){
-               assert( shift == shift_F_nonactive( indices, irrep_a, irrep_b, -1 ) );
-               const int NVIR_a = indices->getNVIRT( irrep_a );
-               const int NVIR_b = indices->getNVIRT( irrep_b );
-               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-               const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-               for ( int a = 0; a < NVIR_a; a++ ){
-                  const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                  for ( int b = 0; b < NVIR_b; b++ ){
-                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                     const double beta = - f_dot_1dm + f_aa + f_bb;
-                     const int count = shift + a + NVIR_a * b;
-                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * count;
-                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ irrep ][ elem ] + beta ); }
-                  }
-               }
-               shift += NVIR_a * NVIR_b;
-            }
-         }
-      }
-   }
-
-   // FEE singlet: < SE_ukbl | F | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_E[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
-            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
-               if ( irrep_i == irrep_j ){
-                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, +1 ) );
-                  const int NOCC_ij = indices->getNOCC( irrep_i );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = i; j < NOCC_ij; j++ ){
-                        const int count = i + ( j * ( j + 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
-               }
-               if ( irrep_i < irrep_j ){
-                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, +1 ) );
-                  const int NOCC_i = indices->getNOCC( irrep_i );
-                  const int NOCC_j = indices->getNOCC( irrep_j );
-                  for ( int i = 0; i < NOCC_i; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = 0; j < NOCC_j; j++ ){
-                        const int count = i + NOCC_i * j;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += NVIR_a * NOCC_i * NOCC_j;
-               }
-            }
-         }
-      }
-   }
-
-   // FEE triplet: < TE_ukbl | F | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_E[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-            const int NVIR_a = indices->getNVIRT( irrep_a );
-            const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-            const int irrep_occ = Irreps::directProd( irrep_a, irrep );
-            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-               const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
-               if ( irrep_i == irrep_j ){
-                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, -1 ) );
-                  const int NOCC_ij = indices->getNOCC( irrep_i );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = i+1; j < NOCC_ij; j++ ){
-                        const int count = i + ( j * ( j - 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += ( NVIR_a * NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
-               }
-               if ( irrep_i < irrep_j ){
-                  assert( shift == shift_E_nonactive( indices, irrep_a, irrep_i, irrep_j, -1 ) );
-                  const int NOCC_i = indices->getNOCC( irrep_i );
-                  const int NOCC_j = indices->getNOCC( irrep_j );
-                  for ( int i = 0; i < NOCC_i; i++ ){
-                     const double f_ii = fock->get( irrep_i, i, i );
-                     for ( int j = 0; j < NOCC_j; j++ ){
-                        const int count = i + NOCC_i * j;
-                        const double f_jj = fock->get( irrep_j, j, j );
-                        for ( int a = 0; a < NVIR_a; a++ ){
-                           const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                           const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + a + NVIR_a * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += NVIR_a * NOCC_i * NOCC_j;
-               }
-            }
-         }
-      }
-   }
-   
-   // FGG singlet: < SG_cjdu | F | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_G[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
-               if ( irrep_a == irrep_b ){
-                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, +1 ) );
-                  const int NVIR_ab = indices->getNVIRT( irrep_a );
-                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  for ( int a = 0; a < NVIR_ab; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
-                     for ( int b = a; b < NVIR_ab; b++ ){
-                        const int count = a + ( b * ( b + 1 ) ) / 2;
-                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-               }
-               if ( irrep_a < irrep_b ){
-                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, +1 ) );
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int count = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += NOCC_i * NVIR_a * NVIR_b;
-               }
-            }
-         }
-      }
-   }
-   
-   // FGG triplet: < TG_cjdu | F | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
-   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
-      const int SIZE = size_G[ irrep ];
-      if ( SIZE > 0 ){
-         int shift = 0;
-         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int irrep_vir = Irreps::directProd( irrep_i, irrep );
-            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
-               const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
-               if ( irrep_a == irrep_b ){
-                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, -1 ) );
-                  const int NVIR_ab = indices->getNVIRT( irrep_a );
-                  const int N_OA_ab = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  for ( int a = 0; a < NVIR_ab; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_ab + a, N_OA_ab + a );
-                     for ( int b = a+1; b < NVIR_ab; b++ ){
-                        const int count = a + ( b * ( b - 1 ) ) / 2;
-                        const double f_bb = fock->get( irrep_b, N_OA_ab + b, N_OA_ab + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += ( NOCC_i * NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-               }
-               if ( irrep_a < irrep_b ){
-                  assert( shift == shift_G_nonactive( indices, irrep_i, irrep_a, irrep_b, -1 ) );
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  for ( int a = 0; a < NVIR_a; a++ ){
-                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int count = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
-                           double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + i + NOCC_i * count );
-                           for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
-                        }
-                     }
-                  }
-                  shift += NOCC_i * NVIR_a * NVIR_b;
-               }
-            }
-         }
-      }
-   }
-
-   // FHH singlet and triplet
-   {
-      int shift = 0;
-      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-         const int NOCC_ij = indices->getNOCC( irrep_ij );
-         const int size_ij = ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            assert( shift == shift_H_nonactive( indices, irrep_ij, irrep_ij, irrep_ab, irrep_ab, +1 ) );
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            const int size_ab = ( NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a; b < NVIR_ab; b++ ){
-                  const int cnt_ab = a + ( b * ( b + 1 ) ) / 2;
-                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_ij, i, i );
-                     for ( int j = i; j < NOCC_ij; j++ ){
-                        const int cnt_ij = i + ( j * ( j + 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_ij, j, j );
-                        const double term = f_aa + f_bb - f_ii - f_jj;
-                        target[ cnt_ij + size_ij * cnt_ab ] = 4 * term;
-                     }
-                  }
-               }
-            }
-            shift += size_ij * size_ab;
-         }
-      }
-   }
-   {
-      int shift = 0;
-      for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
-         const int NOCC_ij = indices->getNOCC( irrep_ij );
-         const int size_ij = ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
-         for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
-            assert( shift == shift_H_nonactive( indices, irrep_ij, irrep_ij, irrep_ab, irrep_ab, -1 ) );
-            const int NVIR_ab = indices->getNVIRT( irrep_ab );
-            const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
-            const int size_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
-            double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-            for ( int a = 0; a < NVIR_ab; a++ ){
-               const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
-               for ( int b = a+1; b < NVIR_ab; b++ ){
-                  const int cnt_ab = a + ( b * ( b - 1 ) ) / 2;
-                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
-                  for ( int i = 0; i < NOCC_ij; i++ ){
-                     const double f_ii = fock->get( irrep_ij, i, i );
-                     for ( int j = i+1; j < NOCC_ij; j++ ){
-                        const int cnt_ij = i + ( j * ( j - 1 ) ) / 2;
-                        const double f_jj = fock->get( irrep_ij, j, j );
-                        const double term = f_aa + f_bb - f_ii - f_jj;
-                        target[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
-                     }
-                  }
-               }
-            }
-            shift += size_ij * size_ab;
-         }
-      }
-   }
-   for ( int irrep = 1; irrep < num_irreps; irrep++ ){
-      int shift = 0;
-      for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
-         const int irrep_j = Irreps::directProd( irrep, irrep_i );
-         if ( irrep_i < irrep_j ){
-            const int NOCC_i = indices->getNOCC( irrep_i );
-            const int NOCC_j = indices->getNOCC( irrep_j );
-            const int size_ij = NOCC_i * NOCC_j;
+      for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_F_singlet[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
             for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
                const int irrep_b = Irreps::directProd( irrep, irrep_a );
                if ( irrep_a < irrep_b ){
-                  assert( shift == shift_H_nonactive( indices, irrep_i, irrep_j, irrep_a, irrep_b, 0 ) );
-                  const int NVIR_a = indices->getNVIRT( irrep_a );
-                  const int NVIR_b = indices->getNVIRT( irrep_b );
-                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
-                  const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
-                  const int size_ab = NVIR_a * NVIR_b;
-                  double * target_singlet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
-                  double * target_triplet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
-                  for ( int a = 0; a < NVIR_a; a++ ){
+                  const int NVIR_a  = indices->getNVIRT( irrep_a );
+                  const int SIZE_ab = NVIR_a * indices->getNVIRT( irrep_b );
+                  const int N_OA_a  = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b  = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  #pragma omp for schedule(static)
+                  for ( int combined = 0; combined < SIZE_ab; combined++ ){
+                     const int a = combined % NVIR_a;
+                     const int b = combined / NVIR_a;
                      const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
-                     for ( int b = 0; b < NVIR_b; b++ ){
-                        const int cnt_ab = a + NVIR_a * b;
-                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
-                        for ( int i = 0; i < NOCC_i; i++ ){
-                           const double f_ii = fock->get( irrep_i, i, i );
-                           for ( int j = 0; j < NOCC_j; j++ ){
-                              const int cnt_ij = i + NOCC_i * j;
-                              const double f_jj = fock->get( irrep_j, j, j );
-                              const double term = f_aa + f_bb - f_ii - f_jj;
-                              target_singlet[ cnt_ij + size_ij * cnt_ab ] =  4 * term;
-                              target_triplet[ cnt_ij + size_ij * cnt_ab ] = 12 * term;
-                           }
-                        }
-                     }
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = - f_dot_1dm + f_aa + f_bb;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE * ( shift + combined );
+                     #pragma omp simd
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_singlet[ irrep ][ elem ] + beta ); }
                   }
-                  shift += size_ij * size_ab;
+                  shift += SIZE_ab;
                }
             }
          }
       }
+
+      // FFF triplet: < TF_cxdy | F | TF_atbu > = 2 delta_ac delta_bd ( FFF_triplet[ Iab ][ xytu ] + ( 2 sum_n f_nn + f_aa + f_bb ) * SFF_triplet[ Iab ][ xytu ] )
+      {
+         const int SIZE = size_F_triplet[ 0 ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int NVIR_ab = indices->getNVIRT( irrep_ab );
+               const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               const int SIZE_ab = ( NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < SIZE_ab; combined++ ){
+                  Special::invert_lower_triangle_two( combined, triangle_idx );
+                  const int a = triangle_idx[ 0 ];
+                  const int b = triangle_idx[ 1 ];
+                  const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double beta = - f_dot_1dm + f_aa + f_bb;
+                  double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * ( shift + combined );
+                  #pragma omp simd
+                  for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ 0 ][ elem ] + beta ); }
+               }
+               shift += SIZE_ab;
+            }
+         }
+      }
+      for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_F_triplet[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int irrep_b = Irreps::directProd( irrep, irrep_a );
+               if ( irrep_a < irrep_b ){
+                  const int NVIR_a  = indices->getNVIRT( irrep_a );
+                  const int SIZE_ab = NVIR_a * indices->getNVIRT( irrep_b );
+                  const int N_OA_a  = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int N_OA_b  = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                  #pragma omp for schedule(static)
+                  for ( int combined = 0; combined < SIZE_ab; combined++ ){
+                     const int a = combined % NVIR_a;
+                     const int b = combined / NVIR_a;
+                     const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                     const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                     const double beta = - f_dot_1dm + f_aa + f_bb;
+                     double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE * ( shift + combined );
+                     #pragma omp simd
+                     for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FFF_triplet[ irrep ][ elem ] + beta ); }
+                  }
+                  shift += SIZE_ab;
+               }
+            }
+         }
+      }
+
+      // FEE singlet: < SE_ukbl | F | SE_tiaj > = 2 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_E[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int NVIR_a = indices->getNVIRT( irrep_a );
+               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+               const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+               for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+                  const int NOCC_i = indices->getNOCC( irrep_i );
+                  const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+                  if ( irrep_i == irrep_j ){
+                     const int SIZE_aij = ( NVIR_a * NOCC_i * ( NOCC_i + 1 ) ) / 2;
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_aij; combined++ ){
+                        const int a = combined % NVIR_a;
+                        Special::invert_triangle_two( combined / NVIR_a, triangle_idx );
+                        const int i = triangle_idx[ 0 ];
+                        const int j = triangle_idx[ 1 ];
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_aij;
+                  }
+                  if ( irrep_i < irrep_j ){
+                     const int SIZE_aij = NVIR_a * NOCC_i * indices->getNOCC( irrep_j );
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_aij; combined++ ){
+                        const int a = combined % NVIR_a;
+                        const int temp = combined / NVIR_a;
+                        const int i = temp % NOCC_i;
+                        const int j = temp / NOCC_i;
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FEE[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_aij;
+                  }
+               }
+            }
+         }
+      }
+
+      // FEE triplet: < TE_ukbl | F | TE_tiaj > = 6 delta_ab delta_ik delta_jl ( FEE[ It ][ ut ] + ( 2 sum_k f_kk + f_aa - f_ii - f_jj ) SEE[ It ][ ut ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_E[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+               const int NVIR_a = indices->getNVIRT( irrep_a );
+               const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+               const int irrep_occ = Irreps::directProd( irrep_a, irrep );
+               for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+                  const int NOCC_i = indices->getNOCC( irrep_i );
+                  const int irrep_j = Irreps::directProd( irrep_occ, irrep_i );
+                  if ( irrep_i == irrep_j ){
+                     const int SIZE_aij = ( NVIR_a * NOCC_i * ( NOCC_i - 1 ) ) / 2;
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_aij; combined++ ){
+                        const int a = combined % NVIR_a;
+                        Special::invert_lower_triangle_two( combined / NVIR_a, triangle_idx );
+                        const int i = triangle_idx[ 0 ];
+                        const int j = triangle_idx[ 1 ];
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_aij;
+                  }
+                  if ( irrep_i < irrep_j ){
+                     const int SIZE_aij = NVIR_a * NOCC_i * indices->getNOCC( irrep_j );
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_aij; combined++ ){
+                        const int a = combined % NVIR_a;
+                        const int temp = combined / NVIR_a;
+                        const int i = temp % NOCC_i;
+                        const int j = temp / NOCC_i;
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double beta = - f_dot_1dm + f_aa - f_ii - f_jj;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FEE[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_aij;
+                  }
+               }
+            }
+         }
+      }
+
+      // FGG singlet: < SG_cjdu | F | SG_aibt > = 2 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_G[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int NOCC_i = indices->getNOCC( irrep_i );
+               const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+               for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+                  if ( irrep_a == irrep_b ){
+                     const int SIZE_iab = ( NOCC_i * NVIR_a * ( NVIR_a + 1 ) ) / 2;
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_iab; combined++ ){
+                        const int i = combined % NOCC_i;
+                        Special::invert_triangle_two( combined / NOCC_i, triangle_idx );
+                        const int a = triangle_idx[ 0 ];
+                        const int b = triangle_idx[ 1 ];
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double f_bb = fock->get( irrep_b, N_OA_a + b, N_OA_a + b );
+                        const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_iab;
+                  }
+                  if ( irrep_a < irrep_b ){
+                     const int SIZE_iab = NOCC_i * NVIR_a * indices->getNVIRT( irrep_b );
+                     const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_iab; combined++ ){
+                        const int i = combined % NOCC_i;
+                        const int temp = combined / NOCC_i;
+                        const int a = temp % NVIR_a;
+                        const int b = temp / NVIR_a;
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 2 * ( FGG[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_iab;
+                  }
+               }
+            }
+         }
+      }
+
+      // FGG triplet: < TG_cjdu | F | TG_aibt > = 6 delta_ij delta_ac delta_bd ( FGG[ It ][ ut ] + ( 2 sum_k f_kk + f_aa + f_bb - f_ii ) SGG[ It ][ ut ] )
+      for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+         const int SIZE = size_G[ irrep ];
+         if ( SIZE > 0 ){
+            int shift = 0;
+            for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+               const int NOCC_i = indices->getNOCC( irrep_i );
+               const int irrep_vir = Irreps::directProd( irrep_i, irrep );
+               for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+                  const int NVIR_a = indices->getNVIRT( irrep_a );
+                  const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                  const int irrep_b = Irreps::directProd( irrep_vir, irrep_a );
+                  if ( irrep_a == irrep_b ){
+                     const int SIZE_iab = ( NOCC_i * NVIR_a * ( NVIR_a - 1 ) ) / 2;
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_iab; combined++ ){
+                        const int i = combined % NOCC_i;
+                        Special::invert_lower_triangle_two( combined / NOCC_i, triangle_idx );
+                        const int a = triangle_idx[ 0 ];
+                        const int b = triangle_idx[ 1 ];
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double f_bb = fock->get( irrep_b, N_OA_a + b, N_OA_a + b );
+                        const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_iab;
+                  }
+                  if ( irrep_a < irrep_b ){
+                     const int SIZE_iab = NOCC_i * NVIR_a * indices->getNVIRT( irrep_b );
+                     const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < SIZE_iab; combined++ ){
+                        const int i = combined % NOCC_i;
+                        const int temp = combined / NOCC_i;
+                        const int a = temp % NVIR_a;
+                        const int b = temp / NVIR_a;
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        const double beta = - f_dot_1dm + f_aa + f_bb - f_ii;
+                        double * target = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * ( shift + combined );
+                        #pragma omp simd
+                        for ( int elem = 0; elem < SIZE; elem++ ){ target[ elem ] = 6 * ( FGG[ irrep ][ elem ] + beta ); }
+                     }
+                     shift += SIZE_iab;
+                  }
+               }
+            }
+         }
+      }
+
+      // FHH singlet and triplet
+      {
+         int shift = 0;
+         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+            const int NOCC_ij = indices->getNOCC( irrep_ij );
+            const int size_ij = ( NOCC_ij * ( NOCC_ij + 1 ) ) / 2;
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int NVIR_ab = indices->getNVIRT( irrep_ab );
+               const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
+               const int size_ijab = ( size_ij * NVIR_ab * ( NVIR_ab + 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < size_ijab; combined++ ){
+                  Special::invert_triangle_two( combined % size_ij, triangle_idx );
+                  const int i = triangle_idx[ 0 ];
+                  const int j = triangle_idx[ 1 ];
+                  Special::invert_triangle_two( combined / size_ij, triangle_idx );
+                  const int a = triangle_idx[ 0 ];
+                  const int b = triangle_idx[ 1 ];
+                  const double f_ii = fock->get( irrep_ij, i, i );
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double term = f_aa + f_bb - f_ii - f_jj;
+                  target[ combined ] = 4 * term;
+               }
+               shift += size_ijab;
+            }
+         }
+      }
+      {
+         int shift = 0;
+         for ( int irrep_ij = 0; irrep_ij < num_irreps; irrep_ij++ ){
+            const int NOCC_ij = indices->getNOCC( irrep_ij );
+            const int size_ij = ( NOCC_ij * ( NOCC_ij - 1 ) ) / 2;
+            for ( int irrep_ab = 0; irrep_ab < num_irreps; irrep_ab++ ){
+               const int NVIR_ab = indices->getNVIRT( irrep_ab );
+               const int N_OA_ab = indices->getNOCC( irrep_ab ) + indices->getNDMRG( irrep_ab );
+               double * target = result + jump[ num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
+               const int size_ijab = ( size_ij * NVIR_ab * ( NVIR_ab - 1 ) ) / 2;
+               #pragma omp for schedule(static)
+               for ( int combined = 0; combined < size_ijab; combined++ ){
+                  Special::invert_lower_triangle_two( combined % size_ij, triangle_idx );
+                  const int i = triangle_idx[ 0 ];
+                  const int j = triangle_idx[ 1 ];
+                  Special::invert_lower_triangle_two( combined / size_ij, triangle_idx );
+                  const int a = triangle_idx[ 0 ];
+                  const int b = triangle_idx[ 1 ];
+                  const double f_ii = fock->get( irrep_ij, i, i );
+                  const double f_jj = fock->get( irrep_ij, j, j );
+                  const double f_aa = fock->get( irrep_ab, N_OA_ab + a, N_OA_ab + a );
+                  const double f_bb = fock->get( irrep_ab, N_OA_ab + b, N_OA_ab + b );
+                  const double term = f_aa + f_bb - f_ii - f_jj;
+                  target[ combined ] = 12 * term;
+               }
+               shift += size_ijab;
+            }
+         }
+      }
+      for ( int irrep = 1; irrep < num_irreps; irrep++ ){
+         int shift = 0;
+         for ( int irrep_i = 0; irrep_i < num_irreps; irrep_i++ ){
+            const int irrep_j = Irreps::directProd( irrep, irrep_i );
+            if ( irrep_i < irrep_j ){
+               const int NOCC_i = indices->getNOCC( irrep_i );
+               const int NOCC_j = indices->getNOCC( irrep_j );
+               for ( int irrep_a = 0; irrep_a < num_irreps; irrep_a++ ){
+                  const int irrep_b = Irreps::directProd( irrep, irrep_a );
+                  if ( irrep_a < irrep_b ){
+                     const int NVIR_a = indices->getNVIRT( irrep_a );
+                     const int N_OA_a = indices->getNOCC( irrep_a ) + indices->getNDMRG( irrep_a );
+                     const int N_OA_b = indices->getNOCC( irrep_b ) + indices->getNDMRG( irrep_b );
+                     double * target_singlet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift;
+                     double * target_triplet = result + jump[ irrep + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift;
+                     const int size_ijab = NOCC_i * NOCC_j * NVIR_a * indices->getNVIRT( irrep_b );
+                     #pragma omp for schedule(static)
+                     for ( int combined = 0; combined < size_ijab; combined++ ){
+                        const int i = combined % NOCC_i;
+                        const int temp1 = combined / NOCC_i;
+                        const int j = temp1 % NOCC_j;
+                        const int temp2 = temp1 / NOCC_j;
+                        const int a = temp2 % NVIR_a;
+                        const int b = temp2 / NVIR_a;
+                        const double f_ii = fock->get( irrep_i, i, i );
+                        const double f_jj = fock->get( irrep_j, j, j );
+                        const double f_aa = fock->get( irrep_a, N_OA_a + a, N_OA_a + a );
+                        const double f_bb = fock->get( irrep_b, N_OA_b + b, N_OA_b + b );
+                        const double term = f_aa + f_bb - f_ii - f_jj;
+                        target_singlet[ combined ] =  4 * term;
+                        target_triplet[ combined ] = 12 * term;
+                     }
+                     shift += size_ijab;
+                  }
+               }
+            }
+         }
+      }
+
    }
 
 }

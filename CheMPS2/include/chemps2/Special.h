@@ -47,6 +47,18 @@ namespace CheMPS2{
 
          }
 
+         //! LOWER triangle function for two variables
+         /** \param global The lower triangle counter global = i + ( j * ( j - 1 ) ) / 2 with i < j
+             \param result Integer array of size 2 where to store i < j */
+         static void invert_lower_triangle_two( const int global, int * result ){
+
+            int j = 1;
+            while (( j * ( j + 1 )) <= ( 2 * global )){ j++; }
+            result[ 1 ] = j;
+            result[ 0 ] = global - ( j * ( j - 1 ) ) / 2;
+
+         }
+
          //! Triangle function for three variables
          /** \param global The triangle counter global = i + ( j * ( j + 1 ) ) / 2 + ( k * ( k + 1 ) * ( k + 2 ) ) / 6 with i <= j <= k
              \param result Integer array of size 3 where to store i <= j <= k */
