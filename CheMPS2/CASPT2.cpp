@@ -5561,12 +5561,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // SAA: - Gamma_{ztuyxv}
                   // FAA: - f_dot_4dm[ ztuyxv ] + ( f_tt + f_uu + f_xx + f_yy ) SAA[ Ii ][ xyztuv ]
                   if ( OVLP ){
-                     for ( int t = 0; t < num_t; t++ ){
+                     #pragma omp parallel for schedule(static)
+                     for ( int v = 0; v < num_v; v++ ){
                         for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
                                        SAA[ irrep ][ ptr ] = - three_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ];
                                     }
@@ -5576,16 +5577,17 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                         }
                      }
                   } else {
-                     for ( int t = 0; t < num_t; t++ ){
-                        const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
+                     #pragma omp parallel for schedule(static)
+                     for ( int v = 0; v < num_v; v++ ){
                         for ( int u = 0; u < num_u; u++ ){
                            const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
-                                 const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
+                           for ( int t = 0; t < num_t; t++ ){
+                              const double f_tt = fock->get( irrep_t, nocc_t + t, nocc_t + t );
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
+                                       const double f_xx = fock->get( irrep_x, nocc_x + x, nocc_x + x );
                                        const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
                                        FAA[ irrep ][ ptr ] = - f_dot_4dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_x + x + LAS * ( d_v + v ))))) ]
                                                              + ( f_tt + f_uu + f_xx + f_yy ) * SAA[ irrep ][ ptr ];
@@ -5600,12 +5602,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // SCC: + Gamma_{zxuytv}
                   // FCC: + f_dot_4dm[ zxuytv ] + ( f_uu + f_yy ) SCC[ Ia ][ xyztuv ]
                   if ( OVLP ){
-                     for ( int t = 0; t < num_t; t++ ){
+                     #pragma omp parallel for schedule(static)
+                     for ( int v = 0; v < num_v; v++ ){
                         for ( int u = 0; u < num_u; u++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
                                        SCC[ irrep ][ ptr ] = three_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ];
                                     }
@@ -5615,14 +5618,15 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                         }
                      }
                   } else {
-                     for ( int t = 0; t < num_t; t++ ){
+                     #pragma omp parallel for schedule(static)
+                     for ( int v = 0; v < num_v; v++ ){
                         for ( int u = 0; u < num_u; u++ ){
                            const double f_uu = fock->get( irrep_u, nocc_u + u, nocc_u + u );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
+                           for ( int t = 0; t < num_t; t++ ){
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
                                     const double f_yy = fock->get( irrep_y, nocc_y + y, nocc_y + y );
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        const int ptr = jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) );
                                        FCC[ irrep ][ ptr ] = f_dot_4dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_t + t + LAS * ( d_v + v ))))) ]
                                                            + ( f_yy + f_uu ) * SCC[ irrep ][ ptr ];
@@ -5638,11 +5642,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: + 2 delta_tx ( f_dot_3dm[ zuyv ] - f_tt Gamma_{zuyv} )
                   if ( irrep_t == irrep_x ){
                      if ( OVLP ){
-                        for ( int xt = 0; xt < num_t; xt++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
                            for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                              for ( int xt = 0; xt < num_t; xt++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
                                        SAA[ irrep ][ jump_row + xt + num_x * ( y + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( u + num_u * v ) ) ]
                                           += 2 * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
                                     }
@@ -5651,12 +5656,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int tx = 0; tx < num_t; tx++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + tx, nocc_t + tx );
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
                            for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                              for ( int tx = 0; tx < num_t; tx++ ){
+                                 const double f_tt = fock->get( irrep_t, nocc_t + tx, nocc_t + tx );
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
                                        FAA[ irrep ][ jump_row + tx + num_x * ( y + num_y * z ) + SIZE * ( jump_col + tx + num_t * ( u + num_u * v ) ) ]
                                           += 2 * ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
                                             - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
@@ -5672,11 +5678,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: - delta_uy ( f_dot_3dm[ ztvx ] - f_uu Gamma_{ztvx} )
                   if ( irrep_u == irrep_y ){
                      if ( OVLP ){
-                        for ( int uy = 0; uy < num_u; uy++ ){
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int uy = 0; uy < num_u; uy++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        SAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
                                           -= two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
                                     }
@@ -5685,12 +5692,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int uy = 0; uy < num_u; uy++ ){
-                           const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int uy = 0; uy < num_u; uy++ ){
+                              const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        FAA[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
                                           -= ( f_dot_3dm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
                                         - f_uu * two_rdm[ d_t + t + LAS * ( d_z + z + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
@@ -5706,11 +5714,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: - delta_ty ( f_dot_3dm[ zuxv ] - f_tt Gamma_{zuxv} )
                   if ( irrep_t == irrep_y ){
                      if ( OVLP ){
-                        for ( int ty = 0; ty < num_t; ty++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
                            for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                              for ( int ty = 0; ty < num_t; ty++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        SAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
                                           -= two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ];
                                     }
@@ -5719,12 +5728,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int ty = 0; ty < num_t; ty++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
                            for ( int u = 0; u < num_u; u++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                              for ( int ty = 0; ty < num_t; ty++ ){
+                                 const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        FAA[ irrep ][ jump_row + x + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( u + num_u * v ) ) ]
                                           -= ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ]
                                         - f_tt * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_x + x + LAS * ( d_v + v ))) ] );
@@ -5740,11 +5750,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: - delta_ux ( f_dot_3dm[ ztyv ] - f_uu Gamma_{ztyv} )
                   if ( irrep_u == irrep_x ){
                      if ( OVLP ){
-                        for ( int ux = 0; ux < num_u; ux++ ){
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int ux = 0; ux < num_u; ux++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
                                        SAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
                                           -= two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
                                     }
@@ -5753,12 +5764,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int ux = 0; ux < num_u; ux++ ){
-                           const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int ux = 0; ux < num_u; ux++ ){
+                              const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int y = 0; y < num_y; y++ ){
                                        FAA[ irrep ][ jump_row + ux + num_x * ( y + num_y * z ) + SIZE * ( jump_col + t + num_t * ( ux + num_u * v ) ) ]
                                           -= ( f_dot_3dm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
                                         - f_uu * two_rdm[ d_z + z + LAS * ( d_t + t + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
@@ -5774,11 +5786,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FCC: + delta_uy ( f_dot_3dm[ xztv ] - f_uu Gamma_{xztv} )
                   if ( irrep_u == irrep_y ){
                      if ( OVLP ){
-                        for ( int uy = 0; uy < num_u; uy++ ){
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int uy = 0; uy < num_u; uy++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        SCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_u * v ) ) ]
                                           += two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
                                     }
@@ -5787,12 +5800,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int uy = 0; uy < num_y; uy++ ){
-                           const double f_uu = fock->get( irrep_y, nocc_y + uy, nocc_y + uy );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int x = 0; x < num_x; x++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int uy = 0; uy < num_y; uy++ ){
+                              const double f_uu = fock->get( irrep_y, nocc_y + uy, nocc_y + uy );
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        FCC[ irrep ][ jump_row + x + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( uy + num_y * v ) ) ]
                                           += ( f_dot_3dm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
                                         - f_uu * two_rdm[ d_x + x + LAS * ( d_z + z + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
@@ -5808,11 +5822,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FCC: + delta_xy ( f_dot_3dm[ zutv ] - f_xx Gamma_{zutv} )
                   if ( irrep_x == irrep_y ){
                      if ( OVLP ){
-                        for ( int xy = 0; xy < num_x; xy++ ){
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int u = 0; u < num_u; u++ ){
-                                 for ( int v = 0; v < num_v; v++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int xy = 0; xy < num_x; xy++ ){
                                        SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_y * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
                                           += two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ];
                                     }
@@ -5821,12 +5836,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int xy = 0; xy < num_x; xy++ ){
-                           const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
-                           for ( int t = 0; t < num_t; t++ ){
-                              for ( int u = 0; u < num_u; u++ ){
-                                 for ( int v = 0; v < num_v; v++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int u = 0; u < num_u; u++ ){
+                              for ( int t = 0; t < num_t; t++ ){
+                                 for ( int z = 0; z < num_z; z++ ){
+                                    for ( int xy = 0; xy < num_x; xy++ ){
+                                       const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
                                        FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + t + num_t * ( u + num_u * v ) ) ]
                                           += ( f_dot_3dm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ]
                                         - f_xx * two_rdm[ d_z + z + LAS * ( d_u + u + LAS * ( d_t + t + LAS * ( d_v + v ))) ] );
@@ -5842,11 +5858,12 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FCC: + delta_ut ( f_dot_3dm[ zxyv ] - f_tt Gamma_{zxyv} )
                   if ( irrep_u == irrep_t ){
                      if ( OVLP ){
-                        for ( int ut = 0; ut < num_u; ut++ ){
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int ut = 0; ut < num_u; ut++ ){
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        SCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_t * ( ut + num_u * v ) ) ]
                                           += two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ];
                                     }
@@ -5855,12 +5872,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int ut = 0; ut < num_u; ut++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + ut, nocc_t + ut );
-                           for ( int v = 0; v < num_v; v++ ){
-                              for ( int x = 0; x < num_x; x++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int ut = 0; ut < num_u; ut++ ){
+                              const double f_tt = fock->get( irrep_t, nocc_t + ut, nocc_t + ut );
+                              for ( int z = 0; z < num_z; z++ ){
                                  for ( int y = 0; y < num_y; y++ ){
-                                    for ( int z = 0; z < num_z; z++ ){
+                                    for ( int x = 0; x < num_x; x++ ){
                                        FCC[ irrep ][ jump_row + x + num_x * ( y + num_y * z ) + SIZE * ( jump_col + ut + num_u * ( ut + num_u * v ) ) ]
                                           += ( f_dot_3dm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ]
                                         - f_tt * two_rdm[ d_z + z + LAS * ( d_x + x + LAS * ( d_y + y + LAS * ( d_v + v ))) ] );
@@ -5876,10 +5894,11 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: + 2 delta_tx delta_uy ( f_dot_2dm[ zv ] - ( f_tt + f_uu ) Gamma_{zv} )
                   if (( irrep_t == irrep_x ) && ( irrep_u == irrep_y ) && ( irrep_z == irrep_v )){
                      if ( OVLP ){
-                        for ( int xt = 0; xt < num_t; xt++ ){
-                           for ( int uy = 0; uy < num_u; uy++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int uy = 0; uy < num_u; uy++ ){
+                                 for ( int xt = 0; xt < num_t; xt++ ){
                                     SAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
                                        += 2 * one_rdm[ d_z + z + LAS * ( d_v + v ) ];
                                  }
@@ -5887,12 +5906,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int xt = 0; xt < num_t; xt++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
-                           for ( int uy = 0; uy < num_u; uy++ ){
-                              const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int uy = 0; uy < num_u; uy++ ){
+                                 const double f_uu = fock->get( irrep_u, nocc_u + uy, nocc_u + uy );
+                                 for ( int xt = 0; xt < num_t; xt++ ){
+                                    const double f_tt = fock->get( irrep_t, nocc_t + xt, nocc_t + xt );
                                     FAA[ irrep ][ jump_row + xt + num_x * ( uy + num_y * z ) + SIZE * ( jump_col + xt + num_t * ( uy + num_u * v ) ) ]
                                        += 2 * ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
                                  }
@@ -5906,10 +5926,11 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FAA: - delta_ux delta_ty ( f_dot_2dm[ zv ] - ( f_tt + f_uu ) Gamma_{zv} )
                   if (( irrep_u == irrep_x ) && ( irrep_t == irrep_y ) && ( irrep_z == irrep_v )){
                      if ( OVLP ){
-                        for ( int ty = 0; ty < num_t; ty++ ){
-                           for ( int ux = 0; ux < num_u; ux++ ){
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int ux = 0; ux < num_u; ux++ ){
+                                 for ( int ty = 0; ty < num_t; ty++ ){
                                     SAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
                                        -= one_rdm[ d_z + z + LAS * ( d_v + v ) ];
                                  }
@@ -5917,12 +5938,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int ty = 0; ty < num_t; ty++ ){
-                           const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
-                           for ( int ux = 0; ux < num_u; ux++ ){
-                              const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int ux = 0; ux < num_u; ux++ ){
+                                 const double f_uu = fock->get( irrep_u, nocc_u + ux, nocc_u + ux );
+                                 for ( int ty = 0; ty < num_t; ty++ ){
+                                    const double f_tt = fock->get( irrep_t, nocc_t + ty, nocc_t + ty );
                                     FAA[ irrep ][ jump_row + ux + num_x * ( ty + num_y * z ) + SIZE * ( jump_col + ty + num_t * ( ux + num_u * v ) ) ]
                                        -= ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_uu ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
                                  }
@@ -5936,10 +5958,11 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                   // FCC: + delta_ut delta_xy ( f_dot_2dm[ zv ] - ( f_tt + f_xx ) Gamma_{zv} )
                   if (( irrep_u == irrep_t ) && ( irrep_x == irrep_y ) && ( irrep_z == irrep_v )){
                      if ( OVLP ){
-                        for ( int xy = 0; xy < num_x; xy++ ){
-                           for ( int tu = 0; tu < num_t; tu++ ){
-                              for ( int v = 0; v < num_z; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_z; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int tu = 0; tu < num_t; tu++ ){
+                                 for ( int xy = 0; xy < num_x; xy++ ){
                                     SCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
                                        += one_rdm[ d_z + z + LAS * ( d_v + v ) ];
                                  }
@@ -5947,12 +5970,13 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
                            }
                         }
                      } else {
-                        for ( int xy = 0; xy < num_x; xy++ ){
-                           const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
-                           for ( int tu = 0; tu < num_t; tu++ ){
-                              const double f_tt = fock->get( irrep_t, nocc_t + tu, nocc_t + tu );
-                              for ( int v = 0; v < num_v; v++ ){
-                                 for ( int z = 0; z < num_z; z++ ){
+                        #pragma omp parallel for schedule(static)
+                        for ( int v = 0; v < num_v; v++ ){
+                           for ( int z = 0; z < num_z; z++ ){
+                              for ( int tu = 0; tu < num_t; tu++ ){
+                                 const double f_tt = fock->get( irrep_t, nocc_t + tu, nocc_t + tu );
+                                 for ( int xy = 0; xy < num_x; xy++ ){
+                                    const double f_xx = fock->get( irrep_x, nocc_x + xy, nocc_x + xy );
                                     FCC[ irrep ][ jump_row + xy + num_x * ( xy + num_x * z ) + SIZE * ( jump_col + tu + num_t * ( tu + num_t * v ) ) ]
                                        += ( f_dot_2dm[ d_z + z + LAS * ( d_v + v ) ] - ( f_tt + f_xx ) * one_rdm[ d_z + z + LAS * ( d_v + v ) ] );
                                  }
@@ -5967,6 +5991,7 @@ void CheMPS2::CASPT2::make_AA_CC( const bool OVLP, const double IPEA ){
             if (( OVLP == false ) && ( fabs( IPEA ) > 0.0 )){
                // A: E_ti E_uv | 0 >   --->   t: excitation into,   u: excitation into, v: excitation out of
                // C: E_at E_uv | 0 >   --->   t: excitation out of, u: excitation into, v: excitation out of
+               #pragma omp parallel for schedule(static)
                for ( int v = 0; v < num_v; v++ ){
                   const double gamma_vv = one_rdm[ ( d_v + v ) * ( 1 + LAS ) ];
                   for ( int u = 0; u < num_u; u++ ){
