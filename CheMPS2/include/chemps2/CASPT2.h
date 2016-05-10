@@ -135,6 +135,7 @@ namespace CheMPS2{
          // Fill result with Fock operator times vector
          void matvec( double * vector, double * result, double * diag_fock ) const;
          static void matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans );
+         static void matmat( char totrans, int rowdim, int coldim, int sumdim, double alpha, double * matrix, int ldaM, double * origin, int ldaO, double * target, int ldaT );
 
          // Helper functions for solve
          void add_shift( double * vector, double * result, double * diag_fock, const double shift, const int * normalizations ) const;
