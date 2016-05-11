@@ -1626,119 +1626,77 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       const int nact_w = indices->getNDMRG( IL );
       const int n_oa_w = nocc_w + nact_w;
       const int nvir_w = indices->getNVIRT( IL );
-      for ( int c = 0; c < nvir_w; c++ ){
+      if ( SIZE * nact_w * nvir_w > 0 ){
+         for ( int c = 0; c < nvir_w; c++ ){
 
-         // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
+            // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
 
-         for ( int Id = 0; Id < num_irreps; Id++ ){
+            for ( int Id = 0; Id < num_irreps; Id++ ){
 
-            const int Icenter = Irreps::directProd( IL, Id );
-            const int nvir_d = indices->getNVIRT( Id );
+               const int Icenter = Irreps::directProd( IL, Id );
+               const int nvir_d = indices->getNVIRT( Id );
+               const int LDA_E = SIZE * nvir_d;
 
-            if ( IL < Id ){ // Ic < Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, +1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 2 * value;
+               if ( IL < Id ){ // Ic < Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, +1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        #pragma omp parallel for schedule(static)
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int ptr_H = jump_H + size_ij * ( c + nvir_w * d );
+                           const int ptr_E = jump_E + SIZE * d;
+                           matmat( 'N', SIZE, size_ij, 1,    2.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                           matmat( 'T', 1,    size_ij, SIZE, 2.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                         }
                      }
                   }
                }
-            }
 
-            if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, +1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, +1 );
-                  const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) + 1 ) ) / 2;
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c + 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 2 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
+               if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, +1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, +1 );
+                     const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) + 1 ) ) / 2;
+                     #pragma omp parallel for schedule(static)
+                     for ( int d = 0; d < c; d++ ){
+                        const int ptr_H = jump_H + size_ij * ( d + ( c * ( c + 1 ) ) / 2 );
+                        const int ptr_E = jump_E + SIZE * d;
+                        matmat( 'N', SIZE, size_ij, 1,    2.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                        matmat( 'T', 1,    size_ij, SIZE, 2.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                      }
-                  }
-                  for ( int d = c; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = factor * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c + 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += 2 * value;
-                     }
-                  }
-                  for ( int d = c; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d + 1 ) ) / 2;
-                     const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += factor * value;
+                     #pragma omp parallel for schedule(static)
+                     for ( int d = c; d < nvir_d; d++ ){
+                        const int ptr_H = jump_H + size_ij * ( c + ( d * ( d + 1 ) ) / 2 );
+                        const int ptr_E = jump_E + SIZE * d;
+                        const double factor = 2 * (( c == d ) ? SQRT2 : 1.0 );
+                        matmat( 'N', SIZE, size_ij, 1,    factor, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                        matmat( 'T', 1,    size_ij, SIZE, factor, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                      }
                   }
                }
-            }
 
-            if ( IL > Id ){ // Ic > Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, +1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 2 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] += 2 * value; // ( d + nvir_d * c ) because Id < Ic
+               if ( IL > Id ){ // Ic > Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, +1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        #pragma omp parallel for schedule(static)
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int ptr_H = jump_H + size_ij * ( d + nvir_d * c );
+                           const int ptr_E = jump_E + SIZE * d;
+                           matmat( 'N', SIZE, size_ij, 1,    2.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                           matmat( 'T', 1,    size_ij, SIZE, 2.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                         }
                      }
                   }
@@ -1755,117 +1713,76 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       const int nact_w = indices->getNDMRG( IL );
       const int n_oa_w = nocc_w + nact_w;
       const int nvir_w = indices->getNVIRT( IL );
-      for ( int c = 0; c < nvir_w; c++ ){
+      if ( SIZE * nact_w * nvir_w > 0 ){
+         for ( int c = 0; c < nvir_w; c++ ){
 
-         // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
+            // workspace_c[ x ] = sum_w f_wc FEH[ Ixw == IL == Ic ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_wc = fock->get( IL, nocc_w + w, n_oa_w + c );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_wc, FEH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
 
-         for ( int Id = 0; Id < num_irreps; Id++ ){
+            for ( int Id = 0; Id < num_irreps; Id++ ){
 
-            const int Icenter = Irreps::directProd( IL, Id );
-            const int nvir_d = indices->getNVIRT( Id );
+               const int Icenter = Irreps::directProd( IL, Id );
+               const int nvir_d = indices->getNVIRT( Id );
+               const int LDA_E = SIZE * nvir_d;
 
-            if ( IL < Id ){ // Ic < Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, -1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( c + nvir_w * d ) ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( c + nvir_w * d ) ] += 6 * value;
+               if ( IL < Id ){ // Ic < Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, IL, Id, -1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        #pragma omp parallel for schedule(static)
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int ptr_H = jump_H + size_ij * ( c + nvir_w * d );
+                           const int ptr_E = jump_E + SIZE * d;
+                           matmat( 'N', SIZE, size_ij, 1,    6.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                           matmat( 'T', 1,    size_ij, SIZE, 6.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                         }
                      }
                   }
                }
-            }
 
-            if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
-               for ( int Iij = 0; Iij < num_irreps; Iij++ ){
-                  const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, -1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, -1 );
-                  const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) - 1 ) ) / 2;
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
-                        }
+               if ( IL == Id ){ // Ic == Id == Ia == Ib --> Iik == Ijl
+                  for ( int Iij = 0; Iij < num_irreps; Iij++ ){
+                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id,  Iij, Iij, -1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Iij, Iij, IL,  Id, -1 );
+                     const int size_ij = ( indices->getNOCC( Iij ) * ( indices->getNOCC( Iij ) - 1 ) ) / 2;
+                     #pragma omp parallel for schedule(static)
+                     for ( int d = 0; d < c; d++ ){
+                        const int ptr_H = jump_H + size_ij * ( d + ( c * ( c - 1 ) ) / 2 );
+                        const int ptr_E = jump_E + SIZE * d;
+                        matmat( 'N', SIZE, size_ij, 1,    -6.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                        matmat( 'T', 1,    size_ij, SIZE, -6.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                      }
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        const double prefactor = 6 * vector[ jump_H + ij + size_ij * count_cd ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int d = 0; d < c; d++ ){
-                     const int count_cd = d + ( c * ( c - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] -= 6 * value;
-                     }
-                  }
-                  for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count_cd = c + ( d * ( d - 1 ) ) / 2;
-                     for ( int ij = 0; ij < size_ij; ij++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + ij + size_ij * count_cd ] += 6 * value;
+                     #pragma omp parallel for schedule(static)
+                     for ( int d = c+1; d < nvir_d; d++ ){
+                        const int ptr_H = jump_H + size_ij * ( c + ( d * ( d - 1 ) ) / 2 );
+                        const int ptr_E = jump_E + SIZE * d;
+                        matmat( 'N', SIZE, size_ij, 1,    6.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                        matmat( 'T', 1,    size_ij, SIZE, 6.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                      }
                   }
                }
-            }
 
-            if ( IL > Id ){ // Ic > Id
-               for ( int Ii = 0; Ii < num_irreps; Ii++ ){
-                  const int Ij = Irreps::directProd( Ii, Icenter );
-                  if ( Ii < Ij ){
-                     const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, -1 );
-                     const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           const double prefactor = 6 * vector[ jump_H + ij + size_ij * ( d + nvir_d * c ) ]; // ( d + nvir_d * c ) because Id < Ic
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] -= prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        for ( int ij = 0; ij < size_ij; ij++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_E + x + SIZE * ( d + nvir_d * ij ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + ij + size_ij * ( d + nvir_d * c ) ] -= 6 * value; // ( d + nvir_d * c ) because Id < Ic
+               if ( IL > Id ){ // Ic > Id
+                  for ( int Ii = 0; Ii < num_irreps; Ii++ ){
+                     const int Ij = Irreps::directProd( Ii, Icenter );
+                     if ( Ii < Ij ){
+                        const int jump_E = jump[ IL + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE * shift_E_nonactive( indices, Id, Ii, Ij, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Ii, Ij, Id, IL, -1 );
+                        const int size_ij = indices->getNOCC( Ii ) * indices->getNOCC( Ij );
+                        #pragma omp parallel for schedule(static)
+                        for ( int d = 0; d < nvir_d; d++ ){
+                           const int ptr_H = jump_H + size_ij * ( d + nvir_d * c );
+                           const int ptr_E = jump_E + SIZE * d;
+                           matmat( 'N', SIZE, size_ij, 1,    -6.0, workspace, SIZE, vector + ptr_H, 1,     result + ptr_E, LDA_E );
+                           matmat( 'T', 1,    size_ij, SIZE, -6.0, workspace, SIZE, vector + ptr_E, LDA_E, result + ptr_H, 1     );
                         }
                      }
                   }
@@ -1880,122 +1797,75 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       int SIZE = size_G[ IL ];
       const int nocc_w = indices->getNOCC( IL );
       const int nact_w = indices->getNDMRG( IL );
-      for ( int k = 0; k < nocc_w; k++ ){
+      if ( SIZE * nocc_w * nact_w > 0 ){
+         for ( int k = 0; k < nocc_w; k++ ){
 
-         // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_kw = fock->get( IL, k, nocc_w + w );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
+            // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_kw = fock->get( IL, k, nocc_w + w );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
 
-         for ( int Il = 0; Il < num_irreps; Il++ ){
+            for ( int Il = 0; Il < num_irreps; Il++ ){
 
-            const int Icenter = Irreps::directProd( IL, Il );
-            const int nocc_l = indices->getNOCC( Il );
+               const int Icenter = Irreps::directProd( IL, Il );
+               const int nocc_l = indices->getNOCC( Il );
 
-            if ( IL < Il ){ // Ik < Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, +1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 2 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + k + nocc_w * l + size_ij * ab ] += 2 * value;
+               if ( IL < Il ){ // Ik < Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int colsize = nocc_l * indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        if ( colsize > 0 ){
+                           const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
+                           const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, +1 ) + k;
+                           matmat( 'N', SIZE, colsize, 1,    2.0, workspace, SIZE, vector + jump_H, nocc_w, result + jump_G, SIZE   );
+                           matmat( 'T', 1,    colsize, SIZE, 2.0, workspace, SIZE, vector + jump_G, SIZE,   result + jump_H, nocc_w );
                         }
                      }
                   }
                }
-            }
 
-            if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, +1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, +1 );
-                  const int size_ij = ( nocc_w * ( nocc_w + 1 ) ) / 2;
-                  const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) + 1 ) ) / 2;
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k + 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 2 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
+               if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd   and   nocc_l == nocc_w
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, +1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, +1 );
+                     const int size_ij = ( nocc_w * ( nocc_w + 1 ) ) / 2;
+                     const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) + 1 ) ) / 2;
+                     const int LDA_G = SIZE * nocc_l;
+                     #pragma omp parallel for schedule(static)
+                     for ( int l = 0; l < k; l++ ){
+                        const int ptr_H = jump_H + ( l + ( k * ( k + 1 ) ) / 2 );
+                        const int ptr_G = jump_G + SIZE * l;
+                        matmat( 'N', SIZE, size_ab, 1,    2.0, workspace, SIZE, vector + ptr_H, size_ij, result + ptr_G, LDA_G   );
+                        matmat( 'T', 1,    size_ab, SIZE, 2.0, workspace, SIZE, vector + ptr_G, LDA_G,   result + ptr_H, size_ij );
                      }
-                  }
-                  for ( int l = k; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = factor * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k + 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += 2 * value;
-                     }
-                  }
-                  for ( int l = k; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l + 1 ) ) / 2;
-                     const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += factor * value;
+                     #pragma omp parallel for schedule(static)
+                     for ( int l = k; l < nocc_l; l++ ){
+                        const int ptr_H = jump_H + ( k + ( l * ( l + 1 ) ) / 2 );
+                        const int ptr_G = jump_G + SIZE * l;
+                        const double factor = 2 * (( k == l ) ? SQRT2 : 1.0 );
+                        matmat( 'N', SIZE, size_ab, 1,    factor, workspace, SIZE, vector + ptr_H, size_ij, result + ptr_G, LDA_G   );
+                        matmat( 'T', 1,    size_ab, SIZE, factor, workspace, SIZE, vector + ptr_G, LDA_G,   result + ptr_H, size_ij );
                      }
                   }
                }
-            }
 
-            if ( IL > Il ){ // Ik > Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, +1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
+               if ( IL > Il ){ // Ik > Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, +1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_SINGLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, +1 );
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        #pragma omp parallel for schedule(static)
                         for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 2 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + l + nocc_l * k + size_ij * ab ] += 2 * value; // ( l + nocc_l * k ) because Il < Ik
+                           const int ptr_H = jump_H + nocc_l * ( k + nocc_w * ab );
+                           const int ptr_G = jump_G + SIZE * nocc_l * ab;
+                           matmat( 'N', SIZE, nocc_l, 1,    2.0, workspace, SIZE, vector + ptr_H, 1,    result + ptr_G, SIZE );
+                           matmat( 'T', 1,    nocc_l, SIZE, 2.0, workspace, SIZE, vector + ptr_G, SIZE, result + ptr_H, 1    );
                         }
                      }
                   }
@@ -2010,120 +1880,74 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
       int SIZE = size_G[ IL ];
       const int nocc_w = indices->getNOCC( IL );
       const int nact_w = indices->getNDMRG( IL );
-      for ( int k = 0; k < nocc_w; k++ ){
+      if ( SIZE * nocc_w * nact_w > 0 ){
+         for ( int k = 0; k < nocc_w; k++ ){
 
-         // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
-         for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
-         for ( int w = 0; w < nact_w; w++ ){
-            double f_kw = fock->get( IL, k, nocc_w + w );
-            int inc1 = 1;
-            daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
-         }
+            // workspace_k[ x ] = sum_w f_kw FGH[ Ixw == IL == Ik ][ w ][ x ]
+            for ( int cnt = 0; cnt < SIZE; cnt++ ){ workspace[ cnt ] = 0.0; }
+            for ( int w = 0; w < nact_w; w++ ){
+               double f_kw = fock->get( IL, k, nocc_w + w );
+               int inc1 = 1;
+               daxpy_( &SIZE, &f_kw, FGH[ IL ][ w ], &inc1, workspace, &inc1 );
+            }
 
-         for ( int Il = 0; Il < num_irreps; Il++ ){
+            for ( int Il = 0; Il < num_irreps; Il++ ){
 
-            const int Icenter = Irreps::directProd( IL, Il );
-            const int nocc_l = indices->getNOCC( Il );
+               const int Icenter = Irreps::directProd( IL, Il );
+               const int nocc_l = indices->getNOCC( Il );
 
-            if ( IL < Il ){ // Ik < Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, -1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 6 * vector[ jump_H + k + nocc_w * l + size_ij * ab ];
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + k + nocc_w * l + size_ij * ab ] -= 6 * value;
+               if ( IL < Il ){ // Ik < Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int colsize = nocc_l * indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        if ( colsize > 0 ){
+                           const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
+                           const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Ia, Ib, -1 ) + k;
+                           matmat( 'N', SIZE, colsize, 1,    -6.0, workspace, SIZE, vector + jump_H, nocc_w, result + jump_G, SIZE   );
+                           matmat( 'T', 1,    colsize, SIZE, -6.0, workspace, SIZE, vector + jump_G, SIZE,   result + jump_H, nocc_w );
                         }
                      }
                   }
                }
-            }
 
-            if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd
-               for ( int Iab = 0; Iab < num_irreps; Iab++ ){
-                  const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, -1 );
-                  const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, -1 );
-                  const int size_ij = ( nocc_w * ( nocc_w - 1 ) ) / 2;
-                  const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) - 1 ) ) / 2;
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                        }
+               if ( IL == Il ){ // Ik == Il == Ii == Ij --> Iac == Ibd   and   nocc_l == nocc_w
+                  for ( int Iab = 0; Iab < num_irreps; Iab++ ){
+                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Iab, Iab, -1 );
+                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, IL, Il, Iab, Iab, -1 );
+                     const int size_ij = ( nocc_w * ( nocc_w - 1 ) ) / 2;
+                     const int size_ab = ( indices->getNVIRT( Iab ) * ( indices->getNVIRT( Iab ) - 1 ) ) / 2;
+                     const int LDA_G = SIZE * nocc_l;
+                     #pragma omp parallel for schedule(static)
+                     for ( int l = 0; l < k; l++ ){
+                        const int ptr_H = jump_H + ( l + ( k * ( k - 1 ) ) / 2 );
+                        const int ptr_G = jump_G + SIZE * l;
+                        matmat( 'N', SIZE, size_ab, 1,    6.0, workspace, SIZE, vector + ptr_H, size_ij, result + ptr_G, LDA_G   );
+                        matmat( 'T', 1,    size_ab, SIZE, 6.0, workspace, SIZE, vector + ptr_G, LDA_G,   result + ptr_H, size_ij );
                      }
-                  }
-                  for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        const double prefactor = 6 * vector[ jump_H + count_kl + size_ij * ab ];
-                        for ( int x = 0; x < nact_w; x++ ){
-                           result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] -= prefactor * workspace[ x ];
-                        }
-                     }
-                  }
-                  for ( int l = 0; l < k; l++ ){
-                     const int count_kl = l + ( k * ( k - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] += 6 * value;
-                     }
-                  }
-                  for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count_kl = k + ( l * ( l - 1 ) ) / 2;
-                     for ( int ab = 0; ab < size_ab; ab++ ){
-                        double value = 0.0;
-                        for ( int x = 0; x < nact_w; x++ ){
-                           value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                        }
-                        result[ jump_H + count_kl + size_ij * ab ] -= 6 * value;
+                     #pragma omp parallel for schedule(static)
+                     for ( int l = k+1; l < nocc_l; l++ ){
+                        const int ptr_H = jump_H + ( k + ( l * ( l - 1 ) ) / 2 );
+                        const int ptr_G = jump_G + SIZE * l;
+                        matmat( 'N', SIZE, size_ab, 1,    -6.0, workspace, SIZE, vector + ptr_H, size_ij, result + ptr_G, LDA_G   );
+                        matmat( 'T', 1,    size_ab, SIZE, -6.0, workspace, SIZE, vector + ptr_G, LDA_G,   result + ptr_H, size_ij );
                      }
                   }
                }
-            }
 
-            if ( IL > Il ){ // Ik > Il
-               for ( int Ia = 0; Ia < num_irreps; Ia++ ){
-                  const int Ib = Irreps::directProd( Ia, Icenter );
-                  if ( Ia < Ib ){
-                     const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
-                     const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, -1 );
-                     const int size_ij = nocc_w * nocc_l;
-                     const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
-                     for ( int l = 0; l < nocc_l; l++ ){
+               if ( IL > Il ){ // Ik > Il
+                  for ( int Ia = 0; Ia < num_irreps; Ia++ ){
+                     const int Ib = Irreps::directProd( Ia, Icenter );
+                     if ( Ia < Ib ){
+                        const int jump_G = jump[ IL + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE * shift_G_nonactive( indices, Il, Ia, Ib, -1 );
+                        const int jump_H = jump[ Icenter + num_irreps * CHEMPS2_CASPT2_H_TRIPLET ] + shift_H_nonactive( indices, Il, IL, Ia, Ib, -1 );
+                        const int size_ab = indices->getNVIRT( Ia ) * indices->getNVIRT( Ib );
+                        #pragma omp parallel for schedule(static)
                         for ( int ab = 0; ab < size_ab; ab++ ){
-                           const double prefactor = 6 * vector[ jump_H + l + nocc_l * k + size_ij * ab ]; // ( l + nocc_l * k ) because Il < Ik
-                           for ( int x = 0; x < nact_w; x++ ){
-                              result[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] += prefactor * workspace[ x ];
-                           }
-                        }
-                     }
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        for ( int ab = 0; ab < size_ab; ab++ ){
-                           double value = 0.0;
-                           for ( int x = 0; x < nact_w; x++ ){
-                              value += vector[ jump_G + x + SIZE * ( l + nocc_l * ab ) ] * workspace[ x ];
-                           }
-                           result[ jump_H + l + nocc_l * k + size_ij * ab ] += 6 * value; // ( l + nocc_l * k ) because Il < Ik
+                           const int ptr_H = jump_H + nocc_l * ( k + nocc_w * ab );
+                           const int ptr_G = jump_G + SIZE * nocc_l * ab;
+                           matmat( 'N', SIZE, nocc_l, 1,    6.0, workspace, SIZE, vector + ptr_H, 1,    result + ptr_G, SIZE );
+                           matmat( 'T', 1,    nocc_l, SIZE, 6.0, workspace, SIZE, vector + ptr_G, SIZE, result + ptr_H, 1    );
                         }
                      }
                   }
@@ -2159,6 +1983,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
                                                                                                                      : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
                      if ( Ikw == Il ){ // irrep_k == irrep_l
+                        #pragma omp parallel for schedule(static)
                         for ( int l = 0; l < nocc_l; l++ ){
                            const double factor = (( k == l ) ? SQRT2 : 1.0 );
                            const int ptr_L = jump_D + SIZE_L * l;
@@ -2168,6 +1993,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            matmat( 'T', SIZE_R, nvir_ab, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
                      } else { // irrep_k != irrep_l
+                        #pragma omp parallel for schedule(static)
                         for ( int l = 0; l < nocc_l; l++ ){
                            const int ptr_L = jump_D + SIZE_L * l;
                            const int ptr_R = jump_E + SIZE_R * nvir_ab * (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
@@ -2209,6 +2035,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                      const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
                                                                                                                      : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
                      if ( Ikw == Il ){ // irrep_k == irrep_l
+                        #pragma omp parallel for schedule(static)
                         for ( int l = 0; l < k; l++ ){
                            const int ptr_L = jump_D + SIZE_L * l;
                            const int ptr_R = jump_E + SIZE_R * nvir_ab * ( l + ( k * ( k - 1 ) ) / 2 );
@@ -2216,6 +2043,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            matmat( 'N', SIZE_L, nvir_ab, SIZE_R, -3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
                            matmat( 'T', SIZE_R, nvir_ab, SIZE_L, -3.0, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
+                        #pragma omp parallel for schedule(static)
                         for ( int l = k+1; l < nocc_l; l++ ){
                            const int ptr_L = jump_D + SIZE_L * l;
                            const int ptr_R = jump_E + SIZE_R * nvir_ab * ( k + ( l * ( l - 1 ) ) / 2 );
@@ -2224,6 +2052,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            matmat( 'T', SIZE_R, nvir_ab, SIZE_L, 3.0, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
                      } else { // irrep_k != irrep_l
+                        #pragma omp parallel for schedule(static)
                         for ( int l = 0; l < nocc_l; l++ ){
                            const double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
                            const int ptr_L = jump_D + SIZE_L * l;
@@ -2274,6 +2103,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            matmat( 'N', SIZE_L, c * nocc_ij, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
                            matmat( 'T', SIZE_R, c * nocc_ij, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
+                        #pragma omp parallel for schedule(static)
                         for ( int d = c; d < nvir_d; d++ ){
                            const double factor = (( c == d ) ? SQRT2 : 1.0 );
                            const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
@@ -2283,6 +2113,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                         }
                      } else { // irrep_c != irrep_d
                         if ( Iwc < Id ){
+                           #pragma omp parallel for schedule(static)
                            for ( int d = 0; d < nvir_d; d++ ){
                               const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
                               const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + nvir_wc * d );
@@ -2337,6 +2168,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                            matmat( 'N', SIZE_L, c * nocc_ij, SIZE_R, -3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
                            matmat( 'T', SIZE_R, c * nocc_ij, SIZE_L, -3.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
+                        #pragma omp parallel for schedule(static)
                         for ( int d = c+1; d < nvir_d; d++ ){
                            const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
                            const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + ( d * ( d - 1 ) ) / 2 );
@@ -2345,6 +2177,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                         }
                      } else { // irrep_c != irrep_d
                         if ( Iwc < Id ){
+                           #pragma omp parallel for schedule(static)
                            for ( int d = 0; d < nvir_d; d++ ){
                               const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
                               const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + nvir_wc * d );
