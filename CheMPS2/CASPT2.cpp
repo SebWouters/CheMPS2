@@ -1183,15 +1183,6 @@ int CheMPS2::CASPT2::get_maxsize() const{
 
 }
 
-void CheMPS2::CASPT2::matvec_helper_offdiag( double * origin, double * target, int SIZE_L, int SIZE_R, double * FOCK, double alpha, char totrans ){
-
-   // target += alpha * FOCK^{ totrans } * origin
-   double add = 1.0;
-   int inc1 = 1;
-   dgemv_( &totrans, &SIZE_L, &SIZE_R, &alpha, FOCK, &SIZE_L, origin, &inc1, &add, target, &inc1 );
-
-}
-
 void CheMPS2::CASPT2::matmat( char totrans, int rowdim, int coldim, int sumdim, double alpha, double * matrix, int ldaM, double * origin, int ldaO, double * target, int ldaT ){
 
    double add = 1.0;
@@ -1308,14 +1299,19 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   daxpy_( &total_size, &f_kw, FAB_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
                if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
+                  if ( k > 0 ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ];
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * ( shift + ( k * ( k + 1 ) ) / 2 );
+                     matmat( 'N', SIZE_L, k, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                     matmat( 'T', SIZE_R, k, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
+                  }
                   #pragma omp parallel for schedule(static)
-                  for ( int l = 0; l < nocc_l; l++ ){
-                     const int count = shift + (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                  for ( int l = k; l < nocc_l; l++ ){
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * count;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_SINGLET ] + SIZE_R * ( shift + k + ( l * ( l + 1 ) ) / 2 );
                      const double factor = (( k == l ) ? SQRT2 : 1.0 );
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     matmat( 'N', SIZE_L, 1, SIZE_R, factor, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                     matmat( 'T', SIZE_R, 1, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                   }
                } else {
                   const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ];
@@ -1349,7 +1345,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   daxpy_( &total_size, &f_kw, FAB_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
                if ( IR == 0 ){ // Ii == Ij  and  Ik == Il
-                  { // ( k > l  --->  - delta_jk delta_il )
+                  if ( k > 0 ){ // ( k > l  --->  - delta_jk delta_il )
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ];
                      const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * ( shift + ( k * ( k - 1 ) ) / 2 );
                      matmat( 'N', SIZE_L, k, SIZE_R, -1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
@@ -1357,11 +1353,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   #pragma omp parallel for schedule(static)
                   for ( int l = k+1; l < nocc_l; l++ ){
-                     const int count = shift + k + ( l * ( l - 1 ) ) / 2;
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ] + SIZE_L * l;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( k < l  --->  + delta_ik delta_jl )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_B_TRIPLET ] + SIZE_R * ( shift + k + ( l * ( l - 1 ) ) / 2 );
+                     matmat( 'N', SIZE_L, 1, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L ); // ( k < l  --->  + delta_ik delta_jl )
+                     matmat( 'T', SIZE_R, 1, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                   }
                } else {
                   const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_A         ];
@@ -1398,14 +1393,19 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   daxpy_( &total_size, &f_wc, FCF_singlet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
                if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
+                  if ( c > 0 ){
+                     const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ];
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * ( shift + ( c * ( c + 1 ) ) / 2 );
+                     matmat( 'N', SIZE_L, c, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                     matmat( 'T', SIZE_R, c, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
+                  }
                   #pragma omp parallel for schedule(static)
-                  for ( int d = 0; d < nvir_d; d++ ){
-                     const int count = shift + (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
+                  for ( int d = c; d < nvir_d; d++ ){
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * count;
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_SINGLET ] + SIZE_R * ( shift + c + ( d * ( d + 1 ) ) / 2 );
                      const double factor = (( c == d ) ? SQRT2 : 1.0 );
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     matmat( 'N', SIZE_L, 1, SIZE_R, factor, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                     matmat( 'T', SIZE_R, 1, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                   }
                } else {
                   const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ];
@@ -1441,7 +1441,7 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   daxpy_( &total_size, &f_wc, FCF_triplet[ IL ][ IR ][ w ], &inc1, workspace, &inc1 );
                }
                if ( IR == 0 ){ // Ia == Ib  and  Ic == Id
-                  { // ( c > d  --->  - delta_ad delta_bc )
+                  if ( c > 0 ){ // ( c > d  --->  - delta_ad delta_bc )
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ];
                      const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * ( shift + ( c * ( c - 1 ) ) / 2 );
                      matmat( 'N', SIZE_L, c, SIZE_R, -1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
@@ -1449,11 +1449,10 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   }
                   #pragma omp parallel for schedule(static)
                   for ( int d = c+1; d < nvir_d; d++ ){
-                     const int count = shift + c + ( d * ( d - 1 ) ) / 2;
                      const int ptr_L = jump[ IL + num_irreps * CHEMPS2_CASPT2_C         ] + SIZE_L * d;
-                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * count;
-                     matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' ); // ( c < d  --->  + delta_ac delta_bd )
-                     matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                     const int ptr_R = jump[ IR + num_irreps * CHEMPS2_CASPT2_F_TRIPLET ] + SIZE_R * ( shift + c + ( d * ( d - 1 ) ) / 2 );
+                     matmat( 'N', SIZE_L, 1, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L ); // ( c < d  --->  + delta_ac delta_bd )
+                     matmat( 'T', SIZE_R, 1, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                   }
                } else {
                   const double factor = (( Iw < IL ) ? 1.0 : -1.0 ); // ( c < d  --->  + delta_ac delta_bd ) and ( c > d  --->  - delta_ad delta_bc )
@@ -2155,30 +2154,26 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   const int nvir_ab = indices->getNVIRT( Iab );
                   const int Il = Irreps::directProd( Iab, IL );
                   const int nocc_l = indices->getNOCC( Il );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
-                                                                                                                  : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
-                  if ( Ikw == Il ){ // irrep_k == irrep_l
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
-                        const double factor = (( k == l ) ? SQRT2 : 1.0 );
-                        #pragma omp parallel for schedule(static)
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                  if ( nvir_ab * nocc_l > 0 ){
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+                     const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_SINGLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  +1 )
+                                                                                                                     : shift_E_nonactive( indices, Iab, Il,  Ikw, +1 ));
+                     if ( Ikw == Il ){ // irrep_k == irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const double factor = (( k == l ) ? SQRT2 : 1.0 );
+                           const int ptr_L = jump_D + SIZE_L * l;
+                           const int ptr_R = jump_E + SIZE_R * nvir_ab * (( k < l ) ? ( k + ( l * ( l + 1 ) ) / 2 ) : ( l + ( k * ( k + 1 ) ) / 2 ));
+                           const int LDA_L = SIZE_L * nocc_l;
+                           matmat( 'N', SIZE_L, nvir_ab, SIZE_R, factor, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
+                           matmat( 'T', SIZE_R, nvir_ab, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
-                     }
-                  } else { // irrep_k != irrep_l
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
-                        #pragma omp parallel for schedule(static)
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                     } else { // irrep_k != irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const int ptr_L = jump_D + SIZE_L * l;
+                           const int ptr_R = jump_E + SIZE_R * nvir_ab * (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
+                           const int LDA_L = SIZE_L * nocc_l;
+                           matmat( 'N', SIZE_L, nvir_ab, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
+                           matmat( 'T', SIZE_R, nvir_ab, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
                      }
                   }
@@ -2209,40 +2204,33 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   const int nvir_ab = indices->getNVIRT( Iab );
                   const int Il = Irreps::directProd( Iab, IL );
                   const int nocc_l = indices->getNOCC( Il );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
-                  const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
-                                                                                                                  : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
-                  if ( Ikw == Il ){ // irrep_k == irrep_l
-                     for ( int l = 0; l < k; l++ ){
-                        const int cnt_kl = l + ( k * ( k - 1 ) ) / 2;
-                        #pragma omp parallel for schedule(static)
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
+                  if ( nvir_ab * nocc_l > 0 ){
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D         ] + SIZE_L * shift_D_nonactive( indices, Il, Iab );
+                     const int jump_E = jump[ IR + num_irreps * CHEMPS2_CASPT2_E_TRIPLET ] + SIZE_R * (( Ikw <= Il ) ? shift_E_nonactive( indices, Iab, Ikw, Il,  -1 )
+                                                                                                                     : shift_E_nonactive( indices, Iab, Il,  Ikw, -1 ));
+                     if ( Ikw == Il ){ // irrep_k == irrep_l
+                        for ( int l = 0; l < k; l++ ){
+                           const int ptr_L = jump_D + SIZE_L * l;
+                           const int ptr_R = jump_E + SIZE_R * nvir_ab * ( l + ( k * ( k - 1 ) ) / 2 );
+                           const int LDA_L = SIZE_L * nocc_l;
+                           matmat( 'N', SIZE_L, nvir_ab, SIZE_R, -3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
+                           matmat( 'T', SIZE_R, nvir_ab, SIZE_L, -3.0, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
-                     }
-                     for ( int l = k+1; l < nocc_l; l++ ){
-                        const int cnt_kl = k + ( l * ( l - 1 ) ) / 2;
-                        #pragma omp parallel for schedule(static)
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
+                        for ( int l = k+1; l < nocc_l; l++ ){
+                           const int ptr_L = jump_D + SIZE_L * l;
+                           const int ptr_R = jump_E + SIZE_R * nvir_ab * ( k + ( l * ( l - 1 ) ) / 2 );
+                           const int LDA_L = SIZE_L * nocc_l;
+                           matmat( 'N', SIZE_L, nvir_ab, SIZE_R, 3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
+                           matmat( 'T', SIZE_R, nvir_ab, SIZE_L, 3.0, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
-                     }
-                  } else { // irrep_k != irrep_l
-                     for ( int l = 0; l < nocc_l; l++ ){
-                        const int cnt_kl = (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
-                        const double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
-                        #pragma omp parallel for schedule(static)
-                        for ( int ab = 0; ab < nvir_ab; ab++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( l + nocc_l * ab );
-                           const int ptr_R = jump_E + SIZE_R * ( ab + nvir_ab * cnt_kl );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     } else { // irrep_k != irrep_l
+                        for ( int l = 0; l < nocc_l; l++ ){
+                           const double factor = (( Ikw < Il ) ? 3.0 : -3.0 );
+                           const int ptr_L = jump_D + SIZE_L * l;
+                           const int ptr_R = jump_E + SIZE_R * nvir_ab * (( Ikw < Il ) ? ( k + nocc_kw * l ) : ( l + nocc_l * k ));
+                           const int LDA_L = SIZE_L * nocc_l;
+                           matmat( 'N', SIZE_L, nvir_ab, SIZE_R, factor, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, LDA_L  );
+                           matmat( 'T', SIZE_R, nvir_ab, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, LDA_L,  result + ptr_R, SIZE_R );
                         }
                      }
                   }
@@ -2275,30 +2263,37 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   const int nocc_ij = indices->getNOCC( Iij );
                   const int Id = Irreps::directProd( Iij, IL );
                   const int nvir_d = indices->getNVIRT( Id );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
-                                                                                                                  : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
-                  if ( Iwc == Id ){ // irrep_c == irrep_d
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( c < d ) ? ( c + ( d * ( d + 1 ) ) / 2 ) : ( d + ( c * ( c + 1 ) ) / 2 ));
-                        const double factor = (( c == d ) ? SQRT2 : 1.0 );
-                        #pragma omp parallel for schedule(static)
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                  if ( nvir_d * nocc_ij > 0 ){
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+                     const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_SINGLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  +1 )
+                                                                                                                     : shift_G_nonactive( indices, Iij, Id,  Iwc, +1 ));
+                     if ( Iwc == Id ){ // irrep_c == irrep_d
+                        if ( c > 0 ){
+                           const int ptr_L = jump_D;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c * ( c + 1 ) ) / 2;
+                           matmat( 'N', SIZE_L, c * nocc_ij, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, c * nocc_ij, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
-                     }
-                  } else { // irrep_c != irrep_d
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
-                        #pragma omp parallel for schedule(static)
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 1.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 1.0, 'T' );
+                        for ( int d = c; d < nvir_d; d++ ){
+                           const double factor = (( c == d ) ? SQRT2 : 1.0 );
+                           const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + ( d * ( d + 1 ) ) / 2 );
+                           matmat( 'N', SIZE_L, nocc_ij, SIZE_R, factor, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, nocc_ij, SIZE_L, factor, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
+                        }
+                     } else { // irrep_c != irrep_d
+                        if ( Iwc < Id ){
+                           for ( int d = 0; d < nvir_d; d++ ){
+                              const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
+                              const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + nvir_wc * d );
+                              matmat( 'N', SIZE_L, nocc_ij, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                              matmat( 'T', SIZE_R, nocc_ij, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
+                           }
+                        } else {
+                           const int ptr_L = jump_D;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * nvir_d * c;
+                           matmat( 'N', SIZE_L, nvir_d * nocc_ij, SIZE_R, 1.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, nvir_d * nocc_ij, SIZE_L, 1.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
                      }
                   }
@@ -2331,40 +2326,36 @@ void CheMPS2::CASPT2::matvec( double * vector, double * result, double * diag_fo
                   const int nocc_ij = indices->getNOCC( Iij );
                   const int Id = Irreps::directProd( Iij, IL );
                   const int nvir_d = indices->getNVIRT( Id );
-                  const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
-                  const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
-                                                                                                                  : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
-                  if ( Iwc == Id ){ // irrep_c == irrep_d
-                     for ( int d = 0; d < c; d++ ){
-                        const int cnt_cd = d + ( c * ( c - 1 ) ) / 2;
-                        #pragma omp parallel for schedule(static)
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, -3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, -3.0, 'T' );
+                  if ( nvir_d * nocc_ij > 0 ){
+                     const int jump_D = jump[ IL + num_irreps * CHEMPS2_CASPT2_D ] + SIZE_L * shift_D_nonactive( indices, Iij, Id );
+                     const int jump_G = jump[ IR + num_irreps * CHEMPS2_CASPT2_G_TRIPLET ] + SIZE_R * (( Iwc <= Id ) ? shift_G_nonactive( indices, Iij, Iwc, Id,  -1 )
+                                                                                                                     : shift_G_nonactive( indices, Iij, Id,  Iwc, -1 ));
+                     if ( Iwc == Id ){ // irrep_c == irrep_d
+                        if ( c > 0 ){
+                           const int ptr_L = jump_D;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c * ( c - 1 ) ) / 2;
+                           matmat( 'N', SIZE_L, c * nocc_ij, SIZE_R, -3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, c * nocc_ij, SIZE_L, -3.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
-                     }
-                     for ( int d = c+1; d < nvir_d; d++ ){
-                        const int cnt_cd = c + ( d * ( d - 1 ) ) / 2;
-                        #pragma omp parallel for schedule(static)
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, 3.0, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, 3.0, 'T' );
+                        for ( int d = c+1; d < nvir_d; d++ ){
+                           const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + ( d * ( d - 1 ) ) / 2 );
+                           matmat( 'N', SIZE_L, nocc_ij, SIZE_R, 3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, nocc_ij, SIZE_L, 3.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
-                     }
-                  } else { // irrep_c != irrep_d
-                     for ( int d = 0; d < nvir_d; d++ ){
-                        const int cnt_cd = (( Iwc < Id ) ? ( c + nvir_wc * d ) : ( d + nvir_d * c ));
-                        const double factor = (( Iwc < Id ) ? 3.0 : -3.0 );
-                        #pragma omp parallel for schedule(static)
-                        for ( int ij = 0; ij < nocc_ij; ij++ ){
-                           const int ptr_L = jump_D + SIZE_L * ( ij + nocc_ij * d );
-                           const int ptr_R = jump_G + SIZE_R * ( ij + nocc_ij * cnt_cd );
-                           matvec_helper_offdiag( vector + ptr_R, result + ptr_L, SIZE_L, SIZE_R, workspace, factor, 'N' );
-                           matvec_helper_offdiag( vector + ptr_L, result + ptr_R, SIZE_L, SIZE_R, workspace, factor, 'T' );
+                     } else { // irrep_c != irrep_d
+                        if ( Iwc < Id ){
+                           for ( int d = 0; d < nvir_d; d++ ){
+                              const int ptr_L = jump_D + SIZE_L * nocc_ij * d;
+                              const int ptr_R = jump_G + SIZE_R * nocc_ij * ( c + nvir_wc * d );
+                              matmat( 'N', SIZE_L, nocc_ij, SIZE_R, 3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                              matmat( 'T', SIZE_R, nocc_ij, SIZE_L, 3.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
+                           }
+                        } else {
+                           const int ptr_L = jump_D;
+                           const int ptr_R = jump_G + SIZE_R * nocc_ij * nvir_d * c;
+                           matmat( 'N', SIZE_L, nvir_d * nocc_ij, SIZE_R, -3.0, workspace, SIZE_L, vector + ptr_R, SIZE_R, result + ptr_L, SIZE_L );
+                           matmat( 'T', SIZE_R, nvir_d * nocc_ij, SIZE_L, -3.0, workspace, SIZE_L, vector + ptr_L, SIZE_L, result + ptr_R, SIZE_R );
                         }
                      }
                   }
