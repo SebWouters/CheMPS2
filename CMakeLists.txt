@@ -1,5 +1,5 @@
 project (CheMPS2)
-set (CheMPS2_VERSION      "1.7-rc1")
+set (CheMPS2_VERSION      "1.7-rc1 (2016-05-11)")
 set (CheMPS2_AUTHORS      "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
@@ -69,6 +69,8 @@ endif (MKL)
 if (WITH_MPI)
     add_definitions (-DCHEMPS2_MPI_COMPILATION)
 endif (WITH_MPI)
+
+add_definitions(-DCHEMPS2_VERSION="${CheMPS2_VERSION}")
 
 if (LAPACK_LIBRARIES)
     message(STATUS "LAPACK detection suppressed. Using: ${LAPACK_LIBRARIES}")

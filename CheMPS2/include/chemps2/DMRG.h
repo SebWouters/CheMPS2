@@ -153,7 +153,7 @@ namespace CheMPS2{
          void newExcitation(const double EshiftIn);
          
          //! Print the license
-         void PrintLicense();
+         static void PrintLicense();
          
       private:
       

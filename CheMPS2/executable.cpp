@@ -377,18 +377,23 @@ int main( int argc, char ** argv ){
 
    struct option long_options[] =
    {
-      {"file", required_argument, 0, 'f'},
-      {"help", no_argument,       0, 'h'},
+      {"file",    required_argument, 0, 'f'},
+      {"version", no_argument,       0, 'v'},
+      {"help",    no_argument,       0, 'h'},
       {0, 0, 0, 0}
    };
 
    int option_index = 0;
    int c;
-   while (( c = getopt_long( argc, argv, "hf:", long_options, &option_index )) != -1 ){
+   while (( c = getopt_long( argc, argv, "hvf:", long_options, &option_index )) != -1 ){
       switch( c ){
          case 'h':
          case '?':
             if ( am_i_master ){ print_help(); }
+            return clean_exit( 0 );
+            break;
+         case 'v':
+            if ( am_i_master ){ cout << "chemps2 version " << CHEMPS2_VERSION << endl; }
             return clean_exit( 0 );
             break;
          case 'f':
@@ -593,8 +598,7 @@ int main( int argc, char ** argv ){
    ***********************/
 
    if ( am_i_master ){
-
-      cout << "\nRunning chemps2 with the following options:\n" << endl;
+      cout << "\nRunning chemps2 version " << CHEMPS2_VERSION << " with the following options:\n" << endl;
       cout << "   FCIDUMP            = " << fcidump << endl;
       cout << "   GROUP              = " << Symmhelper.getGroupName() << endl;
       cout << "   MULTIPLICITY       = " << multiplicity << endl;
