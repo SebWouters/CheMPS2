@@ -1,5 +1,5 @@
 project (CheMPS2)
-set (CheMPS2_VERSION      "1.7-rc2-2 (2016-05-13)")
+set (CheMPS2_VERSION      "1.7-rc2-3 (2016-05-13)")
 set (CheMPS2_AUTHORS      "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")

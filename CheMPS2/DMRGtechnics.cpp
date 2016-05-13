@@ -123,7 +123,7 @@ void CheMPS2::DMRG::calc_rdms_and_correlations( const bool do_3rdm ){
    // Calculate the 3DM and Correlations
    if ( the3DM  != NULL ){ delete the3DM;  the3DM  = NULL; }
    if ( theCorr != NULL ){ delete theCorr; theCorr = NULL; }
-   if ( do_3rdm ){ the3DM = new ThreeDM( denBK, Prob ); }
+   if ( do_3rdm ){ the3DM = new ThreeDM( denBK, Prob, false ); }
    theCorr = new Correlations( denBK, Prob, the2DM );
    if ( am_i_master ){
       Gtensors = new TensorGYZ*[ L - 1 ];

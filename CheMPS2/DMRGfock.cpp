@@ -64,10 +64,10 @@ void CheMPS2::DMRG::Symm4RDM( double * output, const int Y, const int Z, const b
                   output[ j + L * ( k + L * ( Z + L * ( p + L * ( q + L * r )))) ] -= 0.5 * the3DM->get_ham_index( j, k, Y, p, q, r );
                   output[ j + L * ( k + L * ( p + L * ( Y + L * ( q + L * r )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, Z, q, r );
                   output[ j + L * ( k + L * ( p + L * ( Z + L * ( q + L * r )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, Y, q, r );
-                  output[ j + L * ( k + L * ( p + L * ( q + L * ( Y + L * r )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, q, Z, r );
-                  output[ j + L * ( k + L * ( p + L * ( q + L * ( Z + L * r )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, q, Y, r );
-                  output[ j + L * ( k + L * ( p + L * ( q + L * ( r + L * Y )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, q, r, Z );
-                  output[ j + L * ( k + L * ( p + L * ( q + L * ( r + L * Z )))) ] -= 0.5 * the3DM->get_ham_index( j, k, p, q, r, Y );
+                  output[ j + L * ( k + L * ( p + L * ( q + L * ( Y + L * r )))) ] -= 0.5 * the3DM->get_ham_index( k, j, p, Z, q, r );
+                  output[ j + L * ( k + L * ( p + L * ( q + L * ( Z + L * r )))) ] -= 0.5 * the3DM->get_ham_index( k, j, p, Y, q, r );
+                  output[ j + L * ( k + L * ( p + L * ( q + L * ( r + L * Y )))) ] -= 0.5 * the3DM->get_ham_index( p, j, k, Z, q, r );
+                  output[ j + L * ( k + L * ( p + L * ( q + L * ( r + L * Z )))) ] -= 0.5 * the3DM->get_ham_index( p, j, k, Y, q, r );
                }
             }
          }
@@ -125,7 +125,7 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
       updateMovingLeftSafeFirstTime( siteindex - 1 );
    }
 
-   ThreeDM * helper3rdm = new ThreeDM( denBK, Prob );
+   ThreeDM * helper3rdm = new ThreeDM( denBK, Prob, false );
    tensor_3rdm_a_J0_doublet = new Tensor3RDM****[ L - 1 ];
    tensor_3rdm_a_J1_doublet = new Tensor3RDM****[ L - 1 ];
    tensor_3rdm_a_J1_quartet = new Tensor3RDM****[ L - 1 ];

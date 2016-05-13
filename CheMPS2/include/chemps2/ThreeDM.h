@@ -44,8 +44,9 @@ namespace CheMPS2{
 
          //! Constructor
          /** \param book_in Symmetry sector bookkeeper
-             \param prob_in The problem to be solved */
-         ThreeDM(const SyBookkeeper * book_in, const Problem * prob_in);
+             \param prob_in The problem to be solved
+             \param disk_in Whether or not to use disk so that the L^6 3-RDM elements are not all at once in memory */
+         ThreeDM( const SyBookkeeper * book_in, const Problem * prob_in , const bool disk_in );
 
          //! Destructor
          virtual ~ThreeDM();
@@ -58,7 +59,7 @@ namespace CheMPS2{
              \param cnt5 the fifth index
              \param cnt6 the sixth index
              \return the desired value */
-         double get_ham_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6) const;
+         double get_ham_index( const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6 ) const;
 
          //! Perform storage[ :, :, :, :, :, : ] { = or += } alpha * 3-RDM[ :, :, :, :, :, last_orb_start: last_orb_start + last_orb_num ]
          /** \param alpha          The prefactor
@@ -66,7 +67,7 @@ namespace CheMPS2{
              \param storage        Array of size L * L * L * L * L * last_orb_num
              \param last_orb_start Begin index for the sixth orbital of the 3-RDM
              \param last_orb_num   Number of consecutive sixth orbitals to copy */
-         void fill_ham_index( const double alpha, const bool add, double * storage, const int last_orb_start, const int last_orb_num ) const;
+         void fill_ham_index( const double alpha, const bool add, double * storage, const int last_orb_start, const int last_orb_num );
 
          //! Fill the 3-RDM terms corresponding to site denT->gIndex()
          /** \param denT DMRG site-matrices
@@ -98,13 +99,7 @@ namespace CheMPS2{
 
          //! Return the trace (should be N(N-1)(N-2))
          /** \return Trace of the 3-RDM */
-         double trace() const;
-
-         //! Save the 3-RDM to disk
-         void save() const;
-
-         //! Load the 3-RDM from disk
-         void read();
+         double trace();
 
          //! Add the 3-RDM elements of all MPI processes
          void mpi_allreduce();
@@ -117,11 +112,38 @@ namespace CheMPS2{
          //The problem containing orbital reshuffling and symmetry information
          const Problem * prob;
 
+         //Whether or not to keep the full 3-RDM in memory
+         bool disk;
+
          //The DMRG chain length
          int L;
 
-         //The 3-RDM elements (L*L*L*L*L*L array of doubles) are stored in the HAMILTONIAN indices
+         //The array length of elements and (when allocated) temp_disk_vals and temp_disk_orbs = ( disk ) ? L*L*L*L*L : L*L*L*L*L*L
+         int array_size;
+
+         //The 3-RDM elements are stored in the HAMILTONIAN indices
          double * elements;
+
+         //The temporary orbitals when disk == true
+         int * temp_disk_orbs;
+
+         //The temporary values when disk == true
+         double * temp_disk_vals;
+
+         //The number of temporary values / orbitals
+         int temp_disk_counter;
+
+         //Create file
+         void create_file() const;
+
+         //Write a portion of the 3-RDM to disk
+         void write_file( const int last_ham_orb ) const;
+
+         //Read a portion of the 3-RDM from disk
+         void read_file( const int last_ham_orb );
+
+         //Flush the values stored in temp_disk_orbs and temp_disk_vals to disk
+         void flush_disk();
 
          //Set all twelve-fold permutation symmetric 3-RDM elements, using the DMRG indices.
          void set_dmrg_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6, const double value);
