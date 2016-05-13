@@ -104,8 +104,9 @@ namespace CheMPS2{
          void calc2DMandCorrelations(){ calc_rdms_and_correlations(false); }
          
          //! Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gauge.
-         /** \param do_3rdm Whether or not to calculate the 3-RDM */
-         void calc_rdms_and_correlations(const bool do_3rdm);
+         /** \param   do_3rdm Whether or not to calculate the 3-RDM
+             \param disk_3rdm Whether or not to use disk in order to avoid storing the full 3-RDM of size L^6 */
+         void calc_rdms_and_correlations( const bool do_3rdm, const bool disk_3rdm = false );
          
          //! Get the pointer to the 2-RDM
          /** \return The 2-RDM. Returns a NULL pointer if not yet calculated. */

@@ -64,7 +64,7 @@ namespace CheMPS2{
    const string HAMILTONIAN_ParentStorageName = "CheMPS2_Ham_parent.h5";
 
    const string TWO_RDM_storagename           = "CheMPS2_2DM.h5";
-   const string THREE_RDM_storagename         = "CheMPS2_3DM.h5";
+   const string THREE_RDM_storage_prefix      = "CheMPS2_3DM_";
 
    const bool   HEFF_debugPrint               = true;
    const int    DAVIDSON_NUM_VEC              = 32;

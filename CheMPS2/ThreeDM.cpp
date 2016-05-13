@@ -112,15 +112,20 @@ void CheMPS2::ThreeDM::set_dmrg_index( const int cnt1, const int cnt2, const int
    const int orb6 = (( prob->gReorder() ) ? prob->gf2( cnt6 ) : cnt6 );
 
    if ( disk ){
-      assert( temp_disk_counter < array_size );
-      temp_disk_orbs[ 6 * temp_disk_counter + 0 ] = orb1;
-      temp_disk_orbs[ 6 * temp_disk_counter + 1 ] = orb2;
-      temp_disk_orbs[ 6 * temp_disk_counter + 2 ] = orb3;
-      temp_disk_orbs[ 6 * temp_disk_counter + 3 ] = orb4;
-      temp_disk_orbs[ 6 * temp_disk_counter + 4 ] = orb5;
-      temp_disk_orbs[ 6 * temp_disk_counter + 5 ] = orb6;
-      temp_disk_vals[ temp_disk_counter ] = value;
-      temp_disk_counter++;
+      int private_counter = -1;
+      #pragma omp critical
+      {
+         private_counter = temp_disk_counter;
+         temp_disk_counter++;
+      }
+      assert( private_counter < array_size );
+      temp_disk_orbs[ 6 * private_counter + 0 ] = orb1;
+      temp_disk_orbs[ 6 * private_counter + 1 ] = orb2;
+      temp_disk_orbs[ 6 * private_counter + 2 ] = orb3;
+      temp_disk_orbs[ 6 * private_counter + 3 ] = orb4;
+      temp_disk_orbs[ 6 * private_counter + 4 ] = orb5;
+      temp_disk_orbs[ 6 * private_counter + 5 ] = orb6;
+      temp_disk_vals[ private_counter ] = value;
       return;
    }
 
@@ -216,8 +221,18 @@ double CheMPS2::ThreeDM::trace(){
 
 void CheMPS2::ThreeDM::create_file() const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const int mpi_rank = MPIchemps2::mpi_rank();
+   #else
+      const int mpi_rank = 0;
+   #endif
+
    assert( disk == true );
-   hid_t file_id  = H5Fcreate( CheMPS2::THREE_RDM_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+
+   std::stringstream filename;
+   filename << CheMPS2::THREE_RDM_storage_prefix << mpi_rank << ".h5";
+
+   hid_t file_id  = H5Fcreate( filename.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
    hid_t group_id = H5Gcreate( file_id, "three_rdm", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
    for ( int orb = 0; orb < L; orb++ ){
@@ -242,8 +257,18 @@ void CheMPS2::ThreeDM::create_file() const{
 
 void CheMPS2::ThreeDM::write_file( const int last_ham_orb ) const{
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const int mpi_rank = MPIchemps2::mpi_rank();
+   #else
+      const int mpi_rank = 0;
+   #endif
+
    assert( disk == true );
-   hid_t file_id  = H5Fopen( CheMPS2::THREE_RDM_storagename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT );
+
+   std::stringstream filename;
+   filename << CheMPS2::THREE_RDM_storage_prefix << mpi_rank << ".h5";
+
+   hid_t file_id  = H5Fopen( filename.str().c_str(), H5F_ACC_RDWR, H5P_DEFAULT );
    hid_t group_id = H5Gopen( file_id, "three_rdm", H5P_DEFAULT );
 
       std::stringstream storagename;
@@ -261,8 +286,18 @@ void CheMPS2::ThreeDM::write_file( const int last_ham_orb ) const{
 
 void CheMPS2::ThreeDM::read_file( const int last_ham_orb ){
 
+   #ifdef CHEMPS2_MPI_COMPILATION
+      const int mpi_rank = MPIchemps2::mpi_rank();
+   #else
+      const int mpi_rank = 0;
+   #endif
+
    assert( disk == true );
-   hid_t file_id  = H5Fopen( CheMPS2::THREE_RDM_storagename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+
+   std::stringstream filename;
+   filename << CheMPS2::THREE_RDM_storage_prefix << mpi_rank << ".h5";
+
+   hid_t file_id  = H5Fopen( filename.str().c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
    hid_t group_id = H5Gopen( file_id, "three_rdm", H5P_DEFAULT );
 
       std::stringstream storagename;

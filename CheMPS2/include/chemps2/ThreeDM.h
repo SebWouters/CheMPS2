@@ -45,7 +45,7 @@ namespace CheMPS2{
          //! Constructor
          /** \param book_in Symmetry sector bookkeeper
              \param prob_in The problem to be solved
-             \param disk_in Whether or not to use disk so that the L^6 3-RDM elements are not all at once in memory */
+             \param disk_in Whether or not to use disk in order to avoid storing the full 3-RDM of size L^6 */
          ThreeDM( const SyBookkeeper * book_in, const Problem * prob_in , const bool disk_in );
 
          //! Destructor
