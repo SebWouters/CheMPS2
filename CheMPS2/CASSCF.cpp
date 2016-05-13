@@ -138,24 +138,6 @@ void CheMPS2::CASSCF::copy2DMover( TwoDM * theDMRG2DM, const int LAS, double * t
 
 }
 
-void CheMPS2::CASSCF::copy3DMover( ThreeDM * theDMRG3DM, const int LAS, double * three_dm ){
-
-   for ( int i = 0; i < LAS; i++ ){
-      for ( int j = 0; j < LAS; j++ ){
-         for ( int k = 0; k < LAS; k++ ){
-            for ( int l = 0; l < LAS; l++ ){
-               for ( int m = 0; m < LAS; m++ ){
-                  for ( int n = 0; n < LAS; n++ ){
-                     three_dm[ i + LAS * ( j + LAS * ( k + LAS * ( l + LAS * ( m + LAS * n ) ) ) ) ] = theDMRG3DM->get_ham_index( i, j, k, l, m, n );
-                  }
-               }
-            }
-         }
-      }
-   }
-
-}
-
 void CheMPS2::CASSCF::setDMRG1DM( const int num_elec, const int LAS, double * one_dm, double * two_dm ){
 
    #ifdef CHEMPS2_MPI_COMPILATION

@@ -307,7 +307,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
          }
          // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       }
-      copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm ); // 3-RDM
+      theDMRG->get3DM()->fill_ham_index( 1.0, false, three_dm, 0, nOrbDMRG );
       if (( CheMPS2::DMRG_storeMpsOnDisk ) && ( CHECKPOINT == false )){ theDMRG->deleteStoredMPS(); }
       if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;

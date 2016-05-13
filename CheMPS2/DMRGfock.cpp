@@ -181,35 +181,7 @@ void CheMPS2::DMRG::symm_4rdm_helper( double * output, const int ham_orb1, const
    delete [] tensor_3rdm_d_J0_doublet;
    delete [] tensor_3rdm_d_J1_doublet;
    delete [] tensor_3rdm_d_J1_quartet;
-   if ( add ){
-      for ( int ham1 = 0; ham1 < L; ham1++ ){
-         for ( int ham2 = 0; ham2 < L; ham2++ ){
-            for ( int ham3 = 0; ham3 < L; ham3++ ){
-               for ( int ham4 = 0; ham4 < L; ham4++ ){
-                  for ( int ham5 = 0; ham5 < L; ham5++ ){
-                     for ( int ham6 = 0; ham6 < L; ham6++ ){
-                        output[ ham1 + L * ( ham2 + L * ( ham3 + L * ( ham4 + L * ( ham5 + L * ham6 )))) ] += factor * helper3rdm->get_ham_index( ham1, ham2, ham3, ham4, ham5, ham6 );
-                     }
-                  }
-               }
-            }
-         }
-      }
-   } else {
-      for ( int ham1 = 0; ham1 < L; ham1++ ){
-         for ( int ham2 = 0; ham2 < L; ham2++ ){
-            for ( int ham3 = 0; ham3 < L; ham3++ ){
-               for ( int ham4 = 0; ham4 < L; ham4++ ){
-                  for ( int ham5 = 0; ham5 < L; ham5++ ){
-                     for ( int ham6 = 0; ham6 < L; ham6++ ){
-                        output[ ham1 + L * ( ham2 + L * ( ham3 + L * ( ham4 + L * ( ham5 + L * ham6 )))) ] = factor * helper3rdm->get_ham_index( ham1, ham2, ham3, ham4, ham5, ham6 );
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
+   helper3rdm->fill_ham_index( factor, add, output, 0, L );
 
    // Throw out the changed MPS and place back the original left-normalized MPS
    for ( int orbital = 0; orbital < L; orbital++ ){

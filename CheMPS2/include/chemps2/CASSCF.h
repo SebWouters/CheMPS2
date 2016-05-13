@@ -252,12 +252,6 @@ namespace CheMPS2{
              \param two_dm The CASSCF 2-RDM */
          static void copy2DMover( TwoDM * theDMRG2DM, const int LAS, double * two_dm );
 
-         //! Copy over the DMRG 3-RDM
-         /** \param theDMRG3DM The 3-RDM from the DMRG object
-             \param LAS The total number of DMRG orbitals
-             \param three_dm The CASSCF 3-RDM */
-         static void copy3DMover( ThreeDM * theDMRG3DM, const int LAS, double * three_dm );
-
          //! Construct the 1-RDM from the 2-RDM
          /** \param num_elec The number of DMRG active space electrons
              \param LAS The total number of DMRG orbitals

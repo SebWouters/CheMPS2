@@ -67,60 +67,66 @@ void CheMPS2::ThreeDM::mpi_allreduce(){
 }
 #endif
 
-void CheMPS2::ThreeDM::set_dmrg_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6, const double value){
+void CheMPS2::ThreeDM::set_dmrg_index( const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6, const double value ){
 
-   //Prob assumes you use DMRG orbs...
-   //Irrep sanity checks are performed in ThreeDM::fill_site
-   elements[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * ( cnt4 + L * ( cnt5 + L * cnt6 ) ) ) ) ] = value;
-   elements[ cnt2 + L * ( cnt3 + L * ( cnt1 + L * ( cnt5 + L * ( cnt6 + L * cnt4 ) ) ) ) ] = value;
-   elements[ cnt3 + L * ( cnt1 + L * ( cnt2 + L * ( cnt6 + L * ( cnt4 + L * cnt5 ) ) ) ) ] = value;
-   elements[ cnt2 + L * ( cnt1 + L * ( cnt3 + L * ( cnt5 + L * ( cnt4 + L * cnt6 ) ) ) ) ] = value;
-   elements[ cnt3 + L * ( cnt2 + L * ( cnt1 + L * ( cnt6 + L * ( cnt5 + L * cnt4 ) ) ) ) ] = value;
-   elements[ cnt1 + L * ( cnt3 + L * ( cnt2 + L * ( cnt4 + L * ( cnt6 + L * cnt5 ) ) ) ) ] = value;
-   
-   elements[ cnt4 + L * ( cnt5 + L * ( cnt6 + L * ( cnt1 + L * ( cnt2 + L * cnt3 ) ) ) ) ] = value;
-   elements[ cnt5 + L * ( cnt6 + L * ( cnt4 + L * ( cnt2 + L * ( cnt3 + L * cnt1 ) ) ) ) ] = value;
-   elements[ cnt6 + L * ( cnt4 + L * ( cnt5 + L * ( cnt3 + L * ( cnt1 + L * cnt2 ) ) ) ) ] = value;
-   elements[ cnt5 + L * ( cnt4 + L * ( cnt6 + L * ( cnt2 + L * ( cnt1 + L * cnt3 ) ) ) ) ] = value;
-   elements[ cnt6 + L * ( cnt5 + L * ( cnt4 + L * ( cnt3 + L * ( cnt2 + L * cnt1 ) ) ) ) ] = value;
-   elements[ cnt4 + L * ( cnt6 + L * ( cnt5 + L * ( cnt1 + L * ( cnt3 + L * cnt2 ) ) ) ) ] = value;
+   // prob assumes you use DMRG orbs, while elements is stored in hamiltonian orbitals
+   // irrep sanity checks are performed in ThreeDM::fill_site
 
-}
+   const int orb1 = (( prob->gReorder() ) ? prob->gf2( cnt1 ) : cnt1 );
+   const int orb2 = (( prob->gReorder() ) ? prob->gf2( cnt2 ) : cnt2 );
+   const int orb3 = (( prob->gReorder() ) ? prob->gf2( cnt3 ) : cnt3 );
+   const int orb4 = (( prob->gReorder() ) ? prob->gf2( cnt4 ) : cnt4 );
+   const int orb5 = (( prob->gReorder() ) ? prob->gf2( cnt5 ) : cnt5 );
+   const int orb6 = (( prob->gReorder() ) ? prob->gf2( cnt6 ) : cnt6 );
 
-double CheMPS2::ThreeDM::get_dmrg_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6) const{
+   elements[ orb1 + L * ( orb2 + L * ( orb3 + L * ( orb4 + L * ( orb5 + L * orb6 ) ) ) ) ] = value;
+   elements[ orb2 + L * ( orb3 + L * ( orb1 + L * ( orb5 + L * ( orb6 + L * orb4 ) ) ) ) ] = value;
+   elements[ orb3 + L * ( orb1 + L * ( orb2 + L * ( orb6 + L * ( orb4 + L * orb5 ) ) ) ) ] = value;
+   elements[ orb2 + L * ( orb1 + L * ( orb3 + L * ( orb5 + L * ( orb4 + L * orb6 ) ) ) ) ] = value;
+   elements[ orb3 + L * ( orb2 + L * ( orb1 + L * ( orb6 + L * ( orb5 + L * orb4 ) ) ) ) ] = value;
+   elements[ orb1 + L * ( orb3 + L * ( orb2 + L * ( orb4 + L * ( orb6 + L * orb5 ) ) ) ) ] = value;
 
-   //Prob assumes you use DMRG orbs...
-   const int irrep1 = prob->gIrrep(cnt1);
-   const int irrep2 = prob->gIrrep(cnt2);
-   const int irrep3 = prob->gIrrep(cnt3);
-   const int irrep4 = prob->gIrrep(cnt4);
-   const int irrep5 = prob->gIrrep(cnt5);
-   const int irrep6 = prob->gIrrep(cnt6);
-   if ( Irreps::directProd(Irreps::directProd(irrep1, irrep2), irrep3) == Irreps::directProd(Irreps::directProd(irrep4, irrep5), irrep6) ){
-      return elements[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * ( cnt4 + L * ( cnt5 + L * cnt6 ) ) ) ) ];
-   }
-   
-   return 0.0;
+   elements[ orb4 + L * ( orb5 + L * ( orb6 + L * ( orb1 + L * ( orb2 + L * orb3 ) ) ) ) ] = value;
+   elements[ orb5 + L * ( orb6 + L * ( orb4 + L * ( orb2 + L * ( orb3 + L * orb1 ) ) ) ) ] = value;
+   elements[ orb6 + L * ( orb4 + L * ( orb5 + L * ( orb3 + L * ( orb1 + L * orb2 ) ) ) ) ] = value;
+   elements[ orb5 + L * ( orb4 + L * ( orb6 + L * ( orb2 + L * ( orb1 + L * orb3 ) ) ) ) ] = value;
+   elements[ orb6 + L * ( orb5 + L * ( orb4 + L * ( orb3 + L * ( orb2 + L * orb1 ) ) ) ) ] = value;
+   elements[ orb4 + L * ( orb6 + L * ( orb5 + L * ( orb1 + L * ( orb3 + L * orb2 ) ) ) ) ] = value;
 
 }
 
-double CheMPS2::ThreeDM::get_ham_index(const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6) const{
+double CheMPS2::ThreeDM::get_ham_index( const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6 ) const{
 
-   //Prob assumes you use DMRG orbs... f1 converts HAM orbs to DMRG orbs
-   if ( prob->gReorder() ){
-      return get_dmrg_index( prob->gf1(cnt1), prob->gf1(cnt2), prob->gf1(cnt3), prob->gf1(cnt4), prob->gf1(cnt5), prob->gf1(cnt6) );
+   return elements[ cnt1 + L * ( cnt2 + L * ( cnt3 + L * ( cnt4 + L * ( cnt5 + L * cnt6 )))) ];
+
+}
+
+void CheMPS2::ThreeDM::fill_ham_index( const double alpha, const bool add, double * storage, const int last_orb_start, const int last_orb_num ) const{
+
+   assert( last_orb_start >= 0 );
+   assert( last_orb_num   >= 1 );
+   assert( last_orb_start + last_orb_num <= L );
+
+   const int shift = last_orb_start * L * L * L * L * L;
+   const int size  = last_orb_num   * L * L * L * L * L;
+
+   if ( add == false ){
+      #pragma omp simd
+      for ( int cnt = 0; cnt < size; cnt++ ){ storage[ cnt ]  = alpha * elements[ shift + cnt ]; }
+   } else {
+      #pragma omp simd
+      for ( int cnt = 0; cnt < size; cnt++ ){ storage[ cnt ] += alpha * elements[ shift + cnt ]; }
    }
-   return get_dmrg_index( cnt1, cnt2, cnt3, cnt4, cnt5, cnt6 );
 
 }
 
 double CheMPS2::ThreeDM::trace() const{
 
    double value = 0.0;
-   for (int cnt1=0; cnt1<L; cnt1++){
-      for (int cnt2=0; cnt2<L; cnt2++){
-         for (int cnt3=0; cnt3<L; cnt3++){
-            value += get_dmrg_index( cnt1, cnt2, cnt3, cnt1, cnt2, cnt3 );
+   for ( int cnt3 = 0; cnt3 < L; cnt3++ ){
+      for ( int cnt2 = 0; cnt2 < L; cnt2++ ){
+         for ( int cnt1 = 0; cnt1 < L; cnt1++ ){
+            value += get_ham_index( cnt1, cnt2, cnt3, cnt1, cnt2, cnt3 );
          }
       }
    }

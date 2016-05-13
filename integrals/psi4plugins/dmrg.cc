@@ -1097,7 +1097,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
                }
                // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
             }
-            CheMPS2::CASSCF::copy3DMover( theDMRG->get3DM(), nOrbDMRG, three_dm );        // 3-RDM --> three_dm was used as work space for the constracted 4-RDM
+            theDMRG->get3DM()->fill_ham_index( 1.0, false, three_dm, 0, nOrbDMRG ); // 3-RDM --> three_dm was used as work space for the constracted 4-RDM
             if (CheMPS2::DMRG_storeMpsOnDisk){        theDMRG->deleteStoredMPS();       }
             if (CheMPS2::DMRG_storeRenormOptrOnDisk){ theDMRG->deleteStoredOperators(); }
             delete theDMRG;
