@@ -341,9 +341,6 @@ namespace CheMPS2{
          const TwoIndex  * TMAT_ORIG;
          const FourIndex * VMAT_ORIG;
 
-         // The rotated 2-body matrix elements with at most two virtual indices
-         DMRGSCFintegrals * theRotatedTEI;
-
          // Irreps controller
          Irreps SymmInfo;
 
@@ -398,9 +395,6 @@ namespace CheMPS2{
          void constructCoulombAndExchangeMatrixInOrigIndices( DMRGSCFmatrix * density, DMRGSCFmatrix * result );
          void buildQmatOCC();
          void buildQmatACT();
-
-         // The Wmat_tilde function as defined by Eq. (20b) in the Siegbahn paper (see class header for specific definition)
-         DMRGSCFwtilde * wmattilde;
 
          // Function to get coefficients of certain Slater determinants for Fe2. Important to figure out diatomic D(inf)h symmetries when calculating them in D2h symmetry.
          void coeff_fe2( DMRG * theDMRG );

@@ -87,6 +87,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
    const string tmp_filename = tmp_folder + "/" + CheMPS2::DMRGSCF_eri_storage_name;
    const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
    // For ( ERI rotation, update unitary, block diagonalize, orbital localization )
+   DMRGSCFintegrals * theRotatedTEI = new DMRGSCFintegrals( iHandler );
+   DMRGSCFwtilde * wmattilde = new DMRGSCFwtilde( iHandler );
    const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
    const int work_mem_size = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
    double * mem1 = new double[ work_mem_size ];
@@ -275,6 +277,8 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
    delete [] mem1;
    delete [] mem2;
+   delete theRotatedTEI;
+   delete wmattilde;
    if ( am_i_master ){ delete_file( tmp_filename ); }
 
    delete Prob;

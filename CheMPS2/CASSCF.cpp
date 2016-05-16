@@ -74,7 +74,6 @@ CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * noc
 
    iHandler = new DMRGSCFindices( L, SymmInfo.getGroupNumber(), nocc, ndmrg, nvirt );
    unitary  = new DMRGSCFunitary( iHandler );
-   theRotatedTEI = new DMRGSCFintegrals( iHandler );
 
    // Allocate space for the DMRG 1DM and 2DM
    nOrbDMRG = iHandler->getDMRGcumulative( num_irreps );
@@ -88,9 +87,6 @@ CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * noc
    theQmatWORK= new DMRGSCFmatrix( iHandler ); theQmatWORK->clear();
    theTmatrix = new DMRGSCFmatrix( iHandler );  theTmatrix->clear();
 
-   // To store the w_tilde elements
-   wmattilde = new DMRGSCFwtilde( iHandler );
-
    if ( am_i_master ){
       if (( docc != NULL ) && ( socc != NULL )){ checkHF( docc, socc ); } // Print the MO info. This requires the iHandler to be created...
       iHandler->Print();
@@ -103,8 +99,6 @@ CheMPS2::CASSCF::CASSCF( Hamiltonian * ham_in, int * docc, int * socc, int * noc
 
 CheMPS2::CASSCF::~CASSCF(){
 
-   delete theRotatedTEI;
-
    delete [] DMRG1DM;
    delete [] DMRG2DM;
 
@@ -114,7 +108,6 @@ CheMPS2::CASSCF::~CASSCF(){
    delete theQmatACT;
    delete theQmatWORK;
    delete theTmatrix;
-   delete wmattilde;
    delete unitary;
 
    delete iHandler;

@@ -160,6 +160,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    const string tmp_filename = tmp_folder + "/" + CheMPS2::DMRGSCF_eri_storage_name;
    const int dmrgsize_power4 = nOrbDMRG * nOrbDMRG * nOrbDMRG * nOrbDMRG;
    //For (ERI rotation, update unitary, block diagonalize, orbital localization)
+   DMRGSCFintegrals * theRotatedTEI = new DMRGSCFintegrals( iHandler );
    const int temp_work_size = (( fullsize > CheMPS2::DMRGSCF_max_mem_eri_tfo ) ? CheMPS2::DMRGSCF_max_mem_eri_tfo : fullsize );
    const int work_mem_size  = max( max( temp_work_size , maxlinsize * maxlinsize * 4 ) , dmrgsize_power4 );
    const int tot_dmrg_power6 = dmrgsize_power4 * nOrbDMRG * nOrbDMRG;
@@ -343,15 +344,19 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    if ( am_i_master ){
       cout << "CASPT2 : Deviation from pseudocanonical = " << deviation_from_blockdiag( theFmatrix, iHandler ) << endl;
       CheMPS2::CASPT2 * myCASPT2 = new CheMPS2::CASPT2( iHandler, theRotatedTEI, theTmatrix, theFmatrix, DMRG1DM, DMRG2DM, three_dm, contract, IPEA );
+      delete theRotatedTEI;
+      delete [] three_dm;
+      delete [] contract;
       E_CASPT2 = myCASPT2->solve( IMAG );
       delete myCASPT2;
+   } else {
+      delete theRotatedTEI;
+      delete [] three_dm;
+      delete [] contract;
    }
    #ifdef CHEMPS2_MPI_COMPILATION
    MPIchemps2::broadcast_array_double( &E_CASPT2, 1, MPI_CHEMPS2_MASTER );
    #endif
-
-   delete [] three_dm;
-   delete [] contract;
 
    return E_CASPT2;
 
