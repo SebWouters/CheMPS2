@@ -1157,6 +1157,19 @@ void CheMPS2::CASPT2::recreate(){
    delete [] SFF_singlet;
    delete [] SFF_triplet;
 
+   double * temp = NULL;
+   for ( int irrep = 0; irrep < num_irreps; irrep++ ){
+       temp = new double[ size_A[ irrep ] ]; dcopy_( size_A + irrep, FAA[ irrep ], &inc1, temp, &inc1 ); delete [] FAA[ irrep ]; FAA[ irrep ] = temp;
+       temp = new double[ size_C[ irrep ] ]; dcopy_( size_C + irrep, FCC[ irrep ], &inc1, temp, &inc1 ); delete [] FCC[ irrep ]; FCC[ irrep ] = temp;
+       temp = new double[ size_D[ irrep ] ]; dcopy_( size_D + irrep, FDD[ irrep ], &inc1, temp, &inc1 ); delete [] FDD[ irrep ]; FDD[ irrep ] = temp;
+       temp = new double[ size_E[ irrep ] ]; dcopy_( size_E + irrep, FEE[ irrep ], &inc1, temp, &inc1 ); delete [] FEE[ irrep ]; FEE[ irrep ] = temp;
+       temp = new double[ size_G[ irrep ] ]; dcopy_( size_G + irrep, FGG[ irrep ], &inc1, temp, &inc1 ); delete [] FGG[ irrep ]; FGG[ irrep ] = temp;
+       temp = new double[ size_B_singlet[ irrep ] ]; dcopy_( size_B_singlet + irrep, FBB_singlet[ irrep ], &inc1, temp, &inc1 ); delete [] FBB_singlet[ irrep ]; FBB_singlet[ irrep ] = temp;
+       temp = new double[ size_B_triplet[ irrep ] ]; dcopy_( size_B_triplet + irrep, FBB_triplet[ irrep ], &inc1, temp, &inc1 ); delete [] FBB_triplet[ irrep ]; FBB_triplet[ irrep ] = temp;
+       temp = new double[ size_F_singlet[ irrep ] ]; dcopy_( size_F_singlet + irrep, FFF_singlet[ irrep ], &inc1, temp, &inc1 ); delete [] FFF_singlet[ irrep ]; FFF_singlet[ irrep ] = temp;
+       temp = new double[ size_F_triplet[ irrep ] ]; dcopy_( size_F_triplet + irrep, FFF_triplet[ irrep ], &inc1, temp, &inc1 ); delete [] FFF_triplet[ irrep ]; FFF_triplet[ irrep ] = temp;
+   }
+
    const int total_size = jump[ num_irreps * CHEMPS2_CASPT2_NUM_CASES ];
    cout << "CASPT2 : New size V_SD space  = " << total_size << endl;
 
