@@ -136,6 +136,19 @@ To acknowledge CheMPS2, please cite
             doi = {10.1063/1.4885815}
         }
 
+4. S. Wouters, V. Van Speybroeck and D. Van Neck,
+   DMRG-CASPT2 study of the longitudinal static second hyperpolarizability of all-trans polyenes,
+   *Preprint* (2016),
+   [arXiv:1605.05526](http://arxiv.org/abs/1605.05526)
+
+        @article{CheMPS2cite4,
+            author = {Sebastian Wouters and Veronique {Van Speybroeck} and Dimitri {Van Neck}},
+            title = {DMRG-CASPT2 study of the longitudinal static second hyperpolarizability of all-trans polyenes},
+            journal = {arXiv:1605.05526},
+            year = {2016},
+            url = {http://arxiv.org/abs/1605.05526}
+        }
+
 
 Installation
 ------------
