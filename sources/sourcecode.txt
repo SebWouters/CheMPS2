@@ -82,7 +82,7 @@ instead, where option5 and option6 are respectively the missing colon-separated 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 
-For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If CMake complains about the HDF5 headers, try to pass it with the option ``-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial``.
+For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If CMake complains about the HDF5 headers, try to pass it with the option ``-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial``.
 
 To compile, run:
 
@@ -116,8 +116,6 @@ To test libchemps2 for compilation **with MPI**, run:
     $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test1
     $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test2
     ...
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test11
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./test12
 
 ``YYY`` specifies the number of threads per process and ``ZZZ`` the number of processes. Note that the tests are too small to see (near) linear scaling with the number of cores, although improvement should still be noticeable.
 
@@ -131,21 +129,24 @@ To test the chemps2 binary for compilation **without MPI**, run:
     $ man /sourcefolder/chemps2/chemps2.1
     $ cd /sourcefolder/chemps2/build/CheMPS2
     $ ./chemps2 --help
-    $ ./chemps2 --fcidump=/sourcefolder/chemps2/tests/matrixelements/H2O.631G.FCIDUMP \
-                --group=5 \
-                --sweep_d=200,1000 \
-                --sweep_econv=1e-8,1e-8 \
-                --sweep_maxit=2,10 \
-                --sweep_noise=0.05,0.0 \
-                --twodmfile=2dm.out \
-                --print_corr \
-                --reorder=6,5,4,3,2,1,0,7,8,9,10,11,12
+    $ cp /sourcefolder/chemps2/tests/test14.input .
+    $ sed -i "s/path\/to/sourcefolder\/chemps2\/tests\/matrixelements/" test14.input
+    $ cat test14.input
+    $ ./chemps2 --file=test14.input
+
+Note that when you use the CASPT2 checkpoint, and want to restart a
+calculation at a later point, you should
+
+    1. switch the option ``SCF_ACTIVE_SPACE`` to ``I``
+    2. remove the ``CheMPS2_DIIS.h5`` checkpoint
+
+in order to ensure that **exactly** the same orbitals are used in the different runs.
     
 To test the chemps2 binary for compilation **with MPI**, prepend the binary with:
 
 .. code-block:: bash
 
-    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./chemps2 [OPTIONS]
+    $ OMP_NUM_THREADS=YYY mpirun -np ZZZ ./chemps2 --file=test14.input
 
 Build PyCheMPS2
 ---------------
@@ -156,7 +157,7 @@ PyCheMPS2 is a python interface to libchemps2, for compilation **without MPI**. 
 
     $ export CPATH=${CPATH}:/option3/include
     
-where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
+where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
 
 .. code-block:: bash
 
@@ -186,8 +187,6 @@ When libchemps2 has been compiled **without MPI**, PyCheMPS2 can be tested by ru
     $ python test1.py
     $ python test2.py
     ...
-    $ python test11.py
-    $ python test12.py
 
 
 If you compiled the ``c++`` library with ``-DMKL=ON``, you might get the error

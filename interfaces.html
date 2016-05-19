@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>10. Interfaces to psi4 and pyscf &mdash; CheMPS2 1.7 documentation</title>
+    <title>10. Interfaces to psi4 and pyscf &mdash; CheMPS2 1.7-rc2-8 (2016-05-19) documentation</title>
     
-    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7',
+        VERSION:     '1.7-rc2-8 (2016-05-19)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,12 +23,12 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7 documentation" href="index.html" />
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7-rc2-8 (2016-05-19) documentation" href="index.html" />
     <link rel="prev" title="9. DMRG-SCF calculations" href="dmrgscfcalcs.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -37,45 +37,45 @@
         <li class="right" >
           <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="index-0"></span><span class="target" id="index-1"></span><div class="section" id="interfaces-to-psi4-and-pyscf">
 <span id="index-2"></span><h1>10. Interfaces to psi4 and pyscf<a class="headerlink" href="#interfaces-to-psi4-and-pyscf" title="Permalink to this headline">¶</a></h1>
 <p>CheMPS2 is currently interfaced with two ab initio quantum chemistry packages:</p>
 <ol class="arabic simple">
-<li>The <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a> allows to perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations with CheMPS2, by using <a class="reference external" href="http://www.psicode.org/">psi4</a> input files. Since April 2015, CheMPS2 is also an integral part of psi4.</li>
+<li>The <code class="docutils literal"><span class="pre">dmrg</span></code> plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a> allows to perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations with CheMPS2, by using <a class="reference external" href="http://www.psicode.org/">psi4</a> input files. Since April 2015, CheMPS2 is also an integral part of psi4.</li>
 <li>There are also DMRG-CI and DMRG-SCF interfaces between <a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> and CheMPS2.</li>
 </ol>
 <div class="section" id="psi4-dmrg-plugin">
-<h2>10.1. psi4 <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin<a class="headerlink" href="#psi4-dmrg-plugin" title="Permalink to this headline">¶</a></h2>
+<h2>10.1. psi4 <code class="docutils literal"><span class="pre">dmrg</span></code> plugin<a class="headerlink" href="#psi4-dmrg-plugin" title="Permalink to this headline">¶</a></h2>
 <p>DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations can be performed directly with <a class="reference external" href="http://www.psicode.org/">psi4</a>. The plugin has been tested on <a class="reference external" href="https://github.com/psi4/psi4/releases/tag/0.5">psi4-0.5</a> (released February 17, 2016).</p>
-<p>To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option <tt class="docutils literal"><span class="pre">ENABLE_PLUGINS=ON</span></tt>, and then run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins
-<span class="nv">$ </span>psi4 --new-plugin dmrg
-<span class="nv">$ </span><span class="nb">cd </span>dmrg
+<p>To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build <a class="reference external" href="http://www.psicode.org/">psi4</a> with the plugin option <code class="docutils literal"><span class="pre">ENABLE_PLUGINS=ON</span></code>, and then run:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins
+$ psi4 --new-plugin dmrg
+$ <span class="nb">cd</span> dmrg
 </pre></div>
 </div>
-<p>Now, replace the file <tt class="docutils literal"><span class="pre">dmrg.cc</span></tt> with <tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/psi4plugins/dmrg.cc</span></tt>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> <span class="nv">$^</span> <span class="k">$(</span>CXXDEFS<span class="k">)</span>
+<p>Now, replace the file <code class="docutils literal"><span class="pre">dmrg.cc</span></code> with <code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/psi4plugins/dmrg.cc</span></code>. To compile the plugin, the Makefile should be adjusted. Change the line</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> $^ <span class="k">$(</span>CXXDEFS<span class="k">)</span>
 </pre></div>
 </div>
 <p>to</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> <span class="nv">$^</span> <span class="k">$(</span>CXXDEFS<span class="k">)</span> -lchemps2
+<div class="highlight-bash"><div class="highlight"><pre><span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> $^ <span class="k">$(</span>CXXDEFS<span class="k">)</span> -lchemps2
 </pre></div>
 </div>
-<p>Remember to add the library and include paths to the Makefile as well, if <tt class="docutils literal"><span class="pre">libchemps2</span></tt> is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder <tt class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></tt>. It might be necessary to add it to the <tt class="docutils literal"><span class="pre">INCLUDES</span></tt> variable in the Makefile.
+<p>Remember to add the library and include paths to the Makefile as well, if <code class="docutils literal"><span class="pre">libchemps2</span></code> is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. It might be necessary to add it to the <code class="docutils literal"><span class="pre">INCLUDES</span></code> variable in the Makefile.
 To compile the plugin, run:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>make
+<div class="highlight-bash"><div class="highlight"><pre>$ make
 </pre></div>
 </div>
-<p>An example input file to perform a DMRG-CI calculation with the <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin:</p>
+<p>An example input file to perform a DMRG-CI calculation with the <code class="docutils literal"><span class="pre">dmrg</span></code> plugin:</p>
 <div class="highlight-python"><div class="highlight"><pre>molecule H2O {
  0 1
    O   0.000000000   0.00   0.000000000
@@ -103,20 +103,25 @@ set dmrg dmrg_states          [  200,  500, 1000, 1000 ]
 set dmrg dmrg_e_convergence   [ 1e-8, 1e-8, 1e-8, 1e-8 ]
 set dmrg dmrg_maxsweeps       [    5,    5,    5,  100 ]
 set dmrg dmrg_noiseprefactors [ 0.03, 0.03, 0.03,  0.0 ]
+set dmrg dmrg_dvdson_rtol     [ 1e-5, 1e-5, 1e-5, 1e-9 ]
 set dmrg dmrg_print_corr      false
 set dmrg dmrg_chkpt           false
 
 set dmrg dmrg_max_iter        1
 
+set dmrg dmrg_molden          true  # DMRG-CI pseudocanonical orbitals
+set dmrg dmrg_density_ao      true  # DMRG-CI density in the AO basis
+
 energy(&#39;dmrg&#39;)
+
 </pre></div>
 </div>
-<p>Note that the option <tt class="docutils literal"><span class="pre">dmrg_max_iter</span></tt> has been set to <tt class="docutils literal"><span class="pre">1</span></tt>, so that only one active space calculation is performed. This file (<tt class="docutils literal"><span class="pre">H2O.dmrgci.in</span></tt>) should be placed in the folder <tt class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></tt>. The DMRG-CI calculation can then be started with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins/dmrg
-<span class="nv">$ </span>psi4 H2O.dmrgci.in H2O.dmrgci.out
+<p>Note that the option <code class="docutils literal"><span class="pre">dmrg_max_iter</span></code> has been set to <code class="docutils literal"><span class="pre">1</span></code>, so that only one active space calculation is performed. This file (<code class="docutils literal"><span class="pre">H2O.dmrgci.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></code>. The DMRG-CI calculation can then be started with:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins/dmrg
+$ psi4 H2O.dmrgci.in H2O.dmrgci.out
 </pre></div>
 </div>
-<p>An example input file to perform a DMRG-SCF calculation with the <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin:</p>
+<p>An example input file to perform a DMRG-SCF calculation with the <code class="docutils literal"><span class="pre">dmrg</span></code> plugin:</p>
 <div class="highlight-python"><div class="highlight"><pre>molecule O2 {
   O       0.0   0.0   0.0
   O       0.0   0.0   3.0 
@@ -139,6 +144,7 @@ set dmrg dmrg_states          [   500,  1000,  1000 ]
 set dmrg dmrg_e_convergence   [ 1e-10, 1e-10, 1e-10 ]
 set dmrg dmrg_maxsweeps       [     5,     5,    10 ]
 set dmrg dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrg dmrg_dvdson_rtol     [  1e-5,  1e-5,  1e-9 ]
 set dmrg dmrg_print_corr      false
 set dmrg dmrg_chkpt           false
 
@@ -154,15 +160,19 @@ set dmrg dmrg_state_avg       true
 set dmrg dmrg_active_space    NO  # INPUT; NO; LOC
 set dmrg dmrg_loc_random      false
 
+set dmrg dmrg_molden          true  # Converged DMRG-SCF pseudocanonical orbitals
+set dmrg dmrg_density_ao      true  # Converged DMRG-SCF density in the AO basis
+
 energy(&#39;dmrg&#39;)
+
 </pre></div>
 </div>
-<p>This file (<tt class="docutils literal"><span class="pre">O2.dmrgscf.in</span></tt>) should be placed in the folder <tt class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></tt>. The DMRG-SCF calculation can then be started with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins/dmrg
-<span class="nv">$ </span>psi4 O2.dmrgscf.in O2.dmrgscf.out
+<p>This file (<code class="docutils literal"><span class="pre">O2.dmrgscf.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></code>. The DMRG-SCF calculation can then be started with:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins/dmrg
+$ psi4 O2.dmrgscf.in O2.dmrgscf.out
 </pre></div>
 </div>
-<p>An example input file to perform a DMRG-CASPT2 calculation with the <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin:</p>
+<p>An example input file to perform a DMRG-CASPT2 calculation with the <code class="docutils literal"><span class="pre">dmrg</span></code> plugin:</p>
 <div class="highlight-python"><div class="highlight"><pre>molecule N2 {
   N       0.0000   0.0000   0.0000
   N       0.0000   0.0000   2.1180
@@ -187,6 +197,7 @@ set dmrg dmrg_states          [   500,  1000,  1000 ]
 set dmrg dmrg_e_convergence   [ 1e-10, 1e-10, 1e-10 ]
 set dmrg dmrg_maxsweeps       [     5,     5,    10 ]
 set dmrg dmrg_noiseprefactors [  0.05,  0.05,   0.0 ]
+set dmrg dmrg_dvdson_rtol     [  1e-5,  1e-5,  1e-9 ]
 set dmrg dmrg_print_corr      false
 set dmrg dmrg_chkpt           false
 
@@ -202,16 +213,21 @@ set dmrg dmrg_state_avg       false
 set dmrg dmrg_active_space    INPUT # INPUT; NO; LOC
 set dmrg dmrg_loc_random      false
 
+set dmrg dmrg_molden          false # Converged DMRG-SCF pseudocanonical orbitals
+set dmrg dmrg_density_ao      true  # Converged DMRG-SCF density in the AO basis
+
 set dmrg dmrg_caspt2          true
+set dmrg dmrg_caspt2_orb      ACTIVE
 set dmrg dmrg_ipea            0.00
 set dmrg dmrg_imag_shift      0.00
 
 energy(&#39;dmrg&#39;)
+
 </pre></div>
 </div>
-<p>This file (<tt class="docutils literal"><span class="pre">N2.caspt2.in</span></tt>) should be placed in the folder <tt class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></tt>. The DMRG-CASPT2 calculation can then be started with:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span><span class="nb">cd</span> /mypsi4plugins/dmrg
-<span class="nv">$ </span>psi4 N2.caspt2.in N2.caspt2.out
+<p>This file (<code class="docutils literal"><span class="pre">N2.caspt2.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/dmrg</span></code>. The DMRG-CASPT2 calculation can then be started with:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins/dmrg
+$ psi4 N2.caspt2.in N2.caspt2.out
 </pre></div>
 </div>
 <p>Since April 2015, CheMPS2 is also an integral part of <a class="reference external" href="http://www.psicode.org/">psi4</a>. Please consult <a class="reference external" href="http://www.psicode.org/">psi4</a>&#8216;s documentation on how to run DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations with <a class="reference external" href="http://www.psicode.org/">psi4</a>.</p>
@@ -221,13 +237,13 @@ energy(&#39;dmrg&#39;)
 <p><a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> is a new quantum chemistry package, in which all layers are written or interfaced in python. In the future, the package will be able to perform DMRG-CI and DMRG-SCF calculations using PyCheMPS2: <a class="reference external" href="https://github.com/sunqm/pyscf/blob/master/future/dmrgscf/chemps2.py">chemps2.py</a>.</p>
 <p>Examples of how to extract MO integrals from <a class="reference external" href="http://sunqm.github.io/pyscf/">pyscf</a> to perform DMRG-CI calculations with PyCheMPS2 can be found in:</p>
 <ol class="arabic simple">
-<li><tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example.py</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example2.py</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example3.py</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/dmrgci.py</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/call_chemps2.py</span></tt></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example2.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/example3.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/dmrgci.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">/sourcefolder/chemps2/integrals/pyscf/call_chemps2.py</span></code></li>
 </ol>
-<p>Please remember to append the correct pyscf and PyCheMPS2 directories to <tt class="docutils literal"><span class="pre">sys.path</span></tt> at the top of these files.</p>
+<p>Please remember to append the correct pyscf and PyCheMPS2 directories to <code class="docutils literal"><span class="pre">sys.path</span></code> at the top of these files.</p>
 </div>
 </div>
 
@@ -235,7 +251,7 @@ energy(&#39;dmrg&#39;)
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
               <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
@@ -243,7 +259,7 @@ energy(&#39;dmrg&#39;)
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">10. Interfaces to psi4 and pyscf</a><ul>
-<li><a class="reference internal" href="#psi4-dmrg-plugin">10.1. psi4 <tt class="docutils literal"><span class="pre">dmrg</span></tt> plugin</a></li>
+<li><a class="reference internal" href="#psi4-dmrg-plugin">10.1. psi4 <code class="docutils literal"><span class="pre">dmrg</span></code> plugin</a></li>
 <li><a class="reference internal" href="#id7">10.2. pyscf</a></li>
 </ul>
 </li>
@@ -252,12 +268,14 @@ energy(&#39;dmrg&#39;)
   <h4>Previous topic</h4>
   <p class="topless"><a href="dmrgscfcalcs.html"
                         title="previous chapter">9. DMRG-SCF calculations</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="sources/interfaces.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/interfaces.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -274,7 +292,7 @@ energy(&#39;dmrg&#39;)
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -283,12 +301,12 @@ energy(&#39;dmrg&#39;)
         <li class="right" >
           <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
              >previous</a> |</li>
-        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2013-2016, Sebastian Wouters.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
     </div>
   </body>
 </html>

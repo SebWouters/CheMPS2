@@ -6,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>6. DMRG calculations &mdash; CheMPS2 1.7 documentation</title>
+    <title>6. DMRG calculations &mdash; CheMPS2 1.7-rc2-8 (2016-05-19) documentation</title>
     
-    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7',
+        VERSION:     '1.7-rc2-8 (2016-05-19)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,13 +23,13 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7 documentation" href="index.html" />
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7-rc2-8 (2016-05-19) documentation" href="index.html" />
     <link rel="next" title="7. Typical resource requirements" href="resources.html" />
     <link rel="prev" title="5. CheMPS2::Hamiltonian" href="matrixelements.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,28 +41,28 @@
         <li class="right" >
           <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="dmrg-calculations">
 <span id="index-0"></span><h1>6. DMRG calculations<a class="headerlink" href="#dmrg-calculations" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="chemps2-problem">
-<h2>6.1. <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt><a class="headerlink" href="#chemps2-problem" title="Permalink to this headline">¶</a></h2>
-<p>Once a <tt class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></tt> object is created and filled with matrix elements, the desired symmetry sector should be specified in the <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt> object:</p>
+<h2>6.1. <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code><a class="headerlink" href="#chemps2-problem" title="Permalink to this headline">¶</a></h2>
+<p>Once a <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object is created and filled with matrix elements, the desired symmetry sector should be specified in the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> object:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span><span class="o">::</span><span class="n">Problem</span><span class="p">(</span> <span class="k">const</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Hamiltonian</span> <span class="o">*</span> <span class="n">Hamin</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">TwoSin</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Nin</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Irrepin</span> <span class="p">)</span>
 </pre></div>
 </div>
-<p>The variable <tt class="docutils literal"><span class="pre">Hamin</span></tt> contains the number of orbitals, the point group of the Hamiltonian, and the irrep of each orbital. The variable <tt class="docutils literal"><span class="pre">TwoSin</span></tt> should be <span class="math">\(2S\)</span>, twice the targeted spin value in the active space (multiplicity minus one). The variable <tt class="docutils literal"><span class="pre">Nin</span></tt> should be the number of electrons in the active space. The variable <tt class="docutils literal"><span class="pre">Irrepin</span></tt> should be the targeted irrep in the active space, defined according to the numbering conventions in <a class="reference external" href="http://www.psicode.org/">psi4</a>. The section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><em>Custom matrix elements</em></a> lists these conventions.</p>
+<p>The variable <code class="docutils literal"><span class="pre">Hamin</span></code> contains the number of orbitals, the point group of the Hamiltonian, and the irrep of each orbital. The variable <code class="docutils literal"><span class="pre">TwoSin</span></code> should be <span class="math">\(2S\)</span>, twice the targeted spin value in the active space (multiplicity minus one). The variable <code class="docutils literal"><span class="pre">Nin</span></code> should be the number of electrons in the active space. The variable <code class="docutils literal"><span class="pre">Irrepin</span></code> should be the targeted irrep in the active space, defined according to the numbering conventions in <a class="reference external" href="http://www.psicode.org/">psi4</a>. The section <a class="reference internal" href="matrixelements.html#chemps2-psi4irrepconventions"><span>Custom matrix elements</span></a> lists these conventions.</p>
 </div>
 <div class="section" id="chemps2-convergencescheme">
-<span id="chemps2-convergencescheme-object"></span><h2>6.2. <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt><a class="headerlink" href="#chemps2-convergencescheme" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt> defines a FCI problem. In order to perform DMRG calculations, a <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> should be provided as well. A convergence scheme consists of consecutive instructions, which are executed in order. Each instruction specifies four quantities:</p>
+<span id="chemps2-convergencescheme-object"></span><h2>6.2. <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code><a class="headerlink" href="#chemps2-convergencescheme" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> defines a FCI problem. In order to perform DMRG calculations, a <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> should be provided as well. A convergence scheme consists of consecutive instructions, which are executed in order. Each instruction specifies four quantities:</p>
 <ol class="arabic simple">
 <li>The number of reduced virtual basis states <span class="math">\(D_{\mathsf{SU(2)}}\)</span> to be retained.</li>
 <li>The energy convergence threshold <span class="math">\(E_{conv}\)</span> to stop the instruction.</li>
@@ -129,23 +129,23 @@
 </tbody>
 </table>
 </div></blockquote>
-<p>At first, the number of retained reduced virtual basis states is increased in each instruction, while noise is added to the wavefunction prior to decomposition. Afterwards, instructions without noise are performed and the number of retained reduced virtual basis states is decreased. The instructions with decreasing <span class="math">\(D_{\mathsf{SU(2)}}\)</span> are used to extrapolate the variational DMRG energies with discarded weight (see section <a class="reference internal" href="#chemps2-extrapolation"><em>Extrapolation</em></a>).</p>
-<p>The API for the <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> class:</p>
+<p>At first, the number of retained reduced virtual basis states is increased in each instruction, while noise is added to the wavefunction prior to decomposition. Afterwards, instructions without noise are performed and the number of retained reduced virtual basis states is decreased. The instructions with decreasing <span class="math">\(D_{\mathsf{SU(2)}}\)</span> are used to extrapolate the variational DMRG energies with discarded weight (see section <a class="reference internal" href="#chemps2-extrapolation"><span>Extrapolation</span></a>).</p>
+<p>The API for the <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> class:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span><span class="o">::</span><span class="n">ConvergenceScheme</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">nInstructions</span> <span class="p">)</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span><span class="o">::</span><span class="n">setInstruction</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">instruction</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">D</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">Econv</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">nMax</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">noisePrefactor</span> <span class="p">)</span>
 </pre></div>
 </div>
-<p>The variable <tt class="docutils literal"><span class="pre">D</span></tt> is the number of reduced virtual basis states <span class="math">\(D_{\mathsf{SU(2)}}\)</span>!</p>
+<p>The variable <code class="docutils literal"><span class="pre">D</span></code> is the number of reduced virtual basis states <span class="math">\(D_{\mathsf{SU(2)}}\)</span>!</p>
 </div>
 <div class="section" id="chemps2-dmrg">
-<span id="chemps2-dmrg-object"></span><h2>6.3. <tt class="docutils literal"><span class="pre">CheMPS2::DMRG</span></tt><a class="headerlink" href="#chemps2-dmrg" title="Permalink to this headline">¶</a></h2>
-<p>With the <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt> and <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> objects, DMRG calculations are completely defined:</p>
+<span id="chemps2-dmrg-object"></span><h2>6.3. <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code><a class="headerlink" href="#chemps2-dmrg" title="Permalink to this headline">¶</a></h2>
+<p>With the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> and <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> objects, DMRG calculations are completely defined:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">DMRG</span><span class="p">(</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span> <span class="o">*</span> <span class="n">Probin</span><span class="p">,</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">ConvergenceScheme</span> <span class="o">*</span> <span class="n">OptSchemeIn</span><span class="p">,</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">makechkpt</span><span class="p">,</span> <span class="k">const</span> <span class="n">string</span> <span class="n">tmpfolder</span><span class="o">=</span><span class="s">&quot;/tmp&quot;</span> <span class="p">)</span>
 <span class="kt">double</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">Solve</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>If the variable <tt class="docutils literal"><span class="pre">makechkpt</span></tt> is <tt class="docutils literal"><span class="pre">true</span></tt>, MPS checkpoints of the form <tt class="docutils literal"><span class="pre">CheMPS2_MPS*.h5</span></tt> are generated in the execution folder. They are stored/overwritten each time a full left and right sweep has been performed. The checkpoints allow to restart calculations. It is the responsibility of the user to remove the completed instructions from the <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt> before restarting a calculation!</p>
-<p>The function <tt class="docutils literal"><span class="pre">CheMPS2::DMRG::Solve()</span></tt> performs the instructions and returns the minimal encountered energy during all sweeps (which is variational). It is possible to extrapolate the variational energies obtained with different <span class="math">\(D_{\mathsf{SU(2)}}\)</span> to <span class="math">\(D_{\mathsf{SU(2)}} = \infty\)</span>. This is explained in the section <a class="reference internal" href="#chemps2-extrapolation"><em>Extrapolation</em></a>.</p>
+<p>If the variable <code class="docutils literal"><span class="pre">makechkpt</span></code> is <code class="docutils literal"><span class="pre">true</span></code>, MPS checkpoints of the form <code class="docutils literal"><span class="pre">CheMPS2_MPS*.h5</span></code> are generated in the execution folder. They are stored/overwritten each time a full left and right sweep has been performed. The checkpoints allow to restart calculations. It is the responsibility of the user to remove the completed instructions from the <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code> before restarting a calculation!</p>
+<p>The function <code class="docutils literal"><span class="pre">CheMPS2::DMRG::Solve()</span></code> performs the instructions and returns the minimal encountered energy during all sweeps (which is variational). It is possible to extrapolate the variational energies obtained with different <span class="math">\(D_{\mathsf{SU(2)}}\)</span> to <span class="math">\(D_{\mathsf{SU(2)}} = \infty\)</span>. This is explained in the section <a class="reference internal" href="#chemps2-extrapolation"><span>Extrapolation</span></a>.</p>
 <p>In addition to the energy, the 2-RDM of the active space can also be obtained, as well as several correlation functions. Thereto, the following functions should be used:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">calc2DMandCorrelations</span><span class="p">()</span>
 <span class="n">CheMPS2</span><span class="o">::</span><span class="n">TwoDM</span> <span class="o">*</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">get2DM</span><span class="p">()</span>
@@ -175,15 +175,15 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 </div>
 <div class="section" id="excited-states">
 <h2>6.4. Excited states<a class="headerlink" href="#excited-states" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">CheMPS2::DMRG</span></tt> class also allows to calculate excited states in the symmetry sector specified in the <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt> object:</p>
+<p>The <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code> class also allows to calculate excited states in the symmetry sector specified in the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> object:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">activateExcitations</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">maxExcIn</span> <span class="p">)</span>
 <span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">DMRG</span><span class="o">::</span><span class="n">newExcitation</span><span class="p">(</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">EshiftIn</span> <span class="p">)</span>
 </pre></div>
 </div>
-<p>The variable <tt class="docutils literal"><span class="pre">maxExcIn</span></tt> should be the maximum number of excitations to be calculated. The variable <tt class="docutils literal"><span class="pre">EshiftIn</span></tt> is the energy shift you apply to the current MPS before pushing it back. CheMPS2 calculates excited states in a state-specific manner. Suppose you have just calculated the ground state in the current symmetry sector of the Hamiltonian</p>
+<p>The variable <code class="docutils literal"><span class="pre">maxExcIn</span></code> should be the maximum number of excitations to be calculated. The variable <code class="docutils literal"><span class="pre">EshiftIn</span></code> is the energy shift you apply to the current MPS before pushing it back. CheMPS2 calculates excited states in a state-specific manner. Suppose you have just calculated the ground state in the current symmetry sector of the Hamiltonian</p>
 <div class="math">
 \[\hat{H} = \sum\limits_{ i \geq 0 } \left| \Psi_i \right\rangle E_i \left\langle \Psi_i \right|.\]</div>
-<p>By calling <tt class="docutils literal"><span class="pre">CheMPS2::DMRG::newExcitation(</span> <span class="pre">Eshift</span> <span class="pre">)</span></tt>, you push back <span class="math">\(\left| \Psi_0 \right\rangle\)</span> and change the Hamiltonian to</p>
+<p>By calling <code class="docutils literal"><span class="pre">CheMPS2::DMRG::newExcitation(</span> <span class="pre">Eshift</span> <span class="pre">)</span></code>, you push back <span class="math">\(\left| \Psi_0 \right\rangle\)</span> and change the Hamiltonian to</p>
 <div class="math">
 \[\hat{H}_1 = \hat{H} + \left| \Psi_0 \right\rangle E_{\text{shift}} \left\langle \Psi_0 \right| = \left| \Psi_0 \right\rangle ( E_0 + E_{\text{shift}} ) \left\langle \Psi_0 \right| + \sum\limits_{ i \geq 1 } \left| \Psi_i \right\rangle E_i \left\langle \Psi_i \right|.\]</div>
 <p>By choosing <span class="math">\(E_{\text{shift}} &gt; E_1 - E_0\)</span>, the ground state is projected to a higher energy than <span class="math">\(E_1\)</span>, and <span class="math">\(\left| \Psi_1 \right\rangle\)</span> can now be obtained as the ground state of <span class="math">\(\hat{H}_1\)</span>.</p>
@@ -197,14 +197,14 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 <span class="k">const</span> <span class="kt">double</span> <span class="n">Energy2</span> <span class="o">=</span> <span class="n">myDMRG</span><span class="o">-&gt;</span><span class="n">Solve</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>After each call to <tt class="docutils literal"><span class="pre">CheMPS2::DMRG::Solve()</span></tt>, it is possible to calculate and fetch the 2-RDM and correlation functions, as described in the section <a class="reference internal" href="#chemps2-dmrg-object"><em>CheMPS2::DMRG</em></a>.</p>
+<p>After each call to <code class="docutils literal"><span class="pre">CheMPS2::DMRG::Solve()</span></code>, it is possible to calculate and fetch the 2-RDM and correlation functions, as described in the section <a class="reference internal" href="#chemps2-dmrg-object"><span>CheMPS2::DMRG</span></a>.</p>
 </div>
 <div class="section" id="extrapolation">
 <span id="chemps2-extrapolation"></span><span id="index-1"></span><h2>6.5. Extrapolation<a class="headerlink" href="#extrapolation" title="Permalink to this headline">¶</a></h2>
-<p>After reaching the maximum reduced virtual dimension <span class="math">\(D_{\mathsf{SU(2)}}\)</span>, a few sweeps with successively smaller bond dimensions can be performed, as shown in the example in section <a class="reference internal" href="#chemps2-convergencescheme-object"><em>CheMPS2::ConvergenceScheme</em></a>. The corresponding triples with the reduced virtual dimension, the variational energy, and the discarded weight <span class="math">\(( D_{\mathsf{SU(2)}} , E_{D} , w_D^{disc} )\)</span> can be obtained from the output of CheMPS2:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>grep <span class="s2">&quot;The reduced virtual dimension DSU(2)&quot;</span> myCheMPS2calc.out
-<span class="nv">$ </span>grep <span class="s2">&quot;Minimum energy encountered during the last sweep&quot;</span> myCheMPS2calc.out
-<span class="nv">$ </span>grep <span class="s2">&quot;Maximum discarded weight during the last sweep&quot;</span> myCheMPS2calc.out
+<p>After reaching the maximum reduced virtual dimension <span class="math">\(D_{\mathsf{SU(2)}}\)</span>, a few sweeps with successively smaller bond dimensions can be performed, as shown in the example in section <a class="reference internal" href="#chemps2-convergencescheme-object"><span>CheMPS2::ConvergenceScheme</span></a>. The corresponding triples with the reduced virtual dimension, the variational energy, and the discarded weight <span class="math">\(( D_{\mathsf{SU(2)}} , E_{D} , w_D^{disc} )\)</span> can be obtained from the output of CheMPS2:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ grep <span class="s2">&quot;The reduced virtual dimension DSU(2)&quot;</span> myCheMPS2calc.out
+$ grep <span class="s2">&quot;Minimum energy encountered during the last sweep&quot;</span> myCheMPS2calc.out
+$ grep <span class="s2">&quot;Maximum discarded weight during the last sweep&quot;</span> myCheMPS2calc.out
 </pre></div>
 </div>
 <p>The energy <span class="math">\(E_{D}\)</span> is a linear function of the discarded weight <span class="math">\(w_D^{disc}\)</span>, which allows to extrapolate the DMRG energies <span class="math">\(E_D\)</span> to the FCI energy. An example of such an extrapolation for N2 in the cc-pVDZ basis with nuclear separation 2.118 a.u. is given in the figure below:</p>
@@ -212,7 +212,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 </div>
 <div class="section" id="orbital-choice-and-ordering">
 <span id="chemps2-orbitalchoiceordering"></span><span id="index-2"></span><h2>6.6. Orbital choice and ordering<a class="headerlink" href="#orbital-choice-and-ordering" title="Permalink to this headline">¶</a></h2>
-<p>The orbital choice and ordering significantly influences the rate of convergence of DMRG calculations. The <tt class="docutils literal"><span class="pre">CheMPS2::DMRG</span></tt> class uses the orbitals and ordering from the input <tt class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></tt> object. It is hence the responsibility of the user to choose and order the orbitals wisely!</p>
+<p>The orbital choice and ordering significantly influences the rate of convergence of DMRG calculations. The <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code> class uses the orbitals and ordering from the input <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code> object. It is hence the responsibility of the user to choose and order the orbitals wisely!</p>
 <p>As correlations are propagated by the virtual bonds, it is important to place strongly correlated orbitals close to each other in the DMRG chain. Two rules of thumb exist:</p>
 <ol class="arabic simple">
 <li>For elongated molecules such as polyenes, it is best to use localized orbitals, sorted according to the molecule’s topology.</li>
@@ -222,7 +222,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 <img alt="images/Comparison.png" src="images/Comparison.png" />
 <p>An example for N2 in the cc-pVDZ basis with nuclear separation 2.118 a.u. is given in the figure below. The convergence rates of DMRG calculations using the standard irrep ordering in <a class="reference external" href="http://www.psicode.org/">psi4</a> and the ordering where bonding and antibonding irreps are placed adjacent are compared.</p>
 <img alt="images/ComparisonN2.png" src="images/ComparisonN2.png" />
-<p>For homonuclear dimers with d2h symmetry, the <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt> object allows to reorder the irrep blocks from standard <a class="reference external" href="http://www.psicode.org/">psi4</a> ordering to the ordering shown in the figure with bonding and antibonding irreps adjacent:</p>
+<p>For homonuclear dimers with d2h symmetry, the <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code> object allows to reorder the irrep blocks from standard <a class="reference external" href="http://www.psicode.org/">psi4</a> ordering to the ordering shown in the figure with bonding and antibonding irreps adjacent:</p>
 <div class="highlight-c++"><div class="highlight"><pre><span class="kt">void</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">Problem</span><span class="o">::</span><span class="n">SetupReorderD2h</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -252,7 +252,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
               <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
@@ -260,9 +260,9 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">6. DMRG calculations</a><ul>
-<li><a class="reference internal" href="#chemps2-problem">6.1. <tt class="docutils literal"><span class="pre">CheMPS2::Problem</span></tt></a></li>
-<li><a class="reference internal" href="#chemps2-convergencescheme">6.2. <tt class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></tt></a></li>
-<li><a class="reference internal" href="#chemps2-dmrg">6.3. <tt class="docutils literal"><span class="pre">CheMPS2::DMRG</span></tt></a></li>
+<li><a class="reference internal" href="#chemps2-problem">6.1. <code class="docutils literal"><span class="pre">CheMPS2::Problem</span></code></a></li>
+<li><a class="reference internal" href="#chemps2-convergencescheme">6.2. <code class="docutils literal"><span class="pre">CheMPS2::ConvergenceScheme</span></code></a></li>
+<li><a class="reference internal" href="#chemps2-dmrg">6.3. <code class="docutils literal"><span class="pre">CheMPS2::DMRG</span></code></a></li>
 <li><a class="reference internal" href="#excited-states">6.4. Excited states</a></li>
 <li><a class="reference internal" href="#extrapolation">6.5. Extrapolation</a></li>
 <li><a class="reference internal" href="#orbital-choice-and-ordering">6.6. Orbital choice and ordering</a></li>
@@ -272,16 +272,18 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="matrixelements.html"
-                        title="previous chapter">5. <tt class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></tt></a></p>
+                        title="previous chapter">5. <code class="docutils literal"><span class="pre">CheMPS2::Hamiltonian</span></code></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="resources.html"
                         title="next chapter">7. Typical resource requirements</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="sources/inoutput.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/inoutput.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -298,7 +300,7 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -310,12 +312,12 @@ I(i,j) &amp; = &amp; \frac{1}{2} \left( S_1(i) + S_1(j) - S_2(ij) \right) \left(
         <li class="right" >
           <a href="matrixelements.html" title="5. CheMPS2::Hamiltonian"
              >previous</a> |</li>
-        <li><a href="index.html">CheMPS2 1.7 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2013-2016, Sebastian Wouters.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
     </div>
   </body>
 </html>
