@@ -1,0 +1,5 @@
+<map id="CheMPS2::Sobject::addNoise" name="CheMPS2::Sobject::addNoise">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="251,5,475,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="265,56,461,83"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="265,107,460,133"/>
+</map>

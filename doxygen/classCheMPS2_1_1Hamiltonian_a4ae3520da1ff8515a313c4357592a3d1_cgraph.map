@@ -1,5 +1,5 @@
 <map id="CheMPS2::Hamiltonian::Hamiltonian" name="CheMPS2::Hamiltonian::Hamiltonian">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c" title="Set the group. " alt="" coords="217,5,401,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="212,57,407,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="217,122,401,163"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c" title="Set the group. " alt="" coords="212,5,396,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="444,23,639,65"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="212,107,396,149"/>
 </map>

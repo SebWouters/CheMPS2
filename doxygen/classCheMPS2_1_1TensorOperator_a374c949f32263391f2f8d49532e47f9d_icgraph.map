@@ -1,9 +1,10 @@
 <map id="CheMPS2::TensorOperator::get_2j" name="CheMPS2::TensorOperator::get_2j">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor3RDM.html#a92fbde5a7078a0decd2ed0f5d13e1f32" title="Make diagram a1. " alt="" coords="233,5,424,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor3RDM.html#aef47cdca669d74e2f329cae650351b75" title="Make diagram b1. " alt="" coords="233,56,424,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor3RDM.html#acbf0ffe271a46c0a8a6751974448ca4e" title="Make diagram c1. " alt="" coords="233,107,424,133"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor3RDM.html#a0b6d523776c4b779999f75d54e043a3b" title="Make diagram d1. " alt="" coords="233,157,424,184"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1TensorOperator.html#a0c347c3df77117eb3e6340ce032fb3b7" title="Make the in&#45;product of two TensorOperator. " alt="" coords="239,209,419,250"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1ThreeDM.html#a41f377c3636898276dcb6c2f30dbf3ad" title="Fill the 3&#45;RDM terms corresponding to site denT&#45;&gt;gIndex() " alt="" coords="472,216,665,243"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="713,209,876,250"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor3RDM.html#a119e63036c8e52a6f77123798586af1e" title="Get the spin value of the Tensor3RDM. " alt="" coords="245,5,413,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor3RDM.html#a92fbde5a7078a0decd2ed0f5d13e1f32" title="Make diagram a1. " alt="" coords="233,71,424,98"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Tensor3RDM.html#aef47cdca669d74e2f329cae650351b75" title="Make diagram b1. " alt="" coords="233,122,424,149"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Tensor3RDM.html#acbf0ffe271a46c0a8a6751974448ca4e" title="Make diagram c1. " alt="" coords="233,173,424,199"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Tensor3RDM.html#a0b6d523776c4b779999f75d54e043a3b" title="Make diagram d1. " alt="" coords="233,223,424,250"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1TensorOperator.html#a0c347c3df77117eb3e6340ce032fb3b7" title="Make the in&#45;product of two TensorOperator. " alt="" coords="472,195,652,236"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor3RDM.html#abce2935d5e3293bbfbd39c7b78b4705e" title="Make the in&#45;product of two Tensor3RDMs. " alt="" coords="478,5,646,47"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1ThreeDM.html#a41f377c3636898276dcb6c2f30dbf3ad" title="Fill the 3&#45;RDM terms corresponding to site denT&#45;&gt;gIndex() " alt="" coords="700,71,893,98"/>
 </map>

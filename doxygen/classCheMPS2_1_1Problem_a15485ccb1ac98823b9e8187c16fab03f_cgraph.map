@@ -1,3 +1,5 @@
 <map id="CheMPS2::Problem::gSy" name="CheMPS2::Problem::gSy">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="223,5,381,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="233,5,391,47"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="223,71,401,98"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="449,5,633,47"/>
 </map>

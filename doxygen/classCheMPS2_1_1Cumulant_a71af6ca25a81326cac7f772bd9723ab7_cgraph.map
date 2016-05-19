@@ -1,10 +1,14 @@
 <map id="CheMPS2::Cumulant::gamma4_fock_contract_ham" name="CheMPS2::Cumulant::gamma4_fock_contract_ham">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="291,5,451,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="282,56,461,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="272,107,471,133"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="289,157,453,184"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1TwoDM.html#a4eb81922bf21b38ed8fb8c4696da3a19" title="Get a 1&#45;RDM term, using the HAM indices. " alt="" coords="253,208,490,235"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="276,259,467,285"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1ThreeDM.html#ae3a0de0da6659adca36ea0cdae16da0e" title="Get a 3&#45;RDM, using the HAM indices. " alt="" coords="286,310,457,351"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1TwoDM.html#a40c2181006aaf66b8dad2e545e3d8186" title="Get a 2DM_A term, using the HAM indices. " alt="" coords="244,376,499,403"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="1162,157,1341,184"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="571,259,770,285"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="589,157,753,184"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#a4eb81922bf21b38ed8fb8c4696da3a19" title="Get a 1&#45;RDM term, using the HAM indices. " alt="" coords="253,107,490,133"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1156,259,1347,285"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1ThreeDM.html#ae3a0de0da6659adca36ea0cdae16da0e" title="Get a 3&#45;RDM, using the HAM indices. " alt="" coords="286,361,457,402"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1TwoDM.html#a40c2181006aaf66b8dad2e545e3d8186" title="Get a 2DM_A term, using the HAM indices. " alt="" coords="244,208,499,235"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="1395,150,1553,191"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922" title="Get a 1&#45;RDM term, using the DMRG indices. " alt="" coords="547,107,795,133"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005" title="Get a 2DM_A term, using the DMRG indices. " alt="" coords="843,208,1108,235"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="894,107,1057,133"/>
 </map>

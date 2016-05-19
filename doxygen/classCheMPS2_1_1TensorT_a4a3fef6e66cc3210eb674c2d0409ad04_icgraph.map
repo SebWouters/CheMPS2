@@ -1,0 +1,5 @@
+<map id="CheMPS2::TensorT::gKappa" name="CheMPS2::TensorT::gKappa">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#aedead7609c9c66d336d14cdb0fbb5fec" title="Get the pointer to the storage of a certain tensor block. " alt="" coords="252,5,451,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorT.html#a2d9f4127678d9c52388ccf26f7ebe775" title="Check whether the TensorT is left&#45;normal. " alt="" coords="248,57,455,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#a734f76ffa266908bd522fd1d11d4c699" title="Check whether the TensorT is right&#45;normal. " alt="" coords="244,122,459,163"/>
+</map>

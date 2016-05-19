@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['index',['index',['../classCheMPS2_1_1Tensor.html#aba3ee18f13eee357ed13789809082120',1,'CheMPS2::Tensor']]]
+  ['entries',['entries',['../classCheMPS2_1_1DMRGSCFmatrix.html#ad7626d5fa5136c307f4dfffff5aaddc0',1,'CheMPS2::DMRGSCFmatrix']]]
 ];

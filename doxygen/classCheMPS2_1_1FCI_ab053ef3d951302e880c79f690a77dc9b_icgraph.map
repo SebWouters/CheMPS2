@@ -1,0 +1,7 @@
+<map id="CheMPS2::FCI::getNel_down" name="CheMPS2::FCI::getNel_down">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a490f73f0901972ed913a47119b5e0f23" title="Calculate the addition Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a^+_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="249,99,424,141"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1FCI.html#ad940e823b2f18ce3d85ff2f3a0e94889" title="Calculate the removal Green&#39;s function: GF[i+numLeft*j] = &lt;GSvector| a^+_{orbsLeft[i], spin} [ alpha + beta * Ham + I*eta ]^{&#45;1} a_{orbsRight[j], spin} |GSvector&gt; " alt="" coords="480,158,655,199"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#ae8035a4a03bc0232f6a38a90f1477a60" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="472,41,663,82"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="949,81,1128,108"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (= addition + removal amplitude) " alt="" coords="711,5,901,32"/>
+</map>

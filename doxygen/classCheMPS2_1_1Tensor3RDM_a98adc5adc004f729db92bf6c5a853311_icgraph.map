@@ -1,5 +1,6 @@
 <map id="CheMPS2::Tensor3RDM::get_prime_last" name="CheMPS2::Tensor3RDM::get_prime_last">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor3RDM.html#abce2935d5e3293bbfbd39c7b78b4705e" title="Make the in&#45;product of two Tensor3RDMs. " alt="" coords="221,5,389,47"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1ThreeDM.html#a41f377c3636898276dcb6c2f30dbf3ad" title="Fill the 3&#45;RDM terms corresponding to site denT&#45;&gt;gIndex() " alt="" coords="437,13,631,39"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="679,5,841,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor3RDM.html#abce2935d5e3293bbfbd39c7b78b4705e" title="Make the in&#45;product of two Tensor3RDMs. " alt="" coords="221,27,389,69"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1ThreeDM.html#a41f377c3636898276dcb6c2f30dbf3ad" title="Fill the 3&#45;RDM terms corresponding to site denT&#45;&gt;gIndex() " alt="" coords="437,35,631,61"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="679,5,893,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="705,57,867,98"/>
 </map>

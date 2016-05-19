@@ -1,6 +1,13 @@
 <map id="CheMPS2::EdmistonRuedenberg::Optimize" name="CheMPS2::EdmistonRuedenberg::Optimize">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFVmatRotations.html#a5471bb0feb5a00c8619cb9ff25978b16" title="Fill the rotated two&#45;body matrix elements, based on HamOrig and unitary. Do entire blocks at once..." alt="" coords="268,57,513,98"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="565,5,755,32"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="561,57,759,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="573,123,747,149"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="1017,146,1212,187"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="771,76,969,118"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="526,171,721,212"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="273,55,471,96"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="273,172,471,214"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="268,238,476,279"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a" title="Calculate the two&#45;norm of U^T*U &#45; I. " alt="" coords="525,106,722,147"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="524,236,723,278"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="528,353,719,380"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="787,287,953,328"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="785,353,955,380"/>
 </map>

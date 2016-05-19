@@ -1,9 +1,15 @@
 <map id="CheMPS2::FCI::FCI" name="CheMPS2::FCI::FCI">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="196,5,355,47"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="196,71,355,112"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="196,136,355,177"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="196,201,355,243"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="196,267,355,308"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="196,332,355,373"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="403,274,593,301"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="860,144,1055,185"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="196,123,355,164"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="196,188,355,229"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="196,253,355,295"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="196,319,355,360"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="196,384,355,425"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="406,123,590,164"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="403,231,593,258"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="411,326,585,353"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="643,165,810,207"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="641,231,812,258"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1TwoIndex.html#a49c7065a18ca6b82e7a63a56cdf2687c" title="Get an element. " alt="" coords="411,391,585,418"/>
 </map>

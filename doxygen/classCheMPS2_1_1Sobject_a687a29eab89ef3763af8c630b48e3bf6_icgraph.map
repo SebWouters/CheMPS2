@@ -1,6 +1,10 @@
 <map id="CheMPS2::Sobject::Join" name="CheMPS2::Sobject::Join">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="220,27,383,69"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="441,5,633,32"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="431,57,643,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="691,64,875,91"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="523,5,695,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="232,81,447,108"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRG.html#a0c38c4f9194d77fdf28dc34c55be55c2" title="Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbe..." alt="" coords="220,157,459,184"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1033,81,1217,108"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="776,56,968,83"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="516,107,701,133"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRG.html#a13008f80dbfd8312ef4aa3990cbbc436" title="Get the pointer to the Correlations. " alt="" coords="759,157,985,184"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1DMRG.html#a64ad5e21fad5c4f0a383438717942a0b" title="Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian ..." alt="" coords="507,209,711,250"/>
 </map>

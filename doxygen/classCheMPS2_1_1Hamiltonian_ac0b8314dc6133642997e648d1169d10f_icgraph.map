@@ -1,3 +1,9 @@
 <map id="CheMPS2::Hamiltonian::getTmat" name="CheMPS2::Hamiltonian::getTmat">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="212,13,355,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a1e026f0ae4af55325996c6c97af11917" title="Constructor. " alt="" coords="212,5,420,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="245,56,387,83"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="227,107,405,149"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4" title="Construct a table with the h&#45;matrix elements (two&#45;body augmented with one&#45;body). Remember to recall t..." alt="" coords="216,173,416,214"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="468,148,663,175"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="716,123,888,149"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#ab35662dd77d8ae32f5b28bbe04239e79" title="Calculate the energy based on the 2DM&#45;A. " alt="" coords="711,173,893,200"/>
 </map>

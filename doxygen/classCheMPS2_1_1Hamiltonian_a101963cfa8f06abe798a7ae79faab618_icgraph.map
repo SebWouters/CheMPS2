@@ -1,6 +1,13 @@
 <map id="CheMPS2::Hamiltonian::getL" name="CheMPS2::Hamiltonian::getL">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#ad2d958c7b1ca60b43f7aa5eaabeeb0b1" title="Constructor. " alt="" coords="215,5,423,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ae2fd288381bda86ab5c07e1d793aa3fd" title="Constructor. " alt="" coords="212,57,427,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="248,123,391,149"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="222,173,417,200"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a1e026f0ae4af55325996c6c97af11917" title="Constructor. " alt="" coords="212,5,420,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="245,56,387,83"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#af5d7ab013d03c1f6e76e3885a1775df3" title="Write the Hamiltonian to a FCIDUMP file. " alt="" coords="237,107,395,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#aeb177bf0d3fba3520a6fe263a90ee78c" title="Constructor. " alt="" coords="219,173,413,200"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="468,224,719,251"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="468,275,719,301"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc" title="Reorder the orbitals to a custom ordering. Previous reorderings are cleared. " alt="" coords="227,326,405,367"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="504,377,683,418"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="767,300,961,327"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="1015,275,1187,301"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1TwoDM.html#ab35662dd77d8ae32f5b28bbe04239e79" title="Calculate the energy based on the 2DM&#45;A. " alt="" coords="1009,325,1192,352"/>
 </map>

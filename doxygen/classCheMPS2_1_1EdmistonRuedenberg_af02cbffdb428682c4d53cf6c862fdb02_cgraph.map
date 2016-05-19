@@ -1,0 +1,6 @@
+<map id="CheMPS2::EdmistonRuedenberg::getUnitary" name="CheMPS2::EdmistonRuedenberg::getUnitary">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="270,5,465,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="268,71,467,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="280,137,455,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="270,188,465,229"/>
+</map>

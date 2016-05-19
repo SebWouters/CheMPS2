@@ -1,0 +1,10 @@
+<map id="CheMPS2::Correlations::SingleOrbitalEntropy_HAM" name="CheMPS2::Correlations::SingleOrbitalEntropy_HAM">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="240,5,439,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Correlations.html#a7414689fc9e58291884af75779f18f85" title="Get the single&#45;orbital entropy for a certain site, using the DMRG indices. " alt="" coords="241,57,438,98"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="257,123,421,149"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005" title="Get a 2DM_A term, using the DMRG indices. " alt="" coords="783,39,1048,65"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922" title="Get a 1&#45;RDM term, using the DMRG indices. " alt="" coords="487,89,735,116"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="1102,89,1281,116"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1096,39,1287,65"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="834,140,997,167"/>
+</map>

@@ -1,3 +1,26 @@
 <map id="CheMPS2::Correlations::FillSite" name="CheMPS2::Correlations::FillSite">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="213,13,399,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="220,5,405,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#a470a4876ee25036e3f7db2663986d608" title="Get the maximum virtual dimension at a certain boundary. " alt="" coords="225,209,400,250"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="497,50,671,91"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="497,115,671,157"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="497,182,671,223"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="497,249,671,290"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="497,318,671,359"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="219,376,406,403"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="801,422,976,463"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1TwoDM.html#ad7615a0d2458408de29de4b8b88868f1" title="Get a 2DM_B term, using the DMRG indices. " alt="" coords="756,645,1021,672"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1069,645,1260,672"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005" title="Get a 2DM_A term, using the DMRG indices. " alt="" coords="756,593,1021,620"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922" title="Get a 1&#45;RDM term, using the DMRG indices. " alt="" coords="460,493,708,520"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1Correlations.html#a7414689fc9e58291884af75779f18f85" title="Get the single&#45;orbital entropy for a certain site, using the DMRG indices. " alt="" coords="214,529,411,570"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="225,747,400,789"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="213,813,412,840"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="223,865,403,906"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="213,931,412,957"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="231,981,395,1008"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="1075,540,1254,567"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="1314,533,1473,574"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="1310,697,1477,738"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="1308,645,1479,672"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="807,543,970,569"/>
 </map>

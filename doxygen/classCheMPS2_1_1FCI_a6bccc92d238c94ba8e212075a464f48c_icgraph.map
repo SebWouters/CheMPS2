@@ -1,0 +1,11 @@
+<map id="CheMPS2::FCI::FCIdaxpy" name="CheMPS2::FCI::FCIdaxpy">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#a77058d7ff4691b13b773dd4ea6118bc8" title="Construct part of the 4&#45;RDM: output(i,j,k,p,q,r) = Gamma^4(i,j,k,z,p,q,r,z) " alt="" coords="231,165,416,191"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="464,215,643,242"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1FCI.html#ac8ae42bbe769daf5254064e65adc076f" title="Calculate the forward propagating part of the density response Green&#39;s function: &lt;GSvector| ( n_alpha..." alt="" coords="937,5,1161,47"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1FCI.html#aee7af7bfd2815c30db028025d573a684" title="Calculate the backward propagating part of the density response Green&#39;s function: &lt;GSvector| ( n_beta..." alt="" coords="937,107,1161,148"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1FCI.html#a38332cb2e35e961f8b95901002385770" title="Calculate out = [(alpha + beta * Hamiltonian)^2 + eta^2] * in (Econstant is taken into account!!) ..." alt="" coords="956,375,1143,402"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="703,114,877,141"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8" title="Calculates the FCI ground state with Davidson&#39;s algorithm. " alt="" coords="693,317,887,343"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b" title="Calculate out = (alpha + beta * Hamiltonian) * in (Econstant is taken into account!!) ..." alt="" coords="691,368,889,409"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21" title="Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstan..." alt="" coords="696,215,884,242"/>
+</map>

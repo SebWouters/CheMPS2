@@ -1,3 +1,13 @@
 <map id="CheMPS2::Heff::SolveDAVIDSON" name="CheMPS2::Heff::SolveDAVIDSON">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="280,5,447,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="309,64,475,105"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="280,130,504,157"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="294,181,490,207"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="315,232,469,273"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="287,298,497,325"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="295,349,489,375"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="287,399,497,426"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="315,451,469,492"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="565,5,731,47"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="552,71,744,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="553,122,743,149"/>
 </map>

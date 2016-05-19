@@ -2,8 +2,9 @@ var NAVTREE =
 [
   [ "CheMPS2", "index.html", [
     [ "Current HEAD", "md__home_seba_Desktop_CheMPS2_github_CHANGELOG.html", null ],
-    [ "Classes", null, [
-      [ "Class List", "annotated.html", "annotated" ],
+    [ "List of files in CheMPS2", "md__home_seba_Desktop_CheMPS2_github_FILES.html", null ],
+    [ "Classes", "annotated.html", [
+      [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
@@ -21,8 +22,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classCheMPS2_1_1DMRGSCFoptions.html#aa9eb8d4a08896d54e4323122984cee2a",
-"classCheMPS2_1_1TensorL.html"
+"classCheMPS2_1_1DMRGSCFoptions.html#aabfdc28366e49402ebbaf977d154ebe7",
+"classCheMPS2_1_1TensorKM.html#a8b1168401e05142b2ec056e0b5554aa2"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

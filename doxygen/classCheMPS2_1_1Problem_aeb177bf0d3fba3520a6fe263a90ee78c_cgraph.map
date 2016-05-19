@@ -1,5 +1,11 @@
 <map id="CheMPS2::Problem::Problem" name="CheMPS2::Problem::Problem">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="296,5,455,47"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="248,71,503,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="551,64,745,105"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="296,93,455,135"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="248,159,503,186"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="563,21,733,47"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="793,71,972,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="551,123,745,164"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="555,189,741,215"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="567,239,729,266"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="568,290,728,317"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="803,5,962,47"/>
 </map>

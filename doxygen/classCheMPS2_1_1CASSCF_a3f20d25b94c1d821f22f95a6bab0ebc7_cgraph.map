@@ -1,8 +1,9 @@
 <map id="CheMPS2::CASSCF::copy_active" name="CheMPS2::CASSCF::copy_active">
 <area shape="rect" id="node2" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a0729b05fef0cb96eaf26e7c8d6017931" title="Clear the matrix. " alt="" coords="247,5,442,47"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="245,71,444,112"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018" title="Get the cumulative number of active orbitals for an irrep. " alt="" coords="245,136,444,177"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="245,201,444,243"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec" title="Get the number of active orbitals for an irrep. " alt="" coords="245,267,444,308"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24" title="Set an element. " alt="" coords="235,333,455,359"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="245,71,444,112"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018" title="Get the cumulative number of active orbitals for an irrep. " alt="" coords="245,136,444,177"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRGSCFindices.html#a5c96f1d95fd5c2ce508f1f159f12f892" title="Get the number of occupied orbitals for an irrep. " alt="" coords="245,201,444,243"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec" title="Get the number of active orbitals for an irrep. " alt="" coords="245,267,444,308"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRGSCFmatrix.html#a3660ff17cbeb278c265b6461450b1a24" title="Set an element. " alt="" coords="235,333,455,359"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="503,165,701,207"/>
 </map>

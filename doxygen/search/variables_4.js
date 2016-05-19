@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['moving_5fright',['moving_right',['../classCheMPS2_1_1TensorOperator.html#a9c4a634f1828098e4d581200bee011be',1,'CheMPS2::TensorOperator']]]
+  ['kappa2index',['kappa2index',['../classCheMPS2_1_1Tensor.html#ab0c53b7a9fd798d2160d611f83c48133',1,'CheMPS2::Tensor']]]
 ];

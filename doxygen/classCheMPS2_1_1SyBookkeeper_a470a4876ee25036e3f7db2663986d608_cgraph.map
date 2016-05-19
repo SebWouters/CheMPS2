@@ -1,0 +1,7 @@
+<map id="CheMPS2::SyBookkeeper::gMaxDimAtBound" name="CheMPS2::SyBookkeeper::gMaxDimAtBound">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="228,5,403,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="228,71,403,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="228,136,403,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="228,201,403,243"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="228,267,403,308"/>
+</map>

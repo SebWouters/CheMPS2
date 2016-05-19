@@ -1,15 +1,29 @@
 <map id="CheMPS2::DMRGSCFindices::getNirreps" name="CheMPS2::DMRGSCFindices::getNirreps">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASPT2.html#af50043f2bf494dcd7448358fc116f01d" title="Constructor. " alt="" coords="270,5,473,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a258f11f16c7790c6943589633203c7e3" title="From an Edmiston&#45;Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs..." alt="" coords="261,57,482,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7" title="Copy a one&#45;orbital quantity from array format to DMRGSCFmatrix format. " alt="" coords="281,122,462,163"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1CASSCF.html#a06428c029b80277b00a735ea673c147f" title="Block&#45;diagonalize Mat. " alt="" coords="279,187,463,229"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="263,253,480,280"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="266,304,477,331"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca" title="Construct the Fock matrix. " alt="" coords="252,355,491,381"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1CASSCF.html#ad4c00cd4c21dc402ad5e966232b199d3" title="Return the RMS deviation from block&#45;diagonal. " alt="" coords="269,406,474,447"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="268,471,475,513"/>
-<area shape="rect" id="node12" href="$classCheMPS2_1_1DMRGSCFmatrix.html#aa6765c45dee26bc3e1b199ebba99bad5" title="Constructor. " alt="" coords="274,537,469,578"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1DMRGSCFunitary.html#abb04513af627a6fa3173810faee29a36" title="Constructor. " alt="" coords="273,602,470,643"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="275,667,467,709"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="539,275,731,301"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASPT2.html#af50043f2bf494dcd7448358fc116f01d" title="Constructor. " alt="" coords="255,13,457,40"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASPT2.html#a0aad4cf7db898047a811ea75f45b2abc" title="Return the vector length for the CASPT2 first order wavefunction (before diagonalization of the overl..." alt="" coords="263,65,449,106"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1CASSCF.html#a49e2785c67342a2c907cf16292e9b589" title="From an Edmiston&#45;Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs..." alt="" coords="517,589,738,630"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7" title="Copy a one&#45;orbital quantity from array format to DMRGSCFmatrix format. " alt="" coords="537,471,718,513"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1CASSCF.html#a13589f3ee9f293b743676739bb1db372" title="Block&#45;diagonalize Mat. " alt="" coords="535,275,719,317"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="519,654,736,695"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="519,537,736,564"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="522,720,733,747"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca" title="Construct the Fock matrix. " alt="" coords="508,224,747,251"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1CASSCF.html#ad4c00cd4c21dc402ad5e966232b199d3" title="Return the RMS deviation from block&#45;diagonal. " alt="" coords="525,107,730,149"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1DMRGSCFindices.html#a2cb6c31a775d6f155942dc127eee2218" title="Get the total number of occupied orbitals. " alt="" coords="528,341,727,382"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1DMRGSCFindices.html#ade657fa7e0ebf49098f5d22172a0dc01" title="Get the maximum NORB. " alt="" coords="528,406,727,447"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1DMRGSCFindices.html#a8cbb84d6c55248612af1a9527c4934de" title="Get the orbital rotation parameter space size. " alt="" coords="257,945,455,986"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="253,749,459,790"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1DMRGSCFmatrix.html#ae8b7b4d1132ee6ce5c4bff3fbd6a0fd2" title="Constructor. " alt="" coords="259,814,453,855"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1DMRGSCFmatrix.html#ac234313f31037f3ecc326451704ae688" title="Write a DMRGSCFmatrix to disk. " alt="" coords="259,1141,453,1182"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="252,879,460,921"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a41583aec2eca3ceced6d143fc868fcf0" title="Constructor. " alt="" coords="260,1010,452,1051"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a0d7c7c27c5dee1c2b96a08b9e78c081c" title="Destructor. " alt="" coords="260,1075,452,1117"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1DMRGSCFwtilde.html#a939e077b9fcc8ffafd9a168056991795" title="Clear. " alt="" coords="260,479,452,521"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASPT2.html#aa0fce9d99059c2336e06180160de7bd2" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="537,5,718,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="825,224,1017,251"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="795,508,1048,535"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="829,661,1013,688"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1DMRGSCFunitary.html#aa40f3a37dd71b9a2c714fc98094d115e" title="Save the unitary to disk. " alt="" coords="529,1073,726,1114"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c" title="Maximize the Edmiston&#45;Ruedenberg cost function. " alt="" coords="520,822,735,863"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d" title="Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per i..." alt="" coords="520,887,735,929"/>
 </map>

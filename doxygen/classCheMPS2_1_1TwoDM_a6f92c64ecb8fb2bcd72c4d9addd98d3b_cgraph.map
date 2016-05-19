@@ -1,3 +1,19 @@
 <map id="CheMPS2::TwoDM::write2DMAfile" name="CheMPS2::TwoDM::write2DMAfile">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="280,5,471,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="325,5,500,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="328,71,497,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="841,220,1007,261"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="331,177,494,203"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="319,227,506,254"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="313,278,512,305"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="331,329,495,355"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="599,459,778,486"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="593,379,784,406"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005" title="Get a 2DM_A term, using the DMRG indices. " alt="" coords="280,430,545,457"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="609,60,768,101"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="599,9,778,35"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="832,60,1016,101"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="1064,227,1283,254"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="845,452,1003,493"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="839,379,1009,406"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="1076,372,1271,413"/>
 </map>

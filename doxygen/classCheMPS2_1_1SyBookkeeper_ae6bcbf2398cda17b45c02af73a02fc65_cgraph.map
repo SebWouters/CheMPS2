@@ -1,0 +1,12 @@
+<map id="CheMPS2::SyBookkeeper::IsPossible" name="CheMPS2::SyBookkeeper::IsPossible">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="241,5,415,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="229,71,427,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number. " alt="" coords="228,122,428,149"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#a72189d68fe5a90d9b5e4f11aa752a393" title="Get twice the targeted spin. " alt="" coords="241,173,415,215"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="241,239,415,280"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="489,71,649,98"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="488,122,651,149"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="476,181,663,207"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="480,246,659,273"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="711,239,869,280"/>
+</map>

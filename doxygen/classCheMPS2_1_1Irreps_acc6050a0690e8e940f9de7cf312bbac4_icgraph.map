@@ -1,3 +1,8 @@
 <map id="CheMPS2::Irreps::getIrrepName" name="CheMPS2::Irreps::getIrrepName">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="264,5,443,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Molden.html#afddde739687affec4f49e380b243e424" title="Read a molden file. " alt="" coords="271,5,436,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Molden.html#ad27f58d3d37a8b6f6e3e8320a0cfc9a5" title="Multiply and print the new molden file. " alt="" coords="271,71,436,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="264,123,443,164"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="491,130,685,157"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="739,105,911,131"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#ab35662dd77d8ae32f5b28bbe04239e79" title="Calculate the energy based on the 2DM&#45;A. " alt="" coords="733,155,916,182"/>
 </map>

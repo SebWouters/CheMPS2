@@ -1,0 +1,18 @@
+<map id="CheMPS2::Hamiltonian::read" name="CheMPS2::Hamiltonian::read">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TwoIndex.html#a56586b601fa0b79fd6ab93c1a01d9705" title="Load the TwoIndex object. " alt="" coords="214,5,394,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FourIndex.html#a557d6a17fa93c708a94fa5924626c405" title="Load the FourIndex object. " alt="" coords="230,57,378,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="212,122,396,163"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343" title="Debug check certain elements and sums. " alt="" coords="225,187,383,229"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c" title="Set the group. " alt="" coords="683,304,867,331"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="927,297,1121,338"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="691,437,858,478"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="444,359,635,385"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Hamiltonian.html#a7a56bcf4365125ec144c21d5a4684c32" title="Set a Tmat element. " alt="" coords="225,523,383,565"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Hamiltonian.html#a2ddb391c8a20c50bdd2c775cffd8fbb1" title="Set a Vmat element. " alt="" coords="225,406,383,447"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#af40ec881163547a24801df69f093beab" title="Get the pointer to the one&#45;electron integrals. " alt="" coords="460,122,619,163"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Hamiltonian.html#a46ff65615e7af8e82440b9685cf08554" title="Get the pointer to the two&#45;electron integrals. " alt="" coords="460,187,619,229"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="915,444,1133,471"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="689,359,860,385"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1TwoIndex.html#a4385881853e910bb1ce7d5ea911b75c4" title="Set an element. " alt="" coords="453,531,626,557"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="452,413,627,440"/>
+</map>

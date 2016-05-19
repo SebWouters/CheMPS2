@@ -1,0 +1,16 @@
+<map id="CheMPS2::SyBookkeeper::SyBookkeeper" name="CheMPS2::SyBookkeeper::SyBookkeeper">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="231,71,400,98"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="452,122,649,149"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#ae6bcbf2398cda17b45c02af73a02fc65" title="Get whether the desired symmetry sector is possible. " alt="" coords="228,203,403,244"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="471,5,630,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="461,71,640,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="700,5,884,47"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="712,122,872,149"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="463,173,638,215"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#af39babd5df4cb5eeb84ffc017af841c3" title="Get the targeted particle number. " alt="" coords="451,239,651,266"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1SyBookkeeper.html#a72189d68fe5a90d9b5e4f11aa752a393" title="Get twice the targeted spin. " alt="" coords="463,291,638,332"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="463,356,638,397"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="711,239,873,266"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="699,298,885,325"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="703,363,881,390"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="CheMPS2::TensorOperator::gStorage" name="CheMPS2::TensorOperator::gStorage">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorOperator.html#ab737f66e1bd1a39cec215d62882aaf2a" title="Get the index corresponding to a certain tensor block. " alt="" coords="233,64,413,105"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="461,71,652,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="702,5,869,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="700,71,871,98"/>
+</map>

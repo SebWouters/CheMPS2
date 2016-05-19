@@ -1,0 +1,5 @@
+<map id="CheMPS2::MPIchemps2::mpi_rank" name="CheMPS2::MPIchemps2::mpi_rank">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="233,5,399,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="220,71,412,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="221,122,411,149"/>
+</map>

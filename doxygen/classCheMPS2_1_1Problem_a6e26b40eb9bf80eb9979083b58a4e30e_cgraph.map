@@ -1,3 +1,10 @@
 <map id="CheMPS2::Problem::checkConsistency" name="CheMPS2::Problem::checkConsistency">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="308,5,503,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="321,21,490,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="551,71,729,98"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="308,123,503,164"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="312,189,499,215"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="324,239,487,266"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="325,290,485,317"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="561,5,719,47"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="777,5,961,47"/>
 </map>

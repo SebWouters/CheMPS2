@@ -1,3 +1,33 @@
 <map id="CheMPS2::Problem::gEconst" name="CheMPS2::Problem::gEconst">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="248,5,407,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="296,174,455,215"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="266,240,485,267"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14" title="Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with ..." alt="" coords="551,5,781,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4" title="Construct a table with the h&#45;matrix elements (two&#45;body augmented with one&#45;body). Remember to recall t..." alt="" coords="275,342,475,383"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="248,408,503,435"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="276,731,475,757"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="293,781,457,808"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a" title="Get the Ham index corresponding to a DMRG index. " alt="" coords="293,832,457,859"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="250,579,501,605"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="250,629,501,656"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc" title="Reorder the orbitals to a custom ordering. Previous reorderings are cleared. " alt="" coords="577,845,755,886"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="286,513,465,554"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="587,225,745,266"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="587,342,745,383"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="830,244,1021,271"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="838,193,1013,220"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1TwoIndex.html#a49c7065a18ca6b82e7a63a56cdf2687c" title="Get an element. " alt="" coords="839,305,1012,332"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="581,575,751,601"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="836,524,1015,551"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="569,57,763,98"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="573,123,759,149"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="585,173,747,200"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="586,291,746,317"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="846,575,1005,617"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="846,761,1005,802"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="587,677,745,718"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="583,407,749,449"/>
+<area shape="rect" id="node32" href="$classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4" title="Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is ..." alt="" coords="561,524,771,551"/>
+<area shape="rect" id="node29" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="842,407,1009,449"/>
+<area shape="rect" id="node30" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="829,473,1021,500"/>
+<area shape="rect" id="node31" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="830,356,1021,383"/>
 </map>

@@ -188,7 +188,9 @@
 \form#187:$ I_{i} \otimes I_{j} \otimes I_{k} = I_{l} \otimes I_{m} \otimes I_{n} $
 \form#188:$ \Gamma_{ijk;lmn} $
 \form#189:$ \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} = \braket{ a^{\dagger}_{\alpha \sigma} a^{\dagger}_{\beta \tau} a_{\delta \tau} a_{\gamma \sigma} } $
-\form#190:$ \Gamma^A_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
-\form#191:$ \Gamma^B_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
+\form#190:$ \Gamma^{2A}_{\alpha \beta ; \gamma \delta} = \sum_{\sigma \tau} \Gamma_{(\alpha \sigma) (\beta \tau) ; (\gamma \sigma) (\delta \tau)} $
+\form#191:$ \Gamma^{2B}_{\alpha \beta ; \gamma \delta} = \sum_{\sigma} \left( \Gamma_{(\alpha \sigma) (\beta \sigma) ; (\gamma \sigma) (\delta \sigma)} - \Gamma_{(\alpha \sigma) (\beta -\sigma) ; (\gamma \sigma) (\delta -\sigma)} \right) $
 \form#192:$ I_{\alpha} \otimes I_{\beta} \otimes I_{\gamma} \otimes I_{\delta} = I_{trivial} $
 \form#193:$ \Gamma^{A,B}_{\alpha \beta ; \gamma \delta} $
+\form#194:\begin{eqnarray*} \Gamma^{spin}_{ij} & = & \frac{3(1 - \delta_{S,0})}{(S+1)(2S+1)} \sum_{S^z} S^z \braket{ S S^z \mid a^{\dagger}_{i \uparrow} a_{j \uparrow} - a^{\dagger}_{i \downarrow} a_{j \downarrow} \mid S S^z } \\ & = & \frac{3(1 - \delta_{S,0})}{2(S+1)} \left[ ( 2 - N_{elec} ) \Gamma^1_{ij} - \sum_r \Gamma^{2A}_{ir;rj} - \sum_r \Gamma^{2B}_{ir;rj} \right] \end{eqnarray*}
+\form#195:$ trace( \Gamma^{spin} ) = 2 S $

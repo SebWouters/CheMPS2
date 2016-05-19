@@ -3,6 +3,7 @@ var classCheMPS2_1_1DMRGSCFindices =
     [ "DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html#abc4dc13b8c69ab5a38386b570c583df3", null ],
     [ "~DMRGSCFindices", "classCheMPS2_1_1DMRGSCFindices.html#a1dc37bccdc88d7d8f28ab151937f891d", null ],
     [ "getDMRGcumulative", "classCheMPS2_1_1DMRGSCFindices.html#ad00b61100928e4134728b4e0ad17e018", null ],
+    [ "getGroupNumber", "classCheMPS2_1_1DMRGSCFindices.html#a3689ebc91a3c11f3703ba21f53e7604d", null ],
     [ "getIrrepOfEachDMRGorbital", "classCheMPS2_1_1DMRGSCFindices.html#ae04eb205d9aa13edaae834e535c3396d", null ],
     [ "getL", "classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27", null ],
     [ "getNDMRG", "classCheMPS2_1_1DMRGSCFindices.html#aed2d6043d3bd4965a4b85c6f1de5efec", null ],

@@ -1,7 +1,7 @@
 var classCheMPS2_1_1Hamiltonian =
 [
     [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1", null ],
-    [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a98efe1eda4b3c2b5fda162c6c3931f6f", null ],
+    [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#aa6fe69fa4debb2c6f30da1ea061a74d9", null ],
     [ "Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a2eb98b6d8c0d10c12e60ba877434a70d", null ],
     [ "~Hamiltonian", "classCheMPS2_1_1Hamiltonian.html#a27623ac9db80f85c07761ac3ce554a51", null ],
     [ "addToVmat", "classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82", null ],
@@ -11,7 +11,9 @@ var classCheMPS2_1_1Hamiltonian =
     [ "getNGroup", "classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21", null ],
     [ "getOrbitalIrrep", "classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd", null ],
     [ "getTmat", "classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f", null ],
+    [ "getTmat", "classCheMPS2_1_1Hamiltonian.html#af40ec881163547a24801df69f093beab", null ],
     [ "getVmat", "classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126", null ],
+    [ "getVmat", "classCheMPS2_1_1Hamiltonian.html#a46ff65615e7af8e82440b9685cf08554", null ],
     [ "read", "classCheMPS2_1_1Hamiltonian.html#a66c95f16526b770df9b924c70acd5710", null ],
     [ "save", "classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074", null ],
     [ "setEconst", "classCheMPS2_1_1Hamiltonian.html#af6664242601063dd762c6a430054e4c5", null ],

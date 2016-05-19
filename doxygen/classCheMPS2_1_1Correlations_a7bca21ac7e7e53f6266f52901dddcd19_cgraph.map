@@ -1,0 +1,5 @@
+<map id="CheMPS2::Correlations::getMutualInformation_HAM" name="CheMPS2::Correlations::getMutualInformation_HAM">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="243,5,442,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Correlations.html#a6fd4628a95b8ca83f05f5b4ff27056a8" title="Get a mutual information term, using the DMRG indices. " alt="" coords="243,57,443,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="261,123,425,149"/>
+</map>

@@ -1,6 +1,6 @@
 var classCheMPS2_1_1TensorOperator =
 [
-    [ "TensorOperator", "classCheMPS2_1_1TensorOperator.html#a65b8fb20346acef134ca524d1fbeb3c0", null ],
+    [ "TensorOperator", "classCheMPS2_1_1TensorOperator.html#a85969a5c226c1f361d4bf28a74aca7e1", null ],
     [ "~TensorOperator", "classCheMPS2_1_1TensorOperator.html#a940dd678615ce9d731e0f29465af8615", null ],
     [ "clear", "classCheMPS2_1_1TensorOperator.html#a2088bb2ec0105ad443d02413ee2dd998", null ],
     [ "daxpy", "classCheMPS2_1_1TensorOperator.html#a7df2ccd2704f234765152ec1dab915cb", null ],
@@ -15,14 +15,19 @@ var classCheMPS2_1_1TensorOperator =
     [ "gStorage", "classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d", null ],
     [ "gStorage", "classCheMPS2_1_1TensorOperator.html#a39164dac1ea39e1cfafccccb1f0c699a", null ],
     [ "inproduct", "classCheMPS2_1_1TensorOperator.html#a0c347c3df77117eb3e6340ce032fb3b7", null ],
-    [ "update", "classCheMPS2_1_1TensorOperator.html#ad410e3a066869ea14b02292d7119e938", null ],
-    [ "update_moving_left", "classCheMPS2_1_1TensorOperator.html#a5689f75f8f6a108780525514316a1afb", null ],
-    [ "update_moving_right", "classCheMPS2_1_1TensorOperator.html#a7f948cf08871e15bf7a9038787e3dd5a", null ],
+    [ "update", "classCheMPS2_1_1TensorOperator.html#a7e53ebc77a77239387ac6849cc3962ba", null ],
+    [ "update_moving_left", "classCheMPS2_1_1TensorOperator.html#ac2d470cd957aa26a9700ff923e30e1af", null ],
+    [ "update_moving_right", "classCheMPS2_1_1TensorOperator.html#ac3130ea131c40f4ceedfe7b119dfe424", null ],
+    [ "bk_down", "classCheMPS2_1_1TensorOperator.html#ac76ffe337a33e1941ad4d9fd259beb90", null ],
+    [ "bk_up", "classCheMPS2_1_1TensorOperator.html#a509c40e1b414b49c23dfe0f2b47fc076", null ],
     [ "jw_phase", "classCheMPS2_1_1TensorOperator.html#a1252d34e0af5d21ccad9929810b6df2e", null ],
     [ "moving_right", "classCheMPS2_1_1TensorOperator.html#a9c4a634f1828098e4d581200bee011be", null ],
     [ "n_elec", "classCheMPS2_1_1TensorOperator.html#ae1e1337341b2cc1a08f7b75fef461a2a", null ],
     [ "n_irrep", "classCheMPS2_1_1TensorOperator.html#ae0dd1f545ba66ee298ba363bed4ca078", null ],
     [ "prime_last", "classCheMPS2_1_1TensorOperator.html#a4e1f1ba7e66cc3ec622fe1a81088840e", null ],
-    [ "sector_2S_down", "classCheMPS2_1_1TensorOperator.html#a8fad7bfe0de5481abce70e613e6e8b3e", null ],
+    [ "sector_irrep_up", "classCheMPS2_1_1TensorOperator.html#af0f7c8b6e05ae74ffb6e3d39bc78b24a", null ],
+    [ "sector_nelec_up", "classCheMPS2_1_1TensorOperator.html#acbe04e9c69e976e604d4b8d40b24ccd9", null ],
+    [ "sector_spin_down", "classCheMPS2_1_1TensorOperator.html#a53e8c5aa784e7cc0f01f05d41403f670", null ],
+    [ "sector_spin_up", "classCheMPS2_1_1TensorOperator.html#a42ed10e8b17579c706cfa66580ad4b77", null ],
     [ "two_j", "classCheMPS2_1_1TensorOperator.html#a31822ef5c33af22046a8a99b3a9e5322", null ]
 ];

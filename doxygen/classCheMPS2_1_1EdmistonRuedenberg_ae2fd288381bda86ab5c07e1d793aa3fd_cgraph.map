@@ -1,7 +1,0 @@
-<map id="CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg" name="CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c" title="Set the group. " alt="" coords="273,5,457,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="286,57,445,98"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="268,122,463,163"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="286,187,445,229"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="286,253,445,294"/>
-</map>

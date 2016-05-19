@@ -1,0 +1,16 @@
+<map id="CheMPS2::Sobject::Sobject" name="CheMPS2::Sobject::Sobject">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="248,5,423,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="248,71,423,112"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="248,136,423,177"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="248,201,423,243"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="248,267,423,308"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="248,332,423,373"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="248,397,423,439"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="240,463,431,490"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="479,13,657,39"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="735,5,894,47"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="485,397,651,439"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="483,463,653,490"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="705,405,924,431"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="717,456,912,497"/>
+</map>

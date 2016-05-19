@@ -1,6 +1,11 @@
 <map id="CheMPS2::DMRGSCFmatrix::set" name="CheMPS2::DMRGSCFmatrix::set">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7" title="Copy a one&#45;orbital quantity from array format to DMRGSCFmatrix format. " alt="" coords="302,5,483,47"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="287,71,498,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca" title="Construct the Fock matrix. " alt="" coords="273,122,512,149"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="560,67,752,94"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASPT2.html#a0aad4cf7db898047a811ea75f45b2abc" title="Return the vector length for the CASPT2 first order wavefunction (before diagonalization of the overl..." alt="" coords="299,13,486,54"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a49e2785c67342a2c907cf16292e9b589" title="From an Edmiston&#45;Ruedenberg active space rotation, fetch the eigenvectors and store them in eigenvecs..." alt="" coords="282,248,503,289"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7" title="Copy a one&#45;orbital quantity from array format to DMRGSCFmatrix format. " alt="" coords="302,130,483,172"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1CASSCF.html#a0210ff118bab44593aef7c6ec9f31a56" title="Build the F&#45;matrix (Eq. (11) in the Siegbahn paper [CAS3]) " alt="" coords="287,196,498,223"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca" title="Construct the Fock matrix. " alt="" coords="273,79,512,106"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASPT2.html#aa0fce9d99059c2336e06180160de7bd2" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="596,28,777,55"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="861,54,1053,80"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="560,180,813,207"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="595,231,779,258"/>
 </map>

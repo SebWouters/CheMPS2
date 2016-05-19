@@ -1,3 +1,12 @@
 <map id="CheMPS2::Hamiltonian::writeFCIDUMP" name="CheMPS2::Hamiltonian::writeFCIDUMP">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="212,13,403,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="681,35,876,76"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="453,119,619,160"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="228,169,387,211"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="228,235,387,276"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="212,67,403,94"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Hamiltonian.html#a46ff65615e7af8e82440b9685cf08554" title="Get the pointer to the two&#45;electron integrals. " alt="" coords="228,300,387,341"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Hamiltonian.html#af40ec881163547a24801df69f093beab" title="Get the pointer to the one&#45;electron integrals. " alt="" coords="228,365,387,407"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="228,431,387,472"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="669,126,888,153"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="451,67,621,94"/>
 </map>

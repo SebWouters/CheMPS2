@@ -1,0 +1,5 @@
+<map id="CheMPS2::Hamiltonian::getTmat" name="CheMPS2::Hamiltonian::getTmat">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Hamiltonian.html#af5d7ab013d03c1f6e76e3885a1775df3" title="Write the Hamiltonian to a FCIDUMP file. " alt="" coords="212,5,371,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a4f7527a7bf071f46d0f71c47de85c343" title="Debug check certain elements and sums. " alt="" coords="212,71,371,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a66c95f16526b770df9b924c70acd5710" title="Load the Hamiltonian. " alt="" coords="419,71,577,112"/>
+</map>

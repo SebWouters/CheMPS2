@@ -1,3 +1,14 @@
 <map id="CheMPS2::TensorQ::AddTermSimple" name="CheMPS2::TensorQ::AddTermSimple">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="255,13,440,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="277,5,451,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="271,71,457,98"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="255,122,473,149"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="269,173,459,199"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="277,224,451,265"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="265,290,463,317"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="521,13,700,39"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="778,5,937,47"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="527,107,694,148"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="525,173,696,199"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="748,114,967,141"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="760,165,955,207"/>
 </map>

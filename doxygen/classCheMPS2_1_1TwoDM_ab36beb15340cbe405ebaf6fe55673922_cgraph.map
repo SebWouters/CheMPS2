@@ -1,0 +1,11 @@
+<map id="CheMPS2::TwoDM::spin_density_dmrg" name="CheMPS2::TwoDM::spin_density_dmrg">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="837,165,1015,192"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="252,39,439,65"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="569,89,731,116"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1TwoDM.html#abad942f9d45c5ec3f9b3d8d7fd5b2922" title="Get a 1&#45;RDM term, using the DMRG indices. " alt="" coords="221,140,469,167"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1TwoDM.html#a2cb905399d199f45e7101e3927933005" title="Get a 2DM_A term, using the DMRG indices. " alt="" coords="517,191,783,217"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="265,241,425,268"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1TwoDM.html#ad7615a0d2458408de29de4b8b88868f1" title="Get a 2DM_B term, using the DMRG indices. " alt="" coords="517,241,783,268"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="1069,158,1228,199"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="831,216,1021,243"/>
+</map>

@@ -1,7 +1,10 @@
 <map id="CheMPS2::SyBookkeeper::gN" name="CheMPS2::SyBookkeeper::gN">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a2f30a27d6a9acd3abe2c1092d6a4defb" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="259,27,422,69"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a" title="Constructor. " alt="" coords="253,93,428,134"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="486,5,678,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="259,38,422,79"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#ac667c55cdc19cf80711d1838715ce7e5" title="Copy constructor. " alt="" coords="253,103,428,145"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ae6bcbf2398cda17b45c02af73a02fc65" title="Get whether the desired symmetry sector is possible. " alt="" coords="253,169,428,210"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="486,5,678,32"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="476,57,688,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="736,64,920,91"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="736,64,920,91"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRG.html#a53edf0724d79b964dc2130bdcda89dcb" title="Constructor. " alt="" coords="492,140,672,167"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#aa3c75959a25348919a2d676d425d1b7c" title="Constructor. " alt="" coords="495,191,669,233"/>
 </map>

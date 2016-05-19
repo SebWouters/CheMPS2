@@ -1,6 +1,0 @@
-<map id="CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise" name="CheMPS2::DMRGSCFVmatRotations::fillVmatRotatedBlockWise">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="302,5,493,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1FourIndex.html#a8733c4fd0064bcd845786157f7d9b26f" title="Set an element. " alt="" coords="310,56,485,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRGSCFunitary.html#a7ca4dead16809cd2a896c1a05b92fc0b" title="Get the unitary rotation for block irrep. " alt="" coords="299,107,496,149"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1FourIndex.html#a48e9e1b0939679da974e35c26281ba87" title="Add a double to an element. " alt="" coords="309,173,486,200"/>
-</map>

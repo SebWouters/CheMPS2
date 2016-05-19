@@ -1,0 +1,5 @@
+<map id="CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg" name="CheMPS2::EdmistonRuedenberg::EdmistonRuedenberg">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#aca6fdd79557f9189153258daad5fbe8c" title="Set the group. " alt="" coords="268,5,452,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="500,23,695,65"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FourIndex.html#a6488d46b83685234b81a529d61d91cd6" title="Get a given irrep size. " alt="" coords="286,107,434,149"/>
+</map>

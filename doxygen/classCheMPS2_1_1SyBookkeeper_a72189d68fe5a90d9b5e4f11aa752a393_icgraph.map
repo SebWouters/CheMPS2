@@ -1,3 +1,6 @@
 <map id="CheMPS2::SyBookkeeper::gTwoS" name="CheMPS2::SyBookkeeper::gTwoS">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#a755ef2a2c237dcacba3ac4a5a8ea272a" title="Constructor. " alt="" coords="228,5,403,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#ac667c55cdc19cf80711d1838715ce7e5" title="Copy constructor. " alt="" coords="228,5,403,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#ae6bcbf2398cda17b45c02af73a02fc65" title="Get whether the desired symmetry sector is possible. " alt="" coords="228,71,403,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#a53edf0724d79b964dc2130bdcda89dcb" title="Constructor. " alt="" coords="451,49,631,75"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1SyBookkeeper.html#aa3c75959a25348919a2d676d425d1b7c" title="Constructor. " alt="" coords="453,100,628,141"/>
 </map>

@@ -1,0 +1,8 @@
+<map id="CheMPS2::ConvergenceScheme::setInstruction" name="CheMPS2::ConvergenceScheme::setInstruction">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1ConvergenceScheme.html#a20c16d4f2e8850d4ece7e3b993cce7d2" title="Set an instruction. " alt="" coords="268,5,483,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1ConvergenceScheme.html#a982fa5f929b66ed42211f64eb6d5a192" title="Get the number of renormalized states for a particular instruction. " alt="" coords="268,71,483,112"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1ConvergenceScheme.html#ac12ca4a6c69913388eca92bdc361f118" title="Get the energy convergence threshold for a particular instruction. " alt="" coords="268,136,483,177"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1ConvergenceScheme.html#afd35a2f2901d1bd4f24b314fd078e46e" title="Get the maximum number of sweeps for a particular instruction. " alt="" coords="268,201,483,243"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1ConvergenceScheme.html#aaa418f2b95ef871dca6a6aa4d6b0b8cb" title="Get the noise prefactor for a particular instruction. " alt="" coords="268,267,483,308"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1ConvergenceScheme.html#a487130810ed96f93112f07e9beb65f3c" title="Get the Davidson residual tolerance for a particular instruction. " alt="" coords="268,332,483,373"/>
+</map>

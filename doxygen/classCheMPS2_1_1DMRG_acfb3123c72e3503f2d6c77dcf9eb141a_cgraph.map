@@ -1,3 +1,7 @@
 <map id="CheMPS2::DMRG::newExcitation" name="CheMPS2::DMRG::newExcitation">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="275,5,441,47"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="287,64,454,105"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4" title="Reconstruct the renormalized operators when you overwrite the matrix elements with Prob&#45;&gt;setMxElement..." alt="" coords="275,130,467,157"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="527,5,694,47"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="515,71,707,98"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="515,122,706,149"/>
 </map>

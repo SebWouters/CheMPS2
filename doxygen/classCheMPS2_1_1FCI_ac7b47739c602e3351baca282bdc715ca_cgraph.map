@@ -1,0 +1,9 @@
+<map id="CheMPS2::FCI::ActWithNumberOperator" name="CheMPS2::FCI::ActWithNumberOperator">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#af904234f3a73203c39ddadba56d49555" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="277,79,477,106"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#aeb59e611639c0249e422f0f7c5dfda28" title="Find the bit representation of a global counter corresponding to &quot; E_ij | FCI vector &gt; &quot; ; where irre..." alt="" coords="267,130,488,157"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="536,71,727,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#aa86f6afd61836e4bad67955b3f900465" title="Find the irrep of the up Slater determinant of a global counter corresponding to &quot; E_ij | FCI vector ..." alt="" coords="541,123,722,164"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e" title="Convertor between two representations of a same spin&#45;projection Slater determinant. " alt="" coords="550,189,713,215"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="777,5,943,47"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="775,71,945,98"/>
+</map>

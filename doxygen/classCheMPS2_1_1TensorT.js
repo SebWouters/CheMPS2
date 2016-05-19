@@ -1,7 +1,6 @@
 var classCheMPS2_1_1TensorT =
 [
-    [ "TensorT", "classCheMPS2_1_1TensorT.html#ae22dc74a7537e6e883eae4bfd293f614", null ],
-    [ "TensorT", "classCheMPS2_1_1TensorT.html#ad06d396a5a4d3cc2d42bb8cea0e5c88f", null ],
+    [ "TensorT", "classCheMPS2_1_1TensorT.html#af98fc8a1707fa3da255d9453bc5b67c5", null ],
     [ "~TensorT", "classCheMPS2_1_1TensorT.html#af4de45c3fe49b6f0cfc605c4effb5a01", null ],
     [ "CheckLeftNormal", "classCheMPS2_1_1TensorT.html#a2d9f4127678d9c52388ccf26f7ebe775", null ],
     [ "CheckRightNormal", "classCheMPS2_1_1TensorT.html#a734f76ffa266908bd522fd1d11d4c699", null ],
@@ -18,5 +17,6 @@ var classCheMPS2_1_1TensorT =
     [ "QR", "classCheMPS2_1_1TensorT.html#a1ee5bb57153170fc200acea0859a5ef9", null ],
     [ "random", "classCheMPS2_1_1TensorT.html#a5143f02e292c2c7e25d472e75b239298", null ],
     [ "Reset", "classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e", null ],
-    [ "RightMultiply", "classCheMPS2_1_1TensorT.html#a06f61e76a7a6d46c1899141c75678aa8", null ]
+    [ "RightMultiply", "classCheMPS2_1_1TensorT.html#a06f61e76a7a6d46c1899141c75678aa8", null ],
+    [ "sBK", "classCheMPS2_1_1TensorT.html#a315536959cbf0608cd11f386e8637782", null ]
 ];

@@ -1,3 +1,4 @@
 <map id="CheMPS2::TensorT::RightMultiply" name="CheMPS2::TensorT::RightMultiply">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="276,5,467,32"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="284,5,459,47"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="276,71,467,98"/>
 </map>

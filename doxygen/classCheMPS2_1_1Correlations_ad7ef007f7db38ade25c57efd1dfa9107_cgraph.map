@@ -1,0 +1,5 @@
+<map id="CheMPS2::Correlations::getCspin_HAM" name="CheMPS2::Correlations::getCspin_HAM">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="213,5,412,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Correlations.html#aac3405d9298596a6193f521a0bfea4ee" title="Get a Cspin term, using the DMRG indices. " alt="" coords="233,57,393,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="231,123,395,149"/>
+</map>

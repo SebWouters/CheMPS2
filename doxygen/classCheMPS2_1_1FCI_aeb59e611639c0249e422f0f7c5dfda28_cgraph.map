@@ -1,0 +1,9 @@
+<map id="CheMPS2::FCI::getBitsOfCounter" name="CheMPS2::FCI::getBitsOfCounter">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="275,71,465,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#aa86f6afd61836e4bad67955b3f900465" title="Find the irrep of the up Slater determinant of a global counter corresponding to &quot; E_ij | FCI vector ..." alt="" coords="279,123,461,164"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e" title="Convertor between two representations of a same spin&#45;projection Slater determinant. " alt="" coords="289,189,451,215"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="515,5,682,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="513,71,684,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="732,13,951,39"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="744,64,939,105"/>
+</map>

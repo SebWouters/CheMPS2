@@ -1,4 +1,5 @@
 <map id="CheMPS2::DMRG::activateExcitations" name="CheMPS2::DMRG::activateExcitations">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#ad05bfb6ca9c76338ae436083e285cfa6" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="308,5,492,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#afabb84cda6961978c846fa8f18799a5e" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="304,56,496,83"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="579,24,763,50"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="321,24,513,50"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1DMRG.html#a13008f80dbfd8312ef4aa3990cbbc436" title="Get the pointer to the Correlations. " alt="" coords="304,74,531,101"/>
 </map>

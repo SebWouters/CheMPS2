@@ -1,0 +1,5 @@
+<map id="CheMPS2::FCI::GFmatrix_addition" name="CheMPS2::FCI::GFmatrix_addition">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#ae8035a4a03bc0232f6a38a90f1477a60" title="Calculate the addition part of the retarded Green&#39;s function: &lt;GSvector| a_{alpha, spin(isUp)} [ omega &#45; Ham + GSenergy + I*eta ]^{&#45;1} a^+_{beta, spin(isUp)} |GSvector&gt; " alt="" coords="228,41,419,82"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="705,56,884,83"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc" title="Calculate the retarded Green&#39;s function (= addition + removal amplitude) " alt="" coords="467,5,657,32"/>
+</map>

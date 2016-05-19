@@ -1,0 +1,10 @@
+<map id="CheMPS2::FCI::LowestEnergyDeterminant" name="CheMPS2::FCI::LowestEnergyDeterminant">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1FCI.html#af904234f3a73203c39ddadba56d49555" title="Getter for the number of variables in the vector &quot; E_ij | FCI vector &gt; &quot; ; where irrep_center = I_i x..." alt="" coords="489,13,689,40"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1FCI.html#abe702e621bfaec9302f81561cde3c144" title="Function which returns the diagonal elements of the FCI Hamiltonian (without Econstant!!) = Slater de..." alt="" coords="256,64,431,91"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1FCI.html#aeb59e611639c0249e422f0f7c5dfda28" title="Find the bit representation of a global counter corresponding to &quot; E_ij | FCI vector &gt; &quot; ; where irre..." alt="" coords="479,64,700,91"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#ada6d8ff3debe7a82fe843785a2b2d84e" title="Function which returns the AUGMENTED one&#45;body matrix elements ( G_{ij} = T_{ij} &#45; 0..." alt="" coords="504,115,675,141"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1FCI.html#a56cbdfb4af815c382559c888a32e67ac" title="Function which returns the electron repulsion integral (in chemists notation: integral dr1 dr2 orb1(r..." alt="" coords="509,165,670,192"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="748,5,939,32"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1FCI.html#aa86f6afd61836e4bad67955b3f900465" title="Find the irrep of the up Slater determinant of a global counter corresponding to &quot; E_ij | FCI vector ..." alt="" coords="753,57,934,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e" title="Convertor between two representations of a same spin&#45;projection Slater determinant. " alt="" coords="762,123,925,149"/>
+</map>

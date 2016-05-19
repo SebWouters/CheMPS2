@@ -1,3 +1,6 @@
 <map id="CheMPS2::DMRGSCFwtilde::getBlock" name="CheMPS2::DMRGSCFwtilde::getBlock">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="245,13,463,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="245,5,463,47"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a21471f166b873029b5e51dda4a6907c4" title="Build the Wtilde&#45;matrix (Eq. (20b) in the Siegbahn paper [CAS3]) " alt="" coords="245,71,463,98"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="511,15,764,42"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="545,67,729,94"/>
 </map>

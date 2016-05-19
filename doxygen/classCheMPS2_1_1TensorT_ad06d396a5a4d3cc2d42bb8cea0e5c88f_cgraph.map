@@ -1,5 +1,0 @@
-<map id="CheMPS2::TensorT::TensorT" name="CheMPS2::TensorT::TensorT">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1TensorT.html#a279b51f0616ab58f2a2893681b4cab71" title="Get the location index. " alt="" coords="255,5,440,32"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1TensorT.html#a5c9ed2cb2b6014a9b16b60670ff0d2d5" title="Get the pointer to the symmetry bookkeeper. " alt="" coords="262,56,433,83"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="248,107,447,133"/>
-</map>

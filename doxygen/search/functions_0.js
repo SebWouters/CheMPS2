@@ -15,5 +15,5 @@ var searchData=
   ['addtovmat',['addToVmat',['../classCheMPS2_1_1Hamiltonian.html#ab6147d890404000374bb96baba0b1f82',1,'CheMPS2::Hamiltonian']]],
   ['appendnew',['appendNew',['../classCheMPS2_1_1DIIS.html#ae08b4931a1ed04490fecb06618d26432',1,'CheMPS2::DIIS']]],
   ['apply_5fexcitation',['apply_excitation',['../classCheMPS2_1_1FCI.html#a278f51555ab4e5da474403748cff8098',1,'CheMPS2::FCI']]],
-  ['augmentedhessiannr',['augmentedHessianNR',['../classCheMPS2_1_1CASSCF.html#abf34a3243a38979439e7aa2d9e60c4dd',1,'CheMPS2::CASSCF']]]
+  ['augmentedhessiannr',['augmentedHessianNR',['../classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1',1,'CheMPS2::CASSCF']]]
 ];
