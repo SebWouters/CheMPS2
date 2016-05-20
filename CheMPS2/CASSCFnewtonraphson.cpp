@@ -96,7 +96,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
    // Only MASTER process has Edmiston-Ruedenberg active space localizer
    EdmistonRuedenberg * theLocalizer = NULL;
-   if (( scf_options->getWhichActiveSpace() == 2 ) && ( am_i_master )){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
+   if (( scf_options->getWhichActiveSpace() >= 2 ) && ( am_i_master )){ theLocalizer = new EdmistonRuedenberg( HamDMRG->getVmat(), iHandler->getGroupNumber() ); }
 
    // Load unitary from disk
    if ( scf_options->getStoreUnitary() ){
@@ -144,6 +144,9 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
             if ( scf_options->getWhichActiveSpace() == 2 ){
                cout << "DMRGSCF::solve : DIIS has started. Active space not rotated to localized orbitals anymore!" << endl;
             }
+            if ( scf_options->getWhichActiveSpace() == 3 ){
+               cout << "DMRGSCF::solve : DIIS has started. Active space not ordered according to the Fiedler vector of the exchange matrix anymore!" << endl;
+            }
             if ( diis == NULL ){
                const int diis_vec_size = iHandler->getROTparamsize();
                diis = new DIIS( diis_vec_size, unitary->getNumVariablesX(), scf_options->getNumDIISVecs() );
@@ -176,9 +179,9 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
       #endif
 
       // Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
-      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
+      if (( scf_options->getWhichActiveSpace() >= 2 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
          if ( am_i_master ){
-            theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); // Default EDMISTONRUED_gradThreshold and EDMISTONRUED_maxIter used
+            if ( scf_options->getWhichActiveSpace() == 2 ){ theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); }
             theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
             fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
             unitary->rotateActiveSpaceVectors(mem1, mem2);

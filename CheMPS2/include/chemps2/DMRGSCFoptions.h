@@ -44,7 +44,7 @@ namespace CheMPS2{
     (10) StateAveraging (bool) : Whether to do state-averaged or state-specific DMRGSCF \n
     
     DMRG active space options: \n
-    (11) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
+    (11) WhichActiveSpace (int) : Determines which active space is used for the DMRG (FCI replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If 3: Not localized, but only sorted within each irrep by the Fiedler vector of the exchange matrix. If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). \n
     (12) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space \n
     (13) StartLocRandom (bool) : When localized orbitals are used, it is sometimes beneficial to start the localization procedure from a random unitary. A specific example is the reduction of the d2h point group of graphene nanoribbons to the cs point group, in order to make use of locality in the DMRG calculations. Since molecular orbitals will still belong to the full point group d2h, a random unitary helps in constructing localized orbitals which belong to the cs point group.
 */

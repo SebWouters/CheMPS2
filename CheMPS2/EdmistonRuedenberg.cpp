@@ -66,24 +66,14 @@ CheMPS2::EdmistonRuedenberg::~EdmistonRuedenberg(){
 double CheMPS2::EdmistonRuedenberg::Optimize(double * temp1, double * temp2, const bool startFromRandomUnitary, const double gradThreshold, const int maxIter){
 
    //Clear the unitary
-   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){
-      const int linsize = iHandler->getNORB(irrep);
-      double * block = unitary->getBlock(irrep);
-      for (int cnt=0; cnt<linsize*linsize; cnt++){ block[cnt] = 0.0; }
-      for (int cnt=0; cnt<linsize; cnt++){ block[cnt*(1+linsize)] = 1.0; }
-   }
-   
+   unitary->identity();
+
    //Setting up the variables for the gradient
    double gradNorm = 1.0;
-   int numVariables = 0;
-   for (int irrep=0; irrep<SymmInfo.getNumberOfIrreps(); irrep++){
-      if (iHandler->getNORB(irrep) > 1){
-         numVariables += iHandler->getNORB(irrep) * (iHandler->getNORB(irrep) - 1) / 2;
-      }
-   }
+   const int numVariables = iHandler->getROTparamsize();
    double * gradient = new double[numVariables];
    for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] = 0.0; }
-   
+
    //Randomize the unitary if asked
    if (startFromRandomUnitary){
       for (int cnt=0; cnt<numVariables; cnt++){ gradient[cnt] = ((double) rand())/RAND_MAX - 0.5; }
@@ -378,6 +368,9 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
 
    //For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html
 
+   const int mem_size = iHandler->getL() * iHandler->getL() * iHandler->getL() * iHandler->getL();
+   DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
+
    if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at start = " << FiedlerExchangeCost() << endl; }
    
    int * reorder = new int[maxlinsize];
@@ -410,7 +403,6 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
    
    delete [] reorder;
 
-   const int mem_size = iHandler->getL() * iHandler->getL() * iHandler->getL() * iHandler->getL();
    DMRGSCFrotations::rotate( VMAT_ORIG, VmatRotated, NULL, 'F', 'F', 'F', 'F', iHandler, unitary, temp1, temp2, mem_size, "edmistonruedenberg" );
 
    if (printLevel>0){ cout << "   EdmistonRuedenberg::FiedlerExchange : Cost function at end   = " << FiedlerExchangeCost() << endl; }

@@ -296,7 +296,7 @@ cout << "\n"
 "              Specify the maximum number of DMRG-SCF iterations (default 100).\n"
 "\n"
 "       SCF_ACTIVE_SPACE = char\n"
-"              Rotate the active space orbitals: no additional rotations (I), natural orbitals (N), or localized and ordered orbitals (L) (default I).\n"
+"              Rotate the active space orbitals: no additional rotations (I), natural orbitals (N), localized and ordered orbitals (L), or ordered orbitals only (F) (default I).\n"
 "\n"
 "       CASPT2_CALC = bool\n"
 "              Switch on the CASPT2 calculation (TRUE or FALSE; default FALSE).\n"
@@ -443,9 +443,9 @@ int main( int argc, char ** argv ){
       if ( find_double( &caspt2_ipea,  line, "CASPT2_IPEA",  true, 0.0 ) == false ){ return clean_exit( -1 ); }
       if ( find_double( &caspt2_imag,  line, "CASPT2_IMAG",  true, 0.0 ) == false ){ return clean_exit( -1 ); }
 
-      char options1[] = { 'I', 'N', 'L' };
+      char options1[] = { 'I', 'N', 'L', 'F' };
       char options2[] = { 'A', 'P' };
-      if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 3 ) == false ){ return clean_exit( -1 ); }
+      if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 4 ) == false ){ return clean_exit( -1 ); }
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
       if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
@@ -620,10 +620,11 @@ int main( int argc, char ** argv ){
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
       cout << "   SCF_GRAD_THR       = " << scf_grad_thr << endl;
       cout << "   SCF_MAX_ITER       = " << scf_max_iter << endl;
-      cout << "   SCF_ACTIVE_SPACE   = " << (( scf_active_space == 'I' ) ? "no additional rotations" :
-                                            (( scf_active_space == 'N' ) ? "natural orbitals" : "localized and ordered orbitals" )) << endl;
+      cout << "   SCF_ACTIVE_SPACE   = " << (( scf_active_space == 'I' ) ? "I : no additional rotations" :
+                                            (( scf_active_space == 'N' ) ? "N : natural orbitals" :
+                                            (( scf_active_space == 'L' ) ? "L : localized and ordered orbitals" : "F : ordered orbitals only" ))) << endl;
       cout << "   CASPT2_CALC        = " << (( caspt2_calc ) ? "TRUE" : "FALSE" ) << endl;
-      cout << "   CASPT2_ORBS        = " << (( caspt2_orbs == 'A' ) ? "as specified in SCF_ACTIVE_SPACE" : "pseudocanonical orbitals" ) << endl;
+      cout << "   CASPT2_ORBS        = " << (( caspt2_orbs == 'A' ) ? "A : as specified in SCF_ACTIVE_SPACE" : "P : pseudocanonical orbitals" ) << endl;
       cout << "   CASPT2_IPEA        = " << caspt2_ipea << endl;
       cout << "   CASPT2_IMAG        = " << caspt2_imag << endl;
       cout << "   CASPT2_CHECKPT     = " << (( caspt2_checkpt ) ? "TRUE" : "FALSE" ) << endl;
@@ -669,6 +670,7 @@ int main( int argc, char ** argv ){
    if ( scf_active_space == 'I' ){ scf_options->setWhichActiveSpace( 0 ); }
    if ( scf_active_space == 'N' ){ scf_options->setWhichActiveSpace( 1 ); }
    if ( scf_active_space == 'L' ){ scf_options->setWhichActiveSpace( 2 ); }
+   if ( scf_active_space == 'F' ){ scf_options->setWhichActiveSpace( 3 ); }
    scf_options->setDumpCorrelations( print_corr );
    scf_options->setStartLocRandom( true );
 
