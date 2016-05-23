@@ -26,7 +26,7 @@
 #include "Excitation.h"
 #include "Lapack.h"
 #include "Special.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 double CheMPS2::Excitation::matvec( const SyBookkeeper * book_up, const SyBookkeeper * book_down, const int orb1, const int orb2, const double alpha, const double beta, const double gamma, Sobject * S_up, Sobject * S_down, TensorO ** overlaps, TensorL ** regular, TensorL ** trans ){
 
@@ -232,7 +232,7 @@ void CheMPS2::Excitation::first_left( const int ikappa, const SyBookkeeper * boo
                double factor = alpha
                              * Special::phase( TwoSL + TwoSR + TwoJ + 2 * TwoS2 )
                              * sqrt( 1.0 * ( TwoJ + 1 ) * ( TwoSR + 1 ) )
-                             * gsl_sf_coupling_6j( TwoS2, TwoJ, 1, TwoSR, TwoSRdown, TwoSL );
+                             * Wigner::wigner6j( TwoS2, TwoJ, 1, TwoSR, TwoSRdown, TwoSL );
                double add = 1.0;
                char notrans = 'N';
                double * block_right = Rtrans->gStorage( NR - 1, TwoSRdown, IRdown, NR, TwoSR, IR );
@@ -256,7 +256,7 @@ void CheMPS2::Excitation::first_left( const int ikappa, const SyBookkeeper * boo
                      double factor = alpha
                                    * Special::phase( TwoSL + TwoSR + TwoJdown + 1 + 2 * TwoS2 )
                                    * sqrt( 1.0 * ( TwoJdown + 1 ) * ( TwoSR + 1 ) )
-                                   * gsl_sf_coupling_6j( TwoJdown, TwoS2, 1, TwoSR, TwoSRdown, TwoSL );
+                                   * Wigner::wigner6j( TwoJdown, TwoS2, 1, TwoSR, TwoSRdown, TwoSL );
                      double add = 1.0;
                      char notrans = 'N';
                      double * block_right = Rtrans->gStorage( NR - 1, TwoSRdown, IRdown, NR, TwoSR, IR );
@@ -306,7 +306,7 @@ void CheMPS2::Excitation::second_left( const int ikappa, const SyBookkeeper * bo
                      double factor = beta
                                    * Special::phase( TwoSL + TwoSRdown + TwoJdown + 2 * TwoS2 )
                                    * sqrt( 1.0 * ( TwoJdown + 1 ) * ( TwoSRdown + 1 ) )
-                                   * gsl_sf_coupling_6j( TwoJdown, TwoS2, 1, TwoSR, TwoSRdown, TwoSL );
+                                   * Wigner::wigner6j( TwoJdown, TwoS2, 1, TwoSR, TwoSRdown, TwoSL );
                      double add = 1.0;
                      char notrans = 'N';
                      char trans = 'T';
@@ -330,7 +330,7 @@ void CheMPS2::Excitation::second_left( const int ikappa, const SyBookkeeper * bo
                double factor = beta
                              * Special::phase( TwoSL + TwoSRdown + TwoJ + 1 + 2 * TwoS2 )
                              * sqrt( 1.0 * ( TwoJ + 1 ) * ( TwoSRdown + 1 ) )
-                             * gsl_sf_coupling_6j( TwoS2, TwoJ, 1, TwoSR, TwoSRdown, TwoSL );
+                             * Wigner::wigner6j( TwoS2, TwoJ, 1, TwoSR, TwoSRdown, TwoSL );
                double add = 1.0;
                char notrans = 'N';
                char trans = 'T';
@@ -421,7 +421,7 @@ void CheMPS2::Excitation::first_right( const int ikappa, const SyBookkeeper * bo
                      double factor = alpha
                                    * Special::phase( TwoSLdown + TwoSR + 2 - TwoJdown )
                                    * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoJdown + 1 ) )
-                                   * gsl_sf_coupling_6j( TwoJdown, TwoS1, 1, TwoSL, TwoSLdown, TwoSR );
+                                   * Wigner::wigner6j( TwoJdown, TwoS1, 1, TwoSL, TwoSLdown, TwoSR );
                      double add = 1.0;
                      char notrans = 'N';
                      char trans = 'T';
@@ -445,7 +445,7 @@ void CheMPS2::Excitation::first_right( const int ikappa, const SyBookkeeper * bo
                double factor = alpha
                              * Special::phase( TwoSLdown + TwoSR + 3 - TwoJ )
                              * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoJ + 1 ) )
-                             * gsl_sf_coupling_6j( TwoS1, TwoJ, 1, TwoSL, TwoSLdown, TwoSR );
+                             * Wigner::wigner6j( TwoS1, TwoJ, 1, TwoSL, TwoSLdown, TwoSR );
                double add = 1.0;
                char notrans = 'N';
                char trans = 'T';
@@ -494,7 +494,7 @@ void CheMPS2::Excitation::second_right( const int ikappa, const SyBookkeeper * b
                      double factor = beta
                                    * Special::phase( TwoSL + TwoSR + 3 - TwoJdown )
                                    * sqrt( 1.0 * ( TwoJdown + 1 ) * ( TwoSLdown + 1 ) )
-                                   * gsl_sf_coupling_6j( TwoJdown, TwoS1, 1, TwoSL, TwoSLdown, TwoSR );
+                                   * Wigner::wigner6j( TwoJdown, TwoS1, 1, TwoSL, TwoSLdown, TwoSR );
                      double add = 1.0;
                      char notrans = 'N';
                      double * block_left = Lregular->gStorage( NL, TwoSL, IL, NL + 1, TwoSLdown, ILdown );
@@ -517,7 +517,7 @@ void CheMPS2::Excitation::second_right( const int ikappa, const SyBookkeeper * b
                double factor = beta
                              * Special::phase( TwoSL + TwoSR + 2 - TwoJ )
                              * sqrt( 1.0 * ( TwoSLdown + 1 ) * ( TwoJ + 1 ) )
-                             * gsl_sf_coupling_6j( TwoS1, TwoJ, 1, TwoSL, TwoSLdown, TwoSR );
+                             * Wigner::wigner6j( TwoS1, TwoJ, 1, TwoSL, TwoSLdown, TwoSR );
                double add = 1.0;
                char notrans = 'N';
                double * block_left = Lregular->gStorage( NL, TwoSL, IL, NL + 1, TwoSLdown, ILdown );
@@ -605,7 +605,7 @@ void CheMPS2::Excitation::first_middle( const int ikappa, const SyBookkeeper * b
                   double factor = alpha
                                 * Special::phase( TwoSL + TwoSRdown + TwoJ + 1 + 2 * TwoS1 + 2 * TwoS2 )
                                 * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSR + 1 ) )
-                                * gsl_sf_coupling_6j( TwoSL, TwoSR, TwoJ, TwoSRdown, TwoSLdown, 1 );
+                                * Wigner::wigner6j( TwoSL, TwoSR, TwoJ, TwoSRdown, TwoSLdown, 1 );
                   char trans = 'T';
                   char notrans = 'N';
                   double set = 0.0;
@@ -657,7 +657,7 @@ void CheMPS2::Excitation::second_middle( const int ikappa, const SyBookkeeper * 
                   double factor = beta
                                 * Special::phase( TwoSLdown + TwoSR + TwoJ + 1 + 2 * TwoS1 + 2 * TwoS2 )
                                 * sqrt( 1.0 * ( TwoSLdown + 1 ) * ( TwoSRdown + 1 ) )
-                                * gsl_sf_coupling_6j( TwoSL, TwoSR, TwoJ, TwoSRdown, TwoSLdown, 1 );
+                                * Wigner::wigner6j( TwoSL, TwoSR, TwoJ, TwoSRdown, TwoSLdown, 1 );
                   char trans = 'T';
                   char notrans = 'N';
                   double set = 0.0;

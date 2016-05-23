@@ -159,7 +159,6 @@ CheMPS2 can be built with [CMake](http://www.cmake.org/) and depends on
 
 -   BLAS
 -   LAPACK
--   GSL ([GNU Scientific library](http://www.gnu.org/software/gsl/))
 -   HDF5 ([Hierarchical Data Format Release 5](http://www.hdfgroup.org/HDF5/))
 
 It is parallelized for shared memory architectures with the Open

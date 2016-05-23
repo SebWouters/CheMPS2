@@ -24,7 +24,7 @@
 #include "Tensor3RDM.h"
 #include "Special.h"
 #include "Lapack.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 CheMPS2::Tensor3RDM::Tensor3RDM(const int boundary, const int two_j1_in, const int two_j2, const int nelec, const int irrep, const bool prime_last, const SyBookkeeper * book):
 TensorOperator(boundary,
@@ -82,7 +82,7 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
                double * Tdown  =  denT->gStorage( nr_up+2, two_jl_down, il_down, nr_up+3, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
                             * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -109,7 +109,7 @@ void CheMPS2::Tensor3RDM::a1(TensorOperator * Sigma, TensorT * denT, double * wo
                double * Tdown  =  denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+3, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
                             * Special::phase( two_jl_up + two_jr_down + two_j2 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -158,7 +158,7 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
                double * Tdown  =  denT->gStorage( nr_up+1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
                             * Special::phase( two_jl_up + two_jr_down + two_j2 + 3 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -185,7 +185,7 @@ void CheMPS2::Tensor3RDM::b1(TensorOperator * Sigma, TensorT * denT, double * wo
                double * Tdown  =  denT->gStorage( nr_up,   two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
                             * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -234,7 +234,7 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
                double * Tdown  = denT->gStorage( nr_up, two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_down + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
                             * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -261,7 +261,7 @@ void CheMPS2::Tensor3RDM::c1(TensorOperator * denF, TensorT * denT, double * wor
                double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_up + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
                             * Special::phase( two_jl_up + two_jr_down + two_j2 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -310,7 +310,7 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
                double * Tdown  = denT->gStorage( nr_up, two_jl_down, il_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jr_down + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down )
                             * Special::phase( two_jr_up + two_jl_down + two_j2 + 3 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -337,7 +337,7 @@ void CheMPS2::Tensor3RDM::d1(TensorOperator * denF, TensorT * denT, double * wor
                double * Tdown  = denT->gStorage( nr_up-1, two_jr_down, ir_down, nr_up+1, two_jr_down, ir_down );
                
                double alpha = sqrt( 1.0 * ( two_j2 + 1 ) * ( two_jl_up + 1 ) )
-                            * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
+                            * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_down, two_jr_up, two_jl_up )
                             * Special::phase( two_jr_up + two_jr_down + two_j1 + 1 );
                double beta  = 0.0; //set
                char trans   = 'T';
@@ -523,8 +523,8 @@ void CheMPS2::Tensor3RDM::extra4(TensorL * denL, TensorT * denT, double * workme
                   
                   double alpha = sqrt( 1.0 * ( two_j1 + 1 ) * ( two_j2 + 1 ) * ( two_jr_up + 1 ) * ( two_jl_down + 1 ) )
                                * Special::phase( two_jr_up + two_jr_down - two_jl_up - two_jl_down )
-                               * gsl_sf_coupling_6j( 1, 1, two_j1, two_jl_down, two_jr_up, two_jl_up )
-                               * gsl_sf_coupling_6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down );
+                               * Wigner::wigner6j( 1, 1, two_j1, two_jl_down, two_jr_up, two_jl_up )
+                               * Wigner::wigner6j( 1, two_j1, two_j2, two_jr_up, two_jr_down, two_jl_down );
                   double beta  = 0.0; //set
                   char trans   = 'T';
                   char notrans = 'N';

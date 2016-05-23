@@ -22,7 +22,7 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 void CheMPS2::Heff::addDiagonal1A(const int ikappa, double * memHeffDiag, const Sobject * denS, TensorX * Xleft) const{
    int dimL = denBK->gCurrentDim(denS->gIndex(), denS->gNL(ikappa), denS->gTwoSL(ikappa), denS->gIL(ikappa));
@@ -259,7 +259,7 @@ void CheMPS2::Heff::addDiagonal2b3spin1(const int ikappa, double * memHeffDiag, 
       int dimR     = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
       
       int fase = phase(TwoSL + TwoSR + 2*TwoJ + ((N2==1)?1:0) - 1);
-      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSL+1)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,1,1,((N2==1)?1:0)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,TwoSL,TwoSL,TwoSR);
+      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSL+1)) * Wigner::wigner6j(TwoJ,TwoJ,2,1,1,((N2==1)?1:0)) * Wigner::wigner6j(TwoJ,TwoJ,2,TwoSL,TwoSL,TwoSR);
       
       double * Dblock = Dtensor->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
       for (int cntR=0; cntR<dimR; cntR++){
@@ -294,7 +294,7 @@ void CheMPS2::Heff::addDiagonal2c3spin1(const int ikappa, double * memHeffDiag, 
       int dimR     = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
       
       int fase = phase(TwoSL + TwoSR + 2*TwoJ + ((N1==1)?1:0) - 1);
-      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSL+1)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,1,1,((N1==1)?1:0)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,TwoSL,TwoSL,TwoSR);
+      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSL+1)) * Wigner::wigner6j(TwoJ,TwoJ,2,1,1,((N1==1)?1:0)) * Wigner::wigner6j(TwoJ,TwoJ,2,TwoSL,TwoSL,TwoSR);
       
       double * Dblock = Dtensor->gStorage(NL,TwoSL,IL,NL,TwoSL,IL);
       for (int cntR=0; cntR<dimR; cntR++){
@@ -329,7 +329,7 @@ void CheMPS2::Heff::addDiagonal2e3spin1(const int ikappa, double * memHeffDiag, 
       int dimR     = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
       
       int fase = phase(TwoSR + TwoSL + 2*TwoJ + ((N2==1)?1:0) + 1);
-      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSR+1)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,1,1,((N2==1)?1:0)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,TwoSR,TwoSR,TwoSL);
+      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSR+1)) * Wigner::wigner6j(TwoJ,TwoJ,2,1,1,((N2==1)?1:0)) * Wigner::wigner6j(TwoJ,TwoJ,2,TwoSR,TwoSR,TwoSL);
       
       double * Dblock = Dtensor->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
       for (int cntR=0; cntR<dimR; cntR++){
@@ -364,7 +364,7 @@ void CheMPS2::Heff::addDiagonal2f3spin1(const int ikappa, double * memHeffDiag, 
       int dimR     = denBK->gCurrentDim(theindex+2,NR,TwoSR,IR);
       
       int fase = phase(TwoSR + TwoSL + 2*TwoJ + ((N1==1)?1:0) + 1);
-      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSR+1)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,1,1,((N1==1)?1:0)) * gsl_sf_coupling_6j(TwoJ,TwoJ,2,TwoSR,TwoSR,TwoSL);
+      const double alpha = fase * (TwoJ+1) * sqrt(3.0*(TwoSR+1)) * Wigner::wigner6j(TwoJ,TwoJ,2,1,1,((N1==1)?1:0)) * Wigner::wigner6j(TwoJ,TwoJ,2,TwoSR,TwoSR,TwoSL);
       
       double * Dblock = Dtensor->gStorage(NR,TwoSR,IR,NR,TwoSR,IR);
       for (int cntR=0; cntR<dimR; cntR++){
@@ -511,7 +511,7 @@ void CheMPS2::Heff::addDiagonal2a3spin1(const int ikappa, double * memHeffDiag, 
    
    int TwoJ = denS->gTwoJ(ikappa);
    const int fase = phase(TwoSL+TwoSR+TwoJ+2);
-   const double alpha = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,TwoJ,TwoSR,TwoSL,2);
+   const double alpha = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * Wigner::wigner6j(TwoSL,TwoSR,TwoJ,TwoSR,TwoSL,2);
    
    int theindex = denS->gIndex();
    int ptr = denS->gKappa2index(ikappa);

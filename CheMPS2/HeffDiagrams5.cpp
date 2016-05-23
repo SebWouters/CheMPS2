@@ -23,7 +23,7 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorL ** Lleft, TensorL ** Lright, double * temp, double * temp2) const{
 
@@ -66,7 +66,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                   int fase = phase(TwoSLdown+TwoSRdown+2);
-                  const double factor = fase * sqrt((TwoJdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  const double factor = fase * sqrt((TwoJdown+1)*(TwoSRdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -297,7 +297,7 @@ void CheMPS2::Heff::addDiagram5A(const int ikappa, double * memS, double * memHe
             int TwoSRdown = TwoSLdown;
             
             int fase = (((TwoSL+1)%2)!=0)?-1:1;
-            const double factor = fase * sqrt((TwoJ+1)*(TwoSL+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            const double factor = fase * sqrt((TwoJ+1)*(TwoSL+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
             
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -396,7 +396,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
             int TwoSRdown = TwoSLdown;
                
             int fase = phase(TwoSL+TwoSR+2);
-            const double factor = fase * sqrt((TwoJ+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            const double factor = fase * sqrt((TwoJ+1)*(TwoSR+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
            
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -624,7 +624,7 @@ void CheMPS2::Heff::addDiagram5B(const int ikappa, double * memS, double * memHe
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                   int fase = (((TwoSLdown+1)%2)!=0)?-1:1;
-                  const double factor = fase * sqrt((TwoJdown+1)*(TwoSLdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  const double factor = fase * sqrt((TwoJdown+1)*(TwoSLdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -726,7 +726,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                int fase = phase(TwoSL+TwoSRdown);
-               const double factor2 = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1);
+               const double factor2 = fase * sqrt((TwoSL+1)*(TwoSR+1.0)) * Wigner::wigner6j( TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1 );
                const double factor1 = (TwoSL==TwoSRdown)?sqrt((TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -799,7 +799,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
          
                   int fase = phase(TwoSR + TwoSLdown + 3 + TwoJdown);
-                  const double factor1 = fase * sqrt((TwoSR+1)*(TwoJdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  const double factor1 = fase * sqrt((TwoSR+1)*(TwoJdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
                   const double factor2 = (TwoJdown==0)?sqrt(2.0*(TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -872,7 +872,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             int TwoSRdown = TwoSLdown;
             
             int fase = phase(TwoSR + TwoSRdown + 3 + TwoJ);
-            double factor1 = fase * sqrt((TwoSL+1.0)*(TwoJ+1.0)*(TwoSR+1.0)/(TwoSRdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            double factor1 = fase * sqrt((TwoSL+1.0)*(TwoJ+1.0)*(TwoSR+1.0)/(TwoSRdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
             double factor2 = (TwoJ==0)?sqrt(2.0*(TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
             
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -943,7 +943,7 @@ void CheMPS2::Heff::addDiagram5C(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                const double factor1 = (TwoSLdown==TwoSR) ? phase(TwoSL-TwoSRdown) * sqrt((TwoSL+1.0)/(TwoSLdown+1.0)) : 0.0;
-               const double factor2 = phase(TwoSL+TwoSRdown+2) * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,1,TwoSR,TwoSL,1);
+               const double factor2 = phase(TwoSL+TwoSRdown+2) * sqrt((TwoSL+1)*(TwoSR+1.0)) * Wigner::wigner6j( TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1 );
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -1044,7 +1044,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                int fase = phase(TwoSLdown+TwoSR);
-               const double factor2 = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1);
+               const double factor2 = fase * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1 );
                const double factor1 = (TwoSLdown==TwoSR)?sqrt((TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1117,7 +1117,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
             int TwoSRdown = TwoSLdown;
             
             int fase = phase(TwoSRdown + TwoSL + 3 + TwoJ);
-            const double factor1 = fase * sqrt((TwoSRdown+1)*(TwoJ+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            const double factor1 = fase * sqrt((TwoSRdown+1)*(TwoJ+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
             const double factor2 = (TwoJ==0)?sqrt(2.0*(TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1189,7 +1189,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
          
                   int fase = phase(TwoSR + TwoSRdown + 3 + TwoJdown);
-                  double factor1 = fase * sqrt((TwoSLdown+1.0)*(TwoJdown+1.0)*(TwoSRdown+1.0)/(TwoSR+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  double factor1 = fase * sqrt((TwoSLdown+1.0)*(TwoJdown+1.0)*(TwoSRdown+1.0)/(TwoSR+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
                   double factor2 = (TwoJdown==0)?sqrt(2.0*(TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1262,7 +1262,7 @@ void CheMPS2::Heff::addDiagram5D(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                const double factor1 = (TwoSL==TwoSRdown) ? phase(TwoSLdown-TwoSR) * sqrt((TwoSLdown+1.0)/(TwoSL+1.0)) : 0.0;
-               const double factor2 = phase(TwoSLdown+TwoSR+2) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,1,TwoSRdown,TwoSLdown,1);
+               const double factor2 = phase(TwoSLdown+TwoSR+2) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1 );
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -1362,7 +1362,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
-               const double factor2 = phase(TwoSL+TwoSRdown) * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1);
+               const double factor2 = phase(TwoSL+TwoSRdown) * sqrt((TwoSL+1)*(TwoSR+1.0)) * Wigner::wigner6j( TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1 );
                const double factor1 = (TwoSL==TwoSRdown)?sqrt((TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1435,7 +1435,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
          
                   int fase = phase(TwoSR + TwoSLdown + 3);
-                  const double factor1 = fase * sqrt((TwoSR+1)*(TwoJdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  const double factor1 = fase * sqrt((TwoSR+1)*(TwoJdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
                   const double factor2 = (TwoJdown==0)?sqrt(2.0*(TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1508,7 +1508,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
             int TwoSRdown = TwoSLdown;
             
             int fase = phase(TwoSR + TwoSRdown + 3);
-            double factor1 = fase * sqrt((TwoSL+1.0)*(TwoJ+1.0)*(TwoSR+1.0)/(TwoSRdown+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            double factor1 = fase * sqrt((TwoSL+1.0)*(TwoJ+1.0)*(TwoSR+1.0)/(TwoSRdown+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
             double factor2 = (TwoJ==0)?sqrt(2.0*(TwoSR+1.0)/(TwoSRdown+1.0)):0.0;
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1579,7 +1579,7 @@ void CheMPS2::Heff::addDiagram5E(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                const double factor1 = (TwoSLdown==TwoSR) ? phase(TwoSL-TwoSRdown) * sqrt((TwoSL+1.0)/(TwoSLdown+1.0)) : 0.0;
-               const double factor2 = phase(TwoSL+TwoSRdown+2) * sqrt((TwoSL+1)*(TwoSR+1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,1,TwoSR,TwoSL,1);
+               const double factor2 = phase(TwoSL+TwoSRdown+2) * sqrt((TwoSL+1)*(TwoSR+1.0)) * Wigner::wigner6j( TwoSLdown, TwoSRdown, 1, TwoSR, TwoSL, 1 );
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                
@@ -1679,7 +1679,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
          for (int TwoSRdown=TwoSR-1; TwoSRdown<=TwoSR+1; TwoSRdown+=2){
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
-               const double factor2 = phase(TwoSLdown+TwoSR) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1);
+               const double factor2 = phase(TwoSLdown+TwoSR) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1 );
                const double factor1 = (TwoSLdown==TwoSR)?sqrt((TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
            
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1750,7 +1750,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
          if ((TwoSLdown>=0) && (abs(TwoSR-TwoSLdown)<=1)){
             int TwoSRdown = TwoSLdown;
             
-            const double factor1 = phase(TwoSRdown + TwoSL + 3) * sqrt((TwoSRdown+1)*(TwoJ+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown);
+            const double factor1 = phase(TwoSRdown + TwoSL + 3) * sqrt((TwoSRdown+1)*(TwoJ+1.0)) * Wigner::wigner6j( 1, 1, TwoJ, TwoSL, TwoSR, TwoSRdown );
             const double factor2 = (TwoJ==0)?sqrt(2.0*(TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
                
             for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1821,7 +1821,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
             for (int TwoJdown=0; TwoJdown<=2; TwoJdown+=2){
                if ((abs(TwoSLdown-TwoSRdown)<=TwoJdown) && (TwoSLdown>=0) && (TwoSRdown>=0)){
                
-                  double factor1 = phase(TwoSR + TwoSRdown + 3) * sqrt((TwoSLdown+1.0)*(TwoJdown+1.0)*(TwoSRdown+1.0)/(TwoSR+1.0)) * gsl_sf_coupling_6j(1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR);
+                  double factor1 = phase(TwoSR + TwoSRdown + 3) * sqrt((TwoSLdown+1.0)*(TwoJdown+1.0)*(TwoSRdown+1.0)/(TwoSR+1.0)) * Wigner::wigner6j( 1, 1, TwoJdown, TwoSLdown, TwoSRdown, TwoSR );
                   double factor2 = (TwoJdown==0)?sqrt(2.0*(TwoSRdown+1.0)/(TwoSR+1.0)):0.0;
             
                   for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
@@ -1894,7 +1894,7 @@ void CheMPS2::Heff::addDiagram5F(const int ikappa, double * memS, double * memHe
             if ((abs(TwoSLdown-TwoSRdown)<=1) && (TwoSLdown>=0) && (TwoSRdown>=0)){
             
                const double factor1 = (TwoSL==TwoSRdown) ? phase(TwoSLdown-TwoSR) * sqrt((TwoSLdown+1.0)/(TwoSL+1.0)) : 0.0;
-               const double factor2 = phase(TwoSLdown+TwoSR+2) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * gsl_sf_coupling_6j(TwoSL,TwoSR,1,TwoSRdown,TwoSLdown,1);
+               const double factor2 = phase(TwoSLdown+TwoSR+2) * sqrt((TwoSLdown+1)*(TwoSRdown+1.0)) * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRdown, TwoSLdown, 1 );
             
                for (int Irrep=0; Irrep<(denBK->getNumberOfIrreps()); Irrep++){
                

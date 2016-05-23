@@ -27,7 +27,7 @@
 #include "SyBookkeeper.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 #include "Special.h"
 
 using std::min;
@@ -247,7 +247,7 @@ void CheMPS2::Sobject::Join( TensorT * Tleft, TensorT * Tright ){
             double * block_right = Tright->gStorage( NM, TwoJM, IM, NR, TwoSR, IR );
             double prefactor = fase
                              * sqrt( 1.0 * ( TwoJ + 1 ) * ( TwoJM + 1 ) )
-                             * gsl_sf_coupling_6j( TwoSL, TwoSR, TwoJ, TwoS2, TwoS1, TwoJM );
+                             * Wigner::wigner6j( TwoSL, TwoSR, TwoJ, TwoS2, TwoS1, TwoJM );
             char notrans = 'N';
             double add = 1.0;
             dgemm_( &notrans, &notrans, &dimL, &dimR, &dimM, &prefactor, block_left, &dimL, block_right, &dimM, &add, block_s, &dimL );
@@ -383,7 +383,7 @@ double CheMPS2::Sobject::Split( TensorT * Tleft, TensorT * Tright, const int vir
                                     // Calc prefactor
                                     const double prefactor = fase
                                                            * sqrt( 1.0 * ( TwoJ + 1 ) * ( TwoSR + 1 ) )
-                                                           * gsl_sf_coupling_6j( TwoSL, TwoSR, TwoJ, TwoS2, TwoS1, SplitSectTwoJM[ iCenter ] );
+                                                           * Wigner::wigner6j( TwoSL, TwoSR, TwoJ, TwoS2, TwoS1, SplitSectTwoJM[ iCenter ] );
 
                                     // Add them to mem --> += because several TwoJ
                                     double * Block = gStorage( NL, TwoSL, IL, SplitSectNM[ iCenter ] - NL, NR - SplitSectNM[ iCenter ], TwoJ, NR, TwoSR, IR );

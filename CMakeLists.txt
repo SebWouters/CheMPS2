@@ -84,12 +84,6 @@ else (HDF5_LIBRARIES AND HDF5_INCLUDE_DIRS)
     find_package (HDF5 REQUIRED)
 endif (HDF5_LIBRARIES AND HDF5_INCLUDE_DIRS)
 
-if (GSL_LIBRARIES)
-    message(STATUS "GSL detection suppressed. Using: ${GSL_LIBRARIES}")
-else (GSL_LIBRARIES)
-    find_package (GSL REQUIRED)
-endif (GSL_LIBRARIES)
-
 enable_testing ()
 add_subdirectory (CheMPS2)
 if (ENABLE_TESTS)

@@ -24,7 +24,7 @@
 #include "TensorOperator.h"
 #include "Lapack.h"
 #include "Special.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 CheMPS2::TensorOperator::TensorOperator( const int boundary_index, const int two_j, const int n_elec, const int n_irrep, const bool moving_right, const bool prime_last, const bool jw_phase, const SyBookkeeper * bk_up, const SyBookkeeper * bk_down ) : Tensor(){
 
@@ -261,11 +261,11 @@ void CheMPS2::TensorOperator::update_moving_right( const int ikappa, TensorOpera
                   if ( prime_last ){
                      alpha = Special::phase( two_s_right_up + two_s_left_down + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * sqrt( ( two_s_left_down + 1.0 ) * ( two_s_right_up + 1.0 ) )
-                           * gsl_sf_coupling_6j( two_s_left_up, two_s_left_down, two_j, two_s_right_down, two_s_right_up, 1 );
+                           * Wigner::wigner6j( two_s_left_up, two_s_left_down, two_j, two_s_right_down, two_s_right_up, 1 );
                   } else {
                      alpha = Special::phase( two_s_right_down + two_s_left_up + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * sqrt( ( two_s_left_up + 1.0 ) * ( two_s_right_down + 1.0 ) )
-                           * gsl_sf_coupling_6j( two_s_left_down, two_s_left_up, two_j, two_s_right_up, two_s_right_down, 1 );
+                           * Wigner::wigner6j( two_s_left_down, two_s_left_up, two_j, two_s_right_up, two_s_right_down, 1 );
                   }
                }
             }
@@ -375,11 +375,11 @@ void CheMPS2::TensorOperator::update_moving_left( const int ikappa, TensorOperat
                   if ( prime_last ){
                      alpha = Special::phase( two_s_right_up + two_s_left_down + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * ( two_s_right_down + 1 ) * sqrt( ( two_s_right_up + 1.0 ) / ( two_s_left_down + 1 ) )
-                           * gsl_sf_coupling_6j( two_s_right_up, two_s_right_down, two_j, two_s_left_down, two_s_left_up, 1 );
+                           * Wigner::wigner6j( two_s_right_up, two_s_right_down, two_j, two_s_left_down, two_s_left_up, 1 );
                   } else {
                      alpha = Special::phase( two_s_right_down + two_s_left_up + two_j + ( ( jw_phase ) ? 3 : 1 ) )
                            * ( two_s_right_up + 1 ) * sqrt( ( two_s_right_down + 1.0 ) / ( two_s_left_up + 1 ) )
-                           * gsl_sf_coupling_6j( two_s_right_down, two_s_right_up, two_j, two_s_left_up, two_s_left_down, 1 );
+                           * Wigner::wigner6j( two_s_right_down, two_s_right_up, two_j, two_s_left_up, two_s_left_down, 1 );
                   }
                }
             }

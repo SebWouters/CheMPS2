@@ -31,7 +31,7 @@
 #include "Lapack.h"
 #include "Heff.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 #include "Special.h"
 
 using std::cout;
@@ -455,7 +455,7 @@ double CheMPS2::DMRG::getFCIcoefficient(int * alpha, int * beta, const bool mpi_
                   int dimL = jumpL[ indexSL+1 ] - jumpL[ indexSL ];
                   double * Tblock = MPS[DMRGindex]->gStorage(NL,TwoSLvalue,IL,NR,TwoSRvalue,IR);
                   double prefactor = sqrt( TwoSRvalue + 1 )
-                                   * gsl_sf_coupling_3j(TwoSLvalue, spread, TwoSRvalue, twoSLz, twoSzloc, -twoSRz)
+                                   * Wigner::wigner3j(TwoSLvalue, spread, TwoSRvalue, twoSLz, twoSzloc, -twoSRz)
                                    * Special::phase( -TwoSLvalue + spread - twoSRz );
                   double add2array = 1.0;
                   char notrans = 'N';

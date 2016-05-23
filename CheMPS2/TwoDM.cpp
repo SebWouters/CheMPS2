@@ -29,7 +29,7 @@
 #include "MyHDF5.h"
 #include "Options.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 #include "Special.h"
 
 using std::max;
@@ -658,10 +658,9 @@ double CheMPS2::TwoDM::doD2(TensorT * denT, TensorL * Lright, double * workmem){
                   double alpha = 1.0;
                   double beta = 0.0; //set
                   dgemm_(&notrans,&trans,&dimL,&dimRup,&dimRdown,&alpha,Tdown,&dimL,Lblock,&dimRup,&beta,workmem,&dimL);
-                  
-                  int fase = ((((TwoSL+1-TwoSR)/2)%2)!=0)?-1:1;
-                  double factor = fase * 0.5 * sqrt((TwoSL+1)*(TwoSR+1.0));
-                  
+
+                  const double factor = Special::phase( TwoSL + 1 - TwoSR ) * 0.5 * sqrt((TwoSL+1)*(TwoSR+1.0));
+
                   int length = dimL * dimRup;
                   int inc = 1;
                   total += factor * ddot_(&length, workmem, &inc, Tup, &inc);
@@ -822,10 +821,11 @@ double CheMPS2::TwoDM::doD6(TensorT * denT, TensorF1 * F1right, double * workmem
                      double alpha = 1.0;
                      double beta = 0.0; //set
                      dgemm_(&notrans,&notrans,&dimL,&dimRup,&dimRdown,&alpha,Tdown,&dimL,F1block,&dimRdown,&beta,workmem,&dimL);
-               
-                     int fase = ((((TwoSL + TwoSRdown - 1)/2)%2)!=0)?-1:1;
-                     double factor = sqrt((TwoSRup+1)/3.0) * (TwoSRdown+1) * fase * gsl_sf_coupling_6j(1,1,2,TwoSRup,TwoSRdown,TwoSL);
-                     
+
+                     const double factor = sqrt((TwoSRup+1)/3.0) * ( TwoSRdown + 1 )
+                                         * Special::phase( TwoSL + TwoSRdown - 1 )
+                                         * Wigner::wigner6j( 1, 1, 2, TwoSRup, TwoSRdown, TwoSL );
+
                      int length = dimL * dimRup;
                      int inc = 1;
                      total += factor * ddot_(&length, workmem, &inc, Tup, &inc);
@@ -870,10 +870,9 @@ double CheMPS2::TwoDM::doD7(TensorT * denT, TensorL * Lleft, double * workmem){
                   double alpha = 1.0;
                   double beta = 0.0; //set
                   dgemm_(&trans,&notrans,&dimLup,&dimR,&dimLdown,&alpha,Lblock,&dimLdown,Tdown,&dimLdown,&beta,workmem,&dimLup);
-               
-                  int fase = ((((TwoSLup - TwoSLdown + 3)/2)%2)!=0)?-1:1;
-                  double factor = 0.5 * sqrt((TwoSLdown+1)*(TwoSLup+1.0)) * fase;
-                  
+
+                  const double factor = 0.5 * sqrt((TwoSLdown+1)*(TwoSLup+1.0)) * Special::phase( TwoSLup - TwoSLdown + 3 );
+
                   int length = dimLup * dimR;
                   int inc = 1;
                   total += factor * ddot_(&length, workmem, &inc, Tup, &inc);
@@ -989,16 +988,19 @@ void CheMPS2::TwoDM::doD9andD10andD11(TensorT * denT, TensorL * Lleft, TensorL *
                               int length = dimLup * dimRup;
                               int inc = 1;
                               double value = ddot_(&length, workmem2, &inc, T_up, &inc);
-                              
-                              int fase = ((((TwoSLup + TwoSRdown + 2)/2)%2)!=0) ? -1 : 1;
-                              double fact1 = fase * (TwoSRup+1) * sqrt((TwoSRdown+1)*(TwoSLup+1.0)) * gsl_sf_coupling_6j(TwoSRup,1,TwoSLup,TwoSLdown,1,TwoSRdown);
-                              double fact2 = 2 * (TwoSRup+1) * sqrt((TwoSRdown+1)*(TwoSLup+1.0)) * gsl_sf_coupling_6j(TwoSRup, TwoSLdown, 2, 1, 1, TwoSLup) * gsl_sf_coupling_6j(TwoSRup, TwoSLdown, 2, 1, 1, TwoSRdown);
-                              double fact3 = (TwoSRdown == TwoSLup) ? TwoSRup+1.0 : 0.0 ;
-                              
+
+                              const double fact1 = Special::phase( TwoSLup + TwoSRdown + 2 )
+                                                 * ( TwoSRup + 1 ) * sqrt( ( TwoSRdown + 1 ) * ( TwoSLup + 1.0 ) )
+                                                 * Wigner::wigner6j( TwoSRup, 1, TwoSLup, TwoSLdown, 1, TwoSRdown );
+                              const double fact2 = 2 * ( TwoSRup + 1 ) * sqrt( ( TwoSRdown + 1 ) * ( TwoSLup + 1.0 ) )
+                                                 * Wigner::wigner6j( TwoSRup, TwoSLdown, 2, 1, 1, TwoSLup )
+                                                 * Wigner::wigner6j( TwoSRup, TwoSLdown, 2, 1, 1, TwoSRdown );
+                              const int fact3 = (( TwoSRdown == TwoSLup ) ? ( TwoSRup + 1 ) : 0 );
+
                               d9[0] += fact1  * value;
                               d10[0] += fact2 * value;
                               d11[0] += fact3 * value;
-                           
+
                            }
                         }
                      }
@@ -1047,10 +1049,10 @@ double CheMPS2::TwoDM::doD12(TensorT * denT, TensorL * Lleft, TensorL * Lright, 
                      dgemm_(&trans,&notrans,&dimLup,&dimRdown,&dimLdown,&alpha,LleftBlk,&dimLdown,T_down,&dimLdown,&beta,workmem,&dimLup);
                
                      dgemm_(&notrans,&trans,&dimLup,&dimRup,&dimRdown,&alpha,workmem,&dimLup,LrightBlk,&dimRup,&beta,workmem2,&dimLup);
-               
-                     int fase = ((((TwoSLdown+1-TwoSLup)/2)%2)!=0) ? -1 : 1;
-                     double factor = fase * 0.5 * sqrt((TwoSLup+1)*(TwoSLdown+1.0));
-                     
+
+                     const double factor = Special::phase( TwoSLdown + 1 - TwoSLup )
+                                         * 0.5 * sqrt( ( TwoSLup + 1 ) * ( TwoSLdown + 1.0 ) );
+
                      int length = dimLup * dimRup;
                      int inc = 1;
                      d12 += factor * ddot_(&length, workmem2, &inc, T_up, &inc);
@@ -1160,10 +1162,9 @@ double CheMPS2::TwoDM::doD14(TensorT * denT, TensorL * Lleft, TensorS0 * S0right
                      dgemm_(&trans,&notrans,&dimLup,&dimRdown,&dimLdown,&alpha,Lblock,&dimLdown,T_down,&dimLdown,&beta,workmem,&dimLup);
                
                      dgemm_(&notrans,&notrans,&dimLup,&dimRup,&dimRdown,&alpha,workmem,&dimLup,S0block,&dimRdown,&beta,workmem2,&dimLup);
-               
-                     int fase = ((((TwoSLdown + 1 - TwoSLup)/2)%2)!=0) ? -1 : 1;
-                     double factor = fase * 0.5 * sqrt(0.5 * (TwoSLup+1) * (TwoSLdown+1));
-                     
+
+                     const double factor = Special::phase( TwoSLdown + 1 - TwoSLup ) * 0.5 * sqrt(0.5 * (TwoSLup+1) * (TwoSLdown+1));
+
                      int length = dimLup * dimRup;
                      int inc = 1;
                      d14 += factor * ddot_(&length, workmem2, &inc, T_up, &inc);
@@ -1219,8 +1220,8 @@ double CheMPS2::TwoDM::doD15(TensorT * denT, TensorL * Lleft, TensorS1 * S1right
                
                         dgemm_(&notrans,&notrans,&dimLup,&dimRup,&dimRdown,&alpha,workmem,&dimLup,S1block,&dimRdown,&beta,workmem2,&dimLup);
                
-                        int fase = ((((TwoSLdown + TwoSLup + 1)/2)%2)!=0) ? -1 : 1;
-                        double factor = fase * (TwoSLup+1) * sqrt((TwoSRdown+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSLup,TwoSRdown,TwoSLdown);
+                        const double factor = Special::phase( TwoSLdown + TwoSLup + 1 )
+                                            * ( TwoSLup + 1 ) * sqrt((TwoSRdown+1)/3.0) * Wigner::wigner6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSLdown );
                         
                         int length = dimLup * dimRup;
                         int inc = 1;
@@ -1277,10 +1278,10 @@ double CheMPS2::TwoDM::doD16(TensorT * denT, TensorL * Lleft, TensorS1 * S1right
                         dgemm_(&trans,&notrans,&dimLup,&dimRdown,&dimLdown,&alpha,Lblock,&dimLdown,T_down,&dimLdown,&beta,workmem,&dimLup);
                   
                         dgemm_(&notrans,&notrans,&dimLup,&dimRup,&dimRdown,&alpha,workmem,&dimLup,S1block,&dimRdown,&beta,workmem2,&dimLup);
-                  
-                        int fase = ((((TwoSRup+TwoSLdown+2)/2)%2)!=0) ? -1 : 1;
-                        double factor = fase * (TwoSRup+1) * sqrt((TwoSLup+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSRup,TwoSLdown,TwoSLup);
-                        
+
+                        const double factor = Special::phase( TwoSRup + TwoSLdown + 2 ) * (TwoSRup+1) * sqrt((TwoSLup+1)/3.0)
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSLup );
+
                         int length = dimLup * dimRup;
                         int inc = 1;
                         d16 += factor * ddot_(&length, workmem2, &inc, T_up, &inc);
@@ -1395,10 +1396,9 @@ double CheMPS2::TwoDM::doD18orD22(TensorT * denT, TensorL * Lleft, TensorF0 * F0
                      dgemm_(&trans,&notrans,&dimLup,&dimRdown,&dimLdown,&alpha,Lblock,&dimLdown,T_down,&dimLdown,&beta,workmem,&dimLup);
                
                      dgemm_(&notrans,&var,&dimLup,&dimRup,&dimRdown,&alpha,workmem,&dimLup,F0block,&dimvar,&beta,workmem2,&dimLup);
-               
-                     int fase = ((((TwoSLdown + 1 - TwoSLup)/2)%2)!=0) ? -1 : 1;
-                     double factor = fase * 0.5 * sqrt(0.5*(TwoSLup+1)*(TwoSLdown+1));
-                     
+
+                     const double factor = Special::phase( TwoSLdown + 1 - TwoSLup ) * 0.5 * sqrt(0.5*(TwoSLup+1)*(TwoSLdown+1));
+
                      int length = dimLup * dimRup;
                      int inc = 1;
                      total += factor * ddot_(&length, workmem2, &inc, T_up, &inc);
@@ -1459,11 +1459,11 @@ double CheMPS2::TwoDM::doD19orD23(TensorT * denT, TensorL * Lleft, TensorF1 * F1
                   
                         double factor = 0.0;
                         if (shouldIdoD19){
-                           int fase = ((((TwoSLdown + TwoSRdown - 1)/2)%2)!=0) ? -1 : 1;
-                           factor = fase * (TwoSRdown+1) * sqrt((TwoSLup+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSLup,TwoSRdown,TwoSLdown);
+                           factor = Special::phase( TwoSLdown + TwoSRdown - 1 )
+                                  * ( TwoSRdown + 1 ) * sqrt((TwoSLup+1)/3.0) * Wigner::wigner6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSLdown );
                         } else {
-                           int fase = ((((TwoSLdown + TwoSLup - 1)/2)%2)!=0) ? -1 : 1;
-                           factor = fase * (TwoSLup+1) * sqrt((TwoSRdown+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSLup,TwoSRdown,TwoSLdown);
+                           factor = Special::phase( TwoSLdown + TwoSLup - 1 )
+                                  * ( TwoSLup + 1 ) * sqrt((TwoSRdown+1)/3.0) * Wigner::wigner6j( 1, 1, 2, TwoSLup, TwoSRdown, TwoSLdown );
                         }
                         
                         int length = dimLup * dimRup;
@@ -1527,11 +1527,11 @@ double CheMPS2::TwoDM::doD20orD24(TensorT * denT, TensorL * Lleft, TensorF1 * F1
                   
                         double factor = 0.0;
                         if (shouldIdoD20){
-                           int fase = (((TwoSLup)%2)!=0) ? -1 : 1;
-                           factor = fase * sqrt((TwoSLup+1)*(TwoSRup+1)*(TwoSLdown+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSRup,TwoSLdown,TwoSLup);
+                           factor = Special::phase( 2 * TwoSLup )
+                                  * sqrt((TwoSLup+1)*(TwoSRup+1)*(TwoSLdown+1)/3.0) * Wigner::wigner6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSLup );
                         } else {
-                           int fase = ((((2*TwoSLup + TwoSRup - TwoSLdown)/2)%2)!=0) ? -1 : 1;
-                           factor = fase * (TwoSRup+1) * sqrt((TwoSLup+1)/3.0) * gsl_sf_coupling_6j(1,1,2,TwoSRup,TwoSLdown,TwoSLup);
+                           factor = Special::phase( 2 * TwoSLup + TwoSRup - TwoSLdown )
+                                  * (TwoSRup+1) * sqrt((TwoSLup+1)/3.0) * Wigner::wigner6j( 1, 1, 2, TwoSRup, TwoSLdown, TwoSLup );
                         }
                         
                         int length = dimLup * dimRup;

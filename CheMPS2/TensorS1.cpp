@@ -22,7 +22,7 @@
 
 #include "TensorS1.h"
 #include "Lapack.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 CheMPS2::TensorS1::TensorS1(const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * denBK) :
 TensorOperator(boundary_index,
@@ -99,10 +99,10 @@ void CheMPS2::TensorS1::makenewRight(TensorL * denL, TensorT * denT, double * wo
             double alpha = 1.0;
             if (geval<=1){
                int fase = ((((sector_spin_up[ikappa] + sector_spin_down[ikappa] + 2)/2)%2)!=0)?-1:1;
-               alpha = fase * sqrt(3.0*(TwoSLD+1)) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLD);
+               alpha = fase * sqrt(3.0*(TwoSLD+1)) * Wigner::wigner6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLD);
             } else {
                int fase = ((((TwoSLU + sector_spin_down[ikappa] + 1)/2)%2)!=0)?-1:1;
-               alpha = fase * sqrt(3.0*(sector_spin_up[ikappa]+1)) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLU);
+               alpha = fase * sqrt(3.0*(sector_spin_up[ikappa]+1)) * Wigner::wigner6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLU);
             }
             double beta = 0.0; //set
             dgemm_(&trans,&notrans,&dimUR,&dimLD,&dimLU,&alpha,BlockTup,&dimLU,BlockL,&dimLU,&beta,workmem,&dimUR);
@@ -172,10 +172,11 @@ void CheMPS2::TensorS1::makenewLeft(TensorL * denL, TensorT * denT, double * wor
             double alpha = 1.0;
             if (geval<=1){
                int fase = ((((sector_spin_up[ikappa] + sector_spin_down[ikappa] + 2)/2)%2)!=0)?-1:1;
-               alpha = fase * sqrt(3.0 * (TwoSRU+1)) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSRU);
+               alpha = fase * sqrt(3.0 * (TwoSRU+1)) * Wigner::wigner6j( 1, 1, 2, sector_spin_up[ikappa], sector_spin_down[ikappa], TwoSRU );
             } else {
                int fase = ((((sector_spin_up[ikappa] + TwoSRD + 1)/2)%2)!=0)?-1:1;
-               alpha = fase * sqrt(3.0 / (sector_spin_down[ikappa] + 1.0)) * (TwoSRD + 1) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSRD);
+               alpha = fase * sqrt(3.0 / (sector_spin_down[ikappa] + 1.0)) * (TwoSRD + 1)
+                     * Wigner::wigner6j( 1, 1, 2, sector_spin_up[ikappa], sector_spin_down[ikappa], TwoSRD );
             }
             double beta = 0.0; //set
             dgemm_(&notrans,&notrans,&dimUL,&dimRD,&dimRU,&alpha,BlockTup,&dimUL,BlockL,&dimRU,&beta,workmem,&dimUL);

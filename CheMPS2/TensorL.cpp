@@ -23,7 +23,6 @@
 
 #include "TensorL.h"
 #include "Lapack.h"
-#include "Gsl.h"
 #include "Special.h"
 
 CheMPS2::TensorL::TensorL( const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * book_up, const SyBookkeeper * book_down ) :

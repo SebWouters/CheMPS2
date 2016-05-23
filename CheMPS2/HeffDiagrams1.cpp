@@ -22,7 +22,6 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
 
 void CheMPS2::Heff::addDiagram1A(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorX * Xleft) const{
    int dimL = denBK->gCurrentDim(denS->gIndex(), denS->gNL(ikappa), denS->gTwoSL(ikappa), denS->gIL(ikappa));

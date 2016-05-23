@@ -23,7 +23,7 @@
 #include "Heff.h"
 #include "Lapack.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 void CheMPS2::Heff::addDiagram2a1spin0(const int ikappa, double * memS, double * memHeff, const Sobject * denS, TensorOperator **** Atensors, TensorS0 **** S0tensors, double * workspace) const{
 
@@ -259,7 +259,7 @@ void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSRdown+TwoSL+TwoJ+2);
-               const double thefactor = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               const double thefactor = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * Wigner::wigner6j( TwoSLdown, TwoSRdown, TwoJ, TwoSR, TwoSL, 2 );
       
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_beta=l_alpha+1; l_beta<theindex; l_beta++){
@@ -307,7 +307,7 @@ void CheMPS2::Heff::addDiagram2a1spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSRdown+TwoSL+TwoJ+2);
-               const double thefactor = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               const double thefactor = fase * sqrt((TwoSR + 1)*(TwoSL + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
                   for (int l_delta=l_gamma+1; l_delta<Prob->gL(); l_delta++){
@@ -382,7 +382,7 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSLdown+TwoSR+TwoJ+2);
-               const double thefactor = fase * sqrt((TwoSRdown + 1)*(TwoSLdown + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               const double thefactor = fase * sqrt((TwoSRdown + 1)*(TwoSLdown + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
          
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_beta=l_alpha+1; l_beta<theindex; l_beta++){
@@ -430,7 +430,7 @@ void CheMPS2::Heff::addDiagram2a2spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSLdown+TwoSR+TwoJ+2);
-               const double thefactor = fase * sqrt((TwoSRdown + 1)*(TwoSLdown + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               const double thefactor = fase * sqrt((TwoSRdown + 1)*(TwoSLdown + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_gamma=theindex+2; l_gamma<Prob->gL(); l_gamma++){
                   for (int l_delta=l_gamma+1; l_delta<Prob->gL(); l_delta++){
@@ -680,7 +680,7 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSLdown+TwoSRdown+TwoJ+2);
-               double prefactor = fase * sqrt((TwoSR + 1)*(TwoSLdown + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               double prefactor = fase * sqrt((TwoSR + 1)*(TwoSLdown + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_gamma=0; l_gamma<theindex; l_gamma++){
                   for (int l_alpha=l_gamma+1; l_alpha<theindex; l_alpha++){
@@ -718,7 +718,7 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                }
                
                fase = phase(TwoSL+TwoSR+TwoJ+2);
-               prefactor = fase * sqrt((TwoSRdown + 1)*(TwoSL + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               prefactor = fase * sqrt((TwoSRdown + 1)*(TwoSL + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_alpha=0; l_alpha<theindex; l_alpha++){
                   for (int l_gamma=l_alpha; l_gamma<theindex; l_gamma++){
@@ -766,7 +766,7 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
             if ((TwoSLdown>=0) && (TwoSRdown>=0) && (abs(TwoSLdown-TwoSRdown)<=TwoJ)){
             
                int fase = phase(TwoSLdown+TwoSRdown+TwoJ+2);
-               double prefactor = fase * sqrt((TwoSR + 1)*(TwoSLdown + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               double prefactor = fase * sqrt((TwoSR + 1)*(TwoSLdown + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_delta=theindex+2; l_delta<Prob->gL(); l_delta++){
                   for (int l_beta=l_delta+1; l_beta<Prob->gL(); l_beta++){
@@ -804,7 +804,7 @@ void CheMPS2::Heff::addDiagram2a3spin1(const int ikappa, double * memS, double *
                }
                
                fase = phase(TwoSL+TwoSR+TwoJ+2);
-               prefactor = fase * sqrt((TwoSRdown + 1)*(TwoSL + 1.0)) * gsl_sf_coupling_6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
+               prefactor = fase * sqrt((TwoSRdown + 1)*(TwoSL + 1.0)) * Wigner::wigner6j(TwoSLdown,TwoSRdown,TwoJ,TwoSR,TwoSL,2);
       
                for (int l_beta=theindex+2; l_beta<Prob->gL(); l_beta++){
                   for (int l_delta=l_beta; l_delta<Prob->gL(); l_delta++){
@@ -1331,7 +1331,7 @@ void CheMPS2::Heff::addDiagram2b3spin1(const int ikappa, double * memS, double *
                   if (memSkappa!=-1){
             
                      int fase = phase(TwoSLdown + TwoSR + TwoJ + TwoS2 + TwoJdown - 1);
-                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSL+1)) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,1,1,TwoS2) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,TwoSL,TwoSLdown,TwoSR);
+                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSL+1)) * Wigner::wigner6j(TwoJdown,TwoJ,2,1,1,TwoS2) * Wigner::wigner6j(TwoJdown,TwoJ,2,TwoSL,TwoSLdown,TwoSR);
                      char trans = 'T';
                      char notra = 'N';
                      double beta = 1.0;
@@ -1385,7 +1385,7 @@ void CheMPS2::Heff::addDiagram2c3spin1(const int ikappa, double * memS, double *
                   if (memSkappa!=-1){
             
                      int fase = phase(TwoSLdown + TwoSR + 2*TwoJ + TwoS1 - 1);
-                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSL+1)) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,1,1,TwoS1) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,TwoSL,TwoSLdown,TwoSR);
+                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSL+1)) * Wigner::wigner6j(TwoJdown,TwoJ,2,1,1,TwoS1) * Wigner::wigner6j(TwoJdown,TwoJ,2,TwoSL,TwoSLdown,TwoSR);
                      char trans = 'T';
                      char notra = 'N';
                      double beta = 1.0;
@@ -1439,7 +1439,7 @@ void CheMPS2::Heff::addDiagram2e3spin1(const int ikappa, double * memS, double *
                   if (memSkappa!=-1){
             
                      int fase = phase(TwoSRdown + TwoSL + 2*TwoJ + TwoS2 + 1);
-                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSRdown+1)) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,1,1,TwoS2) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,TwoSR,TwoSRdown,TwoSL);
+                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSRdown+1)) * Wigner::wigner6j(TwoJdown,TwoJ,2,1,1,TwoS2) * Wigner::wigner6j(TwoJdown,TwoJ,2,TwoSR,TwoSRdown,TwoSL);
                      char notr = 'N';
                      double beta = 1.0;
                
@@ -1492,7 +1492,7 @@ void CheMPS2::Heff::addDiagram2f3spin1(const int ikappa, double * memS, double *
                   if (memSkappa!=-1){
             
                      int fase = phase(TwoSRdown + TwoSL + TwoJ + TwoS1 + TwoJdown + 1);
-                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSRdown+1)) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,1,1,TwoS1) * gsl_sf_coupling_6j(TwoJdown,TwoJ,2,TwoSR,TwoSRdown,TwoSL);
+                     double alpha = fase * sqrt(3.0*(TwoJ+1)*(TwoJdown+1)*(TwoSRdown+1)) * Wigner::wigner6j(TwoJdown,TwoJ,2,1,1,TwoS1) * Wigner::wigner6j(TwoJdown,TwoJ,2,TwoSR,TwoSRdown,TwoSL);
                      char notr = 'N';
                      double beta = 1.0;
                

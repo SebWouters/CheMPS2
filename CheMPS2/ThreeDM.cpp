@@ -30,7 +30,7 @@
 #include "MyHDF5.h"
 #include "Options.h"
 #include "MPIchemps2.h"
-#include "Gsl.h"
+#include "Wigner.h"
 #include "Special.h"
 
 using std::max;
@@ -1654,7 +1654,7 @@ double CheMPS2::ThreeDM::diagram11(TensorT * denT, TensorS1 * denS1, TensorL * d
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                   * Special::phase( TwoSR + 3 + TwoSLprime )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                         }
@@ -1772,7 +1772,7 @@ double CheMPS2::ThreeDM::diagram13(TensorT * denT, TensorF1 * denF1, TensorL * d
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSR + 1 ) * ( TwoSLprime + 1 ) )
                                   * Special::phase( 2 * TwoSR + 2 )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                         }
@@ -1892,7 +1892,7 @@ double CheMPS2::ThreeDM::diagram15(TensorT * denT, TensorF1 * denF1, TensorL * d
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
                                   * Special::phase( TwoSL + TwoSLprime )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                         }
@@ -2010,7 +2010,7 @@ double CheMPS2::ThreeDM::diagram17(TensorT * denT, TensorL * denL, TensorS1 * de
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
                                   * Special::phase( TwoSL + TwoSLprime + 3 )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
 
                         }
@@ -2129,7 +2129,7 @@ double CheMPS2::ThreeDM::diagram19(TensorT * denT, TensorL * denL, TensorF1 * de
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
                                   * Special::phase( 2 * TwoSR )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
                                   
                         }
@@ -2246,7 +2246,7 @@ double CheMPS2::ThreeDM::diagram21(TensorT * denT, TensorL * denL, TensorF1 * de
                            int inc = 1;
                            total += sqrt( 3.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                   * Special::phase( TwoSR + TwoSLprime )
-                                  * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
+                                  * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL )
                                   * ddot_( &length, workmem2, &inc, Tdown, &inc );
                                   
                         }
@@ -2458,7 +2458,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = doublet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSRprime + 1 ) ) * ( TwoSL + 1 )
                                             * Special::phase( TwoSL + TwoSLprime + 1 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2469,7 +2469,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = quartet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = 2 * sqrt( TwoSRprime + 1.0 ) * ( TwoSL + 1 )
                                             * Special::phase( TwoSL + TwoSLprime + 3 )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2501,7 +2501,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = doublet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                             * Special::phase( TwoSR + TwoSLprime )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2512,7 +2512,7 @@ void CheMPS2::ThreeDM::fill_a_S1( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = quartet->gStorage( NL-3, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = 2 * sqrt( TwoSL + 1.0 ) * ( TwoSR + 1 )
                                             * Special::phase( TwoSR + TwoSLprime )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2577,7 +2577,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                            double * Wblock  = doublet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( 0.5 * ( TwoSLprime + 1 ) ) * ( TwoSRprime + 1 )
                                             * Special::phase( TwoSL + TwoSRprime )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2588,7 +2588,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                            double * Wblock  = quartet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( TwoSLprime + 1.0 ) * ( TwoSRprime + 1 )
                                             * Special::phase( TwoSL + TwoSRprime )
-                                            * gsl_sf_coupling_6j( 1, 2, 3, TwoSL, TwoSLprime, TwoSRprime );
+                                            * Wigner::wigner6j( 1, 2, 3, TwoSL, TwoSLprime, TwoSRprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2620,7 +2620,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                            double * Wblock  = doublet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( 0.5 * ( TwoSR + 1 ) ) * ( TwoSLprime + 1 )
                                             * Special::phase( TwoSL + TwoSLprime + 3 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2631,7 +2631,7 @@ void CheMPS2::ThreeDM::fill_bcd_S1( TensorT * denT, Tensor3RDM * doublet, Tensor
                            double * Wblock  = quartet->gStorage( NL, TwoSL, IL, NL+1, TwoSLprime, ILxImxInxIi );
                            double prefactor = sqrt( TwoSR + 1.0 ) * ( TwoSLprime + 1 )
                                             * Special::phase( TwoSL + TwoSLprime + 1 )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2770,7 +2770,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSRprime + 1 )
                                             * Special::phase( TwoSLprime + TwoSRprime + 3 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2781,7 +2781,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSL + 1.0 ) * ( TwoSRprime + 1 )
                                             * Special::phase( TwoSLprime + TwoSRprime + 3 )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2813,7 +2813,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
                                             * Special::phase( 2*TwoSLprime + 2 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2824,7 +2824,7 @@ void CheMPS2::ThreeDM::fill_F1_T( TensorT * denT, Tensor3RDM * doublet, Tensor3R
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSLprime + 1 ) * ( TwoSR + 1 ) )
                                             * Special::phase( 2*TwoSLprime )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2963,7 +2963,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSRprime + 1 ) ) * ( TwoSL + 1 )
                                             * Special::phase( TwoSLprime + TwoSL + 3 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -2974,7 +2974,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSRprime + 1.0 ) * ( TwoSL + 1 )
                                             * Special::phase( TwoSLprime + TwoSL + 3 )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -3006,7 +3006,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                            double * Wblock  = doublet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( 0.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                             * Special::phase( TwoSLprime + TwoSR + 2 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -3017,7 +3017,7 @@ void CheMPS2::ThreeDM::fill_F1( TensorT * denT, Tensor3RDM * doublet, Tensor3RDM
                            double * Wblock  = quartet->gStorage( NL-1, TwoSLprime, ILxImxInxIi, NL, TwoSL, IL );
                            double prefactor = sqrt( TwoSL + 1.0 ) * ( TwoSR + 1 )
                                             * Special::phase( TwoSLprime + TwoSR )
-                                            * gsl_sf_coupling_6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
+                                            * Wigner::wigner6j( 1, 3, 2, TwoSLprime, TwoSR, TwoSL );
                            int length = dimLup * dimLdown;
                            int inc = 1;
                            daxpy_( &length, &prefactor, workmem2, &inc, Wblock, &inc );
@@ -3181,7 +3181,7 @@ void CheMPS2::ThreeDM::fill_tens_36_42(TensorT * denT, TensorF1 * tofill, Tensor
                      
                         double factor = 0.5 * sqrt( 6.0 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                       * Special::phase( TwoSR + TwoSLprime + 1 )
-                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
+                                      * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
                         char notrans  = 'N';
                         char trans    = 'T';
                         double zero   = 0.0;
@@ -3245,7 +3245,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                               double * left = fill34->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 0.5 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
                                             * Special::phase( TwoSL + TwoSR + 3 )
-                                            * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
+                                            * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3254,7 +3254,7 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                               double * left = fill35->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 0.5 * ( TwoSRprime + 1 ) * sqrt( 6.0 * ( TwoSR + 1 ) )
                                             * Special::phase( TwoSL + TwoSRprime + 3 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3263,8 +3263,8 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                               double * left = fill37->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
                                             * Special::phase( 2*TwoSL + TwoSR + TwoSRprime )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR      )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSLprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR      )
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSLprime );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3273,8 +3273,8 @@ void CheMPS2::ThreeDM::fill_tens_34_35_37_38(TensorT * denT, TensorF1 * fill34, 
                               double * left = fill38->gStorage( NL, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSRprime + 1 ) * sqrt( 1.0 * ( TwoSR + 1 ) * ( TwoSL + 1 ) )
                                             * Special::phase( 2*TwoSR + TwoSL + TwoSLprime )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime )
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3476,7 +3476,7 @@ void CheMPS2::ThreeDM::fill_tens_28(TensorT * denT, TensorS1 * tofill, TensorS0 
                      
                         double factor = sqrt( 1.5 * ( TwoSL + 1 ) ) * ( TwoSR + 1 )
                                       * Special::phase( TwoSLprime + TwoSR + 1 )
-                                      * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
+                                      * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSR );
                         char notrans  = 'N';
                         char trans    = 'T';
                         double zero   = 0.0;
@@ -3581,7 +3581,7 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                               double * left = fill25->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
                                             * Special::phase( TwoSL + TwoSRprime + 3 )
-                                            * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
+                                            * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 2 );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3590,8 +3590,8 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                               double * left = fill26->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = 3 * ( TwoSR + 1 ) * sqrt( 1.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) )
                                             * Special::phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL      )
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSLprime, TwoSRprime );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3600,7 +3600,7 @@ void CheMPS2::ThreeDM::fill_tens_25_26_27(TensorT * denT, TensorS1 * fill25, Ten
                               double * left = fill27->gStorage( NL-2, TwoSLprime, ILxImxIn, NL, TwoSL, IL );
                               double factor = ( TwoSR + 1 ) * sqrt( 1.5 * ( TwoSRprime + 1 ) )
                                             * Special::phase( TwoSL + TwoSR + 3 )
-                                            * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
+                                            * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSRprime, TwoSL );
                               int length = dimLup * dimLdown;
                               int inc    = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
@@ -3897,7 +3897,7 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                            {
                               double factor  = sqrt( 0.5 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
                                              * Special::phase( TwoSL + TwoSRprime + 2 )
-                                             * gsl_sf_coupling_6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 1 );
+                                             * Wigner::wigner6j( TwoSL, TwoSR, 1, TwoSRprime, TwoSLprime, 1 );
                               double * left  = fill63->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
@@ -3919,8 +3919,8 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                            }
                            {
                               double factor  = sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
-                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
-                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSL      );
+                                             * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
+                                             * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSL      );
                               double * left  = fill68->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
@@ -3928,8 +3928,8 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                            }
                            {
                               double factor  = sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
-                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime )
-                                             * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR      )
+                                             * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSLprime )
+                                             * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR      )
                                              * Special::phase( TwoSLprime + TwoSRprime + 2 - TwoSL - TwoSR );
                               double * left  = fill76->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
@@ -3938,7 +3938,7 @@ void CheMPS2::ThreeDM::fill_63_65(TensorT * denT, Tensor3RDM * fill63, Tensor3RD
                            }
                            {
                               double factor  = - sqrt( 6.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 )
-                                             * gsl_sf_coupling_9j( 1, 1, 2, TwoSLprime, TwoSL, 1, TwoSRprime, TwoSR, 1 );
+                                             * Wigner::wigner9j( 1, 1, 2, TwoSLprime, TwoSL, 1, TwoSRprime, TwoSR, 1 );
                               double * left  = fill77->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
@@ -3999,16 +3999,16 @@ void CheMPS2::ThreeDM::fill_69_78_79(TensorT * denT, Tensor3RDM * fill69, Tensor
                            
                            const double prefactor = 2 * sqrt( 3.0 * ( TwoSL + 1 ) * ( TwoSRprime + 1 ) ) * ( TwoSR + 1 );
                            {
-                              double factor  = prefactor * gsl_sf_coupling_6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
-                                                         * gsl_sf_coupling_6j( 1, 2, 3, TwoSLprime, TwoSL, TwoSR );
+                              double factor  = prefactor * Wigner::wigner6j( 1, 1, 2, TwoSR, TwoSLprime, TwoSRprime )
+                                                         * Wigner::wigner6j( 1, 2, 3, TwoSLprime, TwoSL, TwoSR );
                               double * left  = fill69->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
                            }
                            {
-                              double factor  = prefactor * gsl_sf_coupling_6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR )
-                                                         * gsl_sf_coupling_6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime )
+                              double factor  = prefactor * Wigner::wigner6j( 1, 1, 2, TwoSL, TwoSRprime, TwoSR )
+                                                         * Wigner::wigner6j( 1, 3, 2, TwoSL, TwoSRprime, TwoSLprime )
                                                          * Special::phase( TwoSR + TwoSRprime + TwoSL + TwoSLprime + 2 );
                               double * left  = fill78->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
@@ -4016,7 +4016,7 @@ void CheMPS2::ThreeDM::fill_69_78_79(TensorT * denT, Tensor3RDM * fill69, Tensor
                               daxpy_( &length, &factor, workmem2, &inc, left, &inc );
                            }
                            {
-                              double factor  = - prefactor * gsl_sf_coupling_9j( 1, 1, 2, TwoSLprime, TwoSL, 3, TwoSRprime, TwoSR, 1 );
+                              double factor  = - prefactor * Wigner::wigner9j( 1, 1, 2, TwoSLprime, TwoSL, 3, TwoSRprime, TwoSR, 1 );
                               double * left  = fill79->gStorage( NL-1, TwoSLprime, ILxIm, NL, TwoSL, IL );
                               int length     = dimLup * dimLdown;
                               int inc        = 1;

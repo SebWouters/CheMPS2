@@ -22,7 +22,7 @@
 
 #include "TensorQ.h"
 #include "Lapack.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 CheMPS2::TensorQ::TensorQ(const int boundary_index, const int Idiff, const bool moving_right, const SyBookkeeper * denBK, const Problem * Prob, const int site) :
 TensorOperator(boundary_index,
@@ -205,7 +205,8 @@ void CheMPS2::TensorQ::AddTermsLRight(TensorL ** Ltensors, TensorT * denT, doubl
                   dimLD = bk_up->gCurrentDim(index-1, sector_nelec_up[ikappa]  , TwoSLD, ILD);
                   if ((dimLU>0) && (dimLD>0)){
                      int fase = ((((sector_spin_up[ikappa]+TwoSLD)/2)%2)!=0)?-1:1;
-                     double factor = fase * sqrt((TwoSLD+1)*(sector_spin_up[ikappa]+1.0)) * gsl_sf_coupling_6j(sector_spin_up[ikappa], sector_spin_down[ikappa], 1, TwoSLD, TwoSLU, 1);
+                     double factor = fase * sqrt((TwoSLD+1)*(sector_spin_up[ikappa]+1.0))
+                                   * Wigner::wigner6j( sector_spin_up[ikappa], sector_spin_down[ikappa], 1, TwoSLD, TwoSLU, 1 );
                   
                      int dimLUxLD = dimLU * dimLD;
                      for (int cnt=0; cnt<dimLUxLD; cnt++){ workmem[cnt] = 0.0; }
@@ -340,7 +341,8 @@ void CheMPS2::TensorQ::AddTermsLLeft(TensorL ** Ltensors, TensorT * denT, double
                   dimRD = bk_up->gCurrentDim(index+1, sector_nelec_up[ikappa]+2, TwoSRD, IRD);
                   if ((dimRU>0) && (dimRD>0)){
                      int fase = ((((sector_spin_down[ikappa]+TwoSRU)/2)%2)!=0)?-1:1;
-                     double factor1 = fase * sqrt((TwoSRU+1.0)/(sector_spin_down[ikappa]+1.0)) * (TwoSRD+1) * gsl_sf_coupling_6j(sector_spin_up[ikappa], sector_spin_down[ikappa], 1, TwoSRD, TwoSRU, 1);
+                     double factor1 = fase * sqrt((TwoSRU+1.0)/(sector_spin_down[ikappa]+1.0)) * (TwoSRD+1)
+                                    * Wigner::wigner6j( sector_spin_up[ikappa], sector_spin_down[ikappa], 1, TwoSRD, TwoSRU, 1 );
                      double factor2 = (TwoSRD+1.0)/(sector_spin_down[ikappa]+1.0);
                   
                      int dimRUxRD = dimRU * dimRD;
@@ -403,7 +405,8 @@ void CheMPS2::TensorQ::AddTermsABRight(TensorOperator * denA, TensorOperator * d
          if ((dimLU>0) && (dimLD>0)){
          
             int fase = ((((TwoSLU + sector_spin_down[ikappa] + 2)/2)%2)!=0)?-1:1;
-            double factorB = fase * sqrt(3.0*(sector_spin_up[ikappa]+1)) * gsl_sf_coupling_6j(1,2,1,sector_spin_down[ikappa],sector_spin_up[ikappa],TwoSLU);
+            double factorB = fase * sqrt(3.0*(sector_spin_up[ikappa]+1))
+                           * Wigner::wigner6j( 1, 2, 1, sector_spin_down[ikappa], sector_spin_up[ikappa], TwoSLU );
             
             double alpha;
             double * mem;
@@ -450,7 +453,7 @@ void CheMPS2::TensorQ::AddTermsABRight(TensorOperator * denA, TensorOperator * d
          if ((dimLU>0) && (dimLD>0)){
          
             int fase = ((((sector_spin_up[ikappa] + sector_spin_down[ikappa] + 1)/2)%2)!=0)?-1:1;
-            double factorB = fase * sqrt(3.0*(TwoSLD+1)) * gsl_sf_coupling_6j(1,2,1,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLD);
+            double factorB = fase * sqrt(3.0*(TwoSLD+1)) * Wigner::wigner6j( 1, 2, 1, sector_spin_up[ikappa], sector_spin_down[ikappa], TwoSLD );
             
             double alpha;
             double * mem;
@@ -506,7 +509,8 @@ void CheMPS2::TensorQ::AddTermsABLeft(TensorOperator * denA, TensorOperator * de
          if ((dimRU>0) && (dimRD>0)){
          
             int fase = ((((TwoSRD + sector_spin_up[ikappa] + 2)/2)%2)!=0)?-1:1;
-            double factorB = fase * sqrt(3.0/(sector_spin_down[ikappa]+1.0)) * (TwoSRD+1) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],TwoSRD,sector_spin_down[ikappa]);
+            const double factorB = fase * sqrt(3.0/(sector_spin_down[ikappa]+1.0)) * (TwoSRD+1)
+                                 * Wigner::wigner6j( 1, 1, 2, sector_spin_up[ikappa], TwoSRD, sector_spin_down[ikappa] );
             
             double alpha;
             double * mem;
@@ -553,7 +557,7 @@ void CheMPS2::TensorQ::AddTermsABLeft(TensorOperator * denA, TensorOperator * de
          if ((dimRU>0) && (dimRD>0)){
          
             int fase = ((((sector_spin_up[ikappa] + sector_spin_down[ikappa] + 1)/2)%2)!=0)?-1:1;
-            double factorB = fase * sqrt(3.0*(TwoSRU+1)) * gsl_sf_coupling_6j(1,1,2,TwoSRU,sector_spin_down[ikappa],sector_spin_up[ikappa]);
+            double factorB = fase * sqrt(3.0*(TwoSRU+1)) * Wigner::wigner6j( 1, 1, 2, TwoSRU, sector_spin_down[ikappa], sector_spin_up[ikappa] );
             
             double alpha;
             double * mem;
@@ -620,7 +624,7 @@ void CheMPS2::TensorQ::AddTermsCDRight(TensorOperator * denC, TensorOperator * d
             
             //first set to D
             int fase = ((((sector_spin_up[ikappa]+sector_spin_down[ikappa]+1)/2)%2)!=0)?-1:1;
-            double factor = fase * sqrt(3.0*(TwoSLD+1)) * gsl_sf_coupling_6j(1,2,1,sector_spin_up[ikappa],sector_spin_down[ikappa],TwoSLD);
+            double factor = fase * sqrt(3.0*(TwoSLD+1)) * Wigner::wigner6j( 1, 2, 1, sector_spin_up[ikappa], sector_spin_down[ikappa], TwoSLD );
             double * block = denD->gStorage( sector_nelec_up[ikappa], sector_spin_up[ikappa], sector_irrep_up[ikappa], sector_nelec_up[ikappa], TwoSLD, ILD );
             for (int cnt=0; cnt<dimLUxLD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
@@ -658,7 +662,7 @@ void CheMPS2::TensorQ::AddTermsCDRight(TensorOperator * denC, TensorOperator * d
             
             //first set to D
             int fase = ((((TwoSLU + sector_spin_down[ikappa])/2)%2)!=0)?-1:1;
-            double factor = fase * sqrt(3.0*(sector_spin_up[ikappa]+1)) * gsl_sf_coupling_6j(1,2,1,sector_spin_down[ikappa],sector_spin_up[ikappa],TwoSLU);
+            double factor = fase * sqrt(3.0*(sector_spin_up[ikappa]+1)) * Wigner::wigner6j( 1, 2, 1, sector_spin_down[ikappa], sector_spin_up[ikappa], TwoSLU );
             double * block = denD->gStorage( sector_nelec_up[ikappa]-1, TwoSLU, ILU, sector_nelec_up[ikappa]-1, sector_spin_down[ikappa], IRD );
             for (int cnt=0; cnt<dimLUxLD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
@@ -707,7 +711,8 @@ void CheMPS2::TensorQ::AddTermsCDLeft(TensorOperator * denC, TensorOperator * de
             
             //first set to D
             int fase = ((((sector_spin_up[ikappa]+TwoSRU+3)/2)%2)!=0)?-1:1;
-            double factor = fase * sqrt(3.0/(sector_spin_down[ikappa]+1.0)) * (TwoSRU+1) * gsl_sf_coupling_6j(1,1,2,TwoSRU,sector_spin_down[ikappa],sector_spin_up[ikappa]);
+            double factor = fase * sqrt(3.0/(sector_spin_down[ikappa]+1.0)) * ( TwoSRU + 1 )
+                          * Wigner::wigner6j( 1, 1, 2, TwoSRU, sector_spin_down[ikappa], sector_spin_up[ikappa] );
             double * block = denD->gStorage( sector_nelec_up[ikappa]+1, TwoSRU, IRU, sector_nelec_up[ikappa]+1, sector_spin_down[ikappa], ILD );
             for (int cnt=0; cnt<dimRUxRD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             
@@ -745,7 +750,8 @@ void CheMPS2::TensorQ::AddTermsCDLeft(TensorOperator * denC, TensorOperator * de
             
             //first set to D
             int fase = (((TwoSRD+1)%2)!=0)?-1:1;
-            double factor = fase * sqrt(3.0*(TwoSRD+1.0)*(sector_spin_up[ikappa]+1.0)/(sector_spin_down[ikappa]+1.0)) * gsl_sf_coupling_6j(1,1,2,sector_spin_up[ikappa],TwoSRD,sector_spin_down[ikappa]);
+            double factor = fase * sqrt(3.0*(TwoSRD+1.0)*(sector_spin_up[ikappa]+1.0)/(sector_spin_down[ikappa]+1.0))
+                          * Wigner::wigner6j( 1, 1, 2, sector_spin_up[ikappa], TwoSRD, sector_spin_down[ikappa] );
             double * block = denD->gStorage( sector_nelec_up[ikappa]+2, sector_spin_up[ikappa], sector_irrep_up[ikappa], sector_nelec_up[ikappa]+2, TwoSRD, IRD );
             for (int cnt=0; cnt<dimRUxRD; cnt++){ workmem[cnt] = factor * block[cnt]; }
             

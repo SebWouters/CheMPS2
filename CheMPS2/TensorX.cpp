@@ -22,7 +22,7 @@
 
 #include "TensorX.h"
 #include "Lapack.h"
-#include "Gsl.h"
+#include "Wigner.h"
 
 CheMPS2::TensorX::TensorX(const int boundary_index, const bool moving_right, const SyBookkeeper * denBK, const Problem * Prob) :
 TensorOperator(boundary_index,
@@ -572,7 +572,8 @@ void CheMPS2::TensorX::addTermDRight(const int ikappa, TensorT * denT, TensorOpe
          double * BlockTdown = (TwoSLup==TwoSLdown)? BlockTup : denT->gStorage(NL,TwoSLdown,IL,sector_nelec_up[ikappa],sector_spin_up[ikappa],sector_irrep_up[ikappa]);
          
          int fase = ((((TwoSLdown + sector_spin_up[ikappa] + 1)/2)%2)!=0)?-1:1;
-         double factor = fase * sqrt(3.0 * (TwoSLup+1)) * gsl_sf_coupling_6j(1,1,2,TwoSLup,TwoSLdown,sector_spin_up[ikappa]);
+         double factor = fase * sqrt(3.0 * (TwoSLup+1))
+                       * Wigner::wigner6j( 1, 1, 2, TwoSLup, TwoSLdown, sector_spin_up[ikappa] );
          double beta = 0.0; //set
          char totrans = 'T';
          dgemm_(&totrans, &totrans, &dimR, &dimLdown, &dimLup, &factor, BlockTup, &dimLup, BlockD, &dimLdown, &beta, workmemLR, &dimR);
@@ -625,7 +626,8 @@ void CheMPS2::TensorX::addTermDLeft(const int ikappa, TensorT * denT, TensorOper
          double * BlockTdown = (TwoSRup == TwoSRdown)? BlockTup : denT->gStorage(sector_nelec_up[ikappa],sector_spin_up[ikappa],sector_irrep_up[ikappa],NR,TwoSRdown,IR);
          
          int fase = ((((sector_spin_up[ikappa] + TwoSRdown + 3)/2)%2)!=0)?-1:1;
-         double factor = fase*sqrt(3.0 *(TwoSRup+1))*((TwoSRdown + 1.0)/(sector_spin_up[ikappa]+1.0))*gsl_sf_coupling_6j(1,1,2,TwoSRup,TwoSRdown,sector_spin_up[ikappa]);
+         double factor = fase*sqrt(3.0 *(TwoSRup+1))*((TwoSRdown + 1.0)/(sector_spin_up[ikappa]+1.0))
+                       * Wigner::wigner6j( 1, 1, 2, TwoSRup, TwoSRdown, sector_spin_up[ikappa] );
          double beta = 0.0; //set
          char trans = 'T';
          char notr = 'N';
