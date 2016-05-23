@@ -2349,8 +2349,8 @@ void CheMPS2::Wigner::extract_denominator( short * denom, prime_powers * terms, 
 long double CheMPS2::Wigner::form_number_simple( short * pow ){
 
    long double value = 1.0;
-   for ( short cnt = 0; cnt < CHEMPS2_WIGNER_NUM_PRIMENUMS; cnt++ ){
-      for ( short alpha = 0; alpha < pow[ cnt ]; alpha++ ){
+   for ( int cnt = 0; cnt < CHEMPS2_WIGNER_NUM_PRIMENUMS; cnt++ ){
+      for ( int alpha = 0; alpha < pow[ cnt ]; alpha++ ){
          value *= prime_numbers[ cnt ];
       }
    }
