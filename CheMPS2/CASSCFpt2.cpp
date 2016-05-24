@@ -136,7 +136,7 @@ bool CheMPS2::CASSCF::read_f4rdm_checkpoint( const string f4rdm_file, int * hamo
 
 }
 
-double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT ){
+double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT, const bool CUMULANT ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       const bool am_i_master = ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER );
@@ -213,8 +213,9 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
    int next_hamorb1 = 0;
    int next_hamorb2 = 0;
+   const bool make_checkpt = (( CUMULANT == false ) && ( CHECKPOINT ));
    bool checkpt_loaded = false;
-   if ( CHECKPOINT ){
+   if ( make_checkpt ){
       assert(( OptScheme != NULL ) || ( rootNum > 1 ));
       checkpt_loaded = read_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
    }
@@ -254,7 +255,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
 
       assert( OptScheme != NULL );
       for ( int cnt = 0; cnt < dmrgsize_power4; cnt++ ){ DMRG2DM[ cnt ] = 0.0; } // Clear the 2-RDM
-      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme, CHECKPOINT, tmp_folder );
+      CheMPS2::DMRG * theDMRG = new DMRG( Prob, OptScheme, make_checkpt, tmp_folder );
       for ( int state = 0; state < rootNum; state++ ){
          if ( state > 0 ){ theDMRG->newExcitation( fabs( E_CASSCF ) ); }
          if ( checkpt_loaded == false ){ E_CASSCF = theDMRG->Solve(); }
@@ -266,50 +267,53 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       buildQmatACT();
       construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
       copy_active( theFmatrix, mem2, iHandler ); // Fock
-      for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-         if (( next_hamorb1 == ham_orbz ) && ( next_hamorb2 == ham_orbz )){
-            theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
-            int size = tot_dmrg_power6;
-            double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-            int inc1 = 1;
-            daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-            if ( ham_orbz == nOrbDMRG - 1 ){
-               next_hamorb1 = 0;
-               next_hamorb2 = 1;
-            } else {
-               next_hamorb1 = ham_orbz + 1;
-               next_hamorb2 = ham_orbz + 1;
+      if ( CUMULANT ){
+         CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
+      } else {
+         for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
+            if (( next_hamorb1 == ham_orbz ) && ( next_hamorb2 == ham_orbz )){
+               theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
+               int size = tot_dmrg_power6;
+               double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
+               int inc1 = 1;
+               daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+               if ( ham_orbz == nOrbDMRG - 1 ){
+                  next_hamorb1 = 0;
+                  next_hamorb2 = 1;
+               } else {
+                  next_hamorb1 = ham_orbz + 1;
+                  next_hamorb2 = ham_orbz + 1;
+               }
+               if ( make_checkpt ){ write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract ); }
             }
-            if ( CHECKPOINT ){ write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract ); }
          }
-      }
-      if ( PSEUDOCANONICAL == false ){
-         for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
-            for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
-               if (( next_hamorb1 == ham_orb1 ) && ( next_hamorb2 == ham_orb2 )){
-                  if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
-                     theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
-                     int size = tot_dmrg_power6;
-                     double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
-                     int inc1 = 1;
-                     daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-                  }
-                  if ( ham_orb2 == nOrbDMRG - 1 ){
-                     next_hamorb1 = next_hamorb1 + 1;
-                     next_hamorb2 = next_hamorb1 + 1;
-                  } else {
-                     next_hamorb2 = next_hamorb2 + 1;
-                  }
-                  if (( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ) && ( CHECKPOINT )){
-                     write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
+         if ( PSEUDOCANONICAL == false ){
+            for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
+               for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
+                  if (( next_hamorb1 == ham_orb1 ) && ( next_hamorb2 == ham_orb2 )){
+                     if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
+                        theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
+                        int size = tot_dmrg_power6;
+                        double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
+                        int inc1 = 1;
+                        daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
+                     }
+                     if ( ham_orb2 == nOrbDMRG - 1 ){
+                        next_hamorb1 = next_hamorb1 + 1;
+                        next_hamorb2 = next_hamorb1 + 1;
+                     } else {
+                        next_hamorb2 = next_hamorb2 + 1;
+                     }
+                     if (( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ) && ( make_checkpt )){
+                        write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
+                     }
                   }
                }
             }
          }
-         // CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       }
       theDMRG->get3DM()->fill_ham_index( 1.0, false, three_dm, 0, nOrbDMRG );
-      if (( CheMPS2::DMRG_storeMpsOnDisk ) && ( CHECKPOINT == false )){ theDMRG->deleteStoredMPS(); }
+      if (( CheMPS2::DMRG_storeMpsOnDisk ) && ( make_checkpt == false )){ theDMRG->deleteStoredMPS(); }
       if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ theDMRG->deleteStoredOperators(); }
       delete theDMRG;
 

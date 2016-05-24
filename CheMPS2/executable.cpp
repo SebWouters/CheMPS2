@@ -313,6 +313,9 @@ cout << "\n"
 "       CASPT2_CHECKPT = bool\n"
 "              Create checkpoints to continue the CASPT2 4-RDM calculation over multiple runs (TRUE or FALSE; default FALSE).\n"
 "\n"
+"       CASPT2_CUMUL = bool\n"
+"              Use a cumulant approximation for the CASPT2 4-RDM and overwrite CASPT2_CHECKPT to FALSE (TRUE or FALSE; default FALSE).\n"
+"\n"
 "       PRINT_CORR = bool\n"
 "              Print correlation functions (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -374,6 +377,7 @@ int main( int argc, char ** argv ){
    double caspt2_ipea    = 0.0;
    double caspt2_imag    = 0.0;
    bool   caspt2_checkpt = false;
+   bool   caspt2_cumul   = false;
 
    bool   print_corr = false;
    string tmp_folder = "/tmp";
@@ -451,6 +455,7 @@ int main( int argc, char ** argv ){
       if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_cumul,   line, "CASPT2_CUMUL"   ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &print_corr,     line, "PRINT_CORR"     ) == false ){ return clean_exit( -1 ); }
 
       if ( line.find( "SWEEP_STATES" ) != string::npos ){
@@ -628,6 +633,7 @@ int main( int argc, char ** argv ){
       cout << "   CASPT2_IPEA        = " << caspt2_ipea << endl;
       cout << "   CASPT2_IMAG        = " << caspt2_imag << endl;
       cout << "   CASPT2_CHECKPT     = " << (( caspt2_checkpt ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   CASPT2_CUMUL       = " << (( caspt2_cumul   ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   PRINT_CORR         = " << (( print_corr     ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   TMP_FOLDER         = " << tmp_folder << endl;
       cout << " " << endl;
@@ -677,7 +683,7 @@ int main( int argc, char ** argv ){
    const double E_CASSCF = koekoek.solve(  nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options );
    double E_CASPT2 = 0.0;
    if ( caspt2_calc ){
-      E_CASPT2 = koekoek.caspt2( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options, caspt2_ipea, caspt2_imag, ( caspt2_orbs == 'P' ), caspt2_checkpt );
+      E_CASPT2 = koekoek.caspt2( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options, caspt2_ipea, caspt2_imag, ( caspt2_orbs == 'P' ), caspt2_checkpt, caspt2_cumul );
       if ( am_i_master ){
          cout << "E_CASSCF + E_CASPT2 = E_0 + E_1 + E_2 = " << E_CASSCF + E_CASPT2 << endl;
       }

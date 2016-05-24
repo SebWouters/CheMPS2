@@ -203,8 +203,9 @@ namespace CheMPS2{
              \param IMAG The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
              \param PSEUDOCANONICAL If true, use the exact DMRG 4-RDM in the pseudocanonical basis. If false, use the cumulant approximated DMRG 4-RDM in the unrotated basis.
              \param CHECKPOINT If true, write checkpoints to disk and read them back in again in order to perform the contraction of the generalized Fock operator with the 4-RDM in multiple runs.
+             \param CUMULANT If true, a cumulant approximation is used for the 4-RDM and CHECKPOINT is overwritten to false. If false, the full 4-RDM is used.
              \return The CASPT2 variational correction energy */
-         double caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT = false );
+         double caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT = false, const bool CUMULANT = false );
 
          //! CASSCF unitary rotation remove call
          /* \param filename File to delete */
