@@ -219,6 +219,10 @@ sectors.
 [CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container
 class for the one-body matrix elements.
 
+[CheMPS2/Wigner.cpp](CheMPS2/Wigner.cpp) contains static member functions to compute
+Wigner 3j, 6j, and 9j symbols, with the same API as GSL's gsl_sf_coupling_3j,
+gsl_sf_coupling_6j, and gsl_sf_coupling_9j, respectively.
+
 [CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use
 libchemps2 from the command line.
 
@@ -346,6 +350,8 @@ class.
 [CheMPS2/include/chemps2/TwoDM.h](CheMPS2/include/chemps2/TwoDM.h) contains the definitions of the TwoDM class.
 
 [CheMPS2/include/chemps2/TwoIndex.h](CheMPS2/include/chemps2/TwoIndex.h) contains the definitions of the TwoIndex class.
+
+[CheMPS2/include/chemps2/Wigner.h](CheMPS2/include/chemps2/Wigner.h) contains the definitions of the Wigner class.
 
 Please note that these files are documented with doxygen comments. The
 [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
