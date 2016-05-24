@@ -1,4 +1,4 @@
-#### Current HEAD
+#### Version 1.7 (2016-05-24):
 * Class ConjugateGradient
 * Class TensorOperator
 * Class ThreeDM: DMRG 3-RDM in O(L^4 D^3 + L^6 D^2)
