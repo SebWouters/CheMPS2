@@ -334,7 +334,7 @@ void CheMPS2::DMRG::solve_fock( const int dmrg_orb1, const int dmrg_orb2, const 
 
    if ( am_i_master ){
       const double rdm_inproduct = 2 * alpha * the2DM->get1RDM_DMRG( dmrg_orb1, dmrg_orb2 ) + beta;
-      cout << "DMRG::solve_fock : Accuracy = " << fabs( sweep_inproduct - rdm_inproduct ) << endl;
+      cout << "DMRG::solve_fock : Accuracy = " << fabs( sweep_inproduct / ( Prob->gTwoS() + 1 ) - rdm_inproduct ) << endl;
    }
 
 }
