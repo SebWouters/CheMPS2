@@ -179,9 +179,9 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
       #endif
 
       // Localize the active space and reorder the orbitals within each irrep based on the exchange matrix
-      if (( scf_options->getWhichActiveSpace() >= 2 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
+      if (( scf_options->getWhichActiveSpace() == 2 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
          if ( am_i_master ){
-            if ( scf_options->getWhichActiveSpace() == 2 ){ theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom()); }
+            theLocalizer->Optimize(mem1, mem2, scf_options->getStartLocRandom());
             theLocalizer->FiedlerExchange(maxlinsize, mem1, mem2);
             fillLocalizedOrbitalRotations(theLocalizer->getUnitary(), iHandler, mem1);
             unitary->rotateActiveSpaceVectors(mem1, mem2);
@@ -199,6 +199,19 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
          #ifdef CHEMPS2_MPI_COMPILATION
          HamDMRG->getVmat()->broadcast( MPI_CHEMPS2_MASTER );
          #endif
+      }
+
+      // Reorder the orbitals based on the Fiedler vector of the exchange matrix
+      if (( scf_options->getWhichActiveSpace() == 3 ) && ( master_diis == 0 )){ // When the DIIS has started: stop
+         int * dmrg2ham = new int[ nOrbDMRG ];
+         if ( am_i_master ){
+            theLocalizer->FiedlerGlobal( dmrg2ham );
+         }
+         #ifdef CHEMPS2_MPI_COMPILATION
+         MPIchemps2::broadcast_array_int( dmrg2ham, nOrbDMRG, MPI_CHEMPS2_MASTER );
+         #endif
+         Prob->setup_reorder_custom( dmrg2ham );
+         delete [] dmrg2ham;
       }
 
       if (( OptScheme == NULL ) && ( rootNum == 1 )){ // Do FCI, and calculate the 2DM

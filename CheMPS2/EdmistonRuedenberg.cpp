@@ -409,5 +409,85 @@ void CheMPS2::EdmistonRuedenberg::FiedlerExchange(const int maxlinsize, double *
 
 }
 
+double CheMPS2::EdmistonRuedenberg::FiedlerGlobalCost( const DMRGSCFindices * idx, const FourIndex * VMAT_LOCAL, int * dmrg2ham ){
+
+   double cost = 0.0;
+
+   for ( int dmrg_row = 0; dmrg_row < idx->getL(); dmrg_row++ ){
+      for ( int dmrg_col = 0; dmrg_col < idx->getL(); dmrg_col++ ){
+         const int ham_row = dmrg2ham[ dmrg_row ];
+         const int ham_col = dmrg2ham[ dmrg_col ];
+         const int irrep_row = idx->getOrbitalIrrep( ham_row );
+         const int irrep_col = idx->getOrbitalIrrep( ham_col );
+         const int rel_row = ham_row - idx->getOrigNOCCstart( irrep_row );
+         const int rel_col = ham_col - idx->getOrigNOCCstart( irrep_col );
+         cost += VMAT_LOCAL->get( irrep_row, irrep_col, irrep_col, irrep_row, rel_row, rel_col, rel_col, rel_row ) * ( dmrg_row - dmrg_col ) * ( dmrg_row - dmrg_col );
+      }
+   }
+
+   return cost;
+
+}
+
+void CheMPS2::EdmistonRuedenberg::FiedlerGlobal( int * dmrg2ham ) const{
+
+   // For information on the Fiedler vector: see http://web.eecs.utk.edu/~mberry/order/node9.html
+
+   for ( int orb = 0; orb < iHandler->getL(); orb++ ){ dmrg2ham[ orb ] = orb; }
+   if ( printLevel > 0 ){ cout << "   EdmistonRuedenberg::FiedlerGlobal : Cost function at start = " << FiedlerGlobalCost( iHandler, VMAT_ORIG, dmrg2ham ) << endl; }
+
+   // Build the Laplacian
+   double * laplacian = new double[ iHandler->getL() * iHandler->getL() ];
+   for ( int ham_row = 0; ham_row < iHandler->getL(); ham_row++ ){
+      double sum_over_column = 0.0;
+      for ( int ham_col = 0; ham_col < iHandler->getL(); ham_col++ ){
+         if ( ham_row != ham_col ){
+            const int irrep_row = iHandler->getOrbitalIrrep( ham_row );
+            const int irrep_col = iHandler->getOrbitalIrrep( ham_col );
+            const int rel_row = ham_row - iHandler->getOrigNOCCstart( irrep_row );
+            const int rel_col = ham_col - iHandler->getOrigNOCCstart( irrep_col );
+            const double value = fabs( VMAT_ORIG->get( irrep_row, irrep_col, irrep_col, irrep_row, rel_row, rel_col, rel_col, rel_row ) );
+            laplacian[ ham_row + iHandler->getL() * ham_col ] = - value;
+            sum_over_column += value;
+         } else {
+            laplacian[ ham_row + iHandler->getL() * ham_col ] = 0.0;
+         }
+      }
+      laplacian[ ham_row + iHandler->getL() * ham_row ] = sum_over_column;
+   }
+
+   // Calculate the eigenspectrum of the Laplacian
+   int lwork     = 3 * iHandler->getL() * iHandler->getL();
+   double * work = new double[ lwork ];
+   double * eigs = new double[ iHandler->getL() ];
+   char jobz     = 'V';
+   char uplo     = 'U';
+   int linsize   = iHandler->getL();
+   int info;
+   dsyev_( &jobz, &uplo, &linsize, laplacian, &linsize, eigs, work, &lwork, &info );
+   delete [] work;
+   delete [] eigs;
+
+   // Fill dmrg2ham
+   double * fiedler_vec = laplacian + linsize;
+   for ( int dummy = 0; dummy < linsize; dummy++ ){
+      int index = 0;
+      for ( int orb = 1; orb < linsize; orb++ ){
+         if ( fiedler_vec[ orb ] < fiedler_vec[ index ] ){ index = orb; }
+      }
+      dmrg2ham[ dummy ] = index;
+      fiedler_vec[ index ] = 2.0; // Eigenvectors are normalized to 1.0, so certainly OK
+   }
+
+   delete [] laplacian;
+
+   if ( printLevel > 0 ){
+      cout << "   EdmistonRuedenberg::FiedlerGlobal : Cost function at end   = " << FiedlerGlobalCost( iHandler, VMAT_ORIG, dmrg2ham ) << endl;
+      cout << "   EdmistonRuedenberg::FiedlerGlobal : Reordering = [ ";
+      for ( int orb = 0; orb < linsize - 1; orb++ ){ cout << dmrg2ham[ orb ] << ", "; }
+      cout << dmrg2ham[ linsize - 1 ] << " ]." << endl;
+   }
+
+}
 
 

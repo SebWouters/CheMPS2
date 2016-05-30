@@ -150,7 +150,11 @@ namespace CheMPS2{
              \param temp1 Work memory of at least 4*max(dim(irrep(Ham)))^2
              \param temp2 Work memory of at least 4*max(dim(irrep(Ham)))^2 */
          void FiedlerExchange(const int maxlinsize, double * temp1, double * temp2);
-         
+
+         //! Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized
+         /** \param dmrg2ham At exit, dmrg2ham contains the new orbital ordering */
+         void FiedlerGlobal( int * dmrg2ham ) const;
+
          //! Get the pointer to the unitary to use in DMRGSCF
          /** \return Pointer to the unitary which defines the localized orbitals */
          DMRGSCFunitary * getUnitary();
@@ -185,6 +189,7 @@ namespace CheMPS2{
          
          //Fiedler vector helper function
          double FiedlerExchangeCost() const;
+         static double FiedlerGlobalCost( const DMRGSCFindices * idx, const FourIndex * VMAT_LOCAL, int * dmrg2ham );
          void Fiedler(const int irrep, int * reorder, double * laplacian, double * temp2);
          
    };
