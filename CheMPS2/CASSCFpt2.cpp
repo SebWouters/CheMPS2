@@ -197,7 +197,18 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    Hamiltonian * HamAS = new Hamiltonian( nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital() );
    Problem * Prob = new Problem( HamAS, TwoS, num_elec, Irrep );
    Prob->SetupReorderD2h(); // Doesn't matter if the group isn't D2h, Prob checks it.
-   if ( scf_options->getWhichActiveSpace() == 3 ){ // Reorder the orbitals based on the Fiedler vector of the exchange matrix
+   buildTmatrix();
+   buildQmatOCC();
+   fillConstAndTmatDMRG( HamAS );
+   if ( am_i_master ){
+      DMRGSCFrotations::rotate( VMAT_ORIG, HamAS->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
+   }
+   #ifdef CHEMPS2_MPI_COMPILATION
+   HamAS->getVmat()->broadcast( MPI_CHEMPS2_MASTER );
+   #endif
+
+   // Reorder the orbitals based on the Fiedler vector of the exchange matrix
+   if ( scf_options->getWhichActiveSpace() == 3 ){
       int * dmrg2ham = new int[ nOrbDMRG ];
       if ( am_i_master ){
          EdmistonRuedenberg * theLocalizer = new EdmistonRuedenberg( HamAS->getVmat(), iHandler->getGroupNumber() );
@@ -210,15 +221,6 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       Prob->setup_reorder_custom( dmrg2ham );
       delete [] dmrg2ham;
    }
-   buildTmatrix();
-   buildQmatOCC();
-   fillConstAndTmatDMRG( HamAS );
-   if ( am_i_master ){
-      DMRGSCFrotations::rotate( VMAT_ORIG, HamAS->getVmat(), NULL, 'A', 'A', 'A', 'A', iHandler, unitary, mem1, mem2, work_mem_size, tmp_filename );
-   }
-   #ifdef CHEMPS2_MPI_COMPILATION
-   HamAS->getVmat()->broadcast( MPI_CHEMPS2_MASTER );
-   #endif
 
    double E_CASSCF = 0.0;
    double * three_dm = new double[ tot_dmrg_power6 ];
