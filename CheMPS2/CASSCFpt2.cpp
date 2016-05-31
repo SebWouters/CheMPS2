@@ -33,6 +33,7 @@
 #include "Cumulant.h"
 #include "CASPT2.h"
 #include "MPIchemps2.h"
+#include "EdmistonRuedenberg.h"
 
 using std::string;
 using std::ifstream;
@@ -196,6 +197,19 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    Hamiltonian * HamAS = new Hamiltonian( nOrbDMRG, SymmInfo.getGroupNumber(), iHandler->getIrrepOfEachDMRGorbital() );
    Problem * Prob = new Problem( HamAS, TwoS, num_elec, Irrep );
    Prob->SetupReorderD2h(); // Doesn't matter if the group isn't D2h, Prob checks it.
+   if ( scf_options->getWhichActiveSpace() == 3 ){ // Reorder the orbitals based on the Fiedler vector of the exchange matrix
+      int * dmrg2ham = new int[ nOrbDMRG ];
+      if ( am_i_master ){
+         EdmistonRuedenberg * theLocalizer = new EdmistonRuedenberg( HamAS->getVmat(), iHandler->getGroupNumber() );
+         theLocalizer->FiedlerGlobal( dmrg2ham );
+         delete theLocalizer;
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      MPIchemps2::broadcast_array_int( dmrg2ham, nOrbDMRG, MPI_CHEMPS2_MASTER );
+      #endif
+      Prob->setup_reorder_custom( dmrg2ham );
+      delete [] dmrg2ham;
+   }
    buildTmatrix();
    buildQmatOCC();
    fillConstAndTmatDMRG( HamAS );
