@@ -13,8 +13,6 @@ addons:
         - cmake-data
         - liblapack-dev
         - libhdf5-serial-dev
-        - libgsl0-dev
-        - libgsl0ldbl
         - gcc-4.8
         - g++-4.8
         - gcc-5
