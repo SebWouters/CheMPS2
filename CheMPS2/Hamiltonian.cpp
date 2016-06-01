@@ -31,7 +31,6 @@
 #include "MyHDF5.h"
 
 using std::cout;
-using std::cerr;
 using std::endl;
 using std::string;
 using std::ifstream;
@@ -69,15 +68,15 @@ CheMPS2::Hamiltonian::Hamiltonian( const string filename, const int psi4groupnum
 
 }
 
-CheMPS2::Hamiltonian::Hamiltonian(const bool fileh5, const string main_file, const string file_tmat, const string file_vmat){
+CheMPS2::Hamiltonian::Hamiltonian( const bool fileh5, const string main_file, const string file_tmat, const string file_vmat ){
 
-   if (fileh5){
+   if ( fileh5 ){
       CreateAndFillFromH5( main_file, file_tmat, file_vmat );
    } else {
-      cerr << "CheMPS2::Hamiltonian::Hamiltonian( false, const string , const string , const string ) was deprecated." << endl;
+      cout << "CheMPS2::Hamiltonian::Hamiltonian( false, const string , const string , const string ) was deprecated." << endl;
       assert( fileh5 == true );
    }
-   
+
 }
 
 CheMPS2::Hamiltonian::~Hamiltonian(){

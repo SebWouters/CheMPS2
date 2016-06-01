@@ -31,7 +31,6 @@
 #include "MPIchemps2.h"
 
 using std::cout;
-using std::cerr;
 using std::endl;
 
 CheMPS2::DMRG::DMRG( Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder ){

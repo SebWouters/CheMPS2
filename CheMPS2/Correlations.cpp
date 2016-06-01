@@ -28,7 +28,6 @@
 #include "MPIchemps2.h"
 
 using std::cout;
-using std::cerr;
 using std::endl;
 using std::max;
 using std::min;
@@ -168,10 +167,6 @@ double CheMPS2::Correlations::SingleOrbitalEntropy_DMRG(const int index) const{
    const double val4  = 0.5 * the2DM->getTwoDMA_DMRG(index,index,index,index);
    const double val23 = 0.5 * ( the2DM->get1RDM_DMRG(index, index) - the2DM->getTwoDMA_DMRG(index,index,index,index) );
    const double val1  = 1.0 - val4 - 2*val23;
-   
-   if (val1  < 0.0){ cerr << "   Correlations::SingleOrbitalEntropy : Warning : val1  for orbital " << index << " = " << val1  << endl; }
-   if (val23 < 0.0){ cerr << "   Correlations::SingleOrbitalEntropy : Warning : val23 for orbital " << index << " = " << val23 << endl; }
-   if (val4  < 0.0){ cerr << "   Correlations::SingleOrbitalEntropy : Warning : val4  for orbital " << index << " = " << val4  << endl; }
    
    double entropy = 0.0;
    if (val1  > CheMPS2::CORRELATIONS_discardEig){ entropy -=     val1  * log(val1 ); }
@@ -338,9 +333,6 @@ void CheMPS2::Correlations::FillSite(TensorT * denT, TensorGYZ ** Gtensors, Tens
       for (int cnt=0; cnt<lindimRDM; cnt++){
          if (eigs[cnt] > CheMPS2::CORRELATIONS_discardEig){ //With discardEig = 1e-100, the discarded contributions are smaller than 2.4e-98
             entropy -= eigs[cnt] * log(eigs[cnt]);
-         }
-         if (eigs[cnt] < 0.0){
-            cerr << "   Correlations::FillSite : Warning : Eigenvalue RDM orbitals (" << previousindex << "," << theindex << ") = " << eigs[cnt] << endl;
          }
       }
       
