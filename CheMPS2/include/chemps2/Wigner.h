@@ -20,7 +20,8 @@
 #ifndef WIGNER_CHEMPS2_H
 #define WIGNER_CHEMPS2_H
 
-#define CHEMPS2_WIGNER_FACTORIAL_MAX 170
+#define CHEMPS2_WIGNER_FACTORIAL_MAX 191
+#define CHEMPS2_WIGNER_MAX_2J        95   // Maximum factorial = (4j+1)!   <=>   2j = 95
 
 namespace CheMPS2{
 /** Wigner class.
