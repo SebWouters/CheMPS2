@@ -28,6 +28,7 @@
 #include "Lapack.h"
 #include "Options.h"
 #include "ConjugateGradient.h"
+#include "Davidson.h"
 #include "Special.h"
 
 using std::cout;
@@ -202,7 +203,7 @@ CheMPS2::CASPT2::~CASPT2(){
 
 }
 
-double CheMPS2::CASPT2::solve( const double imag_shift ) const{
+double CheMPS2::CASPT2::solve( const double imag_shift, const bool CONJUGATE_GRADIENT ) const{
 
    struct timeval start, end;
    gettimeofday( &start, NULL );
@@ -216,28 +217,36 @@ double CheMPS2::CASPT2::solve( const double imag_shift ) const{
    diagonal( diag_fock );
    double min_eig = diag_fock[ 0 ];
    for ( int elem = 1; elem < total_size; elem++ ){ min_eig = min( min_eig, diag_fock[ elem ] ); }
+   cout << "CASPT2 : Solution algorithm   = " << (( CONJUGATE_GRADIENT ) ? "Conjugate Gradient" : "Davidson" ) << endl;
    cout << "CASPT2 : Minimum(diagonal)    = " << min_eig << endl;
 
-   ConjugateGradient CG( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false );
+   ConjugateGradient * CG = (( CONJUGATE_GRADIENT ) ? new ConjugateGradient( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false ) : NULL );
+   Davidson * DAVID = (( CONJUGATE_GRADIENT ) ? NULL : new Davidson( total_size,
+                                                                     CheMPS2::DAVIDSON_NUM_VEC,
+                                                                     1, // NUM_VEC_KEEP
+                                                                     CheMPS2::CONJ_GRADIENT_RTOL,
+                                                                     CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF,
+                                                                     true, // debug_print
+                                                                     'L' )); // Linear problem
    double ** pointers = new double*[ 3 ];
-   char instruction = CG.step( pointers );
+   char instruction = (( CONJUGATE_GRADIENT ) ? CG->step( pointers ) : DAVID->FetchInstruction( pointers ));
    assert( instruction == 'A' );
    for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 0 ][ elem ] = vector_rhs[ elem ] / diag_fock[ elem ]; } // Initial guess of F * x = V
    for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 1 ][ elem ] =  diag_fock[ elem ]; } // Diagonal of the operator F
    for ( int elem = 0; elem < total_size; elem++ ){ pointers[ 2 ][ elem ] = vector_rhs[ elem ]; } // RHS of the linear problem F * x = V
    int inc1 = 1;
    const double E2_DIAGONAL = - ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 2 ], &inc1 );
-   instruction = CG.step( pointers );
+   instruction = (( CONJUGATE_GRADIENT ) ? CG->step( pointers ) : DAVID->FetchInstruction( pointers ));
    assert( instruction == 'B' );
    while ( instruction == 'B' ){
       matvec( pointers[ 0 ], pointers[ 1 ], diag_fock );
       if ( apply_shift ){ add_shift( pointers[ 0 ], pointers[ 1 ], diag_fock, imag_shift, normalizations ); }
-      instruction = CG.step( pointers );
+      instruction = (( CONJUGATE_GRADIENT ) ? CG->step( pointers ) : DAVID->FetchInstruction( pointers ));
    }
    assert( instruction == 'C' );
    const double E2_NONVARIATIONAL = - ddot_( &total_size, pointers[ 0 ], &inc1, vector_rhs, &inc1 );
    const double rnorm = pointers[ 1 ][ 0 ];
-   cout << "CASPT2 : Number of iterations = " << CG.get_num_matvec() << endl;
+   cout << "CASPT2 : Number of iterations = " << (( CONJUGATE_GRADIENT ) ? CG->get_num_matvec() : DAVID->GetNumMultiplications() ) << endl;
    cout << "CASPT2 : Residual norm        = " << rnorm << endl;
    matvec( pointers[ 0 ], pointers[ 1 ], diag_fock ); // pointers[ 1 ] is a WORK array when instruction == 'C'
    const double E2_VARIATIONAL = 2 * E2_NONVARIATIONAL + ddot_( &total_size, pointers[ 0 ], &inc1, pointers[ 1 ], &inc1 );
@@ -248,6 +257,8 @@ double CheMPS2::CASPT2::solve( const double imag_shift ) const{
    cout << "CASPT2 : Reference weight     = " << reference_weight << endl;
    //energy_per_sector( pointers[ 0 ] );
    delete [] pointers;
+   if ( CG    != NULL ){ delete CG;    }
+   if ( DAVID != NULL ){ delete DAVID; }
 
    gettimeofday( &end, NULL );
    double elapsed = ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );

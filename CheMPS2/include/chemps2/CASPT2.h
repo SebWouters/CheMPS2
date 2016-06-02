@@ -80,8 +80,9 @@ namespace CheMPS2{
 
          //! Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor)
          /** \param imag_shift The CASPT2 imaginary shift from Forsberg and Malmqvist, Chemical Physics Letters 274, 196-204 (1997)
+             \param CONJUGATE_GRADIENT If true (false), the conjugate gradient (Davidson) algorithm is used to solve the CASPT2 equation
              \return The CASPT2 variational correction energy */
-         double solve( const double imag_shift ) const;
+         double solve( const double imag_shift, const bool CONJUGATE_GRADIENT = false ) const;
 
          //! Return the vector length for the CASPT2 first order wavefunction (before diagonalization of the overlap matrix)
          /** \param idx The number of core, active, and virtual orbitals per irrep

@@ -34,74 +34,79 @@ namespace CheMPS2{
    class Davidson{
 
       public:
-      
+
          //! Constructor
-         /** \param veclength_in Linear dimension of the symmetric matrix, or the length of the vectors
-             \param MAX_NUM_VEC_in The maximum number of vectors in which the symmetric matrix is approximately diagonalized
-             \param NUM_VEC_KEEP_in The number of vectors to keep on deflation
-             \param RTOL_in The tolerance for the two-norm of the residual (for convergence)
-             \param DIAG_CUTOFF_in Cutoff value for the diagonal preconditioner
-             \param debugPrint_in Whether or not to debug print */
-         Davidson(const int veclength_in, const int MAX_NUM_VEC_in, const int NUM_VEC_KEEP_in, const double RTOL_in, const double DIAG_CUTOFF_in, const bool debugPrint_in);
-         
+         /** \param veclength    Linear dimension of the symmetric matrix, or the length of the vectors
+             \param MAX_NUM_VEC  The maximum number of vectors in which the symmetric matrix is approximately diagonalized
+             \param NUM_VEC_KEEP The number of vectors to keep during deflation
+             \param RTOL         The tolerance for the two-norm of the residual ( for convergence )
+             \param DIAG_CUTOFF  Cutoff value for the diagonal preconditioner
+             \param debug_print  Whether or not to debug print
+             \param problem_type 'E' for eigenvalue or 'L' for linear problem. */
+         Davidson( const int veclength, const int MAX_NUM_VEC, const int NUM_VEC_KEEP, const double RTOL, const double DIAG_CUTOFF, const bool debug_print, const char problem_type = 'E' );
+
          //! Destructor
          virtual ~Davidson();
-         
+
          //! The iterator to converge the ground state vector
-         /** \param whichpointers Array of double* of length 2 to return pointers to vectors to the caller
-             \return Instruction character. 'A' means copy the initial guess to whichpointers[0] and the diagonal of the symmetric matrix to whichpointers[1]. 'B' means calculate whichpointers[1] as the result of multiplying the symmetric matrix with whichpointers[0]. 'C' means that the converged solution can be copied back from whichpointers[0], and the ground-state energy from whichpointers[1][0]. 'D' means that an error has occurred. */
-         char FetchInstruction(double ** whichpointers);
-         
+         /** \param pointers Array of double* of length 2 when problem_type=='E' or length 3 when problem_type=='L'.
+             \return Instruction character. 'A' means copy the initial guess to pointers[0] and the diagonal of the symmetric matrix to pointers[1]. If 'A' and problem_type=='E', the right-hand side of the problem should be copied to pointers[2]. 'B' means calculate pointers[1] as the result of multiplying the symmetric matrix with pointers[0]. 'C' means that the converged solution can be copied back from pointers[0], and pointers[1][0] contains the ground-state energy if problem_type=='E' or the residual norm if problem_type=='L'. 'D' means that an error has occurred. */
+         char FetchInstruction( double ** pointers );
+
          //! Get the number of matrix vector multiplications which have been performed
          /** \return The number of matrix vector multiplications which have been performed */
          int GetNumMultiplications() const;
-         
+
       private:
-      
+
          int veclength; // The vector length
          int nMultiplications; // Current number of requested matrix-vector multiplications
          char state; // Current state of the algorithm --> based on this parameter the next instruction is given
-         bool debugPrint;
-         
+         bool debug_print;
+         char problem_type;
+
          // Davidson parameters
          int MAX_NUM_VEC;
          int NUM_VEC_KEEP;
          double DIAG_CUTOFF;
          double RTOL;
-         
+
          // To store the vectors and the matrix x vectors
          int num_vec;
          double ** vecs;
          double ** Hvecs;
          int num_allocated;
-         
+
          // The effective diagonalization problem
          double * mxM;
          double * mxM_eigs;
          double * mxM_vecs;
          int mxM_lwork;
          double * mxM_work;
-         
+         double * mxM_rhs;
+
          // Vector spaces
          double * t_vec;
          double * u_vec;
          double * work_vec;
          double * diag;
-         
+         double * RHS;
+
          // For the deflation
          double * Reortho_Lowdin;
          double * Reortho_Overlap_eigs;
          double * Reortho_Overlap;
          double * Reortho_Eigenvecs;
-         
+
          // Control script functions
+         double FrobeniusNorm( double * current_vector );
          void SafetyCheckGuess();
          void AddNewVec();
          double DiagonalizeSmallMatrixAndCalcResidual(); // Returns the residual norm
          void CalculateNewVec();
          void Deflation();
          void MxMafterDeflation();
-         
+
    };
 }
 
