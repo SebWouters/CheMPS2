@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sys/stat.h>
 
 #include "Irreps.h"
 #include "TwoIndex.h"
@@ -292,6 +293,13 @@ void CheMPS2::Hamiltonian::CreateAndFillFromH5(const string file_parent, const s
 }
 
 void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
+
+    struct stat file_info;
+    const bool on_disk = (( fcidumpfile.length() > 0 ) && ( stat( fcidumpfile.c_str(), &file_info ) == 0 ));
+    if ( on_disk == false ){
+       cout << "CheMPS2::Hamiltonian : Unable to find FCIDUMP file " << fcidumpfile << "!" << endl;
+    }
+    assert( on_disk );
 
     const int nIrreps = SymmInfo.getNumberOfIrreps();
     int * psi2molpro = new int[ nIrreps ];
