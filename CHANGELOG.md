@@ -1,3 +1,8 @@
+#### Current HEAD
+* Global reordering of the active space orbitals (mixing
+  irreps) based on Fiedler vector of the exchange matrix
+* Davidson algorithm for linear systems (for CASPT2)
+
 #### Version 1.7 (2016-05-24):
 * Class ConjugateGradient
 * Class TensorOperator
