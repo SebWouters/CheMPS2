@@ -34,9 +34,10 @@ An instance of the ``CheMPS2::DMRGSCFoptions`` class is required to perform DMRG
 * The variable ``UnitaryStorageName_in`` contains the filename of the orbital rotation checkpoint.
 * The variable ``StateAveraging_in`` allows to switch off state-averaged DMRG-SCF calculations (to perform state-specific DMRG-SCF calculations).
 * The variable ``WhichActiveSpace_in`` allows to switch between active space orbital choices (please remember the remark in the section :ref:`chemps2_orbitalchoiceordering`): 
-    * input orbitals (``0``)
-    * natural orbitals (``1``)
-    * localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (``2``)
+    * input orbitals (``0``) : No orbital rotations in addition to the occupied-active, active-virtual, and occupied-virtual rotations are performed.
+    * natural orbitals (``1``) : After each DMRG calculation, and before the calculation of the gradient and Hessian for occupied-active, active-virtual, and occupied-virtual rotations, the active space orbitals are rotated to natural orbitals. This options allows to perform an initial approximate large active space DMRG calculation, from which a smaller active space can subsequently be selected based on the natural orbital occupation numbers.
+    * localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (``2``) : Per irrep, the orbitals are localized with an augmented Hessian Newton-Raphson optimization of the Edmiston-Ruedenberg cost function. The orbitals are ordered per irrep based on the Fiedler vector of the exchange matrix. Orbitals belonging to different irreps are not mingled in the process.
+    * ordered orbitals only (based on the Fiedler vector of the exchange matrix) (``3``) : The orbitals are ordered based on the Fiedler vector of the exchange matrix. Orbitals belonging to different irreps are mingled in the process.
 * The variable ``DumpCorrelations_in`` allows to switch on printing the correlation functions defined in the section :ref:`chemps2_dmrg_object` after each DMRG calculation during the DMRG-SCF iterations.
 * The variable ``StartLocRandom_in`` allows to start the localization of the orbitals (if ``WhichActiveSpace_in==2``) from a random orbital rotation. To study the :math:`\pi`-orbitals of polyenes, for example, the matrix elements should be generated in the :math:`\mathsf{Cs}` subgroup of the molecule's point group in order to be able to localize them. In order to break the symmetry of the R(O)HF orbitals during localization, it is important to start from a random orbital rotation.
 
