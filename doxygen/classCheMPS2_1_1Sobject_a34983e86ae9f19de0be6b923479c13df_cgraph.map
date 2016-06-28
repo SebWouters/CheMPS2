@@ -1,28 +1,30 @@
 <map id="CheMPS2::Sobject::Split" name="CheMPS2::Sobject::Split">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="237,85,404,127"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="715,451,890,492"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="715,596,890,637"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="715,661,890,703"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="715,872,890,913"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="233,544,408,585"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1SyBookkeeper.html#a87e4bca7afcfb744aa224ab2a942c8b4" title="Get the FCI virtual dimensions ( bound by SYBK_dimensionCutoff ) " alt="" coords="479,275,654,316"/>
-<area shape="rect" id="node12" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="471,173,662,199"/>
-<area shape="rect" id="node17" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="715,727,890,768"/>
-<area shape="rect" id="node18" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="233,854,409,881"/>
-<area shape="rect" id="node19" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="223,905,418,931"/>
-<area shape="rect" id="node20" href="$classCheMPS2_1_1SyBookkeeper.html#aeb6f41f7c78c9e15e02e6b238419b5e7" title="Get the current virtual dimensions. " alt="" coords="233,479,408,520"/>
-<area shape="rect" id="node26" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="230,1006,411,1033"/>
-<area shape="rect" id="node27" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="221,1057,420,1083"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="483,5,650,47"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="471,71,663,98"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="471,122,662,149"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="719,224,886,265"/>
-<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="717,173,888,199"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="940,231,1159,258"/>
-<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="952,165,1147,207"/>
-<area shape="rect" id="node21" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="468,341,665,367"/>
-<area shape="rect" id="node23" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="479,392,654,433"/>
-<area shape="rect" id="node25" href="$classCheMPS2_1_1SyBookkeeper.html#afa58c46be55eff86a297e7770450551d" title="Get the total reduced virtual dimension at a certain boundary. " alt="" coords="479,661,654,703"/>
-<area shape="rect" id="node22" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="723,341,883,367"/>
-<area shape="rect" id="node24" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="713,399,892,426"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="237,82,404,123"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="715,594,890,635"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="715,659,890,701"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="715,725,890,766"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="715,790,890,831"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="233,545,408,586"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1SyBookkeeper.html#a87e4bca7afcfb744aa224ab2a942c8b4" title="Get the FCI virtual dimensions ( bound by SYBK_dimensionCutoff ) " alt="" coords="479,275,654,317"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="471,173,662,200"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="715,330,890,371"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="233,880,409,907"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1Wigner.html#a552611fbd1be53036fc06e52fc8632fa" title="Wigner&#45;6j symbol (gsl api) " alt="" coords="227,829,414,856"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="223,981,418,1008"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1SyBookkeeper.html#aeb6f41f7c78c9e15e02e6b238419b5e7" title="Get the current virtual dimensions. " alt="" coords="233,479,408,521"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="230,1083,411,1109"/>
+<area shape="rect" id="node29" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="221,1133,420,1160"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="483,57,650,98"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="471,123,663,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="471,5,662,32"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="719,225,886,266"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="717,173,888,200"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="940,232,1159,259"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="952,166,1147,207"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1Wigner.html#a9e0f7bc0b1b95ad9f57eceaf2ad74651" title="Two times the maximum value of the angular momentum which is allowed. " alt="" coords="476,880,657,907"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="468,392,665,419"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="479,443,654,485"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1SyBookkeeper.html#afa58c46be55eff86a297e7770450551d" title="Get the total reduced virtual dimension at a certain boundary. " alt="" coords="479,662,654,703"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="723,396,883,423"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="713,451,892,477"/>
 </map>

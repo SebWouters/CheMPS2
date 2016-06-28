@@ -1,40 +1,41 @@
 <map id="CheMPS2::DMRG::getCorrelations" name="CheMPS2::DMRG::getCorrelations">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a64ad5e21fad5c4f0a383438717942a0b" title="Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian ..." alt="" coords="303,806,507,847"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a0c38c4f9194d77fdf28dc34c55be55c2" title="Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbe..." alt="" coords="579,813,817,840"/>
-<area shape="rect" id="node34" href="$classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm &quot; + CheMPS2::DMRG_MPS_storage_prefix + &quot;*.h5&quot;. " alt="" coords="285,973,526,1000"/>
-<area shape="rect" id="node35" href="$classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm &quot; + tempfolder + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*..." alt="" coords="299,1025,511,1066"/>
-<area shape="rect" id="node36" href="$classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations. " alt="" coords="280,1091,531,1117"/>
-<area shape="rect" id="node37" href="$classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation. " alt="" coords="295,923,516,949"/>
-<area shape="rect" id="node39" href="$classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="300,1141,511,1168"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a64ad5e21fad5c4f0a383438717942a0b" title="Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian ..." alt="" coords="303,831,507,873"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a0c38c4f9194d77fdf28dc34c55be55c2" title="Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbe..." alt="" coords="579,839,817,865"/>
+<area shape="rect" id="node35" href="$classCheMPS2_1_1DMRG.html#a0f4e487c40f522846288fe1b3d55e66c" title="Call &quot;rm &quot; + CheMPS2::DMRG_MPS_storage_prefix + &quot;*.h5&quot;. " alt="" coords="285,999,526,1025"/>
+<area shape="rect" id="node36" href="$classCheMPS2_1_1DMRG.html#a2254cc31b5d9497694ea2229226b7bd6" title="Call &quot;rm &quot; + tempfolder + &quot;/&quot; + CheMPS2::DMRG_OPERATOR_storage_prefix + string(thePID) + &quot;*..." alt="" coords="299,1050,511,1091"/>
+<area shape="rect" id="node37" href="$classCheMPS2_1_1DMRG.html#ab442cbc43e2e5d877660859578849133" title="Activate the necessary storage and machinery to handle excitations. " alt="" coords="280,1116,531,1143"/>
+<area shape="rect" id="node38" href="$classCheMPS2_1_1DMRG.html#acfb3123c72e3503f2d6c77dcf9eb141a" title="Push back current calculation and set everything up to calculate a (new) excitation. " alt="" coords="295,948,516,975"/>
+<area shape="rect" id="node40" href="$classCheMPS2_1_1DMRG.html#a6c8741ce96ac0e806a8ddc6c3623d904" title="Print the license. " alt="" coords="300,1167,511,1193"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="878,173,1077,200"/>
 <area shape="rect" id="node5" href="$classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a" title="Get the Ham index corresponding to a DMRG index. " alt="" coords="895,224,1059,251"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1141,380,1332,407"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="890,747,1065,789"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="1147,725,1326,752"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="890,697,1065,738"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="1147,733,1326,760"/>
 <area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="896,813,1059,840"/>
 <area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="884,864,1071,891"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="894,1523,1061,1565"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="894,1574,1061,1615"/>
 <area shape="rect" id="node12" href="$classCheMPS2_1_1SyBookkeeper.html#afa58c46be55eff86a297e7770450551d" title="Get the total reduced virtual dimension at a certain boundary. " alt="" coords="1149,314,1324,355"/>
 <area shape="rect" id="node13" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="1384,369,1559,410"/>
 <area shape="rect" id="node14" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="1137,481,1336,508"/>
-<area shape="rect" id="node15" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="1149,532,1325,559"/>
-<area shape="rect" id="node16" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="865,915,1089,941"/>
-<area shape="rect" id="node17" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="879,965,1075,992"/>
-<area shape="rect" id="node18" href="$classCheMPS2_1_1Sobject.html#a973aa40f2b0e659a55b4c63e768afdf2" title="Get the location index. " alt="" coords="887,1016,1068,1043"/>
-<area shape="rect" id="node19" href="$classCheMPS2_1_1SyBookkeeper.html#a470a4876ee25036e3f7db2663986d608" title="Get the maximum virtual dimension at a certain boundary. " alt="" coords="1149,583,1324,625"/>
-<area shape="rect" id="node20" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object. " alt="" coords="894,427,1061,453"/>
-<area shape="rect" id="node21" href="$classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede" title="Get the left particle number symmetry of block ikappa. " alt="" coords="894,1067,1061,1093"/>
-<area shape="rect" id="node22" href="$classCheMPS2_1_1Sobject.html#ae33e692d6e5f89d446f62515a85f725f" title="Get the left spin symmetry of block ikappa. " alt="" coords="882,1117,1073,1144"/>
-<area shape="rect" id="node23" href="$classCheMPS2_1_1Sobject.html#a77be4052f1655e2f8fecee8f231bc209" title="Get the left irrep symmetry of block ikappa. " alt="" coords="897,1168,1057,1195"/>
-<area shape="rect" id="node24" href="$classCheMPS2_1_1Sobject.html#ae27c30606eb0f3f1eb9a32c559b7b209" title="Get the left local particle number symmetry of block ikappa. " alt="" coords="894,1219,1061,1245"/>
-<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#a62923e0b950298fe42017dcdeadcfb03" title="Get the right local particle number symmetry of block ikappa. " alt="" coords="894,1269,1061,1296"/>
-<area shape="rect" id="node26" href="$classCheMPS2_1_1Sobject.html#a2bf86bc7861704b1f2ddb655312da82b" title="Get the central spin symmetry of block ikappa. " alt="" coords="887,1320,1068,1347"/>
-<area shape="rect" id="node27" href="$classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562" title="Get the right particle number symmetry of block ikappa. " alt="" coords="893,1371,1062,1397"/>
-<area shape="rect" id="node28" href="$classCheMPS2_1_1Sobject.html#ac3d208dc1bc37fdbcf48aaa9e4cc6ed7" title="Get the right spin symmetry of block ikappa. " alt="" coords="881,1421,1074,1448"/>
-<area shape="rect" id="node29" href="$classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813" title="Get the right irrep symmetry of block ikappa. " alt="" coords="896,1472,1059,1499"/>
-<area shape="rect" id="node30" href="$classCheMPS2_1_1Sobject.html#a5626b98bd01a9fb04f4d8e9e739e3034" title="Get the index corresponding to a certain symmetry block. " alt="" coords="884,5,1071,32"/>
-<area shape="rect" id="node31" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="880,56,1075,83"/>
-<area shape="rect" id="node32" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="887,107,1067,149"/>
-<area shape="rect" id="node33" href="$classCheMPS2_1_1TensorO.html#acc64022326d67bea68e4de8d78951bee" title="Update the previous TensorO. " alt="" coords="884,630,1071,671"/>
-<area shape="rect" id="node38" href="$classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4" title="Reconstruct the renormalized operators when you overwrite the matrix elements with Prob&#45;&gt;setMxElement..." alt="" coords="602,923,794,949"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Wigner.html#a8766590b07c53f656707890eaec0bf17" title="Wigner&#45;3j symbol (gsl api) " alt="" coords="884,915,1071,941"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="1149,532,1325,559"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="865,965,1089,992"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="879,1016,1075,1043"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1Sobject.html#a973aa40f2b0e659a55b4c63e768afdf2" title="Get the location index. " alt="" coords="887,1067,1068,1093"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1SyBookkeeper.html#a470a4876ee25036e3f7db2663986d608" title="Get the maximum virtual dimension at a certain boundary. " alt="" coords="1149,583,1324,625"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object. " alt="" coords="894,427,1061,453"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1Sobject.html#a2b8ca2eaecfc448c0f0591462c8edede" title="Get the left particle number symmetry of block ikappa. " alt="" coords="894,1117,1061,1144"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1Sobject.html#ae33e692d6e5f89d446f62515a85f725f" title="Get the left spin symmetry of block ikappa. " alt="" coords="882,1168,1073,1195"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Sobject.html#a77be4052f1655e2f8fecee8f231bc209" title="Get the left irrep symmetry of block ikappa. " alt="" coords="897,1219,1057,1245"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#ae27c30606eb0f3f1eb9a32c559b7b209" title="Get the left local particle number symmetry of block ikappa. " alt="" coords="894,1269,1061,1296"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1Sobject.html#a62923e0b950298fe42017dcdeadcfb03" title="Get the right local particle number symmetry of block ikappa. " alt="" coords="894,1320,1061,1347"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1Sobject.html#a2bf86bc7861704b1f2ddb655312da82b" title="Get the central spin symmetry of block ikappa. " alt="" coords="887,1371,1068,1397"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1Sobject.html#a6dc776c7b9c79a2fb5a5e6e81d190562" title="Get the right particle number symmetry of block ikappa. " alt="" coords="893,1421,1062,1448"/>
+<area shape="rect" id="node29" href="$classCheMPS2_1_1Sobject.html#ac3d208dc1bc37fdbcf48aaa9e4cc6ed7" title="Get the right spin symmetry of block ikappa. " alt="" coords="881,1472,1074,1499"/>
+<area shape="rect" id="node30" href="$classCheMPS2_1_1Sobject.html#a1a9a06b257e018439ded8c1bf9c88813" title="Get the right irrep symmetry of block ikappa. " alt="" coords="896,1523,1059,1549"/>
+<area shape="rect" id="node31" href="$classCheMPS2_1_1Sobject.html#a5626b98bd01a9fb04f4d8e9e739e3034" title="Get the index corresponding to a certain symmetry block. " alt="" coords="884,5,1071,32"/>
+<area shape="rect" id="node32" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="880,56,1075,83"/>
+<area shape="rect" id="node33" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="887,107,1067,149"/>
+<area shape="rect" id="node34" href="$classCheMPS2_1_1TensorO.html#acc64022326d67bea68e4de8d78951bee" title="Update the previous TensorO. " alt="" coords="884,579,1071,621"/>
+<area shape="rect" id="node39" href="$classCheMPS2_1_1DMRG.html#aa6e349febeaf92b9dfa4c7f92d8507d4" title="Reconstruct the renormalized operators when you overwrite the matrix elements with Prob&#45;&gt;setMxElement..." alt="" coords="602,948,794,975"/>
 </map>

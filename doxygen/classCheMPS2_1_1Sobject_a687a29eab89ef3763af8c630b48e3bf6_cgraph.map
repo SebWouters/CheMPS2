@@ -3,8 +3,10 @@
 <area shape="rect" id="node3" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="232,57,407,98"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="224,123,415,149"/>
 <area shape="rect" id="node9" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="220,173,419,200"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="469,57,635,98"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="467,123,637,149"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="685,64,904,91"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="697,115,892,157"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Wigner.html#a552611fbd1be53036fc06e52fc8632fa" title="Wigner&#45;6j symbol (gsl api) " alt="" coords="226,224,413,251"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="474,57,641,98"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="472,123,643,149"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="696,64,915,91"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="708,115,903,157"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Wigner.html#a9e0f7bc0b1b95ad9f57eceaf2ad74651" title="Two times the maximum value of the angular momentum which is allowed. " alt="" coords="467,224,648,251"/>
 </map>

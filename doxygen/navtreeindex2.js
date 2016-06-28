@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"classCheMPS2_1_1TensorKM.html#a466d1067475dc5a5dce28fd693851cba":[2,0,0,35,2],
+"classCheMPS2_1_1TensorKM.html#a769bedf9e273ee40e4ceaaa89b7b0908":[2,0,0,35,0],
 "classCheMPS2_1_1TensorKM.html#a8b1168401e05142b2ec056e0b5554aa2":[2,0,0,35,1],
 "classCheMPS2_1_1TensorL.html":[2,0,0,36],
 "classCheMPS2_1_1TensorL.html#a1e9e16eafa80c1268be6adff9fcbe63b":[2,0,0,36,1],
@@ -120,6 +122,7 @@ var NAVTREEINDEX2 =
 "classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12":[2,0,0,46,5],
 "classCheMPS2_1_1TwoIndex.html#a925534dcd083ad986b25335d80e25fc8":[2,0,0,46,2],
 "classCheMPS2_1_1TwoIndex.html#afcc065077cfa14cfecc9a325f39e4649":[2,0,0,46,1],
+"classCheMPS2_1_1Wigner.html":[2,0,0,47],
 "classes.html":[2,1],
 "executable_8cpp_source.html":[3,0,44],
 "files.html":[3,0],

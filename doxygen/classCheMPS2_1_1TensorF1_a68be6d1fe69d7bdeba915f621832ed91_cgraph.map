@@ -4,12 +4,14 @@
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="211,137,401,163"/>
 <area shape="rect" id="node9" href="$classCheMPS2_1_1SyBookkeeper.html#ac0d4a5f26831eaf12b023c623494c144" title="Get an orbital irrep. " alt="" coords="219,188,393,229"/>
 <area shape="rect" id="node12" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="207,254,405,281"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285" title="Get the (real&#45;valued abelian) point group irrep difference between the symmetry sectors of the lower ..." alt="" coords="216,305,396,347"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="216,371,396,412"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="459,71,626,112"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="457,137,628,163"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="680,78,899,105"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="692,129,887,171"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="453,198,632,225"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="710,195,869,236"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Wigner.html#a552611fbd1be53036fc06e52fc8632fa" title="Wigner&#45;6j symbol (gsl api) " alt="" coords="213,305,399,331"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1TensorOperator.html#a1b08aef00ecb10b1e88220dda5c7e285" title="Get the (real&#45;valued abelian) point group irrep difference between the symmetry sectors of the lower ..." alt="" coords="216,356,396,397"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1TensorOperator.html#a0013992f81ec5681774124e104a22a9d" title="Get the pointer to the storage. " alt="" coords="216,421,396,463"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="461,71,627,112"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="459,137,629,163"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="683,78,901,105"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="695,129,889,171"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ac09cc027ab9b41132096e9bd14b549ff" title="Get an orbital irrep. " alt="" coords="455,199,633,226"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="713,195,871,236"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Wigner.html#a9e0f7bc0b1b95ad9f57eceaf2ad74651" title="Two times the maximum value of the angular momentum which is allowed. " alt="" coords="453,305,635,331"/>
 </map>

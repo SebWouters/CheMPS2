@@ -6,7 +6,7 @@ var searchData=
   ['calcspinsquared',['CalcSpinSquared',['../classCheMPS2_1_1FCI.html#ac6d07ca52369591cf7a7676c7181b45f',1,'CheMPS2::FCI']]],
   ['calculateparam',['calculateParam',['../classCheMPS2_1_1DIIS.html#ad8f60dd3e52d1d8a59c155c25a7ce3f3',1,'CheMPS2::DIIS']]],
   ['caspt2',['CASPT2',['../classCheMPS2_1_1CASPT2.html',1,'CheMPS2']]],
-  ['caspt2',['CASPT2',['../classCheMPS2_1_1CASPT2.html#af50043f2bf494dcd7448358fc116f01d',1,'CheMPS2::CASPT2::CASPT2()'],['../classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6',1,'CheMPS2::CASSCF::caspt2()']]],
+  ['caspt2',['CASPT2',['../classCheMPS2_1_1CASPT2.html#af50043f2bf494dcd7448358fc116f01d',1,'CheMPS2::CASPT2::CASPT2()'],['../classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384',1,'CheMPS2::CASSCF::caspt2()']]],
   ['casscf',['CASSCF',['../classCheMPS2_1_1CASSCF.html',1,'CheMPS2']]],
   ['casscf',['CASSCF',['../classCheMPS2_1_1CASSCF.html#a1e026f0ae4af55325996c6c97af11917',1,'CheMPS2::CASSCF']]],
   ['cgalphaplusbetaham',['CGAlphaPlusBetaHAM',['../classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b',1,'CheMPS2::FCI']]],

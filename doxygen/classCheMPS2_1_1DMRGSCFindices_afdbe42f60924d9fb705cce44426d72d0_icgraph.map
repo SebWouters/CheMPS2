@@ -1,5 +1,5 @@
 <map id="CheMPS2::DMRGSCFindices::getNVIRT" name="CheMPS2::DMRGSCFindices::getNVIRT">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASPT2.html#aa0fce9d99059c2336e06180160de7bd2" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="525,49,706,75"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASPT2.html#acda216c42c5245d79ae398ec59f2253f" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="525,49,706,75"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1CASPT2.html#a0aad4cf7db898047a811ea75f45b2abc" title="Return the vector length for the CASPT2 first order wavefunction (before diagonalization of the overl..." alt="" coords="262,5,449,47"/>
 <area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a13589f3ee9f293b743676739bb1db372" title="Block&#45;diagonalize Mat. " alt="" coords="523,165,707,207"/>
 <area shape="rect" id="node8" href="$classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="507,231,724,272"/>
@@ -7,7 +7,7 @@
 <area shape="rect" id="node10" href="$classCheMPS2_1_1DMRGSCFintegrals.html#a2dd903ff0c911207487ce8f4d9fd8426" title="Constructor. " alt="" coords="252,405,459,447"/>
 <area shape="rect" id="node11" href="$classCheMPS2_1_1DMRGSCFunitary.html#a96ea3563e1b1ea0965554f83025e5fbc" title="Constructor. " alt="" coords="257,340,454,381"/>
 <area shape="rect" id="node13" href="$classCheMPS2_1_1DMRGSCFunitary.html#a725cdfa70964b24914436fc40bba90b4" title="Get the number of variables in the x&#45;parametrization of the unitary update. " alt="" coords="257,275,454,316"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="803,78,995,105"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="803,78,995,105"/>
 <area shape="rect" id="node6" href="$classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="772,173,1025,199"/>
 <area shape="rect" id="node7" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="807,267,991,294"/>
 <area shape="rect" id="node12" href="$classCheMPS2_1_1DMRGSCFunitary.html#a4fc1da7a1ee20da577495f0f0c6d5100" title="Obtain the logarithm of the unitary matrix. " alt="" coords="517,348,714,389"/>

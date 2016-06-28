@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classCheMPS2_1_1DMRGSCFoptions.html#aa9eb8d4a08896d54e4323122984cee2a":[2,0,0,12,2],
 "classCheMPS2_1_1DMRGSCFoptions.html#aabfdc28366e49402ebbaf977d154ebe7":[2,0,0,12,16],
 "classCheMPS2_1_1DMRGSCFoptions.html#ab1482f548cb2dd885d19a14d578691de":[2,0,0,12,22],
 "classCheMPS2_1_1DMRGSCFoptions.html#acb3c7d12b054befbe92d704d6746f4be":[2,0,0,12,5],
@@ -30,15 +31,16 @@ var NAVTREEINDEX1 =
 "classCheMPS2_1_1DMRGSCFwtilde.html#a939e077b9fcc8ffafd9a168056991795":[2,0,0,15,2],
 "classCheMPS2_1_1Davidson.html":[2,0,0,6],
 "classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797":[2,0,0,6,3],
-"classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991":[2,0,0,6,2],
+"classCheMPS2_1_1Davidson.html#a3a04d5e4423b6cfc15f985aecf50c4b2":[2,0,0,6,2],
 "classCheMPS2_1_1Davidson.html#a9e03fe514d6149d5be69775179ac5c8a":[2,0,0,6,1],
-"classCheMPS2_1_1Davidson.html#abef20668c9bca9634116c525f9ab0627":[2,0,0,6,0],
+"classCheMPS2_1_1Davidson.html#aa521a64e9a91b7e2ac6d88f1dce318d3":[2,0,0,6,0],
 "classCheMPS2_1_1EdmistonRuedenberg.html":[2,0,0,16],
 "classCheMPS2_1_1EdmistonRuedenberg.html#a535a51ee1a0b133e0e9daaf2d9355b1f":[2,0,0,16,0],
 "classCheMPS2_1_1EdmistonRuedenberg.html#a5d012081f089d72c472ced2ae7bdaaf0":[2,0,0,16,1],
 "classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d":[2,0,0,16,2],
-"classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02":[2,0,0,16,3],
-"classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c":[2,0,0,16,4],
+"classCheMPS2_1_1EdmistonRuedenberg.html#aeefc7cee7eae7da6c2beb4e0c0cdfd7c":[2,0,0,16,3],
+"classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02":[2,0,0,16,4],
+"classCheMPS2_1_1EdmistonRuedenberg.html#af52e7bc01e8f31e9b605ec4130f0337c":[2,0,0,16,5],
 "classCheMPS2_1_1Excitation.html":[2,0,0,17],
 "classCheMPS2_1_1FCI.html":[2,0,0,18],
 "classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b":[2,0,0,18,6],
@@ -247,7 +249,5 @@ var NAVTREEINDEX1 =
 "classCheMPS2_1_1TensorGYZ.html#a1fc81b80064e862b39b63b99798cec82":[2,0,0,34,1],
 "classCheMPS2_1_1TensorGYZ.html#a8470ec48e82ff7d002a1b248afc98787":[2,0,0,34,2],
 "classCheMPS2_1_1TensorGYZ.html#ad13d4ac1dc768a949dc0d754071f5603":[2,0,0,34,0],
-"classCheMPS2_1_1TensorKM.html":[2,0,0,35],
-"classCheMPS2_1_1TensorKM.html#a466d1067475dc5a5dce28fd693851cba":[2,0,0,35,2],
-"classCheMPS2_1_1TensorKM.html#a769bedf9e273ee40e4ceaaa89b7b0908":[2,0,0,35,0]
+"classCheMPS2_1_1TensorKM.html":[2,0,0,35]
 };

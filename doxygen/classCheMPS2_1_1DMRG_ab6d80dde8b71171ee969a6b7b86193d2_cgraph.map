@@ -1,63 +1,65 @@
 <map id="CheMPS2::DMRG::Solve" name="CheMPS2::DMRG::Solve">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="835,392,1001,433"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1ConvergenceScheme.html#a1d5339434adafc615592bf92ab9feb16" title="Get the number of instructions. " alt="" coords="231,1689,446,1730"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1ConvergenceScheme.html#ac12ca4a6c69913388eca92bdc361f118" title="Get the energy convergence threshold for a particular instruction. " alt="" coords="231,1754,446,1796"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1ConvergenceScheme.html#a982fa5f929b66ed42211f64eb6d5a192" title="Get the number of renormalized states for a particular instruction. " alt="" coords="231,1820,446,1861"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1ConvergenceScheme.html#aaa418f2b95ef871dca6a6aa4d6b0b8cb" title="Get the noise prefactor for a particular instruction. " alt="" coords="231,1885,446,1926"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1ConvergenceScheme.html#a487130810ed96f93112f07e9beb65f3c" title="Get the Davidson residual tolerance for a particular instruction. " alt="" coords="231,1950,446,1992"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object. " alt="" coords="255,1536,422,1563"/>
-<area shape="rect" id="node19" href="$classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="225,308,452,335"/>
-<area shape="rect" id="node27" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="241,906,436,932"/>
-<area shape="rect" id="node50" href="$classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c" title="Add noise to the current S&#45;object. " alt="" coords="240,199,437,226"/>
-<area shape="rect" id="node51" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s. " alt="" coords="255,1638,423,1664"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="1094,333,1261,374"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="1081,399,1273,426"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="1082,450,1273,476"/>
-<area shape="rect" id="node12" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="539,1587,715,1614"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="1090,1772,1265,1813"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1082,1435,1273,1462"/>
-<area shape="rect" id="node18" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="528,1536,727,1563"/>
-<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="1323,1457,1490,1498"/>
-<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="1321,1406,1492,1432"/>
-<area shape="rect" id="node17" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="1540,1337,1735,1378"/>
-<area shape="rect" id="node20" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="515,90,739,116"/>
-<area shape="rect" id="node21" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="529,140,725,167"/>
-<area shape="rect" id="node22" href="$classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991" title="The iterator to converge the ground state vector. " alt="" coords="551,242,704,284"/>
-<area shape="rect" id="node23" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="522,308,733,335"/>
-<area shape="rect" id="node24" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="530,476,725,503"/>
-<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="522,359,733,386"/>
-<area shape="rect" id="node26" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="550,410,705,452"/>
-<area shape="rect" id="node28" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="548,528,707,569"/>
-<area shape="rect" id="node29" href="$classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="518,594,737,620"/>
-<area shape="rect" id="node30" href="$classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14" title="Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with ..." alt="" coords="803,963,1033,990"/>
-<area shape="rect" id="node31" href="$classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4" title="Construct a table with the h&#45;matrix elements (two&#45;body augmented with one&#45;body). Remember to recall t..." alt="" coords="527,964,727,1005"/>
-<area shape="rect" id="node34" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="500,1283,755,1310"/>
-<area shape="rect" id="node40" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="528,644,727,671"/>
-<area shape="rect" id="node41" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="545,695,709,722"/>
-<area shape="rect" id="node42" href="$classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a" title="Get the Ham index corresponding to a DMRG index. " alt="" coords="545,746,709,772"/>
-<area shape="rect" id="node43" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="502,1080,753,1107"/>
-<area shape="rect" id="node46" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="502,1131,753,1158"/>
-<area shape="rect" id="node47" href="$classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc" title="Reorder the orbitals to a custom ordering. Previous reorderings are cleared. " alt="" coords="829,664,1007,705"/>
-<area shape="rect" id="node48" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="538,898,717,940"/>
-<area shape="rect" id="node32" href="$classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="839,832,997,873"/>
-<area shape="rect" id="node33" href="$classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="839,897,997,938"/>
-<area shape="rect" id="node35" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="833,1131,1003,1158"/>
-<area shape="rect" id="node36" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="1088,1182,1267,1208"/>
-<area shape="rect" id="node37" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="825,1334,1011,1360"/>
-<area shape="rect" id="node38" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="837,1384,999,1411"/>
-<area shape="rect" id="node39" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="1097,1659,1257,1686"/>
-<area shape="rect" id="node44" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="1098,924,1257,965"/>
-<area shape="rect" id="node45" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="839,1014,997,1056"/>
-<area shape="rect" id="node49" href="$classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4" title="Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is ..." alt="" coords="813,730,1023,756"/>
-<area shape="rect" id="node52" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="1090,1950,1265,1992"/>
-<area shape="rect" id="node53" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="1090,2053,1265,2094"/>
-<area shape="rect" id="node54" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="1090,2118,1265,2160"/>
-<area shape="rect" id="node55" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="1090,2184,1265,2225"/>
-<area shape="rect" id="node56" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="540,2118,715,2160"/>
-<area shape="rect" id="node57" href="$classCheMPS2_1_1SyBookkeeper.html#a87e4bca7afcfb744aa224ab2a942c8b4" title="Get the FCI virtual dimensions ( bound by SYBK_dimensionCutoff ) " alt="" coords="831,2228,1005,2269"/>
-<area shape="rect" id="node58" href="$classCheMPS2_1_1SyBookkeeper.html#aeb6f41f7c78c9e15e02e6b238419b5e7" title="Get the current virtual dimensions. " alt="" coords="540,1950,715,1992"/>
-<area shape="rect" id="node62" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="537,2184,718,2211"/>
-<area shape="rect" id="node59" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="819,1790,1017,1816"/>
-<area shape="rect" id="node60" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="831,1892,1005,1933"/>
-<area shape="rect" id="node61" href="$classCheMPS2_1_1SyBookkeeper.html#afa58c46be55eff86a297e7770450551d" title="Get the total reduced virtual dimension at a certain boundary. " alt="" coords="831,2009,1005,2050"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1MPIchemps2.html#a6732ae60b5b4c8a4f1b063f9db304bf5" title="Get the rank of this MPI process. " alt="" coords="835,485,1001,526"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1ConvergenceScheme.html#a1d5339434adafc615592bf92ab9feb16" title="Get the number of instructions. " alt="" coords="231,1602,446,1643"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1ConvergenceScheme.html#ac12ca4a6c69913388eca92bdc361f118" title="Get the energy convergence threshold for a particular instruction. " alt="" coords="231,1667,446,1709"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1ConvergenceScheme.html#a982fa5f929b66ed42211f64eb6d5a192" title="Get the number of renormalized states for a particular instruction. " alt="" coords="231,1733,446,1774"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1ConvergenceScheme.html#aaa418f2b95ef871dca6a6aa4d6b0b8cb" title="Get the noise prefactor for a particular instruction. " alt="" coords="231,1798,446,1839"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1ConvergenceScheme.html#a487130810ed96f93112f07e9beb65f3c" title="Get the Davidson residual tolerance for a particular instruction. " alt="" coords="231,1863,446,1905"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Sobject.html#a687a29eab89ef3763af8c630b48e3bf6" title="Join two sites to form a composite S&#45;object. " alt="" coords="255,1475,422,1501"/>
+<area shape="rect" id="node21" href="$classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="225,325,452,352"/>
+<area shape="rect" id="node29" href="$classCheMPS2_1_1Problem.html#a6c6f133286114da1666965c8048e47a1" title="Get the constant part of the Hamiltonian. " alt="" coords="241,907,436,933"/>
+<area shape="rect" id="node52" href="$classCheMPS2_1_1Sobject.html#abe676ef06644b5b675c65b123d118f2c" title="Add noise to the current S&#45;object. " alt="" coords="240,208,437,235"/>
+<area shape="rect" id="node53" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s. " alt="" coords="255,1551,423,1577"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1MPIchemps2.html#a2a6ae387436d5e5b0a320a12b87244e1" title="Get the number of MPI processes. " alt="" coords="1094,485,1261,526"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1Tensor.html#ad68f65759e764c6cb55e2b8db18f8874" title="Get the number of tensor blocks. " alt="" coords="1081,551,1273,577"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Tensor.html#a2f17a5413447e77ad3f128d49b3ca676" title="Get the pointer to the storage. " alt="" coords="1082,433,1273,460"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Special.html#afffda0b19a0e9dc4bddca5fb3ebfd350" title="Phase function. " alt="" coords="539,1539,715,1565"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1SyBookkeeper.html#ade15ac00f19abf28ea238a7d2530e049" title="Get the current virtual dimensions. " alt="" coords="1090,1734,1265,1775"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="1082,1387,1273,1413"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1TensorT.html#aafb4d43ad6178437b47a32a24c375fa3" title="Get the pointer to the storage. " alt="" coords="528,1488,727,1515"/>
+<area shape="rect" id="node19" href="$classCheMPS2_1_1Wigner.html#a552611fbd1be53036fc06e52fc8632fa" title="Wigner&#45;6j symbol (gsl api) " alt="" coords="534,1437,721,1464"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="1323,1321,1490,1362"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="1321,1387,1492,1413"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="1540,1303,1735,1345"/>
+<area shape="rect" id="node20" href="$classCheMPS2_1_1Wigner.html#a9e0f7bc0b1b95ad9f57eceaf2ad74651" title="Two times the maximum value of the angular momentum which is allowed. " alt="" coords="827,1539,1009,1565"/>
+<area shape="rect" id="node22" href="$classCheMPS2_1_1Sobject.html#aff81bb404f07da2814b396306fb38588" title="Get the storage jump corresponding to a certain symmetry block. " alt="" coords="515,92,739,119"/>
+<area shape="rect" id="node23" href="$classCheMPS2_1_1Sobject.html#a1dfbe469443fbf7daa49c1d0cb34425e" title="Get the number of symmetry blocks. " alt="" coords="529,143,725,169"/>
+<area shape="rect" id="node24" href="$classCheMPS2_1_1Davidson.html#a3a04d5e4423b6cfc15f985aecf50c4b2" title="The iterator to converge the ground state vector. " alt="" coords="551,259,704,301"/>
+<area shape="rect" id="node25" href="$classCheMPS2_1_1Sobject.html#a01b16408c5439e0eca69b2fde6d0185c" title="Convert the storage from diagram convention to symmetric Hamiltonian convention. " alt="" coords="522,325,733,352"/>
+<area shape="rect" id="node26" href="$classCheMPS2_1_1Sobject.html#a55a31306f564c1d220d36ac9a07623c9" title="Get the pointer to the storage. " alt="" coords="530,477,725,504"/>
+<area shape="rect" id="node27" href="$classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24" title="Convert the storage from symmetric Hamiltonian convention to diagram convention. " alt="" coords="522,376,733,403"/>
+<area shape="rect" id="node28" href="$classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797" title="Get the number of matrix vector multiplications which have been performed. " alt="" coords="550,194,705,235"/>
+<area shape="rect" id="node30" href="$classCheMPS2_1_1Hamiltonian.html#a031fa6987b304e3a7f6114b9f2e1f2ab" title="Get the constant energy. " alt="" coords="548,529,707,570"/>
+<area shape="rect" id="node31" href="$classCheMPS2_1_1Problem.html#af3ad2a73da9b8af05d145b448cf8bc36" title="Get a specific interaction matrix element. " alt="" coords="518,595,737,621"/>
+<area shape="rect" id="node32" href="$classCheMPS2_1_1Problem.html#a0a979c3461cc2824cb7c0e91442d5e14" title="Set the matrix elements: Note that each time you create a DMRG object, they will be overwritten with ..." alt="" coords="803,1133,1033,1160"/>
+<area shape="rect" id="node33" href="$classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4" title="Construct a table with the h&#45;matrix elements (two&#45;body augmented with one&#45;body). Remember to recall t..." alt="" coords="527,1067,727,1109"/>
+<area shape="rect" id="node36" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="500,1235,755,1261"/>
+<area shape="rect" id="node42" href="$classCheMPS2_1_1Problem.html#a2b562b3dce075741cf3cf038143a2754" title="Get whether the Hamiltonian orbitals are reordered for the DMRG calculation. " alt="" coords="528,645,727,672"/>
+<area shape="rect" id="node43" href="$classCheMPS2_1_1Problem.html#af261a2869feffd866b1f7ee5052c9ae9" title="Get the DMRG index corresponding to a Ham index. " alt="" coords="545,696,709,723"/>
+<area shape="rect" id="node44" href="$classCheMPS2_1_1Problem.html#ac5d35cb647b66606e3cf69a21bbcb98a" title="Get the Ham index corresponding to a DMRG index. " alt="" coords="545,747,709,773"/>
+<area shape="rect" id="node45" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="502,965,753,992"/>
+<area shape="rect" id="node48" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="502,1016,753,1043"/>
+<area shape="rect" id="node49" href="$classCheMPS2_1_1Problem.html#aaa734d8f3bf869965af7529df4ff4dfc" title="Reorder the orbitals to a custom ordering. Previous reorderings are cleared. " alt="" coords="829,615,1007,657"/>
+<area shape="rect" id="node50" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="538,899,717,941"/>
+<area shape="rect" id="node34" href="$classCheMPS2_1_1Hamiltonian.html#af2d3836be75d50640cbed9a9234af126" title="Get a Vmat element. " alt="" coords="839,1067,997,1109"/>
+<area shape="rect" id="node35" href="$classCheMPS2_1_1Hamiltonian.html#ac0b8314dc6133642997e648d1169d10f" title="Get a Tmat element. " alt="" coords="839,899,997,941"/>
+<area shape="rect" id="node37" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="833,965,1003,992"/>
+<area shape="rect" id="node38" href="$classCheMPS2_1_1Problem.html#a23de8e37ec94ded22d09328f3d628fad" title="Get the targeted irrep. " alt="" coords="1088,1075,1267,1101"/>
+<area shape="rect" id="node39" href="$classCheMPS2_1_1Problem.html#ad472d8f16b1014db3ae67478684b0c49" title="Get twice the targeted spin. " alt="" coords="825,1285,1011,1312"/>
+<area shape="rect" id="node40" href="$classCheMPS2_1_1Problem.html#a634bbc2ad8be9f45ecd894f0f222885f" title="Get the targeted particle number. " alt="" coords="837,1336,999,1363"/>
+<area shape="rect" id="node41" href="$classCheMPS2_1_1Problem.html#a3e7be26cd15d22f4e0a65a34616cbcdd" title="Get the number of orbitals. " alt="" coords="1097,1509,1257,1536"/>
+<area shape="rect" id="node46" href="$classCheMPS2_1_1Hamiltonian.html#a101963cfa8f06abe798a7ae79faab618" title="Get the number of orbitals. " alt="" coords="1098,750,1257,791"/>
+<area shape="rect" id="node47" href="$classCheMPS2_1_1Hamiltonian.html#a02130b2901a5a3c05171d4f7dd5fa4cd" title="Get an orbital irrep number. " alt="" coords="839,834,997,875"/>
+<area shape="rect" id="node51" href="$classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4" title="Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is ..." alt="" coords="813,681,1023,708"/>
+<area shape="rect" id="node54" href="$classCheMPS2_1_1SyBookkeeper.html#a5e5fbbeb3f0a499ec4b905200f4a14b2" title="Get the min. possible particle number for a certain boundary. " alt="" coords="1090,2062,1265,2103"/>
+<area shape="rect" id="node55" href="$classCheMPS2_1_1SyBookkeeper.html#a3e5f4d30bef465424acb784caaf62628" title="Get the max. possible particle number for a certain boundary. " alt="" coords="1090,2127,1265,2169"/>
+<area shape="rect" id="node56" href="$classCheMPS2_1_1SyBookkeeper.html#ad57f3ba5107c78bdd56131c40ae4f3e9" title="Get the minimum possible spin value for a certain boundary and particle number. " alt="" coords="1090,2222,1265,2263"/>
+<area shape="rect" id="node57" href="$classCheMPS2_1_1SyBookkeeper.html#ad89a9ec018a14187e5a3e5b87ad9fb2c" title="Get the maximum possible spin value for a certain boundary and particle number. " alt="" coords="1090,1953,1265,1994"/>
+<area shape="rect" id="node58" href="$classCheMPS2_1_1SyBookkeeper.html#aac9b4729c5fe841b619b9527dbf69e12" title="Get the total number of irreps. " alt="" coords="540,2318,715,2359"/>
+<area shape="rect" id="node59" href="$classCheMPS2_1_1SyBookkeeper.html#a87e4bca7afcfb744aa224ab2a942c8b4" title="Get the FCI virtual dimensions ( bound by SYBK_dimensionCutoff ) " alt="" coords="831,2343,1005,2385"/>
+<area shape="rect" id="node60" href="$classCheMPS2_1_1SyBookkeeper.html#aeb6f41f7c78c9e15e02e6b238419b5e7" title="Get the current virtual dimensions. " alt="" coords="540,1953,715,1994"/>
+<area shape="rect" id="node64" href="$classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e" title="Reset the TensorT (if virtual dimensions are changed) " alt="" coords="537,2267,718,2293"/>
+<area shape="rect" id="node61" href="$classCheMPS2_1_1SyBookkeeper.html#aff6ffb8d891d6380a7b2770348a0dcd7" title="Get the number of orbitals. " alt="" coords="819,1792,1017,1819"/>
+<area shape="rect" id="node62" href="$classCheMPS2_1_1SyBookkeeper.html#a280917b55df99e07e707f7e088b5f58d" title="Get the targeted irrep. " alt="" coords="831,1894,1005,1935"/>
+<area shape="rect" id="node63" href="$classCheMPS2_1_1SyBookkeeper.html#afa58c46be55eff86a297e7770450551d" title="Get the total reduced virtual dimension at a certain boundary. " alt="" coords="831,2011,1005,2053"/>
 </map>

@@ -47,6 +47,7 @@ var annotated_dup =
       [ "TensorX", "classCheMPS2_1_1TensorX.html", "classCheMPS2_1_1TensorX" ],
       [ "ThreeDM", "classCheMPS2_1_1ThreeDM.html", "classCheMPS2_1_1ThreeDM" ],
       [ "TwoDM", "classCheMPS2_1_1TwoDM.html", "classCheMPS2_1_1TwoDM" ],
-      [ "TwoIndex", "classCheMPS2_1_1TwoIndex.html", "classCheMPS2_1_1TwoIndex" ]
+      [ "TwoIndex", "classCheMPS2_1_1TwoIndex.html", "classCheMPS2_1_1TwoIndex" ],
+      [ "Wigner", "classCheMPS2_1_1Wigner.html", null ]
     ] ]
 ];

@@ -1,19 +1,19 @@
 <map id="CheMPS2::Irreps::getGroupNumber" name="CheMPS2::Irreps::getGroupNumber">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a1e026f0ae4af55325996c6c97af11917" title="Constructor. " alt="" coords="484,182,692,209"/>
-<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="496,25,680,52"/>
-<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="241,113,433,140"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a3689ebc91a3c11f3703ba21f53e7604d" title="Get the group number. " alt="" coords="237,47,436,88"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1" title="Constructor. " alt="" coords="257,215,416,256"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="257,280,416,322"/>
-<area shape="rect" id="node17" href="$classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074" title="Save the Hamiltonian. " alt="" coords="257,346,416,387"/>
-<area shape="rect" id="node18" href="$classCheMPS2_1_1Hamiltonian.html#a66c95f16526b770df9b924c70acd5710" title="Load the Hamiltonian. " alt="" coords="257,411,416,452"/>
-<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="517,269,659,296"/>
-<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="503,320,673,346"/>
-<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="742,152,993,178"/>
-<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="742,202,993,229"/>
-<area shape="rect" id="node12" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="778,254,957,295"/>
-<area shape="rect" id="node13" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="740,320,995,346"/>
-<area shape="rect" id="node14" href="$classCheMPS2_1_1SyBookkeeper.html#aa3c75959a25348919a2d676d425d1b7c" title="Constructor. " alt="" coords="780,371,955,412"/>
-<area shape="rect" id="node15" href="$classCheMPS2_1_1TwoDM.html#ac24a417e0cd64e7c3a82c94ba1d9d71c" title="Print the natural orbital occupation numbers. " alt="" coords="765,437,969,464"/>
-<area shape="rect" id="node16" href="$classCheMPS2_1_1TwoDM.html#a6f92c64ecb8fb2bcd72c4d9addd98d3b" title="Write the 2&#45;RDM&#45;A to a file. " alt="" coords="754,488,981,514"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a1e026f0ae4af55325996c6c97af11917" title="Constructor. " alt="" coords="484,182,692,208"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="496,27,680,54"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="492,82,684,108"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRGSCFindices.html#a3689ebc91a3c11f3703ba21f53e7604d" title="Get the group number. " alt="" coords="237,46,436,88"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1Hamiltonian.html#a4ae3520da1ff8515a313c4357592a3d1" title="Constructor. " alt="" coords="257,214,416,256"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1Hamiltonian.html#a8c18f51ded63810e316f1834853dce21" title="Get the group number. " alt="" coords="257,280,416,321"/>
+<area shape="rect" id="node17" href="$classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074" title="Save the Hamiltonian. " alt="" coords="257,345,416,386"/>
+<area shape="rect" id="node18" href="$classCheMPS2_1_1Hamiltonian.html#a66c95f16526b770df9b924c70acd5710" title="Load the Hamiltonian. " alt="" coords="257,410,416,452"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1FCI.html#a7d47d6038adaa1a5b3ab6d4624976b87" title="Constructor. " alt="" coords="517,319,659,346"/>
+<area shape="rect" id="node9" href="$classCheMPS2_1_1Problem.html#a15485ccb1ac98823b9e8187c16fab03f" title="Get the point group symmetry. " alt="" coords="503,268,673,295"/>
+<area shape="rect" id="node10" href="$classCheMPS2_1_1Problem.html#ace8f96e419792f829198e96b897da0a9" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps Ag B1u B3u B2g B2u B3g B1g..." alt="" coords="742,100,993,127"/>
+<area shape="rect" id="node11" href="$classCheMPS2_1_1Problem.html#aac2913c0dbc0d28dc2ed6cefe853f873" title="Reorder the orbitals, so that they form irrep blocks, with order of irreps A1 B1 B2 A2..." alt="" coords="742,151,993,178"/>
+<area shape="rect" id="node12" href="$classCheMPS2_1_1Problem.html#a24b9329bce03b3d6797750a530d4dd59" title="Reorder the orbitals for d(infinity)h. Previous reorderings are cleared. " alt="" coords="778,202,957,244"/>
+<area shape="rect" id="node13" href="$classCheMPS2_1_1Problem.html#a6e26b40eb9bf80eb9979083b58a4e30e" title="Check whether the given parameters L, N, and TwoS are not inconsistent and whether 0&lt;=Irrep&lt;nIrreps..." alt="" coords="740,268,995,295"/>
+<area shape="rect" id="node14" href="$classCheMPS2_1_1SyBookkeeper.html#aa3c75959a25348919a2d676d425d1b7c" title="Constructor. " alt="" coords="780,320,955,361"/>
+<area shape="rect" id="node15" href="$classCheMPS2_1_1TwoDM.html#ac24a417e0cd64e7c3a82c94ba1d9d71c" title="Print the natural orbital occupation numbers. " alt="" coords="765,386,969,412"/>
+<area shape="rect" id="node16" href="$classCheMPS2_1_1TwoDM.html#a6f92c64ecb8fb2bcd72c4d9addd98d3b" title="Write the 2&#45;RDM&#45;A to a file. " alt="" coords="754,436,981,463"/>
 </map>

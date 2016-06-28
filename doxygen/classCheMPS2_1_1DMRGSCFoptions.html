@@ -222,7 +222,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 (9) UnitaryStorageName (string) : The filename to store the Orbital Rotation checkpoint <br />
 (10) StateAveraging (bool) : Whether to do state-averaged or state-specific DMRGSCF <br />
  <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> active space options: <br />
-(11) WhichActiveSpace (int) : Determines which active space is used for the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> (<a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). <br />
+(11) WhichActiveSpace (int) : Determines which active space is used for the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> (<a class="el" href="classCheMPS2_1_1FCI.html">FCI</a> replacement) calculations. If 1: NO, sorted within each irrep by NOON. If 2: Localized Orbitals (Edmiston-Ruedenberg), sorted within each irrep by the exchange matrix (Fiedler vector). If 3: Not localized, but only sorted within each irrep by the Fiedler vector of the exchange matrix. If other value: No additional active space rotations (the ones from DMRGSCF are of course performed). <br />
 (12) DumpCorrelations (bool) : Whether or not to print the correlation functions and two-orbital mutual information of the active space <br />
 (13) StartLocRandom (bool) : When localized orbitals are used, it is sometimes beneficial to start the localization procedure from a random unitary. A specific example is the reduction of the d2h point group of graphene nanoribbons to the cs point group, in order to make use of locality in the <a class="el" href="classCheMPS2_1_1DMRG.html">DMRG</a> calculations. Since molecular orbitals will still belong to the full point group d2h, a random unitary helps in constructing localized orbitals which belong to the cs point group. </p>
 
@@ -550,7 +550,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_acea3d3f5a5abf8a4bdd509fc13a1a275_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="257,5,441,32"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="253,56,445,83"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="253,56,445,83"/>
 </map>
 </div>
 </p>
@@ -583,7 +583,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a45fb0323c73651fb83f6856af5145e83_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="257,5,441,32"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="253,56,445,83"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="253,56,445,83"/>
 </map>
 </div>
 </p>
@@ -615,7 +615,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="dynsection-10-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph.png" border="0" usemap="#classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph" id="classCheMPS2_1_1DMRGSCFoptions_a9f81d7a089fc4a239638d95d93c24099_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="253,13,437,39"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="257,5,441,32"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="253,56,445,83"/>
 </map>
 </div>
 </p>
@@ -970,7 +971,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1DMRGSCFoptions.html">DMRGSCFoptions</a></li>
-    <li class="footer">Generated on Thu May 19 2016 10:03:20 for CheMPS2 by
+    <li class="footer">Generated on Tue Jun 28 2016 17:16:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

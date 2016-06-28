@@ -41,7 +41,7 @@ var searchData=
   ['singleorbitalentropy_5fham',['SingleOrbitalEntropy_HAM',['../classCheMPS2_1_1Correlations.html#a1cf618a098e75511dda2fb0d010dab2e',1,'CheMPS2::Correlations']]],
   ['sobject',['Sobject',['../classCheMPS2_1_1Sobject.html',1,'CheMPS2']]],
   ['sobject',['Sobject',['../classCheMPS2_1_1Sobject.html#ae6037d0d58130fd4bb4b0f43510e9b58',1,'CheMPS2::Sobject']]],
-  ['solve',['solve',['../classCheMPS2_1_1CASPT2.html#aa0fce9d99059c2336e06180160de7bd2',1,'CheMPS2::CASPT2::solve()'],['../classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e',1,'CheMPS2::CASSCF::solve()'],['../classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2',1,'CheMPS2::DMRG::Solve()']]],
+  ['solve',['solve',['../classCheMPS2_1_1CASPT2.html#acda216c42c5245d79ae398ec59f2253f',1,'CheMPS2::CASPT2::solve()'],['../classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e',1,'CheMPS2::CASSCF::solve()'],['../classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2',1,'CheMPS2::DMRG::Solve()']]],
   ['solvedavidson',['SolveDAVIDSON',['../classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4',1,'CheMPS2::Heff']]],
   ['special',['Special',['../classCheMPS2_1_1Special.html',1,'CheMPS2']]],
   ['spin_5fdensity_5fdmrg',['spin_density_dmrg',['../classCheMPS2_1_1TwoDM.html#ab36beb15340cbe405ebaf6fe55673922',1,'CheMPS2::TwoDM']]],

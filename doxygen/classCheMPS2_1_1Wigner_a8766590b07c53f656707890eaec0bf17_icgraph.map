@@ -1,0 +1,6 @@
+<map id="CheMPS2::Wigner::wigner3j" name="CheMPS2::Wigner::wigner3j">
+<area shape="rect" id="node2" href="$classCheMPS2_1_1DMRG.html#a0c38c4f9194d77fdf28dc34c55be55c2" title="Get a specific FCI coefficient. The arrays alpha and beta contain the alpha and beta occupation numbe..." alt="" coords="240,5,479,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#a13008f80dbfd8312ef4aa3990cbbc436" title="Get the pointer to the Correlations. " alt="" coords="779,5,1005,32"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1DMRG.html#a64ad5e21fad5c4f0a383438717942a0b" title="Get a specific FCI coefficient. The array coeff contains the occupation numbers of the L Hamiltonian ..." alt="" coords="527,27,731,69"/>
+<area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1053,5,1237,32"/>
+</map>

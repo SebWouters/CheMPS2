@@ -118,16 +118,16 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1Davidson.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abef20668c9bca9634116c525f9ab0627"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#abef20668c9bca9634116c525f9ab0627">Davidson</a> (const int veclength_in, const int MAX_NUM_VEC_in, const int NUM_VEC_KEEP_in, const double RTOL_in, const double DIAG_CUTOFF_in, const bool debugPrint_in)</td></tr>
-<tr class="memdesc:abef20668c9bca9634116c525f9ab0627"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#abef20668c9bca9634116c525f9ab0627">More...</a><br /></td></tr>
-<tr class="separator:abef20668c9bca9634116c525f9ab0627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa521a64e9a91b7e2ac6d88f1dce318d3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#aa521a64e9a91b7e2ac6d88f1dce318d3">Davidson</a> (const int veclength, const int MAX_NUM_VEC, const int NUM_VEC_KEEP, const double RTOL, const double DIAG_CUTOFF, const bool debug_print, const char problem_type= 'E')</td></tr>
+<tr class="memdesc:aa521a64e9a91b7e2ac6d88f1dce318d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#aa521a64e9a91b7e2ac6d88f1dce318d3">More...</a><br /></td></tr>
+<tr class="separator:aa521a64e9a91b7e2ac6d88f1dce318d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e03fe514d6149d5be69775179ac5c8a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e03fe514d6149d5be69775179ac5c8a"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#a9e03fe514d6149d5be69775179ac5c8a">~Davidson</a> ()</td></tr>
 <tr class="memdesc:a9e03fe514d6149d5be69775179ac5c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:a9e03fe514d6149d5be69775179ac5c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ae39a55a30271ae6f5d46b52df3d991"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#a2ae39a55a30271ae6f5d46b52df3d991">FetchInstruction</a> (double **whichpointers)</td></tr>
-<tr class="memdesc:a2ae39a55a30271ae6f5d46b52df3d991"><td class="mdescLeft">&#160;</td><td class="mdescRight">The iterator to converge the ground state vector.  <a href="#a2ae39a55a30271ae6f5d46b52df3d991">More...</a><br /></td></tr>
-<tr class="separator:a2ae39a55a30271ae6f5d46b52df3d991"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a04d5e4423b6cfc15f985aecf50c4b2"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#a3a04d5e4423b6cfc15f985aecf50c4b2">FetchInstruction</a> (double **pointers)</td></tr>
+<tr class="memdesc:a3a04d5e4423b6cfc15f985aecf50c4b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The iterator to converge the ground state vector.  <a href="#a3a04d5e4423b6cfc15f985aecf50c4b2">More...</a><br /></td></tr>
+<tr class="separator:a3a04d5e4423b6cfc15f985aecf50c4b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a9f07122a47a4ec24e6add4b8b30797"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1Davidson.html#a0a9f07122a47a4ec24e6add4b8b30797">GetNumMultiplications</a> () const </td></tr>
 <tr class="memdesc:a0a9f07122a47a4ec24e6add4b8b30797"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of matrix vector multiplications which have been performed.  <a href="#a0a9f07122a47a4ec24e6add4b8b30797">More...</a><br /></td></tr>
 <tr class="separator:a0a9f07122a47a4ec24e6add4b8b30797"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,7 +141,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 
 <p>Definition at line <a class="el" href="Davidson_8h_source.html#l00034">34</a> of file <a class="el" href="Davidson_8h_source.html">Davidson.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="abef20668c9bca9634116c525f9ab0627"></a>
+<a class="anchor" id="aa521a64e9a91b7e2ac6d88f1dce318d3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -149,37 +149,43 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
           <td class="memname">CheMPS2::Davidson::Davidson </td>
           <td>(</td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>veclength_in</em>, </td>
+          <td class="paramname"><em>veclength</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>MAX_NUM_VEC_in</em>, </td>
+          <td class="paramname"><em>MAX_NUM_VEC</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const int&#160;</td>
-          <td class="paramname"><em>NUM_VEC_KEEP_in</em>, </td>
+          <td class="paramname"><em>NUM_VEC_KEEP</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>RTOL_in</em>, </td>
+          <td class="paramname"><em>RTOL</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>DIAG_CUTOFF_in</em>, </td>
+          <td class="paramname"><em>DIAG_CUTOFF</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const bool&#160;</td>
-          <td class="paramname"><em>debugPrint_in</em>&#160;</td>
+          <td class="paramname"><em>debug_print</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char&#160;</td>
+          <td class="paramname"><em>problem_type</em> = <code>'E'</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -192,22 +198,23 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">veclength_in</td><td>Linear dimension of the symmetric matrix, or the length of the vectors </td></tr>
-    <tr><td class="paramname">MAX_NUM_VEC_in</td><td>The maximum number of vectors in which the symmetric matrix is approximately diagonalized </td></tr>
-    <tr><td class="paramname">NUM_VEC_KEEP_in</td><td>The number of vectors to keep on deflation </td></tr>
-    <tr><td class="paramname">RTOL_in</td><td>The tolerance for the two-norm of the residual (for convergence) </td></tr>
-    <tr><td class="paramname">DIAG_CUTOFF_in</td><td>Cutoff value for the diagonal preconditioner </td></tr>
-    <tr><td class="paramname">debugPrint_in</td><td>Whether or not to debug print </td></tr>
+    <tr><td class="paramname">veclength</td><td>Linear dimension of the symmetric matrix, or the length of the vectors </td></tr>
+    <tr><td class="paramname">MAX_NUM_VEC</td><td>The maximum number of vectors in which the symmetric matrix is approximately diagonalized </td></tr>
+    <tr><td class="paramname">NUM_VEC_KEEP</td><td>The number of vectors to keep during deflation </td></tr>
+    <tr><td class="paramname">RTOL</td><td>The tolerance for the two-norm of the residual ( for convergence ) </td></tr>
+    <tr><td class="paramname">DIAG_CUTOFF</td><td>Cutoff value for the diagonal preconditioner </td></tr>
+    <tr><td class="paramname">debug_print</td><td>Whether or not to debug print </td></tr>
+    <tr><td class="paramname">problem_type</td><td>'E' for eigenvalue or 'L' for linear problem. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00030">30</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00031">31</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2ae39a55a30271ae6f5d46b52df3d991"></a>
+<a class="anchor" id="a3a04d5e4423b6cfc15f985aecf50c4b2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -215,7 +222,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
           <td class="memname">char CheMPS2::Davidson::FetchInstruction </td>
           <td>(</td>
           <td class="paramtype">double **&#160;</td>
-          <td class="paramname"><em>whichpointers</em></td><td>)</td>
+          <td class="paramname"><em>pointers</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -224,32 +231,33 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>The iterator to converge the ground state vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">whichpointers</td><td>Array of double* of length 2 to return pointers to vectors to the caller </td></tr>
+    <tr><td class="paramname">pointers</td><td>Array of double* of length 2 when problem_type=='E' or length 3 when problem_type=='L'. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Instruction character. 'A' means copy the initial guess to whichpointers[0] and the diagonal of the symmetric matrix to whichpointers[1]. 'B' means calculate whichpointers[1] as the result of multiplying the symmetric matrix with whichpointers[0]. 'C' means that the converged solution can be copied back from whichpointers[0], and the ground-state energy from whichpointers[1][0]. 'D' means that an error has occurred. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Instruction character. 'A' means copy the initial guess to pointers[0] and the diagonal of the symmetric matrix to pointers[1]. If 'A' and problem_type=='E', the right-hand side of the problem should be copied to pointers[2]. 'B' means calculate pointers[1] as the result of multiplying the symmetric matrix with pointers[0]. 'C' means that the converged solution can be copied back from pointers[0], and pointers[1][0] contains the ground-state energy if problem_type=='E' or the residual norm if problem_type=='L'. 'D' means that an error has occurred. </dd></dl>
 
-<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00097">97</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00106">106</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
 
 <p><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><img src="classCheMPS2_1_1Davidson_a2ae39a55a30271ae6f5d46b52df3d991_icgraph.png" border="0" usemap="#classCheMPS2_1_1Davidson_a2ae39a55a30271ae6f5d46b52df3d991_icgraph" alt=""/></div>
-<map name="classCheMPS2_1_1Davidson_a2ae39a55a30271ae6f5d46b52df3d991_icgraph" id="classCheMPS2_1_1Davidson_a2ae39a55a30271ae6f5d46b52df3d991_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="211,45,429,86"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8" title="Calculates the FCI ground state with Davidson&#39;s algorithm. " alt="" coords="223,275,417,301"/>
-<area shape="rect" id="node11" href="classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="207,111,433,137"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="481,5,735,32"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1033,132,1217,159"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="1029,275,1221,301"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="519,275,697,301"/>
-<area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="795,275,969,301"/>
-<area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b" title="Calculate out = (alpha + beta * Hamiltonian) * in (Econstant is taken into account!!) ..." alt="" coords="783,209,981,250"/>
-<area shape="rect" id="node10" href="classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21" title="Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstan..." alt="" coords="788,325,976,352"/>
-<area shape="rect" id="node12" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="796,107,968,133"/>
+<div class="center"><img src="classCheMPS2_1_1Davidson_a3a04d5e4423b6cfc15f985aecf50c4b2_icgraph.png" border="0" usemap="#classCheMPS2_1_1Davidson_a3a04d5e4423b6cfc15f985aecf50c4b2_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1Davidson_a3a04d5e4423b6cfc15f985aecf50c4b2_icgraph" id="classCheMPS2_1_1Davidson_a3a04d5e4423b6cfc15f985aecf50c4b2_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASPT2.html#acda216c42c5245d79ae398ec59f2253f" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="229,27,411,53"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="211,339,429,381"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8" title="Calculates the FCI ground state with Davidson&#39;s algorithm. " alt="" coords="223,128,417,155"/>
+<area shape="rect" id="node12" href="classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="207,233,433,260"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="1029,52,1221,79"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="481,397,735,424"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1033,271,1217,297"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="519,128,697,155"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="795,77,969,104"/>
+<area shape="rect" id="node10" href="classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b" title="Calculate out = (alpha + beta * Hamiltonian) * in (Econstant is taken into account!!) ..." alt="" coords="783,179,981,221"/>
+<area shape="rect" id="node11" href="classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21" title="Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstan..." alt="" coords="788,128,976,155"/>
+<area shape="rect" id="node13" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="796,296,968,323"/>
 </map>
 </div>
 </p>
@@ -272,7 +280,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <p>Get the number of matrix vector multiplications which have been performed. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of matrix vector multiplications which have been performed </dd></dl>
 
-<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00095">95</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
+<p>Definition at line <a class="el" href="Davidson_8cpp_source.html#l00104">104</a> of file <a class="el" href="Davidson_8cpp_source.html">Davidson.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
@@ -281,17 +289,18 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1Davidson_a0a9f07122a47a4ec24e6add4b8b30797_icgraph.png" border="0" usemap="#classCheMPS2_1_1Davidson_a0a9f07122a47a4ec24e6add4b8b30797_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1Davidson_a0a9f07122a47a4ec24e6add4b8b30797_icgraph" id="classCheMPS2_1_1Davidson_a0a9f07122a47a4ec24e6add4b8b30797_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="213,45,430,86"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8" title="Calculates the FCI ground state with Davidson&#39;s algorithm. " alt="" coords="224,275,419,301"/>
-<area shape="rect" id="node11" href="classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="208,111,435,137"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="483,5,736,32"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1035,132,1219,159"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1CASSCF.html#acfc564a969a66a4c81563b14045aaab6" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="1031,275,1223,301"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="520,275,699,301"/>
-<area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="796,275,971,301"/>
-<area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b" title="Calculate out = (alpha + beta * Hamiltonian) * in (Econstant is taken into account!!) ..." alt="" coords="784,209,983,250"/>
-<area shape="rect" id="node10" href="classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21" title="Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstan..." alt="" coords="789,325,977,352"/>
-<area shape="rect" id="node12" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="797,107,969,133"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASPT2.html#acda216c42c5245d79ae398ec59f2253f" title="Solve for the CASPT2 energy (note that the IPEA shift has been set in the constructor) ..." alt="" coords="231,27,412,53"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#a184b5eacca476b5c00750d0485b5e0b1" title="Calculate the augmented Hessian Newton&#45;Raphson update for the orthogonal orbital rotation matrix..." alt="" coords="213,339,430,381"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1FCI.html#a9fba49f1eba2366bd5a26d6d5521c8e8" title="Calculates the FCI ground state with Davidson&#39;s algorithm. " alt="" coords="224,128,419,155"/>
+<area shape="rect" id="node12" href="classCheMPS2_1_1Heff.html#a1075e481d1a1d12f09f791be7389d2f4" title="Davidson Solver. " alt="" coords="208,233,435,260"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="1031,52,1223,79"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="483,397,736,424"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="1035,271,1219,297"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1FCI.html#ad9df11199ab6633de3df7b9c1c51001a" title="Function which returns the nuclear repulsion energy. " alt="" coords="520,128,699,155"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1FCI.html#a36e81090d6d9c12eb8e86f65ce1e66b4" title="Construct the (spin&#45;summed) 2&#45;RDM of a FCI vector: Gamma^2(i,j,k,l) = sum_sigma,tau &lt; a^+_i..." alt="" coords="796,77,971,104"/>
+<area shape="rect" id="node10" href="classCheMPS2_1_1FCI.html#a10b843aafc2f153ee1b5dbf3699c8a1b" title="Calculate out = (alpha + beta * Hamiltonian) * in (Econstant is taken into account!!) ..." alt="" coords="784,179,983,221"/>
+<area shape="rect" id="node11" href="classCheMPS2_1_1FCI.html#a34f2b199f72e604c96f1aeda63f00d21" title="Calculate (without approximation) diagonal = diag[ (alpha + beta * Hamiltonian)^2 + eta^2 ] (Econstan..." alt="" coords="789,128,977,155"/>
+<area shape="rect" id="node13" href="classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="797,296,969,323"/>
 </map>
 </div>
 </p>
@@ -308,7 +317,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1Davidson.html">Davidson</a></li>
-    <li class="footer">Generated on Thu May 19 2016 10:03:19 for CheMPS2 by
+    <li class="footer">Generated on Tue Jun 28 2016 17:16:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

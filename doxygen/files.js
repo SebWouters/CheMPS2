@@ -49,7 +49,6 @@ var files =
     [ "FCI.h", "FCI_8h_source.html", null ],
     [ "FourIndex.cpp", "FourIndex_8cpp_source.html", null ],
     [ "FourIndex.h", "FourIndex_8h_source.html", null ],
-    [ "Gsl.h", "Gsl_8h_source.html", null ],
     [ "Hamiltonian.cpp", "Hamiltonian_8cpp_source.html", null ],
     [ "Hamiltonian.h", "Hamiltonian_8h_source.html", null ],
     [ "Heff.cpp", "Heff_8cpp_source.html", null ],
@@ -110,5 +109,7 @@ var files =
     [ "TwoDM.cpp", "TwoDM_8cpp_source.html", null ],
     [ "TwoDM.h", "TwoDM_8h_source.html", null ],
     [ "TwoIndex.cpp", "TwoIndex_8cpp_source.html", null ],
-    [ "TwoIndex.h", "TwoIndex_8h_source.html", null ]
+    [ "TwoIndex.h", "TwoIndex_8h_source.html", null ],
+    [ "Wigner.cpp", "Wigner_8cpp_source.html", null ],
+    [ "Wigner.h", "Wigner_8h_source.html", null ]
 ];

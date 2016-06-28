@@ -131,6 +131,9 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memitem:ad73febba415f3bcbef367b587d5bcc0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#ad73febba415f3bcbef367b587d5bcc0d">FiedlerExchange</a> (const int maxlinsize, double *temp1, double *temp2)</td></tr>
 <tr class="memdesc:ad73febba415f3bcbef367b587d5bcc0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized (per irrep)  <a href="#ad73febba415f3bcbef367b587d5bcc0d">More...</a><br /></td></tr>
 <tr class="separator:ad73febba415f3bcbef367b587d5bcc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeefc7cee7eae7da6c2beb4e0c0cdfd7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#aeefc7cee7eae7da6c2beb4e0c0cdfd7c">FiedlerGlobal</a> (int *dmrg2ham) const </td></tr>
+<tr class="memdesc:aeefc7cee7eae7da6c2beb4e0c0cdfd7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized.  <a href="#aeefc7cee7eae7da6c2beb4e0c0cdfd7c">More...</a><br /></td></tr>
+<tr class="separator:aeefc7cee7eae7da6c2beb4e0c0cdfd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af02cbffdb428682c4d53cf6c862fdb02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classCheMPS2_1_1DMRGSCFunitary.html">DMRGSCFunitary</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html#af02cbffdb428682c4d53cf6c862fdb02">getUnitary</a> ()</td></tr>
 <tr class="memdesc:af02cbffdb428682c4d53cf6c862fdb02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pointer to the unitary to use in DMRGSCF.  <a href="#af02cbffdb428682c4d53cf6c862fdb02">More...</a><br /></td></tr>
 <tr class="separator:af02cbffdb428682c4d53cf6c862fdb02"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -309,7 +312,7 @@ Boys localization</h1>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00377">377</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00367">367</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
 
 <p><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -318,16 +321,18 @@ Boys localization</h1>
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="989,70,1184,111"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="524,31,723,73"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="285,71,459,97"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="273,122,471,163"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="268,187,476,229"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="524,118,723,159"/>
-<area shape="rect" id="node8" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="528,184,719,211"/>
-<area shape="rect" id="node11" href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="526,235,721,277"/>
-<area shape="rect" id="node9" href="classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="773,118,939,159"/>
-<area shape="rect" id="node10" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="771,184,941,211"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="273,63,471,104"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="268,128,476,169"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="989,171,1184,212"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="524,188,723,229"/>
+<area shape="rect" id="node11" href="classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="285,305,459,331"/>
+<area shape="rect" id="node12" href="classCheMPS2_1_1DMRGSCFindices.html#a2b1f2ae0964f9c0ecd653acfe88f5bd4" title="Get the irrep corresponding to a global orbital index. " alt="" coords="273,356,471,397"/>
+<area shape="rect" id="node13" href="classCheMPS2_1_1DMRGSCFindices.html#a1a24f5ffe9537c50cf1a23211e3a7a5f" title="Get in the original Hamiltonian index the start orbital for the occupied orbitals with a certain irre..." alt="" coords="273,421,471,463"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="524,5,723,47"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="528,71,719,98"/>
+<area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="526,123,721,164"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="773,35,939,76"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="771,101,941,127"/>
 </map>
 </div>
 </p>
@@ -340,6 +345,60 @@ Boys localization</h1>
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_ad73febba415f3bcbef367b587d5bcc0d_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="268,13,452,39"/>
+</map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="aeefc7cee7eae7da6c2beb4e0c0cdfd7c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::EdmistonRuedenberg::FiedlerGlobal </td>
+          <td>(</td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>dmrg2ham</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Permute the orbitals so that the bandwidth of the exchange matrix is (approximately) minimized. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dmrg2ham</td><td>At exit, dmrg2ham contains the new orbital ordering </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00432">432</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+
+<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="268,5,467,47"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFindices.html#a2b1f2ae0964f9c0ecd653acfe88f5bd4" title="Get the irrep corresponding to a global orbital index. " alt="" coords="268,71,467,112"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#a1a24f5ffe9537c50cf1a23211e3a7a5f" title="Get in the original Hamiltonian index the start orbital for the occupied orbitals with a certain irre..." alt="" coords="268,136,467,177"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1FourIndex.html#ae93c264cbb81e7d39db778a129dc7ca1" title="Get an element. " alt="" coords="280,202,455,229"/>
+</map>
+</div>
+</p>
+
+<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_aeefc7cee7eae7da6c2beb4e0c0cdfd7c_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="272,5,456,32"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="268,56,460,83"/>
 </map>
 </div>
 </p>
@@ -362,13 +421,13 @@ Boys localization</h1>
 <p>Get the pointer to the unitary to use in DMRGSCF. </p>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to the unitary which defines the localized orbitals </dd></dl>
 
-<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00153">153</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
+<p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00143">143</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
 
-<p><div id="dynsection-3" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-3-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-3-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-3-content" class="dyncontent" style="display:none;">
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="270,5,465,47"/>
@@ -379,11 +438,11 @@ Boys localization</h1>
 </div>
 </p>
 
-<p><div id="dynsection-4" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-4-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-4-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-4-content" class="dyncontent" style="display:none;">
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_af02cbffdb428682c4d53cf6c862fdb02_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="268,13,452,39"/>
@@ -450,33 +509,35 @@ Boys localization</h1>
 
 <p>Definition at line <a class="el" href="EdmistonRuedenberg_8cpp_source.html#l00066">66</a> of file <a class="el" href="EdmistonRuedenberg_8cpp_source.html">EdmistonRuedenberg.cpp</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_cgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_cgraph" id="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_cgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1Irreps.html#afd3d1b65e870aad920125c05606c4a7d" title="Get the number of irreps for the currently activated group. " alt="" coords="1017,146,1212,187"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="771,76,969,118"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="526,171,721,212"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="273,55,471,96"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="273,172,471,214"/>
-<area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="268,238,476,279"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a" title="Calculate the two&#45;norm of U^T*U &#45; I. " alt="" coords="525,106,722,147"/>
-<area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="524,236,723,278"/>
-<area shape="rect" id="node10" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="528,353,719,380"/>
-<area shape="rect" id="node11" href="classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="787,287,953,328"/>
-<area shape="rect" id="node12" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="785,353,955,380"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRGSCFmatrix.html#abe77319841704812afe86d98b2378149" title="Make this matrix the identity matrix. " alt="" coords="275,167,469,208"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1DMRGSCFindices.html#a8cbb84d6c55248612af1a9527c4934de" title="Get the orbital rotation parameter space size. " alt="" coords="273,232,471,273"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1DMRGSCFunitary.html#a0b7e14e83dd48b97dcd791509bddc630" title="Update the unitary transformation. " alt="" coords="273,64,471,105"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1DMRGSCFindices.html#a2fd841a1120c44377df3ef8d9d1c9f27" title="Get the number of orbitals. " alt="" coords="273,297,471,339"/>
+<area shape="rect" id="node10" href="classCheMPS2_1_1DMRGSCFrotations.html#a0ac61c3fa5cf82a20d0664b1e1452ea0" title="Fill the rotated two&#45;body matrix elements for the space. If the blocks become too large..." alt="" coords="268,363,476,404"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1DMRGSCFmatrix.html#a0729b05fef0cb96eaf26e7c8d6017931" title="Clear the matrix. " alt="" coords="526,173,721,215"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1DMRGSCFindices.html#a2dbdf51ff018cb4110fdd14b300967c2" title="Get the number of orbitals for an irrep. " alt="" coords="771,144,969,185"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1DMRGSCFindices.html#a4254f02aa6d668a25461217fccb8f40c" title="Get the number of irreps. " alt="" coords="524,291,723,332"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1DMRGSCFunitary.html#a8fb18978b7e7de003479e3d06a3dca0a" title="Calculate the two&#45;norm of U^T*U &#45; I. " alt="" coords="525,5,722,47"/>
+<area shape="rect" id="node11" href="classCheMPS2_1_1Irreps.html#a1d86c7a8b3c3a7b9215c0e298f0ae047" title="Get the direct product of the irreps with numbers Irrep1 and Irrep2: a bitwise XOR for psi4&#39;s convent..." alt="" coords="528,407,719,434"/>
+<area shape="rect" id="node14" href="classCheMPS2_1_1DMRGSCFmatrix.html#a230d9fa54109d0754a054868611177c5" title="Get a matrix block. " alt="" coords="526,459,721,500"/>
+<area shape="rect" id="node12" href="classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="787,459,953,500"/>
+<area shape="rect" id="node13" href="classCheMPS2_1_1Irreps.html#afd70b3b21e33a3f8163db04a768ef848" title="Print all info contained in this class. " alt="" coords="785,407,955,434"/>
 </map>
 </div>
 </p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_icgraph.png" border="0" usemap="#classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_icgraph" id="classCheMPS2_1_1EdmistonRuedenberg_af52e7bc01e8f31e9b605ec4130f0337c_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="268,13,452,39"/>
@@ -496,7 +557,7 @@ Boys localization</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1EdmistonRuedenberg.html">EdmistonRuedenberg</a></li>
-    <li class="footer">Generated on Thu May 19 2016 10:03:20 for CheMPS2 by
+    <li class="footer">Generated on Tue Jun 28 2016 17:16:18 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

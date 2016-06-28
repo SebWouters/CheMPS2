@@ -49,5 +49,6 @@ var hierarchy =
     ] ],
     [ "CheMPS2::ThreeDM", "classCheMPS2_1_1ThreeDM.html", null ],
     [ "CheMPS2::TwoDM", "classCheMPS2_1_1TwoDM.html", null ],
-    [ "CheMPS2::TwoIndex", "classCheMPS2_1_1TwoIndex.html", null ]
+    [ "CheMPS2::TwoIndex", "classCheMPS2_1_1TwoIndex.html", null ],
+    [ "CheMPS2::Wigner", "classCheMPS2_1_1Wigner.html", null ]
 ];
