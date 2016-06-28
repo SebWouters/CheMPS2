@@ -17,7 +17,9 @@ psi4 ``dmrg`` plugin
 
 DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations can be performed directly with `psi4 <http://www.psicode.org/>`_. The plugin has been tested on `psi4-0.5 <https://github.com/psi4/psi4/releases/tag/0.5>`_ (released February 17, 2016).
 
-To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build `psi4 <http://www.psicode.org/>`_ with the plugin option ``ENABLE_PLUGINS=ON``, and then run:
+Note that as of late June 2016, DMRG keywords in Psi4 have been realigned to those of the chemps2 executable. A `translation table <https://github.com/psi4/psi4/issues/150#issuecomment-228951911>`_ is available.
+
+To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build `psi4 <http://www.psicode.org/>`_ or use the conda binary, and then run:
 
 .. code-block:: bash
 

@@ -83,6 +83,12 @@ instead, where option5 and option6 are respectively the missing colon-separated 
 
 For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If CMake complains about the HDF5 headers, try to pass it with the option ``-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial``.
 
+For building with GCC, errors involving unresolved symbols or a message
+``plugin needed to handle lto object`` may indicate a failure of the
+interprocedural optimization. This can be resolved by passing full
+locations to gcc toolchain utilites to the ``setup`` command above:
+``-DCMAKE_RANLIB=/path/to/gcc-ranlib -DCMAKE_AR=/path/to/gcc-ar`` .
+
 To compile, run:
 
 .. code-block:: bash

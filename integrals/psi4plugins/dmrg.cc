@@ -1165,7 +1165,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
        outfile->Printf("The DMRG-CASPT2 variational correction energy = %3.10f \n", E_CASPT2);
        outfile->Printf("The DMRG-CASPT2 energy = %3.10f \n", Energy + E_CASPT2);
        Process::environment.globals["CURRENT ENERGY"]    = Energy + E_CASPT2;
-       Process::environment.globals["DMRGCASPT2 ENERGY"] = Energy + E_CASPT2;
+       Process::environment.globals["DMRG-CASPT2 ENERGY"] = Energy + E_CASPT2;
 
     }
 
