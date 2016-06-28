@@ -382,9 +382,9 @@ STO-3G basis set. The ground and two lowest excited states are determined.
 
 [tests/test6.cpp.in](tests/test6.cpp.in) contains a state-averaged
 DMRG-SCF calculation of the first excited state of the ^1Ag sector of O2 (d2h
-symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept frozen,
-and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as active space. A
-significant speedup is obtained with DIIS.
+symmetry) in the CC-pVDZ basis set. The two 1s core orbitals are kept doubly
+occupied, and two Ag, B2g, B3g, B1u, B2u, and B3u orbitals are chosen as
+active space. A significant speedup is obtained with DIIS.
 
 [tests/test7.cpp.in](tests/test7.cpp.in) reads in
 [tests/matrixelements/O2.CCPVDZ.FCIDUMP](tests/matrixelements/O2.CCPVDZ.FCIDUMP),
@@ -393,11 +393,11 @@ compares the two versions.
 
 [tests/test8.cpp.in](tests/test8.cpp.in) contains a DMRG-SCF ground state
 calculation of the ^1Ag state of N2 (d2h symmetry) in the CC-pVDZ basis set.
-The two 1s core orbitals are kept frozen. The next two Ag and B1u orbitals
-(sigma bonding and antibonding), as well as one B2g, B3g, B2u, and B3u orbital
-(pi bonding and antibonding) are chosen as active space. A significant speedup
-is obtained with DIIS. This test is smaller than test6, and is included for
-debugging with valgrind.
+The two 1s core orbitals are kept doubly occupied. The next two Ag and B1u
+orbitals (sigma bonding and antibonding), as well as one B2g, B3g, B2u, and
+B3u orbital (pi bonding and antibonding) are chosen as active space. A
+significant speedup is obtained with DIIS. This test is smaller than test6,
+and is included for debugging with valgrind.
 
 [tests/test9.cpp.in](tests/test9.cpp.in) contains a ground state DMRG
 calculation of a half-filled square 3 by 3 Hubbard lattice, both in the site
@@ -418,16 +418,19 @@ calculation of a BCS Hamiltonian. The matrix elements only have fourfold
 permutation symmetry.
 
 [tests/test13.cpp.in](tests/test13.cpp.in) is a copy of the CASSCF
-calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with in addition
-the calculation of the CASPT2 variational second order correction energy.
+calculation in [tests/test8.cpp.in](tests/test8.cpp.in), but with full
+configuration interaction (FCI) as active space solver. In addition,
+the CASPT2 variational second order perturbation correction energy
+is calculated.
 
 [tests/test14.cpp.in](tests/test14.cpp.in) is a copy of the CASSCF
-calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with a slightly larger
-active space, and which works with ordered localized orbitals instead of natural
-orbitals. The localization occurs by means of Edmiston-Ruedenberg, and the
-ordering based on the Fiedler vector with the exchange matrix as cost function.
-In addition a calculation of the CASPT2 variational second order correction energy
-in the localized (i.e. not pseudocanonical) basis is performed.
+calculation in [tests/test8.cpp.in](tests/test8.cpp.in) with a slightly
+larger active space, and which works with ordered localized orbitals instead
+of natural orbitals. The localization occurs by means of Edmiston-Ruedenberg,
+and the ordering based on the Fiedler vector of the exchange matrix.
+In addition a calculation of the CASPT2 variational second order
+perturbation correction energy in the localized (i.e. not pseudocanonical)
+basis is performed.
 
 [tests/matrixelements/CH4.STO3G.FCIDUMP](tests/matrixelements/CH4.STO3G.FCIDUMP)
 contains the matrix elements for test3 and test10.

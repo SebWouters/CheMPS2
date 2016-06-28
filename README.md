@@ -65,6 +65,15 @@ provided in FCIDUMP format. Usage of the binary is illustrated in the
 example.
 
 
+Publications
+------------
+
+To acknowledge CheMPS2, please cite the publications in
+[sphinx/publications.rst](sphinx/publications.rst). The
+corresponding compiled html documentation can be consulted
+[here](http://sebwouters.github.io/CheMPS2/publications.html).
+
+
 Documentation
 -------------
 
@@ -83,15 +92,6 @@ elaborate information on
 * how to generate matrix elements with plugins to [psi4](http://www.psicode.org)
 * how to perform DMRG, DMRG-SCF, and DMRG-CASPT2 calculations
 * the interfaces to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
-
-
-Publications
-------------
-
-To acknowledge CheMPS2, please cite the publications in
-[sphinx/publications.rst](sphinx/publications.rst). The
-corresponding compiled html documentation can be consulted
-[here](http://sebwouters.github.io/CheMPS2/publications.html).
 
 
 Installation
