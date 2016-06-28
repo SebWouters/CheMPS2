@@ -7,7 +7,7 @@ Interfaces to psi4 and pyscf
 
 CheMPS2 is currently interfaced with two ab initio quantum chemistry packages:
 
-#. The ``dmrg`` plugin to `psi4 <http://www.psicode.org/>`_ allows to perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations with CheMPS2, by using `psi4 <http://www.psicode.org/>`_ input files. Since April 2015, CheMPS2 is also an integral part of psi4.
+#. The ``dmrg`` plugin to `psi4 <http://www.psicode.org/>`_ allows to perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations with CheMPS2. Since April 2015, CheMPS2 is also an integral part of psi4.
 
 #. There are also DMRG-CI and DMRG-SCF interfaces between `pyscf <http://sunqm.github.io/pyscf/>`_ and CheMPS2.
 
@@ -17,7 +17,7 @@ psi4 ``dmrg`` plugin
 
 DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations can be performed directly with `psi4 <http://www.psicode.org/>`_. The plugin has been tested on `psi4-0.5 <https://github.com/psi4/psi4/releases/tag/0.5>`_ (released February 17, 2016).
 
-Note that as of late June 2016, DMRG keywords in Psi4 have been realigned to those of the chemps2 executable. A `translation table <https://github.com/psi4/psi4/issues/150#issuecomment-228951911>`_ is available.
+Note that as of late June 2016, DMRG keywords in `psi4 <http://www.psicode.org/>`_ have been realigned to those of the chemps2 executable. A `translation table <https://github.com/psi4/psi4/issues/150#issuecomment-228951911>`_ is available.
 
 To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build `psi4 <http://www.psicode.org/>`_ or use the conda binary, and then run:
 

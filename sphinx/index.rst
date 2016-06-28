@@ -27,6 +27,7 @@ Contents
    resources
    dmrgscf
    dmrgscfcalcs
+   caspt2
    interfaces
    
    
