@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>5. CheMPS2::Hamiltonian &mdash; CheMPS2 1.7-rc2-8 (2016-05-19) documentation</title>
+    <title>5. CheMPS2::Hamiltonian &mdash; CheMPS2 1.7-28 (2016-06-28) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7-rc2-8 (2016-05-19)',
+        VERSION:     '1.7-28 (2016-06-28)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7-rc2-8 (2016-05-19) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7-28 (2016-06-28) documentation" href="index.html" />
     <link rel="next" title="6. DMRG calculations" href="inoutput.html" />
     <link rel="prev" title="4. Symmetries" href="symmetry.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="symmetry.html" title="4. Symmetries"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -136,13 +136,13 @@ energy(&#39;fcidump&#39;)
 
 </pre></div>
 </div>
-<p>This file (<code class="docutils literal"><span class="pre">N2.fcidump.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/fcidump</span></code>. The FCIDUMP file can then be generated with:</p>
+<p>This file (<code class="docutils literal"><span class="pre">N2.fcidump.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/fcidump/</span></code>. The FCIDUMP file can then be generated with:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins/fcidump
 $ psi4 N2.fcidump.in N2.fcidump.out
 $ less N2.CCPVDZ.FCIDUMP
 </pre></div>
 </div>
-<p>Examples of output generated with this plugin can be found in <code class="docutils literal"><span class="pre">/sourcefolder/chemps2/tests/matrixelements</span></code>.</p>
+<p>Examples of output generated with this plugin can be found in <code class="docutils literal"><span class="pre">/sourcefolder/chemps2/tests/matrixelements/</span></code>.</p>
 </div>
 <div class="section" id="psi4-savehdf-plugin">
 <h2>5.2. psi4 <code class="docutils literal"><span class="pre">savehdf</span></code> plugin<a class="headerlink" href="#psi4-savehdf-plugin" title="Permalink to this headline">¶</a></h2>
@@ -161,7 +161,7 @@ $ <span class="nb">cd</span> savehdf
 <div class="highlight-bash"><div class="highlight"><pre><span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>LDFLAGS<span class="k">)</span> -o <span class="nv">$@</span> $^ <span class="k">$(</span>CXXDEFS<span class="k">)</span> -lchemps2
 </pre></div>
 </div>
-<p>Remember to add the library and include paths to the Makefile as well, if <code class="docutils literal"><span class="pre">libchemps2</span></code> is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. It might be necessary to add it to the <code class="docutils literal"><span class="pre">INCLUDES</span></code> variable in the Makefile.
+<p>Remember to add the library and include paths to the Makefile as well, if <code class="docutils literal"><span class="pre">libchemps2</span></code> is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial/</span></code>. It might be necessary to add it to the <code class="docutils literal"><span class="pre">INCLUDES</span></code> variable in the Makefile.
 To compile the plugin, run:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ make
 </pre></div>
@@ -187,7 +187,7 @@ energy(&#39;savehdf&#39;)
 
 </pre></div>
 </div>
-<p>This file (<code class="docutils literal"><span class="pre">N2.savehdf.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/savehdf</span></code>. The matrix elements can then be saved to disk in binary form with HDF5 by running:</p>
+<p>This file (<code class="docutils literal"><span class="pre">N2.savehdf.in</span></code>) should be placed in the folder <code class="docutils literal"><span class="pre">/mypsi4plugins/savehdf/</span></code>. The matrix elements can then be saved to disk in binary form with HDF5 by running:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> /mypsi4plugins/savehdf
 $ psi4 N2.savehdf.in N2.savehdf.out
 $ ls *.h5
@@ -393,7 +393,7 @@ $ ls *.h5
         <li class="right" >
           <a href="symmetry.html" title="4. Symmetries"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

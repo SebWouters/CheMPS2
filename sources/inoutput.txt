@@ -20,34 +20,35 @@ The variable ``Hamin`` contains the number of orbitals, the point group of the H
 ``CheMPS2::ConvergenceScheme``
 ------------------------------
 
-The ``CheMPS2::Problem`` defines a FCI problem. In order to perform DMRG calculations, a ``CheMPS2::ConvergenceScheme`` should be provided as well. A convergence scheme consists of consecutive instructions, which are executed in order. Each instruction specifies four quantities:
+The ``CheMPS2::Problem`` defines a FCI problem. In order to perform DMRG calculations, a ``CheMPS2::ConvergenceScheme`` should be provided as well. A convergence scheme consists of consecutive instructions, which are executed in order. Each instruction specifies five quantities:
 
 #. The number of reduced virtual basis states :math:`D_{\mathsf{SU(2)}}` to be retained.
 #. The energy convergence threshold :math:`E_{conv}` to stop the instruction.
 #. The maximum number of sweeps :math:`N_{max}` for that instruction.
 #. The noise prefactor :math:`\gamma_{noise}`, which defines the magnitude of the noise added to the tensor :math:`\mathbf{B}[i]` prior to singular value decomposition. The noise is bounded in magnitude by :math:`0.5 \gamma_{\text{noise}} w_D^{disc}`, where :math:`w_D^{disc} = \max\limits_{i}\left( w_D[i] \right)`, the maximum discarded weight of the previous sweep.
+#. The residual norm tolerance for the Davidson algorithm, which is used to solve the effective Hamiltonian eigenvalue equations.
 
 A typical example of a convergence scheme is:
 
- +----------------------------+------------------+-----------------+------------------------+
- | :math:`D_{\mathsf{SU(2)}}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` |
- +============================+==================+=================+========================+
- | 500                        | 1e-8             | 10              | 0.05                   |
- +----------------------------+------------------+-----------------+------------------------+
- | 1000                       | 1e-8             | 10              | 0.05                   |
- +----------------------------+------------------+-----------------+------------------------+
- | 1500                       | 1e-8             | 10              | 0.05                   |
- +----------------------------+------------------+-----------------+------------------------+
- | 2000                       | 1e-8             | 10              | 0.05                   |
- +----------------------------+------------------+-----------------+------------------------+
- | 2500                       | 1e-8             | 10              | 0.05                   |
- +----------------------------+------------------+-----------------+------------------------+
- | 2500                       | 1e-8             | 10              | 0.0                    |
- +----------------------------+------------------+-----------------+------------------------+
- | 2000                       | 1e-8             | 10              | 0.0                    |
- +----------------------------+------------------+-----------------+------------------------+
- | 1500                       | 1e-8             | 10              | 0.0                    |
- +----------------------------+------------------+-----------------+------------------------+
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | :math:`D_{\mathsf{SU(2)}}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` | :math:`r_{tol}` |
+ +============================+==================+=================+========================+=================+
+ | 500                        | 1e-8             | 10              | 0.05                   | 1e-5            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 1000                       | 1e-8             | 10              | 0.05                   | 1e-5            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 1500                       | 1e-8             | 10              | 0.05                   | 1e-5            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 2000                       | 1e-8             | 10              | 0.05                   | 1e-5            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 2500                       | 1e-8             | 10              | 0.05                   | 1e-5            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 2500                       | 1e-8             | 10              | 0.0                    | 1e-8            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 2000                       | 1e-8             | 10              | 0.0                    | 1e-8            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
+ | 1500                       | 1e-8             | 10              | 0.0                    | 1e-8            |
+ +----------------------------+------------------+-----------------+------------------------+-----------------+
 
 At first, the number of retained reduced virtual basis states is increased in each instruction, while noise is added to the wavefunction prior to decomposition. Afterwards, instructions without noise are performed and the number of retained reduced virtual basis states is decreased. The instructions with decreasing :math:`D_{\mathsf{SU(2)}}` are used to extrapolate the variational DMRG energies with discarded weight (see section :ref:`chemps2_extrapolation`).
 
@@ -56,7 +57,7 @@ The API for the ``CheMPS2::ConvergenceScheme`` class:
 .. code-block:: c++
 
     CheMPS2::ConvergenceScheme::ConvergenceScheme( const int nInstructions )
-    void CheMPS2::ConvergenceScheme::setInstruction( const int instruction, const int D, const double Econv, const int nMax, const double noisePrefactor )
+    void CheMPS2::ConvergenceScheme::set_instruction( const int instruction, const int D, const double energy_conv, const int max_sweeps, const double noise_prefactor, const double davidson_rtol )
     
 The variable ``D`` is the number of reduced virtual basis states :math:`D_{\mathsf{SU(2)}}`!
 
@@ -70,22 +71,24 @@ With the ``CheMPS2::Problem`` and ``CheMPS2::ConvergenceScheme`` objects, DMRG c
 
 .. code-block:: c++
 
-    CheMPS2::DMRG::DMRG( CheMPS2::Problem * Probin, CheMPS2::ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder="/tmp" )
+    CheMPS2::DMRG::DMRG( CheMPS2::Problem * Probin, CheMPS2::ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder )
     double CheMPS2::DMRG::Solve()
 
 If the variable ``makechkpt`` is ``true``, MPS checkpoints of the form ``CheMPS2_MPS*.h5`` are generated in the execution folder. They are stored/overwritten each time a full left and right sweep has been performed. The checkpoints allow to restart calculations. It is the responsibility of the user to remove the completed instructions from the ``CheMPS2::ConvergenceScheme`` before restarting a calculation!
 
 The function ``CheMPS2::DMRG::Solve()`` performs the instructions and returns the minimal encountered energy during all sweeps (which is variational). It is possible to extrapolate the variational energies obtained with different :math:`D_{\mathsf{SU(2)}}` to :math:`D_{\mathsf{SU(2)}} = \infty`. This is explained in the section :ref:`chemps2_extrapolation`.
 
-In addition to the energy, the 2-RDM of the active space can also be obtained, as well as several correlation functions. Thereto, the following functions should be used:
+In addition to the energy, the 2-RDM and 3-RDM of the active space can also be obtained, as well as several correlation functions. Thereto, the following functions should be used:
 
 .. code-block:: c++
 
-    void CheMPS2::DMRG::calc2DMandCorrelations()
+    void CheMPS2::DMRG::calc_rdms_and_correlations( const bool do_3rdm, const bool disk_3rdm )
     CheMPS2::TwoDM * CheMPS2::DMRG::get2DM()
+    CheMPS2::ThreeDM * CheMPS2::DMRG::get3DM()
     CheMPS2::Correlations * CheMPS2::DMRG::getCorrelations()
     double CheMPS2::TwoDM::getTwoDMA_HAM( const int cnt1, const int cnt2, const int cnt3, const int cnt4 ) const
     double CheMPS2::TwoDM::getTwoDMB_HAM( const int cnt1, const int cnt2, const int cnt3, const int cnt4 ) const
+    double CheMPS2::ThreeDM::get_ham_index( const int cnt1, const int cnt2, const int cnt3, const int cnt4, const int cnt5, const int cnt6 ) const
     double CheMPS2::Correlations::getCspin_HAM( const int row, const int col ) const
     double CheMPS2::Correlations::getCdens_HAM( const int row, const int col ) const 
     double CheMPS2::Correlations::getCspinflip_HAM( const int row, const int col ) const 
@@ -93,12 +96,13 @@ In addition to the energy, the 2-RDM of the active space can also be obtained, a
     double CheMPS2::Correlations::getMutualInformation_HAM( const int row, const int col ) const
     void CheMPS2::Correlations::Print( const int precision=6, const int columnsPerLine=8 ) const 
     
-The 2-RDM is again represented in physics notation. As CheMPS2 is a spin-adapted code, only spin-summed quantities can be obtained as output:
+The 2-RDM and 3-RDM are again represented in physics notation. As CheMPS2 is a spin-adapted code, only spin-summed quantities can be obtained as output:
 
 .. math::
 
-    \Gamma^A_{ij;kl} & = & \sum_{\sigma \tau} \left\langle a^{\dagger}_{i \sigma} a^{\dagger}_{j \tau} a_{l \tau} a_{k \sigma} \right\rangle \\
-    \Gamma^B_{ij;kl} & = & \sum_{\sigma} \left( \left\langle a^{\dagger}_{i \sigma} a^{\dagger}_{j \sigma} a_{l \sigma} a_{k \sigma} \right\rangle - \left\langle a^{\dagger}_{i \sigma} a^{\dagger}_{j -\sigma} a_{l -\sigma} a_{k \sigma} \right\rangle  \right)
+    \Gamma^A_{ij;kl} & = & \sum_{\sigma \tau} \left\langle \hat{a}^{\dagger}_{i \sigma} \hat{a}^{\dagger}_{j \tau} \hat{a}_{l \tau} \hat{a}_{k \sigma} \right\rangle \\
+    \Gamma^B_{ij;kl} & = & \sum_{\sigma} \left( \left\langle \hat{a}^{\dagger}_{i \sigma} \hat{a}^{\dagger}_{j \sigma} \hat{a}_{l \sigma} \hat{a}_{k \sigma} \right\rangle - \left\langle \hat{a}^{\dagger}_{i \sigma} \hat{a}^{\dagger}_{j -\sigma} \hat{a}_{l -\sigma} \hat{a}_{k \sigma} \right\rangle  \right) \\
+    \Gamma_{ijk;lmn} & = & \sum_{\sigma \tau z} \left\langle \hat{a}^{\dagger}_{i \sigma} \hat{a}^{\dagger}_{j \tau} \hat{a}^{\dagger}_{k z} \hat{a}_{n z } \hat{a}_{m \tau} \hat{a}_{l \sigma} \right\rangle
 
 The correlation functions are defined as:
 
@@ -141,7 +145,7 @@ An example code fragment to calculate the second excited state (assuming it is s
 
 .. code-block:: c++
 
-    CheMPS2::DMRG * myDMRG = new CheMPS2::DMRG( myProblem, myConvergenceScheme, myMakechkpt );
+    CheMPS2::DMRG * myDMRG = new CheMPS2::DMRG( myProblem, myConvergenceScheme, myMakechkpt, myTMPfolder );
     const double Energy0 = myDMRG->Solve();
     myDMRG->activateExcitations( 2 );
     myDMRG->newExcitation( fabs( Energy0 ) );
@@ -186,7 +190,7 @@ As correlations are propagated by the virtual bonds, it is important to place st
 #. For elongated molecules such as polyenes, it is best to use localized orbitals, sorted according to the molecule’s topology.
 #. For compact molecules such as dimers, it is best to group orbitals in irrep blocks, and to place bonding and anti-bonding irreps adjacent.
 
-An example for the all-trans polyene :math:`C_{14}H_{16}` is provided in the figure below. Its geometry was optimized at the B3LYP/6-31G** level of theory. The :math:`\sigma`-orbitals are kept frozen at the RHF/6-31G level of theory, and the active space consists of 28 RHF/6-31G :math:`\pi`-orbitals. In the figure, the convergence rates of DMRG calculations with canonical RHF orbitals and with localized orbitals (Edmiston-Ruedenberg) are compared.
+An example for the all-trans polyene :math:`C_{14}H_{16}` is provided in the figure below. Its geometry was optimized at the B3LYP/6-31G** level of theory. The :math:`\sigma`-orbitals are kept frozen at the RHF/6-31G level of theory, and the active space consists of 28 RHF/6-31G :math:`\pi`-orbitals. In the figure, the convergence rates of DMRG calculations with canonical RHF orbitals and with localized and ordered orbitals (Edmiston-Ruedenberg) are compared.
 
 .. image:: Comparison.png
 

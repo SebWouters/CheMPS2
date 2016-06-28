@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10. Internally contracted CASPT2 &mdash; CheMPS2 1.7-28 (2016-06-28) documentation</title>
+    
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.7-28 (2016-06-28)',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7-28 (2016-06-28) documentation" href="index.html" />
+    <link rel="next" title="11. Interfaces to psi4 and pyscf" href="interfaces.html" />
+    <link rel="prev" title="9. DMRG-SCF calculations" href="dmrgscfcalcs.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="internally-contracted-caspt2">
+<span id="index-0"></span><h1>10. Internally contracted CASPT2<a class="headerlink" href="#internally-contracted-caspt2" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-required-4-rdm-elements">
+<h2>10.1. The required 4-RDM elements<a class="headerlink" href="#the-required-4-rdm-elements" title="Permalink to this headline">¶</a></h2>
+<p>As DMRG is a wavefunction method, higher order reduced density matrices can be evaluated.
+In CheMPS2, up to the 3-RDM is implemented with the usual sweep algorithm.
+For internally contracted CASPT2, the contraction of the 4-RDM with the generalized Fock operator is needed. The generalized Fock operator</p>
+<div class="math">
+\[\begin{split}\hat{F} &amp; = &amp; \sum\limits_{pq} F_{pq} \hat{E}_{pq}\end{split}\]</div>
+<p>has matrix elements</p>
+<div class="math">
+\[F_{pq}  =  \frac{1}{2} \sum\limits_{\sigma} \left\langle \hat{a}_{p\sigma} \left[ \hat{H}, \hat{a}_{q \sigma}^{\dagger} \right] - \hat{a}_{p\sigma}^{\dagger} \left[ \hat{H}, \hat{a}_{q \sigma} \right]  \right\rangle  =  t_{pq} + \sum\limits_{rs} \left\langle \hat{E}_{rs} \right\rangle \left( \left( pq | rs \right) - \frac{1}{2} \left( pr | qs \right) \right).\]</div>
+<p>These matrix elements are symmetric and diagonal in the spatial orbital irreps. The required contraction of the 4-RDM with the generalized Fock operator</p>
+<div class="math">
+\[\begin{split}\left( F . \Gamma^4 \right)_{pqr; wxy} &amp; = &amp; \sum_{\sigma \tau \upsilon} \left\langle \hat{a}^{\dagger}_{p \sigma} \hat{a}^{\dagger}_{q \tau} \hat{a}^{\dagger}_{r \upsilon} \hat{F} \hat{a}_{y \upsilon} \hat{a}_{ x \tau} \hat{a}_{w \sigma} \right\rangle\end{split}\]</div>
+<p>can therefore be obtained from excited wavefunctions, formed by symmetry-conserving single-particle excitations op top of the reference wavefunction. For the matrix element <span class="math">\(F_{sz} = F_{zs}\)</span> the following sum of 4-RDM elements is needed:</p>
+<div class="math">
+\[\Gamma^4_{pqrs; wxyz} + \Gamma^4_{pqrz; wxys}.\]</div>
+<p>It can be obtained by calculating</p>
+<div class="math">
+\[\left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + {E}_{zs} \right) + \beta \right]  \left| \Psi_0 \right\rangle\]</div>
+<p>in which the spatial orbitals <span class="math">\(s\)</span> and <span class="math">\(z\)</span> have equal irreps. This excited wavefunction is decomposed into an MPS, with a sweep algorithm with negligible cost <a class="reference internal" href="#caspt2" id="id1">[CASPT2]</a>. Denote the 3-RDM of the (unnormalized) excited wavefunctions as</p>
+<div class="math">
+\[\Gamma(sz,\alpha,\beta)^3_{pqr; wxy} = \sum\limits_{ \sigma \tau \upsilon } \left\langle sz, \alpha, \beta \mid \hat{a}_{p\sigma}^{\dagger} \hat{a}_{q\tau}^{\dagger} \hat{a}_{r\upsilon}^{\dagger} \hat{a}_{y\upsilon} \hat{a}_{x\tau} \hat{a}_{w\sigma} \mid sz, \alpha, \beta \right\rangle.\]</div>
+<p>In this notation <span class="math">\(\Gamma( sz, 0, 1 )^3_{pqr; wxy} = \Gamma^3_{pqr; wxy}\)</span>, the 3-RDM of the reference wavefunction. The following identity holds:</p>
+<div class="math">
+\[\begin{split}&amp; &amp; 2 \left[ \Gamma^4_{pqrs; wxyz} + \Gamma^4_{pqrz; wxys} \right] + \Gamma^3_{pqr; wxy} \\
+&amp; = &amp; \Gamma( sz, 1, 1 )^3_{pqr; wxy} - \Gamma( sz, 1, 0 )^3_{pqr; wxy} \\
+&amp; - &amp; \delta_{s,p} \Gamma^3_{zqr; wxy} - \delta_{s,q} \Gamma^3_{pzr; wxy} - \delta_{s,r} \Gamma^3_{pqz; wxy} \\
+&amp; - &amp; \delta_{s,w} \Gamma^3_{pqr; zxy} - \delta_{s,x} \Gamma^3_{pqr; wzy} - \delta_{s,y} \Gamma^3_{pqr; wxz} \\
+&amp; - &amp; \delta_{z,p} \Gamma^3_{sqr; wxy} - \delta_{z,q} \Gamma^3_{psr; wxy} - \delta_{z,r} \Gamma^3_{pqs; wxy} \\
+&amp; - &amp; \delta_{z,w} \Gamma^3_{pqr; sxy} - \delta_{z,x} \Gamma^3_{pqr; wsy} - \delta_{z,y} \Gamma^3_{pqr; wxs},\end{split}\]</div>
+<p>which allows to obtain the contraction <span class="math">\(\left( F . \Gamma^4 \right)\)</span> by calculating the 3-RDM of several excited wavefunctions! This algorithm has in practice the same computational cost as the regular 4-RDM evaluation during the usual sweep algorithm.</p>
+</div>
+<div class="section" id="cas-perturbation-theory">
+<h2>10.2. CAS perturbation theory<a class="headerlink" href="#cas-perturbation-theory" title="Permalink to this headline">¶</a></h2>
+<p>The full Hilbert space <span class="math">\(\mathcal{H}\)</span> is split up into four parts <a class="reference internal" href="#roos1" id="id2">[ROOS1]</a> <a class="reference internal" href="#roos2" id="id3">[ROOS2]</a>:</p>
+<div class="math">
+\[\mathcal{H} = \mathcal{V}_0 \oplus \mathcal{V}_{\text{K}} \oplus \mathcal{V}_{\text{SD}} \oplus \mathcal{V}_{\text{TQ..}}.\]</div>
+<ol class="arabic">
+<li><p class="first"><span class="math">\(\mathcal{V}_0\)</span> contains only the CASSCF solution <span class="math">\(\left| \Psi_0 \right\rangle\)</span>.</p>
+</li>
+<li><p class="first"><span class="math">\(\mathcal{V}_{\text{K}}\)</span> is the space spanned by all possible active space excitations on top of <span class="math">\(\left| \Psi_0 \right\rangle\)</span> which are orthogonal to <span class="math">\(\mathcal{V}_0\)</span>. Wavefunctions in <span class="math">\(\mathcal{V}_{\text{K}}\)</span> have the same core and virtual orbitals as <span class="math">\(\left| \Psi_0 \right\rangle\)</span>, with the same occupation.</p>
+</li>
+<li><p class="first"><span class="math">\(\mathcal{V}_{{\text{SD}}}\)</span> contains all single and double particle excitations on top of <span class="math">\(\left| \Psi_0 \right\rangle\)</span> which are orthogonal to <span class="math">\(\mathcal{V}_0 \oplus \mathcal{V}_{\text{K}}\)</span>. With the indices <span class="math">\(ij\)</span> for core orbitals, <span class="math">\(tuv\)</span> for active orbitals, and <span class="math">\(ab\)</span> for virtual orbitals, <span class="math">\(\mathcal{V}_{{\text{SD}}}\)</span> is spanned by the following excitation types:</p>
+<blockquote>
+<div><div class="math">
+\[\begin{split}\text{A} &amp; : &amp; \quad \hat{E}_{ti} \hat{E}_{uv} \left| \Psi_0 \right\rangle, \\
+\text{B} &amp; : &amp; \quad \hat{E}_{ti} \hat{E}_{uj} \left| \Psi_0 \right\rangle, \\
+\text{C} &amp; : &amp; \quad \hat{E}_{at} \hat{E}_{uv} \left| \Psi_0 \right\rangle, \\
+\text{D} &amp; : &amp; \quad \hat{E}_{ai} \hat{E}_{tu} \left| \Psi_0 \right\rangle,~\hat{E}_{ti}\hat{E}_{au} \left| \Psi_0 \right\rangle, \\
+\text{E} &amp; : &amp; \quad \hat{E}_{ti} \hat{E}_{aj} \left| \Psi_0 \right\rangle, \\
+\text{F} &amp; : &amp; \quad \hat{E}_{at} \hat{E}_{bu} \left| \Psi_0 \right\rangle, \\
+\text{G} &amp; : &amp; \quad \hat{E}_{ai} \hat{E}_{bt} \left| \Psi_0 \right\rangle, \\
+\text{H} &amp; : &amp; \quad \hat{E}_{ai} \hat{E}_{bj} \left| \Psi_0 \right\rangle.\end{split}\]</div>
+</div></blockquote>
+</li>
+<li><p class="first">And <span class="math">\(\mathcal{V}_{{\text{TQ..}}}\)</span> is the remainder of <span class="math">\(\mathcal{H}\)</span>.</p>
+</li>
+</ol>
+<p>The zeroth order Hamiltonian for internally contracted CASPT2 is</p>
+<div class="math">
+\[\hat{H}_0 = \hat{P}_0 \hat{F} \hat{P}_0 + \hat{P}_{\text{K}} \hat{F} \hat{P}_{\text{K}} + \hat{P}_{{\text{SD}}} \hat{F} \hat{P}_{{\text{SD}}} + \hat{P}_{{\text{TQ..}}} \hat{F} \hat{P}_{{\text{TQ..}}},\]</div>
+<p>where <span class="math">\(\hat{P}_{\text{X}}\)</span> is the projector onto <span class="math">\(\mathcal{V}_{\text{X}}\)</span>.
+The first order wavefunction <span class="math">\(\left| \Psi_1 \right\rangle\)</span> for internally contracted CASPT2 is spanned by a linear combination over <span class="math">\(\mathcal{V}_{\text{SD}}\)</span>:</p>
+<div class="math">
+\[\left| \Psi_1 \right\rangle = \sum_{pq;rs \in \mathcal{V}_{\text{SD}}} C_{pq;rs} \hat{E}_{pq} \hat{E}_{rs} \left| \Psi_0 \right\rangle = \sum_{pq;rs \in \mathcal{V}_{\text{SD}}} C_{pq;rs} \left| \Psi_{pq;rs} \right\rangle.\]</div>
+<p>The coefficients can be found by solving</p>
+<div class="math">
+\[\sum_{pq;rs \in \mathcal{V}_{\text{SD}}} \left\langle \Psi_{wx;yz} \mid \hat{H}_0 - E_0 \mid \Psi_{pq;rs} \right\rangle C_{pq;rs} = - \left\langle \Psi_{wx;yz} \mid \hat{H} \mid \Psi_0 \right\rangle.\]</div>
+<p>The overlap matrix <span class="math">\(\left\langle \Psi_{wx;yz} \mid \Psi_{pq;rs} \right\rangle\)</span> is block-diagonal in the different excitation types (A to H). It is diagonalized, small eigenvalues are discarded, and the linear equation is transformed to</p>
+<div class="math">
+\[\sum\limits_{ \beta } \left( \mathcal{F}_{\alpha\beta} - E_0 \delta_{\alpha,\beta} \right) \mathcal{C}_{\beta} = - \mathcal{V}_{\alpha},\]</div>
+<p>with <span class="math">\(\mathcal{F}\)</span> diagonal for two excitations of the same type (A to H). The following initial guess is used to solve this linear equation with either the conjugate gradient or Davidson algorithm:</p>
+<div class="math">
+\[\mathcal{C}_{\alpha}^{\text{ini}} = - \frac{ \mathcal{V}_{\alpha} }{ \mathcal{F}_{\alpha\alpha} - E_0 }.\]</div>
+<p>If the active space orbitals in the DMRG algorithm are not pseudocanonical, <span class="math">\(\Gamma^1\)</span>, <span class="math">\(\Gamma^2\)</span>, <span class="math">\(\Gamma^3\)</span>, and <span class="math">\(\left(F.\Gamma^4\right)\)</span> are rotated to the pseudocanonical orbital basis before building the required intermediates to solve the CASPT2 linear equation.</p>
+<p>In order to mitigate intruder state problems, CheMPS2 allows to specify an imaginary level shift <a class="reference internal" href="#imag" id="id4">[IMAG]</a> and/or ionization potential - electron affinity shift <a class="reference internal" href="#ipea" id="id5">[IPEA]</a>. For the latter, the left-hand side matrix of the CASPT2 linear equation is shifted with</p>
+<div class="math">
+\[\left\langle \Psi_{ wx;yz } \mid \hat{F} \mid \Psi_{pq;rs } \right\rangle \mathrel{+}= \delta_{p,w} \delta_{q,x} \delta_{r,y} \delta_{s,z} \frac{ \epsilon^{\text{IPEA}}}{2} \left\langle \Psi_{wx;yz} \mid \Psi_{pq;rs} \right\rangle \left( 4 + \left\langle \hat{E}_{pp} \right\rangle - \left\langle \hat{E}_{qq} \right\rangle + \left\langle \hat{E}_{rr} \right\rangle - \left\langle \hat{E}_{ss} \right\rangle \right).\]</div>
+</div>
+<div class="section" id="caspt2-calculations">
+<h2>10.3. CASPT2 calculations<a class="headerlink" href="#caspt2-calculations" title="Permalink to this headline">¶</a></h2>
+<p>In order to calculate the CASPT2 variational second order perturbation correction energy, the following call should be made:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="kt">double</span> <span class="n">CheMPS2</span><span class="o">::</span><span class="n">CASSCF</span><span class="o">::</span><span class="n">caspt2</span><span class="p">(</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Nelectrons</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">TwoS</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">Irrep</span><span class="p">,</span> <span class="n">ConvergenceScheme</span> <span class="o">*</span> <span class="n">OptScheme</span><span class="p">,</span> <span class="k">const</span> <span class="kt">int</span> <span class="n">rootNum</span><span class="p">,</span> <span class="n">DMRGSCFoptions</span> <span class="o">*</span> <span class="n">scf_options</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">IPEA</span><span class="p">,</span> <span class="k">const</span> <span class="kt">double</span> <span class="n">IMAG</span><span class="p">,</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">PSEUDOCANONICAL</span><span class="p">,</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">CHECKPOINT</span><span class="p">,</span> <span class="k">const</span> <span class="kt">bool</span> <span class="n">CUMULANT</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>after</strong> the CASSCF orbital rotations are converged.</p>
+<ol class="arabic">
+<li><p class="first">The first six parameters are the same as for <code class="docutils literal"><span class="pre">CheMPS2::CASSCF::solve</span></code> in <a class="reference internal" href="dmrgscfcalcs.html#label-casscf-calculations-api"><span>CheMPS2::CASSCF</span></a>.</p>
+</li>
+<li><p class="first">IPEA and IMAG are the ionization potential - electron affinity and imaginary level shifts.</p>
+</li>
+<li><p class="first">PSEUDOCANONICAL allows to change the converged CASSCF orbitals (localized, natural, ...) to pseudocanonical orbitals <strong>before</strong> the DMRG calculation to obtain the contraction of the 4-RDM with the generalized Fock operator. This has the advantage that the Fock operator matrix elements are diagonal, which leads to a significant reduction in computational cost <strong>if</strong> it not requires a significantly larger virtual dimension <span class="math">\(D\)</span>.</p>
+</li>
+<li><p class="first">CHECKPOINT allows to switch on the creation of checkpoints to calculate the required contraction during multiple runs. If CHECKPOINT is true, then after the initial run</p>
+<blockquote>
+<div><div class="highlight-c++"><div class="highlight"><pre><span class="n">scf_options</span><span class="o">-&gt;</span><span class="n">setDoDIIS</span><span class="p">(</span> <span class="nb">false</span> <span class="p">)</span>
+<span class="n">scf_options</span><span class="o">-&gt;</span><span class="n">setWhichActiveSpace</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>should be set in order to use exactly the same orbitals in consecutive runs!</p>
+</li>
+<li><p class="first">It is advised to leave CUMULANT = false.</p>
+</li>
+</ol>
+<table class="docutils citation" frame="void" id="caspt2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[CASPT2]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters, V. Van Speybroeck and D. Van Neck, <em>Preprint</em> (2016), arXiv: <a class="reference external" href="http://arxiv.org/abs/1605.05526">1605.05526</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="roos1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[ROOS1]</a></td><td><ol class="first last upperalpha simple" start="11">
+<li>Andersson, P.-A. Malmqvist, B.O. Roos, A.J. Sadlej and K. Wolinski, <em>Journal of Physical Chemistry</em> <strong>94</strong>, 5483-5488 (1990). doi: <a class="reference external" href="http://dx.doi.org/10.1021/j100377a012">10.1021/j100377a012</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="roos2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[ROOS2]</a></td><td><ol class="first last upperalpha simple" start="11">
+<li>Andersson, P.‐A. Malmqvist and B.O. Roos, <em>Journal of Chemical Physics</em> <strong>96</strong>, 1218-1226 (1992). doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.462209">10.1063/1.462209</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="imag" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[IMAG]</a></td><td><ol class="first last upperalpha simple" start="14">
+<li>Forsberg and P.-A. Malmqvist, <em>Chemical Physics Letters</em> <strong>274</strong>, 196-204 (1997). doi: <a class="reference external" href="http://dx.doi.org/10.1016/S0009-2614(97)00669-6">10.1016/S0009-2614(97)00669-6</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="ipea" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[IPEA]</a></td><td><ol class="first last upperalpha simple" start="7">
+<li>Ghigo, B.O. Roos and P.-A. Malmqvist, <em>Chemical Physics Letters</em> <strong>396</strong>, 142-149 (2004). doi: <a class="reference external" href="http://dx.doi.org/10.1016/j.cplett.2004.08.032">10.1016/j.cplett.2004.08.032</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10. Internally contracted CASPT2</a><ul>
+<li><a class="reference internal" href="#the-required-4-rdm-elements">10.1. The required 4-RDM elements</a></li>
+<li><a class="reference internal" href="#cas-perturbation-theory">10.2. CAS perturbation theory</a></li>
+<li><a class="reference internal" href="#caspt2-calculations">10.3. CASPT2 calculations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="dmrgscfcalcs.html"
+                        title="previous chapter">9. DMRG-SCF calculations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="interfaces.html"
+                        title="next chapter">11. Interfaces to psi4 and pyscf</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/caspt2.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="dmrgscfcalcs.html" title="9. DMRG-SCF calculations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2016, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

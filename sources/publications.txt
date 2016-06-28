@@ -4,7 +4,7 @@
 Publications
 ============
 
-To acknowledge CheMPS2, please cite the publications listed below:
+To acknowledge CheMPS2, please cite the following publications:
 
 *  | Sebastian Wouters, Ward Poelmans, Paul W. Ayers and Dimitri Van Neck,
    | CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry,

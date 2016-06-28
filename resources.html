@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>7. Typical resource requirements &mdash; CheMPS2 1.7-rc2-8 (2016-05-19) documentation</title>
+    <title>7. Typical resource requirements &mdash; CheMPS2 1.7-28 (2016-06-28) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7-rc2-8 (2016-05-19)',
+        VERSION:     '1.7-28 (2016-06-28)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7-rc2-8 (2016-05-19) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7-28 (2016-06-28) documentation" href="index.html" />
     <link rel="next" title="8. DMRG-SCF" href="dmrgscf.html" />
     <link rel="prev" title="6. DMRG calculations" href="inoutput.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="inoutput.html" title="6. DMRG calculations"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,10 +58,15 @@
 <li><span class="math">\(\mathcal{O}(L^2D^2)\)</span> in memory</li>
 <li><span class="math">\(\mathcal{O}(L^3D^2)\)</span> in disk</li>
 </ul>
-<p>The block-sparsity and information compression due to the exploitation of symmetry have not been taken into account in these scalings! Ref. <a class="reference internal" href="#timing" id="id1">[TIMING]</a> contains CPU time measurements for polyenes of increasing length, and demonstrates the scaling of CheMPS2 with <span class="math">\(L\)</span>.</p>
+<p>The block-sparsity and information compression due to the exploitation of symmetry have not been taken into account in these scalings!</p>
+<div class="section" id="scaling-with-system-size">
+<h2>7.1. Scaling with system size<a class="headerlink" href="#scaling-with-system-size" title="Permalink to this headline">¶</a></h2>
+<p>Ref. <a class="reference internal" href="#timing1" id="id1">[TIMING1]</a> contains CPU time measurements for polyenes of increasing length, and demonstrates the scaling of CheMPS2 with <span class="math">\(L\)</span>. The geometries of all-trans polyenes <span class="math">\(\text{C}_n\text{H}_{n+2}\)</span> were optimized at the B3LYP/6-31G** level of theory for <span class="math">\(n=12\)</span>, 14, 16, 18, 20, 22 and 24. The <span class="math">\(\sigma\)</span>-orbitals were kept frozen at the RHF/6-31G level of theory. The <span class="math">\(\pi\)</span>-orbitals in the 6-31G basis were localized by means of the Edmiston-Ruedenberg localization procedure. The localized <span class="math">\(\pi\)</span>-orbitals belong to the <span class="math">\(\mathsf{A''}\)</span> irrep of the <span class="math">\(\mathsf{C_s}\)</span> point group, and were ordered according to the one-dimensional topology of the polyene. For all polyenes, the average CPU time per DMRG sweep (in seconds) was determined with snapshot <a class="reference external" href="https://github.com/SebWouters/CheMPS2/commit/d520e9e5af1c16621537f2bb51f3ae6f398c3ab8">d520e9e5af1c16621537f2bb51f3ae6f398c3ab8</a> from the <a class="reference external" href="https://github.com/sebwouters/chemps2">CheMPS2 github repository</a> on a single Intel Xeon Sandy Bridge (E5-2670) core &#64; 2.6 GHz. For the two values of <span class="math">\(D\)</span> shown in the figure, the energies are converged to <span class="math">\(\mu E_h\)</span> accuracy due to the one-dimensional topology of the localized and ordered <span class="math">\(\pi\)</span>-orbitals. Due to the imposed <span class="math">\(\mathsf{SU(2)} \otimes \mathsf{U(1)} \otimes \mathsf{C_s}\)</span> symmetry, all tensors become block-sparse, which causes the scaling to be below <span class="math">\(\mathcal{O}(L^4)\)</span>.</p>
+<img alt="_images/polyene_scaling.png" src="_images/polyene_scaling.png" />
+</div>
 <div class="section" id="n2-cc-pvdz">
-<h2>7.1. N2/cc-pVDZ<a class="headerlink" href="#n2-cc-pvdz" title="Permalink to this headline">¶</a></h2>
-<p>The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{d2h}\)</span>, and the targeted state was <span class="math">\(X^1\Sigma_g^+\)</span> at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. <a class="reference internal" href="#nitrogen" id="id2">[NITROGEN]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores &#64; 2.6 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 6 Gb of memory.</p>
+<h2>7.2. N2/cc-pVDZ<a class="headerlink" href="#n2-cc-pvdz" title="Permalink to this headline">¶</a></h2>
+<p>The nitrogen dimer in the cc-pVDZ basis has an active space of 14 electrons in 28 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{D_{2h}}\)</span>, and the targeted state was <span class="math">\(\mathsf{X^1\Sigma_g^+}\)</span> at equilibrium bond length: 2.118 a.u. This system was first studied with DMRG in Ref. <a class="reference internal" href="#nitrogen" id="id2">[NITROGEN]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 16 Intel Xeon Sandy Bridge (E5-2670) cores &#64; 2.6 GHz. The calculation was performed with snapshot <a class="reference external" href="https://github.com/SebWouters/CheMPS2/commit/045393b439821c81d800328c0b4b8b1732da47f8">045393b439821c81d800328c0b4b8b1732da47f8</a> from the <a class="reference external" href="https://github.com/sebwouters/chemps2">CheMPS2 github repository</a>. The orbitals were reordered with <code class="docutils literal"><span class="pre">void</span> <span class="pre">CheMPS2::Problem::SetupReorderD2h()</span></code>. The residual norm tolerance for the Davidson algorithm was set to <span class="math">\(10^{-5}\)</span>. OpenMP parallelization on a single node was used, and the calculation needed ~ 6 Gb of memory.</p>
 <blockquote>
 <div><table border="1" class="docutils">
 <colgroup>
@@ -103,8 +108,8 @@
 </div></blockquote>
 </div>
 <div class="section" id="h2o-roos-ano-dz">
-<h2>7.2. H2O/Roos&#8217; ANO DZ<a class="headerlink" href="#h2o-roos-ano-dz" title="Permalink to this headline">¶</a></h2>
-<p>Water in Roos&#8217; ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{c2v}\)</span>, and the targeted state was <span class="math">\(^1A_1\)</span> at equilibrium geometry: O &#64; (0, 0, 0) and H &#64; (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. <a class="reference internal" href="#water" id="id3">[WATER]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores &#64; 2.5 GHz. The calculation was performed with snapshot 045393b439821c81d800328c0b4b8b1732da47f8 from the github repository. OpenMP parallelization on a single node was used, and the calculation needed ~ 64 Gb of memory.</p>
+<span id="label-water-roos-ano-dz"></span><h2>7.3. H2O/Roos&#8217; ANO DZ<a class="headerlink" href="#h2o-roos-ano-dz" title="Permalink to this headline">¶</a></h2>
+<p>Water in Roos&#8217; ANO DZ basis has an active space of 10 electrons in 41 orbitals. The exploited point group in the calculations was <span class="math">\(\mathsf{C_{2v}}\)</span>, and the targeted state was <span class="math">\(\mathsf{^1A_1}\)</span> at equilibrium geometry: O &#64; (0, 0, 0) and H &#64; (± 0.790689766, 0, 0.612217330) Angstrom. This system was first studied with DMRG in Ref. <a class="reference internal" href="#water" id="id4">[WATER]</a>. The listed CheMPS2 timings are wall times per sweep (in seconds) on 20 Intel Xeon Ivy Bridge (E5-2670 v2) cores &#64; 2.5 GHz. The calculation was performed with snapshot <a class="reference external" href="https://github.com/SebWouters/CheMPS2/commit/045393b439821c81d800328c0b4b8b1732da47f8">045393b439821c81d800328c0b4b8b1732da47f8</a> from the <a class="reference external" href="https://github.com/sebwouters/chemps2">CheMPS2 github repository</a>. The residual norm tolerance for the Davidson algorithm was set to <span class="math">\(10^{-5}\)</span>. OpenMP parallelization on a single node was used, and the calculation needed ~ 64 Gb of memory.</p>
 <blockquote>
 <div><table border="1" class="docutils">
 <colgroup>
@@ -144,11 +149,28 @@
 </tbody>
 </table>
 </div></blockquote>
-<table class="docutils citation" frame="void" id="timing" rules="none">
+</div>
+<div class="section" id="hybrid-parallelization">
+<h2>7.4. Hybrid parallelization<a class="headerlink" href="#hybrid-parallelization" title="Permalink to this headline">¶</a></h2>
+<p>CheMPS2 contains a hybrid MPI and OpenMP parallelization for mixed distributed and shared memory architectures. In Ref. <a class="reference internal" href="#timing2" id="id7">[TIMING2]</a> this hybrid parallelization is illustrated for H2O in Roos&#8217; ANO DZ basis, the system studied <a class="reference internal" href="#label-water-roos-ano-dz"><span>above</span></a>. The speedups achieved with snapshot <a class="reference external" href="https://github.com/SebWouters/CheMPS2/commit/045393b439821c81d800328c0b4b8b1732da47f8">045393b439821c81d800328c0b4b8b1732da47f8</a> of the <a class="reference external" href="https://github.com/sebwouters/chemps2">CheMPS2 github repository</a> and <a class="reference external" href="https://github.com/sanshar/block/releases/tag/v1.1-alpha">Block version 1.1-alpha</a> are shown in the figures below. All calculations were performed with reduced virtual dimension <span class="math">\(D=1000\)</span>. RHF orbitals were used, ordered per irreducible representation of <span class="math">\(\mathsf{C_{2v}}\)</span> according to their single-particle energy, and the irreducible representations were ordered as <span class="math">\(\{ \mathsf{A1},~\mathsf{A2},~\mathsf{B1},~\text{and}~\mathsf{B2} \}\)</span>. The residual norm tolerance for the Davidson algorithm was set to <span class="math">\(10^{-4}\)</span>. Note that in Block the square of this parameter needs to be passed. Each node has a dual Intel Xeon Sandy Bridge E5-2670 (total of 16 cores at 2.6 GHz) and 64 GB of memory. The nodes are connected with FDR InfiniBand. The renormalized operators were stored on GPFS in order to achieve high disk bandwidths. Both codes and all depending libraries were compiled with the Intel MPI compiler version 2015.1.133. The Intel Math Kernel Library version 11.2.1.133 was used for BLAS and LAPACK routines.</p>
+<img alt="_images/single_node_h2o.png" src="_images/single_node_h2o.png" />
+<p>Figure above: Comparison of pure MPI and OpenMP speedups on a single node. Wall times per sweep are indicated for 16 cores (in seconds).</p>
+<img alt="_images/multi_node_h2o.png" src="_images/multi_node_h2o.png" />
+<p>Figure above: Illustration of the hybrid parallelization of CheMPS2. For 16 cores and less, one MPI process with several OpenMP threads is used. For 32 cores and more, several MPI processes each with 16 OpenMP threads are used. Wall times per sweep are indicated (in seconds).</p>
+<table class="docutils citation" frame="void" id="timing1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[TIMING]</a></td><td><ol class="first last upperalpha simple" start="19">
+<tr><td class="label"><a class="fn-backref" href="#id1">[TIMING1]</a></td><td><ol class="first last upperalpha simple" start="19">
 <li>Wouters and D. Van Neck, <em>European Physical Journal D</em> <strong>68</strong>, 272 (2014), doi: <a class="reference external" href="http://dx.doi.org/10.1140/epjd/e2014-50500-1">10.1140/epjd/e2014-50500-1</a></li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="timing2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[TIMING2]</a></td><td><ol class="first last upperalpha simple" start="19">
+<li>Wouters, V. Van Speybroeck and D. Van Neck, <em>Preprint</em> (2016), arXiv: <a class="reference external" href="http://arxiv.org/abs/1605.05526">1605.05526</a></li>
 </ol>
 </td></tr>
 </tbody>
@@ -162,7 +184,7 @@
 <table class="docutils citation" frame="void" id="water" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[WATER]</a></td><td><ol class="first last upperalpha simple" start="7">
+<tr><td class="label"><a class="fn-backref" href="#id4">[WATER]</a></td><td><ol class="first last upperalpha simple" start="7">
 <li>K.-L. Chan and M. Head-Gordon, <em>Journal of Chemical Physics</em> <strong>118</strong>, 8551 (2003), doi: <a class="reference external" href="http://dx.doi.org/10.1063/1.1574318">10.1063/1.1574318</a></li>
 </ol>
 </td></tr>
@@ -183,8 +205,10 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">7. Typical resource requirements</a><ul>
-<li><a class="reference internal" href="#n2-cc-pvdz">7.1. N2/cc-pVDZ</a></li>
-<li><a class="reference internal" href="#h2o-roos-ano-dz">7.2. H2O/Roos&#8217; ANO DZ</a></li>
+<li><a class="reference internal" href="#scaling-with-system-size">7.1. Scaling with system size</a></li>
+<li><a class="reference internal" href="#n2-cc-pvdz">7.2. N2/cc-pVDZ</a></li>
+<li><a class="reference internal" href="#h2o-roos-ano-dz">7.3. H2O/Roos&#8217; ANO DZ</a></li>
+<li><a class="reference internal" href="#hybrid-parallelization">7.4. Hybrid parallelization</a></li>
 </ul>
 </li>
 </ul>
@@ -231,7 +255,7 @@
         <li class="right" >
           <a href="inoutput.html" title="6. DMRG calculations"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

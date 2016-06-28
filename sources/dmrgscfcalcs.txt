@@ -34,12 +34,15 @@ An instance of the ``CheMPS2::DMRGSCFoptions`` class is required to perform DMRG
 * The variable ``UnitaryStorageName_in`` contains the filename of the orbital rotation checkpoint.
 * The variable ``StateAveraging_in`` allows to switch off state-averaged DMRG-SCF calculations (to perform state-specific DMRG-SCF calculations).
 * The variable ``WhichActiveSpace_in`` allows to switch between active space orbital choices (please remember the remark in the section :ref:`chemps2_orbitalchoiceordering`): 
-    * input orbitals (``0``)
-    * natural orbitals (``1``)
-    * localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (``2``)
+    * input orbitals (``0``) : No orbital rotations in addition to the occupied-active, active-virtual, and occupied-virtual rotations are performed.
+    * natural orbitals (``1``) : After each DMRG calculation, and before the calculation of the gradient and Hessian for occupied-active, active-virtual, and occupied-virtual rotations, the active space orbitals are rotated to natural orbitals. This options allows to perform an initial approximate large active space DMRG calculation, from which a smaller active space can subsequently be selected based on the natural orbital occupation numbers.
+    * localized (Edmiston-Ruedenberg) and ordered (Fiedler vector of the exchange matrix) orbitals (``2``) : Per irrep, the orbitals are localized with an augmented Hessian Newton-Raphson optimization of the Edmiston-Ruedenberg cost function. The orbitals are ordered per irrep based on the Fiedler vector of the exchange matrix. Orbitals belonging to different irreps are not mingled in the process.
+    * ordered orbitals only (based on the Fiedler vector of the exchange matrix) (``3``) : The orbitals are ordered based on the Fiedler vector of the exchange matrix. Orbitals belonging to different irreps are mingled in the process.
 * The variable ``DumpCorrelations_in`` allows to switch on printing the correlation functions defined in the section :ref:`chemps2_dmrg_object` after each DMRG calculation during the DMRG-SCF iterations.
-* The variable ``StartLocRandom_in`` allows to start the localization of the orbitals (if ``WhichActiveSpace_in==2``) from a random orbital rotation. To study the :math:`\pi`-orbitals of polyenes, for example, the matrix elements should be generated in the :math:`\mathsf{Cs}` subgroup of the molecule's point group in order to be able to localize them. In order to break the symmetry of the R(O)HF orbitals during localization, it is important to start from a random orbital rotation.
+* The variable ``StartLocRandom_in`` allows to start the localization of the orbitals (if ``WhichActiveSpace_in==2``) from a random orbital rotation. To study the :math:`\pi`-orbitals of polyenes, for example, the matrix elements should be generated in the :math:`\mathsf{C_s}` subgroup of the molecule's point group in order to be able to localize them. In order to break the symmetry of the R(O)HF orbitals during localization, it is important to start from a random orbital rotation.
 
+
+.. _label-casscf-calculations-api:
 
 ``CheMPS2::CASSCF``
 -------------------
@@ -48,14 +51,13 @@ Augmented Hessian Newton-Raphson DMRG-SCF calculations can be performed with the
 
 .. code-block:: c++
 
-    CheMPS2::CASSCF::CASSCF( CheMPS2::Hamiltonian * HamIn, int * DOCCin, int * SOCCin )
-    void CheMPS2::CASSCF::setupStart( int * NoccIn, int * NDMRGIn, int * NvirtIn )
-    double CheMPS2::CASSCF::doCASSCFnewtonraphson( const int Nelectrons, const int TwoS, const int Irrep, CheMPS2::ConvergenceScheme * OptScheme, const int rootNum, CheMPS2::DMRGSCFoptions * theDMRGSCFoptions )
+    CheMPS2::CASSCF::CASSCF( CheMPS2::Hamiltonian * ham_in, int * docc, int * socc, int * nocc, int * ndmrg, int * nvirt, const string tmp_folder )
+    double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options )
 
-The variables ``DOCCin``, ``SOCCin``, ``NoccIn``, ``NDMRGIn``, ``NvirtIn`` are arrays which have as length the number of irreps of the point group of the Hamiltonian (see the section :ref:`chemps2_psi4irrepconventions`). The first two arrays contain the number of doubly and singly occupied orbitals per irrep of the initial R(O)HF calculation. The last three arrays define for each of the irreps the number of occupied, active, and virtual orbitals, respectively.
+The variables ``docc``, ``socc``, ``nocc``, ``ndmrg``, ``nvirt`` are arrays which have as length the number of irreps of the point group of the Hamiltonian (see the section :ref:`chemps2_psi4irrepconventions`). The first two arrays contain the number of doubly and singly occupied orbitals per irrep of the initial R(O)HF calculation. The last three arrays define for each of the irreps the number of occupied, active, and virtual orbitals, respectively.
 
-The three functions above should be called in the order they are displayed. The augmented Hessian Newton-Raphson DMRG-SCF calculation is started by calling the function ``doCASSCFnewtonraphson``. The variables ``Nelectrons``, ``TwoS``, and ``Irrep`` define the active space symmetry sector. Note that ``TwoS`` is twice the targeted spin (multiplicity minus one). The numbering convention for the irreps can be found in the section :ref:`chemps2_psi4irrepconventions`. The variable ``rootNum`` defines how many states should be calculated during each DMRG calculation: ``rootNum==1`` means ground state only, ``rootNum==2`` means ground state and first excited state, etc. The DMRG instructions are passed in the ``CheMPS2::ConvergenceScheme`` object and the DMRG-SCF algorithmic choices in the ``CheMPS2::DMRGSCFoptions`` object. After completion, the function ``doCASSCFnewtonraphson`` returns the DMRG-SCF energy.
+The augmented Hessian Newton-Raphson DMRG-SCF calculation is started by calling the function ``solve``. The variables ``Nelectrons``, ``TwoS``, and ``Irrep`` define the active space symmetry sector. Note that ``Nelectrons`` is the total number of electrons, i.e. also the electrons in the doubly occupied core orbitals. ``TwoS`` is twice the targeted spin (multiplicity minus one). The numbering convention for the irreps can be found in the section :ref:`chemps2_psi4irrepconventions`. The variable ``rootNum`` defines how many states should be calculated during each DMRG calculation: ``rootNum==1`` means ground state only, ``rootNum==2`` means ground state and first excited state, etc. The DMRG instructions are passed in the ``CheMPS2::ConvergenceScheme`` object and the DMRG-SCF algorithmic choices in the ``CheMPS2::DMRGSCFoptions`` object. After completion, the function ``solve`` returns the DMRG-SCF energy.
 
-For DMRG-SCF calculations, the number of reduced virtual basis states should not be descreased in the ``CheMPS2::ConvergenceScheme`` object. It is however advised to perform a few sweeps without noise at the largest value of :math:`D_{\mathsf{SU(2)}}`. When you want to extrapolate the energy in the converged active space, it is better to create an orbital rotation checkpoint, and restart the DMRG-SCF calculation for one iteration (``MaxIterations_in==1``).
+For DMRG-SCF calculations, the number of reduced virtual basis states should not be decreased in the ``CheMPS2::ConvergenceScheme`` object. It is however advised to perform a few sweeps without noise and with very small residual norm tolerance (1e-8 to 1e-10) at the largest value of :math:`D_{\mathsf{SU(2)}}`. When you want to extrapolate the energy in the converged active space, it is better to create an orbital rotation checkpoint, and restart the DMRG-SCF calculation for one iteration (``MaxIterations_in==1``) with a different ``CheMPS2::ConvergenceScheme``.
    
 

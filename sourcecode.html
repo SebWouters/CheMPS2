@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. Installation &mdash; CheMPS2 1.7-rc2-8 (2016-05-19) documentation</title>
+    <title>1. Installation &mdash; CheMPS2 1.7-28 (2016-06-28) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7-rc2-8 (2016-05-19)',
+        VERSION:     '1.7-28 (2016-06-28)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7-rc2-8 (2016-05-19) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7-28 (2016-06-28) documentation" href="index.html" />
     <link rel="next" title="2. Publications" href="publications.html" />
     <link rel="prev" title="CheMPS2 documentation" href="index.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="index.html" title="CheMPS2 documentation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -58,7 +58,6 @@
 <ul class="simple">
 <li>BLAS</li>
 <li>LAPACK</li>
-<li>GSL (<a class="reference external" href="http://www.gnu.org/software/gsl/">GNU Scientific library</a>)</li>
 <li>HDF5 (<a class="reference external" href="http://www.hdfgroup.org/HDF5/">Hierarchical Data Format Release 5</a>)</li>
 </ul>
 <p>It is parallelized for shared memory architectures with the Open Multi-Processing (<a class="reference external" href="http://openmp.org/wp/">OpenMP</a>) API and for distributed memory architectures with the Message Passing Interface (<a class="reference external" href="http://www.mpi-forum.org/">MPI</a>). A hybrid combination of both parallelization strategies is supported.</p>
@@ -99,7 +98,7 @@ $ <span class="nb">cd</span> build
 <ol class="arabic simple">
 <li>Option1 is the <code class="docutils literal"><span class="pre">c++</span></code> compiler; typically <code class="docutils literal"><span class="pre">g++</span></code>, <code class="docutils literal"><span class="pre">icpc</span></code>, or <code class="docutils literal"><span class="pre">clang++</span></code> on Linux. It is advised to use the intel compiler if available.</li>
 <li>Option2 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the intel math kernel library.</li>
-<li>/option3 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/option3/lib/x86_64-linux-gnu</span></code>, the headers in <code class="docutils literal"><span class="pre">/option3/include/chemps2</span></code>, and the binary in <code class="docutils literal"><span class="pre">/option3/bin/chemps2</span></code>.</li>
+<li>/option3 is the prefix of the installation directory; typically <code class="docutils literal"><span class="pre">/usr</span></code> or <code class="docutils literal"><span class="pre">/usr/local</span></code> on Linux. On my computer, libchemps2 is then installed in <code class="docutils literal"><span class="pre">/option3/lib/x86_64-linux-gnu/</span></code>, the headers in <code class="docutils literal"><span class="pre">/option3/include/chemps2/</span></code>, and the binary in <code class="docutils literal"><span class="pre">/option3/bin/chemps2</span></code>.</li>
 <li>Option4 can be <code class="docutils literal"><span class="pre">ON</span></code> or <code class="docutils literal"><span class="pre">OFF</span></code> and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide <code class="docutils literal"><span class="pre">mpi.h</span></code>. Option1 should hence be the <code class="docutils literal"><span class="pre">mpic++</span></code> compiler; typically <code class="docutils literal"><span class="pre">mpic++</span></code> or <code class="docutils literal"><span class="pre">mpiicpc</span></code> on Linux. It is advised to use the intel compiler if available.</li>
 </ol>
 <p>If one or more of the required libraries are not found, use the command</p>
@@ -111,7 +110,8 @@ $ <span class="nb">cd</span> build
 <span class="nv">CMAKE_LIBRARY_PATH</span><span class="o">=</span>/my_libs/lib1/lib:/my_libs/lib2/lib
 </pre></div>
 </div>
-<p>For operating systems based on debian, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. If CMake complains about the HDF5 headers, try to pass it with the option <code class="docutils literal"><span class="pre">-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial</span></code>.</p>
+<p>For operating systems based on debian, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial/</span></code>. If CMake complains about the HDF5 headers, try to pass it with the option <code class="docutils literal"><span class="pre">-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial</span></code>.</p>
+<p>For building with GCC, errors involving unresolved symbols or a message <code class="docutils literal"><span class="pre">plugin</span> <span class="pre">needed</span> <span class="pre">to</span> <span class="pre">handle</span> <span class="pre">lto</span> <span class="pre">object</span></code> may indicate a failure of the interprocedural optimization. This can be resolved by passing full locations to gcc toolchain utilites to the <code class="docutils literal"><span class="pre">setup</span></code> command above: <code class="docutils literal"><span class="pre">-DCMAKE_RANLIB=/path/to/gcc-ranlib</span> <span class="pre">-DCMAKE_AR=/path/to/gcc-ar</span></code> .</p>
 <p>To compile, run:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ make
 </pre></div>
@@ -170,7 +170,7 @@ calculation at a later point, you should</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">export</span> <span class="nv">CPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CPATH</span><span class="si">}</span>:/option3/include
 </pre></div>
 </div>
-<p>where <code class="docutils literal"><span class="pre">/option3</span></code> is the option provided to CMake with <code class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX=/option3</span></code> above. For operating systems based on debian, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial</span></code>. If it was explicitly passed to CMake, it should also be appended to <code class="docutils literal"><span class="pre">CPATH</span></code>:</p>
+<p>where <code class="docutils literal"><span class="pre">/option3</span></code> is the option provided to CMake with <code class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX=/option3</span></code> above. For operating systems based on debian, the HDF5 headers are located in the folder <code class="docutils literal"><span class="pre">/usr/include/hdf5/serial/</span></code>. If it was explicitly passed to CMake, it should also be appended to <code class="docutils literal"><span class="pre">CPATH</span></code>:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">export</span> <span class="nv">CPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">CPATH</span><span class="si">}</span>:/option3/include:/usr/include/hdf5/serial
 </pre></div>
 </div>
@@ -270,7 +270,7 @@ $ python test2.py
         <li class="right" >
           <a href="index.html" title="CheMPS2 documentation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-rc2-8 (2016-05-19) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7-28 (2016-06-28) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

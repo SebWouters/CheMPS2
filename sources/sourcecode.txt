@@ -15,7 +15,6 @@ CheMPS2 can be built with `CMake <http://www.cmake.org/>`_ and depends on
 
 * BLAS
 * LAPACK
-* GSL (`GNU Scientific library <http://www.gnu.org/software/gsl/>`_)
 * HDF5 (`Hierarchical Data Format Release 5 <http://www.hdfgroup.org/HDF5/>`_)
 
 It is parallelized for shared memory architectures with the Open Multi-Processing (`OpenMP <http://openmp.org/wp/>`_) API and for distributed memory architectures with the Message Passing Interface (`MPI <http://www.mpi-forum.org/>`_). A hybrid combination of both parallelization strategies is supported.
@@ -66,7 +65,7 @@ CMake generates makefiles based on the user's specifications:
 
 #.  Option1 is the ``c++`` compiler; typically ``g++``, ``icpc``, or ``clang++`` on Linux. It is advised to use the intel compiler if available.
 #.  Option2 can be ``ON`` or ``OFF`` and is used to switch on the intel math kernel library.
-#.  /option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/option3/lib/x86_64-linux-gnu``, the headers in ``/option3/include/chemps2``, and the binary in ``/option3/bin/chemps2``.
+#.  /option3 is the prefix of the installation directory; typically ``/usr`` or ``/usr/local`` on Linux. On my computer, libchemps2 is then installed in ``/option3/lib/x86_64-linux-gnu/``, the headers in ``/option3/include/chemps2/``, and the binary in ``/option3/bin/chemps2``.
 #.  Option4 can be ``ON`` or ``OFF`` and is used to switch on the possibility to compile with MPI. Please note that the compiler should then provide ``mpi.h``. Option1 should hence be the ``mpic++`` compiler; typically ``mpic++`` or ``mpiicpc`` on Linux. It is advised to use the intel compiler if available.
 
 If one or more of the required libraries are not found, use the command
@@ -82,7 +81,9 @@ instead, where option5 and option6 are respectively the missing colon-separated 
     CMAKE_INCLUDE_PATH=/my_libs/lib1/include:/my_libs/lib2/include
     CMAKE_LIBRARY_PATH=/my_libs/lib1/lib:/my_libs/lib2/lib
 
-For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If CMake complains about the HDF5 headers, try to pass it with the option ``-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial``.
+For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial/``. If CMake complains about the HDF5 headers, try to pass it with the option ``-DHDF5_INCLUDE_DIRS=/usr/include/hdf5/serial``.
+
+For building with GCC, errors involving unresolved symbols or a message ``plugin needed to handle lto object`` may indicate a failure of the interprocedural optimization. This can be resolved by passing full locations to gcc toolchain utilites to the ``setup`` command above: ``-DCMAKE_RANLIB=/path/to/gcc-ranlib -DCMAKE_AR=/path/to/gcc-ar`` .
 
 To compile, run:
 
@@ -157,7 +158,7 @@ PyCheMPS2 is a python interface to libchemps2, for compilation **without MPI**. 
 
     $ export CPATH=${CPATH}:/option3/include
     
-where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
+where ``/option3`` is the option provided to CMake with ``-DCMAKE_INSTALL_PREFIX=/option3`` above. For operating systems based on debian, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial/``. If it was explicitly passed to CMake, it should also be appended to ``CPATH``:
 
 .. code-block:: bash
 

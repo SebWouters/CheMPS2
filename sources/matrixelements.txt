@@ -51,7 +51,7 @@ An example input file to generate a FCIDUMP file:
 
 .. literalinclude:: N2.fcidump.in
 
-This file (``N2.fcidump.in``) should be placed in the folder ``/mypsi4plugins/fcidump``. The FCIDUMP file can then be generated with:
+This file (``N2.fcidump.in``) should be placed in the folder ``/mypsi4plugins/fcidump/``. The FCIDUMP file can then be generated with:
 
 .. code-block:: bash
 
@@ -59,7 +59,7 @@ This file (``N2.fcidump.in``) should be placed in the folder ``/mypsi4plugins/fc
     $ psi4 N2.fcidump.in N2.fcidump.out
     $ less N2.CCPVDZ.FCIDUMP
 
-Examples of output generated with this plugin can be found in ``/sourcefolder/chemps2/tests/matrixelements``.
+Examples of output generated with this plugin can be found in ``/sourcefolder/chemps2/tests/matrixelements/``.
 
 
 psi4 ``savehdf`` plugin
@@ -87,7 +87,7 @@ to
 
     $(CXX) $(LDFLAGS) -o $@ $^ $(CXXDEFS) -lchemps2
 
-Remember to add the library and include paths to the Makefile as well, if ``libchemps2`` is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. It might be necessary to add it to the ``INCLUDES`` variable in the Makefile.
+Remember to add the library and include paths to the Makefile as well, if ``libchemps2`` is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial/``. It might be necessary to add it to the ``INCLUDES`` variable in the Makefile.
 To compile the plugin, run:
 
 .. code-block:: bash
@@ -98,7 +98,7 @@ An example input file to use the ``savehdf`` plugin:
 
 .. literalinclude:: N2.savehdf.in
 
-This file (``N2.savehdf.in``) should be placed in the folder ``/mypsi4plugins/savehdf``. The matrix elements can then be saved to disk in binary form with HDF5 by running:
+This file (``N2.savehdf.in``) should be placed in the folder ``/mypsi4plugins/savehdf/``. The matrix elements can then be saved to disk in binary form with HDF5 by running:
 
 .. code-block:: bash
 
