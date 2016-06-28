@@ -248,90 +248,74 @@ executable, which allows to use libchemps2 from the command line.
 
 [CheMPS2/include/chemps2/CASSCF.h](CheMPS2/include/chemps2/CASSCF.h) contains the definitions of the CASSCF class.
 
-[CheMPS2/include/chemps2/ConjugateGradient.h](CheMPS2/include/chemps2/ConjugateGradient.h) contains the definitions of the
-ConjugateGradient class.
+[CheMPS2/include/chemps2/ConjugateGradient.h](CheMPS2/include/chemps2/ConjugateGradient.h) contains the definitions of the ConjugateGradient class.
 
-[CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the
-ConvergenceScheme class.
+[CheMPS2/include/chemps2/ConvergenceScheme.h](CheMPS2/include/chemps2/ConvergenceScheme.h) contains the definitions of the ConvergenceScheme class.
 
-[CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the
-Correlations class.
+[CheMPS2/include/chemps2/Correlations.h](CheMPS2/include/chemps2/Correlations.h) contains the definitions of the Correlations class.
 
 [CheMPS2/include/chemps2/Cumulant.h](CheMPS2/include/chemps2/Cumulant.h) contains the definitions of the Cumulant class.
 
-[CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the
-Davidson class.
+[CheMPS2/include/chemps2/Davidson.h](CheMPS2/include/chemps2/Davidson.h) contains the definitions of the Davidson class.
 
 [CheMPS2/include/chemps2/DIIS.h](CheMPS2/include/chemps2/DIIS.h) contains the definitions of the DIIS class.
 
 [CheMPS2/include/chemps2/DMRG.h](CheMPS2/include/chemps2/DMRG.h) contains the definitions of the DMRG class.
 
-[CheMPS2/include/chemps2/DMRGSCFindices.h](CheMPS2/include/chemps2/DMRGSCFindices.h) contains the definitions of the
-DMRGSCFindices class.
+[CheMPS2/include/chemps2/DMRGSCFindices.h](CheMPS2/include/chemps2/DMRGSCFindices.h) contains the definitions of the DMRGSCFindices class.
 
-[CheMPS2/include/chemps2/DMRGSCFintegrals.h](CheMPS2/include/chemps2/DMRGSCFintegrals.h) contains the definitions of the
-DMRGSCFintegrals class.
+[CheMPS2/include/chemps2/DMRGSCFintegrals.h](CheMPS2/include/chemps2/DMRGSCFintegrals.h) contains the definitions of the DMRGSCFintegrals class.
 
-[CheMPS2/include/chemps2/DMRGSCFmatrix.h](CheMPS2/include/chemps2/DMRGSCFmatrix.h) contains the definitions of the
-DMRGSCFmatrix class.
+[CheMPS2/include/chemps2/DMRGSCFmatrix.h](CheMPS2/include/chemps2/DMRGSCFmatrix.h) contains the definitions of the DMRGSCFmatrix class.
 
-[CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the
-DMRGSCFoptions container class.
+[CheMPS2/include/chemps2/DMRGSCFoptions.h](CheMPS2/include/chemps2/DMRGSCFoptions.h) contains the definitions of the DMRGSCFoptions container class.
 
-[CheMPS2/include/chemps2/DMRGSCFrotations.h](CheMPS2/include/chemps2/DMRGSCFrotations.h) contains the definitions of the
-DMRGSCFrotations class.
+[CheMPS2/include/chemps2/DMRGSCFrotations.h](CheMPS2/include/chemps2/DMRGSCFrotations.h) contains the definitions of the DMRGSCFrotations class.
 
-[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the
-DMRGSCFunitary class.
+[CheMPS2/include/chemps2/DMRGSCFunitary.h](CheMPS2/include/chemps2/DMRGSCFunitary.h) contains the definitions of the DMRGSCFunitary class.
 
-[CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the
-DMRGSCFwtilde class.
+[CheMPS2/include/chemps2/DMRGSCFwtilde.h](CheMPS2/include/chemps2/DMRGSCFwtilde.h) contains the definitions of the DMRGSCFwtilde class.
 
-[CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the
-EdmistonRuedenberg class.
+[CheMPS2/include/chemps2/EdmistonRuedenberg.h](CheMPS2/include/chemps2/EdmistonRuedenberg.h) contains the definitions of the EdmistonRuedenberg class.
 
-[CheMPS2/include/chemps2/Excitation.h](CheMPS2/include/chemps2/Excitation.h) contains the definitions of the
-Excitation class.
+[CheMPS2/include/chemps2/Excitation.h](CheMPS2/include/chemps2/Excitation.h) contains the definitions of the Excitation class.
 
 [CheMPS2/include/chemps2/FCI.h](CheMPS2/include/chemps2/FCI.h) contains the definitions of the FCI class.
 
-[CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex
-class.
+[CheMPS2/include/chemps2/FourIndex.h](CheMPS2/include/chemps2/FourIndex.h) contains the definitions of the FourIndex class.
 
-[CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian
-class.
+[CheMPS2/include/chemps2/Hamiltonian.h](CheMPS2/include/chemps2/Hamiltonian.h) contains the definitions of the Hamiltonian class.
 
 [CheMPS2/include/chemps2/Heff.h](CheMPS2/include/chemps2/Heff.h) contains the definitions of the Heff class.
 
-[CheMPS2/include/chemps2/Initialize.h](CheMPS2/include/chemps2/Initialize.h) contains the definitions of the Initialize
-class.
+[CheMPS2/include/chemps2/Initialize.h](CheMPS2/include/chemps2/Initialize.h) contains the definitions of the Initialize class.
 
-[CheMPS2/include/chemps2/Irreps.h](CheMPS2/include/chemps2/Irreps.h) contains the definitions of the Irrep class.
+[CheMPS2/include/chemps2/Irreps.h](CheMPS2/include/chemps2/Irreps.h) contains the definitions of the Irreps class.
 
-[CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS
-and LAPACK routines.
+[CheMPS2/include/chemps2/Lapack.h](CheMPS2/include/chemps2/Lapack.h) contains the definitions of the external BLAS and LAPACK routines.
 
 [CheMPS2/include/chemps2/Molden.h](CheMPS2/include/chemps2/Molden.h) contains the definitions of the Molden class.
 
-[CheMPS2/include/chemps2/MPIchemps2.h](CheMPS2/include/chemps2/MPIchemps2.h) contains the
-distribution of (complementary) renormalized operators over MPI processes, as well as
-wrappers for the MPI communication routines in the C API.
+[CheMPS2/include/chemps2/MPIchemps2.h](CheMPS2/include/chemps2/MPIchemps2.h)
+contains the distribution of (complementary) renormalized operators over MPI
+processes, as well as wrappers for the MPI communication routines in the C API.
 
-[CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces the use of the HDF5 1.8 API, e.g. 
-H5Gcreate2 instead of H5Gcreate1, a known issue in Ubuntu 12.04.
+[CheMPS2/include/chemps2/MyHDF5.h](CheMPS2/include/chemps2/MyHDF5.h) forces
+the use of the HDF5 1.8 API, e.g. H5Gcreate2 instead of H5Gcreate1, a known
+issue in Ubuntu 12.04.
 
-[CheMPS2/include/chemps2/Options.h](CheMPS2/include/chemps2/Options.h) contains all the options of the CheMPS2
-namespace. Here the checkpoint storage names and folders can be set, as well
-as parameters related to memory usage and convergence.
+[CheMPS2/include/chemps2/Options.h](CheMPS2/include/chemps2/Options.h)
+contains all the options of the CheMPS2 namespace. Here the checkpoint
+storage names and folders can be set, as well as parameters related to
+memory usage and convergence.
 
 [CheMPS2/include/chemps2/Problem.h](CheMPS2/include/chemps2/Problem.h) contains the definitions of the Problem class.
 
 [CheMPS2/include/chemps2/Sobject.h](CheMPS2/include/chemps2/Sobject.h) contains the definitions of the Sobject class.
 
-[CheMPS2/include/chemps2/Special.h](CheMPS2/include/chemps2/Special.h) contains special functions needed in various parts of the library.
+[CheMPS2/include/chemps2/Special.h](CheMPS2/include/chemps2/Special.h) contains special functions needed in various parts of libchemps2.
 
-[CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the
-SyBookkeeper class.
+[CheMPS2/include/chemps2/SyBookkeeper.h](CheMPS2/include/chemps2/SyBookkeeper.h) contains the definitions of the SyBookkeeper class.
 
 [CheMPS2/include/chemps2/Tensor3RDM.h](CheMPS2/include/chemps2/Tensor3RDM.h) contains the definitions of the Tensor3RDM class.
 
@@ -339,11 +323,9 @@ SyBookkeeper class.
 
 [CheMPS2/include/chemps2/TensorF1.h](CheMPS2/include/chemps2/TensorF1.h) contains the definitions of the TensorF1 class.
 
-[CheMPS2/include/chemps2/TensorGYZ.h](CheMPS2/include/chemps2/TensorGYZ.h) contains the definitions of the TensorGYZ
-class.
+[CheMPS2/include/chemps2/TensorGYZ.h](CheMPS2/include/chemps2/TensorGYZ.h) contains the definitions of the TensorGYZ class.
 
-[CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor
-class.
+[CheMPS2/include/chemps2/Tensor.h](CheMPS2/include/chemps2/Tensor.h) contains the definitions of the virtual Tensor class.
 
 [CheMPS2/include/chemps2/TensorKM.h](CheMPS2/include/chemps2/TensorKM.h) contains the definitions of the TensorKM class.
 

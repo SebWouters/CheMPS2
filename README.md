@@ -65,12 +65,12 @@ provided in FCIDUMP format. Usage of the binary is illustrated in the
 example.
 
 
-User manual
------------
+Documentation
+-------------
 
 Information on CheMPS2 can be found in the following documents:
 
-1. [publications](#how-to-acknowledge-chemps2)
+1. [publications](http://sebwouters.github.io/CheMPS2/publications.html)
 2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
 3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
 
@@ -85,87 +85,28 @@ elaborate information on
 * the interfaces to [psi4](http://www.psicode.org) and [pyscf](https://github.com/sunqm/pyscf)
 
 
-How to acknowledge CheMPS2
---------------------------
+Publications
+------------
 
-To acknowledge CheMPS2, please cite
-
-1. S. Wouters, W. Poelmans, P.W. Ayers and D. Van Neck,
-   CheMPS2: a free open-source spin-adapted implementation of the density
-   matrix renormalization group for ab initio quantum chemistry,
-   *Computer Physics Communications* **185** (6), 1501-1514 (2014),
-   [doi:10.1016/j.cpc.2014.01.019](http://dx.doi.org/10.1016/j.cpc.2014.01.019)
-
-        @article{CheMPS2cite1,
-            author = {Sebastian Wouters and Ward Poelmans and Paul W. Ayers and Dimitri {Van Neck}},
-            title = {CheMPS2: a free open-source spin-adapted implementation of the density matrix renormalization group for ab initio quantum chemistry},
-            journal = {Computer Physics Communications},
-            year = {2014},
-            volume = {185},
-            number = {6},
-            pages = {1501-1514},
-            doi = {10.1016/j.cpc.2014.01.019}
-        }
-
-2. S. Wouters and D. Van Neck,
-   The density matrix renormalization group for ab initio quantum chemistry,
-   *European Physical Journal D* **68** (9), 272 (2014),
-   [doi:10.1140/epjd/e2014-50500-1](http://dx.doi.org/10.1140/epjd/e2014-50500-1)
-
-        @article{CheMPS2cite2,
-            author = {Sebastian Wouters and Dimitri {Van Neck}},
-            title = {The density matrix renormalization group for ab initio quantum chemistry},
-            journal = {European Physical Journal D},
-            year = {2014},
-            volume = {68},
-            number = {9},
-            pages = {272},
-            doi = {10.1140/epjd/e2014-50500-1}
-        }
-
-3. S. Wouters, T. Bogaerts, P. Van Der Voort, V. Van Speybroeck and D. Van Neck,
-   Communication: DMRG-SCF study of the singlet, triplet, and quintet states of oxo-Mn(Salen),
-   *Journal of Chemical Physics* **140** (24), 241103 (2014),
-   [doi:10.1063/1.4885815](http://dx.doi.org/10.1063/1.4885815)
-   
-        @article{CheMPS2cite3,
-            author = {Sebastian Wouters and Thomas Bogaerts and Pascal {Van Der Voort} and Veronique {Van Speybroeck} and Dimitri {Van Neck}},
-            title = {Communication: DMRG-SCF study of the singlet, triplet, and quintet states of oxo-Mn(Salen)},
-            journal = {Journal of Chemical Physics},
-            year = {2014},
-            volume = {140},
-            number = {24},
-            pages = {241103},
-            doi = {10.1063/1.4885815}
-        }
-
-4. S. Wouters, V. Van Speybroeck and D. Van Neck,
-   DMRG-CASPT2 study of the longitudinal static second hyperpolarizability of all-trans polyenes,
-   *Preprint* (2016),
-   [arXiv:1605.05526](http://arxiv.org/abs/1605.05526)
-
-        @article{CheMPS2cite4,
-            author = {Sebastian Wouters and Veronique {Van Speybroeck} and Dimitri {Van Neck}},
-            title = {DMRG-CASPT2 study of the longitudinal static second hyperpolarizability of all-trans polyenes},
-            journal = {arXiv:1605.05526},
-            year = {2016},
-            url = {http://arxiv.org/abs/1605.05526}
-        }
+To acknowledge CheMPS2, please cite the publications in
+[sphinx/publications.rst](sphinx/publications.rst). The
+corresponding compiled html documentation can be consulted
+[here](http://sebwouters.github.io/CheMPS2/publications.html).
 
 
 Installation
 ------------
 
-Information on how to build and install CheMPS2 from source can be found at
-[sphinx/sourcecode.rst](sphinx/sourcecode.rst), or alternatively in compiled
-form at the
-[user manual](http://sebwouters.github.io/CheMPS2/sourcecode.html).
+Information on how to build and install CheMPS2 from source can
+be found at [sphinx/sourcecode.rst](sphinx/sourcecode.rst). The
+corresponding compiled html documentation can be consulted
+[here](http://sebwouters.github.io/CheMPS2/sourcecode.html).
 
 
-List of files in CheMPS2
-------------------------
+List of files
+-------------
 
-The files in the CheMPS2 library, as well as the files required to perform
-test runs, can be found in [FILES.md](FILES.md).
+The files in the CheMPS2 library, as well as the files required
+to perform test runs, can be found in [FILES.md](FILES.md).
 
 
