@@ -3,15 +3,19 @@ List of files in CheMPS2
 
 [CheMPS2/CASPT2.cpp](CheMPS2/CASPT2.cpp) contains an implementation of
 internally contracted CASPT2. The user can specify an IPEA shift and/or
-an imaginary shift to mitigate possible intruder state problems.
+an imaginary level shift to mitigate possible intruder state problems.
+The linear CASPT2 equations can be solved with either Davidson's
+algorithm, or with the conjugate gradient method. Note that the overlap
+matrix is always diagonalized, and that a cumulant approximation of the
+4-RDM should therefore be avoided.
 
 [CheMPS2/CASSCF.cpp](CheMPS2/CASSCF.cpp) contains the functionality
-to construct the active space Hamiltonian.
+to construct the active space Hamiltonian for DMRG-SCF.
 
 [CheMPS2/CASSCFdebug.cpp](CheMPS2/CASSCFdebug.cpp) contains two
 functions: one for calculating the ROHF energy; and one for fetching FCI
 coefficients to determine the point group symmetry of certain electronic
-states of the carbon dimer.
+states of the iron dimer.
 
 [CheMPS2/CASSCFnewtonraphson.cpp](CheMPS2/CASSCFnewtonraphson.cpp)
 contains all DMRG-SCF functions which are specific to the augmented Hessian
@@ -19,11 +23,12 @@ Newton-Raphson update scheme, including the functions to calculate the
 gradient and Hessian.
 
 [CheMPS2/CASSCFpt2.cpp](CheMPS2/CASSCFpt2.cpp) provides the interface between
-the CASSCF and CASPT2 classes. The routines for the 3-RDM and the Fock operator
-contracted with the 4-RDM are called here.
+the CASSCF and CASPT2 classes. The routines for the 3-RDM and the Fock
+operator contraction with the 4-RDM are called here.
 
-[CheMPS2/ConjugateGradient.cpp](CheMPS2/ConjugateGradient.cpp) is an implementation of
-the conjugate gradient algorithm, in the style of the Davidson class.
+[CheMPS2/ConjugateGradient.cpp](CheMPS2/ConjugateGradient.cpp) is an
+implementation of the conjugate gradient algorithm, in the style of the
+Davidson class.
 
 [CheMPS2/ConvergenceScheme.cpp](CheMPS2/ConvergenceScheme.cpp) contains
 all functions of the ConvergenceScheme class, which contains the instructions
@@ -33,13 +38,13 @@ for the subsequent DMRG sweeps.
 functionality to calculate the spin, density, and spin-flip correlation
 functions as well as the two-orbital mutual information.
 
-[CheMPS2/Cumulant.cpp](CheMPS2/Cumulant.cpp) contains the functionality
+[CheMPS2/Cumulant.cpp](CheMPS2/Cumulant.cpp) contains static member functions
 to reconstruct the 4-RDM from lower order reduced density matrices. There is
 also a fast contraction of the Fock operator with the cumulant-reconstructed
 4-RDM.
 
 [CheMPS2/Davidson.cpp](CheMPS2/Davidson.cpp) is an implementation of
-Davidson's algorithm.
+Davidson's algorithm, both for eigenvalue problems and linear equations.
 
 [CheMPS2/DIIS.cpp](CheMPS2/DIIS.cpp) contains a DIIS convergence
 speed-up for DMRG-SCF.
@@ -52,15 +57,15 @@ express a symmetry (spin, particle number, and point group) conserving
 single-particle excitation on top of an MPS as a new MPS.
 
 [CheMPS2/DMRGmpsio.cpp](CheMPS2/DMRGmpsio.cpp) contains the store and
-load functions for the DMRG checkpoint file (the MPS).
+load functions for the DMRG checkpoint file (the MPS and the SyBookkeeper).
 
 [CheMPS2/DMRGoperators3RDM.cpp](CheMPS2/DMRGoperators3RDM.cpp) contains all
-update functions for the renormalized operators specific for the ThreeDM and the
-Correlations.
+update functions for the renormalized operators specific for the ThreeDM and
+the Correlations.
 
 [CheMPS2/DMRGoperators.cpp](CheMPS2/DMRGoperators.cpp) contains all
-functions related to the DMRG renormalized operators: saving to disk, loading
-from disk, and updating.
+functions related to the DMRG renormalized operators: saving to disk,
+loading from disk, and updating.
 
 [CheMPS2/DMRGSCFindices.cpp](CheMPS2/DMRGSCFindices.cpp) contains the
 index conversions for the DMRG-SCF algorithm.
@@ -72,43 +77,45 @@ class for two-body matrix elements with at most two virtual indices.
 class for orbital matrices which are blockdiagonal in the irreps.
 
 [CheMPS2/DMRGSCFoptions.cpp](CheMPS2/DMRGSCFoptions.cpp) is a container
-class to pass the DMRGSCF options to the augmented Hessian Newton-Raphson
-routine.
+class to pass the DMRG-SCF options to the augmented Hessian Newton-Raphson
+and CASPT2 routines of the CASSCF class.
 
 [CheMPS2/DMRGSCFrotations.cpp](CheMPS2/DMRGSCFrotations.cpp)
-performs the two-body matrix element rotations for the DMRGSCF and
-Edmiston-Ruedenberg classes.
+contains static member functions for the two-body matrix element rotations
+for the CASSCF and Edmiston-Ruedenberg classes.
 
 [CheMPS2/DMRGSCFunitary.cpp](CheMPS2/DMRGSCFunitary.cpp) contains the
-storage and handling of the unitary matrix and its nonredundant skew-symmetric
-parametrization required for the DMRG-SCF algorithm.
+storage and handling of the unitary matrix and its nonredundant
+skew-symmetric parametrization required for the DMRG-SCF algorithm.
 
 [CheMPS2/DMRGSCFwtilde.cpp](CheMPS2/DMRGSCFwtilde.cpp) is a container
-class to store a tensor which is required to compute the DMRG-SCF Hessian.
+class to store an intermediate for the DMRG-SCF Hessian.
 
 [CheMPS2/DMRGtechnics.cpp](CheMPS2/DMRGtechnics.cpp) contains the
 functions related to the RDM and excited-state calculations.
 
 [CheMPS2/EdmistonRuedenberg.cpp](CheMPS2/EdmistonRuedenberg.cpp) contains
 an orbital localization function based on the Edmiston-Ruedenberg cost function
-and an augmented Hessian Newton-Raphson optimizer.
+and an augmented Hessian Newton-Raphson optimizer. It also contains the
+functionality to compute the Fiedler vector of the exchange matrix, to reorder
+the active space orbitals in a black-box fashion.
 
 [CheMPS2/Excitation.cpp](CheMPS2/Excitation.cpp) contains matrix-vector
 multiplication routines for spin-conserving single-particle excitations.
 
-[CheMPS2/FCI.cpp](CheMPS2/FCI.cpp) contains a full configuration
-interaction solver based on Davidson's algorithm. It also contains the
-functionality to calculate Green's functions.
+[CheMPS2/FCI.cpp](CheMPS2/FCI.cpp) contains a fast determinant-based full
+configuration interaction (FCI) solver. The eigenvalue problem is solved with
+Davidson's algorithm. Green's functions can also be computed.
 
 [CheMPS2/FourIndex.cpp](CheMPS2/FourIndex.cpp) contains all functions of
 the FourIndex container class for the two-body matrix elements.
 
 [CheMPS2/Hamiltonian.cpp](CheMPS2/Hamiltonian.cpp) contains all functions
 of the Hamiltonian class, including functions to get or set specific variables,
-as well as the save and load functions to store the Hamiltonian on disk.
+as well as to save and load the Hamiltonian on disk.
 
 [CheMPS2/Heff.cpp](CheMPS2/Heff.cpp) contains top-level functions to perform
-the effective Hamiltonian times vector multiplication for Davidson's
+the DMRG effective Hamiltonian times vector multiplication for Davidson's
 algorithm.
 
 [CheMPS2/HeffDiagonal.cpp](CheMPS2/HeffDiagonal.cpp) contains the
@@ -116,26 +123,26 @@ functions to calculate the diagonal elements of the effective Hamiltonian.
 These are required as preconditioner in Davidson's algorithm.
     
 [CheMPS2/HeffDiagrams1.cpp](CheMPS2/HeffDiagrams1.cpp) contains a subset
-of functions to perform the effective Hamiltonian times guess-vector
+of functions to perform the effective Hamiltonian times guess vector
 multiplication.
 
 [CheMPS2/HeffDiagrams2.cpp](CheMPS2/HeffDiagrams2.cpp) contains a subset
- of functions to perform the effective Hamiltonian times guess-vector
- multiplication.
+of functions to perform the effective Hamiltonian times guess vector
+multiplication.
 
 [CheMPS2/HeffDiagrams3.cpp](CheMPS2/HeffDiagrams3.cpp) contains a subset
-of functions to perform the effective Hamiltonian times guess-vector
+of functions to perform the effective Hamiltonian times guess vector
 multiplication.
 
 [CheMPS2/HeffDiagrams4.cpp](CheMPS2/HeffDiagrams4.cpp) contains a subset
-of functions to perform the effective Hamiltonian times guess-vector
+of functions to perform the effective Hamiltonian times guess vector
 multiplication.
 
 [CheMPS2/HeffDiagrams5.cpp](CheMPS2/HeffDiagrams5.cpp) contains a subset
-of functions to perform the effective Hamiltonian times guess-vector
+of functions to perform the effective Hamiltonian times guess vector
 multiplication.
 
-[CheMPS2/Initialize.cpp](CheMPS2/Initialize.cpp) allows to set the seed
+[CheMPS2/Initialize.cpp](CheMPS2/Initialize.cpp) sets the seed
 of the random number generator and cout.precision (added for PyCheMPS2).
 
 [CheMPS2/Irreps.cpp](CheMPS2/Irreps.cpp) contains the psi4 symmetry
@@ -150,7 +157,8 @@ which prints the license disclaimer.
 
 [CheMPS2/Problem.cpp](CheMPS2/Problem.cpp) contains all Problem class
 functions. This wrapper class allows to set the desired symmetry sector for
-the DMRG algorithm.
+the DMRG algorithm. It allows to compute fourfold permutation symmetric
+Hamiltonians with DMRG (see tests 9 and 12).
 
 [CheMPS2/Sobject.cpp](CheMPS2/Sobject.cpp) contains all Sobject class
 functions. This class constructs, stores, and decomposes the reduced two-site
@@ -160,71 +168,81 @@ object.
 SyBookkeeper functions. This class keeps track of the FCI and DMRG virtual
 dimensions of all symmetry sectors at all boundaries.
 
-[CheMPS2/Tensor3RDM.cpp](CheMPS2/Tensor3RDM.cpp) contains all initialization functions
-for the spin-reduced renormalized operators of three second quantized operators.
+[CheMPS2/Tensor3RDM.cpp](CheMPS2/Tensor3RDM.cpp) contains all
+initialization functions for the spin-reduced renormalized
+operators of three second quantized operators.
 
-[CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0 functions. This class
-stores and handles the reduced spin-0 part of two sandwiched second
-quantized operators, of which the particle symmetry sectors are equal.
+[CheMPS2/TensorF0.cpp](CheMPS2/TensorF0.cpp) contains all TensorF0
+functions. This class stores and handles the reduced spin-0 part of
+two sandwiched second quantized operators, of which the particle
+symmetry sectors are equal.
 
-[CheMPS2/TensorF1.cpp](CheMPS2/TensorF1.cpp) contains all TensorF1 functions. This class
-stores and handles the reduced spin-1 part of two sandwiched second
-quantized operators, of which the particle symmetry sectors are equal.
+[CheMPS2/TensorF1.cpp](CheMPS2/TensorF1.cpp) contains all TensorF1
+functions. This class stores and handles the reduced spin-1 part of
+two sandwiched second quantized operators, of which the particle
+symmetry sectors are equal.
 
-[CheMPS2/TensorGYZ.cpp](CheMPS2/TensorGYZ.cpp) contains the contruct and update functions
-for the G-, Y-, and Z-tensors. They are required for the two-orbital mutual
-information.
+[CheMPS2/TensorGYZ.cpp](CheMPS2/TensorGYZ.cpp) contains the contruct
+and update functions for the G-, Y-, and Z-tensors. They are required
+for the two-orbital mutual information.
 
-[CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and update functions
-for the K- and M-tensors. It is required for the two-orbital mutual information.
+[CheMPS2/TensorKM.cpp](CheMPS2/TensorKM.cpp) contains the contruct and
+update functions for the K- and M-tensors. It is required for the
+two-orbital mutual information.
 
-[CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions. This class stores
-and handles the reduced spin-1/2 part of a single sandwiched second quantized
-operator.
+[CheMPS2/TensorL.cpp](CheMPS2/TensorL.cpp) contains all TensorL functions.
+This class stores and handles the reduced spin-1/2 part of a single
+sandwiched second quantized operator. The class has been updated to allow
+for a different bra and ket wavefunction, which is needed for
+[CheMPS2/DMRGfock.cpp](CheMPS2/DMRGfock.cpp).
 
-[CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) implements the storage and handling of the partial
-terms which are required to calculate the overlap between two MPSs.
+[CheMPS2/TensorO.cpp](CheMPS2/TensorO.cpp) handles the tensors required
+to calculate the overlap between two MPSs.
 
-[CheMPS2/TensorOperator.cpp](CheMPS2/TensorOperator.cpp) implements the storage and handling of
-tensor operators with a given spin, particle number, and point group irrep. It replaces the
-previous classes TensorDiag, TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase,
-TensorF1Dbase, TensorA, TensorB, TensorC, and TensorD.
+[CheMPS2/TensorOperator.cpp](CheMPS2/TensorOperator.cpp) implements the
+storage and handling of tensor operators with a given spin, particle
+number, and point group irrep. It replaces the deprecated TensorDiag,
+TensorSwap, TensorS0Abase, TensorS1Bbase, TensorF0Cbase, TensorF1Dbase,
+TensorA, TensorB, TensorC, and TensorD classes.
 
-[CheMPS2/TensorQ.cpp](CheMPS2/TensorQ.cpp) contains all TensorQ functions. This class stores
-and handles the complementary reduced spin-1/2 part of three sandwiched second
-quantized operators.
+[CheMPS2/TensorQ.cpp](CheMPS2/TensorQ.cpp) contains all TensorQ functions.
+This class stores and handles the complementary reduced spin-1/2 part of
+three sandwiched second quantized operators.
 
-[CheMPS2/TensorS0.cpp](CheMPS2/TensorS0.cpp) contains all TensorS0 functions. This class
-stores and handles the reduced spin-0 part of two sandwiched second
-quantized operators, of which the particle symmetry sectors differ by 2.
+[CheMPS2/TensorS0.cpp](CheMPS2/TensorS0.cpp) contains all TensorS0
+functions. This class stores and handles the reduced spin-0 part of
+two sandwiched second quantized operators, of which the particle symmetry
+sectors differ by 2.
 
-[CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1 functions. This class
-stores and handles the reduced spin-1 part of two sandwiched second
-quantized operators, of which the particle symmetry sectors differ by 2.
+[CheMPS2/TensorS1.cpp](CheMPS2/TensorS1.cpp) contains all TensorS1
+functions. This class stores and handles the reduced spin-1 part of
+two sandwiched second quantized operators, of which the particle symmetry
+sectors differ by 2.
 
-[CheMPS2/TensorT.cpp](CheMPS2/TensorT.cpp) contains all TensorT functions. This class
-stores and handles the reduced part of an MPS site-tensor.
+[CheMPS2/TensorT.cpp](CheMPS2/TensorT.cpp) contains all TensorT functions.
+This class stores and handles the reduced part of an MPS site-tensor. It
+also contains the functionality for QR- and LQ-decomposition of MPS tensors.
 
-[CheMPS2/TensorX.cpp](CheMPS2/TensorX.cpp) contains all TensorX functions. This class
-stores and handles the complementary reduced spin-0 part of four sandwiched
-second quantized operators, which is of course diagonal in the symmetry
-sectors.
+[CheMPS2/TensorX.cpp](CheMPS2/TensorX.cpp) contains all TensorX functions.
+This class stores and handles the complementary reduced spin-0 part of four
+sandwiched second quantized operators, which is of course diagonal in the
+symmetry sectors.
 
-[CheMPS2/ThreeDM.cpp](CheMPS2/ThreeDM.cpp) contains all functions to calculate and store the
-3-RDM from the DMRG-optimized MPS.
+[CheMPS2/ThreeDM.cpp](CheMPS2/ThreeDM.cpp) contains all functions to calculate
+and store the 3-RDM from the DMRG-optimized MPS.
 
-[CheMPS2/TwoDM.cpp](CheMPS2/TwoDM.cpp) contains all functions to calculate and store the
-2-RDM from the DMRG-optimized MPS.
+[CheMPS2/TwoDM.cpp](CheMPS2/TwoDM.cpp) contains all functions to calculate
+and store the 2-RDM from the DMRG-optimized MPS.
 
-[CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the TwoIndex container
-class for the one-body matrix elements.
+[CheMPS2/TwoIndex.cpp](CheMPS2/TwoIndex.cpp) contains all functions of the
+TwoIndex container class for the one-body matrix elements.
 
-[CheMPS2/Wigner.cpp](CheMPS2/Wigner.cpp) contains static member functions to compute
-Wigner 3j, 6j, and 9j symbols, with the same API as GSL's gsl_sf_coupling_3j,
-gsl_sf_coupling_6j, and gsl_sf_coupling_9j, respectively.
+[CheMPS2/Wigner.cpp](CheMPS2/Wigner.cpp) contains static member functions
+to compute Wigner 3j, 6j, and 9j symbols. The API has been chosen to match
+GSL's gsl_sf_coupling_3j, gsl_sf_coupling_6j, and gsl_sf_coupling_9j.
 
-[CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2 executable, which allows to use
-libchemps2 from the command line.
+[CheMPS2/executable.cpp](CheMPS2/executable.cpp) builds to the chemps2
+executable, which allows to use libchemps2 from the command line.
 
 [CheMPS2/include/chemps2/CASPT2.h](CheMPS2/include/chemps2/CASPT2.h) contains the definitions of the CASPT2 class.
 

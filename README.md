@@ -158,7 +158,8 @@ Installation
 
 Information on how to build and install CheMPS2 from source can be found at
 [sphinx/sourcecode.rst](sphinx/sourcecode.rst), or alternatively in compiled
-form at [user manual](http://sebwouters.github.io/CheMPS2/sourcecode.html).
+form at the
+[user manual](http://sebwouters.github.io/CheMPS2/sourcecode.html).
 
 
 List of files in CheMPS2
