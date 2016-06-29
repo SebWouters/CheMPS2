@@ -1,4 +1,4 @@
-#### Current HEAD
+#### Version 1.7.1 (2016-06-29):
 * Global reordering of the active space orbitals (mixing
   irreps) based on Fiedler vector of the exchange matrix
 * Davidson algorithm for linear systems (for CASPT2)
