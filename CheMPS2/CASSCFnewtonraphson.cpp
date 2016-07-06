@@ -275,6 +275,10 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
          if ( am_i_master ){ cout << "DMRGSCF::solve : Rotated the active space to natural orbitals, sorted according to the NOON." << endl; }
       }
 
+      if (( nIterations == scf_options->getMaxIterations() ) && ( am_i_master ) && ( scf_options->getStoreUnitary() )){
+         unitary->saveU( scf_options->getUnitaryStorageName() );
+      }
+
       // Calculate the matrix elements needed to calculate the gradient and hessian
       buildQmatACT();
       if ( am_i_master ){

@@ -27,6 +27,7 @@
 
 #include "Initialize.h"
 #include "CASSCF.h"
+#include "Molden.h"
 #include "MPIchemps2.h"
 
 using namespace std;
@@ -298,6 +299,9 @@ cout << "\n"
 "       SCF_ACTIVE_SPACE = char\n"
 "              Rotate the active space orbitals: no additional rotations (I), natural orbitals (N), localized and ordered orbitals (L), or ordered orbitals only (F) (default I).\n"
 "\n"
+"       SCF_MOLDEN = /path/to/molden\n"
+"              Rotate the FCIDUMP orbitals to the DMRG-SCF occupied (external core), active, and virtual (secondary) orbitals.\n"
+"\n"
 "       CASPT2_CALC = bool\n"
 "              Switch on the CASPT2 calculation (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -371,6 +375,7 @@ int main( int argc, char ** argv ){
    double scf_grad_thr     = 1e-6;
    int    scf_max_iter     = 100;
    char   scf_active_space = 'I';
+   string scf_molden       = "";
 
    bool   caspt2_calc    = false;
    char   caspt2_orbs    = 'A';
@@ -426,6 +431,13 @@ int main( int argc, char ** argv ){
          fcidump = line.substr( pos, line.length() - pos );
          fcidump.erase( remove( fcidump.begin(), fcidump.end(), ' ' ), fcidump.end() );
          if ( file_exists( fcidump, "FCIDUMP" ) == false ){ return clean_exit( -1 ); }
+      }
+
+      if ( line.find( "SCF_MOLDEN" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         scf_molden = line.substr( pos, line.length() - pos );
+         scf_molden.erase( remove( scf_molden.begin(), scf_molden.end(), ' ' ), scf_molden.end() );
+         if ( file_exists( scf_molden, "SCF_MOLDEN" ) == false ){ return clean_exit( -1 ); }
       }
 
       if ( line.find( "TMP_FOLDER" ) != string::npos ){
@@ -628,6 +640,7 @@ int main( int argc, char ** argv ){
       cout << "   SCF_ACTIVE_SPACE   = " << (( scf_active_space == 'I' ) ? "I : no additional rotations" :
                                             (( scf_active_space == 'N' ) ? "N : natural orbitals" :
                                             (( scf_active_space == 'L' ) ? "L : localized and ordered orbitals" : "F : ordered orbitals only" ))) << endl;
+      cout << "   SCF_MOLDEN         = " << scf_molden << endl;
       cout << "   CASPT2_CALC        = " << (( caspt2_calc ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   CASPT2_ORBS        = " << (( caspt2_orbs == 'A' ) ? "A : as specified in SCF_ACTIVE_SPACE" : "P : pseudocanonical orbitals" ) << endl;
       cout << "   CASPT2_IPEA        = " << caspt2_ipea << endl;
@@ -687,6 +700,18 @@ int main( int argc, char ** argv ){
       if ( am_i_master ){
          cout << "E_CASSCF + E_CASPT2 = E_0 + E_1 + E_2 = " << E_CASSCF + E_CASPT2 << endl;
       }
+   }
+
+   if (( am_i_master ) && ( scf_molden.length() > 0 )){
+      int * norb_ham = new int[ Symmhelper.getNumberOfIrreps() ];
+      for ( int irrep = 0; irrep < Symmhelper.getNumberOfIrreps(); irrep++ ){ norb_ham[ irrep ] = 0; }
+      for ( int orb = 0; orb < ham->getL(); orb++ ){ norb_ham[ ham->getOrbitalIrrep( orb ) ] += 1; }
+      CheMPS2::Molden * molden_rotator = new CheMPS2::Molden( ham->getL(), Symmhelper.getGroupNumber(), norb_ham );
+      molden_rotator->read_molden( scf_molden );
+      molden_rotator->read_unitary( scf_options->getUnitaryStorageName() );
+      molden_rotator->print( scf_molden, scf_molden + ".rotated" );
+      delete [] norb_ham;
+      delete molden_rotator;
    }
 
    // Clean up
