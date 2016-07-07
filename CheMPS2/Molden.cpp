@@ -107,6 +107,10 @@ void CheMPS2::Molden::read_molden( const string filename ){
          for ( int irrep = 0; irrep < num_irreps; irrep++ ){
             if ( part.find( SymmInfo.getIrrepName( irrep ) ) != string::npos ){ psi4_irrep = irrep; }
          }
+         if ( SymmInfo.getGroupNumber() == 3 ){ // Cs
+            if ( part.find( "A'"  ) != string::npos ){ psi4_irrep = 0; }
+            if ( part.find( "A\"" ) != string::npos ){ psi4_irrep = 1; }
+         }
          std::cout << "MO " << orbs + 1 << " has psi4_irrep " << SymmInfo.getIrrepName( psi4_irrep ) << "." << std::endl;
       }
       assert( psi4_irrep != -1 );

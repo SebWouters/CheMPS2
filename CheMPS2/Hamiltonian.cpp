@@ -301,6 +301,8 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
     }
     assert( on_disk );
 
+    cout << "CheMPS2::Hamiltonian : Reading FCIDUMP file " << fcidumpfile << endl;
+
     const int nIrreps = SymmInfo.getNumberOfIrreps();
     int * psi2molpro = new int[ nIrreps ];
     SymmInfo.symm_psi2molpro( psi2molpro );
@@ -429,6 +431,8 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
 
     delete [] psi2molpro;
     thefcidump.close();
+
+    cout << "CheMPS2::Hamiltonian : Finished reading FCIDUMP file " << fcidumpfile << endl;
 
 }
 
