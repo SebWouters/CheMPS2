@@ -101,7 +101,7 @@ void CheMPS2::Molden::read_molden( const string filename ){
          for ( int irrep = 0; irrep < num_irreps; irrep++ ){
             if ( psi2molpro[ irrep ] == molpro_irrep ){ psi4_irrep = irrep; }
          }
-         std::cout << "MO " << orbs + 1 << " has molpro_irrep " << molpro_irrep << " and psi4_irrep " << SymmInfo.getIrrepName( psi4_irrep ) << "." << std::endl;
+         //std::cout << "MO " << orbs + 1 << " has molpro_irrep " << molpro_irrep << " and psi4_irrep " << SymmInfo.getIrrepName( psi4_irrep ) << "." << std::endl;
       } else { // Psi4
          part = line.substr( pos_equal + 1, line.size() - 1 - pos_equal );
          for ( int irrep = 0; irrep < num_irreps; irrep++ ){
@@ -111,7 +111,7 @@ void CheMPS2::Molden::read_molden( const string filename ){
             if ( part.find( "A'"  ) != string::npos ){ psi4_irrep = 0; }
             if ( part.find( "A\"" ) != string::npos ){ psi4_irrep = 1; }
          }
-         std::cout << "MO " << orbs + 1 << " has psi4_irrep " << SymmInfo.getIrrepName( psi4_irrep ) << "." << std::endl;
+         //std::cout << "MO " << orbs + 1 << " has psi4_irrep " << SymmInfo.getIrrepName( psi4_irrep ) << "." << std::endl;
       }
       assert( psi4_irrep != -1 );
 
@@ -125,7 +125,7 @@ void CheMPS2::Molden::read_molden( const string filename ){
          part = line.substr( pos_gap + 1, line.size() - 1 - pos_gap );
          const double value = atof( part.c_str() );
          molden[ psi4_irrep ][ cnt + L * Icounter[ psi4_irrep ] ] = value;
-         std::cout << cnt+1 << " " << value << std::endl;
+         //std::cout << cnt+1 << " " << value << std::endl;
       }
 
       Icounter[ psi4_irrep ] += 1;

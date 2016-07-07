@@ -310,7 +310,7 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
     ifstream thefcidump( fcidumpfile.c_str() );
     string line, part;
     int pos, pos2;
-    
+
     // Get the number of orbitals
     getline( thefcidump, line ); // &FCI NORB= X,NELEC= Y,MS2= Z,   
     pos  = line.find( "NORB" );
@@ -359,24 +359,9 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
         orb2indexSy[cnt] = irrep2num_orb[orb2irrep[cnt]];
         irrep2num_orb[orb2irrep[cnt]]++;
     }
-    Tmat = new TwoIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
-    Vmat = new FourIndex(SymmInfo.getGroupNumber(),irrep2num_orb);
+    Tmat = new TwoIndex(  SymmInfo.getGroupNumber(), irrep2num_orb ); // Constructor ends with Clear(); call
+    Vmat = new FourIndex( SymmInfo.getGroupNumber(), irrep2num_orb ); // Constructor ends with Clear(); call
 
-    // Clear the Hamiltonian
-    Econst = 0.0;
-    for ( int orb1 = 0; orb1 < L; orb1++ ){
-        for ( int orb2 = orb1; orb2 < L; orb2++ ){
-            const int irrepprod12 = SymmInfo.directProd( orb2irrep[ orb1 ] , orb2irrep[ orb2 ] );
-            if ( irrepprod12 == 0 ){ setTmat( orb1, orb2, 0.0 ); }
-            for ( int orb3 = orb1; orb3 < L; orb3++ ){
-                for ( int orb4 = orb2; orb4 < L; orb4++ ){
-                    const int irrepprod34 = SymmInfo.directProd( orb2irrep[ orb3 ] , orb2irrep[ orb4 ] );
-                    if ( irrepprod12 == irrepprod34 ){ setVmat( orb1, orb2, orb3, orb4, 0.0 ); }
-                }
-            }
-        }
-    }
-    
     // Read the Hamiltonian in
     bool stop = false;
     while ( stop == false ){
