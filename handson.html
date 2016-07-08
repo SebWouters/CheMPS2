@@ -1,0 +1,644 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-3 (2016-07-08) documentation</title>
+    
+    <link rel="stylesheet" href="static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.7.2-3 (2016-07-08)',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="CheMPS2 1.7.2-3 (2016-07-08) documentation" href="index.html" />
+    <link rel="prev" title="11. Interfaces to psi4 and pyscf" href="interfaces.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-3 (2016-07-08) documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dmrg-workshop-12-jul-2016-hands-on-session">
+<span id="index-0"></span><h1>12. DMRG workshop (12-jul-2016): hands-on session<a class="headerlink" href="#dmrg-workshop-12-jul-2016-hands-on-session" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>12.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The geometry of tetracene was optimized at the restricted B3LYP/6-31G* level of theory, and can be found in the file <a class="reference external" href="https://github.com/sebwouters/chemps2/raw/master/sphinx/tetracene.fcidump.in">tetracene.fcidump.in</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre>memory 28 Gb
+
+molecule tetracene {
+0 1
+symmetry csz
+    C            4.888883611380    -0.715374463486    -0.000000000000
+    C            4.888883611380     0.715374463486     0.000000000000
+    C           -4.888883611380    -0.715374463486     0.000000000000
+    C           -4.888883611380     0.715374463486    -0.000000000000
+    C            3.711144499602    -1.409316610825     0.000000000000
+    C            3.711144499602     1.409316610825     0.000000000000
+    C           -3.711144499602    -1.409316610825     0.000000000000
+    C           -3.711144499602     1.409316610825     0.000000000000
+    C            2.450542389320    -0.725895641808     0.000000000000
+    C            2.450542389320     0.725895641808     0.000000000000
+    C           -2.450542389320    -0.725895641808     0.000000000000
+    C           -2.450542389320     0.725895641808     0.000000000000
+    C            1.235393613403    -1.406341384439    -0.000000000000
+    C            1.235393613403     1.406341384439    -0.000000000000
+    C           -1.235393613403    -1.406341384439     0.000000000000
+    C           -1.235393613403     1.406341384439    -0.000000000000
+    C            0.000000000000    -0.726150477978     0.000000000000
+    C           -0.000000000000     0.726150477978    -0.000000000000
+    H           -5.836431028249     1.247257941939     0.000000000000
+    H           -5.836431028249    -1.247257941939    -0.000000000000
+    H            5.836431028249    -1.247257941939     0.000000000000
+    H            5.836431028249     1.247257941939    -0.000000000000
+    H            3.708923113951    -2.496817544333     0.000000000000
+    H            3.708923113951     2.496817544333     0.000000000000
+    H           -3.708923113951    -2.496817544333    -0.000000000000
+    H           -3.708923113951     2.496817544333     0.000000000000
+    H            1.235230564126    -2.494555353711     0.000000000000
+    H            1.235230564126     2.494555353711     0.000000000000
+    H           -1.235230564126     2.494555353711     0.000000000000
+    H           -1.235230564126    -2.494555353711     0.000000000000
+}
+
+sys.path.insert( 0, &#39;./..&#39; )
+import fcidump
+
+set basis 6-31g*
+set reference rhf
+set scf_type DIRECT
+set e_convergence 1e-12
+set d_convergence 1e-10
+set ints_tolerance 0.0
+
+set fcidump dumpfilename tetracene.fcidump
+
+E, wfn = energy( &#39;fcidump&#39;, return_wfn=True )
+molden( wfn, &#39;tetracene.molden&#39; )
+
+</pre></div>
+</div>
+<p>The goal of this afternoon is to calculate the vertical singlet-triplet gap with DMRG(18, 18)-CASPT2/6-31G*.</p>
+<p><a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for <a class="reference external" href="http://www.psicode.org/">psi4</a>. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in <code class="docutils literal"><span class="pre">FCIDUMP</span></code> format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to <a class="reference external" href="http://www.psicode.org/">psi4</a> to obtain matrix elements. In the future you can use <a class="reference external" href="http://www.molcas.org/">molcas</a>, <a class="reference external" href="https://www.molpro.net/">molpro</a>, <a class="reference external" href="http://www.daltonprogram.org/">dalton</a>... The disadvantage is that a full-rank <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.</p>
+</div>
+<div class="section" id="ugent-hpc">
+<h2>12.2. UGent HPC<a class="headerlink" href="#ugent-hpc" title="Permalink to this headline">¶</a></h2>
+<p>Follow the <a class="reference external" href="http://hpc.ugent.be/userwiki/index.php/User:VscConnect">instructions</a> to log in to the UGent HPC.</p>
+<p>Submit an interactive job in the XYZ queue:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ qsub -I -q XYZ -l <span class="nv">walltime</span><span class="o">=</span>06:00:00 -l <span class="nv">nodes</span><span class="o">=</span>1:ppn<span class="o">=</span>8
+</pre></div>
+</div>
+<p>Once you are on the node, change directory to, for example, the following folder:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> $VSC_SCRATCH
+$ mkdir dmrg_workshop
+$ <span class="nb">cd</span> dmrg_workshop/
+</pre></div>
+</div>
+<p>Please keep in mind that you will need about 21 Gb of disk for the <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file and <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> checkpoints!</p>
+</div>
+<div class="section" id="fcidump-and-molden">
+<h2>12.3. <code class="docutils literal"><span class="pre">FCIDUMP</span></code> and <code class="docutils literal"><span class="pre">MOLDEN</span></code><a class="headerlink" href="#fcidump-and-molden" title="Permalink to this headline">¶</a></h2>
+<p>We will first use a plugin to <a class="reference external" href="http://www.psicode.org/">psi4</a> to generate the RHF matrix elements in <code class="docutils literal"><span class="pre">FCIDUMP</span></code> format, as well as the corresponding <code class="docutils literal"><span class="pre">MOLDEN</span></code> file. As said before, any other program which is able to generate these two types of files can be used as well. Load the <a class="reference external" href="http://www.psicode.org/">psi4</a> module and generate a new plugin called <code class="docutils literal"><span class="pre">fcidump</span></code>:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ module load PSI4/1.0-intel-2016a-mt-Python-2.7.11
+$ psi4 --new-plugin fcidump
+</pre></div>
+</div>
+<p>Overwrite the dummy file <code class="docutils literal"><span class="pre">fcidump.cc</span></code> and compile:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> fcidump/
+$ rm fcidump.cc
+$ wget <span class="s1">&#39;https://github.com/sebwouters/chemps2/raw/master/integrals/psi4plugins/fcidump.cc&#39;</span>
+$ make
+$ <span class="nb">cd</span> ../
+</pre></div>
+</div>
+<p>The required <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file and the corresponding <code class="docutils literal"><span class="pre">MOLDEN</span></code> file can now be generated with <a class="reference external" href="http://www.psicode.org/">psi4</a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ wget <span class="s1">&#39;https://github.com/sebwouters/chemps2/raw/master/sphinx/tetracene.fcidump.in&#39;</span>
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">8</span> psi4 -n <span class="m">8</span> tetracene.fcidump.in <span class="p">&amp;</span>
+$ tail -n <span class="m">3000</span> -f tetracene.fcidump.out
+$ ls -alh TETRACENE.FCIDUMP
+$ ls -alh tetracene.molden
+</pre></div>
+</div>
+<p>Note that the specified symmetry group in <code class="docutils literal"><span class="pre">tetracene.fcidump.in</span></code> was <code class="docutils literal"><span class="pre">csz</span></code>, a subgroup of <code class="docutils literal"><span class="pre">d2h</span></code>. In the <code class="docutils literal"><span class="pre">csz</span></code> symmetry group, the 18 active space <span class="math">\(\pi\)</span>-orbitals can be localized to the carbon atoms. This is not the case for the <code class="docutils literal"><span class="pre">d2h</span></code> symmetry group.</p>
+<p><strong>While you are waiting for the</strong> <code class="docutils literal"><span class="pre">FCIDUMP</span></code> <strong>file of size 20 Gb, you can already proceed with the next section.</strong></p>
+</div>
+<div class="section" id="basis-choice">
+<h2>12.4. Basis choice<a class="headerlink" href="#basis-choice" title="Permalink to this headline">¶</a></h2>
+<p>Now that you have the required matrix elements in <code class="docutils literal"><span class="pre">FCIDUMP</span></code> format and the corresponding <code class="docutils literal"><span class="pre">MOLDEN</span></code> file, we can perform calculations with <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a>. First load the corresponding module and study the options of the binary:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ module unload CheMPS2/1.7.1-intel-2016a
+$ module load CheMPS2/1.7.2-intel-2016a
+$ chemps2 --help
+</pre></div>
+</div>
+<p>Perform each calculation in a separate folder. This way checkpoint files will not get mixed up. Create a folder <code class="docutils literal"><span class="pre">ci_input_orbs/</span></code> and in that folder an input file <code class="docutils literal"><span class="pre">ci_input_orbs.in</span></code> for <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> with the following options:</p>
+<ul class="simple">
+<li>Target the singlet ground state</li>
+<li>Use an (18, 18) active space</li>
+<li>Switch off the CASPT2 calculation</li>
+<li>Overwrite the tmp folder with the existing path <code class="docutils literal"><span class="pre">/local/NUMBER.master15.delcatty.gent.vsc/</span></code>, where <code class="docutils literal"><span class="pre">NUMBER</span></code> is the job number which you see with</li>
+</ul>
+<div class="highlight-bash"><div class="highlight"><pre>$ qstat -n
+</pre></div>
+</div>
+<ul class="simple">
+<li>Perform one DMRG-SCF iteration, which corresponds to DMRG-CI</li>
+<li>The active space orbitals should be RHF molecular orbitals (i.e. the input orbitals)</li>
+<li>Use the convergence scheme</li>
+</ul>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="19%" />
+<col width="18%" />
+<col width="25%" />
+<col width="18%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(D_{SU(2)}\)</span></th>
+<th class="head"><span class="math">\(E_{conv}\)</span></th>
+<th class="head"><span class="math">\(N_{max}\)</span></th>
+<th class="head"><span class="math">\(\gamma_{noise}\)</span></th>
+<th class="head"><span class="math">\(r_{tol}\)</span></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>200</td>
+<td>1e-6</td>
+<td>10</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>400</td>
+<td>1e-6</td>
+<td>10</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-even"><td>600</td>
+<td>1e-6</td>
+<td>10</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>600</td>
+<td>1e-8</td>
+<td>3</td>
+<td>0.0</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-even"><td>400</td>
+<td>1e-8</td>
+<td>3</td>
+<td>0.0</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>200</td>
+<td>1e-8</td>
+<td>3</td>
+<td>0.0</td>
+<td>1e-5</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<ul class="simple">
+<li>Set the option <code class="docutils literal"><span class="pre">SCF_MOLDEN</span></code> to the corresponding molden file</li>
+</ul>
+<p>When you have created the input file, you can double check with the <a class="reference internal" href="#first-ptr-solution"><span>solution</span></a>.</p>
+<p>Run the calculation:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> ci_input_orbs/
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>ci_input_orbs.in &gt; ci_input_orbs.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../
+</pre></div>
+</div>
+<p><strong>Note that you have now only used 4 of the 8 cores available to you. Proceed with the inctructions below while waiting for the calculation to finish.</strong></p>
+<p>Create a folder <code class="docutils literal"><span class="pre">ci_local_orbs/</span></code> and in that folder an input file <code class="docutils literal"><span class="pre">ci_local_orbs.in</span></code> for <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> which is identical to <code class="docutils literal"><span class="pre">ci_input_orbs.in</span></code>, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the <a class="reference internal" href="#second-ptr-solution"><span>solution</span></a>.</p>
+<p>Run the calculation:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> ci_local_orbs/
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>ci_local_orbs.in &gt; ci_local_orbs.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../
+$ tail -n <span class="m">300</span> ci_input_orbs/ci_input_orbs.out
+$ tail -n <span class="m">300</span> ci_local_orbs/ci_local_orbs.out
+</pre></div>
+</div>
+<p>When the calculations are finished, take a look at the files</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">ci_input_orbs/tetracene.molden.rotated</span></code></li>
+<li><code class="docutils literal"><span class="pre">ci_local_orbs/tetracene.molden.rotated</span></code></li>
+</ul>
+</div></blockquote>
+<p>with your favourite visualization software. Do the first 18 <code class="docutils literal"><span class="pre">App</span></code> or <code class="docutils literal"><span class="pre">A&quot;</span></code> orbitals have the desired shape? How are they ordered? Once you have formulated your own answer, you can double check with the <a class="reference internal" href="#third-ptr-solution"><span>solution</span></a>.</p>
+<p>Compare the energies of the last three sweep instructions as a function of <span class="math">\(D_{SU(2)}\)</span> for both calculations. Thereto you can grep for:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ grep <span class="s2">&quot;Minimum energy encountered during the last sweep&quot;</span> ci_input_orbs/ci_input_orbs.out
+$ grep <span class="s2">&quot;Minimum energy encountered during the last sweep&quot;</span> ci_local_orbs/ci_local_orbs.out
+</pre></div>
+</div>
+<p>What do you observe? Can you explain it? Once you have formulated your own answer, you can double check with the <a class="reference internal" href="#fourth-ptr-solution"><span>solution</span></a>.</p>
+</div>
+<div class="section" id="dmrg-scf">
+<h2>12.5. DMRG-SCF<a class="headerlink" href="#dmrg-scf" title="Permalink to this headline">¶</a></h2>
+<p>Use localized orbitals for the active space from now on. Perform the DMRG-SCF orbital optimization for the singlet and the triplet. Also put DIIS on when the update norm is smaller than 1e-2, switch <code class="docutils literal"><span class="pre">PRINT_CORR</span></code> to <code class="docutils literal"><span class="pre">TRUE</span></code>, and remove the <code class="docutils literal"><span class="pre">SCF_MOLDEN</span></code> line. Use the following convergence scheme:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="19%" />
+<col width="18%" />
+<col width="25%" />
+<col width="18%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(D_{SU(2)}\)</span></th>
+<th class="head"><span class="math">\(E_{conv}\)</span></th>
+<th class="head"><span class="math">\(N_{max}\)</span></th>
+<th class="head"><span class="math">\(\gamma_{noise}\)</span></th>
+<th class="head"><span class="math">\(r_{tol}\)</span></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>250</td>
+<td>1e-6</td>
+<td>8</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>500</td>
+<td>1e-8</td>
+<td>8</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-even"><td>750</td>
+<td>1e-10</td>
+<td>8</td>
+<td>0.0</td>
+<td>1e-8</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Why is the reduced virtual dimension not lowered at the end of the DMRG calculation? Why is the last <span class="math">\(r_{tol}\)</span> smaller? When you have created the input files, you can double check with the solution for the <a class="reference internal" href="#fifth-ptr-solution"><span>singlet</span></a> and the <a class="reference internal" href="#sixth-ptr-solution"><span>triplet</span></a>.</p>
+<p>Run the calculation:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> scf_singlet/
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>scf_singlet.in &gt; scf_singlet.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../scf_triplet/
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>scf_triplet.in &gt; scf_triplet.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../
+$ tail -n <span class="m">300</span> scf_singlet/scf_singlet.out
+$ tail -n <span class="m">300</span> scf_triplet/scf_triplet.out
+</pre></div>
+</div>
+<p>What is the DMRG-SCF singlet-triplet gap you obtain? Double check with the <a class="reference internal" href="#seventh-ptr-solution"><span>solution</span></a>.</p>
+<p>Do you see polyradical character in the natural orbital occupation numbers for the singlet and/or triplet? How can you observe this in the correlation functions? Tip: It might be interesting to read</p>
+<ol class="upperalpha simple" start="10">
+<li>Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, <em>Journal of Chemical Physics</em> <strong>127</strong>, 134309 (2007). <a class="reference external" href="http://dx.doi.org/10.1063/1.2768362">doi link</a></li>
+</ol>
+<p>which can also be found on the <a class="reference external" href="https://arxiv.org/abs/0707.3120">arXiv</a>.</p>
+</div>
+<div class="section" id="dmrg-caspt2">
+<h2>12.6. DMRG-CASPT2<a class="headerlink" href="#dmrg-caspt2" title="Permalink to this headline">¶</a></h2>
+<p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use <code class="docutils literal"><span class="pre">A</span></code> or <code class="docutils literal"><span class="pre">P</span></code> for the option <code class="docutils literal"><span class="pre">CASPT2_ORBS</span></code>, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the following convergence scheme:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="19%" />
+<col width="18%" />
+<col width="25%" />
+<col width="18%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(D_{SU(2)}\)</span></th>
+<th class="head"><span class="math">\(E_{conv}\)</span></th>
+<th class="head"><span class="math">\(N_{max}\)</span></th>
+<th class="head"><span class="math">\(\gamma_{noise}\)</span></th>
+<th class="head"><span class="math">\(r_{tol}\)</span></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>250</td>
+<td>1e-6</td>
+<td>8</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>500</td>
+<td>1e-8</td>
+<td>8</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-even"><td>750</td>
+<td>1e-10</td>
+<td>8</td>
+<td>0.05</td>
+<td>1e-5</td>
+</tr>
+<tr class="row-odd"><td>1250</td>
+<td>1e-10</td>
+<td>8</td>
+<td>0.0</td>
+<td>1e-8</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>A larger virtual dimension is used for DMRG-CASPT2, because the excited wavefunctions</p>
+<div class="math">
+\[\left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + \hat{E}_{zs} \right) + \beta \right] \left| \Psi_0 \right\rangle\]</div>
+<p>have a larger bond dimension than <span class="math">\(\left| \Psi_0 \right\rangle\)</span>.  When you have created the input files, you can double check with the solution for the <a class="reference internal" href="#eigth-ptr-solution"><span>singlet</span></a> and the <a class="reference internal" href="#nineth-ptr-solution"><span>triplet</span></a>.</p>
+<p>Run the calculations, but please remember to copy over the converged DMRG-SCF orbitals:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> pt2_singlet/
+$ cp ../scf_singlet/CheMPS2_CASSCF.h5 .
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>pt2_singlet.in &gt; pt2_singlet.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../pt2_triplet/
+$ cp ../scf_triplet/CheMPS2_CASSCF.h5 .
+$ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>pt2_triplet.in &gt; pt2_triplet.out <span class="p">&amp;</span>
+$ <span class="nb">cd</span> ../
+$ tail -n <span class="m">300</span> pt2_singlet/pt2_singlet.out
+$ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
+</pre></div>
+</div>
+<p>The DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. Please keep the following instructions in mind:</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs <strong>exactly</strong> the same orbitals are used. Therefore, for the second and later DMRG-CASPT2 runs with the binary:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Put <code class="docutils literal"><span class="pre">SCF_DIIS_THR</span></code> to <code class="docutils literal"><span class="pre">0.0</span></code></li>
+<li>Delete any checkpoints named <code class="docutils literal"><span class="pre">CheMPS2_DIIS.h5</span></code></li>
+<li>Switch <code class="docutils literal"><span class="pre">SCF_ACTIVE_SPACE</span></code> to <code class="docutils literal"><span class="pre">I</span></code></li>
+</ul>
+</div></blockquote>
+<p class="last">This ensures that for the second and later DMRG-CASPT2 runs, <strong>exactly</strong> the orbitals from <code class="docutils literal"><span class="pre">CheMPS2_CASSCF.h5</span></code> are used.</p>
+</div>
+<p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?</p>
+<p>And with an IPEA shift of 0.25 and an IMAG shift of 0.0?</p>
+</div>
+<div class="section" id="solutions">
+<h2>12.7. Solutions<a class="headerlink" href="#solutions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ci-input-orbs-in">
+<span id="first-ptr-solution"></span><h3>12.7.1. ci_input_orbs.in<a class="headerlink" href="#ci-input-orbs-in" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">FCIDUMP</span> <span class="o">=</span> /path/to/TETRACENE.FCIDUMP
+
+<span class="nv">GROUP</span>        <span class="o">=</span> 3
+<span class="nv">MULTIPLICITY</span> <span class="o">=</span> 1
+<span class="nv">NELECTRONS</span>   <span class="o">=</span> 120
+<span class="nv">IRREP</span>        <span class="o">=</span> 0
+<span class="nv">EXCITATION</span>   <span class="o">=</span> 0
+
+<span class="nv">SWEEP_STATES</span>       <span class="o">=</span> 200,  400,  600,  600,  400,  200
+<span class="nv">SWEEP_ENERGY_CONV</span>  <span class="o">=</span> 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8
+<span class="nv">SWEEP_MAX_SWEEPS</span>   <span class="o">=</span> 10,   10,   10,   3,    3,    3
+<span class="nv">SWEEP_NOISE_PREFAC</span> <span class="o">=</span> 0.05, 0.05, 0.05, 0.0,  0.0,  0.0
+<span class="nv">SWEEP_DVDSON_RTOL</span>  <span class="o">=</span> 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5
+
+<span class="nv">NOCC</span> <span class="o">=</span> 51,  0
+<span class="nv">NACT</span> <span class="o">=</span> 0,   18
+<span class="nv">NVIR</span> <span class="o">=</span> 171, 54
+
+<span class="nv">SCF_STATE_AVG</span>    <span class="o">=</span> FALSE
+<span class="nv">SCF_DIIS_THR</span>     <span class="o">=</span> 0.0
+<span class="nv">SCF_GRAD_THR</span>     <span class="o">=</span> 1e-6
+<span class="nv">SCF_MAX_ITER</span>     <span class="o">=</span> 1
+<span class="nv">SCF_ACTIVE_SPACE</span> <span class="o">=</span> I
+<span class="nv">SCF_MOLDEN</span>       <span class="o">=</span> /path/to/tetracene.molden
+
+<span class="nv">CASPT2_CALC</span>    <span class="o">=</span> FALSE
+<span class="nv">CASPT2_ORBS</span>    <span class="o">=</span> A
+<span class="nv">CASPT2_IPEA</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_IMAG</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_CHECKPT</span> <span class="o">=</span> FALSE
+<span class="nv">CASPT2_CUMUL</span>   <span class="o">=</span> FALSE
+
+<span class="nv">PRINT_CORR</span> <span class="o">=</span> TRUE
+
+<span class="nv">TMP_FOLDER</span> <span class="o">=</span> /local/NUMBER.master15.delcatty.gent.vsc/
+</pre></div>
+</div>
+</div>
+<div class="section" id="ci-local-orbs-in">
+<span id="second-ptr-solution"></span><h3>12.7.2. ci_local_orbs.in<a class="headerlink" href="#ci-local-orbs-in" title="Permalink to this headline">¶</a></h3>
+<p>Difference with <a class="reference internal" href="#first-ptr-solution"><span>input orbitals</span></a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">SCF_ACTIVE_SPACE</span> <span class="o">=</span> L
+</pre></div>
+</div>
+</div>
+<div class="section" id="tetracene-molden-rotated-for-the-localized-active-space-orbitals">
+<span id="third-ptr-solution"></span><h3>12.7.3. tetracene.molden.rotated for the localized active space orbitals<a class="headerlink" href="#tetracene-molden-rotated-for-the-localized-active-space-orbitals" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/handson_orbitals.png" src="_images/handson_orbitals.png" />
+<p>For <code class="docutils literal"><span class="pre">ci_local_orbs/tetracene.molden.rotated</span></code>, the active space orbitals are localized on the carbon atoms, and are ordered according to the one-dimensional topology of the molecule.</p>
+</div>
+<div class="section" id="molecular-vs-localized-orbitals">
+<span id="fourth-ptr-solution"></span><h3>12.7.4. Molecular vs. localized orbitals<a class="headerlink" href="#molecular-vs-localized-orbitals" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/handson_comparison.png" src="_images/handson_comparison.png" />
+</div>
+<div class="section" id="scf-singlet-in">
+<span id="fifth-ptr-solution"></span><h3>12.7.5. scf_singlet.in<a class="headerlink" href="#scf-singlet-in" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">FCIDUMP</span> <span class="o">=</span> /path/to/TETRACENE.FCIDUMP
+
+<span class="nv">GROUP</span>        <span class="o">=</span> 3
+<span class="nv">MULTIPLICITY</span> <span class="o">=</span> 1
+<span class="nv">NELECTRONS</span>   <span class="o">=</span> 120
+<span class="nv">IRREP</span>        <span class="o">=</span> 0
+<span class="nv">EXCITATION</span>   <span class="o">=</span> 0
+
+<span class="nv">SWEEP_STATES</span>       <span class="o">=</span> 250,  500,  750
+<span class="nv">SWEEP_ENERGY_CONV</span>  <span class="o">=</span> 1e-6, 1e-8, 1e-10
+<span class="nv">SWEEP_MAX_SWEEPS</span>   <span class="o">=</span> 8,    8,    8
+<span class="nv">SWEEP_NOISE_PREFAC</span> <span class="o">=</span> 0.05, 0.05, 0.0
+<span class="nv">SWEEP_DVDSON_RTOL</span>  <span class="o">=</span> 1e-5, 1e-5, 1e-8
+
+<span class="nv">NOCC</span> <span class="o">=</span> 51,  0
+<span class="nv">NACT</span> <span class="o">=</span> 0,   18
+<span class="nv">NVIR</span> <span class="o">=</span> 171, 54
+
+<span class="nv">SCF_STATE_AVG</span>    <span class="o">=</span> FALSE
+<span class="nv">SCF_DIIS_THR</span>     <span class="o">=</span> 1e-2
+<span class="nv">SCF_GRAD_THR</span>     <span class="o">=</span> 1e-6
+<span class="nv">SCF_MAX_ITER</span>     <span class="o">=</span> 100
+<span class="nv">SCF_ACTIVE_SPACE</span> <span class="o">=</span> L
+
+<span class="nv">CASPT2_CALC</span>    <span class="o">=</span> FALSE
+<span class="nv">CASPT2_ORBS</span>    <span class="o">=</span> A
+<span class="nv">CASPT2_IPEA</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_IMAG</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_CHECKPT</span> <span class="o">=</span> FALSE
+<span class="nv">CASPT2_CUMUL</span>   <span class="o">=</span> FALSE
+
+<span class="nv">PRINT_CORR</span> <span class="o">=</span> TRUE
+
+<span class="nv">TMP_FOLDER</span> <span class="o">=</span> /local/NUMBER.master15.delcatty.gent.vsc/
+</pre></div>
+</div>
+</div>
+<div class="section" id="scf-triplet-in">
+<span id="sixth-ptr-solution"></span><h3>12.7.6. scf_triplet.in<a class="headerlink" href="#scf-triplet-in" title="Permalink to this headline">¶</a></h3>
+<p>Difference with <a class="reference internal" href="#fifth-ptr-solution"><span>singlet</span></a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">MULTIPLICITY</span> <span class="o">=</span> 3
+</pre></div>
+</div>
+</div>
+<div class="section" id="dmrg-scf-singlet-triplet-gap">
+<span id="seventh-ptr-solution"></span><h3>12.7.7. DMRG-SCF singlet-triplet gap<a class="headerlink" href="#dmrg-scf-singlet-triplet-gap" title="Permalink to this headline">¶</a></h3>
+<p>Both DMRG-SCF calculations are converged with 8 macro-iterations. The gap is</p>
+<div class="math">
+\[\Delta E = E_{triplet} - E_{singlet} = -688.803387 - (-688.867150) ~ E_{h} = 63.763 ~ mE_{h} = 40.012 ~ kcal/mol\]</div>
+</div>
+<div class="section" id="pt2-singlet-in">
+<span id="eigth-ptr-solution"></span><h3>12.7.8. pt2_singlet.in<a class="headerlink" href="#pt2-singlet-in" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">FCIDUMP</span> <span class="o">=</span> /path/to/TETRACENE.FCIDUMP
+
+<span class="nv">GROUP</span>        <span class="o">=</span> 3
+<span class="nv">MULTIPLICITY</span> <span class="o">=</span> 1
+<span class="nv">NELECTRONS</span>   <span class="o">=</span> 120
+<span class="nv">IRREP</span>        <span class="o">=</span> 0
+<span class="nv">EXCITATION</span>   <span class="o">=</span> 0
+
+<span class="nv">SWEEP_STATES</span>       <span class="o">=</span> 250,  500,  750,   1250
+<span class="nv">SWEEP_ENERGY_CONV</span>  <span class="o">=</span> 1e-6, 1e-8, 1e-10, 1e-10
+<span class="nv">SWEEP_MAX_SWEEPS</span>   <span class="o">=</span> 8,    8,    8,     8
+<span class="nv">SWEEP_NOISE_PREFAC</span> <span class="o">=</span> 0.05, 0.05, 0.05,  0.0
+<span class="nv">SWEEP_DVDSON_RTOL</span>  <span class="o">=</span> 1e-5, 1e-5, 1e-5,  1e-8
+
+<span class="nv">NOCC</span> <span class="o">=</span> 51,  0
+<span class="nv">NACT</span> <span class="o">=</span> 0,   18
+<span class="nv">NVIR</span> <span class="o">=</span> 171, 54
+
+<span class="nv">SCF_STATE_AVG</span>    <span class="o">=</span> FALSE
+<span class="nv">SCF_DIIS_THR</span>     <span class="o">=</span> 0.0
+<span class="nv">SCF_GRAD_THR</span>     <span class="o">=</span> 1e-6
+<span class="nv">SCF_MAX_ITER</span>     <span class="o">=</span> 100
+<span class="nv">SCF_ACTIVE_SPACE</span> <span class="o">=</span> L
+
+<span class="nv">CASPT2_CALC</span>    <span class="o">=</span> TRUE
+<span class="nv">CASPT2_ORBS</span>    <span class="o">=</span> A
+<span class="nv">CASPT2_IPEA</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_IMAG</span>    <span class="o">=</span> 0.0
+<span class="nv">CASPT2_CHECKPT</span> <span class="o">=</span> TRUE
+<span class="nv">CASPT2_CUMUL</span>   <span class="o">=</span> FALSE
+
+<span class="nv">PRINT_CORR</span> <span class="o">=</span> TRUE
+
+<span class="nv">TMP_FOLDER</span> <span class="o">=</span> /local/NUMBER.master15.delcatty.gent.vsc/
+</pre></div>
+</div>
+</div>
+<div class="section" id="pt2-triplet-in">
+<span id="nineth-ptr-solution"></span><h3>12.7.9. pt2_triplet.in<a class="headerlink" href="#pt2-triplet-in" title="Permalink to this headline">¶</a></h3>
+<p>Difference with <a class="reference internal" href="#eigth-ptr-solution"><span>singlet</span></a>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">MULTIPLICITY</span> <span class="o">=</span> 3
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="static/CheMPS2logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">12. DMRG workshop (12-jul-2016): hands-on session</a><ul>
+<li><a class="reference internal" href="#introduction">12.1. Introduction</a></li>
+<li><a class="reference internal" href="#ugent-hpc">12.2. UGent HPC</a></li>
+<li><a class="reference internal" href="#fcidump-and-molden">12.3. <code class="docutils literal"><span class="pre">FCIDUMP</span></code> and <code class="docutils literal"><span class="pre">MOLDEN</span></code></a></li>
+<li><a class="reference internal" href="#basis-choice">12.4. Basis choice</a></li>
+<li><a class="reference internal" href="#dmrg-scf">12.5. DMRG-SCF</a></li>
+<li><a class="reference internal" href="#dmrg-caspt2">12.6. DMRG-CASPT2</a></li>
+<li><a class="reference internal" href="#solutions">12.7. Solutions</a><ul>
+<li><a class="reference internal" href="#ci-input-orbs-in">12.7.1. ci_input_orbs.in</a></li>
+<li><a class="reference internal" href="#ci-local-orbs-in">12.7.2. ci_local_orbs.in</a></li>
+<li><a class="reference internal" href="#tetracene-molden-rotated-for-the-localized-active-space-orbitals">12.7.3. tetracene.molden.rotated for the localized active space orbitals</a></li>
+<li><a class="reference internal" href="#molecular-vs-localized-orbitals">12.7.4. Molecular vs. localized orbitals</a></li>
+<li><a class="reference internal" href="#scf-singlet-in">12.7.5. scf_singlet.in</a></li>
+<li><a class="reference internal" href="#scf-triplet-in">12.7.6. scf_triplet.in</a></li>
+<li><a class="reference internal" href="#dmrg-scf-singlet-triplet-gap">12.7.7. DMRG-SCF singlet-triplet gap</a></li>
+<li><a class="reference internal" href="#pt2-singlet-in">12.7.8. pt2_singlet.in</a></li>
+<li><a class="reference internal" href="#pt2-triplet-in">12.7.9. pt2_triplet.in</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="interfaces.html"
+                        title="previous chapter">11. Interfaces to psi4 and pyscf</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="sources/handson.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-3 (2016-07-08) documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-2016, Sebastian Wouters.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

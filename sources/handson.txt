@@ -1,0 +1,459 @@
+.. CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
+   Copyright (C) 2013-2016 Sebastian Wouters
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+.. index:: Hands-on
+
+DMRG workshop (12-jul-2016): hands-on session
+=============================================
+
+Introduction
+------------
+
+The geometry of tetracene was optimized at the restricted B3LYP/6-31G* level of theory, and can be found in the file `tetracene.fcidump.in <https://github.com/sebwouters/chemps2/raw/master/sphinx/tetracene.fcidump.in>`_:
+
+.. literalinclude:: tetracene.fcidump.in
+
+The goal of this afternoon is to calculate the vertical singlet-triplet gap with DMRG(18, 18)-CASPT2/6-31G*.
+
+`chemps2 <https://github.com/sebwouters/chemps2>`_ is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for `psi4 <http://www.psicode.org/>`_. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in ``FCIDUMP`` format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to `psi4 <http://www.psicode.org/>`_ to obtain matrix elements. In the future you can use `molcas <http://www.molcas.org/>`_, `molpro <https://www.molpro.net/>`_, `dalton <http://www.daltonprogram.org/>`_... The disadvantage is that a full-rank ``FCIDUMP`` file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.
+
+UGent HPC
+---------
+
+Follow the `instructions <http://hpc.ugent.be/userwiki/index.php/User:VscConnect>`_ to log in to the UGent HPC.
+
+Submit an interactive job in the XYZ queue:
+
+.. code-block:: bash
+
+    $ qsub -I -q XYZ -l walltime=06:00:00 -l nodes=1:ppn=8
+
+Once you are on the node, change directory to, for example, the following folder:
+
+.. code-block:: bash
+
+    $ cd $VSC_SCRATCH
+    $ mkdir dmrg_workshop
+    $ cd dmrg_workshop/
+
+Please keep in mind that you will need about 21 Gb of disk for the ``FCIDUMP`` file and `chemps2 <https://github.com/sebwouters/chemps2>`_ checkpoints!
+
+``FCIDUMP`` and ``MOLDEN``
+--------------------------
+
+We will first use a plugin to `psi4 <http://www.psicode.org/>`_ to generate the RHF matrix elements in ``FCIDUMP`` format, as well as the corresponding ``MOLDEN`` file. As said before, any other program which is able to generate these two types of files can be used as well. Load the `psi4 <http://www.psicode.org/>`_ module and generate a new plugin called ``fcidump``:
+
+.. code-block:: bash
+
+    $ module load PSI4/1.0-intel-2016a-mt-Python-2.7.11
+    $ psi4 --new-plugin fcidump
+
+Overwrite the dummy file ``fcidump.cc`` and compile:
+
+.. code-block:: bash
+
+    $ cd fcidump/
+    $ rm fcidump.cc
+    $ wget 'https://github.com/sebwouters/chemps2/raw/master/integrals/psi4plugins/fcidump.cc'
+    $ make
+    $ cd ../
+
+The required ``FCIDUMP`` file and the corresponding ``MOLDEN`` file can now be generated with `psi4 <http://www.psicode.org/>`_:
+
+.. code-block:: bash
+
+    $ wget 'https://github.com/sebwouters/chemps2/raw/master/sphinx/tetracene.fcidump.in'
+    $ OMP_NUM_THREADS=8 psi4 -n 8 tetracene.fcidump.in &
+    $ tail -n 3000 -f tetracene.fcidump.out
+    $ ls -alh TETRACENE.FCIDUMP
+    $ ls -alh tetracene.molden
+
+Note that the specified symmetry group in ``tetracene.fcidump.in`` was ``csz``, a subgroup of ``d2h``. In the ``csz`` symmetry group, the 18 active space :math:`\pi`-orbitals can be localized to the carbon atoms. This is not the case for the ``d2h`` symmetry group.
+
+**While you are waiting for the** ``FCIDUMP`` **file of size 20 Gb, you can already proceed with the next section.**
+
+Basis choice
+------------
+
+Now that you have the required matrix elements in ``FCIDUMP`` format and the corresponding ``MOLDEN`` file, we can perform calculations with `chemps2 <https://github.com/sebwouters/chemps2>`_. First load the corresponding module and study the options of the binary:
+
+.. code-block:: bash
+
+    $ module unload CheMPS2/1.7.1-intel-2016a
+    $ module load CheMPS2/1.7.2-intel-2016a
+    $ chemps2 --help
+
+Perform each calculation in a separate folder. This way checkpoint files will not get mixed up. Create a folder ``ci_input_orbs/`` and in that folder an input file ``ci_input_orbs.in`` for `chemps2 <https://github.com/sebwouters/chemps2>`_ with the following options:
+
+- Target the singlet ground state
+- Use an (18, 18) active space
+- Switch off the CASPT2 calculation
+- Overwrite the tmp folder with the existing path ``/local/NUMBER.master15.delcatty.gent.vsc/``, where ``NUMBER`` is the job number which you see with
+
+.. code-block:: bash
+
+    $ qstat -n
+
+- Perform one DMRG-SCF iteration, which corresponds to DMRG-CI
+- The active space orbitals should be RHF molecular orbitals (i.e. the input orbitals)
+- Use the convergence scheme
+
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | :math:`D_{SU(2)}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` | :math:`r_{tol}` |
+ +===================+==================+=================+========================+=================+
+ | 200               | 1e-6             | 10              | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 400               | 1e-6             | 10              | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 600               | 1e-6             | 10              | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 600               | 1e-8             | 3               | 0.0                    | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 400               | 1e-8             | 3               | 0.0                    | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 200               | 1e-8             | 3               | 0.0                    | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+
+- Set the option ``SCF_MOLDEN`` to the corresponding molden file
+
+When you have created the input file, you can double check with the :ref:`solution <first_ptr_solution>`.
+
+Run the calculation:
+
+.. code-block:: bash
+
+    $ cd ci_input_orbs/
+    $ OMP_NUM_THREADS=4 chemps2 --file=ci_input_orbs.in > ci_input_orbs.out &
+    $ cd ../
+
+**Note that you have now only used 4 of the 8 cores available to you. Proceed with the inctructions below while waiting for the calculation to finish.**
+
+Create a folder ``ci_local_orbs/`` and in that folder an input file ``ci_local_orbs.in`` for `chemps2 <https://github.com/sebwouters/chemps2>`_ which is identical to ``ci_input_orbs.in``, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the :ref:`solution <second_ptr_solution>`.
+
+Run the calculation:
+
+.. code-block:: bash
+
+    $ cd ci_local_orbs/
+    $ OMP_NUM_THREADS=4 chemps2 --file=ci_local_orbs.in > ci_local_orbs.out &
+    $ cd ../
+    $ tail -n 300 ci_input_orbs/ci_input_orbs.out
+    $ tail -n 300 ci_local_orbs/ci_local_orbs.out
+
+When the calculations are finished, take a look at the files
+
+ - ``ci_input_orbs/tetracene.molden.rotated``
+ - ``ci_local_orbs/tetracene.molden.rotated``
+
+with your favourite visualization software. Do the first 18 ``App`` or ``A"`` orbitals have the desired shape? How are they ordered? Once you have formulated your own answer, you can double check with the :ref:`solution <third_ptr_solution>`.
+
+Compare the energies of the last three sweep instructions as a function of :math:`D_{SU(2)}` for both calculations. Thereto you can grep for:
+
+.. code-block:: bash
+
+    $ grep "Minimum energy encountered during the last sweep" ci_input_orbs/ci_input_orbs.out
+    $ grep "Minimum energy encountered during the last sweep" ci_local_orbs/ci_local_orbs.out
+
+What do you observe? Can you explain it? Once you have formulated your own answer, you can double check with the :ref:`solution <fourth_ptr_solution>`.
+
+DMRG-SCF
+--------
+
+Use localized orbitals for the active space from now on. Perform the DMRG-SCF orbital optimization for the singlet and the triplet. Also put DIIS on when the update norm is smaller than 1e-2, switch ``PRINT_CORR`` to ``TRUE``, and remove the ``SCF_MOLDEN`` line. Use the following convergence scheme:
+
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | :math:`D_{SU(2)}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` | :math:`r_{tol}` |
+ +===================+==================+=================+========================+=================+
+ | 250               | 1e-6             | 8               | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 500               | 1e-8             | 8               | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 750               | 1e-10            | 8               | 0.0                    | 1e-8            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+
+Why is the reduced virtual dimension not lowered at the end of the DMRG calculation? Why is the last :math:`r_{tol}` smaller? When you have created the input files, you can double check with the solution for the :ref:`singlet <fifth_ptr_solution>` and the :ref:`triplet <sixth_ptr_solution>`.
+
+Run the calculation:
+
+.. code-block:: bash
+
+    $ cd scf_singlet/
+    $ OMP_NUM_THREADS=4 chemps2 --file=scf_singlet.in > scf_singlet.out &
+    $ cd ../scf_triplet/
+    $ OMP_NUM_THREADS=4 chemps2 --file=scf_triplet.in > scf_triplet.out &
+    $ cd ../
+    $ tail -n 300 scf_singlet/scf_singlet.out
+    $ tail -n 300 scf_triplet/scf_triplet.out
+
+What is the DMRG-SCF singlet-triplet gap you obtain? Double check with the :ref:`solution <seventh_ptr_solution>`.
+
+Do you see polyradical character in the natural orbital occupation numbers for the singlet and/or triplet? How can you observe this in the correlation functions? Tip: It might be interesting to read 
+
+J. Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, *Journal of Chemical Physics* **127**, 134309 (2007). `doi link <http://dx.doi.org/10.1063/1.2768362>`_
+
+which can also be found on the `arXiv <https://arxiv.org/abs/0707.3120>`_.
+
+DMRG-CASPT2
+-----------
+
+How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use ``A`` or ``P`` for the option ``CASPT2_ORBS``, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the following convergence scheme:
+
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | :math:`D_{SU(2)}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` | :math:`r_{tol}` |
+ +===================+==================+=================+========================+=================+
+ | 250               | 1e-6             | 8               | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 500               | 1e-8             | 8               | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 750               | 1e-10            | 8               | 0.05                   | 1e-5            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+ | 1250              | 1e-10            | 8               | 0.0                    | 1e-8            |
+ +-------------------+------------------+-----------------+------------------------+-----------------+
+
+A larger virtual dimension is used for DMRG-CASPT2, because the excited wavefunctions
+
+.. math::
+
+    \left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + \hat{E}_{zs} \right) + \beta \right] \left| \Psi_0 \right\rangle
+
+have a larger bond dimension than :math:`\left| \Psi_0 \right\rangle`.  When you have created the input files, you can double check with the solution for the :ref:`singlet <eigth_ptr_solution>` and the :ref:`triplet <nineth_ptr_solution>`.
+
+Run the calculations, but please remember to copy over the converged DMRG-SCF orbitals:
+
+.. code-block:: bash
+
+    $ cd pt2_singlet/
+    $ cp ../scf_singlet/CheMPS2_CASSCF.h5 .
+    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_singlet.in > pt2_singlet.out &
+    $ cd ../pt2_triplet/
+    $ cp ../scf_triplet/CheMPS2_CASSCF.h5 .
+    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_triplet.in > pt2_triplet.out &
+    $ cd ../
+    $ tail -n 300 pt2_singlet/pt2_singlet.out
+    $ tail -n 300 pt2_triplet/pt2_triplet.out
+
+The DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. Please keep the following instructions in mind:
+
+.. warning::
+
+    In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs **exactly** the same orbitals are used. Therefore, for the second and later DMRG-CASPT2 runs with the binary:
+    
+     - Put ``SCF_DIIS_THR`` to ``0.0``
+     - Delete any checkpoints named ``CheMPS2_DIIS.h5``
+     - Switch ``SCF_ACTIVE_SPACE`` to ``I``
+    
+    This ensures that for the second and later DMRG-CASPT2 runs, **exactly** the orbitals from ``CheMPS2_CASSCF.h5`` are used.
+
+How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?
+
+And with an IPEA shift of 0.25 and an IMAG shift of 0.0?
+
+Solutions
+---------
+
+.. _first_ptr_solution:
+
+ci_input_orbs.in
+~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    FCIDUMP = /path/to/TETRACENE.FCIDUMP
+
+    GROUP        = 3
+    MULTIPLICITY = 1
+    NELECTRONS   = 120
+    IRREP        = 0
+    EXCITATION   = 0
+
+    SWEEP_STATES       = 200,  400,  600,  600,  400,  200
+    SWEEP_ENERGY_CONV  = 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-8
+    SWEEP_MAX_SWEEPS   = 10,   10,   10,   3,    3,    3
+    SWEEP_NOISE_PREFAC = 0.05, 0.05, 0.05, 0.0,  0.0,  0.0
+    SWEEP_DVDSON_RTOL  = 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5
+
+    NOCC = 51,  0
+    NACT = 0,   18
+    NVIR = 171, 54
+
+    SCF_STATE_AVG    = FALSE
+    SCF_DIIS_THR     = 0.0
+    SCF_GRAD_THR     = 1e-6
+    SCF_MAX_ITER     = 1
+    SCF_ACTIVE_SPACE = I
+    SCF_MOLDEN       = /path/to/tetracene.molden
+
+    CASPT2_CALC    = FALSE
+    CASPT2_ORBS    = A
+    CASPT2_IPEA    = 0.0
+    CASPT2_IMAG    = 0.0
+    CASPT2_CHECKPT = FALSE
+    CASPT2_CUMUL   = FALSE
+
+    PRINT_CORR = TRUE
+
+    TMP_FOLDER = /local/NUMBER.master15.delcatty.gent.vsc/
+
+.. _second_ptr_solution:
+
+ci_local_orbs.in
+~~~~~~~~~~~~~~~~
+
+Difference with :ref:`input orbitals <first_ptr_solution>`:
+
+.. code-block:: bash
+
+    SCF_ACTIVE_SPACE = L
+
+.. _third_ptr_solution:
+
+tetracene.molden.rotated for the localized active space orbitals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: handson_orbitals.png
+
+For ``ci_local_orbs/tetracene.molden.rotated``, the active space orbitals are localized on the carbon atoms, and are ordered according to the one-dimensional topology of the molecule.
+
+.. _fourth_ptr_solution:
+
+Molecular vs. localized orbitals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: handson_comparison.png
+
+.. _fifth_ptr_solution:
+
+scf_singlet.in
+~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    FCIDUMP = /path/to/TETRACENE.FCIDUMP
+
+    GROUP        = 3
+    MULTIPLICITY = 1
+    NELECTRONS   = 120
+    IRREP        = 0
+    EXCITATION   = 0
+
+    SWEEP_STATES       = 250,  500,  750
+    SWEEP_ENERGY_CONV  = 1e-6, 1e-8, 1e-10
+    SWEEP_MAX_SWEEPS   = 8,    8,    8
+    SWEEP_NOISE_PREFAC = 0.05, 0.05, 0.0
+    SWEEP_DVDSON_RTOL  = 1e-5, 1e-5, 1e-8
+
+    NOCC = 51,  0
+    NACT = 0,   18
+    NVIR = 171, 54
+
+    SCF_STATE_AVG    = FALSE
+    SCF_DIIS_THR     = 1e-2
+    SCF_GRAD_THR     = 1e-6
+    SCF_MAX_ITER     = 100
+    SCF_ACTIVE_SPACE = L
+
+    CASPT2_CALC    = FALSE
+    CASPT2_ORBS    = A
+    CASPT2_IPEA    = 0.0
+    CASPT2_IMAG    = 0.0
+    CASPT2_CHECKPT = FALSE
+    CASPT2_CUMUL   = FALSE
+
+    PRINT_CORR = TRUE
+
+    TMP_FOLDER = /local/NUMBER.master15.delcatty.gent.vsc/
+
+.. _sixth_ptr_solution:
+
+scf_triplet.in
+~~~~~~~~~~~~~~
+
+Difference with :ref:`singlet <fifth_ptr_solution>`:
+
+.. code-block:: bash
+
+    MULTIPLICITY = 3
+
+.. _seventh_ptr_solution:
+
+DMRG-SCF singlet-triplet gap
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Both DMRG-SCF calculations are converged with 8 macro-iterations. The gap is
+
+.. math::
+
+    \Delta E = E_{triplet} - E_{singlet} = -688.803387 - (-688.867150) ~ E_{h} = 63.763 ~ mE_{h} = 40.012 ~ kcal/mol
+
+.. _eigth_ptr_solution:
+
+pt2_singlet.in
+~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    FCIDUMP = /path/to/TETRACENE.FCIDUMP
+
+    GROUP        = 3
+    MULTIPLICITY = 1
+    NELECTRONS   = 120
+    IRREP        = 0
+    EXCITATION   = 0
+
+    SWEEP_STATES       = 250,  500,  750,   1250
+    SWEEP_ENERGY_CONV  = 1e-6, 1e-8, 1e-10, 1e-10
+    SWEEP_MAX_SWEEPS   = 8,    8,    8,     8
+    SWEEP_NOISE_PREFAC = 0.05, 0.05, 0.05,  0.0
+    SWEEP_DVDSON_RTOL  = 1e-5, 1e-5, 1e-5,  1e-8
+
+    NOCC = 51,  0
+    NACT = 0,   18
+    NVIR = 171, 54
+
+    SCF_STATE_AVG    = FALSE
+    SCF_DIIS_THR     = 0.0
+    SCF_GRAD_THR     = 1e-6
+    SCF_MAX_ITER     = 100
+    SCF_ACTIVE_SPACE = L
+
+    CASPT2_CALC    = TRUE
+    CASPT2_ORBS    = A
+    CASPT2_IPEA    = 0.0
+    CASPT2_IMAG    = 0.0
+    CASPT2_CHECKPT = TRUE
+    CASPT2_CUMUL   = FALSE
+
+    PRINT_CORR = TRUE
+
+    TMP_FOLDER = /local/NUMBER.master15.delcatty.gent.vsc/
+
+.. _nineth_ptr_solution:
+
+pt2_triplet.in
+~~~~~~~~~~~~~~
+
+Difference with :ref:`singlet <eigth_ptr_solution>`:
+
+.. code-block:: bash
+
+    MULTIPLICITY = 3
+
+.. DMRG-CASPT2 singlet-triplet gaps
+.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. Copy-paste the IPEA 0.0 and IPEA 0.25 solution here
+.. 1 Hartree = 627.509469 kcal / mol
+
