@@ -29,7 +29,7 @@ Contents
    dmrgscfcalcs
    caspt2
    interfaces
-   
+   handson
    
 For more elaborate information on CheMPS2, please consult the :ref:`publications <label-publications>` and the `doxygen html output <http://sebwouters.github.io/CheMPS2/doxygen/index.html>`_.
 
