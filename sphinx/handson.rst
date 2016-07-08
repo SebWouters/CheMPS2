@@ -40,13 +40,13 @@ Submit an interactive job in the XYZ queue:
 
 .. code-block:: bash
 
-    $ qsub -I -q XYZ -l walltime=06:00:00 -l nodes=1:ppn=8
+    $ qsub -I -W x=FLAGS:ADVRES:dmrg.198 -l walltime=06:00:00 -l nodes=1:ppn=8
 
 Once you are on the node, change directory to, for example, the following folder:
 
 .. code-block:: bash
 
-    $ cd $VSC_SCRATCH
+    $ cd $VSC_SCRATCH_NODE
     $ mkdir dmrg_workshop
     $ cd dmrg_workshop/
 
@@ -86,15 +86,31 @@ Note that the specified symmetry group in ``tetracene.fcidump.in`` was ``csz``, 
 
 **While you are waiting for the** ``FCIDUMP`` **file of size 20 Gb, you can already proceed with the next section.**
 
+.. note::
+
+    You can also use the precreated files from the folder ``/apps/gent/tutorials/DMRG/`` instead:
+    
+    .. code-block:: bash
+    
+        $ ls -al /apps/gent/tutorials/DMRG/tetracene.fcidump.in
+        $ ls -al /apps/gent/tutorials/DMRG/tetracene.fcidump.out
+        $ ls -al /apps/gent/tutorials/DMRG/TETRACENE.FCIDUMP
+        $ ls -al /apps/gent/tutorials/DMRG/tetracene.molden
+
 Basis choice
 ------------
 
-Now that you have the required matrix elements in ``FCIDUMP`` format and the corresponding ``MOLDEN`` file, we can perform calculations with `chemps2 <https://github.com/sebwouters/chemps2>`_. First load the corresponding module and study the options of the binary:
+Now that you have the required matrix elements in ``FCIDUMP`` format and the corresponding ``MOLDEN`` file, we can perform calculations with `chemps2 <https://github.com/sebwouters/chemps2>`_ v1.7.2. This module should have been loaded together with the `psi4 <http://www.psicode.org/>`_ module. If this was not the case, you can load it with:
 
 .. code-block:: bash
 
-    $ module unload CheMPS2/1.7.1-intel-2016a
     $ module load CheMPS2/1.7.2-intel-2016a
+
+Study the options of the binary:
+
+.. code-block:: bash
+
+    $ chemps2 --version
     $ chemps2 --help
 
 Perform each calculation in a separate folder. This way checkpoint files will not get mixed up. Create a folder ``ci_input_orbs/`` and in that folder an input file ``ci_input_orbs.in`` for `chemps2 <https://github.com/sebwouters/chemps2>`_ with the following options:
@@ -137,7 +153,7 @@ Run the calculation:
 .. code-block:: bash
 
     $ cd ci_input_orbs/
-    $ OMP_NUM_THREADS=4 chemps2 --file=ci_input_orbs.in > ci_input_orbs.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=ci_input_orbs.in &> ci_input_orbs.out &
     $ cd ../
 
 **Note that you have now only used 4 of the 8 cores available to you. Proceed with the inctructions below while waiting for the calculation to finish.**
@@ -149,7 +165,7 @@ Run the calculation:
 .. code-block:: bash
 
     $ cd ci_local_orbs/
-    $ OMP_NUM_THREADS=4 chemps2 --file=ci_local_orbs.in > ci_local_orbs.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=ci_local_orbs.in &> ci_local_orbs.out &
     $ cd ../
     $ tail -n 300 ci_input_orbs/ci_input_orbs.out
     $ tail -n 300 ci_local_orbs/ci_local_orbs.out
@@ -192,9 +208,9 @@ Run the calculation:
 .. code-block:: bash
 
     $ cd scf_singlet/
-    $ OMP_NUM_THREADS=4 chemps2 --file=scf_singlet.in > scf_singlet.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=scf_singlet.in &> scf_singlet.out &
     $ cd ../scf_triplet/
-    $ OMP_NUM_THREADS=4 chemps2 --file=scf_triplet.in > scf_triplet.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=scf_triplet.in &> scf_triplet.out &
     $ cd ../
     $ tail -n 300 scf_singlet/scf_singlet.out
     $ tail -n 300 scf_triplet/scf_triplet.out
@@ -207,8 +223,27 @@ J. Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, *Journal of
 
 which can also be found on the `arXiv <https://arxiv.org/abs/0707.3120>`_.
 
+.. note::
+
+    If you are in a hurry or immediately want to start with the DMRG-CASPT2 calculations, you can also use the precreated checkpoints from the folder ``/apps/gent/tutorials/DMRG/``:
+    
+    .. code-block:: bash
+    
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_CASSCF.h5.singlet scf_singlet/.
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_CASSCF.h5.triplet scf_triplet/.
+
 DMRG-CASPT2
 -----------
+
+.. note::
+
+    DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs **exactly** the same orbitals are used. Therefore, start from the converged DMRG-SCF checkpoint ``CheMPS2_CASSCF.h5`` and do the following things:
+    
+     - Put ``SCF_DIIS_THR`` to ``0.0``
+     - Delete any checkpoints named ``CheMPS2_DIIS.h5``
+     - Switch ``SCF_ACTIVE_SPACE`` to ``I``
+    
+    This ensures that for the subsequent DMRG-CASPT2 runs, **exactly** the orbitals from ``CheMPS2_CASSCF.h5`` are used.
 
 How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use ``A`` or ``P`` for the option ``CASPT2_ORBS``, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the same convergence scheme as for the DMRG-SCF calculations.
 
@@ -230,25 +265,13 @@ Run the calculations, but please remember to copy over the converged DMRG-SCF or
 
     $ cd pt2_singlet/
     $ cp ../scf_singlet/CheMPS2_CASSCF.h5 .
-    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_singlet.in > pt2_singlet.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_singlet.in &> pt2_singlet.out &
     $ cd ../pt2_triplet/
     $ cp ../scf_triplet/CheMPS2_CASSCF.h5 .
-    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_triplet.in > pt2_triplet.out &
+    $ OMP_NUM_THREADS=4 chemps2 --file=pt2_triplet.in &> pt2_triplet.out &
     $ cd ../
     $ tail -n 300 pt2_singlet/pt2_singlet.out
     $ tail -n 300 pt2_triplet/pt2_triplet.out
-
-The DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. Please keep the following instructions in mind:
-
-.. warning::
-
-    In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs **exactly** the same orbitals are used. Therefore, for the second and later DMRG-CASPT2 runs with the binary:
-    
-     - Put ``SCF_DIIS_THR`` to ``0.0``
-     - Delete any checkpoints named ``CheMPS2_DIIS.h5``
-     - Switch ``SCF_ACTIVE_SPACE`` to ``I``
-    
-    This ensures that for the second and later DMRG-CASPT2 runs, **exactly** the orbitals from ``CheMPS2_CASSCF.h5`` are used.
 
 How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?
 
@@ -420,7 +443,7 @@ pt2_singlet.in
     SCF_DIIS_THR     = 0.0
     SCF_GRAD_THR     = 1e-6
     SCF_MAX_ITER     = 100
-    SCF_ACTIVE_SPACE = L
+    SCF_ACTIVE_SPACE = I
 
     CASPT2_CALC    = TRUE
     CASPT2_ORBS    = A
