@@ -326,56 +326,15 @@ $ tail -n <span class="m">300</span> scf_triplet/scf_triplet.out
 </div>
 <div class="section" id="dmrg-caspt2">
 <h2>12.6. DMRG-CASPT2<a class="headerlink" href="#dmrg-caspt2" title="Permalink to this headline">¶</a></h2>
-<p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use <code class="docutils literal"><span class="pre">A</span></code> or <code class="docutils literal"><span class="pre">P</span></code> for the option <code class="docutils literal"><span class="pre">CASPT2_ORBS</span></code>, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the following convergence scheme:</p>
-<blockquote>
-<div><table border="1" class="docutils">
-<colgroup>
-<col width="20%" />
-<col width="19%" />
-<col width="18%" />
-<col width="25%" />
-<col width="18%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><span class="math">\(D_{SU(2)}\)</span></th>
-<th class="head"><span class="math">\(E_{conv}\)</span></th>
-<th class="head"><span class="math">\(N_{max}\)</span></th>
-<th class="head"><span class="math">\(\gamma_{noise}\)</span></th>
-<th class="head"><span class="math">\(r_{tol}\)</span></th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>250</td>
-<td>1e-6</td>
-<td>8</td>
-<td>0.05</td>
-<td>1e-5</td>
-</tr>
-<tr class="row-odd"><td>500</td>
-<td>1e-8</td>
-<td>8</td>
-<td>0.05</td>
-<td>1e-5</td>
-</tr>
-<tr class="row-even"><td>750</td>
-<td>1e-10</td>
-<td>8</td>
-<td>0.05</td>
-<td>1e-5</td>
-</tr>
-<tr class="row-odd"><td>1250</td>
-<td>1e-10</td>
-<td>8</td>
-<td>0.0</td>
-<td>1e-8</td>
-</tr>
-</tbody>
-</table>
-</div></blockquote>
-<p>A larger virtual dimension is used for DMRG-CASPT2, because the excited wavefunctions</p>
+<p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use <code class="docutils literal"><span class="pre">A</span></code> or <code class="docutils literal"><span class="pre">P</span></code> for the option <code class="docutils literal"><span class="pre">CASPT2_ORBS</span></code>, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the same convergence scheme as for the DMRG-SCF calculations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Sometimes a larger virtual dimension can be required for DMRG-CASPT2 as compared to DMRG-SCF, because the excited wavefunctions</p>
 <div class="math">
 \[\left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + \hat{E}_{zs} \right) + \beta \right] \left| \Psi_0 \right\rangle\]</div>
-<p>have a larger bond dimension than <span class="math">\(\left| \Psi_0 \right\rangle\)</span>.  When you have created the input files, you can double check with the solution for the <a class="reference internal" href="#eigth-ptr-solution"><span>singlet</span></a> and the <a class="reference internal" href="#nineth-ptr-solution"><span>triplet</span></a>.</p>
+<p class="last">are a linear combination over three matrix product states: <span class="math">\(\left| \Psi_0 \right\rangle\)</span>, <span class="math">\(\hat{E}_{sz} \left| \Psi_0 \right\rangle\)</span>, and <span class="math">\(\hat{E}_{zs} \left| \Psi_0 \right\rangle\)</span>. In practice, you should therefore check how the DMRG-CASPT2 second order energy in <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> varies with <span class="math">\(D_{SU(2)}\)</span>!</p>
+</div>
+<p>When you have created the input files, you can double check with the solution for the <a class="reference internal" href="#eigth-ptr-solution"><span>singlet</span></a> and the <a class="reference internal" href="#nineth-ptr-solution"><span>triplet</span></a>.</p>
 <p>Run the calculations, but please remember to copy over the converged DMRG-SCF orbitals:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> pt2_singlet/
 $ cp ../scf_singlet/CheMPS2_CASSCF.h5 .
@@ -524,11 +483,11 @@ $ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
 <span class="nv">IRREP</span>        <span class="o">=</span> 0
 <span class="nv">EXCITATION</span>   <span class="o">=</span> 0
 
-<span class="nv">SWEEP_STATES</span>       <span class="o">=</span> 250,  500,  750,   1250
-<span class="nv">SWEEP_ENERGY_CONV</span>  <span class="o">=</span> 1e-6, 1e-8, 1e-10, 1e-10
-<span class="nv">SWEEP_MAX_SWEEPS</span>   <span class="o">=</span> 8,    8,    8,     8
-<span class="nv">SWEEP_NOISE_PREFAC</span> <span class="o">=</span> 0.05, 0.05, 0.05,  0.0
-<span class="nv">SWEEP_DVDSON_RTOL</span>  <span class="o">=</span> 1e-5, 1e-5, 1e-5,  1e-8
+<span class="nv">SWEEP_STATES</span>       <span class="o">=</span> 250,  500,  750
+<span class="nv">SWEEP_ENERGY_CONV</span>  <span class="o">=</span> 1e-6, 1e-8, 1e-10
+<span class="nv">SWEEP_MAX_SWEEPS</span>   <span class="o">=</span> 8,    8,    8
+<span class="nv">SWEEP_NOISE_PREFAC</span> <span class="o">=</span> 0.05, 0.05, 0.0
+<span class="nv">SWEEP_DVDSON_RTOL</span>  <span class="o">=</span> 1e-5, 1e-5, 1e-8
 
 <span class="nv">NOCC</span> <span class="o">=</span> 51,  0
 <span class="nv">NACT</span> <span class="o">=</span> 0,   18
