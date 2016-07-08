@@ -9,4 +9,6 @@ sed -i "s/_images/images/" inoutput.html
 sed -i "s/_images/images/" inoutput.html
 sed -i "s/_images/images/" handson.html
 sed -i "s/_images/images/" handson.html
+sed -i "s/_images/images/" resources.html
+sed -i "s/_images/images/" resources.html
 
