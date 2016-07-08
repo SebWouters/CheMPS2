@@ -210,27 +210,19 @@ which can also be found on the `arXiv <https://arxiv.org/abs/0707.3120>`_.
 DMRG-CASPT2
 -----------
 
-How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use ``A`` or ``P`` for the option ``CASPT2_ORBS``, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the following convergence scheme:
+How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used? Is it best to use ``A`` or ``P`` for the option ``CASPT2_ORBS``, and why? In your input file, also switch on the DMRG-CASPT2 checkpoint, because later we will redo the calculation with an IPEA shift of 0.25. Use the same convergence scheme as for the DMRG-SCF calculations.
 
- +-------------------+------------------+-----------------+------------------------+-----------------+
- | :math:`D_{SU(2)}` | :math:`E_{conv}` | :math:`N_{max}` | :math:`\gamma_{noise}` | :math:`r_{tol}` |
- +===================+==================+=================+========================+=================+
- | 250               | 1e-6             | 8               | 0.05                   | 1e-5            |
- +-------------------+------------------+-----------------+------------------------+-----------------+
- | 500               | 1e-8             | 8               | 0.05                   | 1e-5            |
- +-------------------+------------------+-----------------+------------------------+-----------------+
- | 750               | 1e-10            | 8               | 0.05                   | 1e-5            |
- +-------------------+------------------+-----------------+------------------------+-----------------+
- | 1250              | 1e-10            | 8               | 0.0                    | 1e-8            |
- +-------------------+------------------+-----------------+------------------------+-----------------+
+.. note::
 
-A larger virtual dimension is used for DMRG-CASPT2, because the excited wavefunctions
+    Sometimes a larger virtual dimension can be required for DMRG-CASPT2 as compared to DMRG-SCF, because the excited wavefunctions
+    
+    .. math::
+    
+        \left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + \hat{E}_{zs} \right) + \beta \right] \left| \Psi_0 \right\rangle
+    
+    are a linear combination over three matrix product states: :math:`\left| \Psi_0 \right\rangle`, :math:`\hat{E}_{sz} \left| \Psi_0 \right\rangle`, and :math:`\hat{E}_{zs} \left| \Psi_0 \right\rangle`. In practice, you should therefore check how the DMRG-CASPT2 second order energy in `chemps2 <https://github.com/sebwouters/chemps2>`_ varies with :math:`D_{SU(2)}`!
 
-.. math::
-
-    \left| sz, \alpha, \beta \right\rangle = \left[ \alpha \left( \hat{E}_{sz} + \hat{E}_{zs} \right) + \beta \right] \left| \Psi_0 \right\rangle
-
-have a larger bond dimension than :math:`\left| \Psi_0 \right\rangle`.  When you have created the input files, you can double check with the solution for the :ref:`singlet <eigth_ptr_solution>` and the :ref:`triplet <nineth_ptr_solution>`.
+When you have created the input files, you can double check with the solution for the :ref:`singlet <eigth_ptr_solution>` and the :ref:`triplet <nineth_ptr_solution>`.
 
 Run the calculations, but please remember to copy over the converged DMRG-SCF orbitals:
 
@@ -414,11 +406,11 @@ pt2_singlet.in
     IRREP        = 0
     EXCITATION   = 0
 
-    SWEEP_STATES       = 250,  500,  750,   1250
-    SWEEP_ENERGY_CONV  = 1e-6, 1e-8, 1e-10, 1e-10
-    SWEEP_MAX_SWEEPS   = 8,    8,    8,     8
-    SWEEP_NOISE_PREFAC = 0.05, 0.05, 0.05,  0.0
-    SWEEP_DVDSON_RTOL  = 1e-5, 1e-5, 1e-5,  1e-8
+    SWEEP_STATES       = 250,  500,  750
+    SWEEP_ENERGY_CONV  = 1e-6, 1e-8, 1e-10
+    SWEEP_MAX_SWEEPS   = 8,    8,    8
+    SWEEP_NOISE_PREFAC = 0.05, 0.05, 0.0
+    SWEEP_DVDSON_RTOL  = 1e-5, 1e-5, 1e-8
 
     NOCC = 51,  0
     NACT = 0,   18
