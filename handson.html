@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-5 (2016-07-08) documentation</title>
+    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-7 (2016-07-08) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7.2-5 (2016-07-08)',
+        VERSION:     '1.7.2-7 (2016-07-08)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7.2-5 (2016-07-08) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7.2-7 (2016-07-08) documentation" href="index.html" />
     <link rel="prev" title="11. Interfaces to psi4 and pyscf" href="interfaces.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-5 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-7 (2016-07-08) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -107,7 +107,7 @@ molden( wfn, &#39;tetracene.molden&#39; )
 </div>
 <p>The goal of this afternoon is to calculate the vertical singlet-triplet gap with DMRG(18, 18)-CASPT2/6-31G*.</p>
 <p><a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for <a class="reference external" href="http://www.psicode.org/">psi4</a>. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in <code class="docutils literal"><span class="pre">FCIDUMP</span></code> format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to <a class="reference external" href="http://www.psicode.org/">psi4</a> to obtain matrix elements. In the future you can use <a class="reference external" href="http://www.molcas.org/">molcas</a>, <a class="reference external" href="https://www.molpro.net/">molpro</a>, <a class="reference external" href="http://www.daltonprogram.org/">dalton</a>... The disadvantage is that a full-rank <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.</p>
-<p>Please read an entire section before starting the instructions. Than you will have all the useful information you need!</p>
+<p>Please read an entire section before starting the instructions. Then you will have all the useful information you need!</p>
 </div>
 <div class="section" id="ugent-hpc">
 <h2>12.2. UGent HPC<a class="headerlink" href="#ugent-hpc" title="Permalink to this headline">¶</a></h2>
@@ -652,7 +652,7 @@ $ grep <span class="s2">&quot;Reference weight&quot;</span> test14.output
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-5 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-7 (2016-07-08) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
