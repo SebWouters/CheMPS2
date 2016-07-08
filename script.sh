@@ -7,3 +7,5 @@ sed -i "s/_sources/sources/" static/searchtools.js
 sed -i "s/_sources/sources/" *.html
 sed -i "s/_images/images/" inoutput.html
 sed -i "s/_images/images/" inoutput.html
+sed -i "s/_images/images/" handson.html
+
