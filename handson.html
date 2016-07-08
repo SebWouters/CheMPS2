@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-4 (2016-07-08) documentation</title>
+    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-5 (2016-07-08) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7.2-4 (2016-07-08)',
+        VERSION:     '1.7.2-5 (2016-07-08)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7.2-4 (2016-07-08) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7.2-5 (2016-07-08) documentation" href="index.html" />
     <link rel="prev" title="11. Interfaces to psi4 and pyscf" href="interfaces.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-4 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-5 (2016-07-08) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -107,6 +107,7 @@ molden( wfn, &#39;tetracene.molden&#39; )
 </div>
 <p>The goal of this afternoon is to calculate the vertical singlet-triplet gap with DMRG(18, 18)-CASPT2/6-31G*.</p>
 <p><a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for <a class="reference external" href="http://www.psicode.org/">psi4</a>. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in <code class="docutils literal"><span class="pre">FCIDUMP</span></code> format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to <a class="reference external" href="http://www.psicode.org/">psi4</a> to obtain matrix elements. In the future you can use <a class="reference external" href="http://www.molcas.org/">molcas</a>, <a class="reference external" href="https://www.molpro.net/">molpro</a>, <a class="reference external" href="http://www.daltonprogram.org/">dalton</a>... The disadvantage is that a full-rank <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.</p>
+<p>Please read an entire section before starting the instructions. Than you will have all the useful information you need!</p>
 </div>
 <div class="section" id="ugent-hpc">
 <h2>12.2. UGent HPC<a class="headerlink" href="#ugent-hpc" title="Permalink to this headline">¶</a></h2>
@@ -121,7 +122,10 @@ $ mkdir dmrg_workshop
 $ <span class="nb">cd</span> dmrg_workshop/
 </pre></div>
 </div>
-<p>Please keep in mind that you will need about 21 Gb of disk for the <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file and <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> checkpoints!</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please keep in mind that you will need about 20 GB of disk for the <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file and 1 GB of disk for the <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> checkpoints!</p>
+</div>
 </div>
 <div class="section" id="fcidump-and-molden">
 <h2>12.3. <code class="docutils literal"><span class="pre">FCIDUMP</span></code> and <code class="docutils literal"><span class="pre">MOLDEN</span></code><a class="headerlink" href="#fcidump-and-molden" title="Permalink to this headline">¶</a></h2>
@@ -146,8 +150,14 @@ $ ls -alh TETRACENE.FCIDUMP
 $ ls -alh tetracene.molden
 </pre></div>
 </div>
-<p>Note that the specified symmetry group in <code class="docutils literal"><span class="pre">tetracene.fcidump.in</span></code> was <code class="docutils literal"><span class="pre">csz</span></code>, a subgroup of <code class="docutils literal"><span class="pre">d2h</span></code>. In the <code class="docutils literal"><span class="pre">csz</span></code> symmetry group, the 18 active space <span class="math">\(\pi\)</span>-orbitals can be localized to the carbon atoms. This is not the case for the <code class="docutils literal"><span class="pre">d2h</span></code> symmetry group.</p>
-<p><strong>While you are waiting for the</strong> <code class="docutils literal"><span class="pre">FCIDUMP</span></code> <strong>file of size 20 Gb, you can already proceed with the next section.</strong></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The specified symmetry group in <code class="docutils literal"><span class="pre">tetracene.fcidump.in</span></code> was <code class="docutils literal"><span class="pre">csz</span></code>, a subgroup of <code class="docutils literal"><span class="pre">d2h</span></code>. In the <code class="docutils literal"><span class="pre">csz</span></code> symmetry group, the 18 active space <span class="math">\(\pi\)</span>-orbitals can be localized to the carbon atoms. This is not the case for the <code class="docutils literal"><span class="pre">d2h</span></code> symmetry group.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While you are waiting for the <code class="docutils literal"><span class="pre">FCIDUMP</span></code> file of size 20 GB, you can already proceed with the next section.</p>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>You can also use the precreated files from the folder <code class="docutils literal"><span class="pre">/apps/gent/tutorials/DMRG/</span></code> instead:</p>
@@ -182,7 +192,7 @@ $ chemps2 --help
 </div>
 <ul class="simple">
 <li>Perform one DMRG-SCF iteration, which corresponds to DMRG-CI</li>
-<li>The active space orbitals should be RHF molecular orbitals (i.e. the input orbitals)</li>
+<li>The active space orbitals should be the RHF molecular orbitals (i.e. the input orbitals)</li>
 <li>Use the convergence scheme</li>
 </ul>
 <blockquote>
@@ -252,8 +262,11 @@ $ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m"
 $ <span class="nb">cd</span> ../
 </pre></div>
 </div>
-<p><strong>Note that you have now only used 4 of the 8 cores available to you. Proceed with the inctructions below while waiting for the calculation to finish.</strong></p>
-<p>Create a folder <code class="docutils literal"><span class="pre">ci_local_orbs/</span></code> and in that folder an input file <code class="docutils literal"><span class="pre">ci_local_orbs.in</span></code> for <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> which is identical to <code class="docutils literal"><span class="pre">ci_input_orbs.in</span></code>, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the <a class="reference internal" href="#second-ptr-solution"><span>solution</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You have now only used 4 of the 8 available cores. Proceed with the instructions below while waiting for the calculation to finish.</p>
+</div>
+<p>Create a folder <code class="docutils literal"><span class="pre">ci_local_orbs/</span></code> and in that folder an input file <code class="docutils literal"><span class="pre">ci_local_orbs.in</span></code> for <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a>, which is identical to <code class="docutils literal"><span class="pre">ci_input_orbs.in</span></code>, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the <a class="reference internal" href="#second-ptr-solution"><span>solution</span></a>.</p>
 <p>Run the calculation:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> ci_local_orbs/
 $ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>ci_local_orbs.in <span class="p">&amp;</span>&gt; ci_local_orbs.out <span class="p">&amp;</span>
@@ -320,7 +333,7 @@ $ grep <span class="s2">&quot;Minimum energy encountered during the last sweep&q
 </table>
 </div></blockquote>
 <p>Why is the reduced virtual dimension not lowered at the end of the DMRG calculation? Why is the last <span class="math">\(r_{tol}\)</span> smaller? When you have created the input files, you can double check with the solution for the <a class="reference internal" href="#fifth-ptr-solution"><span>singlet</span></a> and the <a class="reference internal" href="#sixth-ptr-solution"><span>triplet</span></a>.</p>
-<p>Run the calculation:</p>
+<p>Run the calculation in separate folders:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ <span class="nb">cd</span> scf_singlet/
 $ <span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span> chemps2 --file<span class="o">=</span>scf_singlet.in <span class="p">&amp;</span>&gt; scf_singlet.out <span class="p">&amp;</span>
 $ <span class="nb">cd</span> ../scf_triplet/
@@ -333,9 +346,8 @@ $ tail -n <span class="m">300</span> scf_triplet/scf_triplet.out
 <p>What is the DMRG-SCF singlet-triplet gap you obtain? Double check with the <a class="reference internal" href="#seventh-ptr-solution"><span>solution</span></a>.</p>
 <p>Do you see polyradical character in the natural orbital occupation numbers for the singlet and/or triplet? How can you observe this in the correlation functions? Tip: It might be interesting to read</p>
 <ol class="upperalpha simple" start="10">
-<li>Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, <em>Journal of Chemical Physics</em> <strong>127</strong>, 134309 (2007). <a class="reference external" href="http://dx.doi.org/10.1063/1.2768362">doi link</a></li>
+<li>Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, <em>Journal of Chemical Physics</em> <strong>127</strong>, 134309 (2007): <a class="reference external" href="http://dx.doi.org/10.1063/1.2768362">doi link</a> or <a class="reference external" href="https://arxiv.org/abs/0707.3120">arXiv</a></li>
 </ol>
-<p>which can also be found on the <a class="reference external" href="https://arxiv.org/abs/0707.3120">arXiv</a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>If you are in a hurry or immediately want to start with the DMRG-CASPT2 calculations, you can also use the precreated checkpoints from the folder <code class="docutils literal"><span class="pre">/apps/gent/tutorials/DMRG/</span></code>:</p>
@@ -349,7 +361,7 @@ $ cp /apps/gent/tutorials/DMRG/CheMPS2_CASSCF.h5.triplet scf_triplet/.
 <h2>12.6. DMRG-CASPT2<a class="headerlink" href="#dmrg-caspt2" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs <strong>exactly</strong> the same orbitals are used. Therefore, start from the converged DMRG-SCF checkpoint <code class="docutils literal"><span class="pre">CheMPS2_CASSCF.h5</span></code> and do the following things:</p>
+<p>DMRG-CASPT2 checkpoints can be used when you kill a DMRG-CASPT2 calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs <strong>exactly</strong> the same orbitals are used. Therefore, start from the converged DMRG-SCF checkpoint <code class="docutils literal"><span class="pre">CheMPS2_CASSCF.h5</span></code> and do the following things:</p>
 <blockquote>
 <div><ul class="simple">
 <li>Put <code class="docutils literal"><span class="pre">SCF_DIIS_THR</span></code> to <code class="docutils literal"><span class="pre">0.0</span></code></li>
@@ -382,6 +394,34 @@ $ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
 </div>
 <p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?</p>
 <p>And with an IPEA shift of 0.25 and an IMAG shift of 0.0?</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You will see</p>
+<div class="highlight-bash"><div class="highlight"><pre>CheMPS2::DMRG::Symm4RDM<span class="o">(</span> X , Y <span class="o">)</span> : Elapsed wall <span class="nb">time</span> <span class="o">=</span> Z seconds.
+</pre></div>
+</div>
+<p>appear in the output, with X and Y integers, and Z a floating point number. An estimate for the total wall time for the contraction of the 4-RDM with the Fock matrix is <span class="math">\(\frac{18 (18 + 1)}{2} Z\)</span> seconds.</p>
+<p><strong>So this last exercise is homework!</strong></p>
+<p>Compile <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> on your institution&#8217;s HPC (or ask your admin or Sebastian to), and submit a non-interactive job for the DMRG-CASPT2 calculations.</p>
+<p class="last">Yes, I have tricked you into using <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> in the future!</p>
+</div>
+<p>To study an example DMRG-CASPT2 output during this workshop, perform a small active space calculation. For example:</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ mkdir small_caspt2/
+$ <span class="nb">cd</span> small_caspt2/
+$ wget <span class="s1">&#39;https://github.com/sebwouters/chemps2/raw/master/tests/matrixelements/N2.CCPVDZ.FCIDUMP&#39;</span>
+$ wget <span class="s1">&#39;https://github.com/sebwouters/chemps2/raw/master/tests/test14.input&#39;</span>
+$ sed -i <span class="s2">&quot;s/\/path\/to/./&quot;</span> test14.input
+$ sed -i <span class="s2">&quot;s/\/tmp/\/local\/NUMBER.master15.delcatty.gent.vsc\//&quot;</span> test14.input
+$ cat test14.input
+$ chemps2 --file<span class="o">=</span>test14.input <span class="p">&amp;</span>&gt; test14.output <span class="p">&amp;</span>
+$ tail -n <span class="m">3000</span> -f test14.output
+</pre></div>
+</div>
+<p>Do you know the difference between the diagonal, non-variational, and variational second order perturbation energies? How is the reference weight calculated and what does it mean?</p>
+<div class="highlight-bash"><div class="highlight"><pre>$ grep <span class="s2">&quot;E2&quot;</span> test14.output
+$ grep <span class="s2">&quot;Reference weight&quot;</span> test14.output
+</pre></div>
+</div>
 </div>
 <div class="section" id="solutions">
 <h2>12.7. Solutions<a class="headerlink" href="#solutions" title="Permalink to this headline">¶</a></h2>
@@ -612,7 +652,7 @@ $ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-4 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-5 (2016-07-08) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
