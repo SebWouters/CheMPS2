@@ -31,6 +31,8 @@ The goal of this afternoon is to calculate the vertical singlet-triplet gap with
 
 `chemps2 <https://github.com/sebwouters/chemps2>`_ is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for `psi4 <http://www.psicode.org/>`_. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in ``FCIDUMP`` format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to `psi4 <http://www.psicode.org/>`_ to obtain matrix elements. In the future you can use `molcas <http://www.molcas.org/>`_, `molpro <https://www.molpro.net/>`_, `dalton <http://www.daltonprogram.org/>`_... The disadvantage is that a full-rank ``FCIDUMP`` file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.
 
+Please read an entire section before starting the instructions. Than you will have all the useful information you need!
+
 UGent HPC
 ---------
 
@@ -50,7 +52,9 @@ Once you are on the node, change directory to, for example, the following folder
     $ mkdir dmrg_workshop
     $ cd dmrg_workshop/
 
-Please keep in mind that you will need about 21 Gb of disk for the ``FCIDUMP`` file and `chemps2 <https://github.com/sebwouters/chemps2>`_ checkpoints!
+.. note::
+
+    Please keep in mind that you will need about 20 GB of disk for the ``FCIDUMP`` file and 1 GB of disk for the `chemps2 <https://github.com/sebwouters/chemps2>`_ checkpoints!
 
 ``FCIDUMP`` and ``MOLDEN``
 --------------------------
@@ -82,9 +86,13 @@ The required ``FCIDUMP`` file and the corresponding ``MOLDEN`` file can now be g
     $ ls -alh TETRACENE.FCIDUMP
     $ ls -alh tetracene.molden
 
-Note that the specified symmetry group in ``tetracene.fcidump.in`` was ``csz``, a subgroup of ``d2h``. In the ``csz`` symmetry group, the 18 active space :math:`\pi`-orbitals can be localized to the carbon atoms. This is not the case for the ``d2h`` symmetry group.
+.. note::
 
-**While you are waiting for the** ``FCIDUMP`` **file of size 20 Gb, you can already proceed with the next section.**
+    The specified symmetry group in ``tetracene.fcidump.in`` was ``csz``, a subgroup of ``d2h``. In the ``csz`` symmetry group, the 18 active space :math:`\pi`-orbitals can be localized to the carbon atoms. This is not the case for the ``d2h`` symmetry group.
+
+.. note::
+
+    While you are waiting for the ``FCIDUMP`` file of size 20 GB, you can already proceed with the next section.
 
 .. note::
 
@@ -125,7 +133,7 @@ Perform each calculation in a separate folder. This way checkpoint files will no
     $ qstat -n
 
 - Perform one DMRG-SCF iteration, which corresponds to DMRG-CI
-- The active space orbitals should be RHF molecular orbitals (i.e. the input orbitals)
+- The active space orbitals should be the RHF molecular orbitals (i.e. the input orbitals)
 - Use the convergence scheme
 
  +-------------------+------------------+-----------------+------------------------+-----------------+
@@ -156,9 +164,11 @@ Run the calculation:
     $ OMP_NUM_THREADS=4 chemps2 --file=ci_input_orbs.in &> ci_input_orbs.out &
     $ cd ../
 
-**Note that you have now only used 4 of the 8 cores available to you. Proceed with the inctructions below while waiting for the calculation to finish.**
+.. note::
 
-Create a folder ``ci_local_orbs/`` and in that folder an input file ``ci_local_orbs.in`` for `chemps2 <https://github.com/sebwouters/chemps2>`_ which is identical to ``ci_input_orbs.in``, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the :ref:`solution <second_ptr_solution>`.
+    You have now only used 4 of the 8 available cores. Proceed with the instructions below while waiting for the calculation to finish.
+
+Create a folder ``ci_local_orbs/`` and in that folder an input file ``ci_local_orbs.in`` for `chemps2 <https://github.com/sebwouters/chemps2>`_, which is identical to ``ci_input_orbs.in``, except for the active space orbitals. These should now be localized orbitals. When you have created the input file, you can double check with the :ref:`solution <second_ptr_solution>`.
 
 Run the calculation:
 
@@ -203,7 +213,7 @@ Use localized orbitals for the active space from now on. Perform the DMRG-SCF or
 
 Why is the reduced virtual dimension not lowered at the end of the DMRG calculation? Why is the last :math:`r_{tol}` smaller? When you have created the input files, you can double check with the solution for the :ref:`singlet <fifth_ptr_solution>` and the :ref:`triplet <sixth_ptr_solution>`.
 
-Run the calculation:
+Run the calculation in separate folders:
 
 .. code-block:: bash
 
@@ -219,9 +229,7 @@ What is the DMRG-SCF singlet-triplet gap you obtain? Double check with the :ref:
 
 Do you see polyradical character in the natural orbital occupation numbers for the singlet and/or triplet? How can you observe this in the correlation functions? Tip: It might be interesting to read 
 
-J. Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, *Journal of Chemical Physics* **127**, 134309 (2007). `doi link <http://dx.doi.org/10.1063/1.2768362>`_
-
-which can also be found on the `arXiv <https://arxiv.org/abs/0707.3120>`_.
+J. Hachmann, J. J. Dorando, Michael Avilés and Garnet Kin-Lic Chan, *Journal of Chemical Physics* **127**, 134309 (2007): `doi link <http://dx.doi.org/10.1063/1.2768362>`_ or `arXiv <https://arxiv.org/abs/0707.3120>`_
 
 .. note::
 
@@ -237,7 +245,7 @@ DMRG-CASPT2
 
 .. note::
 
-    DMRG-CASPT2 checkpoints can be used when you kill a calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs **exactly** the same orbitals are used. Therefore, start from the converged DMRG-SCF checkpoint ``CheMPS2_CASSCF.h5`` and do the following things:
+    DMRG-CASPT2 checkpoints can be used when you kill a DMRG-CASPT2 calculation before it is finished, or to redo the DMRG-CASPT2 calculation with another IPEA or IMAG shift. In case you would like to use checkpoints for the DMRG-CASPT2 calculations, it is important that for subsequent runs **exactly** the same orbitals are used. Therefore, start from the converged DMRG-SCF checkpoint ``CheMPS2_CASSCF.h5`` and do the following things:
     
      - Put ``SCF_DIIS_THR`` to ``0.0``
      - Delete any checkpoints named ``CheMPS2_DIIS.h5``
@@ -276,6 +284,43 @@ Run the calculations, but please remember to copy over the converged DMRG-SCF or
 How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?
 
 And with an IPEA shift of 0.25 and an IMAG shift of 0.0?
+
+.. note::
+
+    You will see
+    
+    .. code-block:: bash
+    
+        CheMPS2::DMRG::Symm4RDM( X , Y ) : Elapsed wall time = Z seconds.
+    
+    appear in the output, with X and Y integers, and Z a floating point number. An estimate for the total wall time for the contraction of the 4-RDM with the Fock matrix is :math:`\frac{18 (18 + 1)}{2} Z` seconds.
+    
+    **So this last exercise is homework!**
+    
+    Compile `chemps2 <https://github.com/sebwouters/chemps2>`_ on your institution's HPC (or ask your admin or Sebastian to), and submit a non-interactive job for the DMRG-CASPT2 calculations.
+    
+    Yes, I have tricked you into using `chemps2 <https://github.com/sebwouters/chemps2>`_ in the future!
+
+To study an example DMRG-CASPT2 output during this workshop, perform a small active space calculation. For example:
+
+.. code-block:: bash
+
+    $ mkdir small_caspt2/
+    $ cd small_caspt2/
+    $ wget 'https://github.com/sebwouters/chemps2/raw/master/tests/matrixelements/N2.CCPVDZ.FCIDUMP'
+    $ wget 'https://github.com/sebwouters/chemps2/raw/master/tests/test14.input'
+    $ sed -i "s/\/path\/to/./" test14.input
+    $ sed -i "s/\/tmp/\/local\/NUMBER.master15.delcatty.gent.vsc\//" test14.input
+    $ cat test14.input
+    $ chemps2 --file=test14.input &> test14.output &
+    $ tail -n 3000 -f test14.output
+
+Do you know the difference between the diagonal, non-variational, and variational second order perturbation energies? How is the reference weight calculated and what does it mean?
+
+.. code-block:: bash
+
+    $ grep "E2" test14.output
+    $ grep "Reference weight" test14.output
 
 Solutions
 ---------
