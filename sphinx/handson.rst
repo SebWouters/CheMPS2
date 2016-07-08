@@ -31,7 +31,7 @@ The goal of this afternoon is to calculate the vertical singlet-triplet gap with
 
 `chemps2 <https://github.com/sebwouters/chemps2>`_ is a C++ library for spin-adapted DMRG calculations which can be incorporated in quantum chemistry packages. This has been done for `psi4 <http://www.psicode.org/>`_. Alternatively, the same functionality can be used with the binary, when the required matrix elements have been generated in ``FCIDUMP`` format. We will follow the second route this afternoon. The advantage of the latter route is that you are not tied to `psi4 <http://www.psicode.org/>`_ to obtain matrix elements. In the future you can use `molcas <http://www.molcas.org/>`_, `molpro <https://www.molpro.net/>`_, `dalton <http://www.daltonprogram.org/>`_... The disadvantage is that a full-rank ``FCIDUMP`` file is required, and that less virtual (secondary) orbitals can be used than with density-fitted DMRG-SCF and DMRG-CASPT2.
 
-Please read an entire section before starting the instructions. Than you will have all the useful information you need!
+Please read an entire section before starting the instructions. Then you will have all the useful information you need!
 
 UGent HPC
 ---------
