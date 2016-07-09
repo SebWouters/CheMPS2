@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-7 (2016-07-08) documentation</title>
+    <title>12. DMRG workshop (12-jul-2016): hands-on session &mdash; CheMPS2 1.7.2-9 (2016-07-09) documentation</title>
     
     <link rel="stylesheet" href="static/classic.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.7.2-7 (2016-07-08)',
+        VERSION:     '1.7.2-9 (2016-07-09)',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="CheMPS2 1.7.2-7 (2016-07-08) documentation" href="index.html" />
+    <link rel="top" title="CheMPS2 1.7.2-9 (2016-07-09) documentation" href="index.html" />
     <link rel="prev" title="11. Interfaces to psi4 and pyscf" href="interfaces.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-7 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-9 (2016-07-09) documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -394,6 +394,7 @@ $ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
 </div>
 <p>How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 and an IMAG shift of 0.0 are used?</p>
 <p>And with an IPEA shift of 0.25 and an IMAG shift of 0.0?</p>
+<p>You can double check with the <a class="reference internal" href="#tenth-ptr-solution"><span>solution</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p>You will see</p>
@@ -404,6 +405,21 @@ $ tail -n <span class="m">300</span> pt2_triplet/pt2_triplet.out
 <p><strong>So this last exercise is homework!</strong></p>
 <p>Compile <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> on your institution&#8217;s HPC (or ask your admin or Sebastian to), and submit a non-interactive job for the DMRG-CASPT2 calculations.</p>
 <p class="last">Yes, I have tricked you into using <a class="reference external" href="https://github.com/sebwouters/chemps2">chemps2</a> in the future!</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can also find the precreated DMRG-CASPT2 checkpoints and the corresponding output in the folder <code class="docutils literal"><span class="pre">/apps/gent/tutorials/DMRG/</span></code>:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>$ cp /apps/gent/tutorials/DMRG/CheMPS2_f4rdm.h5.singlet pt2_singlet/.
+$ cp /apps/gent/tutorials/DMRG/CheMPS2_MPS0.h5.singlet pt2_singlet/.
+$ less /apps/gent/tutorials/DMRG/pt2_singlet.out.0.0
+$ less /apps/gent/tutorials/DMRG/pt2_singlet.out.0.25
+
+$ cp /apps/gent/tutorials/DMRG/CheMPS2_f4rdm.h5.triplet pt2_triplet/.
+$ cp /apps/gent/tutorials/DMRG/CheMPS2_MPS0.h5.triplet pt2_triplet/.
+$ less /apps/gent/tutorials/DMRG/pt2_triplet.out.0.0
+$ less /apps/gent/tutorials/DMRG/pt2_triplet.out.0.25
+</pre></div>
+</div>
 </div>
 <p>To study an example DMRG-CASPT2 output during this workshop, perform a small active space calculation. For example:</p>
 <div class="highlight-bash"><div class="highlight"><pre>$ mkdir small_caspt2/
@@ -579,6 +595,15 @@ $ grep <span class="s2">&quot;Reference weight&quot;</span> test14.output
 </pre></div>
 </div>
 </div>
+<div class="section" id="dmrg-caspt2-singlet-triplet-gaps">
+<span id="tenth-ptr-solution"></span><h3>12.7.10. DMRG-CASPT2 singlet-triplet gaps<a class="headerlink" href="#dmrg-caspt2-singlet-triplet-gaps" title="Permalink to this headline">¶</a></h3>
+<p>For IPEA = 0.0 a.u. the gap is</p>
+<div class="math">
+\[\Delta E = E_{triplet} - E_{singlet} = -690.945663 - (-691.000608) ~ E_{h} = 54.945 ~ mE_{h} = 34.479 ~ kcal/mol\]</div>
+<p>and for IPEA = 0.25 a.u. the gap is</p>
+<div class="math">
+\[\Delta E = E_{triplet} - E_{singlet} = -690.923604 - (-690.987560) ~ E_{h} = 63.956 ~ mE_{h} = 40.133 ~ kcal/mol\]</div>
+</div>
 </div>
 </div>
 
@@ -610,6 +635,7 @@ $ grep <span class="s2">&quot;Reference weight&quot;</span> test14.output
 <li><a class="reference internal" href="#dmrg-scf-singlet-triplet-gap">12.7.7. DMRG-SCF singlet-triplet gap</a></li>
 <li><a class="reference internal" href="#pt2-singlet-in">12.7.8. pt2_singlet.in</a></li>
 <li><a class="reference internal" href="#pt2-triplet-in">12.7.9. pt2_triplet.in</a></li>
+<li><a class="reference internal" href="#dmrg-caspt2-singlet-triplet-gaps">12.7.10. DMRG-CASPT2 singlet-triplet gaps</a></li>
 </ul>
 </li>
 </ul>
@@ -652,7 +678,7 @@ $ grep <span class="s2">&quot;Reference weight&quot;</span> test14.output
         <li class="right" >
           <a href="interfaces.html" title="11. Interfaces to psi4 and pyscf"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-7 (2016-07-08) documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">CheMPS2 1.7.2-9 (2016-07-09) documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
