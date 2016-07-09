@@ -285,6 +285,8 @@ How large is the singlet-triplet gap with DMRG-CASPT2 when an IPEA shift of 0.0 
 
 And with an IPEA shift of 0.25 and an IMAG shift of 0.0?
 
+You can double check with the :ref:`solution <tenth_ptr_solution>`.
+
 .. note::
 
     You will see
@@ -300,6 +302,22 @@ And with an IPEA shift of 0.25 and an IMAG shift of 0.0?
     Compile `chemps2 <https://github.com/sebwouters/chemps2>`_ on your institution's HPC (or ask your admin or Sebastian to), and submit a non-interactive job for the DMRG-CASPT2 calculations.
     
     Yes, I have tricked you into using `chemps2 <https://github.com/sebwouters/chemps2>`_ in the future!
+
+.. note::
+
+    You can also find the precreated DMRG-CASPT2 checkpoints and the corresponding output in the folder ``/apps/gent/tutorials/DMRG/``:
+    
+    .. code-block:: bash
+    
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_f4rdm.h5.singlet pt2_singlet/.
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_MPS0.h5.singlet pt2_singlet/.
+        $ less /apps/gent/tutorials/DMRG/pt2_singlet.out.0.0
+        $ less /apps/gent/tutorials/DMRG/pt2_singlet.out.0.25
+        
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_f4rdm.h5.triplet pt2_triplet/.
+        $ cp /apps/gent/tutorials/DMRG/CheMPS2_MPS0.h5.triplet pt2_triplet/.
+        $ less /apps/gent/tutorials/DMRG/pt2_triplet.out.0.0
+        $ less /apps/gent/tutorials/DMRG/pt2_triplet.out.0.25
 
 To study an example DMRG-CASPT2 output during this workshop, perform a small active space calculation. For example:
 
@@ -512,8 +530,21 @@ Difference with :ref:`singlet <eigth_ptr_solution>`:
 
     MULTIPLICITY = 3
 
-.. DMRG-CASPT2 singlet-triplet gaps
-.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. Copy-paste the IPEA 0.0 and IPEA 0.25 solution here
-.. 1 Hartree = 627.509469 kcal / mol
+.. _tenth_ptr_solution:
+
+DMRG-CASPT2 singlet-triplet gaps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For IPEA = 0.0 a.u. the gap is
+
+.. math::
+
+    \Delta E = E_{triplet} - E_{singlet} = -690.945663 - (-691.000608) ~ E_{h} = 54.945 ~ mE_{h} = 34.479 ~ kcal/mol
+
+and for IPEA = 0.25 a.u. the gap is
+
+.. math::
+
+    \Delta E = E_{triplet} - E_{singlet} = -690.923604 - (-690.987560) ~ E_{h} = 63.956 ~ mE_{h} = 40.133 ~ kcal/mol
+
 
