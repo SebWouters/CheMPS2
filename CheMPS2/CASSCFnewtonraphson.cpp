@@ -63,7 +63,7 @@ double CheMPS2::CASSCF::solve( const int Nelectrons, const int TwoS, const int I
 
    const int num_elec = Nelectrons - 2 * iHandler->getNOCCsum();
    assert( num_elec >= 0 );
-   assert(( OptScheme != NULL ) || (( OptScheme == NULL ) && ( rootNum == 1 )));
+   assert(( OptScheme != NULL ) || ( rootNum == 1 ));
 
    // Convergence variables
    double gradNorm = 1.0;
