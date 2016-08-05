@@ -168,28 +168,29 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
    double * mem1 = new double[ work_mem_size ];
    double * mem2 = new double[ ( PSEUDOCANONICAL ) ? work_mem_size : max( work_mem_size, tot_dmrg_power6 ) ];
 
-   // Rotate to pseudocanonical orbitals
-   if ( PSEUDOCANONICAL ){
-      assert( successful_solve ); // DMRG1RDM needs to be set by CASSCF::solve for buildQmatACT()
-      buildTmatrix();
-      buildQmatOCC();
-      buildQmatACT();
-      construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
-      block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
-      block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
-      block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+   // If you did not run CheMPS2::CASSCF::solve, you NEED to load the unitary from disk
+   if ( successful_solve == false ){
+      assert( scf_options->getStoreUnitary() );
+      if ( am_i_master ){
+         struct stat file_info;
+         const int file_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
+         assert( file_stat == 0 );
+         unitary->loadU( scf_options->getUnitaryStorageName() );
+      }
+      #ifdef CHEMPS2_MPI_COMPILATION
+      unitary->broadcast( MPI_CHEMPS2_MASTER );
+      #endif
    } else {
-      if ( successful_solve == false ){
-         assert( scf_options->getStoreUnitary() );
-         if ( am_i_master ){
-            struct stat file_info;
-            const int file_stat = stat( (scf_options->getUnitaryStorageName()).c_str(), &file_info );
-            assert( file_stat == 0 );
-            unitary->loadU( scf_options->getUnitaryStorageName() );
-         }
-         #ifdef CHEMPS2_MPI_COMPILATION
-         unitary->broadcast( MPI_CHEMPS2_MASTER );
-         #endif
+      // Rotate to pseudocanonical orbitals
+      if ( PSEUDOCANONICAL ){ // successful_solve needs to be true, because the 1-RDM is needed for buildQmatACT();
+         buildTmatrix();
+         buildQmatOCC();
+         buildQmatACT();
+         construct_fock( theFmatrix, theTmatrix, theQmatOCC, theQmatACT, iHandler );
+         block_diagonalize( 'O', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+         block_diagonalize( 'A', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+         block_diagonalize( 'V', theFmatrix, unitary, mem1, mem2, iHandler, false, NULL, NULL, NULL );
+         if (( am_i_master ) && ( scf_options->getStoreUnitary() )){ unitary->saveU( scf_options->getUnitaryStorageName() ); }
       }
    }
 
