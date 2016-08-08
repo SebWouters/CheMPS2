@@ -244,22 +244,28 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
 
    int inc1 = 1;
 
-   // mxM contains the Hamiltonian in the basis "vecs"
-   for ( int cnt = 0; cnt < num_vec; cnt++ ){
-      mxM[ cnt + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, Hvecs[ cnt ], &inc1 );
-      mxM[ num_vec + MAX_NUM_VEC * cnt ] = mxM[ cnt + MAX_NUM_VEC * num_vec ];
-   }
-   mxM[ num_vec + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, Hvecs[ num_vec ], &inc1 );
-
-   // mxM_rhs contains the projected RHS
-   if ( problem_type == 'L' ){
-      mxM_rhs[ num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, RHS, &inc1 );
+   if ( problem_type = 'E' ){ // EIGENVALUE PROBLEM
+      // mxM contains V^T . A . V
+      for ( int cnt = 0; cnt < num_vec; cnt++ ){
+         mxM[ cnt + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, Hvecs[ cnt ], &inc1 );
+         mxM[ num_vec + MAX_NUM_VEC * cnt ] = mxM[ cnt + MAX_NUM_VEC * num_vec ];
+      }
+      mxM[ num_vec + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, Hvecs[ num_vec ], &inc1 );
+   } else { // LINEAR PROBLEM
+      // mxM contains V^T . A^T . A . V
+      for ( int cnt = 0; cnt < num_vec; cnt++ ){
+         mxM[ cnt + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, Hvecs[ num_vec ], &inc1, Hvecs[ cnt ], &inc1 );
+         mxM[ num_vec + MAX_NUM_VEC * cnt ] = mxM[ cnt + MAX_NUM_VEC * num_vec ];
+      }
+      mxM[ num_vec + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, Hvecs[ num_vec ], &inc1, Hvecs[ num_vec ], &inc1 );
+      // mxM_rhs contains V^T . A^T . RHS
+      mxM_rhs[ num_vec ] = ddot_( &veclength, Hvecs[ num_vec ], &inc1, RHS, &inc1 );
    }
 
    // When t-vec was added to vecs, the number of vecs was actually increased by one. Now the number is incremented.
    num_vec++;
 
-   // Solve the projected eigenvalue problem ( always )
+   // Diagonalize mxM ( always )
    char jobz = 'V';
    char uplo = 'U';
    int info;
@@ -270,7 +276,7 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
    }
    dsyev_( &jobz, &uplo, &num_vec, mxM_vecs, &MAX_NUM_VEC, mxM_eigs, mxM_work, &mxM_lwork, &info ); // Ascending order of eigenvalues
 
-   // If problem_type == linear, use the eigenvalue decomposition to solve the linear problem.
+   // If problem_type == linear, solve the linear problem in least-squares sense!
    if ( problem_type == 'L' ){
       double one = 1.0;
       double set = 0.0;
@@ -282,7 +288,7 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
          if ( fabs( current_eigenvalue ) < DIAG_CUTOFF ){
             current_eigenvalue = DIAG_CUTOFF * (( current_eigenvalue < 0.0 ) ? -1 : 1 );
             if ( debug_print ){
-               cout << "WARNING AT DAVIDSON : The eigenvalue " << mxM_eigs[ cnt ] << " of Ax = b has been overwritten with " << current_eigenvalue << "." << endl;
+               cout << "WARNING AT DAVIDSON : The eigenvalue " << mxM_eigs[ cnt ] << " to solve Ax = b has been overwritten with " << current_eigenvalue << "." << endl;
             }
          }
          mxM_work[ cnt ] = mxM_work[ cnt ] / current_eigenvalue;
@@ -407,18 +413,25 @@ void CheMPS2::Davidson::MxMafterDeflation(){
 
    int inc1 = 1;
 
-   // mxM contains the Hamiltonian in the basis "vecs"
-   for ( int ivec = 0; ivec < NUM_VEC_KEEP; ivec++ ){
-      for ( int ivec2 = ivec; ivec2 < NUM_VEC_KEEP; ivec2++ ){
-         mxM[ ivec + MAX_NUM_VEC * ivec2 ] = ddot_( &veclength, vecs[ ivec ], &inc1, Hvecs[ ivec2 ], &inc1 );
-         mxM[ ivec2 + MAX_NUM_VEC * ivec ] = mxM[ ivec + MAX_NUM_VEC * ivec2 ];
-      }
-   }
-
-   // mxM_rhs contains the projected RHS
-   if ( problem_type == 'L' ){
+   if ( problem_type = 'E' ){ // EIGENVALUE PROBLEM
+      // mxM contains V^T . A . V
       for ( int ivec = 0; ivec < NUM_VEC_KEEP; ivec++ ){
-         mxM_rhs[ ivec ] = ddot_( &veclength, vecs[ ivec ], &inc1, RHS, &inc1 );
+         for ( int ivec2 = ivec; ivec2 < NUM_VEC_KEEP; ivec2++ ){
+            mxM[ ivec + MAX_NUM_VEC * ivec2 ] = ddot_( &veclength, vecs[ ivec ], &inc1, Hvecs[ ivec2 ], &inc1 );
+            mxM[ ivec2 + MAX_NUM_VEC * ivec ] = mxM[ ivec + MAX_NUM_VEC * ivec2 ];
+         }
+      }
+   } else { // LINEAR PROBLEM
+      // mxM contains V^T . A^T . A . V
+      for ( int ivec = 0; ivec < NUM_VEC_KEEP; ivec++ ){
+         for ( int ivec2 = ivec; ivec2 < NUM_VEC_KEEP; ivec2++ ){
+            mxM[ ivec + MAX_NUM_VEC * ivec2 ] = ddot_( &veclength, Hvecs[ ivec ], &inc1, Hvecs[ ivec2 ], &inc1 );
+            mxM[ ivec2 + MAX_NUM_VEC * ivec ] = mxM[ ivec + MAX_NUM_VEC * ivec2 ];
+         }
+      }
+      // mxM_rhs contains V^T . A^T . RHS
+      for ( int ivec = 0; ivec < NUM_VEC_KEEP; ivec++ ){
+         mxM_rhs[ ivec ] = ddot_( &veclength, Hvecs[ ivec ], &inc1, RHS, &inc1 );
       }
    }
 
