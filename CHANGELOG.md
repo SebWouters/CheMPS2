@@ -1,3 +1,12 @@
+#### CURRENT HEAD:
+* Fix slow convergence linear Davidson algorithm
+
+#### Version 1.7.3 (2016-07-14):
+* DMRG workshop in sphinx documentation
+
+#### Version 1.7.2 (2016-07-07):
+* Rotate molden files with DMRG-SCF unitary from executable
+
 #### Version 1.7.1 (2016-06-29):
 * Global reordering of the active space orbitals (mixing
   irreps) based on Fiedler vector of the exchange matrix
