@@ -315,7 +315,7 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
 
    // Calculate the norm of r
    const double rnorm = FrobeniusNorm( t_vec );
-   cout << "    Davidson :: rnorm = " << rnorm << endl;
+   //cout << "    Davidson :: rnorm = " << rnorm << endl;
    return rnorm;
 
 }
