@@ -244,7 +244,7 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
 
    int inc1 = 1;
 
-   if ( problem_type = 'E' ){ // EIGENVALUE PROBLEM
+   if ( problem_type == 'E' ){ // EIGENVALUE PROBLEM
       // mxM contains V^T . A . V
       for ( int cnt = 0; cnt < num_vec; cnt++ ){
          mxM[ cnt + MAX_NUM_VEC * num_vec ] = ddot_( &veclength, vecs[ num_vec ], &inc1, Hvecs[ cnt ], &inc1 );
@@ -315,6 +315,7 @@ double CheMPS2::Davidson::DiagonalizeSmallMatrixAndCalcResidual(){
 
    // Calculate the norm of r
    const double rnorm = FrobeniusNorm( t_vec );
+   cout << "    Davidson :: rnorm = " << rnorm << endl;
    return rnorm;
 
 }
@@ -413,7 +414,7 @@ void CheMPS2::Davidson::MxMafterDeflation(){
 
    int inc1 = 1;
 
-   if ( problem_type = 'E' ){ // EIGENVALUE PROBLEM
+   if ( problem_type == 'E' ){ // EIGENVALUE PROBLEM
       // mxM contains V^T . A . V
       for ( int ivec = 0; ivec < NUM_VEC_KEEP; ivec++ ){
          for ( int ivec2 = ivec; ivec2 < NUM_VEC_KEEP; ivec2++ ){
