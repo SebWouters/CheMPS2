@@ -485,9 +485,9 @@ void CheMPS2::Davidson::SolveLinearSystemDeflation( const int NUM_SOLUTIONS ){
          int inc1 = 1;
          double * ptr = work2 + MAX_NUM_VEC * solution;
          const double twonorm = sqrt( ddot_( &MAX_NUM_VEC, ptr, &inc1, ptr, &inc1 ) );
-         if ( debug_print ){
+         /*if ( debug_print ){
             cout << "Davidson :: Deflation :: Norm of solution " << solution << " = " << twonorm << endl;
-         }
+         }*/
          double factor = 1.0 / twonorm;
          dscal_( &MAX_NUM_VEC, &factor, ptr, &inc1 );
       }
