@@ -106,6 +106,7 @@ namespace CheMPS2{
          void CalculateNewVec();
          void Deflation();
          void MxMafterDeflation();
+         void SolveLinearSystemDeflation( const int NUM_SOLUTIONS );
 
    };
 }

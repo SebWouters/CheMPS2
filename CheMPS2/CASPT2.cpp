@@ -223,7 +223,7 @@ double CheMPS2::CASPT2::solve( const double imag_shift, const bool CONJUGATE_GRA
    ConjugateGradient * CG = (( CONJUGATE_GRADIENT ) ? new ConjugateGradient( total_size, CheMPS2::CONJ_GRADIENT_RTOL, CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF, false ) : NULL );
    Davidson * DAVID = (( CONJUGATE_GRADIENT ) ? NULL : new Davidson( total_size,
                                                                      CheMPS2::DAVIDSON_NUM_VEC,
-                                                                     1, // NUM_VEC_KEEP
+                                                                     CheMPS2::DAVIDSON_NUM_VEC_KEEP,
                                                                      CheMPS2::CONJ_GRADIENT_RTOL,
                                                                      CheMPS2::CONJ_GRADIENT_PRECOND_CUTOFF,
                                                                      true, // debug_print

@@ -31,7 +31,6 @@ using std::endl;
 CheMPS2::Davidson::Davidson( const int veclength, const int MAX_NUM_VEC, const int NUM_VEC_KEEP, const double RTOL, const double DIAG_CUTOFF, const bool debug_print, const char problem_type ){
 
    assert( ( problem_type == 'E' ) || ( problem_type == 'L' ) );
-   if ( problem_type == 'L' ){ assert( NUM_VEC_KEEP == 1 ); }
 
    this->debug_print  = debug_print;
    this->veclength    = veclength;
@@ -363,6 +362,8 @@ void CheMPS2::Davidson::Deflation(){
 
    } else {
 
+      if ( problem_type == 'L' ){ SolveLinearSystemDeflation( NUM_VEC_KEEP ); }
+
       if ( Reortho_Eigenvecs    == NULL ){ Reortho_Eigenvecs    = new double[    veclength * NUM_VEC_KEEP ]; }
       if ( Reortho_Overlap      == NULL ){ Reortho_Overlap      = new double[ NUM_VEC_KEEP * NUM_VEC_KEEP ]; }
       if ( Reortho_Overlap_eigs == NULL ){ Reortho_Overlap_eigs = new double[ NUM_VEC_KEEP                ]; }
@@ -407,6 +408,102 @@ void CheMPS2::Davidson::Deflation(){
    }
 
    num_vec = 0;
+
+}
+
+void CheMPS2::Davidson::SolveLinearSystemDeflation( const int NUM_SOLUTIONS ){
+
+   assert( problem_type == 'L' );
+   assert( num_vec == MAX_NUM_VEC );
+   assert( NUM_SOLUTIONS <= MAX_NUM_VEC );
+   assert( 2 <= NUM_SOLUTIONS );
+
+   double * work1 = new double[ MAX_NUM_VEC * MAX_NUM_VEC ];   // projector
+   double * work3 = new double[ MAX_NUM_VEC * MAX_NUM_VEC ];   // projector times mxM_rhs
+   double * work2 = new double[ MAX_NUM_VEC * NUM_SOLUTIONS ]; // solutions
+
+   for ( int solution = 0; solution < NUM_SOLUTIONS; solution++ ){
+
+      // work1 = ( 1 - sum_j v_j v_j^T ) = projector
+      for ( int cntr = 0; cntr < MAX_NUM_VEC * MAX_NUM_VEC; cntr++ ){ work1[ cntr ] = 0.0; }
+      for ( int diag = 0; diag < MAX_NUM_VEC; diag++ ){ work1[ diag * ( 1 + MAX_NUM_VEC ) ] = 1.0; }
+      for ( int prev = 0; prev < solution; prev++ ){
+         for ( int col = 0; col < MAX_NUM_VEC; col++ ){
+            for ( int row = 0; row < MAX_NUM_VEC; row++ ){
+               work1[ row + MAX_NUM_VEC * col ] -= work2[ row + MAX_NUM_VEC * prev ] * work2[ col + MAX_NUM_VEC * prev ];
+            }
+         }
+      }
+
+      // work3    = ( 1 - sum_j v_j v_j^T ) * [ U^T * A^T * b ]                               = work1 * mxM_rhs
+      // mxM_vecs = ( 1 - sum_j v_j v_j^T ) * [ U^T * A^T * A * U ] * ( 1 - sum_j v_j v_j^T ) = work1 * mxM * work1
+      {
+         double one = 1.0;
+         double set = 0.0;
+         char notrans = 'N';
+         int inc1 = 1;
+         dgemm_( &notrans, &notrans, &MAX_NUM_VEC, &MAX_NUM_VEC, &MAX_NUM_VEC, &one, work1, &MAX_NUM_VEC, mxM,     &MAX_NUM_VEC, &set, work3,    &MAX_NUM_VEC );
+         dgemm_( &notrans, &notrans, &MAX_NUM_VEC, &MAX_NUM_VEC, &MAX_NUM_VEC, &one, work3, &MAX_NUM_VEC, work1,   &MAX_NUM_VEC, &set, mxM_vecs, &MAX_NUM_VEC );
+         dgemm_( &notrans, &notrans, &MAX_NUM_VEC, &inc1,        &MAX_NUM_VEC, &one, work1, &MAX_NUM_VEC, mxM_rhs, &MAX_NUM_VEC, &set, work3,    &MAX_NUM_VEC );
+      }
+
+      // Diagonalize mxM_vecs = V * lambda * V^T   ===>   Ascending order of eigenvalues   &    ( V, lambda ) = ( mxM_vecs, mxM_eigs )
+      {
+         char jobz = 'V';
+         char uplo = 'U';
+         int info;
+         dsyev_( &jobz, &uplo, &MAX_NUM_VEC, mxM_vecs, &MAX_NUM_VEC, mxM_eigs, mxM_work, &mxM_lwork, &info );
+      }
+
+      // work2[ :, solution ] = [ ( 1 - sum_j v_j v_j^T ) * [ U^T * A^T * A * U ] * ( 1 - sum_j v_j v_j^T ) ]^{-1} * ( 1 - sum_j v_j v_j^T ) * [ U^T * A^T * b ] = V * lambda^{-1} * V^T * work3
+      {
+         double one = 1.0;
+         double set = 0.0;
+         char trans = 'T';
+         char notrans = 'N';
+         int inc1 = 1;
+         dgemm_( &trans, &notrans, &MAX_NUM_VEC, &inc1, &MAX_NUM_VEC, &one, mxM_vecs, &MAX_NUM_VEC, work3, &MAX_NUM_VEC, &set, mxM_work, &MAX_NUM_VEC );
+         for ( int diag = 0; diag < MAX_NUM_VEC; diag++ ){
+            if ( diag < solution ){
+               mxM_work[ diag ] = 0.0; // PSEUDOINVERSE
+            } else {
+               double current_eigenvalue = mxM_eigs[ diag ];
+               if ( fabs( current_eigenvalue ) < DIAG_CUTOFF ){
+                  current_eigenvalue = DIAG_CUTOFF * (( current_eigenvalue < 0.0 ) ? -1 : 1 );
+                  if ( debug_print ){
+                     cout << "WARNING AT DAVIDSON : The eigenvalue " << mxM_eigs[ diag ] << " to solve Ax = b has been overwritten with " << current_eigenvalue << "." << endl;
+                  }
+               }
+               mxM_work[ diag ] = mxM_work[ diag ] / current_eigenvalue;
+            }
+         }
+         dgemm_( &notrans, &notrans, &MAX_NUM_VEC, &inc1, &MAX_NUM_VEC, &one, mxM_vecs, &MAX_NUM_VEC, mxM_work, &MAX_NUM_VEC, &set, work2 + MAX_NUM_VEC * solution, &MAX_NUM_VEC );
+      }
+
+      // Normalize work2[ :, solution ]
+      {
+         int inc1 = 1;
+         double * ptr = work2 + MAX_NUM_VEC * solution;
+         const double twonorm = sqrt( ddot_( &MAX_NUM_VEC, ptr, &inc1, ptr, &inc1 ) );
+         if ( debug_print ){
+            cout << "Davidson :: Deflation :: Norm of solution " << solution << " = " << twonorm << endl;
+         }
+         double factor = 1.0 / twonorm;
+         dscal_( &MAX_NUM_VEC, &factor, ptr, &inc1 );
+      }
+
+   }
+
+   // Copy over work2 to mxM_vecs
+   {
+      int inc1 = 1;
+      int size = MAX_NUM_VEC * NUM_SOLUTIONS;
+      dcopy_( &size, work2, &inc1, mxM_vecs, &inc1 );
+   }
+
+   delete [] work1;
+   delete [] work2;
+   delete [] work3;
 
 }
 
