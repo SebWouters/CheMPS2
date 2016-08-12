@@ -1,0 +1,28 @@
+
+FCIDUMP = ../../tests/matrixelements/N2.STO3G.FCIDUMP
+GROUP   = 7
+
+MULTIPLICITY = 1
+NELECTRONS   = 14
+IRREP        = 0
+EXCITATION   = 0
+
+SWEEP_STATES       = 100,   200,   500
+SWEEP_ENERGY_CONV  = 1e-10, 1e-10, 1e-10
+SWEEP_MAX_SWEEPS   = 5,     5,     50
+SWEEP_NOISE_PREFAC = 0.1,   0.1,   0.0
+SWEEP_DVDSON_RTOL  = 1e-5,  1e-6,  1e-8
+
+NOCC = 0, 0, 0, 0, 0, 0, 0, 0
+NACT = 3, 0, 1, 1, 0, 3, 1, 1
+NVIR = 0, 0, 0, 0, 0, 0, 0, 0
+
+MOLCAS_2RDM    = ./molcas_2rdm.h5
+MOLCAS_3RDM    = ./molcas_3rdm.h5
+MOLCAS_F4RDM   = ./molcas_f4rdm.h5
+MOLCAS_FOCK    = fockdump
+MOLCAS_REORDER = FALSE
+
+PRINT_CORR = TRUE
+TMP_FOLDER = /tmp
+

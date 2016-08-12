@@ -9,4 +9,6 @@ integrals/pyscf/*.pyc
 PyCheMPS2/build
 PyCheMPS2/PyCheMPS2.cpp
 PyCheMPS2/tests/*.h5
+integrals/molcas/a.out
+integrals/molcas/molcas_*.h5
 

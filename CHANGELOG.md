@@ -2,6 +2,7 @@
 * Fix slow convergence linear Davidson algorithm
 * Binary options to dump out CASPT2 intermediates (2-RDM,
   3-RDM, and 4-RDM contracted with Fock) for MOLCAS
+* Fortran example to read in CASPT2 intermediates
 
 #### Version 1.7.3 (2016-07-14):
 * DMRG workshop in sphinx documentation
