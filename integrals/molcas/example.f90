@@ -38,7 +38,7 @@ PROGRAM main
   CALL h5fclose_f( file_h5,  hdferr )
 
   WRITE( *, * ) "2-RDM"
-  WRITE( *, * ) "   two_rdm[ 1 + i + L * ( j + L * ( k + L * l ) ) ]"
+  WRITE( *, * ) "   two_rdm( 1 + i + L * ( j + L * ( k + L * l ) ) )"
   WRITE( *, * ) "     = sum_{sigma,tau} < a^+_{i,sigma} a^+_{j,tau} a_{l,tau} a_{k,sigma} >"
   WRITE( *, * ) "     = 2-RDM[ i, j, k, l ]"
   WRITE( *, * ) "   2-RDM[ 0, 0, 0, 0 ] = ", two_rdm( 1 )
@@ -57,7 +57,7 @@ PROGRAM main
   CALL h5fclose_f( file_h5,  hdferr )
 
   WRITE( *, * ) "3-RDM"
-  WRITE( *, * ) "   three_rdm[ 1 + i + L * ( j + L * ( k + L * ( l + L * ( m + L * n ) ) ) ) ]"
+  WRITE( *, * ) "   three_rdm( 1 + i + L * ( j + L * ( k + L * ( l + L * ( m + L * n ) ) ) ) )"
   WRITE( *, * ) "     = sum_{sigma,tau,z} < a^+_{i,sigma} a^+_{j,tau} a^+_{k,z} a_{n,z} a_{m,tau} a_{l,sigma} >"
   WRITE( *, * ) "     = 3-RDM[ i, j, k, l, m, n ]"
   WRITE( *, * ) "   3-RDM[ 1, 0, 0, 1, 0, 0 ] = ", three_rdm( 1001 + 1 )
@@ -76,11 +76,11 @@ PROGRAM main
   CALL h5fclose_f( file_h5,  hdferr )
 
   WRITE( *, * ) "F.4-RDM"
-  WRITE( *, * ) "   f_dot_4rdm[ 1 + i + L * ( j + L * ( k + L * ( l + L * ( m + L * n ) ) ) ) ]"
+  WRITE( *, * ) "   f_dot_4rdm( 1 + i + L * ( j + L * ( k + L * ( l + L * ( m + L * n ) ) ) ) )"
   WRITE( *, * ) "     = sum_{p,q} sum_{s,tau,z} < a^+_{i,s} a^+_{j,tau} a^+_{k,z} E_{p,q} a_{n,z} a_{m,tau} a_{l,s} > * Fock[p,q]"
   WRITE( *, * ) "     = F.4-RDM[ i, j, k, l, m, n ]"
-  WRITE( *, * ) "   3-RDM[ 1, 0, 0, 1, 0, 0 ] = ", f_dot_4rdm( 1001 + 1 )
-  WRITE( *, * ) "   3-RDM[ 9, 9, 8, 9, 9, 8 ] = ", f_dot_4rdm( 998998 + 1 )
+  WRITE( *, * ) "   F.4-RDM[ 1, 0, 0, 1, 0, 0 ] = ", f_dot_4rdm( 1001 + 1 )
+  WRITE( *, * ) "   F.4-RDM[ 9, 9, 8, 9, 9, 8 ] = ", f_dot_4rdm( 998998 + 1 )
 
 END PROGRAM main
 
