@@ -143,7 +143,11 @@ namespace CheMPS2{
          
          //! Load the TwoDMs from disk
          void read();
-         
+
+         //! Save the 2-RDM-A to disk in Hamiltonian indices
+         /** \param filename The filename to store the 2-RDM at */
+         void save_HAM( const string filename ) const;
+
          //! Write the 2-RDM-A to a file
          /** param filename where to write the 2-RDM-A elements to */
          void write2DMAfile(const string filename) const;

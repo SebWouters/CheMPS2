@@ -137,6 +137,55 @@ bool CheMPS2::CASSCF::read_f4rdm_checkpoint( const string f4rdm_file, int * hamo
 
 }
 
+void CheMPS2::CASSCF::fock_dot_4rdm( double * fockmx, CheMPS2::DMRG * dmrgsolver, CheMPS2::Hamiltonian * ham, int next_orb1, int next_orb2, double * work, double * result, const bool CHECKPOINT, const bool PSEUDOCANONICAL ){
+
+   const int LAS = ham->getL();
+   int size      = LAS * LAS * LAS * LAS * LAS * LAS;
+   int inc1      = 1;
+
+   for ( int diag = 0; diag < LAS; diag++ ){
+      if (( next_orb1 == diag ) && ( next_orb2 == diag )){
+         double prefactor = 0.5 * fockmx[ diag + LAS * diag ];
+         if ( fabs( prefactor ) > 0.0 ){
+            dmrgsolver->Symm4RDM( work, diag, diag, false );
+            daxpy_( &size, &prefactor, work, &inc1, result, &inc1 );
+         }
+         if ( diag == LAS - 1 ){
+            next_orb1 = 0;
+            next_orb2 = 1;
+         } else {
+            next_orb1 = diag + 1;
+            next_orb2 = diag + 1;
+         }
+         if ( CHECKPOINT ){ write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_orb1, &next_orb2, size, result ); }
+      }
+   }
+
+   if ( PSEUDOCANONICAL == false ){
+      for ( int orb1 = 0; orb1 < LAS; orb1++ ){
+         for ( int orb2 = orb1 + 1; orb2 < LAS; orb2++ ){
+            if (( next_orb1 == orb1 ) && ( next_orb2 == orb2 )){
+               double prefactor = 0.5 * ( fockmx[ orb1 + LAS * orb2 ] + fockmx[ orb2 + LAS * orb1 ] );
+               if (( ham->getOrbitalIrrep( orb1 ) == ham->getOrbitalIrrep( orb2 ) ) && ( fabs( prefactor ) > 0.0 )){
+                  dmrgsolver->Symm4RDM( work, orb1, orb2, false );
+                  daxpy_( &size, &prefactor, work, &inc1, result, &inc1 );
+               }
+               if ( orb2 == LAS - 1 ){
+                  next_orb1 = next_orb1 + 1;
+                  next_orb2 = next_orb1 + 1;
+               } else {
+                  next_orb2 = next_orb2 + 1;
+               }
+               if (( ham->getOrbitalIrrep( orb1 ) == ham->getOrbitalIrrep( orb2 ) ) && ( CHECKPOINT )){
+                  write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_orb1, &next_orb2, size, result );
+               }
+            }
+         }
+      }
+   }
+
+}
+
 double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int Irrep, ConvergenceScheme * OptScheme, const int rootNum, DMRGSCFoptions * scf_options, const double IPEA, const double IMAG, const bool PSEUDOCANONICAL, const bool CHECKPOINT, const bool CUMULANT ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
@@ -287,47 +336,7 @@ double CheMPS2::CASSCF::caspt2( const int Nelectrons, const int TwoS, const int 
       if ( CUMULANT ){
          CheMPS2::Cumulant::gamma4_fock_contract_ham( Prob, theDMRG->get3DM(), theDMRG->get2DM(), mem2, contract );
       } else {
-         for ( int ham_orbz = 0; ham_orbz < nOrbDMRG; ham_orbz++ ){
-            if (( next_hamorb1 == ham_orbz ) && ( next_hamorb2 == ham_orbz )){
-               theDMRG->Symm4RDM( three_dm, ham_orbz, ham_orbz, false );
-               int size = tot_dmrg_power6;
-               double f_zz = 0.5 * mem2[ ham_orbz + nOrbDMRG * ham_orbz ];
-               int inc1 = 1;
-               daxpy_( &size, &f_zz, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-               if ( ham_orbz == nOrbDMRG - 1 ){
-                  next_hamorb1 = 0;
-                  next_hamorb2 = 1;
-               } else {
-                  next_hamorb1 = ham_orbz + 1;
-                  next_hamorb2 = ham_orbz + 1;
-               }
-               if ( make_checkpt ){ write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract ); }
-            }
-         }
-         if ( PSEUDOCANONICAL == false ){
-            for ( int ham_orb1 = 0; ham_orb1 < nOrbDMRG; ham_orb1++ ){
-               for ( int ham_orb2 = ham_orb1 + 1; ham_orb2 < nOrbDMRG; ham_orb2++ ){
-                  if (( next_hamorb1 == ham_orb1 ) && ( next_hamorb2 == ham_orb2 )){
-                     if ( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ){
-                        theDMRG->Symm4RDM( three_dm, ham_orb1, ham_orb2, false );
-                        int size = tot_dmrg_power6;
-                        double f_12 = 0.5 * ( mem2[ ham_orb1 + nOrbDMRG * ham_orb2 ] + mem2[ ham_orb2 + nOrbDMRG * ham_orb1 ] );
-                        int inc1 = 1;
-                        daxpy_( &size, &f_12, three_dm, &inc1, contract, &inc1 ); // trace( Fock * 4-RDM )
-                     }
-                     if ( ham_orb2 == nOrbDMRG - 1 ){
-                        next_hamorb1 = next_hamorb1 + 1;
-                        next_hamorb2 = next_hamorb1 + 1;
-                     } else {
-                        next_hamorb2 = next_hamorb2 + 1;
-                     }
-                     if (( HamAS->getOrbitalIrrep( ham_orb1 ) == HamAS->getOrbitalIrrep( ham_orb2 ) ) && ( make_checkpt )){
-                        write_f4rdm_checkpoint( CheMPS2::DMRGSCF_f4rdm_name, &next_hamorb1, &next_hamorb2, tot_dmrg_power6, contract );
-                     }
-                  }
-               }
-            }
-         }
+         fock_dot_4rdm( mem2, theDMRG, HamAS, next_hamorb1, next_hamorb2, three_dm, contract, make_checkpt, PSEUDOCANONICAL );
       }
       theDMRG->get3DM()->fill_ham_index( 1.0, false, three_dm, 0, nOrbDMRG );
       if (( CheMPS2::DMRG_storeMpsOnDisk ) && ( make_checkpt == false )){ theDMRG->deleteStoredMPS(); }

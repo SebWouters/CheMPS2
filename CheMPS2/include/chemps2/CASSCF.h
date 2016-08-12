@@ -323,6 +323,18 @@ namespace CheMPS2{
              \return Whether the file was found and read */
          static bool read_f4rdm_checkpoint( const string f4rdm_file, int * hamorb1, int * hamorb2, const int tot_dmrg_power6, double * contract );
 
+         //! Build the contraction of the fock matrix with the 4-RDM
+         /** \param fockmx Array of size ham->getL() x ham->getL() containing the Fock matrix elements
+             \param dmrgsolver DMRG object which is solved, and for which the 2-RDM and 3-RDM have been calculated as well
+             \param ham Active space Hamiltonian, which is needed for the size of the active space and the orbital irreps
+             \param next_orb1 The next first  orbital for which the contraction should be continued
+             \param next_orb2 The next second orbital for which the contraction should be continued
+             \param work Work array of size ham->getL()**6
+             \param result On entry, contains the partial contraction corresponding to (next_orb1, next_orb2). On exit, contains the full contraction.
+             \param CHECKPOINT Whether or not the standard CheMPS2 F.4-RDM checkpoint should be created/updated to continue the contraction at later times 
+             \param PSEUDOCANONICAL Whether or not pseudocanonical orbitals are used in the active space */
+         static void fock_dot_4rdm( double * fockmx, CheMPS2::DMRG * dmrgsolver, CheMPS2::Hamiltonian * ham, int next_orb1, int next_orb2, double * work, double * result, const bool CHECKPOINT, const bool PSEUDOCANONICAL );
+
       private:
 
          // CASSCF tmp folder

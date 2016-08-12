@@ -421,6 +421,120 @@ void CheMPS2::Hamiltonian::CreateAndFillFromFCIDUMP( const string fcidumpfile ){
 
 }
 
+void CheMPS2::Hamiltonian::readfock( const string fockfile, double * fockmx, const bool printinfo ) const{
+
+/************************
+ *   FOCK file format   *
+************************************
+ &FOCK NACT= X,
+  ORBSYM=X,X,X,X,
+ /
+  1.1234567890123456E-03   I   J
+  1.1234567890123456E-03   I   J
+************************************
+     Remark: ORBSYM are the MOLPRO irreps !!!
+*/
+
+    struct stat file_info;
+    const bool on_disk = (( fockfile.length() > 0 ) && ( stat( fockfile.c_str(), &file_info ) == 0 ));
+    if ( on_disk == false ){
+       cout << "Unable to find the FOCK file " << fockfile << "!" << endl;
+    }
+    assert( on_disk );
+
+    cout << "Reading FOCK file " << fockfile << endl;
+
+    const int nIrreps = SymmInfo.getNumberOfIrreps();
+    int * psi2molpro = new int[ nIrreps ];
+    SymmInfo.symm_psi2molpro( psi2molpro );
+
+    ifstream thedump( fockfile.c_str() );
+    string line, part;
+    int pos, pos2;
+
+    // Double check the number of orbitals
+    getline( thedump, line ); // &FOCK NACT= X,
+    pos  = line.find( "NACT" );
+    pos  = line.find( "=", pos ); //1
+    pos2 = line.find( ",", pos ); //4
+    part = line.substr( pos+1, pos2-pos-1 );
+    const int LAS = atoi( part.c_str() );
+    if ( LAS != getL() ){
+       cout << "The number of orbitals in the FOCK file and Hamiltonian object does not match!" << endl;
+       assert( LAS == getL() );
+    }
+
+    // Double check the orbital irreps
+    getline( thedump, line ); //  ORBSYM=A,B,C,D,
+    getline( thedump, part );
+    while ( part.find( "/" ) == string::npos ){
+        pos = line.find( "\n" );
+        if ( pos != string::npos ){ line.erase( pos ); }
+        pos = part.find( " " );
+        if ( pos != string::npos ){ part.erase( pos, 1 ); }
+        line.append( part );
+        getline( thedump, part );
+    }
+    pos = line.find( "ORBSYM" );
+    pos = line.find( "=", pos ); //1
+    for ( int orb = 0; orb < LAS; orb++ ){
+        pos2 = line.find( ",", pos+1 ); //3
+        part = line.substr( pos+1, pos2-pos-1 );
+        const int molproirrep = atoi( part.c_str() );
+        if ( molproirrep != psi2molpro[ getOrbitalIrrep( orb ) ] ){
+            cout << "The irrep of orbital " << orb << " in the FOCK file and Hamiltonian object does not match!" << endl;
+            assert( molproirrep == psi2molpro[ getOrbitalIrrep( orb ) ] );
+        }
+        pos = pos2;
+    }
+
+    // Read the FOCK matrix in
+    for ( int cnt = 0; cnt < LAS * LAS; cnt++ ){ fockmx[ cnt ] = 0.0; }
+    while ( getline( thedump, line ) ){ // value i1 i2
+
+        if ( line.length() > 2 ){
+
+            pos  = line.find( " " );
+            pos2 = line.find( "." );
+            pos2 = line.find( " ", pos2 );
+            part = line.substr( pos, pos2-pos );
+            const double value = atof( part.c_str() );
+            pos  = pos2;
+            while ( line.substr( pos, 1 ).compare(" ") == 0 ){ pos++; }
+            pos2 = line.find( " ", pos );
+            part = line.substr( pos, pos2-pos );
+            const int index1 = atoi( part.c_str() );
+            pos  = pos2;
+            while ( line.substr( pos, 1 ).compare(" ") == 0 ){ pos++; }
+            pos2 = line.find( " ", pos );
+            part = line.substr( pos, pos2-pos );
+            const int index2 = atoi( part.c_str() );
+
+            if ( printinfo ){
+                cout << "        Processed FOCK( " << index1 << ", " << index2 << " ) = " << value << endl;
+            }
+
+            const int orb1 = index1 - 1;
+            const int orb2 = index2 - 1;
+
+            if ( getOrbitalIrrep( orb1 ) != getOrbitalIrrep( orb2 ) ){
+                cout << "In the FOCK file a specific value is given for orbitals " << index1 << " and " << index2 << " which have different irreps. This is not allowed!" << endl;
+                assert( getOrbitalIrrep( orb1 ) == getOrbitalIrrep( orb2 ) );
+            }
+
+            fockmx[ orb1 + LAS * orb2 ] = value;
+            fockmx[ orb2 + LAS * orb1 ] = value;
+
+        }
+    }
+
+    delete [] psi2molpro;
+    thedump.close();
+
+    cout << "Finished reading FOCK file " << fockfile << endl;
+
+}
+
 void CheMPS2::Hamiltonian::writeFCIDUMP( const string fcidumpfile, const int Nelec, const int TwoS, const int TargetIrrep ) const{
 
    int * psi2molpro = new int[ SymmInfo.getNumberOfIrreps() ];

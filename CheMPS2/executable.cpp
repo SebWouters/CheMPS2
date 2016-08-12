@@ -29,6 +29,7 @@
 #include "CASSCF.h"
 #include "Molden.h"
 #include "MPIchemps2.h"
+#include "EdmistonRuedenberg.h"
 
 using namespace std;
 
@@ -284,6 +285,21 @@ cout << "\n"
 "       NVIR = int, int, int, int\n"
 "              Set the number of virtual (secondary) orbitals per irrep (psi4 irrep ordering).\n"
 "\n"
+"       MOLCAS_2RDM = /path/to/2rdm/output\n"
+"              When all orbitals are active orbitals, write out the 2-RDM in HDF5 format when specified (default unspecified).\n"
+"\n"
+"       MOLCAS_3RDM = /path/to/3rdm/output\n"
+"              When all orbitals are active orbitals, write out the 3-RDM in HDF5 format when specified (default unspecified).\n"
+"\n"
+"       MOLCAS_F4RDM = /path/to/f4rdm/output\n"
+"              When all orbitals are active orbitals, write out the 4-RDM contracted with the Fock operator in HDF5 format when specified (default unspecified).\n"
+"\n"
+"       MOLCAS_FOCK = /path/to/fock/input\n"
+"              When all orbitals are active orbitals, read in this file containing the Fock operator (default unspecified).\n"
+"\n"
+"       MOLCAS_REORDER = bool\n"
+"              When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE).\n"
+"\n"
 "       SCF_STATE_AVG = bool\n"
 "              Switch on state-averaging (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -370,6 +386,12 @@ int main( int argc, char ** argv ){
    string nact = "";
    string nvir = "";
 
+   string molcas_2rdm    = "";
+   string molcas_3rdm    = "";
+   string molcas_f4rdm   = "";
+   string molcas_fock    = "";
+   bool   molcas_reorder = false;
+
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
    double scf_grad_thr     = 1e-6;
@@ -433,6 +455,31 @@ int main( int argc, char ** argv ){
          if ( file_exists( fcidump, "FCIDUMP" ) == false ){ return clean_exit( -1 ); }
       }
 
+      if ( line.find( "MOLCAS_2RDM" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_2rdm = line.substr( pos, line.length() - pos );
+         molcas_2rdm.erase( remove( molcas_2rdm.begin(), molcas_2rdm.end(), ' ' ), molcas_2rdm.end() );
+      }
+
+      if ( line.find( "MOLCAS_3RDM" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_3rdm = line.substr( pos, line.length() - pos );
+         molcas_3rdm.erase( remove( molcas_3rdm.begin(), molcas_3rdm.end(), ' ' ), molcas_3rdm.end() );
+      }
+
+      if ( line.find( "MOLCAS_F4RDM" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_f4rdm = line.substr( pos, line.length() - pos );
+         molcas_f4rdm.erase( remove( molcas_f4rdm.begin(), molcas_f4rdm.end(), ' ' ), molcas_f4rdm.end() );
+      }
+
+      if ( line.find( "MOLCAS_FOCK" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_fock = line.substr( pos, line.length() - pos );
+         molcas_fock.erase( remove( molcas_fock.begin(), molcas_fock.end(), ' ' ), molcas_fock.end() );
+         if ( file_exists( molcas_fock, "MOLCAS_FOCK" ) == false ){ return clean_exit( -1 ); }
+      }
+
       if ( line.find( "SCF_MOLDEN" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
          scf_molden = line.substr( pos, line.length() - pos );
@@ -464,6 +511,7 @@ int main( int argc, char ** argv ){
       if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 4 ) == false ){ return clean_exit( -1 ); }
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
+      if ( find_boolean( &molcas_reorder, line, "MOLCAS_REORDER" ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return clean_exit( -1 ); }
@@ -613,6 +661,28 @@ int main( int argc, char ** argv ){
    int * nact_parsed = new int[ ni_act ]; fetch_ints( nact, nact_parsed, ni_act );
    int * nvir_parsed = new int[ ni_vir ]; fetch_ints( nvir, nvir_parsed, ni_vir );
 
+   /**************************************
+   *  Check consistency MOLCAS_ options  *
+   ***************************************/
+
+   bool full_active_space_calculation = true;
+   for ( int cnt = 0; cnt < num_irreps; cnt++ ){
+      if ( nocc_parsed[ cnt ] != 0 ){ full_active_space_calculation = false; }
+      if ( nvir_parsed[ cnt ] != 0 ){ full_active_space_calculation = false; }
+   }
+
+   if ( ( molcas_2rdm.length() != 0 ) || ( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ) || ( molcas_fock.length() != 0 ) ){
+      if ( full_active_space_calculation == false ){
+         if ( am_i_master ){ cerr << "The options MOLCAS_* can only be specified for full active space calculations (when NOCC = NVIR = 0)!" << endl; }
+         return clean_exit( -1 );
+      }
+   }
+
+   if ( ( molcas_f4rdm.length() != 0 ) && ( molcas_fock.length() == 0 ) ){
+      if ( am_i_master ){ cerr << "When MOLCAS_F4RDM should be written, MOLCAS_FOCK should be specified as well!" << endl; }
+      return clean_exit( -1 );
+   }
+
    /**********************
    *  Print the options  *
    ***********************/
@@ -633,6 +703,13 @@ int main( int argc, char ** argv ){
       cout << "   NOCC               = [ " << nocc_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nocc_parsed[ cnt ]; } cout << " ]" << endl;
       cout << "   NACT               = [ " << nact_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nact_parsed[ cnt ]; } cout << " ]" << endl;
       cout << "   NVIR               = [ " << nvir_parsed[ 0 ]; for ( int cnt = 1; cnt < num_irreps; cnt++ ){ cout << " ; " << nvir_parsed[ cnt ]; } cout << " ]" << endl;
+   if ( full_active_space_calculation ){
+      cout << "   MOLCAS_2RDM        = " << molcas_2rdm << endl;
+      cout << "   MOLCAS_3RDM        = " << molcas_3rdm << endl;
+      cout << "   MOLCAS_F4RDM       = " << molcas_f4rdm << endl;
+      cout << "   MOLCAS_FOCK        = " << molcas_fock << endl;
+      cout << "   MOLCAS_REORDER     = " << molcas_reorder << endl;
+   } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
       cout << "   SCF_GRAD_THR       = " << scf_grad_thr << endl;
@@ -647,6 +724,7 @@ int main( int argc, char ** argv ){
       cout << "   CASPT2_IMAG        = " << caspt2_imag << endl;
       cout << "   CASPT2_CHECKPT     = " << (( caspt2_checkpt ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   CASPT2_CUMUL       = " << (( caspt2_cumul   ) ? "TRUE" : "FALSE" ) << endl;
+   }
       cout << "   PRINT_CORR         = " << (( print_corr     ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   TMP_FOLDER         = " << tmp_folder << endl;
       cout << " " << endl;
@@ -658,11 +736,6 @@ int main( int argc, char ** argv ){
 
    CheMPS2::Initialize::Init();
    CheMPS2::Hamiltonian * ham = new CheMPS2::Hamiltonian( fcidump, group );
-   CheMPS2::CASSCF koekoek( ham, NULL, NULL, nocc_parsed, nact_parsed, nvir_parsed, tmp_folder );
-   delete [] nocc_parsed;
-   delete [] nact_parsed;
-   delete [] nvir_parsed;
-
    CheMPS2::ConvergenceScheme * opt_scheme = new CheMPS2::ConvergenceScheme( ni_d );
    for ( int count = 0; count < ni_d; count++ ){
       opt_scheme->set_instruction( count, value_states[ count ],
@@ -677,46 +750,116 @@ int main( int argc, char ** argv ){
    delete [] value_noise;
    delete [] value_rtol;
 
-   const int root_num = excitation + 1;
-   CheMPS2::DMRGSCFoptions * scf_options = new CheMPS2::DMRGSCFoptions();
-   scf_options->setDoDIIS( true );
-   scf_options->setDIISGradientBranch( scf_diis_thr );
-   scf_options->setStoreDIIS( true );
-   scf_options->setMaxIterations( scf_max_iter );
-   scf_options->setGradientThreshold( scf_grad_thr );
-   scf_options->setStoreUnitary( true );
-   scf_options->setStateAveraging( scf_state_avg );
-   if ( scf_active_space == 'I' ){ scf_options->setWhichActiveSpace( 0 ); }
-   if ( scf_active_space == 'N' ){ scf_options->setWhichActiveSpace( 1 ); }
-   if ( scf_active_space == 'L' ){ scf_options->setWhichActiveSpace( 2 ); }
-   if ( scf_active_space == 'F' ){ scf_options->setWhichActiveSpace( 3 ); }
-   scf_options->setDumpCorrelations( print_corr );
-   scf_options->setStartLocRandom( true );
+   if ( full_active_space_calculation ){
 
-   const double E_CASSCF = koekoek.solve(  nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options );
-   double E_CASPT2 = 0.0;
-   if ( caspt2_calc ){
-      E_CASPT2 = koekoek.caspt2( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options, caspt2_ipea, caspt2_imag, ( caspt2_orbs == 'P' ), caspt2_checkpt, caspt2_cumul );
-      if ( am_i_master ){
-         cout << "E_CASSCF + E_CASPT2 = E_0 + E_1 + E_2 = " << E_CASSCF + E_CASPT2 << endl;
+      CheMPS2::Problem * prob = new CheMPS2::Problem( ham, multiplicity - 1, nelectrons, irrep );
+
+      // Reorder the orbitals if desired
+      if (( group == 7 ) && ( molcas_reorder == false )){ prob->SetupReorderD2h(); }
+      if ( molcas_reorder ){
+         int * dmrg2ham = new int[ ham->getL() ];
+         if ( am_i_master ){
+            CheMPS2::EdmistonRuedenberg * fiedler = new CheMPS2::EdmistonRuedenberg( ham->getVmat(), group );
+            fiedler->FiedlerGlobal( dmrg2ham );
+            delete fiedler;
+         }
+         #ifdef CHEMPS2_MPI_COMPILATION
+         MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
+         #endif
+         prob->setup_reorder_custom( dmrg2ham );
+         delete [] dmrg2ham;
       }
+
+      CheMPS2::DMRG * dmrgsolver = new CheMPS2::DMRG( prob, opt_scheme, CheMPS2::DMRG_storeMpsOnDisk, tmp_folder );
+
+      // Solve for the correct root
+      double DMRG_ENERGY;
+      for ( int state = 0; state < ( excitation + 1 ); state++ ){
+         if ( state > 0 ){ dmrgsolver->newExcitation( fabs( DMRG_ENERGY ) ); }
+         DMRG_ENERGY = dmrgsolver->Solve();
+         if (( state == 0 ) && ( excitation > 0 )){ dmrgsolver->activateExcitations( excitation ); }
+      }
+
+      // Calculate the RDMs and correlations
+      const bool calc_3rdm = (( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ));
+      const bool calc_2rdm = (( print_corr == true ) || ( molcas_2rdm.length() != 0 ));
+      if (( calc_2rdm ) || ( calc_3rdm )){
+         dmrgsolver->calc_rdms_and_correlations( calc_3rdm, false );
+         if ( molcas_2rdm.length() != 0 ){ dmrgsolver->get2DM()->save_HAM( molcas_2rdm ); }
+         if ( molcas_3rdm.length() != 0 ){ dmrgsolver->get3DM()->save_HAM( molcas_3rdm ); }
+         if ( molcas_f4rdm.length() != 0 ){
+            const int LAS      = ham->getL();
+            const int LAS_pow6 = LAS * LAS * LAS * LAS * LAS * LAS;
+            double * fockmx = new double[ LAS * LAS ];
+            double * work   = new double[ LAS_pow6  ];
+            double * result = new double[ LAS_pow6  ];
+            for ( int cnt = 0; cnt < LAS_pow6; cnt++ ){ result[ cnt ] = 0.0; }
+            ham->readfock( molcas_fock, fockmx, true );
+            CheMPS2::CASSCF::fock_dot_4rdm( fockmx, dmrgsolver, ham, 0, 0, work, result, false, false );
+            CheMPS2::ThreeDM::save_HAM_generic( molcas_f4rdm, LAS, "F.4-RDM", result );
+            delete [] fockmx;
+            delete [] work;
+            delete [] result;
+         }
+         if ( print_corr ){ dmrgsolver->getCorrelations()->Print(); }
+      }
+
+      // Clean up
+      if ( CheMPS2::DMRG_storeMpsOnDisk ){ dmrgsolver->deleteStoredMPS(); }
+      if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ dmrgsolver->deleteStoredOperators(); }
+      delete dmrgsolver;
+      delete prob;
+
+   } else {
+
+      CheMPS2::CASSCF koekoek( ham, NULL, NULL, nocc_parsed, nact_parsed, nvir_parsed, tmp_folder );
+
+      const int root_num = excitation + 1;
+      CheMPS2::DMRGSCFoptions * scf_options = new CheMPS2::DMRGSCFoptions();
+      scf_options->setDoDIIS( true );
+      scf_options->setDIISGradientBranch( scf_diis_thr );
+      scf_options->setStoreDIIS( true );
+      scf_options->setMaxIterations( scf_max_iter );
+      scf_options->setGradientThreshold( scf_grad_thr );
+      scf_options->setStoreUnitary( true );
+      scf_options->setStateAveraging( scf_state_avg );
+      if ( scf_active_space == 'I' ){ scf_options->setWhichActiveSpace( 0 ); }
+      if ( scf_active_space == 'N' ){ scf_options->setWhichActiveSpace( 1 ); }
+      if ( scf_active_space == 'L' ){ scf_options->setWhichActiveSpace( 2 ); }
+      if ( scf_active_space == 'F' ){ scf_options->setWhichActiveSpace( 3 ); }
+      scf_options->setDumpCorrelations( print_corr );
+      scf_options->setStartLocRandom( true );
+
+      const double E_CASSCF = koekoek.solve( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options );
+      double E_CASPT2 = 0.0;
+      if ( caspt2_calc ){
+         E_CASPT2 = koekoek.caspt2( nelectrons, multiplicity - 1, irrep, opt_scheme, root_num, scf_options, caspt2_ipea, caspt2_imag, ( caspt2_orbs == 'P' ), caspt2_checkpt, caspt2_cumul );
+         if ( am_i_master ){
+            cout << "E_CASSCF + E_CASPT2 = E_0 + E_1 + E_2 = " << E_CASSCF + E_CASPT2 << endl;
+         }
+      }
+
+      if ( ( am_i_master ) && ( scf_molden.length() > 0 ) ){
+         int * norb_ham = new int[ Symmhelper.getNumberOfIrreps() ];
+         for ( int irrep = 0; irrep < Symmhelper.getNumberOfIrreps(); irrep++ ){ norb_ham[ irrep ] = 0; }
+         for ( int orb = 0; orb < ham->getL(); orb++ ){ norb_ham[ ham->getOrbitalIrrep( orb ) ] += 1; }
+         CheMPS2::Molden * molden_rotator = new CheMPS2::Molden( ham->getL(), Symmhelper.getGroupNumber(), norb_ham );
+         molden_rotator->read_molden( scf_molden );
+         molden_rotator->read_unitary( scf_options->getUnitaryStorageName() );
+         molden_rotator->print( scf_molden, scf_molden + ".rotated" );
+         delete [] norb_ham;
+         delete molden_rotator;
+      }
+
+      // Clean up
+      if (( scf_options->getStoreDIIS() ) && ( am_i_master )){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
+      delete scf_options;
+
    }
 
-   if (( am_i_master ) && ( scf_molden.length() > 0 )){
-      int * norb_ham = new int[ Symmhelper.getNumberOfIrreps() ];
-      for ( int irrep = 0; irrep < Symmhelper.getNumberOfIrreps(); irrep++ ){ norb_ham[ irrep ] = 0; }
-      for ( int orb = 0; orb < ham->getL(); orb++ ){ norb_ham[ ham->getOrbitalIrrep( orb ) ] += 1; }
-      CheMPS2::Molden * molden_rotator = new CheMPS2::Molden( ham->getL(), Symmhelper.getGroupNumber(), norb_ham );
-      molden_rotator->read_molden( scf_molden );
-      molden_rotator->read_unitary( scf_options->getUnitaryStorageName() );
-      molden_rotator->print( scf_molden, scf_molden + ".rotated" );
-      delete [] norb_ham;
-      delete molden_rotator;
-   }
-
-   // Clean up
-   if (( scf_options->getStoreDIIS() ) && ( am_i_master )){ koekoek.deleteStoredDIIS( scf_options->getDIISStorageName() ); }
-   delete scf_options;
+   delete [] nocc_parsed;
+   delete [] nact_parsed;
+   delete [] nvir_parsed;
    delete opt_scheme;
    delete ham;
 

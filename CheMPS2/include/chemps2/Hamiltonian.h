@@ -161,7 +161,13 @@ namespace CheMPS2{
          
          //! Debug check certain elements and sums
          void debugcheck() const;
-      
+
+         //! Read in a FOCK file
+         /** \param fockfile The FOCK file to read in
+             \param fockmx The array to store the Fock matrix in
+             \param printinfo Whether or not to print information regarding the read in values */
+         void readfock( const string fockfile, double * fockmx, const bool printinfo ) const;
+
       private:
       
          //number of orbitals

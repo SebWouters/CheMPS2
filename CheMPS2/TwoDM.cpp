@@ -275,6 +275,42 @@ void CheMPS2::TwoDM::print_noon() const{
 
 }
 
+void CheMPS2::TwoDM::save_HAM( const string filename ) const{
+
+   // Create an array with the 2-RDM in the ORIGINAL HAM indices
+   const int total_size = L * L * L * L;
+   double * local_array = new double[ total_size ];
+   for ( int ham4 = 0; ham4 < L; ham4++ ){
+      for ( int ham3 = 0; ham3 < L; ham3++ ){
+         for ( int ham2 = 0; ham2 < L; ham2++ ){
+            for ( int ham1 = 0; ham1 < L; ham1++ ){
+                local_array[ ham1 + L * ( ham2 + L * ( ham3 + L * ham4 ) ) ] = getTwoDMA_HAM( ham1, ham2, ham3, ham4 );
+            }
+         }
+      }
+   }
+
+   // (Re)create the HDF5 file with the 2-RDM
+   hid_t   file_id      = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+   hsize_t dimarray     = total_size;
+   hid_t   group_id     = H5Gcreate( file_id, "2-RDM", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   hid_t   dataspace_id = H5Screate_simple( 1, &dimarray, NULL );
+   hid_t   dataset_id   = H5Dcreate( group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+   H5Dwrite( dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, local_array );
+
+   H5Dclose( dataset_id );
+   H5Sclose( dataspace_id );
+   H5Gclose( group_id );
+   H5Fclose( file_id );
+
+   // Deallocate the array
+   delete [] local_array;
+
+   cout << "Saved the 2-RDM to the file " << filename << endl;
+
+}
+
 void CheMPS2::TwoDM::save() const{
 
    hid_t   file_id  = H5Fcreate(CheMPS2::TWO_RDM_storagename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);

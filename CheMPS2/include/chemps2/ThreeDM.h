@@ -104,6 +104,17 @@ namespace CheMPS2{
          //! Add the 3-RDM elements of all MPI processes
          void mpi_allreduce();
 
+         //! Save the 3-RDM to disk in Hamiltonian indices
+         /** \param filename The filename to store the 3-RDM at */
+         void save_HAM( const string filename ) const;
+
+         //! Generic save routine for objects of size LAS**6
+         /** \param filename The filename to store the object at
+             \param LAS The number of orbitals
+             \param tag The name of the object
+             \param array Pointer to the object */
+         static void save_HAM_generic( const string filename, const int LAS, const string tag, double * array );
+
       private:
 
          //The BK containing all the irrep information

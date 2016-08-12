@@ -83,6 +83,21 @@ Set the number of active orbitals per irrep (psi4 irrep ordering).
 .BR "NVIR = \fIint,int,int,int\fB"
 Set the number of virtual (secondary) orbitals per irrep (psi4 irrep ordering).
 .TP
+.BR "MOLCAS_2RDM = \fI/path/to/2rdm/output\fB"
+When all orbitals are active orbitals, write out the 2-RDM in HDF5 format when specified (default unspecified)."
+.TP
+.BR "MOLCAS_3RDM = \fI/path/to/3rdm/output\fB"
+When all orbitals are active orbitals, write out the 3-RDM in HDF5 format when specified (default unspecified)."
+.TP
+.BR "MOLCAS_F4RDM = \fI/path/to/f4rdm/output\fB"
+When all orbitals are active orbitals, write out the 4-RDM contracted with the Fock operator in HDF5 format when specified (default unspecified)."
+.TP
+.BR "MOLCAS_FOCK = \fI/path/to/fock/input\fB"
+When all orbitals are active orbitals, read in this file containing the Fock operator (default unspecified)."
+.TP
+.BR "MOLCAS_REORDER = \fIbool\fB"
+When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE)."
+.TP
 .BR "SCF_STATE_AVG = \fIbool\fB"
 Switch on state\-averaging (TRUE or FALSE; default FALSE).
 .TP

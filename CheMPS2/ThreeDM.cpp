@@ -368,6 +368,33 @@ void CheMPS2::ThreeDM::flush_disk(){
 
 }
 
+void CheMPS2::ThreeDM::save_HAM( const string filename ) const{
+
+   assert( disk == false );
+   save_HAM_generic( filename, L, "3-RDM", elements );
+
+}
+
+void CheMPS2::ThreeDM::save_HAM_generic( const string filename, const int LAS, const string tag, double * array ){
+
+   hid_t   file_id      = H5Fcreate( filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+   long long linsize    = ( long long ) LAS;
+   hsize_t dimarray     = ( linsize * linsize * linsize * linsize * linsize * linsize );
+   hid_t   group_id     = H5Gcreate( file_id, tag.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   hid_t   dataspace_id = H5Screate_simple( 1, &dimarray, NULL );
+   hid_t   dataset_id   = H5Dcreate( group_id, "elements", H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+   H5Dwrite( dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array );
+
+   H5Dclose( dataset_id );
+   H5Sclose( dataspace_id );
+   H5Gclose( group_id );
+   H5Fclose( file_id );
+
+   std::cout << "Saved the " << tag << " to the file " << filename << std::endl;
+
+}
+
 void CheMPS2::ThreeDM::fill_site( TensorT * denT, TensorL *** Ltensors, TensorF0 **** F0tensors, TensorF1 **** F1tensors, TensorS0 **** S0tensors, TensorS1 **** S1tensors,
                                   Tensor3RDM **** dm3_a_J0_doublet, Tensor3RDM **** dm3_a_J1_doublet, Tensor3RDM **** dm3_a_J1_quartet,
                                   Tensor3RDM **** dm3_b_J0_doublet, Tensor3RDM **** dm3_b_J1_doublet, Tensor3RDM **** dm3_b_J1_quartet,
