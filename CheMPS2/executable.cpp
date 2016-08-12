@@ -708,7 +708,7 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_3RDM        = " << molcas_3rdm << endl;
       cout << "   MOLCAS_F4RDM       = " << molcas_f4rdm << endl;
       cout << "   MOLCAS_FOCK        = " << molcas_fock << endl;
-      cout << "   MOLCAS_REORDER     = " << molcas_reorder << endl;
+      cout << "   MOLCAS_REORDER     = " << (( molcas_reorder ) ? "TRUE" : "FALSE" ) << endl;
    } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
