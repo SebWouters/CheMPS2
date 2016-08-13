@@ -1,3 +1,5 @@
+set(PN ${PROJECT_NAME})
+
 include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2/ ${HDF5_INCLUDE_DIRS})
 
 set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
@@ -77,10 +79,14 @@ if (NOT SHARED_ONLY)
 endif (NOT SHARED_ONLY)
 
 if (NOT STATIC_ONLY)
-    install (TARGETS chemps2-shared DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+    install (TARGETS chemps2-shared
+             EXPORT "${PN}Targets"
+             LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 endif (NOT STATIC_ONLY)
 if (NOT SHARED_ONLY)
-    install (TARGETS chemps2-static DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+    install (TARGETS chemps2-static
+             EXPORT "${PN}Targets"
+             ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 endif (NOT SHARED_ONLY)
 install (DIRECTORY include/chemps2/ DESTINATION include/chemps2 FILES_MATCHING PATTERN "*.h")
 
@@ -95,5 +101,23 @@ else (STATIC_ONLY)
 endif (STATIC_ONLY)
 set_target_properties (chemps2bin PROPERTIES OUTPUT_NAME "chemps2")
 
-install (TARGETS chemps2bin DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
+install (TARGETS chemps2bin
+         EXPORT "${PN}Targets"
+         RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
+
+# <<<  Export Interface  >>>
+
+#target_compile_definitions(chemps2-static INTERFACE USING_${PN})
+#target_include_directories(efp INTERFACE
+#                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+
+# <<<  Export Config  >>>
+
+#include(CMakePackageConfigHelpers)
+
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PN}")
+install(EXPORT "${PN}Targets"
+        NAMESPACE "${PN}::"
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 

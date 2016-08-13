@@ -1,5 +1,6 @@
 project (CheMPS2)
-set (CheMPS2_VERSION      "1.8-3 (2016-08-29)")
+set (CheMPS2_MMP_VERSION  "1.8")
+set (CheMPS2_VERSION      "${CheMPS2_MMP_VERSION}-3 (2016-08-29)")
 set (CheMPS2_AUTHORS      "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION  "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL        "sebastianwouters@gmail.com")
@@ -25,6 +26,12 @@ set (CMAKE_VERBOSE_MAKEFILE OFF)
 if (STATIC_ONLY AND SHARED_ONLY)
     message (FATAL_ERROR "The options STATIC_ONLY=ON and SHARED_ONLY=ON are conflicting." )
 endif (STATIC_ONLY AND SHARED_ONLY)
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+        "Choose the type of build, options are: Debug Release
+RelWithDebInfo MinSizeRel." FORCE)
+endif()
 
 find_package (OpenMP)
 if (OPENMP_FOUND)
@@ -118,4 +125,20 @@ if (BUILD_DOXYGEN)
     configure_file (${CheMPS2_SOURCE_DIR}/CheMPS2/Doxyfile.in ${CheMPS2_BINARY_DIR}/Doxyfile @ONLY IMMEDIATE)
     add_custom_target (doc COMMAND ${DOXYGEN_EXECUTABLE} ${CheMPS2_BINARY_DIR}/Doxyfile SOURCES ${CheMPS2_BINARY_DIR}/Doxyfile)
 endif (BUILD_DOXYGEN)
+
+# <<<  Export Config  >>>
+
+include(CMakePackageConfigHelpers)
+set(PN ${PROJECT_NAME})
+
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PN}")
+configure_package_config_file(${PN}Config.cmake.in
+                              "${CMAKE_CURRENT_BINARY_DIR}/${PN}Config.cmake"
+                              INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PN}ConfigVersion.cmake
+                                 VERSION ${CheMPS2_MMP_VERSION}
+                                 COMPATIBILITY AnyNewerVersion)  # arguably should be same M.M version
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PN}Config.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/${PN}ConfigVersion.cmake
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
