@@ -764,7 +764,7 @@ int main( int argc, char ** argv ){
             delete fiedler;
          }
          #ifdef CHEMPS2_MPI_COMPILATION
-         MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
+         CheMPS2::MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
          #endif
          prob->setup_reorder_custom( dmrg2ham );
          delete [] dmrg2ham;
