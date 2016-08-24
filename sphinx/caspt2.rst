@@ -161,7 +161,7 @@ In order to calculate the CASPT2 variational second order perturbation correctio
 #. It is advised to leave CUMULANT = false.
 
 
-.. [CASPT2] S. Wouters, V. Van Speybroeck and D. Van Neck, *Preprint* (2016), arXiv: `1605.05526 <http://arxiv.org/abs/1605.05526>`_
+.. [CASPT2] S. Wouters, V. Van Speybroeck and D. Van Neck, *Journal of Chemical Physics* **145**, 054120 (2016), doi: `10.1063/1.4959817 <http://dx.doi.org/10.1063/1.4959817>`_
 .. [ROOS1]  K. Andersson, P.-A. Malmqvist, B.O. Roos, A.J. Sadlej and K. Wolinski, *Journal of Physical Chemistry* **94**, 5483-5488 (1990). doi: `10.1021/j100377a012 <http://dx.doi.org/10.1021/j100377a012>`_
 .. [ROOS2]  K. Andersson, P.‐A. Malmqvist and B.O. Roos, *Journal of Chemical Physics* **96**, 1218-1226 (1992). doi: `10.1063/1.462209 <http://dx.doi.org/10.1063/1.462209>`_
 .. [IMAG]   N. Forsberg and P.-A. Malmqvist, *Chemical Physics Letters* **274**, 196-204 (1997). doi: `10.1016/S0009-2614(97)00669-6 <http://dx.doi.org/10.1016/S0009-2614(97)00669-6>`_

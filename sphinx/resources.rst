@@ -92,7 +92,7 @@ Figure above: Illustration of the hybrid parallelization of CheMPS2. For 16 core
 
 
 .. [TIMING1] S. Wouters and D. Van Neck, *European Physical Journal D* **68**, 272 (2014), doi: `10.1140/epjd/e2014-50500-1 <http://dx.doi.org/10.1140/epjd/e2014-50500-1>`_
-.. [TIMING2] S. Wouters, V. Van Speybroeck and D. Van Neck, *Preprint* (2016), arXiv: `1605.05526 <http://arxiv.org/abs/1605.05526>`_
+.. [TIMING2] S. Wouters, V. Van Speybroeck and D. Van Neck, *Journal of Chemical Physics* **145**, 054120 (2016), doi: `10.1063/1.4959817 <http://dx.doi.org/10.1063/1.4959817>`_
 .. [NITROGEN] G.K.-L. Chan, M. Kallay and J. Gauss, *Journal of Chemical Physics* **121**, 6110 (2004), doi: `10.1063/1.1783212 <http://dx.doi.org/10.1063/1.1783212>`_
 .. [WATER] G. K.-L. Chan and M. Head-Gordon, *Journal of Chemical Physics* **118**, 8551 (2003), doi: `10.1063/1.1574318 <http://dx.doi.org/10.1063/1.1574318>`_
 
