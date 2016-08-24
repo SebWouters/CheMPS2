@@ -26,14 +26,13 @@ var searchData=
   ['construct_5ffock',['construct_fock',['../classCheMPS2_1_1CASSCF.html#a10b37b294f7573005a6b49b669e734ca',1,'CheMPS2::CASSCF']]],
   ['construct_5fmxelem',['construct_mxelem',['../classCheMPS2_1_1Problem.html#ac2e23ae168f5c9ffa1c98a73da91def4',1,'CheMPS2::Problem']]],
   ['contract',['contract',['../classCheMPS2_1_1Tensor3RDM.html#abce2935d5e3293bbfbd39c7b78b4705e',1,'CheMPS2::Tensor3RDM']]],
-  ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#a32c3e296a5d4cfc302bf537c349d07e8',1,'CheMPS2::ConvergenceScheme']]],
   ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html',1,'CheMPS2']]],
+  ['convergencescheme',['ConvergenceScheme',['../classCheMPS2_1_1ConvergenceScheme.html#a32c3e296a5d4cfc302bf537c349d07e8',1,'CheMPS2::ConvergenceScheme']]],
   ['copy2dmover',['copy2DMover',['../classCheMPS2_1_1CASSCF.html#a0dbcb41aa9097e3b45b93c232337ec8a',1,'CheMPS2::CASSCF']]],
   ['copy_5factive',['copy_active',['../classCheMPS2_1_1CASSCF.html#a3f20d25b94c1d821f22f95a6bab0ebc7',1,'CheMPS2::CASSCF::copy_active(double *origin, DMRGSCFmatrix *result, const DMRGSCFindices *idx, const bool one_rdm)'],['../classCheMPS2_1_1CASSCF.html#a53a0c4f5043fd2494f8825cb43578fa7',1,'CheMPS2::CASSCF::copy_active(const DMRGSCFmatrix *origin, double *result, const DMRGSCFindices *idx)']]],
   ['correct_5fhigher_5fmultiplicities',['correct_higher_multiplicities',['../classCheMPS2_1_1ThreeDM.html#a0a3de81e9881218690e26094be30b749',1,'CheMPS2::ThreeDM::correct_higher_multiplicities()'],['../classCheMPS2_1_1TwoDM.html#a09eb9e2471fe7fb19659b611e3e4550b',1,'CheMPS2::TwoDM::correct_higher_multiplicities()']]],
-  ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html#aeb2b17926e78c7735821a13c1faf6867',1,'CheMPS2::Correlations']]],
   ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html',1,'CheMPS2']]],
+  ['correlations',['Correlations',['../classCheMPS2_1_1Correlations.html#aeb2b17926e78c7735821a13c1faf6867',1,'CheMPS2::Correlations']]],
   ['create',['create',['../classCheMPS2_1_1TensorL.html#a51ae1984b9ed9e377f4e7e2694ac6ea5',1,'CheMPS2::TensorL::create(TensorT *mps_tensor)'],['../classCheMPS2_1_1TensorL.html#a9ca1f2f868c94cbb8b36ff826bc7fd34',1,'CheMPS2::TensorL::create(TensorT *mps_tensor_up, TensorT *mps_tensor_down, TensorO *previous, double *workmem)'],['../classCheMPS2_1_1TensorO.html#a58f16f6eaa3282bb6b44e9f1c17a71cb',1,'CheMPS2::TensorO::create()']]],
-  ['cumulant',['Cumulant',['../classCheMPS2_1_1Cumulant.html',1,'CheMPS2']]],
-  ['current_20head',['Current HEAD',['../md__home_seba_Desktop_CheMPS2_github_CHANGELOG.html',1,'']]]
+  ['cumulant',['Cumulant',['../classCheMPS2_1_1Cumulant.html',1,'CheMPS2']]]
 ];

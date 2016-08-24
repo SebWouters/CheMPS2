@@ -1,6 +1,8 @@
 var searchData=
 [
   ['save',['save',['../classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d',1,'CheMPS2::FourIndex::save()'],['../classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074',1,'CheMPS2::Hamiltonian::save()'],['../classCheMPS2_1_1TwoDM.html#aaa4b369e9ee67833388601cc80989caf',1,'CheMPS2::TwoDM::save()'],['../classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12',1,'CheMPS2::TwoIndex::save()']]],
+  ['save_5fham',['save_HAM',['../classCheMPS2_1_1ThreeDM.html#ac1d8f0a899a6e7c9532d54f69deb4591',1,'CheMPS2::ThreeDM::save_HAM()'],['../classCheMPS2_1_1TwoDM.html#a184036d9231127c7dabc401c390f0e9c',1,'CheMPS2::TwoDM::save_HAM()']]],
+  ['save_5fham_5fgeneric',['save_HAM_generic',['../classCheMPS2_1_1ThreeDM.html#a891c794acfb021f3ac4cd0c154973c30',1,'CheMPS2::ThreeDM']]],
   ['savediis',['saveDIIS',['../classCheMPS2_1_1DIIS.html#a49b15fbf0a60e554085ba5c868e11440',1,'CheMPS2::DIIS']]],
   ['saveu',['saveU',['../classCheMPS2_1_1DMRGSCFunitary.html#aa40f3a37dd71b9a2c714fc98094d115e',1,'CheMPS2::DMRGSCFunitary']]],
   ['sbk',['sBK',['../classCheMPS2_1_1TensorT.html#a315536959cbf0608cd11f386e8637782',1,'CheMPS2::TensorT']]],

@@ -15,6 +15,7 @@ var classCheMPS2_1_1TwoDM =
     [ "print_noon", "classCheMPS2_1_1TwoDM.html#ac24a417e0cd64e7c3a82c94ba1d9d71c", null ],
     [ "read", "classCheMPS2_1_1TwoDM.html#a371ffeddaa5c310b32449fed92071ac3", null ],
     [ "save", "classCheMPS2_1_1TwoDM.html#aaa4b369e9ee67833388601cc80989caf", null ],
+    [ "save_HAM", "classCheMPS2_1_1TwoDM.html#a184036d9231127c7dabc401c390f0e9c", null ],
     [ "spin_density_dmrg", "classCheMPS2_1_1TwoDM.html#ab36beb15340cbe405ebaf6fe55673922", null ],
     [ "spin_density_ham", "classCheMPS2_1_1TwoDM.html#adfd873d92103e1619d33683e382b3486", null ],
     [ "trace", "classCheMPS2_1_1TwoDM.html#a5ea664bc3b45270494e3d6e9f8d52619", null ],

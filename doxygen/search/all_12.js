@@ -1,6 +1,8 @@
 var searchData=
 [
   ['save',['save',['../classCheMPS2_1_1FourIndex.html#a7d434479fe129f2c094c59f8a130361d',1,'CheMPS2::FourIndex::save()'],['../classCheMPS2_1_1Hamiltonian.html#a7d42b53e874194c378b78368f760a074',1,'CheMPS2::Hamiltonian::save()'],['../classCheMPS2_1_1TwoDM.html#aaa4b369e9ee67833388601cc80989caf',1,'CheMPS2::TwoDM::save()'],['../classCheMPS2_1_1TwoIndex.html#a8e9f890d5af1091e10d09f43da11de12',1,'CheMPS2::TwoIndex::save()']]],
+  ['save_5fham',['save_HAM',['../classCheMPS2_1_1ThreeDM.html#ac1d8f0a899a6e7c9532d54f69deb4591',1,'CheMPS2::ThreeDM::save_HAM()'],['../classCheMPS2_1_1TwoDM.html#a184036d9231127c7dabc401c390f0e9c',1,'CheMPS2::TwoDM::save_HAM()']]],
+  ['save_5fham_5fgeneric',['save_HAM_generic',['../classCheMPS2_1_1ThreeDM.html#a891c794acfb021f3ac4cd0c154973c30',1,'CheMPS2::ThreeDM']]],
   ['savediis',['saveDIIS',['../classCheMPS2_1_1DIIS.html#a49b15fbf0a60e554085ba5c868e11440',1,'CheMPS2::DIIS']]],
   ['saveu',['saveU',['../classCheMPS2_1_1DMRGSCFunitary.html#aa40f3a37dd71b9a2c714fc98094d115e',1,'CheMPS2::DMRGSCFunitary']]],
   ['sbk',['sBK',['../classCheMPS2_1_1TensorT.html#a315536959cbf0608cd11f386e8637782',1,'CheMPS2::TensorT']]],
@@ -50,8 +52,8 @@ var searchData=
   ['step',['step',['../classCheMPS2_1_1ConjugateGradient.html#a37f5465c918d5d922fc5b108ab29f6ea',1,'CheMPS2::ConjugateGradient']]],
   ['storage',['storage',['../classCheMPS2_1_1Tensor.html#ae38c4be492a8bf729d472e5a0c1d6d12',1,'CheMPS2::Tensor']]],
   ['str2bits',['str2bits',['../classCheMPS2_1_1FCI.html#aee672b186854b9fdaf2402203892852e',1,'CheMPS2::FCI']]],
-  ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html',1,'CheMPS2']]],
   ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html#aa3c75959a25348919a2d676d425d1b7c',1,'CheMPS2::SyBookkeeper::SyBookkeeper(const Problem *Prob, const int D)'],['../classCheMPS2_1_1SyBookkeeper.html#ac667c55cdc19cf80711d1838715ce7e5',1,'CheMPS2::SyBookkeeper::SyBookkeeper(const SyBookkeeper &amp;tocopy)']]],
+  ['sybookkeeper',['SyBookkeeper',['../classCheMPS2_1_1SyBookkeeper.html',1,'CheMPS2']]],
   ['symm2prog',['symm2prog',['../classCheMPS2_1_1Sobject.html#a2b482f6b45ddd735e42b906843c10e24',1,'CheMPS2::Sobject']]],
   ['symm4rdm',['Symm4RDM',['../classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac',1,'CheMPS2::DMRG']]],
   ['symm_5fpsi2molpro',['symm_psi2molpro',['../classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67',1,'CheMPS2::Irreps::symm_psi2molpro(int *psi2molpro) const '],['../classCheMPS2_1_1Irreps.html#acfe240ed34c83d42cd263eec6365e08d',1,'CheMPS2::Irreps::symm_psi2molpro(int *psi2molpro, const string SymmLabel)']]]

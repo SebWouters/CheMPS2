@@ -1,8 +1,9 @@
 <map id="CheMPS2::SyBookkeeper::SetDim" name="CheMPS2::SyBookkeeper::SetDim">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s. " alt="" coords="228,81,396,108"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1Sobject.html#a34983e86ae9f19de0be6b923479c13df" title="SVD an S&#45;object into 2 TensorT&#39;s. " alt="" coords="228,85,396,112"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1DMRG.html#ab6d80dde8b71171ee969a6b7b86193d2" title="Solver. " alt="" coords="465,56,637,83"/>
-<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="444,107,659,133"/>
+<area shape="rect" id="node6" href="$classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="444,115,659,141"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="707,5,891,32"/>
-<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="940,107,1132,133"/>
-<area shape="rect" id="node7" href="$classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="707,157,892,184"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="940,115,1132,141"/>
+<area shape="rect" id="node7" href="$classCheMPS2_1_1CASSCF.html#a3f1e0dc3e01be6e48eed126ca0ff1fd9" title="Build the contraction of the fock matrix with the 4&#45;RDM. " alt="" coords="710,107,889,149"/>
+<area shape="rect" id="node8" href="$classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="707,173,892,200"/>
 </map>

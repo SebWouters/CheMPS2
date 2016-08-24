@@ -1,3 +1,4 @@
 <map id="CheMPS2::DMRGSCFunitary::saveU" name="CheMPS2::DMRGSCFunitary::saveU">
-<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="251,13,435,39"/>
+<area shape="rect" id="node2" href="$classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="255,5,439,32"/>
+<area shape="rect" id="node3" href="$classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="251,56,443,83"/>
 </map>

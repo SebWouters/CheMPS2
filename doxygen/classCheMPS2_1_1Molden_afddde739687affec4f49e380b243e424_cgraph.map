@@ -2,4 +2,5 @@
 <area shape="rect" id="node2" href="$classCheMPS2_1_1Irreps.html#a78b964944caac0cf835e42a428cfef67" title="Fill the array psi2molpro with the irrep conventions of molpro for the currently activated group..." alt="" coords="241,5,407,47"/>
 <area shape="rect" id="node3" href="$classCheMPS2_1_1Irreps.html#aa56e8dea52881f0c86c348539b21bb5c" title="Get the name of the group. " alt="" coords="477,42,696,69"/>
 <area shape="rect" id="node4" href="$classCheMPS2_1_1Irreps.html#acc6050a0690e8e940f9de7cf312bbac4" title="Get the name of the irrep with number irrepNumber of the activated group. The irrep with number 0 is ..." alt="" coords="219,122,429,149"/>
+<area shape="rect" id="node5" href="$classCheMPS2_1_1Irreps.html#a9813550797b0557cf22d2bca5f3e07b0" title="Get the group number. " alt="" coords="232,173,416,215"/>
 </map>

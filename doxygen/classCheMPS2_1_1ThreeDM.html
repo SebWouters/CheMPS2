@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('classCheMPS2_1_1ThreeDM.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="classCheMPS2_1_1ThreeDM-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">CheMPS2::ThreeDM Class Reference</div>  </div>
@@ -145,6 +146,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1ThreeDM.html#acceb29cbf3244a2fee196f36c87589a7">mpi_allreduce</a> ()</td></tr>
 <tr class="memdesc:acceb29cbf3244a2fee196f36c87589a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the 3-RDM elements of all MPI processes. <br /></td></tr>
 <tr class="separator:acceb29cbf3244a2fee196f36c87589a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1d8f0a899a6e7c9532d54f69deb4591"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1ThreeDM.html#ac1d8f0a899a6e7c9532d54f69deb4591">save_HAM</a> (const string filename) const </td></tr>
+<tr class="memdesc:ac1d8f0a899a6e7c9532d54f69deb4591"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the 3-RDM to disk in <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> indices.  <a href="#ac1d8f0a899a6e7c9532d54f69deb4591">More...</a><br /></td></tr>
+<tr class="separator:ac1d8f0a899a6e7c9532d54f69deb4591"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a891c794acfb021f3ac4cd0c154973c30"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCheMPS2_1_1ThreeDM.html#a891c794acfb021f3ac4cd0c154973c30">save_HAM_generic</a> (const string filename, const int LAS, const string tag, double *array)</td></tr>
+<tr class="memdesc:a891c794acfb021f3ac4cd0c154973c30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic save routine for objects of size LAS**6.  <a href="#a891c794acfb021f3ac4cd0c154973c30">More...</a><br /></td></tr>
+<tr class="separator:a891c794acfb021f3ac4cd0c154973c30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classCheMPS2_1_1ThreeDM.html">ThreeDM</a> class. </p><dl class="section author"><dt>Author</dt><dd>Sebastian Wouters <a href="#" onclick="location.href='mai'+'lto:'+'seb'+'as'+'tia'+'nw'+'out'+'er'+'s@g'+'ma'+'il.'+'co'+'m'; return false;">sebas<span style="display: none;">.nosp@m.</span>tian<span style="display: none;">.nosp@m.</span>woute<span style="display: none;">.nosp@m.</span>rs@g<span style="display: none;">.nosp@m.</span>mail.<span style="display: none;">.nosp@m.</span>com</a> </dd></dl>
@@ -276,9 +286,11 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1ThreeDM_af918bc3d3c4655263b8205a2f99632c8_icgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_af918bc3d3c4655263b8205a2f99632c8_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1ThreeDM_af918bc3d3c4655263b8205a2f99632c8_icgraph" id="classCheMPS2_1_1ThreeDM_af918bc3d3c4655263b8205a2f99632c8_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="715,38,907,65"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="745,38,937,65"/>
 <area shape="rect" id="node3" href="classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="219,38,433,65"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="481,89,667,115"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#a3f1e0dc3e01be6e48eed126ca0ff1fd9" title="Build the contraction of the fock matrix with the 4&#45;RDM. " alt="" coords="485,89,663,131"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="481,38,667,65"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="715,97,968,123"/>
 </map>
 </div>
 </p>
@@ -430,7 +442,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="ThreeDM_8cpp_source.html#l00371">371</a> of file <a class="el" href="ThreeDM_8cpp_source.html">ThreeDM.cpp</a>.</p>
+<p>Definition at line <a class="el" href="ThreeDM_8cpp_source.html#l00398">398</a> of file <a class="el" href="ThreeDM_8cpp_source.html">ThreeDM.cpp</a>.</p>
 
 <p><div id="dynsection-2" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-2-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
@@ -487,12 +499,14 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="dynsection-3-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1ThreeDM_a41f377c3636898276dcb6c2f30dbf3ad_icgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_a41f377c3636898276dcb6c2f30dbf3ad_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1ThreeDM_a41f377c3636898276dcb6c2f30dbf3ad_icgraph" id="classCheMPS2_1_1ThreeDM_a41f377c3636898276dcb6c2f30dbf3ad_icgraph">
-<area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="247,19,461,46"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="273,70,435,112"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="769,23,961,50"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="523,23,708,50"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="509,125,721,166"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="773,132,957,159"/>
+<area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="247,67,461,94"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="273,119,435,160"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a3f1e0dc3e01be6e48eed126ca0ff1fd9" title="Build the contraction of the fock matrix with the 4&#45;RDM. " alt="" coords="526,5,705,47"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="523,71,708,98"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="769,13,1023,39"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="800,71,992,98"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="509,173,721,215"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1CASSCF.html#a8b4ebee13ba2a5764081fae5275f6c7e" title="Do the CASSCF cycles with the augmented Hessian Newton&#45;Raphson method. " alt="" coords="804,181,988,207"/>
 </map>
 </div>
 </p>
@@ -571,13 +585,124 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div class="center"><img src="classCheMPS2_1_1ThreeDM_ae3a0de0da6659adca36ea0cdae16da0e_icgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_ae3a0de0da6659adca36ea0cdae16da0e_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1ThreeDM_ae3a0de0da6659adca36ea0cdae16da0e_icgraph" id="classCheMPS2_1_1ThreeDM_ae3a0de0da6659adca36ea0cdae16da0e_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1Cumulant.html#a71af6ca25a81326cac7f772bd9723ab7" title="Contract the CASPT2 Fock operator with the cumulant approximation of &#160;in &#160;time, using HAM indices..." alt="" coords="487,5,677,47"/>
-<area shape="rect" id="node4" href="classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71" title="Get the cumulant approximation of , using HAM indices. " alt="" coords="254,61,409,103"/>
-<area shape="rect" id="node5" href="classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="224,127,439,154"/>
-<area shape="rect" id="node7" href="classCheMPS2_1_1ThreeDM.html#a363f29c1aea7e4317c3e5814099a6d5a" title="Return the trace (should be N(N&#45;1)(N&#45;2)) " alt="" coords="241,179,422,206"/>
-<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="735,99,927,126"/>
-<area shape="rect" id="node6" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="489,125,675,151"/>
-<area shape="rect" id="node8" href="classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="501,176,663,217"/>
-<area shape="rect" id="node9" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="725,176,937,217"/>
+<area shape="rect" id="node4" href="classCheMPS2_1_1Cumulant.html#ad55b86a6598f2af787a1d246334f5c71" title="Get the cumulant approximation of , using HAM indices. " alt="" coords="254,216,409,257"/>
+<area shape="rect" id="node5" href="classCheMPS2_1_1DMRG.html#a5e39f9d280ccbdc3944b5d50012306ac" title="Obtain the symmetrized 4&#45;RDM terms 0.5 * ( Gamma4_ijkl,pqrt + Gamma4_ijkt,pqrl ) with l and t fixed..." alt="" coords="224,114,439,141"/>
+<area shape="rect" id="node9" href="classCheMPS2_1_1ThreeDM.html#a363f29c1aea7e4317c3e5814099a6d5a" title="Return the trace (should be N(N&#45;1)(N&#45;2)) " alt="" coords="241,165,422,191"/>
+<area shape="rect" id="node3" href="classCheMPS2_1_1CASSCF.html#a0e8e56a34c6f28fe27341425a1db8384" title="Calculate the caspt2 correction energy for a converged casscf wavefunction. " alt="" coords="756,75,948,102"/>
+<area shape="rect" id="node6" href="classCheMPS2_1_1CASSCF.html#a3f1e0dc3e01be6e48eed126ca0ff1fd9" title="Build the contraction of the fock matrix with the 4&#45;RDM. " alt="" coords="493,123,671,164"/>
+<area shape="rect" id="node8" href="classCheMPS2_1_1DMRG.html#ae87028e0d13f774aa31d5b41978e6aa4" title="Get the pointer to the 3&#45;RDM. " alt="" coords="489,71,675,98"/>
+<area shape="rect" id="node7" href="classCheMPS2_1_1CASSCF.html#aa0ecf5c63622cb1f2aa4e72eebb31fe1" title="CASSCF DIIS vectors remove call. " alt="" coords="725,130,979,157"/>
+<area shape="rect" id="node10" href="classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="501,188,663,229"/>
+<area shape="rect" id="node11" href="classCheMPS2_1_1DMRG.html#aea1ffffbf2e12b56d602e5b692dd3a79" title="Calculate the 2&#45;RDM and correlations. Afterwards the MPS is again in LLLLLLLC gauge. " alt="" coords="746,188,958,229"/>
+</map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="ac1d8f0a899a6e7c9532d54f69deb4591"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::ThreeDM::save_HAM </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Save the 3-RDM to disk in <a class="el" href="classCheMPS2_1_1Hamiltonian.html">Hamiltonian</a> indices. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>The filename to store the 3-RDM at </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="ThreeDM_8cpp_source.html#l00371">371</a> of file <a class="el" href="ThreeDM_8cpp_source.html">ThreeDM.cpp</a>.</p>
+
+<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1ThreeDM_ac1d8f0a899a6e7c9532d54f69deb4591_cgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_ac1d8f0a899a6e7c9532d54f69deb4591_cgraph" alt=""/></div>
+<map name="classCheMPS2_1_1ThreeDM_ac1d8f0a899a6e7c9532d54f69deb4591_cgraph" id="classCheMPS2_1_1ThreeDM_ac1d8f0a899a6e7c9532d54f69deb4591_cgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1ThreeDM.html#a891c794acfb021f3ac4cd0c154973c30" title="Generic save routine for objects of size LAS**6. " alt="" coords="271,5,451,47"/>
+</map>
+</div>
+</p>
+
+</div>
+</div>
+<a class="anchor" id="a891c794acfb021f3ac4cd0c154973c30"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CheMPS2::ThreeDM::save_HAM_generic </td>
+          <td>(</td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>filename</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>LAS</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const string&#160;</td>
+          <td class="paramname"><em>tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>array</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generic save routine for objects of size LAS**6. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">filename</td><td>The filename to store the object at </td></tr>
+    <tr><td class="paramname">LAS</td><td>The number of orbitals </td></tr>
+    <tr><td class="paramname">tag</td><td>The name of the object </td></tr>
+    <tr><td class="paramname">array</td><td>Pointer to the object </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="ThreeDM_8cpp_source.html#l00378">378</a> of file <a class="el" href="ThreeDM_8cpp_source.html">ThreeDM.cpp</a>.</p>
+
+<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="classCheMPS2_1_1ThreeDM_a891c794acfb021f3ac4cd0c154973c30_icgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_a891c794acfb021f3ac4cd0c154973c30_icgraph" alt=""/></div>
+<map name="classCheMPS2_1_1ThreeDM_a891c794acfb021f3ac4cd0c154973c30_icgraph" id="classCheMPS2_1_1ThreeDM_a891c794acfb021f3ac4cd0c154973c30_icgraph">
+<area shape="rect" id="node2" href="classCheMPS2_1_1ThreeDM.html#ac1d8f0a899a6e7c9532d54f69deb4591" title="Save the 3&#45;RDM to disk in Hamiltonian indices. " alt="" coords="233,13,451,39"/>
 </map>
 </div>
 </p>
@@ -602,11 +727,11 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 
 <p>Definition at line <a class="el" href="ThreeDM_8cpp_source.html#l00191">191</a> of file <a class="el" href="ThreeDM_8cpp_source.html">ThreeDM.cpp</a>.</p>
 
-<p><div id="dynsection-5" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-5-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
-<div id="dynsection-5-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-7" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-7-trigger" src="closed.png" alt="+"/> Here is the call graph for this function:</div>
+<div id="dynsection-7-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-5-content" class="dyncontent" style="display:none;">
+<div id="dynsection-7-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_cgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_cgraph" alt=""/></div>
 <map name="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_cgraph" id="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_cgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1ThreeDM.html#ae3a0de0da6659adca36ea0cdae16da0e" title="Get a 3&#45;RDM, using the HAM indices. " alt="" coords="235,5,405,47"/>
@@ -618,11 +743,11 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 </div>
 </p>
 
-<p><div id="dynsection-6" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-6-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
-<div id="dynsection-6-summary" class="dynsummary" style="display:block;">
+<p><div id="dynsection-8" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-8-trigger" src="closed.png" alt="+"/> Here is the caller graph for this function:</div>
+<div id="dynsection-8-summary" class="dynsummary" style="display:block;">
 </div>
-<div id="dynsection-6-content" class="dyncontent" style="display:none;">
+<div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_icgraph.png" border="0" usemap="#classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_icgraph" alt=""/></div>
 <map name="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_icgraph" id="classCheMPS2_1_1ThreeDM_a363f29c1aea7e4317c3e5814099a6d5a_icgraph">
 <area shape="rect" id="node2" href="classCheMPS2_1_1DMRG.html#a43f338725791d3b5822acdba6444c056" title="Calculate the reduced density matrices and correlations. Afterwards the MPS is again in LLLLLLLC gaug..." alt="" coords="235,27,397,69"/>
@@ -645,7 +770,7 @@ Because the wave-function belongs to a certain Abelian irrep, <img class="formul
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>CheMPS2</b></li><li class="navelem"><a class="el" href="classCheMPS2_1_1ThreeDM.html">ThreeDM</a></li>
-    <li class="footer">Generated on Tue Jun 28 2016 17:16:18 for CheMPS2 by
+    <li class="footer">Generated on Wed Aug 24 2016 10:09:17 for CheMPS2 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>

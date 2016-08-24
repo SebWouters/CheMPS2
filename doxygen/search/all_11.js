@@ -5,6 +5,7 @@ var searchData=
   ['read_5ff4rdm_5fcheckpoint',['read_f4rdm_checkpoint',['../classCheMPS2_1_1CASSCF.html#ad493cbf60a7b807ad0d3a06de74001b9',1,'CheMPS2::CASSCF']]],
   ['read_5fmolden',['read_molden',['../classCheMPS2_1_1Molden.html#afddde739687affec4f49e380b243e424',1,'CheMPS2::Molden']]],
   ['read_5funitary',['read_unitary',['../classCheMPS2_1_1Molden.html#ad45a03ea0b7dd62c60ae6e9b41f6f6c3',1,'CheMPS2::Molden']]],
+  ['readfock',['readfock',['../classCheMPS2_1_1Hamiltonian.html#a0a30a7d2960ba0b0c4d772b157c1bfa6',1,'CheMPS2::Hamiltonian']]],
   ['reset',['Reset',['../classCheMPS2_1_1TensorT.html#a1f0830b0e729573fe19a3327462f7e7e',1,'CheMPS2::TensorT']]],
   ['restart',['restart',['../classCheMPS2_1_1SyBookkeeper.html#acea8cf07785547a8cb1a6029eb4c47e4',1,'CheMPS2::SyBookkeeper']]],
   ['retardedgf',['RetardedGF',['../classCheMPS2_1_1FCI.html#aaa00a4720e4796700dc9ebd83aa71cfc',1,'CheMPS2::FCI']]],
