@@ -1,8 +1,8 @@
-#### CURRENT HEAD:
+#### Version 1.8 LTS (2016-08-24):
 * Fix slow convergence linear Davidson algorithm
-* Binary options to dump out CASPT2 intermediates (2-RDM,
-  3-RDM, and 4-RDM contracted with Fock) for MOLCAS
-* Fortran example to read in CASPT2 intermediates
+* Fix MPI bug binary
+* MOLCAS interface binary (2-RDM, 3-RDM, and F.4-RDM dump)
+* Fortran example to read in CASPT2 intermediates for MOLCAS
 
 #### Version 1.7.3 (2016-07-14):
 * DMRG workshop in sphinx documentation
