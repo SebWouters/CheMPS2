@@ -65,8 +65,14 @@ set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
 
 add_library (chemps2-base OBJECT ${CHEMPS2LIB_SOURCE_FILES})
 
-if (NOT STATIC_ONLY)
+if (BUILD_FPIC OR NOT STATIC_ONLY)
     set_target_properties (chemps2-base PROPERTIES POSITION_INDEPENDENT_CODE 1)
+    if(CMAKE_CXX_COMPILER_ID MATCHES Intel)
+        set_source_files_properties(Sobject.cpp PROPERTIES COMPILE_FLAGS "-qno-openmp")
+    endif()
+endif()
+
+if (NOT STATIC_ONLY)
     add_library (chemps2-shared SHARED $<TARGET_OBJECTS:chemps2-base>)
     target_link_libraries (chemps2-shared ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION} OUTPUT_NAME "chemps2")
