@@ -300,6 +300,9 @@ cout << "\n"
 "       MOLCAS_REORDER = bool\n"
 "              When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE).\n"
 "\n"
+"       MOLCAS_MPS = bool\n"
+"              When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).\n"
+"\n"
 "       SCF_STATE_AVG = bool\n"
 "              Switch on state-averaging (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -391,6 +394,7 @@ int main( int argc, char ** argv ){
    string molcas_f4rdm   = "";
    string molcas_fock    = "";
    bool   molcas_reorder = false;
+   bool   molcas_mps     = false;
 
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
@@ -512,6 +516,7 @@ int main( int argc, char ** argv ){
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
       if ( find_boolean( &molcas_reorder, line, "MOLCAS_REORDER" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_mps,     line, "MOLCAS_MPS"     ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return clean_exit( -1 ); }
@@ -709,6 +714,7 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_F4RDM       = " << molcas_f4rdm << endl;
       cout << "   MOLCAS_FOCK        = " << molcas_fock << endl;
       cout << "   MOLCAS_REORDER     = " << (( molcas_reorder ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
    } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
@@ -770,7 +776,7 @@ int main( int argc, char ** argv ){
          delete [] dmrg2ham;
       }
 
-      CheMPS2::DMRG * dmrgsolver = new CheMPS2::DMRG( prob, opt_scheme, CheMPS2::DMRG_storeMpsOnDisk, tmp_folder );
+      CheMPS2::DMRG * dmrgsolver = new CheMPS2::DMRG( prob, opt_scheme, molcas_mps, tmp_folder );
 
       // Solve for the correct root
       double DMRG_ENERGY;
@@ -805,7 +811,6 @@ int main( int argc, char ** argv ){
       }
 
       // Clean up
-      if ( CheMPS2::DMRG_storeMpsOnDisk ){ dmrgsolver->deleteStoredMPS(); }
       if ( CheMPS2::DMRG_storeRenormOptrOnDisk ){ dmrgsolver->deleteStoredOperators(); }
       delete dmrgsolver;
       delete prob;
