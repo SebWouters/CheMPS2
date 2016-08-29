@@ -24,6 +24,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include "Initialize.h"
 #include "CASSCF.h"
@@ -202,6 +203,41 @@ int clean_exit( const int return_code ){
    #endif
 
    return return_code;
+
+}
+
+bool print_molcas_reorder( int * dmrg2ham, const int L, const string filename, const bool read ){
+
+   bool on_disk = false;
+
+   if ( read ){
+      struct stat file_info;
+      on_disk = (( filename.length() > 0 ) && ( stat( filename.c_str(), &file_info ) == 0 ));
+      if ( on_disk ){
+         ifstream input( filename.c_str() );
+         string line;
+         getline( input, line );
+         const int num = count( line.begin(), line.end(), ',' ) + 1;
+         assert( num == L );
+         fetch_ints( line, dmrg2ham, L );
+         input.close();
+         cout << "Read orbital reordering = [ ";
+         for ( int orb = 0; orb < L - 1; orb++ ){ cout << dmrg2ham[ orb ] << ", "; }
+         cout << dmrg2ham[ L - 1 ] << " ]." << endl;
+      }
+   } else { // write
+      FILE * capturing;
+      capturing = fopen( filename.c_str(), "w" ); // "w" with fopen means truncate file
+      for ( int orb = 0; orb < L - 1; orb++ ){
+         fprintf( capturing, "%d, ", dmrg2ham[ orb ] );
+      }
+      fprintf( capturing, "%d \n", dmrg2ham[ L - 1 ] );
+      fclose( capturing );
+      cout << "Orbital reordering written to " << filename << "." << endl;
+      on_disk = true;
+   }
+
+   return on_disk;
 
 }
 
@@ -765,9 +801,13 @@ int main( int argc, char ** argv ){
       if ( molcas_reorder ){
          int * dmrg2ham = new int[ ham->getL() ];
          if ( am_i_master ){
-            CheMPS2::EdmistonRuedenberg * fiedler = new CheMPS2::EdmistonRuedenberg( ham->getVmat(), group );
-            fiedler->FiedlerGlobal( dmrg2ham );
-            delete fiedler;
+            const bool read_success = (( molcas_mps ) ? print_molcas_reorder( dmrg2ham, ham->getL(), "molcas_fiedler.txt", true ) : false );
+            if ( read_success == false ){
+               CheMPS2::EdmistonRuedenberg * fiedler = new CheMPS2::EdmistonRuedenberg( ham->getVmat(), group );
+               fiedler->FiedlerGlobal( dmrg2ham );
+               delete fiedler;
+               if ( molcas_mps ){ print_molcas_reorder( dmrg2ham, ham->getL(), "molcas_fiedler.txt", false ); }
+            }
          }
          #ifdef CHEMPS2_MPI_COMPILATION
          CheMPS2::MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
