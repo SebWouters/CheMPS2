@@ -85,7 +85,7 @@ if (NOT SHARED_ONLY)
 endif ()
 
 if (STATIC_ONLY)
-    add_library (chemps2 ALIAS chemps-static)
+    add_library (chemps2 ALIAS chemps2-static)
 else ()
     add_library (chemps2 ALIAS chemps2-shared)
 endif ()
