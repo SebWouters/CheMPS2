@@ -55,12 +55,6 @@ if (ENABLE_XHOST)
     endif ()
 endif (ENABLE_XHOST)
 
-IF (CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set (CMAKE_CXX_FLAGS "-g -O3 ${CMAKE_CXX_FLAGS}")
-ELSE (CMAKE_BUILD_TYPE MATCHES DEBUG)
-    set (CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")
-ENDIF (CMAKE_BUILD_TYPE MATCHES DEBUG)
-
 check_cxx_compiler_flag (-ipo HAS_IPO)
 if (HAS_IPO)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
@@ -141,7 +135,7 @@ configure_package_config_file(${PN}Config.cmake.in
                               INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PN}ConfigVersion.cmake
                                  VERSION ${CheMPS2_MMP_VERSION}
-                                 COMPATIBILITY AnyNewerVersion)  # arguably should be same M.M version
+                                 COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PN}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PN}ConfigVersion.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
