@@ -412,7 +412,9 @@ double CheMPS2::Sobject::Split( TensorT * Tleft, TensorT * Tright, const int vir
          int info;
 
          // dgesdd is not thread-safe in every implementation ( intel MKL is safe, Atlas is not safe )
+         #ifndef CHEMPS2_MKL
          #pragma omp critical
+         #endif
          dgesdd_( &jobz, DimLtotal + iCenter, DimRtotal + iCenter, mem, DimLtotal + iCenter,
                   Lambdas[ iCenter ], Us[ iCenter ], DimLtotal + iCenter, VTs[ iCenter ], CenterDims + iCenter, work, &lwork, iwork, &info );
 
