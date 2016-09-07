@@ -1,4 +1,5 @@
-include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2/ ${HDF5_INCLUDE_DIRS})
+cmake_policy(SET CMP0022 NEW)
+set(PN ${PROJECT_NAME})
 
 set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
                              "CASSCF.cpp"
@@ -62,38 +63,87 @@ set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
                              "Wigner.cpp")
 
 add_library (chemps2-base OBJECT ${CHEMPS2LIB_SOURCE_FILES})
+target_include_directories(chemps2-base PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2 ${HDF5_INCLUDE_DIRS})
+
+if (BUILD_FPIC OR NOT STATIC_ONLY)
+    set_target_properties (chemps2-base PROPERTIES POSITION_INDEPENDENT_CODE 1)
+endif()
 
 if (NOT STATIC_ONLY)
-    set_target_properties (chemps2-base PROPERTIES POSITION_INDEPENDENT_CODE 1)
     add_library (chemps2-shared SHARED $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-shared ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
-    set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION} CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME "chemps2")
-endif (NOT STATIC_ONLY)
+    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
+    set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
+                                                     OUTPUT_NAME "chemps2"
+                                                     EXPORT_NAME "chemps2")
+endif ()
 
 if (NOT SHARED_ONLY)
     add_library (chemps2-static STATIC $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-static ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
-    set_target_properties (chemps2-static PROPERTIES CLEAN_DIRECT_OUTPUT 1 OUTPUT_NAME "chemps2")
-endif (NOT SHARED_ONLY)
+    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
+    set_target_properties (chemps2-static PROPERTIES OUTPUT_NAME "chemps2"
+                                                     EXPORT_NAME "chemps2")
+endif ()
+
+if (STATIC_ONLY)
+    add_library (chemps2 ALIAS chemps2-static)
+else ()
+    add_library (chemps2 ALIAS chemps2-shared)
+endif ()
+
+add_executable (chemps2bin executable.cpp)
+target_link_libraries (chemps2bin chemps2 ${LIBC_INTERJECT})
+set_target_properties (chemps2bin PROPERTIES OUTPUT_NAME "chemps2")
+target_include_directories(chemps2bin PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2 ${HDF5_INCLUDE_DIRS})
+
+# <<<  Install  >>>
 
 if (NOT STATIC_ONLY)
-    install (TARGETS chemps2-shared DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-endif (NOT STATIC_ONLY)
+    install (TARGETS chemps2-shared chemps2bin
+             EXPORT "${PN}Targets-shared"
+             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif ()
+
 if (NOT SHARED_ONLY)
-    install (TARGETS chemps2-static DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-endif (NOT SHARED_ONLY)
-install (DIRECTORY include/chemps2/ DESTINATION include/chemps2 FILES_MATCHING PATTERN "*.h")
+    install (TARGETS chemps2-static chemps2bin
+             EXPORT "${PN}Targets-static"
+             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif ()
 
-link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
-add_executable (chemps2bin executable.cpp)
-if (STATIC_ONLY)
-    add_dependencies (chemps2bin chemps2-static)
-    target_link_libraries (chemps2bin chemps2 ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
-else (STATIC_ONLY)
-    add_dependencies (chemps2bin chemps2-shared)
-    target_link_libraries (chemps2bin ${LIBC_INTERJECT} chemps2)
-endif (STATIC_ONLY)
-set_target_properties (chemps2bin PROPERTIES OUTPUT_NAME "chemps2")
+install (DIRECTORY include/chemps2/
+         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/chemps2
+         FILES_MATCHING PATTERN "*.h")
 
-install (TARGETS chemps2bin DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR})
+# <<<  Export Interface  >>>
 
+if (NOT STATIC_ONLY)
+    target_compile_definitions(chemps2-shared INTERFACE USING_${PN})
+    target_link_libraries     (chemps2-shared INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_include_directories(chemps2-shared INTERFACE
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                               $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
+endif ()
+
+if (NOT SHARED_ONLY)
+    target_compile_definitions(chemps2-static INTERFACE USING_${PN})
+    target_link_libraries     (chemps2-static INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_include_directories(chemps2-static INTERFACE
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                               $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
+endif ()
+
+# <<<  Export Config  >>>
+
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PN}")
+if (NOT STATIC_ONLY)
+    install(EXPORT "${PN}Targets-shared"
+            NAMESPACE "${PN}::"
+            DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+endif()
+
+if (NOT SHARED_ONLY)
+    install(EXPORT "${PN}Targets-static"
+            NAMESPACE "${PN}::"
+            DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+endif()

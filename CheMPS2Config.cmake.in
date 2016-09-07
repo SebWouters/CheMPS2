@@ -1,0 +1,156 @@
+# CheMPS2Config.cmake
+# ------------------
+#
+# CheMPS2 cmake module.
+# This module sets the following variables in your project:
+#
+# ::
+#
+#   CheMPS2_FOUND - true if CHEMPS2 and all required components found on the system
+##   CheMPS2_VERSION - liberp version in format Major.Minor.Release
+#   CheMPS2_INCLUDE_DIRS - Directory where chemps2/DMRG.h header is located.
+#   CheMPS2_INCLUDE_DIR - same as DIRS
+##   CheMPS2_DEFINITIONS: Definitions necessary to use CheMPS2, namely USING_CheMPS2.
+#   CheMPS2_LIBRARIES - CheMPS2 library to link against.
+#   CheMPS2_LIBRARY - same as LIBRARIES
+#   CheMPS2_EXECUTABLE - path to CheMPS2 executable
+#
+#
+# Available components: shared static exe
+#
+# ::
+#
+#   shared - search for only shared library
+#   static - search for only static library
+#   exe - search for executable as well as library
+#
+#
+# Exported targets:
+#
+# ::
+#
+# If CheMPS2 is found, this module defines the following :prop_tgt:`IMPORTED`
+## target. Target is shared _or_ static, so, for both, use separate, not
+## overlapping, installations. ::
+##
+##   CheMPS2::chemps - the main CheMPS2 library with header & defs attached.
+##
+##
+## Suggested usage:
+##
+## ::
+##
+##   find_package(CheMPS2)
+##   find_package(CheMPS2 1.7 CONFIG REQUIRED COMPONENTS shared)
+#
+#
+# The following variables can be set to guide the search for this package:
+#
+# ::
+#
+#   CheMPS2_DIR - CMake variable, set to directory containing this Config file
+#   CMAKE_PREFIX_PATH - CMake variable, set to root directory of this package
+#   PATH - environment variable, set to bin directory of this package
+#   CMAKE_DISABLE_FIND_PACKAGE_CheMPS2 - CMake variable, disables
+#       find_package(CheMPS2) perhaps to force internal build
+
+@PACKAGE_INIT@
+
+set(PN CheMPS2)
+set (_valid_components
+    static
+    shared
+    exe
+)
+
+# find includes
+unset(_temp_h CACHE)
+find_path(_temp_h
+          NAMES chemps2/DMRG.h
+          PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@
+          NO_DEFAULT_PATH)
+if(_temp_h)
+    set(${PN}_INCLUDE_DIR "${_temp_h}")
+    set(${PN}_INCLUDE_DIRS ${${PN}_INCLUDE_DIR})
+else()
+    set(${PN}_FOUND 0)
+    if(NOT CMAKE_REQUIRED_QUIET)
+        message(STATUS "${PN}Config missing component: header (${PN}: ${_temp_h})")
+    endif()
+endif()
+
+# find executable
+list(FIND ${PN}_FIND_COMPONENTS "exe" _seek_exe)
+unset(_temp_exe CACHE)
+find_program(_temp_exe
+             NAMES chemps2
+             PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+             NO_DEFAULT_PATH)
+if(_temp_exe)
+    set(${PN}_EXECUTABLE "{_temp_exe}")
+    if(_seek_exe GREATER -1)
+        set(${PN}_exe_FOUND 1)
+    endif()
+else()
+    if(_seek_exe GREATER -1)
+        if(NOT CMAKE_REQUIRED_QUIET)
+            message(STATUS "${PN}Config missing component: executable (${PN}: ${_temp_exe})")
+        endif()
+    endif()
+endif()
+
+# find library: shared, static, or whichever
+set(_hold_library_suffixes ${CMAKE_FIND_LIBRARY_SUFFIXES})
+list(FIND ${PN}_FIND_COMPONENTS "shared" _seek_shared)
+list(FIND ${PN}_FIND_COMPONENTS "static" _seek_static)
+if(_seek_shared GREATER -1)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_SHARED_LIBRARY_SUFFIX})
+elseif(_seek_static GREATER -1)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX})
+endif()
+unset(_temp CACHE)
+find_library(_temp
+             NAMES chemps2
+             PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@
+             NO_DEFAULT_PATH)
+if(_temp)
+    set(${PN}_LIBRARY "${_temp}")
+    if(_seek_shared GREATER -1)
+        set(${PN}_shared_FOUND 1)
+    elseif(_seek_static GREATER -1)
+        set(${PN}_static_FOUND 1)
+    endif()
+else()
+    if(_seek_shared GREATER -1)
+        if(NOT CMAKE_REQUIRED_QUIET)
+            message(STATUS "${PN}Config missing component: shared library (${PN}: ${_temp})")
+        endif()
+    elseif(_seek_static GREATER -1)
+        if(NOT CMAKE_REQUIRED_QUIET)
+            message(STATUS "${PN}Config missing component: static library (${PN}: ${_temp})")
+        endif()
+    else()
+        set(${PN}_FOUND 0)
+        if(NOT CMAKE_REQUIRED_QUIET)
+            message(STATUS "${PN}Config missing component: library (${PN}: ${_temp})")
+        endif()
+    endif()
+endif()
+set(CMAKE_FIND_LIBRARY_SUFFIXES ${_hold_library_suffixes})
+set(${PN}_LIBRARIES ${${PN}_LIBRARY})
+
+check_required_components(${PN})
+
+#-----------------------------------------------------------------------------
+# Don't include targets if this file is being picked up by another
+# project which has already built this as a subproject
+#-----------------------------------------------------------------------------
+if(NOT TARGET ${PN}::chemps2)
+    get_filename_component(_fext ${${PN}_LIBRARY} EXT)
+    if(${_fext} STREQUAL ${CMAKE_SHARED_LIBRARY_SUFFIX})
+        include("${CMAKE_CURRENT_LIST_DIR}/${PN}Targets-shared.cmake")
+    else()
+        include("${CMAKE_CURRENT_LIST_DIR}/${PN}Targets-static.cmake")
+    endif()
+endif()
+
