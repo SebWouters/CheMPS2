@@ -1,3 +1,7 @@
+#### Current HEAD
+* MPS checkpoint for MOLCAS interface
+* Fiedler order checkpoint for MOLCAS interface
+
 #### Version 1.8 LTS (2016-08-24):
 * Fix slow convergence linear Davidson algorithm
 * Fix MPI bug binary
