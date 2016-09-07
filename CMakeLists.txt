@@ -1,6 +1,6 @@
 project (CheMPS2)
 set (CheMPS2_MMP_VERSION   "1.8")
-set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-15 (2016-09-07)")
+set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-16 (2016-09-07)")
 set (CheMPS2_AUTHORS       "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION   "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
 set (CheMPS2_EMAIL         "sebastianwouters@gmail.com")
@@ -153,11 +153,12 @@ endif()
 # <<<  Export config  >>>
 
 set (CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
-configure_package_config_file (${PROJECT_NAME}Config.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-                               INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
+configure_package_config_file (${CheMPS2_SOURCE_DIR}/CMake/${PROJECT_NAME}Config.cmake.in
+                                    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+                                    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                  VERSION ${CheMPS2_MMP_VERSION}
-                                  COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
+                                      VERSION ${CheMPS2_MMP_VERSION}
+                                      COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                DESTINATION ${CMAKECONFIG_INSTALL_DIR})
