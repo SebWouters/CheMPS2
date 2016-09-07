@@ -9,7 +9,7 @@ set (TESTLIST "test1" "test2" "test3" "test4" "test5" "test6" "test7" "test8" "t
 foreach (ITEM ${TESTLIST})
     configure_file (${CMAKE_SOURCE_DIR}/tests/${ITEM}.cpp.in ${CMAKE_BINARY_DIR}/tests/tests/${ITEM}.cpp)
     add_executable (${ITEM} ${CMAKE_BINARY_DIR}/tests/tests/${ITEM}.cpp)
-    target_link_libraries(${ITEM} chemps2)
-    add_test(${ITEM} ${ITEM})
-endforeach (ITEM)
+    target_link_libraries (${ITEM} chemps2-lib)
+    add_test (${ITEM} ${ITEM})
+endforeach()
 
