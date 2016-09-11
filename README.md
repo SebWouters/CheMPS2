@@ -81,7 +81,8 @@ Information on CheMPS2 can be found in the following documents:
 
 1. [publications](http://sebwouters.github.io/CheMPS2/publications.html)
 2. [user manual](http://sebwouters.github.io/CheMPS2/index.html)
-3. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
+3. [workshop video](https://www.youtube.com/watch?v=U96atV5Akx4)
+4. [doxygen html output](http://sebwouters.github.io/CheMPS2/doxygen/index.html)
 
 The [user manual](http://sebwouters.github.io/CheMPS2/index.html) contains
 elaborate information on
