@@ -30,18 +30,17 @@
 # ::
 #
 # If CheMPS2 is found, this module defines the following :prop_tgt:`IMPORTED`
-## target. Target is shared _or_ static, so, for both, use separate, not
-## overlapping, installations. ::
-##
-##   CheMPS2::chemps - the main CheMPS2 library with header & defs attached.
-##
-##
-## Suggested usage:
-##
-## ::
-##
-##   find_package(CheMPS2)
-##   find_package(CheMPS2 1.7 CONFIG REQUIRED COMPONENTS shared)
+# target. ::
+#
+#   CheMPS2::chemps2 - the main CheMPS2 library with header & defs attached.
+#
+#
+# Suggested usage:
+#
+# ::
+#
+#   find_package(CheMPS2)
+#   find_package(CheMPS2 1.8 CONFIG REQUIRED COMPONENTS shared)
 #
 #
 # The following variables can be set to guide the search for this package:
