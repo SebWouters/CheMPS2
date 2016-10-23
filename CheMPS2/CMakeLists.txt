@@ -118,7 +118,7 @@ install (DIRECTORY include/chemps2/
 
 if (NOT STATIC_ONLY)
     if (APPLE)
-        target_link_libraries  (chemps2-shared PRIVATE "-undefined dynamic_lookup")
+        set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
     endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
     target_link_libraries      (chemps2-shared INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})

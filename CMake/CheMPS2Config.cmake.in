@@ -6,11 +6,11 @@
 #
 # ::
 #
-#   CheMPS2_FOUND - true if CHEMPS2 and all required components found on the system
-##   CheMPS2_VERSION - liberp version in format Major.Minor.Release
+#   CheMPS2_FOUND - true if CheMPS2 and all required components found on the system
+#   CheMPS2_VERSION - CheMPS2 version in format Major.Minor.Release
 #   CheMPS2_INCLUDE_DIRS - Directory where chemps2/DMRG.h header is located.
 #   CheMPS2_INCLUDE_DIR - same as DIRS
-##   CheMPS2_DEFINITIONS: Definitions necessary to use CheMPS2, namely USING_CheMPS2.
+#   CheMPS2_DEFINITIONS: Definitions necessary to use CheMPS2, namely USING_CheMPS2.
 #   CheMPS2_LIBRARIES - CheMPS2 library to link against.
 #   CheMPS2_LIBRARY - same as LIBRARIES
 #   CheMPS2_EXECUTABLE - path to CheMPS2 executable
@@ -137,6 +137,7 @@ else()
 endif()
 set(CMAKE_FIND_LIBRARY_SUFFIXES ${_hold_library_suffixes})
 set(${PN}_LIBRARIES ${${PN}_LIBRARY})
+set(${PN}_DEFINITIONS USING_${PN})
 
 check_required_components(${PN})
 
