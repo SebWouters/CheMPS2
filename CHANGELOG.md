@@ -1,4 +1,4 @@
-#### Current HEAD
+#### Version 1.8.1 LTS update (2016-10-25):
 * MPS checkpoint for MOLCAS interface
 * Fiedler order checkpoint for MOLCAS interface
 
