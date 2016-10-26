@@ -117,6 +117,9 @@ install (DIRECTORY include/chemps2/
 # <<<  Export interface  >>>
 
 if (NOT STATIC_ONLY)
+    if (APPLE)
+        set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
     target_link_libraries      (chemps2-shared INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
     target_include_directories (chemps2-shared INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -132,7 +135,8 @@ endif()
 
 # <<<  Export Config  >>>
 
-set (CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
+    # explicit "share" not "DATADIR" for CMake search path
+set (CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}")
 if (NOT STATIC_ONLY)
     install (EXPORT "${PROJECT_NAME}Targets-shared"
                      NAMESPACE "${PROJECT_NAME}::"

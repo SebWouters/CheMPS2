@@ -152,7 +152,8 @@ endif()
 
 # <<<  Export config  >>>
 
-set (CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
+    # explicit "share" not "DATADIR" for CMake search path
+set (CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}")
 configure_package_config_file (${CheMPS2_SOURCE_DIR}/CMake/${PROJECT_NAME}Config.cmake.in
                                     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                                     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
