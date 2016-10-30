@@ -121,14 +121,14 @@ if (NOT STATIC_ONLY)
         target_link_libraries  (chemps2-shared PRIVATE "-undefined dynamic_lookup")
     endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-shared INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries      (chemps2-shared PUBLIC ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
     target_include_directories (chemps2-shared INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
 endif()
 
 if (NOT SHARED_ONLY)
     target_compile_definitions (chemps2-static INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-static INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries      (chemps2-static PUBLIC ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
     target_include_directories (chemps2-static INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
 endif()
