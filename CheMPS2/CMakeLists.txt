@@ -70,7 +70,7 @@ endif()
 
 if (NOT STATIC_ONLY)
     add_library           (chemps2-shared SHARED  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
                                                      OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
@@ -78,7 +78,7 @@ endif()
 
 if (NOT SHARED_ONLY)
     add_library           (chemps2-static STATIC  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
     set_target_properties (chemps2-static PROPERTIES OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
 endif()
@@ -118,7 +118,7 @@ install (DIRECTORY include/chemps2/
 
 if (NOT STATIC_ONLY)
     if (APPLE)
-        target_link_libraries  (chemps2-shared PRIVATE "-undefined dynamic_lookup")
+        set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
     endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
     target_link_libraries      (chemps2-shared PUBLIC ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
