@@ -1,6 +1,6 @@
 .\" Manpage for chemps2 executable
 .\" Contact sebastianwouters [at] gmail.com
-.TH CHEMPS2 1 "24 August 2016" "version 1.8.2" "chemps2 v1.8.2"
+.TH CHEMPS2 1 "14 November 2016" "version 1.8.2-1" "chemps2 v1.8.2-1"
 
 .SH NAME
 chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
@@ -84,22 +84,25 @@ Set the number of active orbitals per irrep (psi4 irrep ordering).
 Set the number of virtual (secondary) orbitals per irrep (psi4 irrep ordering).
 .TP
 .BR "MOLCAS_2RDM = \fI/path/to/2rdm/output\fB"
-When all orbitals are active orbitals, write out the 2-RDM in HDF5 format when specified (default unspecified)."
+When all orbitals are active orbitals, write out the 2-RDM in HDF5 format when specified (default unspecified).
 .TP
 .BR "MOLCAS_3RDM = \fI/path/to/3rdm/output\fB"
-When all orbitals are active orbitals, write out the 3-RDM in HDF5 format when specified (default unspecified)."
+When all orbitals are active orbitals, write out the 3-RDM in HDF5 format when specified (default unspecified).
 .TP
 .BR "MOLCAS_F4RDM = \fI/path/to/f4rdm/output\fB"
-When all orbitals are active orbitals, write out the 4-RDM contracted with the Fock operator in HDF5 format when specified (default unspecified)."
+When all orbitals are active orbitals, write out the 4-RDM contracted with the Fock operator in HDF5 format when specified (default unspecified).
 .TP
 .BR "MOLCAS_FOCK = \fI/path/to/fock/input\fB"
-When all orbitals are active orbitals, read in this file containing the Fock operator (default unspecified)."
+When all orbitals are active orbitals, read in this file containing the Fock operator (default unspecified).
 .TP
-.BR "MOLCAS_REORDER = \fIbool\fB"
-When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE)."
+.BR "MOLCAS_FIEDLER = \fIbool\fB"
+When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE).
+.TP
+.BR "MOLCAS_ORDER = \fIint,int,int,int\fB"
+When all orbitals are active orbitals, provide a custom orbital reordering (default unspecified). When specified, this option takes precedence over MOLCAS_FIEDLER.
 .TP
 .BR "MOLCAS_MPS = \fIbool\fB"
-When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE)."
+When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).
 .TP
 .BR "SCF_STATE_AVG = \fIbool\fB"
 Switch on state\-averaging (TRUE or FALSE; default FALSE).

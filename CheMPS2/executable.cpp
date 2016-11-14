@@ -333,8 +333,11 @@ cout << "\n"
 "       MOLCAS_FOCK = /path/to/fock/input\n"
 "              When all orbitals are active orbitals, read in this file containing the Fock operator (default unspecified).\n"
 "\n"
-"       MOLCAS_REORDER = bool\n"
+"       MOLCAS_FIEDLER = bool\n"
 "              When all orbitals are active orbitals, switch on orbital reordering based on the Fiedler vector of the exchange matrix (TRUE or FALSE; default FALSE).\n"
+"\n"
+"       MOLCAS_ORDER = int, int, int, int\n"
+"              When all orbitals are active orbitals, provide a custom orbital reordering (default unspecified). When specified, this option takes precedence over MOLCAS_FIEDLER.\n"
 "\n"
 "       MOLCAS_MPS = bool\n"
 "              When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).\n"
@@ -429,8 +432,9 @@ int main( int argc, char ** argv ){
    string molcas_3rdm    = "";
    string molcas_f4rdm   = "";
    string molcas_fock    = "";
-   bool   molcas_reorder = false;
+   bool   molcas_fiedler = false;
    bool   molcas_mps     = false;
+   string molcas_order   = "";
 
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
@@ -551,7 +555,7 @@ int main( int argc, char ** argv ){
       if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 4 ) == false ){ return clean_exit( -1 ); }
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
-      if ( find_boolean( &molcas_reorder, line, "MOLCAS_REORDER" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_fiedler, line, "MOLCAS_FIEDLER" ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &molcas_mps,     line, "MOLCAS_MPS"     ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
       if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
@@ -597,6 +601,11 @@ int main( int argc, char ** argv ){
       if ( line.find( "NVIR" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
          nvir = line.substr( pos, line.length() - pos );
+      }
+
+      if ( line.find( "MOLCAS_ORDER" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_order = line.substr( pos, line.length() - pos );
       }
 
    }
@@ -712,7 +721,7 @@ int main( int argc, char ** argv ){
       if ( nvir_parsed[ cnt ] != 0 ){ full_active_space_calculation = false; }
    }
 
-   if ( ( molcas_2rdm.length() != 0 ) || ( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ) || ( molcas_fock.length() != 0 ) ){
+   if ( ( molcas_2rdm.length() != 0 ) || ( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ) || ( molcas_fock.length() != 0 ) || ( molcas_order.length() != 0 ) ){
       if ( full_active_space_calculation == false ){
          if ( am_i_master ){ cerr << "The options MOLCAS_* can only be specified for full active space calculations (when NOCC = NVIR = 0)!" << endl; }
          return clean_exit( -1 );
@@ -722,6 +731,16 @@ int main( int argc, char ** argv ){
    if ( ( molcas_f4rdm.length() != 0 ) && ( molcas_fock.length() == 0 ) ){
       if ( am_i_master ){ cerr << "When MOLCAS_F4RDM should be written, MOLCAS_FOCK should be specified as well!" << endl; }
       return clean_exit( -1 );
+   }
+
+   /*********************************
+   *  Parse reordering if required  *
+   *********************************/
+
+   int * dmrg2ham = NULL;
+   if ( molcas_order.length() > 0 ){
+      dmrg2ham = new int[ fcidump_norb ];
+      fetch_ints( molcas_order, dmrg2ham, fcidump_norb );
    }
 
    /**********************
@@ -749,7 +768,11 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_3RDM        = " << molcas_3rdm << endl;
       cout << "   MOLCAS_F4RDM       = " << molcas_f4rdm << endl;
       cout << "   MOLCAS_FOCK        = " << molcas_fock << endl;
-      cout << "   MOLCAS_REORDER     = " << (( molcas_reorder ) ? "TRUE" : "FALSE" ) << endl;
+   if ( dmrg2ham != NULL ){
+      cout << "   MOLCAS_ORDER       = " << dmrg2ham[ 0 ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << dmrg2ham[ cnt ]; } cout << " ]" << endl;
+   } else {
+      cout << "   MOLCAS_FIEDLER     = " << (( molcas_fiedler ) ? "TRUE" : "FALSE" ) << endl;
+   }
       cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
    } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
@@ -797,9 +820,9 @@ int main( int argc, char ** argv ){
       CheMPS2::Problem * prob = new CheMPS2::Problem( ham, multiplicity - 1, nelectrons, irrep );
 
       // Reorder the orbitals if desired
-      if (( group == 7 ) && ( molcas_reorder == false )){ prob->SetupReorderD2h(); }
-      if ( molcas_reorder ){
-         int * dmrg2ham = new int[ ham->getL() ];
+      if (( group == 7 ) && ( molcas_fiedler == false ) && ( dmrg2ham == NULL )){ prob->SetupReorderD2h(); }
+      if (( molcas_fiedler ) && ( dmrg2ham == NULL )){
+         dmrg2ham = new int[ ham->getL() ];
          if ( am_i_master ){
             const bool read_success = (( molcas_mps ) ? print_molcas_reorder( dmrg2ham, ham->getL(), "molcas_fiedler.txt", true ) : false );
             if ( read_success == false ){
@@ -812,6 +835,9 @@ int main( int argc, char ** argv ){
          #ifdef CHEMPS2_MPI_COMPILATION
          CheMPS2::MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
          #endif
+      }
+      if ( dmrg2ham != NULL ){
+         assert( fcidump_norb == ham->getL() );
          prob->setup_reorder_custom( dmrg2ham );
          delete [] dmrg2ham;
       }
