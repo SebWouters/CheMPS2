@@ -738,7 +738,9 @@ int main( int argc, char ** argv ){
    *********************************/
 
    int * dmrg2ham = NULL;
-   if ( molcas_order.length() > 0 ){
+   if (( full_active_space_calculation == true ) && ( molcas_order.length() > 0 )){
+      const int list_length = count( molcas_order.begin(), molcas_order.end(), ',' ) + 1;
+      assert( list_length == fcidump_norb );
       dmrg2ham = new int[ fcidump_norb ];
       fetch_ints( molcas_order, dmrg2ham, fcidump_norb );
    }
@@ -768,8 +770,8 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_3RDM        = " << molcas_3rdm << endl;
       cout << "   MOLCAS_F4RDM       = " << molcas_f4rdm << endl;
       cout << "   MOLCAS_FOCK        = " << molcas_fock << endl;
-   if ( dmrg2ham != NULL ){
-      cout << "   MOLCAS_ORDER       = " << dmrg2ham[ 0 ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << dmrg2ham[ cnt ]; } cout << " ]" << endl;
+   if ( molcas_order.length() > 0 ){
+      cout << "   MOLCAS_ORDER       = [ " << dmrg2ham[ 0 ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << dmrg2ham[ cnt ]; } cout << " ]" << endl;
    } else {
       cout << "   MOLCAS_FIEDLER     = " << (( molcas_fiedler ) ? "TRUE" : "FALSE" ) << endl;
    }
@@ -820,8 +822,8 @@ int main( int argc, char ** argv ){
       CheMPS2::Problem * prob = new CheMPS2::Problem( ham, multiplicity - 1, nelectrons, irrep );
 
       // Reorder the orbitals if desired
-      if (( group == 7 ) && ( molcas_fiedler == false ) && ( dmrg2ham == NULL )){ prob->SetupReorderD2h(); }
-      if (( molcas_fiedler ) && ( dmrg2ham == NULL )){
+      if (( group == 7 ) && ( molcas_fiedler == false ) && ( molcas_order.length() == 0 )){ prob->SetupReorderD2h(); }
+      if (( molcas_fiedler ) && ( molcas_order.length() == 0 )){
          dmrg2ham = new int[ ham->getL() ];
          if ( am_i_master ){
             const bool read_success = (( molcas_mps ) ? print_molcas_reorder( dmrg2ham, ham->getL(), "molcas_fiedler.txt", true ) : false );
@@ -835,8 +837,10 @@ int main( int argc, char ** argv ){
          #ifdef CHEMPS2_MPI_COMPILATION
          CheMPS2::MPIchemps2::broadcast_array_int( dmrg2ham, ham->getL(), MPI_CHEMPS2_MASTER );
          #endif
+         prob->setup_reorder_custom( dmrg2ham );
+         delete [] dmrg2ham;
       }
-      if ( dmrg2ham != NULL ){
+      if ( molcas_order.length() > 0 ){
          assert( fcidump_norb == ham->getL() );
          prob->setup_reorder_custom( dmrg2ham );
          delete [] dmrg2ham;
