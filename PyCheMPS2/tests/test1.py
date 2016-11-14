@@ -112,7 +112,7 @@ for sector in range( len( TwoS ) ):
                 rms_error1 += temp1 * temp1
                 rms_error2 += temp2 * temp2
     C_dev[ sector ] = np.sqrt( min( rms_error1, rms_error2 ) ) # The global phase of the wavefunction is arbitrary, hence.
-    print "RMS difference FCI and DMRG determinant coefficients =", C_dev[ sector ]
+    print("RMS difference FCI and DMRG determinant coefficients =", C_dev[ sector ])
 
     # Clean-up
     # dmrg_solver.deleteStoredMPS()
@@ -133,7 +133,7 @@ for sector in range( len( TwoS ) ):
     success = success and ( C_dev[ sector ] < 1e-5 )
     success = success and ( np.fabs( S_FCI[ sector ] - 0.25 * TwoS[ sector ] * ( TwoS[ sector ] + 2 ) ) < 1e-8 )
 if ( success ):
-    print "================> Did test 1 succeed : yes"
+    print("================> Did test 1 succeed : yes")
 else:
-    print "================> Did test 1 succeed : no"
+    print("================> Did test 1 succeed : no")
 

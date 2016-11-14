@@ -104,9 +104,9 @@ theFCI.Diag4RDM( GSvector, ThreeRDM, ham_orbz, fci_diag_4rdm )
 RMSerror4DM = np.linalg.norm( 0.5 * dmrg_diag_4rdm - fci_diag_4rdm )
 RMSerror2DM = np.sqrt(RMSerror2DM)
 RMSerror3DM = np.sqrt(RMSerror3DM)
-print "Frobenius norm of the difference of the DMRG and FCI 2-RDM =", RMSerror2DM
-print "Frobenius norm of the difference of the DMRG and FCI 3-RDM =", RMSerror3DM
-print "Frobenius norm of the difference of the DMRG and FCI diag(4-RDM) for fixed orbital", ham_orbz, "=", RMSerror4DM
+print("Frobenius norm of the difference of the DMRG and FCI 2-RDM =", RMSerror2DM)
+print("Frobenius norm of the difference of the DMRG and FCI 3-RDM =", RMSerror3DM)
+print("Frobenius norm of the difference of the DMRG and FCI diag(4-RDM) for fixed orbital", ham_orbz, "=", RMSerror4DM)
 
 # Clean-up
 # theDMRG.deleteStoredMPS()
@@ -120,7 +120,7 @@ del Initializer
 
 # Check whether the test succeeded
 if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-8) and (RMSerror2DM < 1e-3) and (RMSerror3DM < 1e-3) and (RMSerror4DM < 1e-3)):
-    print "================> Did test 11 succeed : yes"
+    print("================> Did test 11 succeed : yes")
 else:
-    print "================> Did test 11 succeed : no"
+    print("================> Did test 11 succeed : no")
 

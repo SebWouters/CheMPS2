@@ -72,7 +72,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (np.fabs(Energy + 109.103502335253) < 1e-8):
-    print "================> Did test 8 succeed : yes"
+    print("================> Did test 8 succeed : yes")
 else:
-    print "================> Did test 8 succeed : no"
+    print("================> Did test 8 succeed : no")
 

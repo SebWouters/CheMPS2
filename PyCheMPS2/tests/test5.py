@@ -76,7 +76,7 @@ OK0 = (np.fabs(Energy0 + 107.648250974014) < 1e-8)
 OK1 = (np.fabs(Energy1 + 106.944757308768) < 1e-8)
 OK2 = (np.fabs(Energy2 + 106.92314213886 ) < 1e-8)
 if (OK0 and OK1 and OK2):
-    print "================> Did test 5 succeed : yes"
+    print("================> Did test 5 succeed : yes")
 else:
-    print "================> Did test 5 succeed : no"
+    print("================> Did test 5 succeed : no")
 

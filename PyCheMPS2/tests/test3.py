@@ -71,7 +71,7 @@ for orb1 in range(0, Ham.getL()):
                 temp = TwoRDM[orb1 + Ham.getL()*(orb2 + Ham.getL()*(orb3 + Ham.getL()*orb4))] - theDMRG.get2DMA(orb1,orb2,orb3,orb4)
                 RMSerror2DM += temp*temp
 RMSerror2DM = np.sqrt(RMSerror2DM)
-print "Frobenius norm of the difference of the DMRG and FCI 2-RDMs =", RMSerror2DM
+print("Frobenius norm of the difference of the DMRG and FCI 2-RDMs =", RMSerror2DM)
 
 # Clean-up
 # theDMRG.deleteStoredMPS()
@@ -85,7 +85,7 @@ del Initializer
 
 # Check whether the test succeeded
 if ((np.fabs(EnergyDMRG - EnergyFCI) < 1e-8) and (RMSerror2DM < 1e-3)):
-    print "================> Did test 3 succeed : yes"
+    print("================> Did test 3 succeed : yes")
 else:
-    print "================> Did test 3 succeed : no"
+    print("================> Did test 3 succeed : no")
 

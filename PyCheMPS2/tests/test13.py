@@ -69,7 +69,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (( np.fabs( Energy1 + 109.103502335253 ) < 1e-8 ) and ( np.fabs( Energy2 + 0.159997813112638 ) < 1e-8 )):
-    print "================> Did test 13 succeed : yes"
+    print("================> Did test 13 succeed : yes")
 else:
-    print "================> Did test 13 succeed : no"
+    print("================> Did test 13 succeed : no")
 
