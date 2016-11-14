@@ -28,7 +28,7 @@ Initializer.Init()
 
 # Read in the FCIDUMP
 psi4group = 5 # c2v: see chemps2/Irreps.h
-filename  = '../../tests/matrixelements/H2O.631G.FCIDUMP'
+filename  = b'../../tests/matrixelements/H2O.631G.FCIDUMP'
 orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 
