@@ -1,5 +1,6 @@
-#### Current HEAD:
+#### Version 1.8.3 LTS update (2016-11-15):
 * Custom orbital reordering for MOLCAS interface
+* Fix building PyCheMPS2 (thanks @loriab)
 
 #### Version 1.8.2 LTS update (2016-10-26):
 * Fix PyCheMPS2 build
