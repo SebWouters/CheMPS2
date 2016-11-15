@@ -608,6 +608,11 @@ int main( int argc, char ** argv ){
          molcas_order = line.substr( pos, line.length() - pos );
       }
 
+      if ( line.find( "MOLCAS_REORDER" ) != string::npos ){
+         if ( am_i_master ){ cerr << "MOLCAS_REORDER is deprecated. Please use MOLCAS_ORDER and/or MOLCAS_FIEDLER." << endl; }
+         return clean_exit( -1 );
+      }
+
    }
    input.close();
 
@@ -740,7 +745,10 @@ int main( int argc, char ** argv ){
    int * dmrg2ham = NULL;
    if (( full_active_space_calculation == true ) && ( molcas_order.length() > 0 )){
       const int list_length = count( molcas_order.begin(), molcas_order.end(), ',' ) + 1;
-      assert( list_length == fcidump_norb );
+      if ( list_length != fcidump_norb ){
+         if ( am_i_master ){ cerr << "The number of integers specified in MOLCAS_ORDER should equal the number of orbitals in the FCIDUMP file!" << endl; }
+         return clean_exit( -1 );
+      }
       dmrg2ham = new int[ fcidump_norb ];
       fetch_ints( molcas_order, dmrg2ham, fcidump_norb );
    }
