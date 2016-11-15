@@ -119,7 +119,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (np.fabs(EnergySite - EnergyMomentum) < 1e-8):
-    print "================> Did test 9 succeed : yes"
+    print("================> Did test 9 succeed : yes")
 else:
-    print "================> Did test 9 succeed : no"
+    print("================> Did test 9 succeed : no")
 

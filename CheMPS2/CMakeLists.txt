@@ -70,7 +70,7 @@ endif()
 
 if (NOT STATIC_ONLY)
     add_library           (chemps2-shared SHARED  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
                                                      OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
@@ -78,7 +78,7 @@ endif()
 
 if (NOT SHARED_ONLY)
     add_library           (chemps2-static STATIC  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT} ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
     set_target_properties (chemps2-static PROPERTIES OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
 endif()
@@ -117,22 +117,31 @@ install (DIRECTORY include/chemps2/
 # <<<  Export interface  >>>
 
 if (NOT STATIC_ONLY)
+    if (APPLE)
+        set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+    endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-shared INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    if (LAPACK_INTERJECT)
+        target_link_libraries  (chemps2-shared PRIVATE ${LAPACK_LIBRARIES})
+    else()
+        target_link_libraries  (chemps2-shared PUBLIC ${LAPACK_LIBRARIES})
+    endif()
+    target_link_libraries      (chemps2-shared PUBLIC ${HDF5_LIBRARIES})
     target_include_directories (chemps2-shared INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
 endif()
 
 if (NOT SHARED_ONLY)
     target_compile_definitions (chemps2-static INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-static INTERFACE ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
+    target_link_libraries      (chemps2-static PUBLIC ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
     target_include_directories (chemps2-static INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
 endif()
 
 # <<<  Export Config  >>>
 
-set (CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
+    # explicit "share" not "DATADIR" for CMake search path
+set (CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}")
 if (NOT STATIC_ONLY)
     install (EXPORT "${PROJECT_NAME}Targets-shared"
                      NAMESPACE "${PROJECT_NAME}::"

@@ -86,7 +86,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (np.fabs(EnergyDMRG - EnergyFCI) < 1e-8):
-    print "================> Did test 4 succeed : yes"
+    print("================> Did test 4 succeed : yes")
 else:
-    print "================> Did test 4 succeed : no"
+    print("================> Did test 4 succeed : no")
 

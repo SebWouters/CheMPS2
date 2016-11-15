@@ -105,8 +105,9 @@ if (MKL)
     set (ENV{BLA_VENDOR} "Intel10_64lp")
 endif()
 
-if (LAPACK_LIBRARIES)
-    message (STATUS "LAPACK detection suppressed. Using: ${LAPACK_LIBRARIES}")
+if (LAPACK_INTERJECT)
+    set (LAPACK_LIBRARIES ${LAPACK_INTERJECT})
+    message (STATUS "LAPACK detection suppressed. Using (assumed static for cmake export): ${LAPACK_LIBRARIES}")
 else()
     find_package (LAPACK REQUIRED)
 endif()
@@ -152,7 +153,8 @@ endif()
 
 # <<<  Export config  >>>
 
-set (CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}")
+    # explicit "share" not "DATADIR" for CMake search path
+set (CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}")
 configure_package_config_file (${CheMPS2_SOURCE_DIR}/CMake/${PROJECT_NAME}Config.cmake.in
                                     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                                     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})

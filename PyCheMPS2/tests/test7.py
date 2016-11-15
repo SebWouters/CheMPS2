@@ -30,7 +30,7 @@ Initializer.Init()
 
 # Read in the FCIDUMP
 psi4group = 7 # d2h: see chemps2/Irreps.h
-filename  = '../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
+filename  = b'../../tests/matrixelements/O2.CCPVDZ.FCIDUMP'
 orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 L = Ham.getL()
@@ -69,8 +69,8 @@ for i1 in range(0,L):
                 RMS += temp * temp
 RMS = m.sqrt(RMS)
 RMSabs = m.sqrt(RMSabs)
-print "The 2-norm of all Hamiltonian matrix elements is", RMSabs
-print "The RMS difference between Ham and HamLoad is", RMS
+print("The 2-norm of all Hamiltonian matrix elements is", RMSabs)
+print("The RMS difference between Ham and HamLoad is", RMS)
 
 # Clean-up
 os.system('ls -alh CheMPS2_Ham*.h5')
@@ -82,7 +82,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (RMS < 1e-10):
-    print "================> Did test 7 succeed : yes"
+    print("================> Did test 7 succeed : yes")
 else:
-    print "================> Did test 7 succeed : no"
+    print("================> Did test 7 succeed : no")
 

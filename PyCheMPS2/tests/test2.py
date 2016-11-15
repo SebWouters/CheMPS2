@@ -28,7 +28,7 @@ Initializer.Init()
 
 # Read in the FCIDUMP
 psi4group = 5 # c2v: see chemps2/Irreps.h
-filename  = '../../tests/matrixelements/H2O.631G.FCIDUMP'
+filename  = b'../../tests/matrixelements/H2O.631G.FCIDUMP'
 orbirreps = np.array([-1, -1], dtype=ctypes.c_int) # CheMPS2 reads it in from FCIDUMP
 Ham = PyCheMPS2.PyHamiltonian( -1, psi4group, orbirreps, filename )
 
@@ -76,7 +76,7 @@ del Initializer
 
 # Check whether the test succeeded
 if (np.fabs(EnergyDMRG - EnergyFCI) < 1e-8):
-    print "================> Did test 2 succeed : yes"
+    print("================> Did test 2 succeed : yes")
 else:
-    print "================> Did test 2 succeed : no"
+    print("================> Did test 2 succeed : no")
 
