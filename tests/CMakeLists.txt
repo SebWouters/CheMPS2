@@ -1,7 +1,3 @@
-include_directories (${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2/ ${HDF5_INCLUDE_DIRS})
-
-link_directories (${CMAKE_BINARY_DIR}/CheMPS2)
-
 file (MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests/tests)
 
 set (TESTLIST "test1" "test2" "test3" "test4" "test5" "test6" "test7" "test8" "test9" "test10" "test11" "test12" "test13" "test14")

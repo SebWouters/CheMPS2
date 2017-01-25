@@ -1,4 +1,5 @@
 cmake_policy (SET CMP0022 NEW)
+cmake_policy (SET CMP0028 NEW)
 
 set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
                              "CASSCF.cpp"
@@ -62,7 +63,8 @@ set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
                              "Wigner.cpp")
 
 add_library (chemps2-base OBJECT ${CHEMPS2LIB_SOURCE_FILES})
-target_include_directories (chemps2-base PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2 ${HDF5_INCLUDE_DIRS})
+target_include_directories (chemps2-base PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2
+                                                 $<TARGET_PROPERTY:tgt::hdf5,INTERFACE_INCLUDE_DIRECTORIES>)
 
 if (BUILD_FPIC OR NOT STATIC_ONLY)
     set_target_properties (chemps2-base PROPERTIES POSITION_INDEPENDENT_CODE 1)
@@ -92,7 +94,6 @@ endif()
 add_executable             (chemps2-bin executable.cpp)
 target_link_libraries      (chemps2-bin chemps2-lib ${LIBC_INTERJECT})
 set_target_properties      (chemps2-bin PROPERTIES OUTPUT_NAME "chemps2")
-target_include_directories (chemps2-bin PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2 ${HDF5_INCLUDE_DIRS})
 
 # <<<  Install  >>>
 
@@ -121,21 +122,23 @@ if (NOT STATIC_ONLY)
         set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
     endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
-    if (LAPACK_INTERJECT)
-        target_link_libraries  (chemps2-shared PRIVATE ${LAPACK_LIBRARIES})
-    else()
-        target_link_libraries  (chemps2-shared PUBLIC ${LAPACK_LIBRARIES})
-    endif()
-    target_link_libraries      (chemps2-shared PUBLIC ${HDF5_LIBRARIES})
-    target_include_directories (chemps2-shared INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                                                         $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
+    target_link_libraries      (chemps2-shared INTERFACE tgt::lapack)
+    target_link_libraries      (chemps2-shared PUBLIC    tgt::hdf5)
+    target_include_directories (chemps2-shared INTERFACE $<BUILD_INTERFACE:${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2>
+                                                         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    #if (LAPACK_INTERJECT)
+    #    target_link_libraries  (chemps2-shared PRIVATE ${LAPACK_LIBRARIES})
+    #else()
+    #    target_link_libraries  (chemps2-shared PUBLIC ${LAPACK_LIBRARIES})
+    #endif()
 endif()
 
 if (NOT SHARED_ONLY)
     target_compile_definitions (chemps2-static INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-static PUBLIC ${LAPACK_LIBRARIES} ${HDF5_LIBRARIES})
-    target_include_directories (chemps2-static INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                                                         $<INSTALL_INTERFACE:${HDF5_INCLUDE_DIRS}>)
+    target_link_libraries      (chemps2-static PUBLIC    tgt::lapack
+                                                         tgt::hdf5)
+    target_include_directories (chemps2-static INTERFACE $<BUILD_INTERFACE:${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2>
+                                                         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 endif()
 
 # <<<  Export Config  >>>

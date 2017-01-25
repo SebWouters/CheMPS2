@@ -105,14 +105,10 @@ if (MKL)
     set (ENV{BLA_VENDOR} "Intel10_64lp")
 endif()
 
-if (LAPACK_INTERJECT)
-    set (LAPACK_LIBRARIES ${LAPACK_INTERJECT})
-    message (STATUS "LAPACK detection suppressed. Using (assumed static for cmake export): ${LAPACK_LIBRARIES}")
-else()
-    find_package (LAPACK REQUIRED)
-endif()
+find_package (TargetLAPACK REQUIRED)
 
-foreach (_l in LISTS LAPACK_LIBRARIES)
+get_property(_lapack_libraries TARGET tgt::lapack PROPERTY INTERFACE_LINK_LIBRARIES)
+foreach (_l IN LISTS _lapack_libraries)
     if (${_l} MATCHES "mkl")
         set (MKL "ON")
     endif()
@@ -124,11 +120,7 @@ endif ()
 
 # <<<  Find HDF5  >>>
 
-if (HDF5_LIBRARIES AND HDF5_INCLUDE_DIRS)
-    message (STATUS "HDF5 detection suppressed. Using: ${HDF5_LIBRARIES} and includes ${HDF5_INCLUDE_DIRS}")
-else()
-    find_package (HDF5 REQUIRED)
-endif()
+find_package (TargetHDF5 REQUIRED)
 
 # <<<  Add source files, tests, sphinx, and doxygen  >>>
 
@@ -163,5 +155,7 @@ write_basic_package_version_file (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Con
                                       COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+               ${CheMPS2_SOURCE_DIR}/CMake/FindTargetLAPACK.cmake
+               ${CheMPS2_SOURCE_DIR}/CMake/FindTargetHDF5.cmake
                DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
