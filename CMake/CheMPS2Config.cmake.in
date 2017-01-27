@@ -162,7 +162,7 @@ if(NOT TARGET ${PN}::chemps2)
     endif()
 
     if(NOT TARGET tgt::hdf5)
-        find_dependency(TargetHDF5)
+        find_dependency(TargetHDF5 @TargetHDF5_VERSION@ EXACT)
     endif()
 endif()
 

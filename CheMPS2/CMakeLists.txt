@@ -135,7 +135,7 @@ endif()
 
 if (NOT SHARED_ONLY)
     target_compile_definitions (chemps2-static INTERFACE USING_${PROJECT_NAME})
-    target_link_libraries      (chemps2-static PUBLIC    tgt::lapack
+    target_link_libraries      (chemps2-static INTERFACE tgt::lapack
                                                          tgt::hdf5)
     target_include_directories (chemps2-static INTERFACE $<BUILD_INTERFACE:${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2>
                                                          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
