@@ -155,7 +155,6 @@ write_basic_package_version_file (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Con
                                       COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-               ${CheMPS2_SOURCE_DIR}/CMake/FindTargetLAPACK.cmake
                ${CheMPS2_SOURCE_DIR}/CMake/FindTargetHDF5.cmake
                DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 

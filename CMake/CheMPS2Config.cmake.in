@@ -157,10 +157,6 @@ if(NOT TARGET ${PN}::chemps2)
     endif()
 
     include(CMakeFindDependencyMacro)
-    if(NOT TARGET tgt::lapack)
-        find_dependency(TargetLAPACK)
-    endif()
-
     if(NOT TARGET tgt::hdf5)
         find_dependency(TargetHDF5 @TargetHDF5_VERSION@ EXACT)
     endif()

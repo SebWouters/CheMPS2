@@ -126,22 +126,13 @@ if (NOT STATIC_ONLY)
         set_target_properties(chemps2-shared PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
     endif()
     target_compile_definitions (chemps2-shared INTERFACE USING_${PROJECT_NAME})
-    #target_link_libraries      (chemps2-shared PRIVATE   tgt::lapack
-    #                                                     tgt::hdf5)
     target_include_directories (chemps2-shared INTERFACE $<BUILD_INTERFACE:${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2>
                                                          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<TARGET_PROPERTY:tgt::hdf5,INTERFACE_INCLUDE_DIRECTORIES>)
-    #if (LAPACK_INTERJECT)
-    #    target_link_libraries  (chemps2-shared PRIVATE ${LAPACK_LIBRARIES})
-    #else()
-    #    target_link_libraries  (chemps2-shared PUBLIC ${LAPACK_LIBRARIES})
-    #endif()
 endif()
 
 if (NOT SHARED_ONLY)
     target_compile_definitions (chemps2-static INTERFACE USING_${PROJECT_NAME})
-    #target_link_libraries      (chemps2-static PRIVATE   tgt::lapack
-    #                                                     tgt::hdf5)
     target_include_directories (chemps2-static INTERFACE $<BUILD_INTERFACE:${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2>
                                                          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                                          $<TARGET_PROPERTY:tgt::hdf5,INTERFACE_INCLUDE_DIRECTORIES>)

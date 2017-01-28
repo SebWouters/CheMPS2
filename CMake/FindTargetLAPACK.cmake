@@ -43,19 +43,18 @@ else()
     
         add_library (tgt::lapack INTERFACE IMPORTED)
         set_property (TARGET tgt::lapack PROPERTY INTERFACE_LINK_LIBRARIES ${LAPACK_LIBRARIES})
+
+        unset (LAPACK_FOUND)
+        unset (LAPACK_LIBRARIES)
     endif()
 endif()    
 
-unset (LAPACK_FOUND)
-unset (LAPACK_LIBRARIES)
-
+get_property(_ill TARGET tgt::lapack PROPERTY INTERFACE_LINK_LIBRARIES)
+set(${PN}_MESSAGE "Found LAPACK: ${_ill}")
 if ((TARGET tgt::blas) AND (TARGET tgt::lapk))
     get_property(_illb TARGET tgt::blas PROPERTY INTERFACE_LINK_LIBRARIES)
     get_property(_illl TARGET tgt::lapk PROPERTY INTERFACE_LINK_LIBRARIES)
     set(${PN}_MESSAGE "Found LAPACK: ${_illl};${_illb}")
-else()
-    get_property(_ill TARGET tgt::lapack PROPERTY INTERFACE_LINK_LIBRARIES)
-    set(${PN}_MESSAGE "Found LAPACK: ${_ill}")
 endif()
 
 include(FindPackageHandleStandardArgs)
