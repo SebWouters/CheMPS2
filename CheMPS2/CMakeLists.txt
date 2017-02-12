@@ -76,6 +76,7 @@ if (NOT STATIC_ONLY)
                                                   tgt::lapack
                                                   tgt::hdf5)
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
+                                                     MACOSX_RPATH ON
                                                      OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
 endif()
