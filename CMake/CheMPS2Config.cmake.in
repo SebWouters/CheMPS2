@@ -2,9 +2,7 @@
 # ------------------
 #
 # CheMPS2 cmake module.
-# This module sets the following variables in your project:
-#
-# ::
+# This module sets the following variables in your project::
 #
 #   CheMPS2_FOUND - true if CheMPS2 and all required components found on the system
 #   CheMPS2_VERSION - CheMPS2 version in format Major.Minor.Release
@@ -16,18 +14,14 @@
 #   CheMPS2_EXECUTABLE - path to CheMPS2 executable
 #
 #
-# Available components: shared static exe
-#
-# ::
+# Available components: shared static exe ::
 #
 #   shared - search for only shared library
 #   static - search for only static library
 #   exe - search for executable as well as library
 #
 #
-# Exported targets:
-#
-# ::
+# Exported targets::
 #
 # If CheMPS2 is found, this module defines the following :prop_tgt:`IMPORTED`
 # target. ::
@@ -35,17 +29,13 @@
 #   CheMPS2::chemps2 - the main CheMPS2 library with header & defs attached.
 #
 #
-# Suggested usage:
-#
-# ::
+# Suggested usage::
 #
 #   find_package(CheMPS2)
 #   find_package(CheMPS2 1.8 CONFIG REQUIRED COMPONENTS shared)
 #
 #
-# The following variables can be set to guide the search for this package:
-#
-# ::
+# The following variables can be set to guide the search for this package::
 #
 #   CheMPS2_DIR - CMake variable, set to directory containing this Config file
 #   CMAKE_PREFIX_PATH - CMake variable, set to root directory of this package
