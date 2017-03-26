@@ -145,14 +145,14 @@ endif()
 
 # <<<  Export config  >>>
 
-    # explicit "share" not "DATADIR" for CMake search path
+# GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
 set (CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}")
 configure_package_config_file (${CheMPS2_SOURCE_DIR}/CMake/${PROJECT_NAME}Config.cmake.in
                                     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                                     INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 write_basic_package_version_file (${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                       VERSION ${CheMPS2_MMP_VERSION}
-                                      COMPATIBILITY AnyNewerVersion)  # arguably should be same M.m version
+                                      COMPATIBILITY AnyNewerVersion)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                ${CheMPS2_SOURCE_DIR}/CMake/FindTargetHDF5.cmake

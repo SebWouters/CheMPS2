@@ -20,33 +20,23 @@
 #   HDF5_INCLUDE_DIRS
 #   HDF5_LIBRARIES
 #
-# Exported targets:
-#
-# ::
+# Exported targets::
 #
 # If HDF5 is found, this module defines the following :prop_tgt:`IMPORTED`
 # target. ::
 #
 #   tgt::hdf5 - the HDF5 libraries with headers attached.
 #
-#
-# Suggested usage:
-#
-# ::
+# Suggested usage::
 #
 #   find_package(TargetHDF5)
 #   find_package(TargetHDF5 1.8.16 REQUIRED)
 #
 #
-## The following variables can be set to guide the search for this package:
-##
-## ::
-##
-##   TargetHDF5_DIR - CMake variable, set to directory containing this Config file
-##   CMAKE_PREFIX_PATH - CMake variable, set to root directory of this package
-##   PATH - environment variable, set to bin directory of this package
-##   CMAKE_DISABLE_FIND_PACKAGE_CheMPS2 - CMake variable, disables
-##       find_package(CheMPS2) perhaps to force internal build
+# The following variables can be set to guide the search for this package::
+#
+#   TargetHDF5_DIR - CMake variable, set to directory containing this Config file
+#   CMAKE_PREFIX_PATH - CMake variable, set to root directory of this package
 
 set(PN TargetHDF5)
 
@@ -67,7 +57,6 @@ if (HDF5_LIBRARIES AND HDF5_INCLUDE_DIRS)
 else()
     # 2nd precedence - target already prepared and findable in TargetHDF5Config.cmake
     find_package (TargetHDF5 QUIET CONFIG)
-#<name>_FIND_REQUIRED or <name>_FIND_QUIETLY
     if ((TARGET tgt::hdf5) AND (${PN}_VERSION))
         if (NOT ${PN}_FIND_QUIETLY)
             message (STATUS "TargetHDF5Config detected.")
