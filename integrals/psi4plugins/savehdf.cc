@@ -1,11 +1,14 @@
-#include <psi4-dec.h>
-#include <libparallel/parallel.h>
-#include <liboptions/liboptions.h>
-#include <libmints/mints.h>
-#include <libpsio/psio.hpp>
-#include <libdpd/dpd.h>
-#include <libtrans/integraltransform.h>
-#include <libiwl/iwl.hpp>
+#include <psi4/psi4-dec.h>
+#include <psi4/libparallel/parallel.h>
+#include <psi4/liboptions/liboptions.h>
+#include <psi4/libmints/molecule.h>
+#include <psi4/libmints/matrix.h>
+#include <psi4/libmints/wavefunction.h>
+#include <psi4/libpsio/psio.hpp>
+#include <psi4/libdpd/dpd.h>
+#include <psi4/libtrans/integraltransform.h>
+#include <psi4/libiwl/iwl.hpp>
+#include <psi4/libciomr/libciomr.h>
 
 #include <stdlib.h>
 #include <iostream>
@@ -16,6 +19,8 @@
 
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints.DPD_ID(x)
+
+using namespace std;
 
 namespace psi{ namespace savehdf{
 
@@ -42,7 +47,7 @@ SharedWavefunction savehdf(SharedWavefunction wfn, Options& options)
     int print = options.get_int("PRINT");
 
     // Grab the global (default) PSIO object, for file I/O
-    boost::shared_ptr<PSIO> psio(_default_psio_lib_);
+    std::shared_ptr<PSIO> psio(_default_psio_lib_);
 
     /*MoldenWriter mollie(wfn);
     mollie.write("infoForMolden.txt");*/ //Please call the MoldenWriter from the psi4 input file from now on.
@@ -52,7 +57,7 @@ SharedWavefunction savehdf(SharedWavefunction wfn, Options& options)
 
     // For now, we'll just transform for closed shells and generate all integrals.  For more elaborate use of the
     // LibTrans object, check out the plugin_mp2 example.
-    std::vector<boost::shared_ptr<MOSpace> > spaces;
+    std::vector<std::shared_ptr<MOSpace> > spaces;
     spaces.push_back(MOSpace::all);
     IntegralTransform ints(wfn, spaces, IntegralTransform::Restricted);
     ints.transform_tei(MOSpace::all, MOSpace::all, MOSpace::all, MOSpace::all);
@@ -62,9 +67,14 @@ SharedWavefunction savehdf(SharedWavefunction wfn, Options& options)
     //Readin the MO OEI in moOei & print everything
     int nmo       = wfn->nmo();
     int nIrreps   = wfn->nirrep();
-    int *orbspi   = wfn->nmopi();
-    int *docc     = wfn->doccpi();
-    int *socc     = wfn->soccpi();
+    int * orbspi  = init_int_array(nirrep);
+    int * docc    = init_int_array(nirrep);
+    int * socc    = init_int_array(nirrep);
+    for ( int h = 0; h < nirrep; ++h ){
+        orbspi[h] = wfn->nmopi()[h];
+        docc[h] = wfn->doccpi()[h];
+        socc[h] = wfn->soccpi()[h];
+    }
     
     int nTriMo = nmo * (nmo + 1) / 2;
     double *temp = new double[nTriMo];

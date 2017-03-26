@@ -32,7 +32,8 @@ CheMPS2 is currently interfaced with two ab initio quantum chemistry packages:
 psi4 ``dmrg`` plugin
 --------------------
 
-DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations can be performed directly with `psi4 <http://www.psicode.org/>`_. The plugin has been tested on `psi4-0.5 <https://github.com/psi4/psi4/releases/tag/0.5>`_ (released February 17, 2016).
+DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations can be performed directly with `psi4 <http://www.psicode.org/>`_. The plugin has been tested on late March 2017 psi4 pre-1.1.
+.. comment  `tag <https://github.com/psi4/psi4/releases/tag/0.5>`_ (released February 17, 2016).
 
 Note that as of late June 2016, DMRG keywords in `psi4 <http://www.psicode.org/>`_ have been realigned to those of the chemps2 executable. A `translation table <https://github.com/psi4/psi4/issues/150#issuecomment-228951911>`_ is available.
 
@@ -41,23 +42,22 @@ To perform DMRG-CI, DMRG-SCF, and DMRG-CASPT2 calculations, build `psi4 <http://
 .. code-block:: bash
 
     $ cd /mypsi4plugins
-    $ psi4 --new-plugin dmrg
+    $ psi4 --plugin-name dmrg
     $ cd dmrg
 
-Now, replace the file ``dmrg.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/dmrg.cc``. To compile the plugin, the Makefile should be adjusted. Change the line
+Now, replace the file ``plugin.cc`` with ``/sourcefolder/chemps2/integrals/psi4plugins/dmrg.cc`` (file can be named ``plugin.cc`` or ``dmrg.cc``, but if the latter, change ``CMakeLists.txt`` to match). To compile the plugin, the CMakeLists.txt should be adjusted. Change the line
 
 .. code-block:: bash
 
-    $(CXX) $(LDFLAGS) -o $@ $^ $(CXXDEFS)
+    find_package(psi4 1.0 REQUIRED)
 
 to
 
 .. code-block:: bash
 
-    $(CXX) $(LDFLAGS) -o $@ $^ $(CXXDEFS) -lchemps2
+    find_package(psi4 1.0 REQUIRED COMPONENTS chemps2)
 
-Remember to add the library and include paths to the Makefile as well, if ``libchemps2`` is not installed in a standard location. For debian/sid, the HDF5 headers are located in the folder ``/usr/include/hdf5/serial``. It might be necessary to add it to the ``INCLUDES`` variable in the Makefile.
-To compile the plugin, run:
+Now call ``psi4 --plugin-compile`` and execute the result. Additional variables can be passed to the ``cmake`` command (including `-DCheMPS2_DIR`), but none should be necessary. Avoid building against a Psi4 with PCMSolver enabled, as this will cause trouble with capturing stdout. To compile the plugin, run:
 
 .. code-block:: bash
 
@@ -84,7 +84,7 @@ This file (``O2.dmrgscf.in``) should be placed in the folder ``/mypsi4plugins/dm
 
     $ cd /mypsi4plugins/dmrg
     $ psi4 O2.dmrgscf.in O2.dmrgscf.out
-    
+
 An example input file to perform a DMRG-CASPT2 calculation with the ``dmrg`` plugin:
 
 .. literalinclude:: N2.caspt2.in

@@ -11,7 +11,6 @@ import dmrg
 
 set basis          cc-pVDZ
 set reference      rhf
-set scf_type       PK
 set e_convergence  1e-13
 set d_convergence  1e-13
 set ints_tolerance 0.0
@@ -20,19 +19,18 @@ set dmrg_irrep                0
 set dmrg_multiplicity         1
 set restricted_docc           [ 1 , 0 , 0 , 0 ]
 set active                    [ 5 , 0 , 4 , 2 ]
-
 set dmrg_sweep_states         [  200,  500, 1000, 1000 ]
 set dmrg_sweep_energy_conv    [ 1e-8, 1e-8, 1e-8, 1e-8 ]
+set dmrg_sweep_dvdson_rtol    [ 1e-4, 1e-4, 1e-4, 1e-4 ]
 set dmrg_sweep_max_sweeps     [    5,    5,    5,  100 ]
 set dmrg_sweep_noise_prefac   [ 0.03, 0.03, 0.03,  0.0 ]
-set dmrg_sweep_dvdson_rtol    [ 1e-5, 1e-5, 1e-5, 1e-9 ]
 set dmrg_print_corr           false
-set dmrg_mp2_write            false
+set dmrg_mps_write            false
 
 set dmrg_scf_max_iter         1
 
-set dmrg_molden_write         true  # DMRG-CI pseudocanonical orbitals
-set dmrg_opdm_ao_print        true  # DMRG-CI density in the AO basis
-
 energy('dmrg')
 
+ref_energy = -76.1261102339
+compare_values(-76.02141840825, get_variable('SCF TOTAL ENERGY'), 6, 'SCF Energy')
+compare_values(ref_energy, get_variable("CURRENT ENERGY"), 6, "DMRG CI Energy")

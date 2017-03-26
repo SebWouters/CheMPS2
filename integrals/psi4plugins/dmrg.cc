@@ -1,25 +1,34 @@
-#include <psi4-dec.h>
-#include <libparallel/parallel.h>
-#include <liboptions/liboptions.h>
-#include <libmints/mints.h>
-#include <libpsio/psio.hpp>
-#include <libtrans/integraltransform.h>
-#include <libfock/jk.h>
-#include <libdpd/dpd.h>
-#include <libiwl/iwl.hpp>
-#include <libmints/writer_file_prefix.h>
+#include <psi4/psi4-dec.h>
+#include <psi4/libparallel/parallel.h>
+#include <psi4/liboptions/liboptions.h>
+#include <psi4/libmints/matrix.h>
+#include <psi4/libmints/vector.h>
+#include <psi4/libmints/writer.h>
+#include <psi4/libmints/molecule.h>
+#include <psi4/libmints/dimension.h>
+#include <psi4/libpsio/psio.hpp>
+#include <psi4/libtrans/integraltransform.h>
+#include <psi4/libfock/jk.h>
+#include <psi4/libdpd/dpd.h>
+#include <psi4/libiwl/iwl.hpp>
+#include <psi4/libmints/writer_file_prefix.h>
+#include "psi4/psifiles.h"
+#include <psi4/libmints/wavefunction.h>
+#include <psi4/libciomr/libciomr.h>
 
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
 
-#include "chemps2/Irreps.h"
-#include "chemps2/Problem.h"
-#include "chemps2/CASSCF.h"
-#include "chemps2/Initialize.h"
-#include "chemps2/EdmistonRuedenberg.h"
-#include "chemps2/CASPT2.h"
-#include "chemps2/Lapack.h"
+#include <chemps2/Irreps.h>
+#include <chemps2/Problem.h>
+#include <chemps2/CASSCF.h>
+#include <chemps2/Initialize.h>
+#include <chemps2/EdmistonRuedenberg.h>
+#include <chemps2/CASPT2.h>
+#include <chemps2/Lapack.h>
+
+using namespace std;
 
 // This allows us to be lazy in getting the spaces in DPD calls
 #define ID(x) ints->DPD_ID(x)
@@ -37,55 +46,46 @@ int read_options(std::string name, Options &options)
         /*- The DMRG wavefunction irrep uses the same conventions as PSI4. How convenient :-).
             Just to avoid confusion, it's copied here. It can also be found on
             http://sebwouters.github.io/CheMPS2/doxygen/classCheMPS2_1_1Irreps.html .
-
             Symmetry Conventions        Irrep Number & Name
-            Group Number & Name         0 	1 	2 	3 	4 	5 	6 	7
-            0: c1                       A 							
-            1: ci                       Ag 	Au 						
-            2: c2                       A 	B 						
-            3: cs                       A' 	A'' 						
-            4: d2                       A 	B1 	B2 	B3 				
-            5: c2v                      A1 	A2 	B1 	B2 				
-            6: c2h                      Ag 	Bg 	Au 	Bu 				
-            7: d2h                      Ag 	B1g 	B2g 	B3g 	Au 	B1u 	B2u 	B3u    
+            Group Number & Name         0     1     2     3     4     5     6     7
+            0: c1                       A
+            1: ci                       Ag    Au
+            2: c2                       A     B
+            3: cs                       A'    A''
+            4: d2                       A     B1    B2     B3
+            5: c2v                      A1    A2    B1     B2
+            6: c2h                      Ag    Bg    Au     Bu
+            7: d2h                      Ag    B1g   B2g    B3g     Au     B1u     B2u     B3u
         -*/
         options.add_int("DMRG_IRREP", -1);
 
         /*- The number of reduced renormalized basis states to be
             retained during successive DMRG instructions -*/
-        options.add_array("DMRG_SWEEP_STATES");
+        options.add("DMRG_SWEEP_STATES", new ArrayType());
 
         /*- The energy convergence to stop an instruction
             during successive DMRG instructions -*/
-        options.add_array("DMRG_SWEEP_ENERGY_CONV");
+        options.add("DMRG_SWEEP_ENERGY_CONV", new ArrayType());
+
+        /*- The density RMS convergence to stop an instruction
+            during successive DMRG instructions -*/
+        options.add_double("DMRG_SCF_GRAD_THR", 1.e-6);
 
         /*- The maximum number of sweeps to stop an instruction
             during successive DMRG instructions -*/
-        options.add_array("DMRG_SWEEP_MAX_SWEEPS");
+        options.add("DMRG_SWEEP_MAX_SWEEPS", new ArrayType());
 
         /*- The noiseprefactors for successive DMRG instructions -*/
-        options.add_array("DMRG_SWEEP_NOISE_PREFAC");
+        options.add("DMRG_SWEEP_NOISE_PREFAC", new ArrayType());
 
         /*- The residual tolerances for the Davidson diagonalization during DMRG instructions -*/
-        options.add_array("DMRG_SWEEP_DVDSON_RTOL");
+        options.add("DMRG_SWEEP_DVDSON_RTOL", new ArrayType());
 
         /*- Whether or not to print the correlation functions after the DMRG calculation -*/
         options.add_bool("DMRG_PRINT_CORR", false);
 
         /*- Whether or not to create intermediary MPS checkpoints -*/
         options.add_bool("DMRG_MPS_WRITE", false);
-
-        /*- Doubly occupied restricted orbitals for DMRG, per irrep. Same
-            conventions as for other MR methods (not excited in CI wavefunctions,
-            but orbitals can be optimized in MCSCF). -*/
-        options.add_array("RESTRICTED_DOCC");
-
-        /*- Active space orbitals (occupied plus unoccupied) for DMRG, per irrep.
-            Same conventions as for other MR methods. -*/
-        options.add_array("ACTIVE");
-
-        /*- Convergence threshold for the gradient norm. -*/
-        options.add_double("DMRG_SCF_GRAD_THR", 1e-6);
 
         /*- Whether or not to store the unitary on disk (convenient for restarting). -*/
         options.add_bool("DMRG_UNITARY_WRITE", true);
@@ -164,13 +164,17 @@ int chemps2_groupnumber(const string SymmLabel){
 }
 
 
-void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK, boost::shared_ptr<Wavefunction> wfn){
+void buildJK(SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, std::shared_ptr<JK> myJK, std::shared_ptr<Wavefunction> wfn){
 
     const int nso    = wfn->nso();
-    int * nsopi      = wfn->nsopi();
     const int nmo    = wfn->nmo();
-    int * nmopi      = wfn->nmopi();
     const int nirrep = wfn->nirrep();
+    int * nmopi      = init_int_array(nirrep);
+    int * nsopi      = init_int_array(nirrep);
+    for ( int h = 0; h < nirrep; ++h ){
+        nmopi[h] = wfn->nmopi()[h];
+        nsopi[h] = wfn->nsopi()[h];
+    }
 
     // nso can be different from nmo
     SharedMatrix SO_RDM;     SO_RDM = SharedMatrix( new Matrix( "SO RDM",   nirrep, nsopi, nsopi ) );
@@ -231,7 +235,7 @@ void copyPSIMXtoCHEMPS2MX( SharedMatrix source, CheMPS2::DMRGSCFindices * iHandl
 }*/
 
 
-void buildQmatOCC( CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK, boost::shared_ptr<Wavefunction> wfn ){
+void buildQmatOCC( CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices * iHandler, SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, std::shared_ptr<JK> myJK, std::shared_ptr<Wavefunction> wfn ){
 
     MO_RDM->zero();
     for (int irrep = 0; irrep < iHandler->getNirreps(); irrep++){
@@ -245,7 +249,7 @@ void buildQmatOCC( CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices 
 }
 
 
-void buildQmatACT( CheMPS2::DMRGSCFmatrix * theQmatACT, CheMPS2::DMRGSCFindices * iHandler, double * DMRG1DM, SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, boost::shared_ptr<JK> myJK, boost::shared_ptr<Wavefunction> wfn ){
+void buildQmatACT( CheMPS2::DMRGSCFmatrix * theQmatACT, CheMPS2::DMRGSCFindices * iHandler, double * DMRG1DM, SharedMatrix MO_RDM, SharedMatrix MO_JK, SharedMatrix Cmat, std::shared_ptr<JK> myJK, std::shared_ptr<Wavefunction> wfn ){
 
     MO_RDM->zero();
     const int nOrbDMRG = iHandler->getDMRGcumulative(iHandler->getNirreps());
@@ -266,7 +270,7 @@ void buildQmatACT( CheMPS2::DMRGSCFmatrix * theQmatACT, CheMPS2::DMRGSCFindices 
 }
 
 
-SharedMatrix print_rdm_ao( CheMPS2::DMRGSCFindices * idx, double * DMRG1DM, SharedMatrix MO_RDM, SharedMatrix Cmat, boost::shared_ptr<Wavefunction> wfn ){
+SharedMatrix print_rdm_ao( CheMPS2::DMRGSCFindices * idx, double * DMRG1DM, SharedMatrix MO_RDM, SharedMatrix Cmat, std::shared_ptr<Wavefunction> wfn ){
 
     const int num_irreps = idx->getNirreps();
     const int tot_dmrg   = idx->getDMRGcumulative( num_irreps );
@@ -291,8 +295,13 @@ SharedMatrix print_rdm_ao( CheMPS2::DMRGSCFindices * idx, double * DMRG1DM, Shar
         }
     }
 
-    int * nmopi = wfn->nmopi();
-    int * nsopi = wfn->nsopi();
+    const int nirrep = wfn->nirrep();
+    int * nmopi = init_int_array(nirrep);
+    int * nsopi = init_int_array(nirrep);
+    for ( int h = 0; h < nirrep; ++h ){
+        nmopi[h] = wfn->nmopi()[h];
+        nsopi[h] = wfn->nsopi()[h];
+    }
     const int nao = wfn->aotoso()->rowspi( 0 );
 
     SharedMatrix tfo;       tfo = SharedMatrix( new Matrix( num_irreps, nao, nmopi ) );
@@ -319,7 +328,7 @@ SharedMatrix print_rdm_ao( CheMPS2::DMRGSCFindices * idx, double * DMRG1DM, Shar
 }
 
 
-void buildHamDMRG( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<MOSpace> Aorbs_ptr, CheMPS2::DMRGSCFmatrix * theTmatrix, CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::Hamiltonian * HamDMRG, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Wavefunction> wfn ){
+void buildHamDMRG( std::shared_ptr<IntegralTransform> ints, std::shared_ptr<MOSpace> Aorbs_ptr, CheMPS2::DMRGSCFmatrix * theTmatrix, CheMPS2::DMRGSCFmatrix * theQmatOCC, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::Hamiltonian * HamDMRG, std::shared_ptr<PSIO> psio, std::shared_ptr<Wavefunction> wfn ){
 
     ints->update_orbitals();
     // Since we don't regenerate the SO ints, we don't call sort_so_tei, and the OEI are not updated !!!!!
@@ -367,15 +376,19 @@ void buildHamDMRG( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<
 
 }
 
-void buildTmatrix( CheMPS2::DMRGSCFmatrix * theTmatrix, CheMPS2::DMRGSCFindices * iHandler, boost::shared_ptr<PSIO> psio, SharedMatrix Cmat, boost::shared_ptr<Wavefunction> wfn ){
+void buildTmatrix( CheMPS2::DMRGSCFmatrix * theTmatrix, CheMPS2::DMRGSCFindices * iHandler, std::shared_ptr<PSIO> psio, SharedMatrix Cmat, std::shared_ptr<Wavefunction> wfn ){
 
     const int nirrep = wfn->nirrep();
     const int nmo    = wfn->nmo();
     const int nTriMo = nmo * (nmo + 1) / 2;
     const int nso    = wfn->nso();
     const int nTriSo = nso * (nso + 1) / 2;
-    int * mopi       = wfn->nmopi();
-    int * sopi       = wfn->nsopi();
+    int * mopi       = init_int_array(nirrep);
+    int * sopi       = init_int_array(nirrep);
+    for ( int h = 0; h < nirrep; ++h ){
+        mopi[h] = wfn->nmopi()[h];
+        sopi[h] = wfn->nsopi()[h];
+    }
     double * work1   = new double[ nTriSo ];
     double * work2   = new double[ nTriSo ];
     IWL::read_one(psio.get(), PSIF_OEI, PSIF_SO_T, work1, nTriSo, 0, 0, "outfile");
@@ -397,7 +410,7 @@ void buildTmatrix( CheMPS2::DMRGSCFmatrix * theTmatrix, CheMPS2::DMRGSCFindices 
 }
 
 
-void fillRotatedTEI_coulomb( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<MOSpace> OAorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, boost::shared_ptr<PSIO> psio, boost::shared_ptr<Wavefunction> wfn ){
+void fillRotatedTEI_coulomb( std::shared_ptr<IntegralTransform> ints, std::shared_ptr<MOSpace> OAorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, std::shared_ptr<PSIO> psio, std::shared_ptr<Wavefunction> wfn ){
 
     ints->update_orbitals();
     // Since we don't regenerate the SO ints, we don't call sort_so_tei, and the OEI are not updated !!!!!
@@ -440,7 +453,7 @@ void fillRotatedTEI_coulomb( boost::shared_ptr<IntegralTransform> ints, boost::s
 }
 
 
-void fillRotatedTEI_exchange( boost::shared_ptr<IntegralTransform> ints, boost::shared_ptr<MOSpace> OAorbs_ptr, boost::shared_ptr<MOSpace> Vorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, boost::shared_ptr<PSIO> psio ){
+void fillRotatedTEI_exchange( std::shared_ptr<IntegralTransform> ints, std::shared_ptr<MOSpace> OAorbs_ptr, std::shared_ptr<MOSpace> Vorbs_ptr, CheMPS2::DMRGSCFintegrals * theRotatedTEI, CheMPS2::DMRGSCFindices * iHandler, std::shared_ptr<PSIO> psio ){
 
     ints->update_orbitals();
     ints->transform_tei( Vorbs_ptr, OAorbs_ptr, Vorbs_ptr, OAorbs_ptr );
@@ -494,7 +507,7 @@ void copyUNITARYtoPSIMX( CheMPS2::DMRGSCFunitary * unitary, CheMPS2::DMRGSCFindi
 }
 
 
-void update_WFNco( SharedMatrix orig_coeff, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, boost::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2 ){
+void update_WFNco( SharedMatrix orig_coeff, CheMPS2::DMRGSCFindices * iHandler, CheMPS2::DMRGSCFunitary * unitary, std::shared_ptr<Wavefunction> wfn, SharedMatrix work1, SharedMatrix work2 ){
 
     copyUNITARYtoPSIMX( unitary, iHandler, work2 );
     wfn->Ca()->gemm(false, true, 1.0, orig_coeff, work2, 0.0);
@@ -512,7 +525,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     /*******************************
      *   Environment information   *
      *******************************/
-    boost::shared_ptr<PSIO> psio(_default_psio_lib_); // Grab the global (default) PSIO object, for file I/O
+    std::shared_ptr<PSIO> psio(_default_psio_lib_); // Grab the global (default) PSIO object, for file I/O
     if (!wfn){ throw PSIEXCEPTION("SCF has not been run yet!"); }
 
     /*************************
@@ -563,9 +576,14 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
     const int SyGroup= chemps2_groupnumber( wfn->molecule()->sym_label() );
     const int nmo    = wfn->nmo();
     const int nirrep = wfn->nirrep();
-    int * orbspi     = wfn->nmopi();
-    int * docc       = wfn->doccpi();
-    int * socc       = wfn->soccpi();
+    int * orbspi     = init_int_array(nirrep);
+    int * docc       = init_int_array(nirrep);
+    int * socc       = init_int_array(nirrep);
+    for ( int h = 0; h < nirrep; ++h ){
+        orbspi[h] = wfn->nmopi()[h];
+        docc[h] = wfn->doccpi()[h];
+        socc[h] = wfn->soccpi()[h];
+    }
     if ( wfn_irrep<0 )                            { throw PSIEXCEPTION("Option DMRG_IRREP (integer) may not be smaller than zero!"); }
     if ( wfn_multp<1 )                            { throw PSIEXCEPTION("Option DMRG_MULTIPLICITY (integer) should be larger or equal to one: DMRG_MULTIPLICITY = (2S+1) >= 1 !"); }
     if ( ndmrg_states==0 )                        { throw PSIEXCEPTION("Option DMRG_SWEEP_STATES (integer array) should be set!"); }
@@ -693,7 +711,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
 
     SharedMatrix work1; work1 = SharedMatrix( new Matrix("work1", nirrep, orbspi, orbspi) );
     SharedMatrix work2; work2 = SharedMatrix( new Matrix("work2", nirrep, orbspi, orbspi) );
-    boost::shared_ptr<JK> myJK; myJK = boost::shared_ptr<JK>(new DiskJK(wfn->basisset(), options));
+    std::shared_ptr<JK> myJK; myJK = std::shared_ptr<JK>(new DiskJK(wfn->basisset(), options));
     myJK->set_cutoff(0.0);
     myJK->initialize();
     SharedMatrix orig_coeff; orig_coeff = SharedMatrix( new Matrix( wfn->Ca() ) );
@@ -713,17 +731,17 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
           Vorbs.push_back( iHandler->getOrigNVIRTstart(h) + orb );
        }
     }
-    boost::shared_ptr<MOSpace> OAorbs_ptr; OAorbs_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'Q', OAorbs, empty ) );
-    boost::shared_ptr<MOSpace>  Aorbs_ptr;  Aorbs_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'S',  Aorbs, empty ) );
-    boost::shared_ptr<MOSpace>  Vorbs_ptr;  Vorbs_ptr = boost::shared_ptr<MOSpace>( new MOSpace( 'T',  Vorbs, empty ) );
-    std::vector<boost::shared_ptr<MOSpace> > spaces;
+    std::shared_ptr<MOSpace> OAorbs_ptr; OAorbs_ptr = std::shared_ptr<MOSpace>( new MOSpace( 'Q', OAorbs, empty ) );
+    std::shared_ptr<MOSpace>  Aorbs_ptr;  Aorbs_ptr = std::shared_ptr<MOSpace>( new MOSpace( 'S',  Aorbs, empty ) );
+    std::shared_ptr<MOSpace>  Vorbs_ptr;  Vorbs_ptr = std::shared_ptr<MOSpace>( new MOSpace( 'T',  Vorbs, empty ) );
+    std::vector<std::shared_ptr<MOSpace> > spaces;
     spaces.push_back( OAorbs_ptr   );
     spaces.push_back(  Aorbs_ptr   );
     spaces.push_back(  Vorbs_ptr   );
     spaces.push_back( MOSpace::all );
     // CheMPS2 requires RHF or ROHF orbitals.
-    boost::shared_ptr<IntegralTransform> ints;
-    ints = boost::shared_ptr<IntegralTransform>( new IntegralTransform( wfn, spaces, IntegralTransform::Restricted ) );
+    std::shared_ptr<IntegralTransform> ints;
+    ints = std::shared_ptr<IntegralTransform>( new IntegralTransform( wfn, spaces, IntegralTransform::Restricted ) );
     ints->set_keep_iwl_so_ints( true );
     ints->set_keep_dpd_so_ints( true );
     //ints->set_print(6);
@@ -971,7 +989,7 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
 
     outfile->Printf("The DMRG-SCF energy = %3.10f \n", Energy);
     Process::environment.globals["CURRENT ENERGY"] = Energy;
-    Process::environment.globals["DMRG-SCF TOTAL ENERGY"] = Energy;
+    Process::environment.globals["DMRG-SCF ENERGY"] = Energy;
 
     if ((( dmrg_molden ) || (( dmrg_caspt2 ) && ( PSEUDOCANONICAL ))) && ( nIterations > 0 )){
 
@@ -1022,10 +1040,10 @@ SharedWavefunction dmrg(SharedWavefunction wfn, Options& options)
             }
         }
 
-        boost::shared_ptr<MoldenWriter> molden( new MoldenWriter( wfn ) );
+        std::shared_ptr<MoldenWriter> molden( new MoldenWriter( wfn ) );
         std::string filename = get_writer_file_prefix( wfn->molecule()->name() ) + ".pseudocanonical.molden";
         outfile->Printf( "Write molden file to %s. \n", filename.c_str() );
-        molden->write( filename, wfn->Ca(), wfn->Ca(), sp_energies, sp_energies, occupation, occupation );
+        molden->write( filename, wfn->Ca(), wfn->Ca(), sp_energies, sp_energies, occupation, occupation, true );
 
     }
 

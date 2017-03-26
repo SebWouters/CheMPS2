@@ -2,9 +2,7 @@
 # ------------------
 #
 # CheMPS2 cmake module.
-# This module sets the following variables in your project:
-#
-# ::
+# This module sets the following variables in your project::
 #
 #   CheMPS2_FOUND - true if CheMPS2 and all required components found on the system
 #   CheMPS2_VERSION - CheMPS2 version in format Major.Minor.Release
@@ -16,18 +14,14 @@
 #   CheMPS2_EXECUTABLE - path to CheMPS2 executable
 #
 #
-# Available components: shared static exe
-#
-# ::
+# Available components: shared static exe ::
 #
 #   shared - search for only shared library
 #   static - search for only static library
 #   exe - search for executable as well as library
 #
 #
-# Exported targets:
-#
-# ::
+# Exported targets::
 #
 # If CheMPS2 is found, this module defines the following :prop_tgt:`IMPORTED`
 # target. ::
@@ -35,17 +29,13 @@
 #   CheMPS2::chemps2 - the main CheMPS2 library with header & defs attached.
 #
 #
-# Suggested usage:
-#
-# ::
+# Suggested usage::
 #
 #   find_package(CheMPS2)
 #   find_package(CheMPS2 1.8 CONFIG REQUIRED COMPONENTS shared)
 #
 #
-# The following variables can be set to guide the search for this package:
-#
-# ::
+# The following variables can be set to guide the search for this package::
 #
 #   CheMPS2_DIR - CMake variable, set to directory containing this Config file
 #   CMAKE_PREFIX_PATH - CMake variable, set to root directory of this package
@@ -141,6 +131,9 @@ set(${PN}_DEFINITIONS USING_${PN})
 
 check_required_components(${PN})
 
+# make detectable the FindTarget*.cmake modules
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+
 #-----------------------------------------------------------------------------
 # Don't include targets if this file is being picked up by another
 # project which has already built this as a subproject
@@ -151,6 +144,11 @@ if(NOT TARGET ${PN}::chemps2)
         include("${CMAKE_CURRENT_LIST_DIR}/${PN}Targets-shared.cmake")
     else()
         include("${CMAKE_CURRENT_LIST_DIR}/${PN}Targets-static.cmake")
+    endif()
+
+    include(CMakeFindDependencyMacro)
+    if(NOT TARGET tgt::hdf5)
+        find_dependency(TargetHDF5 @TargetHDF5_VERSION@ EXACT)
     endif()
 endif()
 
