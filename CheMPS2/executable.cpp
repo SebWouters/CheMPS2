@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2016 Sebastian Wouters
+   Copyright (C) 2013-2017 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -245,7 +245,7 @@ void print_help(){
 
 cout << "\n"
 "CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry\n"
-"Copyright (C) 2013-2016 Sebastian Wouters\n"
+"Copyright (C) 2013-2017 Sebastian Wouters\n"
 "\n"
 "Usage: chemps2 [OPTIONS]\n"
 "\n"
