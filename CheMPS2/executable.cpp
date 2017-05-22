@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <sstream>
 
 #include "Initialize.h"
 #include "CASSCF.h"
@@ -342,6 +343,9 @@ cout << "\n"
 "       MOLCAS_MPS = bool\n"
 "              When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).\n"
 "\n"
+"       MOLCAS_STATE_SPEC = bool\n"
+"              Switch on writing to disk of N-RDMs of intermediate roots (TRUE or FALSE; default FALSE).\n"
+"\n"
 "       SCF_STATE_AVG = bool\n"
 "              Switch on state-averaging (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -428,13 +432,14 @@ int main( int argc, char ** argv ){
    string nact = "";
    string nvir = "";
 
-   string molcas_2rdm    = "";
-   string molcas_3rdm    = "";
-   string molcas_f4rdm   = "";
-   string molcas_fock    = "";
-   bool   molcas_fiedler = false;
-   bool   molcas_mps     = false;
-   string molcas_order   = "";
+   string molcas_2rdm       = "";
+   string molcas_3rdm       = "";
+   string molcas_f4rdm      = "";
+   string molcas_fock       = "";
+   bool   molcas_fiedler    = false;
+   bool   molcas_mps        = false;
+   bool   molcas_state_spec = false;
+   string molcas_order      = "";
 
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
@@ -555,13 +560,14 @@ int main( int argc, char ** argv ){
       if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 4 ) == false ){ return clean_exit( -1 ); }
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
-      if ( find_boolean( &molcas_fiedler, line, "MOLCAS_FIEDLER" ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &molcas_mps,     line, "MOLCAS_MPS"     ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &scf_state_avg,  line, "SCF_STATE_AVG"  ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_calc,    line, "CASPT2_CALC"    ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_checkpt, line, "CASPT2_CHECKPT" ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_cumul,   line, "CASPT2_CUMUL"   ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &print_corr,     line, "PRINT_CORR"     ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_fiedler,    line, "MOLCAS_FIEDLER"    ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_mps,        line, "MOLCAS_MPS"        ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_state_spec, line, "MOLCAS_STATE_SPEC" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &scf_state_avg,     line, "SCF_STATE_AVG"     ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_calc,       line, "CASPT2_CALC"       ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_checkpt,    line, "CASPT2_CHECKPT"    ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_cumul,      line, "CASPT2_CUMUL"      ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &print_corr,        line, "PRINT_CORR"        ) == false ){ return clean_exit( -1 ); }
 
       if ( line.find( "SWEEP_STATES" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
@@ -784,6 +790,7 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_FIEDLER     = " << (( molcas_fiedler ) ? "TRUE" : "FALSE" ) << endl;
    }
       cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   MOLCAS_STATE_SPEC  = " << (( molcas_state_spec ) ? "TRUE" : "FALSE" ) << endl;
    } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
@@ -862,30 +869,52 @@ int main( int argc, char ** argv ){
          if ( state > 0 ){ dmrgsolver->newExcitation( fabs( DMRG_ENERGY ) ); }
          DMRG_ENERGY = dmrgsolver->Solve();
          if (( state == 0 ) && ( excitation > 0 )){ dmrgsolver->activateExcitations( excitation ); }
-      }
 
-      // Calculate the RDMs and correlations
-      const bool calc_3rdm = (( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ));
-      const bool calc_2rdm = (( print_corr == true ) || ( molcas_2rdm.length() != 0 ));
-      if (( calc_2rdm ) || ( calc_3rdm )){
-         dmrgsolver->calc_rdms_and_correlations( calc_3rdm, false );
-         if ( molcas_2rdm.length() != 0 ){ dmrgsolver->get2DM()->save_HAM( molcas_2rdm ); }
-         if ( molcas_3rdm.length() != 0 ){ dmrgsolver->get3DM()->save_HAM( molcas_3rdm ); }
-         if ( molcas_f4rdm.length() != 0 ){
-            const int LAS      = ham->getL();
-            const int LAS_pow6 = LAS * LAS * LAS * LAS * LAS * LAS;
-            double * fockmx = new double[ LAS * LAS ];
-            double * work   = new double[ LAS_pow6  ];
-            double * result = new double[ LAS_pow6  ];
-            for ( int cnt = 0; cnt < LAS_pow6; cnt++ ){ result[ cnt ] = 0.0; }
-            ham->readfock( molcas_fock, fockmx, true );
-            CheMPS2::CASSCF::fock_dot_4rdm( fockmx, dmrgsolver, ham, 0, 0, work, result, false, false );
-            CheMPS2::ThreeDM::save_HAM_generic( molcas_f4rdm, LAS, "F.4-RDM", result );
-            delete [] fockmx;
-            delete [] work;
-            delete [] result;
+         // Only if state specific or last state N-RDMs should be calculated
+         if (( molcas_state_spec == true ) || ( state == excitation )){
+
+            const bool calc_3rdm = (( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ));
+            const bool calc_2rdm = (( print_corr == true ) || ( molcas_2rdm.length() != 0 ));
+            if (( calc_2rdm ) || ( calc_3rdm )){
+
+               dmrgsolver->calc_rdms_and_correlations( calc_3rdm, false );
+               std::stringstream result_filename;
+
+               // 2-RDM
+               if ( molcas_2rdm.length() != 0 ){
+                  result_filename.str("");
+                  result_filename << molcas_2rdm << ".r" << state;
+                  dmrgsolver->get2DM()->save_HAM( result_filename.str() );
+               }
+
+               // 3-RDM
+               if ( molcas_3rdm.length() != 0 ){
+                  result_filename.str("");
+                  result_filename << molcas_3rdm << ".r" << state;
+                  dmrgsolver->get3DM()->save_HAM( result_filename.str() );
+               }
+
+               // F . 4-RDM
+               if ( molcas_f4rdm.length() != 0 ){
+                  const int LAS      = ham->getL();
+                  const int LAS_pow6 = LAS * LAS * LAS * LAS * LAS * LAS;
+                  double * fockmx = new double[ LAS * LAS ];
+                  double * work   = new double[ LAS_pow6  ];
+                  double * result = new double[ LAS_pow6  ];
+                  for ( int cnt = 0; cnt < LAS_pow6; cnt++ ){ result[ cnt ] = 0.0; }
+                  ham->readfock( molcas_fock, fockmx, true );
+                  CheMPS2::CASSCF::fock_dot_4rdm( fockmx, dmrgsolver, ham, 0, 0, work, result, false, false );
+
+                  result_filename.str("");
+                  result_filename << molcas_f4rdm << ".r" << state;
+                  CheMPS2::ThreeDM::save_HAM_generic( result_filename.str(), LAS, "F.4-RDM", result );
+                  delete [] fockmx;
+                  delete [] work;
+                  delete [] result;
+               }
+               if (( print_corr ) && ( state == excitation )){ dmrgsolver->getCorrelations()->Print(); }
+            }
          }
-         if ( print_corr ){ dmrgsolver->getCorrelations()->Print(); }
       }
 
       // Clean up
@@ -949,5 +978,6 @@ int main( int argc, char ** argv ){
    return clean_exit( 0 );
 
 }
+
 
 
