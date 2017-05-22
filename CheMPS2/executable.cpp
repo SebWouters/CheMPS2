@@ -343,7 +343,7 @@ cout << "\n"
 "       MOLCAS_MPS = bool\n"
 "              When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).\n"
 "\n"
-"       MOLCAS_STATE_SPEC = bool\n"
+"       MOLCAS_STATE_AVG = bool\n"
 "              Switch on writing to disk of N-RDMs of intermediate roots (TRUE or FALSE; default FALSE).\n"
 "\n"
 "       SCF_STATE_AVG = bool\n"
@@ -432,14 +432,14 @@ int main( int argc, char ** argv ){
    string nact = "";
    string nvir = "";
 
-   string molcas_2rdm       = "";
-   string molcas_3rdm       = "";
-   string molcas_f4rdm      = "";
-   string molcas_fock       = "";
-   bool   molcas_fiedler    = false;
-   bool   molcas_mps        = false;
-   bool   molcas_state_spec = false;
-   string molcas_order      = "";
+   string molcas_2rdm      = "";
+   string molcas_3rdm      = "";
+   string molcas_f4rdm     = "";
+   string molcas_fock      = "";
+   bool   molcas_fiedler   = false;
+   bool   molcas_mps       = false;
+   bool   molcas_state_avg = false;
+   string molcas_order     = "";
 
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
@@ -560,14 +560,14 @@ int main( int argc, char ** argv ){
       if ( find_character( &scf_active_space, line, "SCF_ACTIVE_SPACE", options1, 4 ) == false ){ return clean_exit( -1 ); }
       if ( find_character( &caspt2_orbs,      line, "CASPT2_ORBS",      options2, 2 ) == false ){ return clean_exit( -1 ); }
 
-      if ( find_boolean( &molcas_fiedler,    line, "MOLCAS_FIEDLER"    ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &molcas_mps,        line, "MOLCAS_MPS"        ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &molcas_state_spec, line, "MOLCAS_STATE_SPEC" ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &scf_state_avg,     line, "SCF_STATE_AVG"     ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_calc,       line, "CASPT2_CALC"       ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_checkpt,    line, "CASPT2_CHECKPT"    ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &caspt2_cumul,      line, "CASPT2_CUMUL"      ) == false ){ return clean_exit( -1 ); }
-      if ( find_boolean( &print_corr,        line, "PRINT_CORR"        ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_fiedler,   line, "MOLCAS_FIEDLER"   ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_mps,       line, "MOLCAS_MPS"       ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &molcas_state_avg, line, "MOLCAS_STATE_AVG" ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &scf_state_avg,    line, "SCF_STATE_AVG"    ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_calc,      line, "CASPT2_CALC"      ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_checkpt,   line, "CASPT2_CHECKPT"   ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &caspt2_cumul,     line, "CASPT2_CUMUL"     ) == false ){ return clean_exit( -1 ); }
+      if ( find_boolean( &print_corr,       line, "PRINT_CORR"       ) == false ){ return clean_exit( -1 ); }
 
       if ( line.find( "SWEEP_STATES" ) != string::npos ){
          const int pos = line.find( "=" ) + 1;
@@ -790,7 +790,7 @@ int main( int argc, char ** argv ){
       cout << "   MOLCAS_FIEDLER     = " << (( molcas_fiedler ) ? "TRUE" : "FALSE" ) << endl;
    }
       cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
-      cout << "   MOLCAS_STATE_SPEC  = " << (( molcas_state_spec ) ? "TRUE" : "FALSE" ) << endl;
+      cout << "   MOLCAS_STATE_AVG   = " << (( molcas_state_avg ) ? "TRUE" : "FALSE" ) << endl;
    } else {
       cout << "   SCF_STATE_AVG      = " << (( scf_state_avg ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   SCF_DIIS_THR       = " << scf_diis_thr << endl;
@@ -871,7 +871,7 @@ int main( int argc, char ** argv ){
          if (( state == 0 ) && ( excitation > 0 )){ dmrgsolver->activateExcitations( excitation ); }
 
          // Only if state specific or last state N-RDMs should be calculated
-         if (( molcas_state_spec == true ) || ( state == excitation )){
+         if (( molcas_state_avg == true ) || ( state == excitation )){
 
             const bool calc_3rdm = (( molcas_3rdm.length() != 0 ) || ( molcas_f4rdm.length() != 0 ));
             const bool calc_2rdm = (( print_corr == true ) || ( molcas_2rdm.length() != 0 ));
