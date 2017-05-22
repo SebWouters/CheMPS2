@@ -1,3 +1,7 @@
+#### Current HEAD (2017-05-22):
+* MOLCAS state average CASPT2 interface
+* Update build system for psi4 (thanks @loriab)
+
 #### Version 1.8.3 LTS update (2016-11-15):
 * Custom orbital reordering for MOLCAS interface
 * Fix building PyCheMPS2 (thanks @loriab)
