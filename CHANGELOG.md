@@ -1,5 +1,5 @@
-#### Current HEAD (2017-05-22):
-* MOLCAS state average CASPT2 interface
+#### Version 1.8.4 LTS update (2017-05-23):
+* MOLCAS state average CASPT2 interface (thanks @quanp)
 * Update build system for psi4 (thanks @loriab)
 
 #### Version 1.8.3 LTS update (2016-11-15):
