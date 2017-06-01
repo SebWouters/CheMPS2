@@ -1,6 +1,6 @@
 project (CheMPS2)
 set (CheMPS2_MMP_VERSION   "1.8.4")
-set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION} (2017-05-23)")
+set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-1 (2017-06-01)")
 #set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-15 (2017-05-22)")
 set (CheMPS2_AUTHORS       "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION   "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
@@ -9,7 +9,7 @@ set (CheMPS2_URL           "https://github.com/SebWouters/CheMPS2")
 set (CheMPS2_LICENSE       "GNU General Public License, version 2")
 set (CheMPS2_LIB_SOVERSION 2)
 
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.0.2)
 
 # <<<  CMake includes  >>>
 
