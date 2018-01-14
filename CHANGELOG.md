@@ -1,3 +1,6 @@
+#### Version 1.8.5 LTS update (2018-01-18):
+* Fix build; bump up required CMake (thanks @quanp)
+
 #### Version 1.8.4 LTS update (2017-05-23):
 * MOLCAS state average CASPT2 interface (thanks @quanp)
 * Update build system for psi4 (thanks @loriab)
