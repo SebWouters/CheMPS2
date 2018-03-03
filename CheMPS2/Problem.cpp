@@ -424,10 +424,15 @@ bool CheMPS2::Problem::check_rohf_occ( int * occupancies ){
    int sum_n__tot = 0;
    int sum_2s_tot = 0;
    int sum_i__tot = 0;
+   //Irreps SymmInfo(gSy());
 
    for ( int site = 0; site < gL(); site++ ){
-      if ( occupancies[ site ] < 0 ){ return false; }
-      if ( occupancies[ site ] > 2 ){ return false; }
+      //cout << "Site " << site << " has irrep psi4 = " << gIrrep( site ) << " = " << SymmInfo.getIrrepName( gIrrep( site ) ) << endl;
+      //cout << "Site " << site << " has occupancy  = " << occupancies[ site ] << endl;
+      if (( occupancies[ site ] < 0 ) || ( occupancies[ site ] > 2 )){
+         cout << "Problem::check_rohf_occ() : occupancies[ " << site << " ] = " << occupancies[ site ] << " and should be 0, 1 or 2." << endl;
+         return false;
+      }
       sum_n__tot += occupancies[ site ];
       if ( occupancies[ site ] == 1 ){
          sum_2s_tot += 1;
@@ -435,9 +440,10 @@ bool CheMPS2::Problem::check_rohf_occ( int * occupancies ){
       }
    }
 
-   if ( sum_n__tot != gN()     ){ return false; }
-   if ( sum_2s_tot != gTwoS()  ){ return false; }
-   if ( sum_i__tot != gIrrep() ){ return false; }
+   if (( sum_n__tot != gN() ) || ( sum_2s_tot != gTwoS() ) || ( sum_i__tot != gIrrep() )){
+      cout << "Problem::check_rohf_occ() : occupancies corresponds to ( N, 2S, I ) = ( " << sum_n__tot << ", " << sum_2s_tot << ", " << sum_i__tot << " ), while the DMRG targeted sector is ( N, 2S, I ) = ( " << gN() << ", " << gTwoS() << ", " << gIrrep() << " )." << endl;
+      return false;
+   }
 
    return true;
 

@@ -88,7 +88,7 @@ namespace CheMPS2{
              \param OptSchemeIn The optimization scheme for the DMRG sweeps
              \param makechkpt Whether or not to save MPS checkpoints in the working directory
              \param tmpfolder Temporary folder on a large partition to store the renormalized operators on disk (by default "/tmp")
-             \param occupancies ROHF occupancies of a determinant to enlarge in the initial guess */
+             \param occupancies ROHF occupancies of a determinant to enlarge in the initial guess in HAM order */
          DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn, const bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk, const string tmpfolder=CheMPS2::defaultTMPpath, int * occupancies=NULL);
          
          //! Destructor

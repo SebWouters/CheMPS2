@@ -833,9 +833,6 @@ int main( int argc, char ** argv ){
    }
    if ( molcas_occ.length() > 0 ){
       cout << "   MOLCAS_OCC (HAM)   = [ " << occupancies[ 0 ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << occupancies[ cnt ]; } cout << " ]" << endl;
-   if ( molcas_order.length() > 0 ){
-      cout << "   MOLCAS_OCC (DMRG)  = [ " << occupancies[ dmrg2ham[ 0 ] ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << occupancies[ dmrg2ham[ cnt ] ]; } cout << " ]" << endl;
-   }
    }
       cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   MOLCAS_STATE_AVG   = " << (( molcas_state_avg ) ? "TRUE" : "FALSE" ) << endl;
@@ -858,19 +855,6 @@ int main( int argc, char ** argv ){
       cout << "   PRINT_CORR         = " << (( print_corr     ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   TMP_FOLDER         = " << tmp_folder << endl;
       cout << " " << endl;
-   }
-
-   /************************************************
-   *  Convert OCC (HAM) to OCC (DMRG) if necessary *
-   ************************************************/
-
-   if (( dmrg2ham != NULL ) && ( occupancies != NULL )){
-      int * temp_copy_occ = occupancies;
-      occupancies = new int[ fcidump_norb ];
-      for ( int cnt = 0; cnt < fcidump_norb; cnt++ ){
-         occupancies[ cnt ] = temp_copy_occ[ dmrg2ham[ cnt ] ];
-      }
-      delete [] temp_copy_occ;
    }
 
    /********************************

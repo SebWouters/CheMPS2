@@ -115,8 +115,16 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
 
    if ( loadedMPS ){ loadDIM( MPSstoragename, denBK ); }
 
+   // Convert occupancies from HAM to DMRG orbitals
+   if (( occupancies != NULL ) && ( Prob->gReorder() )){
+      int * tmp_cpy_occ = new int[ L ];
+      for ( int cnt = 0; cnt < L; cnt++ ){ tmp_cpy_occ[ cnt ] = occupancies[ cnt ]; }
+      for ( int cnt = 0; cnt < L; cnt++ ){ occupancies[ cnt ] = tmp_cpy_occ[ Prob->gf2( cnt ) ]; }
+      delete [] tmp_cpy_occ;
+   }
+
    // Set to ROHF dimensions
-   if (( !loadedMPS ) && ( occupancies != NULL )){
+   /*if (( !loadedMPS ) && ( occupancies != NULL )){
       int left_n  = 0;
       int left_i  = 0;
       int left_2s = 0;
@@ -136,7 +144,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
       assert( left_n  == Prob->gN() );
       assert( left_i  == Prob->gIrrep() );
       assert( left_2s == Prob->gTwoS() );
-   }
+   }*/
 
    MPS = new TensorT * [ L ];
    for ( int cnt = 0; cnt < L; cnt++ ){ MPS[ cnt ] = new TensorT( cnt, denBK ); }
