@@ -173,13 +173,28 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
          int left_i  = 0;
          int left_2s = 0;
          for ( int site = 0; site < L; site++ ){
-            int right_n  = left_n + occupancies[ site ];
-            int right_i  = (( occupancies[ site ] == 1 ) ? Irreps::directProd( left_i, Prob->gIrrep( site ) ) : left_i );
-            int right_2s = (( occupancies[ site ] == 1 ) ? ( left_2s + 1 ) : left_2s );
-            if ( am_i_master ){ MPS[ site ]->random(); }
-            double * space = MPS[ site ]->gStorage( left_n, left_2s, left_i, right_n, right_2s, right_i );
-            assert( space != NULL );
-            space[ 0 ] = 42;
+            const int right_n  = left_n + occupancies[ site ];
+            const int right_i  = (( occupancies[ site ] == 1 ) ? Irreps::directProd( left_i, Prob->gIrrep( site ) ) : left_i );
+            const int right_2s = (( occupancies[ site ] == 1 ) ? ( left_2s + 1 ) : left_2s );
+            const int dimL = denBK->gCurrentDim( site,      left_n,  left_2s,  left_i );
+            const int dimR = denBK->gCurrentDim( site + 1, right_n, right_2s, right_i );
+            assert( dimL > 0 );
+            assert( dimR > 0 );
+            if ( am_i_master ){
+               MPS[ site ]->random();
+               for ( int NL = right_n - 2; NL <= right_n; NL++ ){
+                  const int DS = (( right_n == NL + 1 ) ? 1 : 0 );
+                  const int IL = (( right_n == NL + 1 ) ? Irreps::directProd( right_i, Prob->gIrrep( site ) ) : right_i );
+                  for ( int TwoSL = right_2s - DS; TwoSL <= right_2s + DS; TwoSL+=2 ){
+                     const int dimL2 = denBK->gCurrentDim( site, NL, TwoSL, IL );
+                     if ( dimL2 > 0 ){
+                        double * space = MPS[ site ]->gStorage( NL, TwoSL, IL, right_n, right_2s, right_i );
+                        for ( int row = 0; row < dimL2; row++ ){ space[ row + dimL2 * 0 ] = 0.0; }
+                        if (( NL == left_n ) && ( TwoSL == left_2s ) && ( IL == left_i )){ space[ 0 + dimL * 0  ] = 42; }
+                     }
+                  }
+               }
+            }
             left_normalize( MPS[ site ], NULL );
             left_n  = right_n;
             left_i  = right_i;
