@@ -2,10 +2,8 @@ language: cpp
 addons:
   apt:
     sources:
-        # Clang 3.8
-        - llvm-toolchain-precise-3.8
-        # Newer CMake
-        - george-edison55-precise-backports
+        # Clang 5.0
+        - llvm-toolchain-trusty-5.0
         # Newer GCC
         - ubuntu-toolchain-r-test
     packages:
@@ -13,11 +11,9 @@ addons:
         - cmake-data
         - liblapack-dev
         - libhdf5-serial-dev
-        - gcc-4.8
-        - g++-4.8
-        - gcc-5
-        - g++-5
-        - clang-3.8
+        - gcc-7
+        - g++-7
+        - clang-5.0
 env:
     global:
     # should be limited to 4 on travis
@@ -26,9 +22,8 @@ env:
     - VERBOSE=1
     matrix:
     # test three different compilers
-    - OUR_CXX='clang++-3.8' OUR_CC='clang-3.8' BUILD_TYPE='release'
-    - OUR_CXX='g++-4.8' OUR_CC='gcc-4.8' BUILD_TYPE='release'
-    - OUR_CXX='g++-5' OUR_CC='gcc-5' BUILD_TYPE='release'
+    - OUR_CXX='clang++-5.0' OUR_CC='clang-5.0' BUILD_TYPE='release'
+    - OUR_CXX='g++-7' OUR_CC='gcc-7' BUILD_TYPE='release'
 install:
     - mkdir build
     - cd build
