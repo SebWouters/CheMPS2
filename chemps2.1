@@ -101,6 +101,9 @@ When all orbitals are active orbitals, switch on orbital reordering based on the
 .BR "MOLCAS_ORDER = \fIint,int,int,int\fB"
 When all orbitals are active orbitals, provide a custom orbital reordering (default unspecified). When specified, this option takes precedence over MOLCAS_FIEDLER.
 .TP
+.BR "MOLCAS_OCC = \fIint,int,int,int\fB"
+When all orbitals are active orbitals, enlarge an ROHF determinant (default unspecified). The occupancy integers should be 0, 1 or 2 and the orbital ordering convention is FCIDUMP.
+.TP
 .BR "MOLCAS_MPS = \fIbool\fB"
 When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).
 .TP

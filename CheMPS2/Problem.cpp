@@ -23,6 +23,7 @@
 #include <math.h> // fabs
 
 #include "Problem.h"
+#include "Irreps.h"
 #include "MPIchemps2.h"
 
 using std::cout;
@@ -414,6 +415,30 @@ bool CheMPS2::Problem::checkConsistency() const{
       return false;
    }
    
+   return true;
+
+}
+
+bool CheMPS2::Problem::check_rohf_occ( int * occupancies ){
+
+   int sum_n__tot = 0;
+   int sum_2s_tot = 0;
+   int sum_i__tot = 0;
+
+   for ( int site = 0; site < gL(); site++ ){
+      if ( occupancies[ site ] < 0 ){ return false; }
+      if ( occupancies[ site ] > 2 ){ return false; }
+      sum_n__tot += occupancies[ site ];
+      if ( occupancies[ site ] == 1 ){
+         sum_2s_tot += 1;
+         sum_i__tot = Irreps::directProd( sum_i__tot, gIrrep( site ) );
+      }
+   }
+
+   if ( sum_n__tot != gN()     ){ return false; }
+   if ( sum_2s_tot != gTwoS()  ){ return false; }
+   if ( sum_i__tot != gIrrep() ){ return false; }
+
    return true;
 
 }

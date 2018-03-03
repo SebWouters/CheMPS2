@@ -340,6 +340,9 @@ cout << "\n"
 "       MOLCAS_ORDER = int, int, int, int\n"
 "              When all orbitals are active orbitals, provide a custom orbital reordering (default unspecified). When specified, this option takes precedence over MOLCAS_FIEDLER.\n"
 "\n"
+"       MOLCAS_OCC = int, int, int, int\n"
+"              When all orbitals are active orbitals, enlarge an ROHF determinant (default unspecified). The occupancy integers should be 0, 1 or 2 and the orbital ordering convention is FCIDUMP.\n"
+"\n"
 "       MOLCAS_MPS = bool\n"
 "              When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).\n"
 "\n"
@@ -440,6 +443,7 @@ int main( int argc, char ** argv ){
    bool   molcas_mps       = false;
    bool   molcas_state_avg = false;
    string molcas_order     = "";
+   string molcas_occ       = "";
 
    bool   scf_state_avg    = false;
    double scf_diis_thr     = 0.0;
@@ -614,6 +618,11 @@ int main( int argc, char ** argv ){
          molcas_order = line.substr( pos, line.length() - pos );
       }
 
+      if ( line.find( "MOLCAS_OCC" ) != string::npos ){
+         const int pos = line.find( "=" ) + 1;
+         molcas_occ = line.substr( pos, line.length() - pos );
+      }
+
       if ( line.find( "MOLCAS_REORDER" ) != string::npos ){
          if ( am_i_master ){ cerr << "MOLCAS_REORDER is deprecated. Please use MOLCAS_ORDER and/or MOLCAS_FIEDLER." << endl; }
          return clean_exit( -1 );
@@ -752,11 +761,44 @@ int main( int argc, char ** argv ){
    if (( full_active_space_calculation == true ) && ( molcas_order.length() > 0 )){
       const int list_length = count( molcas_order.begin(), molcas_order.end(), ',' ) + 1;
       if ( list_length != fcidump_norb ){
-         if ( am_i_master ){ cerr << "The number of integers specified in MOLCAS_ORDER should equal the number of orbitals in the FCIDUMP file!" << endl; }
+         if ( am_i_master ){ cerr << "The number of integers specified in MOLCAS_ORDER should be equal to the number of orbitals in the FCIDUMP file!" << endl; }
          return clean_exit( -1 );
       }
       dmrg2ham = new int[ fcidump_norb ];
       fetch_ints( molcas_order, dmrg2ham, fcidump_norb );
+   }
+
+   /**********************************
+   *  Parse occupancies if required  *
+   **********************************/
+
+   int * occupancies = NULL;
+   if (( full_active_space_calculation == true ) && ( molcas_occ.length() > 0 )){
+      const int list_length = count( molcas_occ.begin(), molcas_occ.end(), ',' ) + 1;
+      if ( list_length != fcidump_norb ){
+         if ( am_i_master ){ cerr << "The number of integers specified in MOLCAS_OCC should be equal to the number of orbitals in the FCIDUMP file!" << endl; }
+         return clean_exit( -1 );
+      }
+      occupancies = new int[ fcidump_norb ];
+      fetch_ints( molcas_occ, occupancies, fcidump_norb );
+      int occ_n_tot = 0;
+      int occ_2s_tot = 0;
+      for ( int cnt = 0; cnt < fcidump_norb; cnt++ ){
+         if (( occupancies[ cnt ] < 0 ) || ( occupancies[ cnt ] > 2 )){
+            if ( am_i_master ){ cerr << "The integers specified in MOLCAS_OCC should be 0, 1 or 2!" << endl; }
+            return clean_exit( -1 );
+         }
+         occ_n_tot += occupancies[ cnt ];
+         if ( occupancies[ cnt ] == 1 ){ occ_2s_tot += 1; }
+      }
+      if ( occ_n_tot != nelectrons ){
+         if ( am_i_master ){ cerr << "The sum of the integers specified in MOLCAS_OCC should be equal to the number of electrons specified in the FCIDUMP file!" << endl; }
+         return clean_exit( -1 );
+      }
+      if ( ( occ_2s_tot + 1 ) != multiplicity ){
+         if ( am_i_master ){ cerr << "The number of singly occupied orbitals in MOLCAS_OCC should be equal to the value 2S specified in the FCIDUMP file!" << endl; }
+         return clean_exit( -1 );
+      }
    }
 
    /**********************
@@ -789,6 +831,12 @@ int main( int argc, char ** argv ){
    } else {
       cout << "   MOLCAS_FIEDLER     = " << (( molcas_fiedler ) ? "TRUE" : "FALSE" ) << endl;
    }
+   if ( molcas_occ.length() > 0 ){
+      cout << "   MOLCAS_OCC (HAM)   = [ " << occupancies[ 0 ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << occupancies[ cnt ]; } cout << " ]" << endl;
+   if ( molcas_order.length() > 0 ){
+      cout << "   MOLCAS_OCC (DMRG)  = [ " << occupancies[ dmrg2ham[ 0 ] ]; for ( int cnt = 1; cnt < fcidump_norb; cnt++ ){ cout << " ; " << occupancies[ dmrg2ham[ cnt ] ]; } cout << " ]" << endl;
+   }
+   }
       cout << "   MOLCAS_MPS         = " << (( molcas_mps ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   MOLCAS_STATE_AVG   = " << (( molcas_state_avg ) ? "TRUE" : "FALSE" ) << endl;
    } else {
@@ -810,6 +858,19 @@ int main( int argc, char ** argv ){
       cout << "   PRINT_CORR         = " << (( print_corr     ) ? "TRUE" : "FALSE" ) << endl;
       cout << "   TMP_FOLDER         = " << tmp_folder << endl;
       cout << " " << endl;
+   }
+
+   /************************************************
+   *  Convert OCC (HAM) to OCC (DMRG) if necessary *
+   ************************************************/
+
+   if (( dmrg2ham != NULL ) && ( occupancies != NULL )){
+      int * temp_copy_occ = occupancies;
+      occupancies = new int[ fcidump_norb ];
+      for ( int cnt = 0; cnt < fcidump_norb; cnt++ ){
+         occupancies[ cnt ] = temp_copy_occ[ dmrg2ham[ cnt ] ];
+      }
+      delete [] temp_copy_occ;
    }
 
    /********************************
@@ -861,7 +922,8 @@ int main( int argc, char ** argv ){
          delete [] dmrg2ham;
       }
 
-      CheMPS2::DMRG * dmrgsolver = new CheMPS2::DMRG( prob, opt_scheme, molcas_mps, tmp_folder );
+      CheMPS2::DMRG * dmrgsolver = new CheMPS2::DMRG( prob, opt_scheme, molcas_mps, tmp_folder, occupancies );
+      if ( molcas_occ.length() > 0 ){ delete [] occupancies; }
 
       // Solve for the correct root
       double DMRG_ENERGY;

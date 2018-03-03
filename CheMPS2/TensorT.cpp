@@ -167,7 +167,7 @@ void CheMPS2::TensorT::sBK( const SyBookkeeper * newBK ){ denBK = newBK; }
 void CheMPS2::TensorT::random(){
 
    for ( int cnt = 0; cnt < kappa2index[ nKappa ]; cnt++ ){
-      storage[ cnt ] = ((double) rand()) / RAND_MAX;
+      storage[ cnt ] = ( 2 * ( (double) rand() ) / RAND_MAX ) - 1.0; // Value in [-1,1[
    }
 
 }

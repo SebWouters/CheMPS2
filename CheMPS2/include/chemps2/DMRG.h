@@ -87,8 +87,9 @@ namespace CheMPS2{
          /** \param Probin The problem to be solved
              \param OptSchemeIn The optimization scheme for the DMRG sweeps
              \param makechkpt Whether or not to save MPS checkpoints in the working directory
-             \param tmpfolder Temporary folder on a large partition to store the renormalized operators on disk (by default "/tmp") */
-         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn, const bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk, const string tmpfolder=CheMPS2::defaultTMPpath);
+             \param tmpfolder Temporary folder on a large partition to store the renormalized operators on disk (by default "/tmp")
+             \param occupancies ROHF occupancies of a determinant to enlarge in the initial guess */
+         DMRG(Problem * Probin, ConvergenceScheme * OptSchemeIn, const bool makechkpt=CheMPS2::DMRG_storeMpsOnDisk, const string tmpfolder=CheMPS2::defaultTMPpath, int * occupancies=NULL);
          
          //! Destructor
          virtual ~DMRG();
@@ -159,8 +160,8 @@ namespace CheMPS2{
       private:
       
          //Setup the DMRG SyBK and MPS (in separate function to allow pushbacks and recreations for excited states)
-         void setupBookkeeperAndMPS();
-      
+         void setupBookkeeperAndMPS( int * occupancies=NULL );
+
          //! DMRG MPS + virt. dim. storage filename
          string MPSstoragename;
          

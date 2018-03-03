@@ -33,7 +33,7 @@
 using std::cout;
 using std::endl;
 
-CheMPS2::DMRG::DMRG( Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder ){
+CheMPS2::DMRG::DMRG( Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bool makechkpt, const string tmpfolder, int * occupancies ){
 
    #ifdef CHEMPS2_MPI_COMPILATION
       if ( MPIchemps2::mpi_rank() == MPI_CHEMPS2_MASTER ){ PrintLicense(); }
@@ -93,12 +93,12 @@ CheMPS2::DMRG::DMRG( Problem * ProbIn, ConvergenceScheme * OptSchemeIn, const bo
    makecheckpoints = makechkpt;
    tempfolder = tmpfolder;
    
-   setupBookkeeperAndMPS();
+   setupBookkeeperAndMPS( occupancies );
    PreSolve();
 
 }
 
-void CheMPS2::DMRG::setupBookkeeperAndMPS(){
+void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
 
    denBK = new SyBookkeeper( Prob, OptScheme->get_D( 0 ) );
    assert( denBK->IsPossible() );
@@ -131,9 +131,32 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS(){
       #else
          const bool am_i_master = true;
       #endif
-      for ( int site = 0; site < L; site++ ){
-         if ( am_i_master ){ MPS[ site ]->random(); }
-         left_normalize( MPS[ site ], NULL );
+      if ( occupancies == NULL ){
+         for ( int site = 0; site < L; site++ ){
+            if ( am_i_master ){ MPS[ site ]->random(); }
+            left_normalize( MPS[ site ], NULL );
+         }
+      } else {
+         assert( Prob->check_rohf_occ( occupancies ) ); // Check compatibility
+         int left_n  = 0;
+         int left_i  = 0;
+         int left_2s = 0;
+         for ( int site = 0; site < L; site++ ){
+            int right_n  = left_n + occupancies[ site ];
+            int right_i  = (( occupancies[ site ] == 1 ) ? Irreps::directProd( left_i, Prob->gIrrep( site ) ) : left_i );
+            int right_2s = (( occupancies[ site ] == 1 ) ? ( left_2s + 1 ) : left_2s );
+            if ( am_i_master ){ MPS[ site ]->random(); }
+            double * space = MPS[ site ]->gStorage( left_n, left_2s, left_i, right_n, right_2s, right_i );
+            assert( space != NULL );
+            space[ 0 ] = 100.0;
+            left_normalize( MPS[ site ], NULL );
+            left_n  = right_n;
+            left_i  = right_i;
+            left_2s = right_2s;
+         }
+         assert( left_n  == Prob->gN() );
+         assert( left_i  == Prob->gIrrep() );
+         assert( left_2s == Prob->gTwoS() );
       }
    }
 

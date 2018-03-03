@@ -1,3 +1,6 @@
+#### Current HEAD:
+* Enlarge ROHF determinant in initial guess (for @quanp)
+
 #### Version 1.8.5 LTS update (2018-01-18):
 * Fix build; bump up required CMake (thanks @quanp)
 
