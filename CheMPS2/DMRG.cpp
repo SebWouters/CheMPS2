@@ -115,6 +115,29 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
 
    if ( loadedMPS ){ loadDIM( MPSstoragename, denBK ); }
 
+   // Set to ROHF dimensions
+   if (( !loadedMPS ) && ( occupancies != NULL )){
+      int left_n  = 0;
+      int left_i  = 0;
+      int left_2s = 0;
+      for ( int site = 0; site < denBK->gL(); site++ ){
+         for ( int N = denBK->gNmin( site ); N <= denBK->gNmax( site ); N++ ){
+            for ( int TwoS = denBK->gTwoSmin( site, N ); TwoS <= denBK->gTwoSmax( site, N ); TwoS+=2 ){
+               for ( int Irrep = 0; Irrep < denBK->getNumberOfIrreps(); Irrep++ ){
+                  denBK->SetDim( site, N, TwoS, Irrep, 0 );
+               }
+            }
+         }
+         denBK->SetDim( site, left_n, left_2s, left_i, 1 );
+         left_n  = left_n + occupancies[ site ];
+         left_i  = (( occupancies[ site ] == 1 ) ? Irreps::directProd( left_i, Prob->gIrrep( site ) ) : left_i );
+         left_2s = (( occupancies[ site ] == 1 ) ? ( left_2s + 1 ) : left_2s );
+      }
+      assert( left_n  == Prob->gN() );
+      assert( left_i  == Prob->gIrrep() );
+      assert( left_2s == Prob->gTwoS() );
+   }
+
    MPS = new TensorT * [ L ];
    for ( int cnt = 0; cnt < L; cnt++ ){ MPS[ cnt ] = new TensorT( cnt, denBK ); }
 
@@ -148,7 +171,7 @@ void CheMPS2::DMRG::setupBookkeeperAndMPS( int * occupancies ){
             if ( am_i_master ){ MPS[ site ]->random(); }
             double * space = MPS[ site ]->gStorage( left_n, left_2s, left_i, right_n, right_2s, right_i );
             assert( space != NULL );
-            space[ 0 ] = 100.0;
+            space[ 0 ] = 42;
             left_normalize( MPS[ site ], NULL );
             left_n  = right_n;
             left_i  = right_i;
