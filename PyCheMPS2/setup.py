@@ -33,7 +33,7 @@ def get_depends(dirname):
 
 setup(
     name='CheMPS2',
-    version='1.8.5',
+    version='1.8.6',
     description='A spin-adapted implementation of DMRG for ab initio quantum chemistry',
     author='Sebastian Wouters',
     author_email='sebastianwouters@gmail.com',

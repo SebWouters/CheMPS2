@@ -1,6 +1,6 @@
 .\" Manpage for chemps2 executable
 .\" Contact sebastianwouters [at] gmail.com
-.TH CHEMPS2 1 "23 May 2017" "version 1.8.5" "chemps2 v1.8.5"
+.TH CHEMPS2 1 "16 March 2018" "version 1.8.6" "chemps2 v1.8.6"
 
 .SH NAME
 chemps2 \- spin-adapted DMRG for ab initio quantum chemistry
@@ -102,7 +102,7 @@ When all orbitals are active orbitals, switch on orbital reordering based on the
 When all orbitals are active orbitals, provide a custom orbital reordering (default unspecified). When specified, this option takes precedence over MOLCAS_FIEDLER.
 .TP
 .BR "MOLCAS_OCC = \fIint,int,int,int\fB"
-When all orbitals are active orbitals, enlarge an ROHF determinant (default unspecified). The occupancy integers should be 0, 1 or 2 and the orbital ordering convention is FCIDUMP.
+When all orbitals are active orbitals, set initial guess to an ROHF determinant (default unspecified). The occupancy integers should be 0, 1 or 2 and the orbital ordering convention is FCIDUMP.
 .TP
 .BR "MOLCAS_MPS = \fIbool\fB"
 When all orbitals are active orbitals, switch on the creation of MPS checkpoints (TRUE or FALSE; default FALSE).
