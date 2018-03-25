@@ -1,3 +1,6 @@
+#### Version 1.8.7 LTS update (2018-03-25):
+* Bump up SO version from 2 to 3
+
 #### Version 1.8.6 LTS update (2018-03-16):
 * Set initial guess to an ROHF determinant (for @quanp)
 
