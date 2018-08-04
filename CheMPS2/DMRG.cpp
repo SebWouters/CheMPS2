@@ -341,6 +341,7 @@ double CheMPS2::DMRG::Solve(){
       if ( am_i_master ){
          cout << "***  Information on completed instruction " << instruction << ":" << endl;
          cout << "***     The reduced virtual dimension DSU(2)               = " << OptScheme->get_D(instruction) << endl;
+         cout << "***     Number of MPS variables                            = " << get_num_mps_var() << endl;
          cout << "***     Minimum energy encountered during all instructions = " << TotalMinEnergy << endl;
          cout << "***     Minimum energy encountered during the last sweep   = " << LastMinEnergy << endl;
          cout << "***     Maximum discarded weight during the last sweep     = " << MaxDiscWeightLastSweep << endl;
@@ -447,6 +448,16 @@ double CheMPS2::DMRG::solve_site( const int index, const double dvdson_rtol, con
    timings[ CHEMPS2_TIME_S_SPLIT ] += ( end.tv_sec - start.tv_sec ) + 1e-6 * ( end.tv_usec - start.tv_usec );
 
    return Energy;
+
+}
+
+int CheMPS2::DMRG::get_num_mps_var() const{
+
+   int num_var = 0;
+   for ( int site = 0; site < L; site++ ){
+      num_var += MPS[ site ]->gKappa2index( MPS[ site ]->gNKappa() );
+   }
+   return num_var;
 
 }
 

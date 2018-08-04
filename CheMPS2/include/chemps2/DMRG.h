@@ -156,6 +156,9 @@ namespace CheMPS2{
          
          //! Print the license
          static void PrintLicense();
+
+         //! Get the number of MPS variables
+         int get_num_mps_var() const;
          
       private:
       
