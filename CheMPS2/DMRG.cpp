@@ -341,7 +341,7 @@ double CheMPS2::DMRG::Solve(){
       if ( am_i_master ){
          cout << "***  Information on completed instruction " << instruction << ":" << endl;
          cout << "***     The reduced virtual dimension DSU(2)               = " << OptScheme->get_D(instruction) << endl;
-         cout << "***     Number of MPS variables                            = " << get_num_mps_var() << endl;
+         cout << "***     The total number of reduced MPS variables          = " << get_num_mps_var() << endl;
          cout << "***     Minimum energy encountered during all instructions = " << TotalMinEnergy << endl;
          cout << "***     Minimum energy encountered during the last sweep   = " << LastMinEnergy << endl;
          cout << "***     Maximum discarded weight during the last sweep     = " << MaxDiscWeightLastSweep << endl;
