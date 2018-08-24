@@ -14,6 +14,12 @@
 #   LAPACK_FOUND
 #   LAPACK_LIBRARIES
 #
+# In order of decreasing precedence, this module returns in a target ``tgt::lapack``
+#  (1) the libraries passed through CMake variable LAPACK_LIBRARIES,
+#  (2) the libraries defined in a detectable TargetLAPACKConfig.cmake file
+#      (skip via DISABLE_FIND_PACKAGE_TargetLAPACK), or
+#  (3) the libraries detected by the usual FindLAPACK.cmake module.
+#
 
 set(PN TargetLAPACK)
 
@@ -27,7 +33,9 @@ if (LAPACK_LIBRARIES)
     set_property (TARGET tgt::lapack PROPERTY INTERFACE_LINK_LIBRARIES ${LAPACK_LIBRARIES})
 else()
     # 2nd precedence - target already prepared and findable in TargetLAPACKConfig.cmake
-    find_package (TargetLAPACK QUIET CONFIG)
+    if (NOT "${DISABLE_FIND_PACKAGE_${PN}}")
+        find_package (TargetLAPACK QUIET CONFIG)
+    endif()
     if (TARGET tgt::lapack)
         if (NOT ${PN}_FIND_QUIETLY)
             message (STATUS "TargetLAPACKConfig detected.")
