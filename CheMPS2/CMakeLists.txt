@@ -72,8 +72,8 @@ endif()
 
 if (NOT STATIC_ONLY)
     add_library           (chemps2-shared SHARED  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT}
-                                                  tgt::lapack
+    target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
+    target_link_libraries (chemps2-shared PUBLIC  tgt::lapack
                                                   tgt::hdf5)
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
                                                      MACOSX_RPATH ON
@@ -83,8 +83,8 @@ endif()
 
 if (NOT SHARED_ONLY)
     add_library           (chemps2-static STATIC  $<TARGET_OBJECTS:chemps2-base>)
-    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT}
-                                                  tgt::lapack
+    target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
+    target_link_libraries (chemps2-static PUBLIC  tgt::lapack
                                                   tgt::hdf5)
     set_target_properties (chemps2-static PROPERTIES OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
