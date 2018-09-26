@@ -1,3 +1,6 @@
+#### Version 1.8.8 LTS update (2018-09-26):
+* Print the number of MPS variables
+
 #### Version 1.8.7 LTS update (2018-03-25):
 * Bump up SO version from 2 to 3
 
