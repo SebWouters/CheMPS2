@@ -1,3 +1,6 @@
+#### Version 1.8.9 LTS update (2018-10-29):
+* Bug fix long double literal Wigner.cpp
+
 #### Version 1.8.8 LTS update (2018-09-26):
 * Print the number of MPS variables
 
