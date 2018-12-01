@@ -1,0 +1,25 @@
+
+FCIDUMP = /path/to/H2O.631G.FCIDUMP
+GROUP   = 5
+
+MULTIPLICITY = 1
+NELECTRONS   = 10
+IRREP        = 0
+EXCITATION   = 0
+
+SWEEP_STATES       = 240,   240,   120,   60,    30
+SWEEP_ENERGY_CONV  = 1e-5,  1e-10, 1e-10, 1e-10, 1e-10
+SWEEP_MAX_SWEEPS   = 3,     10,    10,    10,    10
+SWEEP_NOISE_PREFAC = 0.03,  0.0,   0.0,   0.0,   0.0
+SWEEP_DVDSON_RTOL  = 1e-3,  1e-8,  1e-8,  1e-8,  1e-8
+
+NOCC = 0, 0, 0, 0
+NACT = 7, 0, 4, 2
+NVIR = 0, 0, 0, 0
+
+MOLCAS_OCC = 2, 2, 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0
+
+PRINT_CORR = FALSE
+TMP_FOLDER = /tmp
+ 
+
