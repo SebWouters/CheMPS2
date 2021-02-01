@@ -2,18 +2,15 @@ language: cpp
 addons:
   apt:
     sources:
-        # Clang 5.0
-        - llvm-toolchain-trusty-5.0
-        # Newer GCC
         - ubuntu-toolchain-r-test
     packages:
         - cmake
         - cmake-data
         - liblapack-dev
         - libhdf5-serial-dev
-        - gcc-7
-        - g++-7
-        - clang-5.0
+        - g++
+        - gcc
+        - clang
 env:
     global:
     # should be limited to 4 on travis
@@ -21,9 +18,9 @@ env:
     # make cmake verbose
     - VERBOSE=1
     matrix:
-    # test three different compilers
-    - OUR_CXX='clang++-5.0' OUR_CC='clang-5.0' BUILD_TYPE='release'
-    - OUR_CXX='g++-7' OUR_CC='gcc-7' BUILD_TYPE='release'
+    # test two different compilers
+    - OUR_CXX='clang++' OUR_CC='clang' BUILD_TYPE='release'
+    - OUR_CXX='g++' OUR_CC='gcc' BUILD_TYPE='release'
 install:
     - mkdir build
     - cd build
