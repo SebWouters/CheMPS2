@@ -1,6 +1,6 @@
 project (CheMPS2)
-set (CheMPS2_MMP_VERSION   "1.8.9")
-set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-1 (2018-12-01)")
+set (CheMPS2_MMP_VERSION   "1.8.10")
+set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION} (2021-02-01)")
 #set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION}-15 (2017-05-22)")
 set (CheMPS2_AUTHORS       "Sebastian Wouters")
 set (CheMPS2_DESCRIPTION   "A spin-adapted implementation of DMRG for ab initio quantum chemistry")
@@ -37,6 +37,9 @@ set (CMAKE_MODULE_PATH       ${CMAKE_MODULE_PATH} "${CheMPS2_SOURCE_DIR}/CMake/"
 if (STATIC_ONLY AND SHARED_ONLY)
     message (FATAL_ERROR "The options STATIC_ONLY=ON and SHARED_ONLY=ON are conflicting." )
 endif()
+
+# <<<  Build with HDF5 1.10 API: CheMPS2 does not support HDF5 1.12 API  >>>
+add_definitions(-DH5_USE_110_API)
 
 # <<<  Enable MPI  >>>
 

@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2018 Sebastian Wouters
+   Copyright (C) 2013-2021 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,9 +25,10 @@
 #include <iostream>
 #include <sstream>
 
+#include <hdf5.h>
+
 #include "ThreeDM.h"
 #include "Lapack.h"
-#include "MyHDF5.h"
 #include "Options.h"
 #include "MPIchemps2.h"
 #include "Wigner.h"
