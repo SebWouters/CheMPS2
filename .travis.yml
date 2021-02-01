@@ -19,13 +19,14 @@ env:
     - VERBOSE=1
     matrix:
     # test two different compilers
-    - OUR_CXX='clang++' OUR_CC='clang' BUILD_TYPE='release'
-    - OUR_CXX='g++' OUR_CC='gcc' BUILD_TYPE='release'
+    - OUR_CXX=clang++ OUR_CC=clang BUILD_TYPE=Release
+    - OUR_CXX=g++ OUR_CC=gcc BUILD_TYPE=Release
 install:
     - mkdir build
     - cd build
     - cmake -DCMAKE_C_COMPILER=$OUR_CC -DCMAKE_CXX_COMPILER=$OUR_CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
     - make
 script:
+    - if [[ $CXX == "clang++" ]]; then export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH; fi
     # we put a timeout of 90 minutes
     - travis_wait 90 make test ARGS="-V"
