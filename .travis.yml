@@ -1,4 +1,7 @@
 language: cpp
+os: linux
+dist: bionic
+
 addons:
   apt:
     sources:
@@ -8,8 +11,8 @@ addons:
         - cmake-data
         - liblapack-dev
         - libhdf5-serial-dev
-        - g++
-        - gcc
+        - g++-9
+        - gcc-9
         - clang
 env:
     global:
@@ -19,14 +22,16 @@ env:
     - VERBOSE=1
     matrix:
     # test two different compilers
-    - OUR_CXX=clang++ OUR_CC=clang BUILD_TYPE=Release
-    - OUR_CXX=g++ OUR_CC=gcc BUILD_TYPE=Release
+    - MATRIX_EVAL="CXX=clang++ && CC=clang"
+    - MATRIX_EVAL="CXX=g++-9 && CC=gcc-9"
+before_install:
+    - eval "${MATRIX_EVAL}"
+    - if [[ $CXX == "clang++" ]]; then export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH; fi
 install:
     - mkdir build
     - cd build
-    - cmake -DCMAKE_C_COMPILER=$OUR_CC -DCMAKE_CXX_COMPILER=$OUR_CXX -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+    - cmake -DCMAKE_BUILD_TYPE=Release ..
     - make
 script:
-    - if [[ $CXX == "clang++" ]]; then export LD_LIBRARY_PATH=/usr/local/clang/lib:$LD_LIBRARY_PATH; fi
     # we put a timeout of 90 minutes
     - travis_wait 90 make test ARGS="-V"
