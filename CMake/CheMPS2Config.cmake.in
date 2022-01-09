@@ -148,7 +148,7 @@ if(NOT TARGET ${PN}::chemps2)
 
     include(CMakeFindDependencyMacro)
     if(NOT TARGET tgt::hdf5)
-        find_dependency(TargetHDF5 @TargetHDF5_VERSION@ EXACT)
+        find_dependency(TargetHDF5 @TargetHDF5_VERSION@) # minimum version is HDF5 version of CheMPS2 build
     endif()
 endif()
 
