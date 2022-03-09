@@ -1,6 +1,6 @@
 /*
    CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-   Copyright (C) 2013-2018 Sebastian Wouters
+   Copyright (C) 2013-2022 Sebastian Wouters
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -73,13 +73,13 @@ namespace CheMPS2{
       private:
 
          // List of square roots of factorials
-         static const long double sqrt_fact[ CHEMPS2_WIGNER_FACTORIAL_MAX + 1 ];
+         static const double sqrt_fact[ CHEMPS2_WIGNER_FACTORIAL_MAX + 1 ];
 
          // Test triangle conditions
          static bool triangle_fails( const int two_ja, const int two_jb, const int two_jc );
 
          // Delta function for the Wigner-6j terms
-         static long double sqrt_delta( const int two_ja, const int two_jb, const int two_jc );
+         static double sqrt_delta( const int two_ja, const int two_jb, const int two_jc );
 
    };
 }

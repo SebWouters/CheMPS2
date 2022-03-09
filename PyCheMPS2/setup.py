@@ -1,7 +1,7 @@
 #!/usr/bin/env
 #
 #   CheMPS2: a spin-adapted implementation of DMRG for ab initio quantum chemistry
-#   Copyright (C) 2013-2021 Sebastian Wouters
+#   Copyright (C) 2013-2022 Sebastian Wouters
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ def get_depends(dirname):
 
 setup(
     name='CheMPS2',
-    version='1.8.11',
+    version='1.8.12',
     description='A spin-adapted implementation of DMRG for ab initio quantum chemistry',
     author='Sebastian Wouters',
     author_email='sebastianwouters@gmail.com',

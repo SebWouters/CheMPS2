@@ -1,3 +1,13 @@
+#### Version 1.8.12 LTS update (2022-03-09):
+* Use double instead of long double in Wigner:
+  max diff {2j <= 95} = 2.37707e-12
+
+#### Version 1.8.11 LTS update (2022-01-09):
+* Don't require exact HDF5 version
+
+#### Version 1.8.10 LTS update (2021-02-01):
+* Fix building with HDF5 1.12
+
 #### Version 1.8.9 LTS update (2018-10-29):
 * Bug fix long double literal Wigner.cpp
 
