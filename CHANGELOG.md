@@ -1,6 +1,10 @@
 #### Version 1.8.12 LTS update (2022-03-09):
 * Use double instead of long double in Wigner:
-  max diff {2j <= 95} = 2.37707e-12
+  max(abs(diff(wigner6j(2ja, 2jb, 2jc, 2jd, 2je, 2jf))))
+    2j <= 95, clang : 6.90446e-12
+    2j <= 95, gcc   : 7.01087e-12
+    2j <= 40, clang : 2.16754e-15
+    2j <= 40, gcc   : 1.99840e-15
 
 #### Version 1.8.11 LTS update (2022-01-09):
 * Don't require exact HDF5 version
