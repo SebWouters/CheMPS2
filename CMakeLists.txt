@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.0...4.0)
+
 project (CheMPS2)
 set (CheMPS2_MMP_VERSION   "1.8.12")
 set (CheMPS2_VERSION       "${CheMPS2_MMP_VERSION} (2022-03-09)")
@@ -8,8 +10,6 @@ set (CheMPS2_EMAIL         "sebastianwouters@gmail.com")
 set (CheMPS2_URL           "https://github.com/SebWouters/CheMPS2")
 set (CheMPS2_LICENSE       "GNU General Public License, version 2")
 set (CheMPS2_LIB_SOVERSION 3)
-
-cmake_minimum_required (VERSION 3.0.2)
 
 # <<<  CMake includes  >>>
 
