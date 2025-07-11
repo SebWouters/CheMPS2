@@ -45,6 +45,10 @@ add_definitions(-DH5_USE_110_API)
 # <<<  Enable MPI  >>>
 
 if (WITH_MPI)
+    find_package (MPI)
+    if (NOT MPI_FOUND)
+        message (FATAL_ERROR "Could not find MPI.")
+    endif()
     add_definitions (-DCHEMPS2_MPI_COMPILATION)
 endif ()
 

@@ -161,6 +161,7 @@ int main(void){
    #ifdef CHEMPS2_MPI_COMPILATION
    CheMPS2::MPIchemps2::broadcast_array_double( E_fci, num_sectors, MPI_CHEMPS2_MASTER );
    CheMPS2::MPIchemps2::broadcast_array_double( C_dev, num_sectors, MPI_CHEMPS2_MASTER );
+   CheMPS2::MPIchemps2::broadcast_array_double( S_fci, num_sectors, MPI_CHEMPS2_MASTER );
    #endif
 
    // Clean up the Hamiltonian
