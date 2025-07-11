@@ -28,6 +28,7 @@ option (ENABLE_TESTS         "Compile the tests"                       ON)
 option (ENABLE_XHOST         "Enable processor-specific optimizations" ON)
 option (ENABLE_GENERIC       "Enable mostly static linking in shared library" OFF)
 option (ENABLE_OPENMP        "Enable OpenMP parallelization"           ON)
+option (ENABLE_IPO           "Enable IPO"                              ON)
 option (WITH_MPI             "Build the library with MPI"              OFF)
 option (BUILD_FPIC           "Static library in STATIC_ONLY will be compiled with position independent code" OFF)
 
@@ -82,14 +83,14 @@ endif()
 
 # <<<  Enable inter-parts / link-time optimization  >>>
 
-check_cxx_compiler_flag (-ipo HAS_IPO)
-if (HAS_IPO)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-endif()
-
-check_cxx_compiler_flag (-flto HAS_FLTO)
-if (HAS_FLTO)
-    set (CMAKE_CXX_FLAGS "-flto ${CMAKE_CXX_FLAGS}")
+if (ENABLE_IPO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT HAS_IPO OUTPUT OUTPUT_IPO)
+    if (HAS_IPO)
+        message(STATUS "IPO is supported.")
+    else()
+        message(WARNING "IPO is not supported: ${OUTPUT_IPO}")
+    endif()
 endif()
 
 # <<<  Enable generic  >>>
