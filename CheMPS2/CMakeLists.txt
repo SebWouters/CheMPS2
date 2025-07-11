@@ -63,6 +63,9 @@ set (CHEMPS2LIB_SOURCE_FILES "CASPT2.cpp"
                              "Wigner.cpp")
 
 add_library (chemps2-base OBJECT ${CHEMPS2LIB_SOURCE_FILES})
+if (HAS_IPO)
+    set_property(TARGET chemps2-base PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 target_include_directories (chemps2-base PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2
                                                  $<TARGET_PROPERTY:tgt::hdf5,INTERFACE_INCLUDE_DIRECTORIES>)
 
@@ -72,6 +75,9 @@ endif()
 
 if (NOT STATIC_ONLY)
     add_library           (chemps2-shared SHARED  $<TARGET_OBJECTS:chemps2-base>)
+    if (HAS_IPO)
+        set_property(TARGET chemps2-shared PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
     target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
     target_link_libraries (chemps2-shared PUBLIC  tgt::lapack
                                                   tgt::hdf5)
@@ -83,6 +89,9 @@ endif()
 
 if (NOT SHARED_ONLY)
     add_library           (chemps2-static STATIC  $<TARGET_OBJECTS:chemps2-base>)
+    if (HAS_IPO)
+        set_property(TARGET chemps2-static PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    endif()
     target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
     target_link_libraries (chemps2-static PUBLIC  tgt::lapack
                                                   tgt::hdf5)
@@ -97,6 +106,9 @@ else ()
 endif()
 
 add_executable             (chemps2-bin executable.cpp)
+if (HAS_IPO)
+    set_property(TARGET chemps2-bin PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 target_link_libraries      (chemps2-bin chemps2-lib ${LIBC_INTERJECT})
 set_target_properties      (chemps2-bin PROPERTIES OUTPUT_NAME "chemps2")
 
