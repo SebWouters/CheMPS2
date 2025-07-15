@@ -68,6 +68,9 @@ if (HAS_IPO)
 endif()
 target_include_directories (chemps2-base PRIVATE ${CheMPS2_SOURCE_DIR}/CheMPS2/include/chemps2
                                                  $<TARGET_PROPERTY:tgt::hdf5,INTERFACE_INCLUDE_DIRECTORIES>)
+if (WITH_MPI)
+    target_link_libraries (chemps2-base PUBLIC MPI::MPI_CXX)
+endif ()
 
 if (BUILD_FPIC OR NOT STATIC_ONLY)
     set_target_properties (chemps2-base PROPERTIES POSITION_INDEPENDENT_CODE 1)
@@ -80,7 +83,8 @@ if (NOT STATIC_ONLY)
     endif()
     target_link_libraries (chemps2-shared PRIVATE ${LIBC_INTERJECT})
     target_link_libraries (chemps2-shared PUBLIC  tgt::lapack
-                                                  tgt::hdf5)
+                                                  tgt::hdf5
+                                                  $<$<BOOL:${WITH_MPI}>:MPI::MPI_CXX>)
     set_target_properties (chemps2-shared PROPERTIES SOVERSION ${CheMPS2_LIB_SOVERSION}
                                                      MACOSX_RPATH ON
                                                      OUTPUT_NAME "chemps2"
@@ -94,7 +98,8 @@ if (NOT SHARED_ONLY)
     endif()
     target_link_libraries (chemps2-static PRIVATE ${LIBC_INTERJECT})
     target_link_libraries (chemps2-static PUBLIC  tgt::lapack
-                                                  tgt::hdf5)
+                                                  tgt::hdf5
+                                                  $<$<BOOL:${WITH_MPI}>:MPI::MPI_CXX>)
     set_target_properties (chemps2-static PROPERTIES OUTPUT_NAME "chemps2"
                                                      EXPORT_NAME "chemps2")
 endif()
